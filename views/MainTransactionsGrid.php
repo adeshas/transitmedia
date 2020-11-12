@@ -28,6 +28,7 @@ loadjs.ready("head", function () {
         ["quantity", [fields.quantity.required ? ew.Validators.required(fields.quantity.caption) : null, ew.Validators.integer], fields.quantity.isInvalid],
         ["start_date", [fields.start_date.required ? ew.Validators.required(fields.start_date.caption) : null, ew.Validators.datetime(5)], fields.start_date.isInvalid],
         ["end_date", [fields.end_date.required ? ew.Validators.required(fields.end_date.caption) : null, ew.Validators.datetime(5)], fields.end_date.isInvalid],
+        ["visible_status_id", [fields.visible_status_id.required ? ew.Validators.required(fields.visible_status_id.caption) : null], fields.visible_status_id.isInvalid],
         ["status_id", [fields.status_id.required ? ew.Validators.required(fields.status_id.caption) : null], fields.status_id.isInvalid],
         ["print_status_id", [fields.print_status_id.required ? ew.Validators.required(fields.print_status_id.caption) : null], fields.print_status_id.isInvalid],
         ["payment_status_id", [fields.payment_status_id.required ? ew.Validators.required(fields.payment_status_id.caption) : null], fields.payment_status_id.isInvalid],
@@ -99,6 +100,8 @@ loadjs.ready("head", function () {
             return false;
         if (ew.valueChanged(fobj, rowIndex, "end_date", false))
             return false;
+        if (ew.valueChanged(fobj, rowIndex, "visible_status_id", false))
+            return false;
         if (ew.valueChanged(fobj, rowIndex, "status_id", false))
             return false;
         if (ew.valueChanged(fobj, rowIndex, "print_status_id", false))
@@ -123,6 +126,7 @@ loadjs.ready("head", function () {
     fmain_transactionsgrid.lists.campaign_id = <?= $Grid->campaign_id->toClientList($Grid) ?>;
     fmain_transactionsgrid.lists.operator_id = <?= $Grid->operator_id->toClientList($Grid) ?>;
     fmain_transactionsgrid.lists.price_id = <?= $Grid->price_id->toClientList($Grid) ?>;
+    fmain_transactionsgrid.lists.visible_status_id = <?= $Grid->visible_status_id->toClientList($Grid) ?>;
     fmain_transactionsgrid.lists.status_id = <?= $Grid->status_id->toClientList($Grid) ?>;
     fmain_transactionsgrid.lists.print_status_id = <?= $Grid->print_status_id->toClientList($Grid) ?>;
     fmain_transactionsgrid.lists.payment_status_id = <?= $Grid->payment_status_id->toClientList($Grid) ?>;
@@ -179,6 +183,9 @@ $Grid->ListOptions->render("header", "left");
 <?php } ?>
 <?php if ($Grid->end_date->Visible) { // end_date ?>
         <th data-name="end_date" class="<?= $Grid->end_date->headerCellClass() ?>"><div id="elh_main_transactions_end_date" class="main_transactions_end_date"><?= $Grid->renderSort($Grid->end_date) ?></div></th>
+<?php } ?>
+<?php if ($Grid->visible_status_id->Visible) { // visible_status_id ?>
+        <th data-name="visible_status_id" class="<?= $Grid->visible_status_id->headerCellClass() ?>"><div id="elh_main_transactions_visible_status_id" class="main_transactions_visible_status_id"><?= $Grid->renderSort($Grid->visible_status_id) ?></div></th>
 <?php } ?>
 <?php if ($Grid->status_id->Visible) { // status_id ?>
         <th data-name="status_id" class="<?= $Grid->status_id->headerCellClass() ?>"><div id="elh_main_transactions_status_id" class="main_transactions_status_id"><?= $Grid->renderSort($Grid->status_id) ?></div></th>
@@ -721,6 +728,75 @@ loadjs.ready(["fmain_transactionsgrid", "datetimepicker"], function() {
 <?php } ?>
 </td>
     <?php } ?>
+    <?php if ($Grid->visible_status_id->Visible) { // visible_status_id ?>
+        <td data-name="visible_status_id" <?= $Grid->visible_status_id->cellAttributes() ?>>
+<?php if ($Grid->RowType == ROWTYPE_ADD) { // Add record ?>
+<span id="el<?= $Grid->RowCount ?>_main_transactions_visible_status_id" class="form-group">
+    <select
+        id="x<?= $Grid->RowIndex ?>_visible_status_id"
+        name="x<?= $Grid->RowIndex ?>_visible_status_id"
+        class="form-control ew-select<?= $Grid->visible_status_id->isInvalidClass() ?>"
+        data-select2-id="main_transactions_x<?= $Grid->RowIndex ?>_visible_status_id"
+        data-table="main_transactions"
+        data-field="x_visible_status_id"
+        data-value-separator="<?= $Grid->visible_status_id->displayValueSeparatorAttribute() ?>"
+        data-placeholder="<?= HtmlEncode($Grid->visible_status_id->getPlaceHolder()) ?>"
+        <?= $Grid->visible_status_id->editAttributes() ?>>
+        <?= $Grid->visible_status_id->selectOptionListHtml("x{$Grid->RowIndex}_visible_status_id") ?>
+    </select>
+    <div class="invalid-feedback"><?= $Grid->visible_status_id->getErrorMessage() ?></div>
+<?= $Grid->visible_status_id->Lookup->getParamTag($Grid, "p_x" . $Grid->RowIndex . "_visible_status_id") ?>
+<script>
+loadjs.ready("head", function() {
+    var el = document.querySelector("select[data-select2-id='main_transactions_x<?= $Grid->RowIndex ?>_visible_status_id']"),
+        options = { name: "x<?= $Grid->RowIndex ?>_visible_status_id", selectId: "main_transactions_x<?= $Grid->RowIndex ?>_visible_status_id", language: ew.LANGUAGE_ID, dir: ew.IS_RTL ? "rtl" : "ltr" };
+    options.dropdownParent = $(el).closest("#ew-modal-dialog, #ew-add-opt-dialog")[0];
+    Object.assign(options, ew.vars.tables.main_transactions.fields.visible_status_id.selectOptions);
+    ew.createSelect(options);
+});
+</script>
+</span>
+<input type="hidden" data-table="main_transactions" data-field="x_visible_status_id" data-hidden="1" name="o<?= $Grid->RowIndex ?>_visible_status_id" id="o<?= $Grid->RowIndex ?>_visible_status_id" value="<?= HtmlEncode($Grid->visible_status_id->OldValue) ?>">
+<?php } ?>
+<?php if ($Grid->RowType == ROWTYPE_EDIT) { // Edit record ?>
+<span id="el<?= $Grid->RowCount ?>_main_transactions_visible_status_id" class="form-group">
+    <select
+        id="x<?= $Grid->RowIndex ?>_visible_status_id"
+        name="x<?= $Grid->RowIndex ?>_visible_status_id"
+        class="form-control ew-select<?= $Grid->visible_status_id->isInvalidClass() ?>"
+        data-select2-id="main_transactions_x<?= $Grid->RowIndex ?>_visible_status_id"
+        data-table="main_transactions"
+        data-field="x_visible_status_id"
+        data-value-separator="<?= $Grid->visible_status_id->displayValueSeparatorAttribute() ?>"
+        data-placeholder="<?= HtmlEncode($Grid->visible_status_id->getPlaceHolder()) ?>"
+        <?= $Grid->visible_status_id->editAttributes() ?>>
+        <?= $Grid->visible_status_id->selectOptionListHtml("x{$Grid->RowIndex}_visible_status_id") ?>
+    </select>
+    <div class="invalid-feedback"><?= $Grid->visible_status_id->getErrorMessage() ?></div>
+<?= $Grid->visible_status_id->Lookup->getParamTag($Grid, "p_x" . $Grid->RowIndex . "_visible_status_id") ?>
+<script>
+loadjs.ready("head", function() {
+    var el = document.querySelector("select[data-select2-id='main_transactions_x<?= $Grid->RowIndex ?>_visible_status_id']"),
+        options = { name: "x<?= $Grid->RowIndex ?>_visible_status_id", selectId: "main_transactions_x<?= $Grid->RowIndex ?>_visible_status_id", language: ew.LANGUAGE_ID, dir: ew.IS_RTL ? "rtl" : "ltr" };
+    options.dropdownParent = $(el).closest("#ew-modal-dialog, #ew-add-opt-dialog")[0];
+    Object.assign(options, ew.vars.tables.main_transactions.fields.visible_status_id.selectOptions);
+    ew.createSelect(options);
+});
+</script>
+</span>
+<?php } ?>
+<?php if ($Grid->RowType == ROWTYPE_VIEW) { // View record ?>
+<span id="el<?= $Grid->RowCount ?>_main_transactions_visible_status_id">
+<span<?= $Grid->visible_status_id->viewAttributes() ?>>
+<?= $Grid->visible_status_id->getViewValue() ?></span>
+</span>
+<?php if ($Grid->isConfirm()) { ?>
+<input type="hidden" data-table="main_transactions" data-field="x_visible_status_id" data-hidden="1" name="fmain_transactionsgrid$x<?= $Grid->RowIndex ?>_visible_status_id" id="fmain_transactionsgrid$x<?= $Grid->RowIndex ?>_visible_status_id" value="<?= HtmlEncode($Grid->visible_status_id->FormValue) ?>">
+<input type="hidden" data-table="main_transactions" data-field="x_visible_status_id" data-hidden="1" name="fmain_transactionsgrid$o<?= $Grid->RowIndex ?>_visible_status_id" id="fmain_transactionsgrid$o<?= $Grid->RowIndex ?>_visible_status_id" value="<?= HtmlEncode($Grid->visible_status_id->OldValue) ?>">
+<?php } ?>
+<?php } ?>
+</td>
+    <?php } ?>
     <?php if ($Grid->status_id->Visible) { // status_id ?>
         <td data-name="status_id" <?= $Grid->status_id->cellAttributes() ?>>
 <?php if ($Grid->RowType == ROWTYPE_ADD) { // Add record ?>
@@ -1233,6 +1309,44 @@ loadjs.ready(["fmain_transactionsgrid", "datetimepicker"], function() {
 <input type="hidden" data-table="main_transactions" data-field="x_end_date" data-hidden="1" name="o<?= $Grid->RowIndex ?>_end_date" id="o<?= $Grid->RowIndex ?>_end_date" value="<?= HtmlEncode($Grid->end_date->OldValue) ?>">
 </td>
     <?php } ?>
+    <?php if ($Grid->visible_status_id->Visible) { // visible_status_id ?>
+        <td data-name="visible_status_id">
+<?php if (!$Grid->isConfirm()) { ?>
+<span id="el$rowindex$_main_transactions_visible_status_id" class="form-group main_transactions_visible_status_id">
+    <select
+        id="x<?= $Grid->RowIndex ?>_visible_status_id"
+        name="x<?= $Grid->RowIndex ?>_visible_status_id"
+        class="form-control ew-select<?= $Grid->visible_status_id->isInvalidClass() ?>"
+        data-select2-id="main_transactions_x<?= $Grid->RowIndex ?>_visible_status_id"
+        data-table="main_transactions"
+        data-field="x_visible_status_id"
+        data-value-separator="<?= $Grid->visible_status_id->displayValueSeparatorAttribute() ?>"
+        data-placeholder="<?= HtmlEncode($Grid->visible_status_id->getPlaceHolder()) ?>"
+        <?= $Grid->visible_status_id->editAttributes() ?>>
+        <?= $Grid->visible_status_id->selectOptionListHtml("x{$Grid->RowIndex}_visible_status_id") ?>
+    </select>
+    <div class="invalid-feedback"><?= $Grid->visible_status_id->getErrorMessage() ?></div>
+<?= $Grid->visible_status_id->Lookup->getParamTag($Grid, "p_x" . $Grid->RowIndex . "_visible_status_id") ?>
+<script>
+loadjs.ready("head", function() {
+    var el = document.querySelector("select[data-select2-id='main_transactions_x<?= $Grid->RowIndex ?>_visible_status_id']"),
+        options = { name: "x<?= $Grid->RowIndex ?>_visible_status_id", selectId: "main_transactions_x<?= $Grid->RowIndex ?>_visible_status_id", language: ew.LANGUAGE_ID, dir: ew.IS_RTL ? "rtl" : "ltr" };
+    options.dropdownParent = $(el).closest("#ew-modal-dialog, #ew-add-opt-dialog")[0];
+    Object.assign(options, ew.vars.tables.main_transactions.fields.visible_status_id.selectOptions);
+    ew.createSelect(options);
+});
+</script>
+</span>
+<?php } else { ?>
+<span id="el$rowindex$_main_transactions_visible_status_id" class="form-group main_transactions_visible_status_id">
+<span<?= $Grid->visible_status_id->viewAttributes() ?>>
+<input type="text" readonly class="form-control-plaintext" value="<?= HtmlEncode(RemoveHtml($Grid->visible_status_id->getDisplayValue($Grid->visible_status_id->ViewValue))) ?>"></span>
+</span>
+<input type="hidden" data-table="main_transactions" data-field="x_visible_status_id" data-hidden="1" name="x<?= $Grid->RowIndex ?>_visible_status_id" id="x<?= $Grid->RowIndex ?>_visible_status_id" value="<?= HtmlEncode($Grid->visible_status_id->FormValue) ?>">
+<?php } ?>
+<input type="hidden" data-table="main_transactions" data-field="x_visible_status_id" data-hidden="1" name="o<?= $Grid->RowIndex ?>_visible_status_id" id="o<?= $Grid->RowIndex ?>_visible_status_id" value="<?= HtmlEncode($Grid->visible_status_id->OldValue) ?>">
+</td>
+    <?php } ?>
     <?php if ($Grid->status_id->Visible) { // status_id ?>
         <td data-name="status_id">
 <?php if (!$Grid->isConfirm()) { ?>
@@ -1432,6 +1546,11 @@ $Grid->ListOptions->render("footer", "left");
     <?php } ?>
     <?php if ($Grid->end_date->Visible) { // end_date ?>
         <td data-name="end_date" class="<?= $Grid->end_date->footerCellClass() ?>"><span id="elf_main_transactions_end_date" class="main_transactions_end_date">
+        &nbsp;
+        </span></td>
+    <?php } ?>
+    <?php if ($Grid->visible_status_id->Visible) { // visible_status_id ?>
+        <td data-name="visible_status_id" class="<?= $Grid->visible_status_id->footerCellClass() ?>"><span id="elf_main_transactions_visible_status_id" class="main_transactions_visible_status_id">
         &nbsp;
         </span></td>
     <?php } ?>

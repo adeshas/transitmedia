@@ -130,6 +130,12 @@ $Page->ListOptions->render("header", "left");
 <?php if ($Page->name->Visible) { // name ?>
         <th data-name="name" class="<?= $Page->name->headerCellClass() ?>"><div id="elh_x_transaction_status_name" class="x_transaction_status_name"><?= $Page->renderSort($Page->name) ?></div></th>
 <?php } ?>
+<?php if ($Page->admin_name->Visible) { // admin_name ?>
+        <th data-name="admin_name" class="<?= $Page->admin_name->headerCellClass() ?>"><div id="elh_x_transaction_status_admin_name" class="x_transaction_status_admin_name"><?= $Page->renderSort($Page->admin_name) ?></div></th>
+<?php } ?>
+<?php if ($Page->operator_name->Visible) { // operator_name ?>
+        <th data-name="operator_name" class="<?= $Page->operator_name->headerCellClass() ?>"><div id="elh_x_transaction_status_operator_name" class="x_transaction_status_operator_name"><?= $Page->renderSort($Page->operator_name) ?></div></th>
+<?php } ?>
 <?php
 // Render list options (header, right)
 $Page->ListOptions->render("header", "right");
@@ -210,6 +216,22 @@ $Page->ListOptions->render("body", "left", $Page->RowCount);
 <span id="el<?= $Page->RowCount ?>_x_transaction_status_name">
 <span<?= $Page->name->viewAttributes() ?>>
 <?= $Page->name->getViewValue() ?></span>
+</span>
+</td>
+    <?php } ?>
+    <?php if ($Page->admin_name->Visible) { // admin_name ?>
+        <td data-name="admin_name" <?= $Page->admin_name->cellAttributes() ?>>
+<span id="el<?= $Page->RowCount ?>_x_transaction_status_admin_name">
+<span<?= $Page->admin_name->viewAttributes() ?>>
+<?= $Page->admin_name->getViewValue() ?></span>
+</span>
+</td>
+    <?php } ?>
+    <?php if ($Page->operator_name->Visible) { // operator_name ?>
+        <td data-name="operator_name" <?= $Page->operator_name->cellAttributes() ?>>
+<span id="el<?= $Page->RowCount ?>_x_transaction_status_operator_name">
+<span<?= $Page->operator_name->viewAttributes() ?>>
+<?= $Page->operator_name->getViewValue() ?></span>
 </span>
 </td>
     <?php } ?>

@@ -905,7 +905,6 @@ class MainUsersAdd extends MainUsers
             $this->vendor_id->ViewCustomAttributes = "";
 
             // reportsto
-            $this->reportsto->ViewValue = $this->reportsto->CurrentValue;
             $curVal = strval($this->reportsto->CurrentValue);
             if ($curVal != "") {
                 $this->reportsto->ViewValue = $this->reportsto->lookupCacheOption($curVal);
@@ -1022,26 +1021,6 @@ class MainUsersAdd extends MainUsers
                 }
                 $this->vendor_id->ViewCustomAttributes = "";
             } elseif (!$Security->isAdmin() && $Security->isLoggedIn() && !$this->userIDAllow("add")) { // Non system admin
-                $this->vendor_id->CurrentValue = CurrentUserID();
-                $curVal = strval($this->vendor_id->CurrentValue);
-                if ($curVal != "") {
-                    $this->vendor_id->EditValue = $this->vendor_id->lookupCacheOption($curVal);
-                    if ($this->vendor_id->EditValue === null) { // Lookup from database
-                        $filterWrk = "\"id\"" . SearchString("=", $curVal, DATATYPE_NUMBER, "");
-                        $sqlWrk = $this->vendor_id->Lookup->getSql(false, $filterWrk, '', $this, true);
-                        $rswrk = Conn()->executeQuery($sqlWrk)->fetchAll(\PDO::FETCH_BOTH);
-                        $ari = count($rswrk);
-                        if ($ari > 0) { // Lookup values found
-                            $arwrk = $this->vendor_id->Lookup->renderViewRow($rswrk[0]);
-                            $this->vendor_id->EditValue = $this->vendor_id->displayValue($arwrk);
-                        } else {
-                            $this->vendor_id->EditValue = $this->vendor_id->CurrentValue;
-                        }
-                    }
-                } else {
-                    $this->vendor_id->EditValue = null;
-                }
-                $this->vendor_id->ViewCustomAttributes = "";
             } else {
                 $curVal = trim(strval($this->vendor_id->CurrentValue));
                 if ($curVal != "") {
@@ -1069,26 +1048,39 @@ class MainUsersAdd extends MainUsers
             // reportsto
             $this->reportsto->EditAttrs["class"] = "form-control";
             $this->reportsto->EditCustomAttributes = "";
-            $this->reportsto->EditValue = HtmlEncode($this->reportsto->CurrentValue);
-            $curVal = strval($this->reportsto->CurrentValue);
-            if ($curVal != "") {
-                $this->reportsto->EditValue = $this->reportsto->lookupCacheOption($curVal);
-                if ($this->reportsto->EditValue === null) { // Lookup from database
-                    $filterWrk = "\"id\"" . SearchString("=", $curVal, DATATYPE_NUMBER, "");
-                    $sqlWrk = $this->reportsto->Lookup->getSql(false, $filterWrk, '', $this, true);
+            if (!$Security->isAdmin() && $Security->isLoggedIn()) { // Non system admin
+                if (trim(strval($this->reportsto->CurrentValue)) == "") {
+                    $filterWrk = "0=1";
+                } else {
+                    $filterWrk = "\"id\"" . SearchString("=", $this->reportsto->CurrentValue, DATATYPE_NUMBER, "");
+                }
+                $sqlWrk = $this->reportsto->Lookup->getSql(true, $filterWrk, '', $this);
+                $rswrk = Conn()->executeQuery($sqlWrk)->fetchAll(\PDO::FETCH_BOTH);
+                $arwrk = $rswrk;
+                $this->reportsto->EditValue = $arwrk;
+            } else {
+                $curVal = trim(strval($this->reportsto->CurrentValue));
+                if ($curVal != "") {
+                    $this->reportsto->ViewValue = $this->reportsto->lookupCacheOption($curVal);
+                } else {
+                    $this->reportsto->ViewValue = $this->reportsto->Lookup !== null && is_array($this->reportsto->Lookup->Options) ? $curVal : null;
+                }
+                if ($this->reportsto->ViewValue !== null) { // Load from cache
+                    $this->reportsto->EditValue = array_values($this->reportsto->Lookup->Options);
+                } else { // Lookup from database
+                    if ($curVal == "") {
+                        $filterWrk = "0=1";
+                    } else {
+                        $filterWrk = "\"id\"" . SearchString("=", $this->reportsto->CurrentValue, DATATYPE_NUMBER, "");
+                    }
+                    $sqlWrk = $this->reportsto->Lookup->getSql(true, $filterWrk, '', $this);
                     $rswrk = Conn()->executeQuery($sqlWrk)->fetchAll(\PDO::FETCH_BOTH);
                     $ari = count($rswrk);
-                    if ($ari > 0) { // Lookup values found
-                        $arwrk = $this->reportsto->Lookup->renderViewRow($rswrk[0]);
-                        $this->reportsto->EditValue = $this->reportsto->displayValue($arwrk);
-                    } else {
-                        $this->reportsto->EditValue = HtmlEncode($this->reportsto->CurrentValue);
-                    }
+                    $arwrk = $rswrk;
+                    $this->reportsto->EditValue = $arwrk;
                 }
-            } else {
-                $this->reportsto->EditValue = null;
+                $this->reportsto->PlaceHolder = RemoveHtml($this->reportsto->caption());
             }
-            $this->reportsto->PlaceHolder = RemoveHtml($this->reportsto->caption());
 
             // Add refer script
 
@@ -1180,9 +1172,6 @@ class MainUsersAdd extends MainUsers
                 $this->reportsto->addErrorMessage(str_replace("%s", $this->reportsto->caption(), $this->reportsto->RequiredErrorMessage));
             }
         }
-        if (!CheckInteger($this->reportsto->FormValue)) {
-            $this->reportsto->addErrorMessage($this->reportsto->getErrorMessage(false));
-        }
 
         // Validate detail grid
         $detailTblVar = explode(",", $this->getCurrentDetailTable());
@@ -1216,6 +1205,18 @@ class MainUsersAdd extends MainUsers
                 $userIdMsg = str_replace("%c", CurrentUserID(), $Language->phrase("UnAuthorizedUserID"));
                 $userIdMsg = str_replace("%u", $this->vendor_id->CurrentValue, $userIdMsg);
                 $this->setFailureMessage($userIdMsg);
+                return false;
+            }
+        }
+
+        // Check if valid Parent User ID
+        $validParentUser = false;
+        if ($Security->currentUserID() != "" && !EmptyValue($this->reportsto->CurrentValue) && !$Security->isAdmin()) { // Non system admin
+            $validParentUser = $Security->isValidUserID($this->reportsto->CurrentValue);
+            if (!$validParentUser) {
+                $parentUserIdMsg = str_replace("%c", CurrentUserID(), $Language->phrase("UnAuthorizedParentUserID"));
+                $parentUserIdMsg = str_replace("%p", $this->reportsto->CurrentValue, $parentUserIdMsg);
+                $this->setFailureMessage($parentUserIdMsg);
                 return false;
             }
         }

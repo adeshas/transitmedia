@@ -108,46 +108,34 @@ $main_campaigns = Container("main_campaigns");
 </td>
         </tr>
 <?php } ?>
-<?php if ($main_campaigns->status_id->Visible) { // status_id ?>
-        <tr id="r_status_id">
-            <td class="<?= $main_campaigns->TableLeftColumnClass ?>"><?= $main_campaigns->status_id->caption() ?></td>
-            <td <?= $main_campaigns->status_id->cellAttributes() ?>>
-<span id="el_main_campaigns_status_id">
-<span<?= $main_campaigns->status_id->viewAttributes() ?>>
-<?= $main_campaigns->status_id->getViewValue() ?></span>
-</span>
-</td>
-        </tr>
-<?php } ?>
-<?php if ($main_campaigns->print_status_id->Visible) { // print_status_id ?>
-        <tr id="r_print_status_id">
-            <td class="<?= $main_campaigns->TableLeftColumnClass ?>"><?= $main_campaigns->print_status_id->caption() ?></td>
-            <td <?= $main_campaigns->print_status_id->cellAttributes() ?>>
-<span id="el_main_campaigns_print_status_id">
-<span<?= $main_campaigns->print_status_id->viewAttributes() ?>>
-<?= $main_campaigns->print_status_id->getViewValue() ?></span>
-</span>
-</td>
-        </tr>
-<?php } ?>
-<?php if ($main_campaigns->payment_status_id->Visible) { // payment_status_id ?>
-        <tr id="r_payment_status_id">
-            <td class="<?= $main_campaigns->TableLeftColumnClass ?>"><?= $main_campaigns->payment_status_id->caption() ?></td>
-            <td <?= $main_campaigns->payment_status_id->cellAttributes() ?>>
-<span id="el_main_campaigns_payment_status_id">
-<span<?= $main_campaigns->payment_status_id->viewAttributes() ?>>
-<?= $main_campaigns->payment_status_id->getViewValue() ?></span>
-</span>
-</td>
-        </tr>
-<?php } ?>
 <?php if ($main_campaigns->renewal_stage_id->Visible) { // renewal_stage_id ?>
         <tr id="r_renewal_stage_id">
             <td class="<?= $main_campaigns->TableLeftColumnClass ?>"><?= $main_campaigns->renewal_stage_id->caption() ?></td>
             <td <?= $main_campaigns->renewal_stage_id->cellAttributes() ?>>
 <span id="el_main_campaigns_renewal_stage_id">
 <span<?= $main_campaigns->renewal_stage_id->viewAttributes() ?>>
-<?= $main_campaigns->renewal_stage_id->getViewValue() ?></span>
+<?php if (!EmptyString($main_campaigns->renewal_stage_id->getViewValue()) && $main_campaigns->renewal_stage_id->linkAttributes() != "") { ?>
+<a<?= $main_campaigns->renewal_stage_id->linkAttributes() ?>><?= $main_campaigns->renewal_stage_id->getViewValue() ?></a>
+<?php } else { ?>
+<?= $main_campaigns->renewal_stage_id->getViewValue() ?>
+<?php } ?>
+</span>
+</span>
+</td>
+        </tr>
+<?php } ?>
+<?php if ($main_campaigns->check_status->Visible) { // check_status ?>
+        <tr id="r_check_status">
+            <td class="<?= $main_campaigns->TableLeftColumnClass ?>"><?= $main_campaigns->check_status->caption() ?></td>
+            <td <?= $main_campaigns->check_status->cellAttributes() ?>>
+<span id="el_main_campaigns_check_status">
+<span<?= $main_campaigns->check_status->viewAttributes() ?>>
+<?php if (!EmptyString($main_campaigns->check_status->getViewValue()) && $main_campaigns->check_status->linkAttributes() != "") { ?>
+<a<?= $main_campaigns->check_status->linkAttributes() ?>><?= $main_campaigns->check_status->getViewValue() ?></a>
+<?php } else { ?>
+<?= $main_campaigns->check_status->getViewValue() ?>
+<?php } ?>
+</span>
 </span>
 </td>
         </tr>

@@ -13,4 +13,22 @@ class XUserTypesController extends ControllerBase
     {
         return $this->runPage($request, $response, $args, "XUserTypesList");
     }
+
+    // add
+    public function add(Request $request, Response $response, array $args): Response
+    {
+        return $this->runPage($request, $response, $args, "XUserTypesAdd");
+    }
+
+    // edit
+    public function edit(Request $request, Response $response, array $args): Response
+    {
+        return $this->runPage($request, $response, $args, "XUserTypesEdit");
+    }
+
+    // delete
+    public function delete(Request $request, Response $response, array $args): Response
+    {
+        return $this->runPage($request, $response, $args, "XUserTypesDelete");
+    }
 }

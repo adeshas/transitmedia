@@ -19,7 +19,8 @@ loadjs.ready("head", function () {
     var fields = ew.vars.tables.y_platforms.fields;
     fy_platformsadd.addFields([
         ["name", [fields.name.required ? ew.Validators.required(fields.name.caption) : null], fields.name.isInvalid],
-        ["shortname", [fields.shortname.required ? ew.Validators.required(fields.shortname.caption) : null], fields.shortname.isInvalid]
+        ["shortname", [fields.shortname.required ? ew.Validators.required(fields.shortname.caption) : null], fields.shortname.isInvalid],
+        ["_email", [fields._email.required ? ew.Validators.required(fields._email.caption) : null], fields._email.isInvalid]
     ]);
 
     // Set invalid fields
@@ -128,6 +129,18 @@ $Page->showMessage();
 <input type="<?= $Page->shortname->getInputTextType() ?>" data-table="y_platforms" data-field="x_shortname" name="x_shortname" id="x_shortname" size="30" maxlength="50" placeholder="<?= HtmlEncode($Page->shortname->getPlaceHolder()) ?>" value="<?= $Page->shortname->EditValue ?>"<?= $Page->shortname->editAttributes() ?> aria-describedby="x_shortname_help">
 <?= $Page->shortname->getCustomMessage() ?>
 <div class="invalid-feedback"><?= $Page->shortname->getErrorMessage() ?></div>
+</span>
+</div></div>
+    </div>
+<?php } ?>
+<?php if ($Page->_email->Visible) { // email ?>
+    <div id="r__email" class="form-group row">
+        <label id="elh_y_platforms__email" for="x__email" class="<?= $Page->LeftColumnClass ?>"><?= $Page->_email->caption() ?><?= $Page->_email->Required ? $Language->phrase("FieldRequiredIndicator") : "" ?></label>
+        <div class="<?= $Page->RightColumnClass ?>"><div <?= $Page->_email->cellAttributes() ?>>
+<span id="el_y_platforms__email">
+<input type="<?= $Page->_email->getInputTextType() ?>" data-table="y_platforms" data-field="x__email" name="x__email" id="x__email" size="30" placeholder="<?= HtmlEncode($Page->_email->getPlaceHolder()) ?>" value="<?= $Page->_email->EditValue ?>"<?= $Page->_email->editAttributes() ?> aria-describedby="x__email_help">
+<?= $Page->_email->getCustomMessage() ?>
+<div class="invalid-feedback"><?= $Page->_email->getErrorMessage() ?></div>
 </span>
 </div></div>
     </div>

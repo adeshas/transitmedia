@@ -494,6 +494,8 @@ class YOperatorsView extends YOperators
         $this->name->setVisibility();
         $this->shortname->setVisibility();
         $this->platform_id->setVisibility();
+        $this->_email->setVisibility();
+        $this->contact_name->setVisibility();
         $this->hideFieldsForAddEdit();
 
         // Do not use lookup cache
@@ -617,6 +619,35 @@ class YOperatorsView extends YOperators
         global $Language, $Security;
         $options = &$this->OtherOptions;
         $option = $options["action"];
+
+        // Add
+        $item = &$option->add("add");
+        $addcaption = HtmlTitle($Language->phrase("ViewPageAddLink"));
+        if ($this->IsModal) {
+            $item->Body = "<a class=\"ew-action ew-add\" title=\"" . $addcaption . "\" data-caption=\"" . $addcaption . "\" href=\"#\" onclick=\"return ew.modalDialogShow({lnk:this,url:'" . HtmlEncode(GetUrl($this->AddUrl)) . "'});\">" . $Language->phrase("ViewPageAddLink") . "</a>";
+        } else {
+            $item->Body = "<a class=\"ew-action ew-add\" title=\"" . $addcaption . "\" data-caption=\"" . $addcaption . "\" href=\"" . HtmlEncode(GetUrl($this->AddUrl)) . "\">" . $Language->phrase("ViewPageAddLink") . "</a>";
+        }
+        $item->Visible = ($this->AddUrl != "" && $Security->canAdd());
+
+        // Edit
+        $item = &$option->add("edit");
+        $editcaption = HtmlTitle($Language->phrase("ViewPageEditLink"));
+        if ($this->IsModal) {
+            $item->Body = "<a class=\"ew-action ew-edit\" title=\"" . $editcaption . "\" data-caption=\"" . $editcaption . "\" href=\"#\" onclick=\"return ew.modalDialogShow({lnk:this,url:'" . HtmlEncode(GetUrl($this->EditUrl)) . "'});\">" . $Language->phrase("ViewPageEditLink") . "</a>";
+        } else {
+            $item->Body = "<a class=\"ew-action ew-edit\" title=\"" . $editcaption . "\" data-caption=\"" . $editcaption . "\" href=\"" . HtmlEncode(GetUrl($this->EditUrl)) . "\">" . $Language->phrase("ViewPageEditLink") . "</a>";
+        }
+        $item->Visible = ($this->EditUrl != "" && $Security->canEdit());
+
+        // Delete
+        $item = &$option->add("delete");
+        if ($this->IsModal) { // Handle as inline delete
+            $item->Body = "<a onclick=\"return ew.confirmDelete(this);\" class=\"ew-action ew-delete\" title=\"" . HtmlTitle($Language->phrase("ViewPageDeleteLink")) . "\" data-caption=\"" . HtmlTitle($Language->phrase("ViewPageDeleteLink")) . "\" href=\"" . HtmlEncode(UrlAddQuery(GetUrl($this->DeleteUrl), "action=1")) . "\">" . $Language->phrase("ViewPageDeleteLink") . "</a>";
+        } else {
+            $item->Body = "<a class=\"ew-action ew-delete\" title=\"" . HtmlTitle($Language->phrase("ViewPageDeleteLink")) . "\" data-caption=\"" . HtmlTitle($Language->phrase("ViewPageDeleteLink")) . "\" href=\"" . HtmlEncode(GetUrl($this->DeleteUrl)) . "\">" . $Language->phrase("ViewPageDeleteLink") . "</a>";
+        }
+        $item->Visible = ($this->DeleteUrl != "" && $Security->canDelete());
         $option = $options["detail"];
         $detailTableLink = "";
         $detailViewTblVar = "";
@@ -635,6 +666,13 @@ class YOperatorsView extends YOperators
                 $detailViewTblVar .= ",";
             }
             $detailViewTblVar .= "main_transactions";
+        }
+        if ($detailPageObj->DetailEdit && $Security->canEdit() && $Security->allowEdit(CurrentProjectID() . 'y_operators')) {
+            $links .= "<li><a class=\"dropdown-item ew-row-link ew-detail-edit\" data-action=\"edit\" data-caption=\"" . HtmlTitle($Language->phrase("MasterDetailEditLink")) . "\" href=\"" . HtmlEncode(GetUrl($this->getEditUrl(Config("TABLE_SHOW_DETAIL") . "=main_transactions"))) . "\">" . HtmlImageAndText($Language->phrase("MasterDetailEditLink")) . "</a></li>";
+            if ($detailEditTblVar != "") {
+                $detailEditTblVar .= ",";
+            }
+            $detailEditTblVar .= "main_transactions";
         }
         if ($links != "") {
             $body .= "<button class=\"dropdown-toggle btn btn-default ew-detail\" data-toggle=\"dropdown\"></button>";
@@ -748,6 +786,8 @@ class YOperatorsView extends YOperators
         $this->name->setDbValue($row['name']);
         $this->shortname->setDbValue($row['shortname']);
         $this->platform_id->setDbValue($row['platform_id']);
+        $this->_email->setDbValue($row['email']);
+        $this->contact_name->setDbValue($row['contact_name']);
     }
 
     // Return a row with default values
@@ -758,6 +798,8 @@ class YOperatorsView extends YOperators
         $row['name'] = null;
         $row['shortname'] = null;
         $row['platform_id'] = null;
+        $row['email'] = null;
+        $row['contact_name'] = null;
         return $row;
     }
 
@@ -786,6 +828,10 @@ class YOperatorsView extends YOperators
         // shortname
 
         // platform_id
+
+        // email
+
+        // contact_name
         if ($this->RowType == ROWTYPE_VIEW) {
             // id
             $this->id->ViewValue = $this->id->CurrentValue;
@@ -820,6 +866,14 @@ class YOperatorsView extends YOperators
             }
             $this->platform_id->ViewCustomAttributes = "";
 
+            // email
+            $this->_email->ViewValue = $this->_email->CurrentValue;
+            $this->_email->ViewCustomAttributes = "";
+
+            // contact_name
+            $this->contact_name->ViewValue = $this->contact_name->CurrentValue;
+            $this->contact_name->ViewCustomAttributes = "";
+
             // id
             $this->id->LinkCustomAttributes = "";
             $this->id->HrefValue = "";
@@ -839,6 +893,16 @@ class YOperatorsView extends YOperators
             $this->platform_id->LinkCustomAttributes = "";
             $this->platform_id->HrefValue = "";
             $this->platform_id->TooltipValue = "";
+
+            // email
+            $this->_email->LinkCustomAttributes = "";
+            $this->_email->HrefValue = "";
+            $this->_email->TooltipValue = "";
+
+            // contact_name
+            $this->contact_name->LinkCustomAttributes = "";
+            $this->contact_name->HrefValue = "";
+            $this->contact_name->TooltipValue = "";
         }
 
         // Call Row Rendered event

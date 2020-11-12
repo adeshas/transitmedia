@@ -86,6 +86,28 @@ $Page->showMessage();
 </td>
     </tr>
 <?php } ?>
+<?php if ($Page->_email->Visible) { // email ?>
+    <tr id="r__email">
+        <td class="<?= $Page->TableLeftColumnClass ?>"><span id="elh_y_operators__email"><?= $Page->_email->caption() ?></span></td>
+        <td data-name="_email" <?= $Page->_email->cellAttributes() ?>>
+<span id="el_y_operators__email">
+<span<?= $Page->_email->viewAttributes() ?>>
+<?= $Page->_email->getViewValue() ?></span>
+</span>
+</td>
+    </tr>
+<?php } ?>
+<?php if ($Page->contact_name->Visible) { // contact_name ?>
+    <tr id="r_contact_name">
+        <td class="<?= $Page->TableLeftColumnClass ?>"><span id="elh_y_operators_contact_name"><?= $Page->contact_name->caption() ?></span></td>
+        <td data-name="contact_name" <?= $Page->contact_name->cellAttributes() ?>>
+<span id="el_y_operators_contact_name">
+<span<?= $Page->contact_name->viewAttributes() ?>>
+<?= $Page->contact_name->getViewValue() ?></span>
+</span>
+</td>
+    </tr>
+<?php } ?>
 </table>
 <?php
     if (in_array("main_transactions", explode(",", $Page->getCurrentDetailTable())) && $main_transactions->DetailView) {

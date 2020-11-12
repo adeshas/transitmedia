@@ -23,7 +23,9 @@ loadjs.ready("head", function () {
         ["id", [fields.id.required ? ew.Validators.required(fields.id.caption) : null], fields.id.isInvalid],
         ["name", [fields.name.required ? ew.Validators.required(fields.name.caption) : null], fields.name.isInvalid],
         ["shortname", [fields.shortname.required ? ew.Validators.required(fields.shortname.caption) : null], fields.shortname.isInvalid],
-        ["platform_id", [fields.platform_id.required ? ew.Validators.required(fields.platform_id.caption) : null], fields.platform_id.isInvalid]
+        ["platform_id", [fields.platform_id.required ? ew.Validators.required(fields.platform_id.caption) : null], fields.platform_id.isInvalid],
+        ["_email", [fields._email.required ? ew.Validators.required(fields._email.caption) : null], fields._email.isInvalid],
+        ["contact_name", [fields.contact_name.required ? ew.Validators.required(fields.contact_name.caption) : null], fields.contact_name.isInvalid]
     ]);
 
     // Set invalid fields
@@ -83,6 +85,10 @@ loadjs.ready("head", function () {
             return false;
         if (ew.valueChanged(fobj, rowIndex, "platform_id", false))
             return false;
+        if (ew.valueChanged(fobj, rowIndex, "_email", false))
+            return false;
+        if (ew.valueChanged(fobj, rowIndex, "contact_name", false))
+            return false;
         return true;
     }
 
@@ -138,6 +144,12 @@ $Grid->ListOptions->render("header", "left");
 <?php } ?>
 <?php if ($Grid->platform_id->Visible) { // platform_id ?>
         <th data-name="platform_id" class="<?= $Grid->platform_id->headerCellClass() ?>"><div id="elh_y_operators_platform_id" class="y_operators_platform_id"><?= $Grid->renderSort($Grid->platform_id) ?></div></th>
+<?php } ?>
+<?php if ($Grid->_email->Visible) { // email ?>
+        <th data-name="_email" class="<?= $Grid->_email->headerCellClass() ?>"><div id="elh_y_operators__email" class="y_operators__email"><?= $Grid->renderSort($Grid->_email) ?></div></th>
+<?php } ?>
+<?php if ($Grid->contact_name->Visible) { // contact_name ?>
+        <th data-name="contact_name" class="<?= $Grid->contact_name->headerCellClass() ?>"><div id="elh_y_operators_contact_name" class="y_operators_contact_name"><?= $Grid->renderSort($Grid->contact_name) ?></div></th>
 <?php } ?>
 <?php
 // Render list options (header, right)
@@ -416,6 +428,60 @@ loadjs.ready("head", function() {
 <?php } ?>
 </td>
     <?php } ?>
+    <?php if ($Grid->_email->Visible) { // email ?>
+        <td data-name="_email" <?= $Grid->_email->cellAttributes() ?>>
+<?php if ($Grid->RowType == ROWTYPE_ADD) { // Add record ?>
+<span id="el<?= $Grid->RowCount ?>_y_operators__email" class="form-group">
+<input type="<?= $Grid->_email->getInputTextType() ?>" data-table="y_operators" data-field="x__email" name="x<?= $Grid->RowIndex ?>__email" id="x<?= $Grid->RowIndex ?>__email" size="30" placeholder="<?= HtmlEncode($Grid->_email->getPlaceHolder()) ?>" value="<?= $Grid->_email->EditValue ?>"<?= $Grid->_email->editAttributes() ?>>
+<div class="invalid-feedback"><?= $Grid->_email->getErrorMessage() ?></div>
+</span>
+<input type="hidden" data-table="y_operators" data-field="x__email" data-hidden="1" name="o<?= $Grid->RowIndex ?>__email" id="o<?= $Grid->RowIndex ?>__email" value="<?= HtmlEncode($Grid->_email->OldValue) ?>">
+<?php } ?>
+<?php if ($Grid->RowType == ROWTYPE_EDIT) { // Edit record ?>
+<span id="el<?= $Grid->RowCount ?>_y_operators__email" class="form-group">
+<input type="<?= $Grid->_email->getInputTextType() ?>" data-table="y_operators" data-field="x__email" name="x<?= $Grid->RowIndex ?>__email" id="x<?= $Grid->RowIndex ?>__email" size="30" placeholder="<?= HtmlEncode($Grid->_email->getPlaceHolder()) ?>" value="<?= $Grid->_email->EditValue ?>"<?= $Grid->_email->editAttributes() ?>>
+<div class="invalid-feedback"><?= $Grid->_email->getErrorMessage() ?></div>
+</span>
+<?php } ?>
+<?php if ($Grid->RowType == ROWTYPE_VIEW) { // View record ?>
+<span id="el<?= $Grid->RowCount ?>_y_operators__email">
+<span<?= $Grid->_email->viewAttributes() ?>>
+<?= $Grid->_email->getViewValue() ?></span>
+</span>
+<?php if ($Grid->isConfirm()) { ?>
+<input type="hidden" data-table="y_operators" data-field="x__email" data-hidden="1" name="fy_operatorsgrid$x<?= $Grid->RowIndex ?>__email" id="fy_operatorsgrid$x<?= $Grid->RowIndex ?>__email" value="<?= HtmlEncode($Grid->_email->FormValue) ?>">
+<input type="hidden" data-table="y_operators" data-field="x__email" data-hidden="1" name="fy_operatorsgrid$o<?= $Grid->RowIndex ?>__email" id="fy_operatorsgrid$o<?= $Grid->RowIndex ?>__email" value="<?= HtmlEncode($Grid->_email->OldValue) ?>">
+<?php } ?>
+<?php } ?>
+</td>
+    <?php } ?>
+    <?php if ($Grid->contact_name->Visible) { // contact_name ?>
+        <td data-name="contact_name" <?= $Grid->contact_name->cellAttributes() ?>>
+<?php if ($Grid->RowType == ROWTYPE_ADD) { // Add record ?>
+<span id="el<?= $Grid->RowCount ?>_y_operators_contact_name" class="form-group">
+<input type="<?= $Grid->contact_name->getInputTextType() ?>" data-table="y_operators" data-field="x_contact_name" name="x<?= $Grid->RowIndex ?>_contact_name" id="x<?= $Grid->RowIndex ?>_contact_name" size="30" placeholder="<?= HtmlEncode($Grid->contact_name->getPlaceHolder()) ?>" value="<?= $Grid->contact_name->EditValue ?>"<?= $Grid->contact_name->editAttributes() ?>>
+<div class="invalid-feedback"><?= $Grid->contact_name->getErrorMessage() ?></div>
+</span>
+<input type="hidden" data-table="y_operators" data-field="x_contact_name" data-hidden="1" name="o<?= $Grid->RowIndex ?>_contact_name" id="o<?= $Grid->RowIndex ?>_contact_name" value="<?= HtmlEncode($Grid->contact_name->OldValue) ?>">
+<?php } ?>
+<?php if ($Grid->RowType == ROWTYPE_EDIT) { // Edit record ?>
+<span id="el<?= $Grid->RowCount ?>_y_operators_contact_name" class="form-group">
+<input type="<?= $Grid->contact_name->getInputTextType() ?>" data-table="y_operators" data-field="x_contact_name" name="x<?= $Grid->RowIndex ?>_contact_name" id="x<?= $Grid->RowIndex ?>_contact_name" size="30" placeholder="<?= HtmlEncode($Grid->contact_name->getPlaceHolder()) ?>" value="<?= $Grid->contact_name->EditValue ?>"<?= $Grid->contact_name->editAttributes() ?>>
+<div class="invalid-feedback"><?= $Grid->contact_name->getErrorMessage() ?></div>
+</span>
+<?php } ?>
+<?php if ($Grid->RowType == ROWTYPE_VIEW) { // View record ?>
+<span id="el<?= $Grid->RowCount ?>_y_operators_contact_name">
+<span<?= $Grid->contact_name->viewAttributes() ?>>
+<?= $Grid->contact_name->getViewValue() ?></span>
+</span>
+<?php if ($Grid->isConfirm()) { ?>
+<input type="hidden" data-table="y_operators" data-field="x_contact_name" data-hidden="1" name="fy_operatorsgrid$x<?= $Grid->RowIndex ?>_contact_name" id="fy_operatorsgrid$x<?= $Grid->RowIndex ?>_contact_name" value="<?= HtmlEncode($Grid->contact_name->FormValue) ?>">
+<input type="hidden" data-table="y_operators" data-field="x_contact_name" data-hidden="1" name="fy_operatorsgrid$o<?= $Grid->RowIndex ?>_contact_name" id="fy_operatorsgrid$o<?= $Grid->RowIndex ?>_contact_name" value="<?= HtmlEncode($Grid->contact_name->OldValue) ?>">
+<?php } ?>
+<?php } ?>
+</td>
+    <?php } ?>
 <?php
 // Render list options (body, right)
 $Grid->ListOptions->render("body", "right", $Grid->RowCount);
@@ -552,6 +618,40 @@ loadjs.ready("head", function() {
 <input type="hidden" data-table="y_operators" data-field="x_platform_id" data-hidden="1" name="x<?= $Grid->RowIndex ?>_platform_id" id="x<?= $Grid->RowIndex ?>_platform_id" value="<?= HtmlEncode($Grid->platform_id->FormValue) ?>">
 <?php } ?>
 <input type="hidden" data-table="y_operators" data-field="x_platform_id" data-hidden="1" name="o<?= $Grid->RowIndex ?>_platform_id" id="o<?= $Grid->RowIndex ?>_platform_id" value="<?= HtmlEncode($Grid->platform_id->OldValue) ?>">
+</td>
+    <?php } ?>
+    <?php if ($Grid->_email->Visible) { // email ?>
+        <td data-name="_email">
+<?php if (!$Grid->isConfirm()) { ?>
+<span id="el$rowindex$_y_operators__email" class="form-group y_operators__email">
+<input type="<?= $Grid->_email->getInputTextType() ?>" data-table="y_operators" data-field="x__email" name="x<?= $Grid->RowIndex ?>__email" id="x<?= $Grid->RowIndex ?>__email" size="30" placeholder="<?= HtmlEncode($Grid->_email->getPlaceHolder()) ?>" value="<?= $Grid->_email->EditValue ?>"<?= $Grid->_email->editAttributes() ?>>
+<div class="invalid-feedback"><?= $Grid->_email->getErrorMessage() ?></div>
+</span>
+<?php } else { ?>
+<span id="el$rowindex$_y_operators__email" class="form-group y_operators__email">
+<span<?= $Grid->_email->viewAttributes() ?>>
+<input type="text" readonly class="form-control-plaintext" value="<?= HtmlEncode(RemoveHtml($Grid->_email->getDisplayValue($Grid->_email->ViewValue))) ?>"></span>
+</span>
+<input type="hidden" data-table="y_operators" data-field="x__email" data-hidden="1" name="x<?= $Grid->RowIndex ?>__email" id="x<?= $Grid->RowIndex ?>__email" value="<?= HtmlEncode($Grid->_email->FormValue) ?>">
+<?php } ?>
+<input type="hidden" data-table="y_operators" data-field="x__email" data-hidden="1" name="o<?= $Grid->RowIndex ?>__email" id="o<?= $Grid->RowIndex ?>__email" value="<?= HtmlEncode($Grid->_email->OldValue) ?>">
+</td>
+    <?php } ?>
+    <?php if ($Grid->contact_name->Visible) { // contact_name ?>
+        <td data-name="contact_name">
+<?php if (!$Grid->isConfirm()) { ?>
+<span id="el$rowindex$_y_operators_contact_name" class="form-group y_operators_contact_name">
+<input type="<?= $Grid->contact_name->getInputTextType() ?>" data-table="y_operators" data-field="x_contact_name" name="x<?= $Grid->RowIndex ?>_contact_name" id="x<?= $Grid->RowIndex ?>_contact_name" size="30" placeholder="<?= HtmlEncode($Grid->contact_name->getPlaceHolder()) ?>" value="<?= $Grid->contact_name->EditValue ?>"<?= $Grid->contact_name->editAttributes() ?>>
+<div class="invalid-feedback"><?= $Grid->contact_name->getErrorMessage() ?></div>
+</span>
+<?php } else { ?>
+<span id="el$rowindex$_y_operators_contact_name" class="form-group y_operators_contact_name">
+<span<?= $Grid->contact_name->viewAttributes() ?>>
+<input type="text" readonly class="form-control-plaintext" value="<?= HtmlEncode(RemoveHtml($Grid->contact_name->getDisplayValue($Grid->contact_name->ViewValue))) ?>"></span>
+</span>
+<input type="hidden" data-table="y_operators" data-field="x_contact_name" data-hidden="1" name="x<?= $Grid->RowIndex ?>_contact_name" id="x<?= $Grid->RowIndex ?>_contact_name" value="<?= HtmlEncode($Grid->contact_name->FormValue) ?>">
+<?php } ?>
+<input type="hidden" data-table="y_operators" data-field="x_contact_name" data-hidden="1" name="o<?= $Grid->RowIndex ?>_contact_name" id="o<?= $Grid->RowIndex ?>_contact_name" value="<?= HtmlEncode($Grid->contact_name->OldValue) ?>">
 </td>
     <?php } ?>
 <?php

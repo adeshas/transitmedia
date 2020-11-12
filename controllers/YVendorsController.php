@@ -19,4 +19,16 @@ class YVendorsController extends ControllerBase
     {
         return $this->runPage($request, $response, $args, "YVendorsAdd");
     }
+
+    // edit
+    public function edit(Request $request, Response $response, array $args): Response
+    {
+        return $this->runPage($request, $response, $args, "YVendorsEdit");
+    }
+
+    // delete
+    public function delete(Request $request, Response $response, array $args): Response
+    {
+        return $this->runPage($request, $response, $args, "YVendorsDelete");
+    }
 }

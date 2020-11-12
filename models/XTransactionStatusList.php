@@ -398,6 +398,7 @@ class XTransactionStatusList extends XTransactionStatus
     {
         $key = "";
         if (is_array($ar)) {
+            $key .= @$ar['id'];
         }
         return $key;
     }
@@ -409,6 +410,9 @@ class XTransactionStatusList extends XTransactionStatus
      */
     protected function hideFieldsForAddEdit()
     {
+        if ($this->isAdd() || $this->isCopy() || $this->isGridAdd()) {
+            $this->id->Visible = false;
+        }
     }
 
     // Lookup data
@@ -537,6 +541,8 @@ class XTransactionStatusList extends XTransactionStatus
         $this->setupListOptions();
         $this->id->setVisibility();
         $this->name->setVisibility();
+        $this->admin_name->setVisibility();
+        $this->operator_name->setVisibility();
         $this->hideFieldsForAddEdit();
 
         // Global Page Loading event (in userfn*.php)
@@ -829,6 +835,8 @@ class XTransactionStatusList extends XTransactionStatus
         $savedFilterList = "";
         $filterList = Concat($filterList, $this->id->AdvancedSearch->toJson(), ","); // Field id
         $filterList = Concat($filterList, $this->name->AdvancedSearch->toJson(), ","); // Field name
+        $filterList = Concat($filterList, $this->admin_name->AdvancedSearch->toJson(), ","); // Field admin_name
+        $filterList = Concat($filterList, $this->operator_name->AdvancedSearch->toJson(), ","); // Field operator_name
         if ($this->BasicSearch->Keyword != "") {
             $wrk = "\"" . Config("TABLE_BASIC_SEARCH") . "\":\"" . JsEncode($this->BasicSearch->Keyword) . "\",\"" . Config("TABLE_BASIC_SEARCH_TYPE") . "\":\"" . JsEncode($this->BasicSearch->Type) . "\"";
             $filterList = Concat($filterList, $wrk, ",");
@@ -884,6 +892,22 @@ class XTransactionStatusList extends XTransactionStatus
         $this->name->AdvancedSearch->SearchValue2 = @$filter["y_name"];
         $this->name->AdvancedSearch->SearchOperator2 = @$filter["w_name"];
         $this->name->AdvancedSearch->save();
+
+        // Field admin_name
+        $this->admin_name->AdvancedSearch->SearchValue = @$filter["x_admin_name"];
+        $this->admin_name->AdvancedSearch->SearchOperator = @$filter["z_admin_name"];
+        $this->admin_name->AdvancedSearch->SearchCondition = @$filter["v_admin_name"];
+        $this->admin_name->AdvancedSearch->SearchValue2 = @$filter["y_admin_name"];
+        $this->admin_name->AdvancedSearch->SearchOperator2 = @$filter["w_admin_name"];
+        $this->admin_name->AdvancedSearch->save();
+
+        // Field operator_name
+        $this->operator_name->AdvancedSearch->SearchValue = @$filter["x_operator_name"];
+        $this->operator_name->AdvancedSearch->SearchOperator = @$filter["z_operator_name"];
+        $this->operator_name->AdvancedSearch->SearchCondition = @$filter["v_operator_name"];
+        $this->operator_name->AdvancedSearch->SearchValue2 = @$filter["y_operator_name"];
+        $this->operator_name->AdvancedSearch->SearchOperator2 = @$filter["w_operator_name"];
+        $this->operator_name->AdvancedSearch->save();
         $this->BasicSearch->setKeyword(@$filter[Config("TABLE_BASIC_SEARCH")]);
         $this->BasicSearch->setType(@$filter[Config("TABLE_BASIC_SEARCH_TYPE")]);
     }
@@ -893,6 +917,8 @@ class XTransactionStatusList extends XTransactionStatus
     {
         $where = "";
         $this->buildBasicSearchSql($where, $this->name, $arKeywords, $type);
+        $this->buildBasicSearchSql($where, $this->admin_name, $arKeywords, $type);
+        $this->buildBasicSearchSql($where, $this->operator_name, $arKeywords, $type);
         return $where;
     }
 
@@ -1057,6 +1083,8 @@ class XTransactionStatusList extends XTransactionStatus
             $this->CurrentOrderType = Get("ordertype", "");
             $this->updateSort($this->id); // id
             $this->updateSort($this->name); // name
+            $this->updateSort($this->admin_name); // admin_name
+            $this->updateSort($this->operator_name); // operator_name
             $this->setStartRecordNumber(1); // Reset start position
         }
     }
@@ -1098,6 +1126,8 @@ class XTransactionStatusList extends XTransactionStatus
                 $this->setSessionOrderBy($orderBy);
                 $this->id->setSort("");
                 $this->name->setSort("");
+                $this->admin_name->setSort("");
+                $this->operator_name->setSort("");
             }
 
             // Reset start position
@@ -1116,6 +1146,24 @@ class XTransactionStatusList extends XTransactionStatus
         $item->Body = "";
         $item->OnLeft = false;
         $item->Visible = false;
+
+        // "view"
+        $item = &$this->ListOptions->add("view");
+        $item->CssClass = "text-nowrap";
+        $item->Visible = $Security->canView();
+        $item->OnLeft = false;
+
+        // "edit"
+        $item = &$this->ListOptions->add("edit");
+        $item->CssClass = "text-nowrap";
+        $item->Visible = $Security->canEdit();
+        $item->OnLeft = false;
+
+        // "delete"
+        $item = &$this->ListOptions->add("delete");
+        $item->CssClass = "text-nowrap";
+        $item->Visible = $Security->canDelete();
+        $item->OnLeft = false;
 
         // List actions
         $item = &$this->ListOptions->add("listactions");
@@ -1159,7 +1207,32 @@ class XTransactionStatusList extends XTransactionStatus
         // Call ListOptions_Rendering event
         $this->listOptionsRendering();
         $pageUrl = $this->pageUrl();
-        if ($this->CurrentMode == "view") { // View mode
+        if ($this->CurrentMode == "view") {
+            // "view"
+            $opt = $this->ListOptions["view"];
+            $viewcaption = HtmlTitle($Language->phrase("ViewLink"));
+            if ($Security->canView()) {
+                $opt->Body = "<a class=\"ew-row-link ew-view\" title=\"" . $viewcaption . "\" data-caption=\"" . $viewcaption . "\" href=\"" . HtmlEncode(GetUrl($this->ViewUrl)) . "\">" . $Language->phrase("ViewLink") . "</a>";
+            } else {
+                $opt->Body = "";
+            }
+
+            // "edit"
+            $opt = $this->ListOptions["edit"];
+            $editcaption = HtmlTitle($Language->phrase("EditLink"));
+            if ($Security->canEdit()) {
+                $opt->Body = "<a class=\"ew-row-link ew-edit\" title=\"" . HtmlTitle($Language->phrase("EditLink")) . "\" data-caption=\"" . HtmlTitle($Language->phrase("EditLink")) . "\" href=\"" . HtmlEncode(GetUrl($this->EditUrl)) . "\">" . $Language->phrase("EditLink") . "</a>";
+            } else {
+                $opt->Body = "";
+            }
+
+            // "delete"
+            $opt = $this->ListOptions["delete"];
+            if ($Security->canDelete()) {
+            $opt->Body = "<a class=\"ew-row-link ew-delete\"" . "" . " title=\"" . HtmlTitle($Language->phrase("DeleteLink")) . "\" data-caption=\"" . HtmlTitle($Language->phrase("DeleteLink")) . "\" href=\"" . HtmlEncode(GetUrl($this->DeleteUrl)) . "\">" . $Language->phrase("DeleteLink") . "</a>";
+            } else {
+                $opt->Body = "";
+            }
         } // End View mode
 
         // Set up list action buttons
@@ -1195,6 +1268,7 @@ class XTransactionStatusList extends XTransactionStatus
 
         // "checkbox"
         $opt = $this->ListOptions["checkbox"];
+        $opt->Body = "<div class=\"custom-control custom-checkbox d-inline-block\"><input type=\"checkbox\" id=\"key_m_" . $this->RowCount . "\" name=\"key_m[]\" class=\"custom-control-input ew-multi-select\" value=\"" . HtmlEncode($this->id->CurrentValue) . "\" onclick=\"ew.clickMultiCheckbox(event);\"><label class=\"custom-control-label\" for=\"key_m_" . $this->RowCount . "\"></label></div>";
         $this->renderListOptionsExt();
 
         // Call ListOptions_Rendered event
@@ -1446,6 +1520,8 @@ class XTransactionStatusList extends XTransactionStatus
         }
         $this->id->setDbValue($row['id']);
         $this->name->setDbValue($row['name']);
+        $this->admin_name->setDbValue($row['admin_name']);
+        $this->operator_name->setDbValue($row['operator_name']);
     }
 
     // Return a row with default values
@@ -1454,13 +1530,25 @@ class XTransactionStatusList extends XTransactionStatus
         $row = [];
         $row['id'] = null;
         $row['name'] = null;
+        $row['admin_name'] = null;
+        $row['operator_name'] = null;
         return $row;
     }
 
     // Load old record
     protected function loadOldRecord()
     {
-        return false;
+        // Load old record
+        $this->OldRecordset = null;
+        $validKey = $this->OldKey != "";
+        if ($validKey) {
+            $this->CurrentFilter = $this->getRecordFilter();
+            $sql = $this->getCurrentSql();
+            $conn = $this->getConnection();
+            $this->OldRecordset = LoadRecordset($sql, $conn);
+        }
+        $this->loadRowValues($this->OldRecordset); // Load row values
+        return $validKey;
     }
 
     // Render row values based on field settings
@@ -1484,15 +1572,26 @@ class XTransactionStatusList extends XTransactionStatus
         // id
 
         // name
+
+        // admin_name
+
+        // operator_name
         if ($this->RowType == ROWTYPE_VIEW) {
             // id
             $this->id->ViewValue = $this->id->CurrentValue;
-            $this->id->ViewValue = FormatNumber($this->id->ViewValue, 0, -2, -2, -2);
             $this->id->ViewCustomAttributes = "";
 
             // name
             $this->name->ViewValue = $this->name->CurrentValue;
             $this->name->ViewCustomAttributes = "";
+
+            // admin_name
+            $this->admin_name->ViewValue = $this->admin_name->CurrentValue;
+            $this->admin_name->ViewCustomAttributes = "";
+
+            // operator_name
+            $this->operator_name->ViewValue = $this->operator_name->CurrentValue;
+            $this->operator_name->ViewCustomAttributes = "";
 
             // id
             $this->id->LinkCustomAttributes = "";
@@ -1503,6 +1602,16 @@ class XTransactionStatusList extends XTransactionStatus
             $this->name->LinkCustomAttributes = "";
             $this->name->HrefValue = "";
             $this->name->TooltipValue = "";
+
+            // admin_name
+            $this->admin_name->LinkCustomAttributes = "";
+            $this->admin_name->HrefValue = "";
+            $this->admin_name->TooltipValue = "";
+
+            // operator_name
+            $this->operator_name->LinkCustomAttributes = "";
+            $this->operator_name->HrefValue = "";
+            $this->operator_name->TooltipValue = "";
         }
 
         // Call Row Rendered event

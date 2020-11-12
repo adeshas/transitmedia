@@ -52,6 +52,28 @@ function MenuItem_Adding($item)
 {
     //var_dump($item);
     // Return false if menu item not allowed
+
+    // IF OPERATOR REMOVE SOME TOP MENU's
+    if(CurrentUserLevel() == 5){
+        if( in_array($item->id, [32,98, 132,129])){
+            return false;
+        }
+    }
+    if(CurrentUserLevel() == 6){
+        if( in_array($item->id, [32,98, 132,129])){
+            return false;
+        }
+    }
+
+    // MANAGER
+    if(CurrentUserLevel() >= 1 && CurrentUserLevel() <= 4){
+        if( in_array($item->id, [195,197,198,133])){
+            return false;
+        }
+    }
+
+    // 32, -> 35 133
+    //98 -> 174
     return true;
 }
 

@@ -163,39 +163,6 @@ $Page->showMessage();
 </td>
     </tr>
 <?php } ?>
-<?php if ($Page->status_id->Visible) { // status_id ?>
-    <tr id="r_status_id">
-        <td class="<?= $Page->TableLeftColumnClass ?>"><span id="elh_main_campaigns_status_id"><?= $Page->status_id->caption() ?></span></td>
-        <td data-name="status_id" <?= $Page->status_id->cellAttributes() ?>>
-<span id="el_main_campaigns_status_id">
-<span<?= $Page->status_id->viewAttributes() ?>>
-<?= $Page->status_id->getViewValue() ?></span>
-</span>
-</td>
-    </tr>
-<?php } ?>
-<?php if ($Page->print_status_id->Visible) { // print_status_id ?>
-    <tr id="r_print_status_id">
-        <td class="<?= $Page->TableLeftColumnClass ?>"><span id="elh_main_campaigns_print_status_id"><?= $Page->print_status_id->caption() ?></span></td>
-        <td data-name="print_status_id" <?= $Page->print_status_id->cellAttributes() ?>>
-<span id="el_main_campaigns_print_status_id">
-<span<?= $Page->print_status_id->viewAttributes() ?>>
-<?= $Page->print_status_id->getViewValue() ?></span>
-</span>
-</td>
-    </tr>
-<?php } ?>
-<?php if ($Page->payment_status_id->Visible) { // payment_status_id ?>
-    <tr id="r_payment_status_id">
-        <td class="<?= $Page->TableLeftColumnClass ?>"><span id="elh_main_campaigns_payment_status_id"><?= $Page->payment_status_id->caption() ?></span></td>
-        <td data-name="payment_status_id" <?= $Page->payment_status_id->cellAttributes() ?>>
-<span id="el_main_campaigns_payment_status_id">
-<span<?= $Page->payment_status_id->viewAttributes() ?>>
-<?= $Page->payment_status_id->getViewValue() ?></span>
-</span>
-</td>
-    </tr>
-<?php } ?>
 <?php if ($Page->ts_last_update->Visible) { // ts_last_update ?>
     <tr id="r_ts_last_update">
         <td class="<?= $Page->TableLeftColumnClass ?>"><span id="elh_main_campaigns_ts_last_update"><?= $Page->ts_last_update->caption() ?></span></td>
@@ -224,7 +191,12 @@ $Page->showMessage();
         <td data-name="renewal_stage_id" <?= $Page->renewal_stage_id->cellAttributes() ?>>
 <span id="el_main_campaigns_renewal_stage_id">
 <span<?= $Page->renewal_stage_id->viewAttributes() ?>>
-<?= $Page->renewal_stage_id->getViewValue() ?></span>
+<?php if (!EmptyString($Page->renewal_stage_id->getViewValue()) && $Page->renewal_stage_id->linkAttributes() != "") { ?>
+<a<?= $Page->renewal_stage_id->linkAttributes() ?>><?= $Page->renewal_stage_id->getViewValue() ?></a>
+<?php } else { ?>
+<?= $Page->renewal_stage_id->getViewValue() ?>
+<?php } ?>
+</span>
 </span>
 </td>
     </tr>

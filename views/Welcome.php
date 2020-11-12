@@ -124,6 +124,8 @@ $Welcome = &$Page;
 </div>
 
 
+<?php /* ?>
+
 <div class="panel panel-default">
 <h2>Prices</h2>
 
@@ -156,7 +158,7 @@ from
 view_pricing_all
 where inventory_id = 3
 order by platform_id desc, inventory_id, bus_size, price desc";
-	Write(ExecuteHtml($sql, ["fieldcaption" => false, "tablename" => ["view_pricing_all"]]));
+	//Write(ExecuteHtml($sql, ["fieldcaption" => false, "tablename" => ["view_pricing_all"]]));
 ?>
 	</div>
 </div>
@@ -194,7 +196,7 @@ from
 view_pricing_all
 where inventory_id = 1
 order by platform_id desc, inventory_id, bus_size";
-	Write(ExecuteHtml($sql, ["fieldcaption" => false, "tablename" => ["view_pricing_all"]]));
+	//Write(ExecuteHtml($sql, ["fieldcaption" => false, "tablename" => ["view_pricing_all"]]));
 ?>
 	</div>
 </div>
@@ -230,7 +232,7 @@ from
 view_pricing_all
 where inventory_id = 2
 order by platform_id desc, inventory_id, bus_size";
-	Write(ExecuteHtml($sql, ["fieldcaption" => false, "tablename" => ["view_pricing_all"]]));
+//	Write(ExecuteHtml($sql, ["fieldcaption" => false, "tablename" => ["view_pricing_all"]]));
 ?>
 	</div>
 </div>
@@ -244,6 +246,7 @@ order by platform_id desc, inventory_id, bus_size";
 
 </section>
 </div>
+<?php */ ?>
 <?php
 
 #$Email = new \PHPMailer\PHPMailer\PHPMailer();

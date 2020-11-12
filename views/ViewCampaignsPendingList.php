@@ -125,55 +125,40 @@ $Page->renderListOptions();
 $Page->ListOptions->render("header", "left");
 ?>
 <?php if ($Page->transaction_id->Visible) { // transaction_id ?>
-        <th data-name="transaction_id" class="<?= $Page->transaction_id->headerCellClass() ?>"><div id="elh_view_campaigns_pending_transaction_id" class="view_campaigns_pending_transaction_id"><?= $Page->renderSort($Page->transaction_id) ?></div></th>
+        <th data-name="transaction_id" class="<?= $Page->transaction_id->headerCellClass() ?>" style="white-space: nowrap;"><div id="elh_view_campaigns_pending_transaction_id" class="view_campaigns_pending_transaction_id"><?= $Page->renderSort($Page->transaction_id) ?></div></th>
 <?php } ?>
-<?php if ($Page->campaign_id->Visible) { // campaign_id ?>
-        <th data-name="campaign_id" class="<?= $Page->campaign_id->headerCellClass() ?>"><div id="elh_view_campaigns_pending_campaign_id" class="view_campaigns_pending_campaign_id"><?= $Page->renderSort($Page->campaign_id) ?></div></th>
+<?php if ($Page->campaign->Visible) { // campaign ?>
+        <th data-name="campaign" class="<?= $Page->campaign->headerCellClass() ?>" style="white-space: nowrap;"><div id="elh_view_campaigns_pending_campaign" class="view_campaigns_pending_campaign"><?= $Page->renderSort($Page->campaign) ?></div></th>
 <?php } ?>
-<?php if ($Page->quantity->Visible) { // quantity ?>
-        <th data-name="quantity" class="<?= $Page->quantity->headerCellClass() ?>"><div id="elh_view_campaigns_pending_quantity" class="view_campaigns_pending_quantity"><?= $Page->renderSort($Page->quantity) ?></div></th>
+<?php if ($Page->transaction_status->Visible) { // transaction_status ?>
+        <th data-name="transaction_status" class="<?= $Page->transaction_status->headerCellClass() ?>" style="white-space: nowrap;"><div id="elh_view_campaigns_pending_transaction_status" class="view_campaigns_pending_transaction_status"><?= $Page->renderSort($Page->transaction_status) ?></div></th>
 <?php } ?>
-<?php if ($Page->campaign_status->Visible) { // campaign_status ?>
-        <th data-name="campaign_status" class="<?= $Page->campaign_status->headerCellClass() ?>"><div id="elh_view_campaigns_pending_campaign_status" class="view_campaigns_pending_campaign_status"><?= $Page->renderSort($Page->campaign_status) ?></div></th>
+<?php if ($Page->status_id->Visible) { // status_id ?>
+        <th data-name="status_id" class="<?= $Page->status_id->headerCellClass() ?>" style="white-space: nowrap;"><div id="elh_view_campaigns_pending_status_id" class="view_campaigns_pending_status_id"><?= $Page->renderSort($Page->status_id) ?></div></th>
 <?php } ?>
-<?php if ($Page->print_status->Visible) { // print_status ?>
-        <th data-name="print_status" class="<?= $Page->print_status->headerCellClass() ?>"><div id="elh_view_campaigns_pending_print_status" class="view_campaigns_pending_print_status"><?= $Page->renderSort($Page->print_status) ?></div></th>
+<?php if ($Page->payment_date->Visible) { // payment_date ?>
+        <th data-name="payment_date" class="<?= $Page->payment_date->headerCellClass() ?>" style="white-space: nowrap;"><div id="elh_view_campaigns_pending_payment_date" class="view_campaigns_pending_payment_date"><?= $Page->renderSort($Page->payment_date) ?></div></th>
 <?php } ?>
-<?php if ($Page->payment_status->Visible) { // payment_status ?>
-        <th data-name="payment_status" class="<?= $Page->payment_status->headerCellClass() ?>"><div id="elh_view_campaigns_pending_payment_status" class="view_campaigns_pending_payment_status"><?= $Page->renderSort($Page->payment_status) ?></div></th>
+<?php if ($Page->inventory->Visible) { // inventory ?>
+        <th data-name="inventory" class="<?= $Page->inventory->headerCellClass() ?>" style="white-space: nowrap;"><div id="elh_view_campaigns_pending_inventory" class="view_campaigns_pending_inventory"><?= $Page->renderSort($Page->inventory) ?></div></th>
 <?php } ?>
-<?php if ($Page->start_date->Visible) { // start_date ?>
-        <th data-name="start_date" class="<?= $Page->start_date->headerCellClass() ?>"><div id="elh_view_campaigns_pending_start_date" class="view_campaigns_pending_start_date"><?= $Page->renderSort($Page->start_date) ?></div></th>
-<?php } ?>
-<?php if ($Page->end_date->Visible) { // end_date ?>
-        <th data-name="end_date" class="<?= $Page->end_date->headerCellClass() ?>"><div id="elh_view_campaigns_pending_end_date" class="view_campaigns_pending_end_date"><?= $Page->renderSort($Page->end_date) ?></div></th>
+<?php if ($Page->bus_size->Visible) { // bus_size ?>
+        <th data-name="bus_size" class="<?= $Page->bus_size->headerCellClass() ?>" style="white-space: nowrap;"><div id="elh_view_campaigns_pending_bus_size" class="view_campaigns_pending_bus_size"><?= $Page->renderSort($Page->bus_size) ?></div></th>
 <?php } ?>
 <?php if ($Page->vendor->Visible) { // vendor ?>
-        <th data-name="vendor" class="<?= $Page->vendor->headerCellClass() ?>"><div id="elh_view_campaigns_pending_vendor" class="view_campaigns_pending_vendor"><?= $Page->renderSort($Page->vendor) ?></div></th>
+        <th data-name="vendor" class="<?= $Page->vendor->headerCellClass() ?>" style="white-space: nowrap;"><div id="elh_view_campaigns_pending_vendor" class="view_campaigns_pending_vendor"><?= $Page->renderSort($Page->vendor) ?></div></th>
 <?php } ?>
 <?php if ($Page->operator->Visible) { // operator ?>
-        <th data-name="operator" class="<?= $Page->operator->headerCellClass() ?>"><div id="elh_view_campaigns_pending_operator" class="view_campaigns_pending_operator"><?= $Page->renderSort($Page->operator) ?></div></th>
+        <th data-name="operator" class="<?= $Page->operator->headerCellClass() ?>" style="white-space: nowrap;"><div id="elh_view_campaigns_pending_operator" class="view_campaigns_pending_operator"><?= $Page->renderSort($Page->operator) ?></div></th>
 <?php } ?>
-<?php if ($Page->platform->Visible) { // platform ?>
-        <th data-name="platform" class="<?= $Page->platform->headerCellClass() ?>"><div id="elh_view_campaigns_pending_platform" class="view_campaigns_pending_platform"><?= $Page->renderSort($Page->platform) ?></div></th>
-<?php } ?>
-<?php if ($Page->price->Visible) { // price ?>
-        <th data-name="price" class="<?= $Page->price->headerCellClass() ?>"><div id="elh_view_campaigns_pending_price" class="view_campaigns_pending_price"><?= $Page->renderSort($Page->price) ?></div></th>
+<?php if ($Page->quantity->Visible) { // quantity ?>
+        <th data-name="quantity" class="<?= $Page->quantity->headerCellClass() ?>" style="white-space: nowrap;"><div id="elh_view_campaigns_pending_quantity" class="view_campaigns_pending_quantity"><?= $Page->renderSort($Page->quantity) ?></div></th>
 <?php } ?>
 <?php if ($Page->operator_fee->Visible) { // operator_fee ?>
-        <th data-name="operator_fee" class="<?= $Page->operator_fee->headerCellClass() ?>"><div id="elh_view_campaigns_pending_operator_fee" class="view_campaigns_pending_operator_fee"><?= $Page->renderSort($Page->operator_fee) ?></div></th>
+        <th data-name="operator_fee" class="<?= $Page->operator_fee->headerCellClass() ?>" style="white-space: nowrap;"><div id="elh_view_campaigns_pending_operator_fee" class="view_campaigns_pending_operator_fee"><?= $Page->renderSort($Page->operator_fee) ?></div></th>
 <?php } ?>
-<?php if ($Page->agency_fee->Visible) { // agency_fee ?>
-        <th data-name="agency_fee" class="<?= $Page->agency_fee->headerCellClass() ?>"><div id="elh_view_campaigns_pending_agency_fee" class="view_campaigns_pending_agency_fee"><?= $Page->renderSort($Page->agency_fee) ?></div></th>
-<?php } ?>
-<?php if ($Page->lamata_fee->Visible) { // lamata_fee ?>
-        <th data-name="lamata_fee" class="<?= $Page->lamata_fee->headerCellClass() ?>"><div id="elh_view_campaigns_pending_lamata_fee" class="view_campaigns_pending_lamata_fee"><?= $Page->renderSort($Page->lamata_fee) ?></div></th>
-<?php } ?>
-<?php if ($Page->lasaa_fee->Visible) { // lasaa_fee ?>
-        <th data-name="lasaa_fee" class="<?= $Page->lasaa_fee->headerCellClass() ?>"><div id="elh_view_campaigns_pending_lasaa_fee" class="view_campaigns_pending_lasaa_fee"><?= $Page->renderSort($Page->lasaa_fee) ?></div></th>
-<?php } ?>
-<?php if ($Page->printers_fee->Visible) { // printers_fee ?>
-        <th data-name="printers_fee" class="<?= $Page->printers_fee->headerCellClass() ?>"><div id="elh_view_campaigns_pending_printers_fee" class="view_campaigns_pending_printers_fee"><?= $Page->renderSort($Page->printers_fee) ?></div></th>
+<?php if ($Page->total->Visible) { // total ?>
+        <th data-name="total" class="<?= $Page->total->headerCellClass() ?>" style="white-space: nowrap;"><div id="elh_view_campaigns_pending_total" class="view_campaigns_pending_total"><?= $Page->renderSort($Page->total) ?></div></th>
 <?php } ?>
 <?php
 // Render list options (header, right)
@@ -250,59 +235,63 @@ $Page->ListOptions->render("body", "left", $Page->RowCount);
 </span>
 </td>
     <?php } ?>
-    <?php if ($Page->campaign_id->Visible) { // campaign_id ?>
-        <td data-name="campaign_id" <?= $Page->campaign_id->cellAttributes() ?>>
-<span id="el<?= $Page->RowCount ?>_view_campaigns_pending_campaign_id">
-<span<?= $Page->campaign_id->viewAttributes() ?>>
-<?= $Page->campaign_id->getViewValue() ?></span>
+    <?php if ($Page->campaign->Visible) { // campaign ?>
+        <td data-name="campaign" <?= $Page->campaign->cellAttributes() ?>>
+<span id="el<?= $Page->RowCount ?>_view_campaigns_pending_campaign">
+<span<?= $Page->campaign->viewAttributes() ?>>
+<?= $Page->campaign->getViewValue() ?></span>
 </span>
 </td>
     <?php } ?>
-    <?php if ($Page->quantity->Visible) { // quantity ?>
-        <td data-name="quantity" <?= $Page->quantity->cellAttributes() ?>>
-<span id="el<?= $Page->RowCount ?>_view_campaigns_pending_quantity">
-<span<?= $Page->quantity->viewAttributes() ?>>
-<?= $Page->quantity->getViewValue() ?></span>
+    <?php if ($Page->transaction_status->Visible) { // transaction_status ?>
+        <td data-name="transaction_status" <?= $Page->transaction_status->cellAttributes() ?>>
+<span id="el<?= $Page->RowCount ?>_view_campaigns_pending_transaction_status">
+<span<?= $Page->transaction_status->viewAttributes() ?>>
+<?= $Page->transaction_status->getViewValue() ?></span>
 </span>
 </td>
     <?php } ?>
-    <?php if ($Page->campaign_status->Visible) { // campaign_status ?>
-        <td data-name="campaign_status" <?= $Page->campaign_status->cellAttributes() ?>>
-<span id="el<?= $Page->RowCount ?>_view_campaigns_pending_campaign_status">
-<span<?= $Page->campaign_status->viewAttributes() ?>>
-<?= $Page->campaign_status->getViewValue() ?></span>
+    <?php if ($Page->status_id->Visible) { // status_id ?>
+        <td data-name="status_id" <?= $Page->status_id->cellAttributes() ?>>
+<span id="el<?= $Page->RowCount ?>_view_campaigns_pending_status_id">
+<span<?= $Page->status_id->viewAttributes() ?>>
+<?php if (!EmptyString($Page->status_id->getViewValue()) && $Page->status_id->linkAttributes() != "") { ?>
+<a<?= $Page->status_id->linkAttributes() ?>><?= $Page->status_id->getViewValue() ?></a>
+<?php } else { ?>
+<?= $Page->status_id->getViewValue() ?>
+<?php } ?>
+</span>
 </span>
 </td>
     <?php } ?>
-    <?php if ($Page->print_status->Visible) { // print_status ?>
-        <td data-name="print_status" <?= $Page->print_status->cellAttributes() ?>>
-<span id="el<?= $Page->RowCount ?>_view_campaigns_pending_print_status">
-<span<?= $Page->print_status->viewAttributes() ?>>
-<?= $Page->print_status->getViewValue() ?></span>
+    <?php if ($Page->payment_date->Visible) { // payment_date ?>
+        <td data-name="payment_date" <?= $Page->payment_date->cellAttributes() ?>>
+<span id="el<?= $Page->RowCount ?>_view_campaigns_pending_payment_date">
+<span<?= $Page->payment_date->viewAttributes() ?>>
+<?= $Page->payment_date->getViewValue() ?></span>
 </span>
 </td>
     <?php } ?>
-    <?php if ($Page->payment_status->Visible) { // payment_status ?>
-        <td data-name="payment_status" <?= $Page->payment_status->cellAttributes() ?>>
-<span id="el<?= $Page->RowCount ?>_view_campaigns_pending_payment_status">
-<span<?= $Page->payment_status->viewAttributes() ?>>
-<?= $Page->payment_status->getViewValue() ?></span>
+    <?php if ($Page->inventory->Visible) { // inventory ?>
+        <td data-name="inventory" <?= $Page->inventory->cellAttributes() ?>>
+<span id="el<?= $Page->RowCount ?>_view_campaigns_pending_inventory">
+<span<?= $Page->inventory->viewAttributes() ?>>
+<?php if (!EmptyString($Page->inventory->TooltipValue) && $Page->inventory->linkAttributes() != "") { ?>
+<a<?= $Page->inventory->linkAttributes() ?>><?= $Page->inventory->getViewValue() ?></a>
+<?php } else { ?>
+<?= $Page->inventory->getViewValue() ?>
+<?php } ?>
+<span id="tt_view_campaigns_pending_x<?= $Page->RowCount ?>_inventory" class="d-none">
+<?= $Page->inventory->TooltipValue ?>
+</span></span>
 </span>
 </td>
     <?php } ?>
-    <?php if ($Page->start_date->Visible) { // start_date ?>
-        <td data-name="start_date" <?= $Page->start_date->cellAttributes() ?>>
-<span id="el<?= $Page->RowCount ?>_view_campaigns_pending_start_date">
-<span<?= $Page->start_date->viewAttributes() ?>>
-<?= $Page->start_date->getViewValue() ?></span>
-</span>
-</td>
-    <?php } ?>
-    <?php if ($Page->end_date->Visible) { // end_date ?>
-        <td data-name="end_date" <?= $Page->end_date->cellAttributes() ?>>
-<span id="el<?= $Page->RowCount ?>_view_campaigns_pending_end_date">
-<span<?= $Page->end_date->viewAttributes() ?>>
-<?= $Page->end_date->getViewValue() ?></span>
+    <?php if ($Page->bus_size->Visible) { // bus_size ?>
+        <td data-name="bus_size" <?= $Page->bus_size->cellAttributes() ?>>
+<span id="el<?= $Page->RowCount ?>_view_campaigns_pending_bus_size">
+<span<?= $Page->bus_size->viewAttributes() ?>>
+<?= $Page->bus_size->getViewValue() ?></span>
 </span>
 </td>
     <?php } ?>
@@ -322,19 +311,11 @@ $Page->ListOptions->render("body", "left", $Page->RowCount);
 </span>
 </td>
     <?php } ?>
-    <?php if ($Page->platform->Visible) { // platform ?>
-        <td data-name="platform" <?= $Page->platform->cellAttributes() ?>>
-<span id="el<?= $Page->RowCount ?>_view_campaigns_pending_platform">
-<span<?= $Page->platform->viewAttributes() ?>>
-<?= $Page->platform->getViewValue() ?></span>
-</span>
-</td>
-    <?php } ?>
-    <?php if ($Page->price->Visible) { // price ?>
-        <td data-name="price" <?= $Page->price->cellAttributes() ?>>
-<span id="el<?= $Page->RowCount ?>_view_campaigns_pending_price">
-<span<?= $Page->price->viewAttributes() ?>>
-<?= $Page->price->getViewValue() ?></span>
+    <?php if ($Page->quantity->Visible) { // quantity ?>
+        <td data-name="quantity" <?= $Page->quantity->cellAttributes() ?>>
+<span id="el<?= $Page->RowCount ?>_view_campaigns_pending_quantity">
+<span<?= $Page->quantity->viewAttributes() ?>>
+<?= $Page->quantity->getViewValue() ?></span>
 </span>
 </td>
     <?php } ?>
@@ -346,35 +327,11 @@ $Page->ListOptions->render("body", "left", $Page->RowCount);
 </span>
 </td>
     <?php } ?>
-    <?php if ($Page->agency_fee->Visible) { // agency_fee ?>
-        <td data-name="agency_fee" <?= $Page->agency_fee->cellAttributes() ?>>
-<span id="el<?= $Page->RowCount ?>_view_campaigns_pending_agency_fee">
-<span<?= $Page->agency_fee->viewAttributes() ?>>
-<?= $Page->agency_fee->getViewValue() ?></span>
-</span>
-</td>
-    <?php } ?>
-    <?php if ($Page->lamata_fee->Visible) { // lamata_fee ?>
-        <td data-name="lamata_fee" <?= $Page->lamata_fee->cellAttributes() ?>>
-<span id="el<?= $Page->RowCount ?>_view_campaigns_pending_lamata_fee">
-<span<?= $Page->lamata_fee->viewAttributes() ?>>
-<?= $Page->lamata_fee->getViewValue() ?></span>
-</span>
-</td>
-    <?php } ?>
-    <?php if ($Page->lasaa_fee->Visible) { // lasaa_fee ?>
-        <td data-name="lasaa_fee" <?= $Page->lasaa_fee->cellAttributes() ?>>
-<span id="el<?= $Page->RowCount ?>_view_campaigns_pending_lasaa_fee">
-<span<?= $Page->lasaa_fee->viewAttributes() ?>>
-<?= $Page->lasaa_fee->getViewValue() ?></span>
-</span>
-</td>
-    <?php } ?>
-    <?php if ($Page->printers_fee->Visible) { // printers_fee ?>
-        <td data-name="printers_fee" <?= $Page->printers_fee->cellAttributes() ?>>
-<span id="el<?= $Page->RowCount ?>_view_campaigns_pending_printers_fee">
-<span<?= $Page->printers_fee->viewAttributes() ?>>
-<?= $Page->printers_fee->getViewValue() ?></span>
+    <?php if ($Page->total->Visible) { // total ?>
+        <td data-name="total" <?= $Page->total->cellAttributes() ?>>
+<span id="el<?= $Page->RowCount ?>_view_campaigns_pending_total">
+<span<?= $Page->total->viewAttributes() ?>>
+<?= $Page->total->getViewValue() ?></span>
 </span>
 </td>
     <?php } ?>
@@ -391,6 +348,91 @@ $Page->ListOptions->render("body", "right", $Page->RowCount);
 }
 ?>
 </tbody>
+<?php
+// Render aggregate row
+$Page->RowType = ROWTYPE_AGGREGATE;
+$Page->resetAttributes();
+$Page->renderRow();
+?>
+<?php if ($Page->TotalRecords > 0 && !$Page->isGridAdd() && !$Page->isGridEdit()) { ?>
+<tfoot><!-- Table footer -->
+    <tr class="ew-table-footer">
+<?php
+// Render list options
+$Page->renderListOptions();
+
+// Render list options (footer, left)
+$Page->ListOptions->render("footer", "left");
+?>
+    <?php if ($Page->transaction_id->Visible) { // transaction_id ?>
+        <td data-name="transaction_id" class="<?= $Page->transaction_id->footerCellClass() ?>"><span id="elf_view_campaigns_pending_transaction_id" class="view_campaigns_pending_transaction_id">
+        &nbsp;
+        </span></td>
+    <?php } ?>
+    <?php if ($Page->campaign->Visible) { // campaign ?>
+        <td data-name="campaign" class="<?= $Page->campaign->footerCellClass() ?>"><span id="elf_view_campaigns_pending_campaign" class="view_campaigns_pending_campaign">
+        &nbsp;
+        </span></td>
+    <?php } ?>
+    <?php if ($Page->transaction_status->Visible) { // transaction_status ?>
+        <td data-name="transaction_status" class="<?= $Page->transaction_status->footerCellClass() ?>"><span id="elf_view_campaigns_pending_transaction_status" class="view_campaigns_pending_transaction_status">
+        &nbsp;
+        </span></td>
+    <?php } ?>
+    <?php if ($Page->status_id->Visible) { // status_id ?>
+        <td data-name="status_id" class="<?= $Page->status_id->footerCellClass() ?>"><span id="elf_view_campaigns_pending_status_id" class="view_campaigns_pending_status_id">
+        &nbsp;
+        </span></td>
+    <?php } ?>
+    <?php if ($Page->payment_date->Visible) { // payment_date ?>
+        <td data-name="payment_date" class="<?= $Page->payment_date->footerCellClass() ?>"><span id="elf_view_campaigns_pending_payment_date" class="view_campaigns_pending_payment_date">
+        &nbsp;
+        </span></td>
+    <?php } ?>
+    <?php if ($Page->inventory->Visible) { // inventory ?>
+        <td data-name="inventory" class="<?= $Page->inventory->footerCellClass() ?>"><span id="elf_view_campaigns_pending_inventory" class="view_campaigns_pending_inventory">
+        &nbsp;
+        </span></td>
+    <?php } ?>
+    <?php if ($Page->bus_size->Visible) { // bus_size ?>
+        <td data-name="bus_size" class="<?= $Page->bus_size->footerCellClass() ?>"><span id="elf_view_campaigns_pending_bus_size" class="view_campaigns_pending_bus_size">
+        &nbsp;
+        </span></td>
+    <?php } ?>
+    <?php if ($Page->vendor->Visible) { // vendor ?>
+        <td data-name="vendor" class="<?= $Page->vendor->footerCellClass() ?>"><span id="elf_view_campaigns_pending_vendor" class="view_campaigns_pending_vendor">
+        &nbsp;
+        </span></td>
+    <?php } ?>
+    <?php if ($Page->operator->Visible) { // operator ?>
+        <td data-name="operator" class="<?= $Page->operator->footerCellClass() ?>"><span id="elf_view_campaigns_pending_operator" class="view_campaigns_pending_operator">
+        &nbsp;
+        </span></td>
+    <?php } ?>
+    <?php if ($Page->quantity->Visible) { // quantity ?>
+        <td data-name="quantity" class="<?= $Page->quantity->footerCellClass() ?>"><span id="elf_view_campaigns_pending_quantity" class="view_campaigns_pending_quantity">
+        <span class="ew-aggregate"><?= $Language->phrase("TOTAL") ?></span><span class="ew-aggregate-value">
+        <?= $Page->quantity->ViewValue ?></span>
+        </span></td>
+    <?php } ?>
+    <?php if ($Page->operator_fee->Visible) { // operator_fee ?>
+        <td data-name="operator_fee" class="<?= $Page->operator_fee->footerCellClass() ?>"><span id="elf_view_campaigns_pending_operator_fee" class="view_campaigns_pending_operator_fee">
+        <span class="ew-aggregate"><?= $Language->phrase("TOTAL") ?></span><span class="ew-aggregate-value">
+        <?= $Page->operator_fee->ViewValue ?></span>
+        </span></td>
+    <?php } ?>
+    <?php if ($Page->total->Visible) { // total ?>
+        <td data-name="total" class="<?= $Page->total->footerCellClass() ?>"><span id="elf_view_campaigns_pending_total" class="view_campaigns_pending_total">
+        &nbsp;
+        </span></td>
+    <?php } ?>
+<?php
+// Render list options (footer, right)
+$Page->ListOptions->render("footer", "right");
+?>
+    </tr>
+</tfoot>
+<?php } ?>
 </table><!-- /.ew-table -->
 <?php } ?>
 </div><!-- /.ew-grid-middle-panel -->

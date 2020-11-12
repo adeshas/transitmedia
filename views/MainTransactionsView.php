@@ -130,6 +130,17 @@ $Page->showMessage();
 </td>
     </tr>
 <?php } ?>
+<?php if ($Page->visible_status_id->Visible) { // visible_status_id ?>
+    <tr id="r_visible_status_id">
+        <td class="<?= $Page->TableLeftColumnClass ?>"><span id="elh_main_transactions_visible_status_id"><?= $Page->visible_status_id->caption() ?></span></td>
+        <td data-name="visible_status_id" <?= $Page->visible_status_id->cellAttributes() ?>>
+<span id="el_main_transactions_visible_status_id">
+<span<?= $Page->visible_status_id->viewAttributes() ?>>
+<?= $Page->visible_status_id->getViewValue() ?></span>
+</span>
+</td>
+    </tr>
+<?php } ?>
 <?php if ($Page->status_id->Visible) { // status_id ?>
     <tr id="r_status_id">
         <td class="<?= $Page->TableLeftColumnClass ?>"><span id="elh_main_transactions_status_id"><?= $Page->status_id->caption() ?></span></td>

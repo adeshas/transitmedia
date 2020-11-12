@@ -182,7 +182,7 @@ class ViewCampaignsPendingList extends ViewCampaignsPending
         $this->ExportHtmlUrl = $pageUrl . "export=html";
         $this->ExportXmlUrl = $pageUrl . "export=xml";
         $this->ExportCsvUrl = $pageUrl . "export=csv";
-        $this->AddUrl = "viewcampaignspendingadd";
+        $this->AddUrl = "viewcampaignspendingadd?" . Config("TABLE_SHOW_DETAIL") . "=";
         $this->InlineAddUrl = $pageUrl . "action=add";
         $this->GridAddUrl = $pageUrl . "action=gridadd";
         $this->GridEditUrl = $pageUrl . "action=gridedit";
@@ -398,6 +398,7 @@ class ViewCampaignsPendingList extends ViewCampaignsPending
     {
         $key = "";
         if (is_array($ar)) {
+            $key .= @$ar['transaction_id'];
         }
         return $key;
     }
@@ -536,27 +537,33 @@ class ViewCampaignsPendingList extends ViewCampaignsPending
         // Set up list options
         $this->setupListOptions();
         $this->transaction_id->setVisibility();
-        $this->campaign_id->setVisibility();
-        $this->campaign_name->Visible = false;
-        $this->quantity->setVisibility();
-        $this->campaign_status->setVisibility();
-        $this->print_status->setVisibility();
-        $this->payment_status->setVisibility();
-        $this->start_date->setVisibility();
-        $this->end_date->setVisibility();
+        $this->campaign->setVisibility();
+        $this->transaction_status->setVisibility();
+        $this->status_id->setVisibility();
+        $this->payment_status->Visible = false;
+        $this->payment_date->setVisibility();
+        $this->inventory->setVisibility();
+        $this->bus_size->setVisibility();
         $this->vendor->setVisibility();
         $this->operator->setVisibility();
-        $this->platform->setVisibility();
-        $this->inventory->Visible = false;
-        $this->bus_size->Visible = false;
         $this->print_stage->Visible = false;
-        $this->price->setVisibility();
+        $this->platform->Visible = false;
+        $this->quantity->setVisibility();
         $this->operator_fee->setVisibility();
-        $this->agency_fee->setVisibility();
-        $this->lamata_fee->setVisibility();
-        $this->lasaa_fee->setVisibility();
-        $this->printers_fee->setVisibility();
-        $this->price_details->Visible = false;
+        $this->price->Visible = false;
+        $this->lamata_fee->Visible = false;
+        $this->agency_fee->Visible = false;
+        $this->lasaa_fee->Visible = false;
+        $this->printers_fee->Visible = false;
+        $this->payment_status_id->Visible = false;
+        $this->vendor_id->Visible = false;
+        $this->inventory_id->Visible = false;
+        $this->platform_id->Visible = false;
+        $this->operator_id->Visible = false;
+        $this->bus_size_id->Visible = false;
+        $this->total->setVisibility();
+        $this->start_date->Visible = false;
+        $this->end_date->Visible = false;
         $this->hideFieldsForAddEdit();
 
         // Global Page Loading event (in userfn*.php)
@@ -584,6 +591,7 @@ class ViewCampaignsPendingList extends ViewCampaignsPending
         }
 
         // Set up lookup cache
+        $this->setupLookupOptions($this->status_id);
 
         // Search filters
         $srchAdvanced = ""; // Advanced search filter
@@ -848,27 +856,33 @@ class ViewCampaignsPendingList extends ViewCampaignsPending
         $filterList = "";
         $savedFilterList = "";
         $filterList = Concat($filterList, $this->transaction_id->AdvancedSearch->toJson(), ","); // Field transaction_id
-        $filterList = Concat($filterList, $this->campaign_id->AdvancedSearch->toJson(), ","); // Field campaign_id
-        $filterList = Concat($filterList, $this->campaign_name->AdvancedSearch->toJson(), ","); // Field campaign_name
-        $filterList = Concat($filterList, $this->quantity->AdvancedSearch->toJson(), ","); // Field quantity
-        $filterList = Concat($filterList, $this->campaign_status->AdvancedSearch->toJson(), ","); // Field campaign_status
-        $filterList = Concat($filterList, $this->print_status->AdvancedSearch->toJson(), ","); // Field print_status
+        $filterList = Concat($filterList, $this->campaign->AdvancedSearch->toJson(), ","); // Field campaign
+        $filterList = Concat($filterList, $this->transaction_status->AdvancedSearch->toJson(), ","); // Field transaction_status
+        $filterList = Concat($filterList, $this->status_id->AdvancedSearch->toJson(), ","); // Field status_id
         $filterList = Concat($filterList, $this->payment_status->AdvancedSearch->toJson(), ","); // Field payment_status
-        $filterList = Concat($filterList, $this->start_date->AdvancedSearch->toJson(), ","); // Field start_date
-        $filterList = Concat($filterList, $this->end_date->AdvancedSearch->toJson(), ","); // Field end_date
-        $filterList = Concat($filterList, $this->vendor->AdvancedSearch->toJson(), ","); // Field vendor
-        $filterList = Concat($filterList, $this->operator->AdvancedSearch->toJson(), ","); // Field operator
-        $filterList = Concat($filterList, $this->platform->AdvancedSearch->toJson(), ","); // Field platform
+        $filterList = Concat($filterList, $this->payment_date->AdvancedSearch->toJson(), ","); // Field payment_date
         $filterList = Concat($filterList, $this->inventory->AdvancedSearch->toJson(), ","); // Field inventory
         $filterList = Concat($filterList, $this->bus_size->AdvancedSearch->toJson(), ","); // Field bus_size
+        $filterList = Concat($filterList, $this->vendor->AdvancedSearch->toJson(), ","); // Field vendor
+        $filterList = Concat($filterList, $this->operator->AdvancedSearch->toJson(), ","); // Field operator
         $filterList = Concat($filterList, $this->print_stage->AdvancedSearch->toJson(), ","); // Field print_stage
-        $filterList = Concat($filterList, $this->price->AdvancedSearch->toJson(), ","); // Field price
+        $filterList = Concat($filterList, $this->platform->AdvancedSearch->toJson(), ","); // Field platform
+        $filterList = Concat($filterList, $this->quantity->AdvancedSearch->toJson(), ","); // Field quantity
         $filterList = Concat($filterList, $this->operator_fee->AdvancedSearch->toJson(), ","); // Field operator_fee
-        $filterList = Concat($filterList, $this->agency_fee->AdvancedSearch->toJson(), ","); // Field agency_fee
+        $filterList = Concat($filterList, $this->price->AdvancedSearch->toJson(), ","); // Field price
         $filterList = Concat($filterList, $this->lamata_fee->AdvancedSearch->toJson(), ","); // Field lamata_fee
+        $filterList = Concat($filterList, $this->agency_fee->AdvancedSearch->toJson(), ","); // Field agency_fee
         $filterList = Concat($filterList, $this->lasaa_fee->AdvancedSearch->toJson(), ","); // Field lasaa_fee
         $filterList = Concat($filterList, $this->printers_fee->AdvancedSearch->toJson(), ","); // Field printers_fee
-        $filterList = Concat($filterList, $this->price_details->AdvancedSearch->toJson(), ","); // Field price_details
+        $filterList = Concat($filterList, $this->payment_status_id->AdvancedSearch->toJson(), ","); // Field payment_status_id
+        $filterList = Concat($filterList, $this->vendor_id->AdvancedSearch->toJson(), ","); // Field vendor_id
+        $filterList = Concat($filterList, $this->inventory_id->AdvancedSearch->toJson(), ","); // Field inventory_id
+        $filterList = Concat($filterList, $this->platform_id->AdvancedSearch->toJson(), ","); // Field platform_id
+        $filterList = Concat($filterList, $this->operator_id->AdvancedSearch->toJson(), ","); // Field operator_id
+        $filterList = Concat($filterList, $this->bus_size_id->AdvancedSearch->toJson(), ","); // Field bus_size_id
+        $filterList = Concat($filterList, $this->total->AdvancedSearch->toJson(), ","); // Field total
+        $filterList = Concat($filterList, $this->start_date->AdvancedSearch->toJson(), ","); // Field start_date
+        $filterList = Concat($filterList, $this->end_date->AdvancedSearch->toJson(), ","); // Field end_date
         if ($this->BasicSearch->Keyword != "") {
             $wrk = "\"" . Config("TABLE_BASIC_SEARCH") . "\":\"" . JsEncode($this->BasicSearch->Keyword) . "\",\"" . Config("TABLE_BASIC_SEARCH_TYPE") . "\":\"" . JsEncode($this->BasicSearch->Type) . "\"";
             $filterList = Concat($filterList, $wrk, ",");
@@ -917,45 +931,29 @@ class ViewCampaignsPendingList extends ViewCampaignsPending
         $this->transaction_id->AdvancedSearch->SearchOperator2 = @$filter["w_transaction_id"];
         $this->transaction_id->AdvancedSearch->save();
 
-        // Field campaign_id
-        $this->campaign_id->AdvancedSearch->SearchValue = @$filter["x_campaign_id"];
-        $this->campaign_id->AdvancedSearch->SearchOperator = @$filter["z_campaign_id"];
-        $this->campaign_id->AdvancedSearch->SearchCondition = @$filter["v_campaign_id"];
-        $this->campaign_id->AdvancedSearch->SearchValue2 = @$filter["y_campaign_id"];
-        $this->campaign_id->AdvancedSearch->SearchOperator2 = @$filter["w_campaign_id"];
-        $this->campaign_id->AdvancedSearch->save();
+        // Field campaign
+        $this->campaign->AdvancedSearch->SearchValue = @$filter["x_campaign"];
+        $this->campaign->AdvancedSearch->SearchOperator = @$filter["z_campaign"];
+        $this->campaign->AdvancedSearch->SearchCondition = @$filter["v_campaign"];
+        $this->campaign->AdvancedSearch->SearchValue2 = @$filter["y_campaign"];
+        $this->campaign->AdvancedSearch->SearchOperator2 = @$filter["w_campaign"];
+        $this->campaign->AdvancedSearch->save();
 
-        // Field campaign_name
-        $this->campaign_name->AdvancedSearch->SearchValue = @$filter["x_campaign_name"];
-        $this->campaign_name->AdvancedSearch->SearchOperator = @$filter["z_campaign_name"];
-        $this->campaign_name->AdvancedSearch->SearchCondition = @$filter["v_campaign_name"];
-        $this->campaign_name->AdvancedSearch->SearchValue2 = @$filter["y_campaign_name"];
-        $this->campaign_name->AdvancedSearch->SearchOperator2 = @$filter["w_campaign_name"];
-        $this->campaign_name->AdvancedSearch->save();
+        // Field transaction_status
+        $this->transaction_status->AdvancedSearch->SearchValue = @$filter["x_transaction_status"];
+        $this->transaction_status->AdvancedSearch->SearchOperator = @$filter["z_transaction_status"];
+        $this->transaction_status->AdvancedSearch->SearchCondition = @$filter["v_transaction_status"];
+        $this->transaction_status->AdvancedSearch->SearchValue2 = @$filter["y_transaction_status"];
+        $this->transaction_status->AdvancedSearch->SearchOperator2 = @$filter["w_transaction_status"];
+        $this->transaction_status->AdvancedSearch->save();
 
-        // Field quantity
-        $this->quantity->AdvancedSearch->SearchValue = @$filter["x_quantity"];
-        $this->quantity->AdvancedSearch->SearchOperator = @$filter["z_quantity"];
-        $this->quantity->AdvancedSearch->SearchCondition = @$filter["v_quantity"];
-        $this->quantity->AdvancedSearch->SearchValue2 = @$filter["y_quantity"];
-        $this->quantity->AdvancedSearch->SearchOperator2 = @$filter["w_quantity"];
-        $this->quantity->AdvancedSearch->save();
-
-        // Field campaign_status
-        $this->campaign_status->AdvancedSearch->SearchValue = @$filter["x_campaign_status"];
-        $this->campaign_status->AdvancedSearch->SearchOperator = @$filter["z_campaign_status"];
-        $this->campaign_status->AdvancedSearch->SearchCondition = @$filter["v_campaign_status"];
-        $this->campaign_status->AdvancedSearch->SearchValue2 = @$filter["y_campaign_status"];
-        $this->campaign_status->AdvancedSearch->SearchOperator2 = @$filter["w_campaign_status"];
-        $this->campaign_status->AdvancedSearch->save();
-
-        // Field print_status
-        $this->print_status->AdvancedSearch->SearchValue = @$filter["x_print_status"];
-        $this->print_status->AdvancedSearch->SearchOperator = @$filter["z_print_status"];
-        $this->print_status->AdvancedSearch->SearchCondition = @$filter["v_print_status"];
-        $this->print_status->AdvancedSearch->SearchValue2 = @$filter["y_print_status"];
-        $this->print_status->AdvancedSearch->SearchOperator2 = @$filter["w_print_status"];
-        $this->print_status->AdvancedSearch->save();
+        // Field status_id
+        $this->status_id->AdvancedSearch->SearchValue = @$filter["x_status_id"];
+        $this->status_id->AdvancedSearch->SearchOperator = @$filter["z_status_id"];
+        $this->status_id->AdvancedSearch->SearchCondition = @$filter["v_status_id"];
+        $this->status_id->AdvancedSearch->SearchValue2 = @$filter["y_status_id"];
+        $this->status_id->AdvancedSearch->SearchOperator2 = @$filter["w_status_id"];
+        $this->status_id->AdvancedSearch->save();
 
         // Field payment_status
         $this->payment_status->AdvancedSearch->SearchValue = @$filter["x_payment_status"];
@@ -965,45 +963,13 @@ class ViewCampaignsPendingList extends ViewCampaignsPending
         $this->payment_status->AdvancedSearch->SearchOperator2 = @$filter["w_payment_status"];
         $this->payment_status->AdvancedSearch->save();
 
-        // Field start_date
-        $this->start_date->AdvancedSearch->SearchValue = @$filter["x_start_date"];
-        $this->start_date->AdvancedSearch->SearchOperator = @$filter["z_start_date"];
-        $this->start_date->AdvancedSearch->SearchCondition = @$filter["v_start_date"];
-        $this->start_date->AdvancedSearch->SearchValue2 = @$filter["y_start_date"];
-        $this->start_date->AdvancedSearch->SearchOperator2 = @$filter["w_start_date"];
-        $this->start_date->AdvancedSearch->save();
-
-        // Field end_date
-        $this->end_date->AdvancedSearch->SearchValue = @$filter["x_end_date"];
-        $this->end_date->AdvancedSearch->SearchOperator = @$filter["z_end_date"];
-        $this->end_date->AdvancedSearch->SearchCondition = @$filter["v_end_date"];
-        $this->end_date->AdvancedSearch->SearchValue2 = @$filter["y_end_date"];
-        $this->end_date->AdvancedSearch->SearchOperator2 = @$filter["w_end_date"];
-        $this->end_date->AdvancedSearch->save();
-
-        // Field vendor
-        $this->vendor->AdvancedSearch->SearchValue = @$filter["x_vendor"];
-        $this->vendor->AdvancedSearch->SearchOperator = @$filter["z_vendor"];
-        $this->vendor->AdvancedSearch->SearchCondition = @$filter["v_vendor"];
-        $this->vendor->AdvancedSearch->SearchValue2 = @$filter["y_vendor"];
-        $this->vendor->AdvancedSearch->SearchOperator2 = @$filter["w_vendor"];
-        $this->vendor->AdvancedSearch->save();
-
-        // Field operator
-        $this->operator->AdvancedSearch->SearchValue = @$filter["x_operator"];
-        $this->operator->AdvancedSearch->SearchOperator = @$filter["z_operator"];
-        $this->operator->AdvancedSearch->SearchCondition = @$filter["v_operator"];
-        $this->operator->AdvancedSearch->SearchValue2 = @$filter["y_operator"];
-        $this->operator->AdvancedSearch->SearchOperator2 = @$filter["w_operator"];
-        $this->operator->AdvancedSearch->save();
-
-        // Field platform
-        $this->platform->AdvancedSearch->SearchValue = @$filter["x_platform"];
-        $this->platform->AdvancedSearch->SearchOperator = @$filter["z_platform"];
-        $this->platform->AdvancedSearch->SearchCondition = @$filter["v_platform"];
-        $this->platform->AdvancedSearch->SearchValue2 = @$filter["y_platform"];
-        $this->platform->AdvancedSearch->SearchOperator2 = @$filter["w_platform"];
-        $this->platform->AdvancedSearch->save();
+        // Field payment_date
+        $this->payment_date->AdvancedSearch->SearchValue = @$filter["x_payment_date"];
+        $this->payment_date->AdvancedSearch->SearchOperator = @$filter["z_payment_date"];
+        $this->payment_date->AdvancedSearch->SearchCondition = @$filter["v_payment_date"];
+        $this->payment_date->AdvancedSearch->SearchValue2 = @$filter["y_payment_date"];
+        $this->payment_date->AdvancedSearch->SearchOperator2 = @$filter["w_payment_date"];
+        $this->payment_date->AdvancedSearch->save();
 
         // Field inventory
         $this->inventory->AdvancedSearch->SearchValue = @$filter["x_inventory"];
@@ -1021,6 +987,22 @@ class ViewCampaignsPendingList extends ViewCampaignsPending
         $this->bus_size->AdvancedSearch->SearchOperator2 = @$filter["w_bus_size"];
         $this->bus_size->AdvancedSearch->save();
 
+        // Field vendor
+        $this->vendor->AdvancedSearch->SearchValue = @$filter["x_vendor"];
+        $this->vendor->AdvancedSearch->SearchOperator = @$filter["z_vendor"];
+        $this->vendor->AdvancedSearch->SearchCondition = @$filter["v_vendor"];
+        $this->vendor->AdvancedSearch->SearchValue2 = @$filter["y_vendor"];
+        $this->vendor->AdvancedSearch->SearchOperator2 = @$filter["w_vendor"];
+        $this->vendor->AdvancedSearch->save();
+
+        // Field operator
+        $this->operator->AdvancedSearch->SearchValue = @$filter["x_operator"];
+        $this->operator->AdvancedSearch->SearchOperator = @$filter["z_operator"];
+        $this->operator->AdvancedSearch->SearchCondition = @$filter["v_operator"];
+        $this->operator->AdvancedSearch->SearchValue2 = @$filter["y_operator"];
+        $this->operator->AdvancedSearch->SearchOperator2 = @$filter["w_operator"];
+        $this->operator->AdvancedSearch->save();
+
         // Field print_stage
         $this->print_stage->AdvancedSearch->SearchValue = @$filter["x_print_stage"];
         $this->print_stage->AdvancedSearch->SearchOperator = @$filter["z_print_stage"];
@@ -1029,13 +1011,21 @@ class ViewCampaignsPendingList extends ViewCampaignsPending
         $this->print_stage->AdvancedSearch->SearchOperator2 = @$filter["w_print_stage"];
         $this->print_stage->AdvancedSearch->save();
 
-        // Field price
-        $this->price->AdvancedSearch->SearchValue = @$filter["x_price"];
-        $this->price->AdvancedSearch->SearchOperator = @$filter["z_price"];
-        $this->price->AdvancedSearch->SearchCondition = @$filter["v_price"];
-        $this->price->AdvancedSearch->SearchValue2 = @$filter["y_price"];
-        $this->price->AdvancedSearch->SearchOperator2 = @$filter["w_price"];
-        $this->price->AdvancedSearch->save();
+        // Field platform
+        $this->platform->AdvancedSearch->SearchValue = @$filter["x_platform"];
+        $this->platform->AdvancedSearch->SearchOperator = @$filter["z_platform"];
+        $this->platform->AdvancedSearch->SearchCondition = @$filter["v_platform"];
+        $this->platform->AdvancedSearch->SearchValue2 = @$filter["y_platform"];
+        $this->platform->AdvancedSearch->SearchOperator2 = @$filter["w_platform"];
+        $this->platform->AdvancedSearch->save();
+
+        // Field quantity
+        $this->quantity->AdvancedSearch->SearchValue = @$filter["x_quantity"];
+        $this->quantity->AdvancedSearch->SearchOperator = @$filter["z_quantity"];
+        $this->quantity->AdvancedSearch->SearchCondition = @$filter["v_quantity"];
+        $this->quantity->AdvancedSearch->SearchValue2 = @$filter["y_quantity"];
+        $this->quantity->AdvancedSearch->SearchOperator2 = @$filter["w_quantity"];
+        $this->quantity->AdvancedSearch->save();
 
         // Field operator_fee
         $this->operator_fee->AdvancedSearch->SearchValue = @$filter["x_operator_fee"];
@@ -1045,13 +1035,13 @@ class ViewCampaignsPendingList extends ViewCampaignsPending
         $this->operator_fee->AdvancedSearch->SearchOperator2 = @$filter["w_operator_fee"];
         $this->operator_fee->AdvancedSearch->save();
 
-        // Field agency_fee
-        $this->agency_fee->AdvancedSearch->SearchValue = @$filter["x_agency_fee"];
-        $this->agency_fee->AdvancedSearch->SearchOperator = @$filter["z_agency_fee"];
-        $this->agency_fee->AdvancedSearch->SearchCondition = @$filter["v_agency_fee"];
-        $this->agency_fee->AdvancedSearch->SearchValue2 = @$filter["y_agency_fee"];
-        $this->agency_fee->AdvancedSearch->SearchOperator2 = @$filter["w_agency_fee"];
-        $this->agency_fee->AdvancedSearch->save();
+        // Field price
+        $this->price->AdvancedSearch->SearchValue = @$filter["x_price"];
+        $this->price->AdvancedSearch->SearchOperator = @$filter["z_price"];
+        $this->price->AdvancedSearch->SearchCondition = @$filter["v_price"];
+        $this->price->AdvancedSearch->SearchValue2 = @$filter["y_price"];
+        $this->price->AdvancedSearch->SearchOperator2 = @$filter["w_price"];
+        $this->price->AdvancedSearch->save();
 
         // Field lamata_fee
         $this->lamata_fee->AdvancedSearch->SearchValue = @$filter["x_lamata_fee"];
@@ -1060,6 +1050,14 @@ class ViewCampaignsPendingList extends ViewCampaignsPending
         $this->lamata_fee->AdvancedSearch->SearchValue2 = @$filter["y_lamata_fee"];
         $this->lamata_fee->AdvancedSearch->SearchOperator2 = @$filter["w_lamata_fee"];
         $this->lamata_fee->AdvancedSearch->save();
+
+        // Field agency_fee
+        $this->agency_fee->AdvancedSearch->SearchValue = @$filter["x_agency_fee"];
+        $this->agency_fee->AdvancedSearch->SearchOperator = @$filter["z_agency_fee"];
+        $this->agency_fee->AdvancedSearch->SearchCondition = @$filter["v_agency_fee"];
+        $this->agency_fee->AdvancedSearch->SearchValue2 = @$filter["y_agency_fee"];
+        $this->agency_fee->AdvancedSearch->SearchOperator2 = @$filter["w_agency_fee"];
+        $this->agency_fee->AdvancedSearch->save();
 
         // Field lasaa_fee
         $this->lasaa_fee->AdvancedSearch->SearchValue = @$filter["x_lasaa_fee"];
@@ -1077,13 +1075,77 @@ class ViewCampaignsPendingList extends ViewCampaignsPending
         $this->printers_fee->AdvancedSearch->SearchOperator2 = @$filter["w_printers_fee"];
         $this->printers_fee->AdvancedSearch->save();
 
-        // Field price_details
-        $this->price_details->AdvancedSearch->SearchValue = @$filter["x_price_details"];
-        $this->price_details->AdvancedSearch->SearchOperator = @$filter["z_price_details"];
-        $this->price_details->AdvancedSearch->SearchCondition = @$filter["v_price_details"];
-        $this->price_details->AdvancedSearch->SearchValue2 = @$filter["y_price_details"];
-        $this->price_details->AdvancedSearch->SearchOperator2 = @$filter["w_price_details"];
-        $this->price_details->AdvancedSearch->save();
+        // Field payment_status_id
+        $this->payment_status_id->AdvancedSearch->SearchValue = @$filter["x_payment_status_id"];
+        $this->payment_status_id->AdvancedSearch->SearchOperator = @$filter["z_payment_status_id"];
+        $this->payment_status_id->AdvancedSearch->SearchCondition = @$filter["v_payment_status_id"];
+        $this->payment_status_id->AdvancedSearch->SearchValue2 = @$filter["y_payment_status_id"];
+        $this->payment_status_id->AdvancedSearch->SearchOperator2 = @$filter["w_payment_status_id"];
+        $this->payment_status_id->AdvancedSearch->save();
+
+        // Field vendor_id
+        $this->vendor_id->AdvancedSearch->SearchValue = @$filter["x_vendor_id"];
+        $this->vendor_id->AdvancedSearch->SearchOperator = @$filter["z_vendor_id"];
+        $this->vendor_id->AdvancedSearch->SearchCondition = @$filter["v_vendor_id"];
+        $this->vendor_id->AdvancedSearch->SearchValue2 = @$filter["y_vendor_id"];
+        $this->vendor_id->AdvancedSearch->SearchOperator2 = @$filter["w_vendor_id"];
+        $this->vendor_id->AdvancedSearch->save();
+
+        // Field inventory_id
+        $this->inventory_id->AdvancedSearch->SearchValue = @$filter["x_inventory_id"];
+        $this->inventory_id->AdvancedSearch->SearchOperator = @$filter["z_inventory_id"];
+        $this->inventory_id->AdvancedSearch->SearchCondition = @$filter["v_inventory_id"];
+        $this->inventory_id->AdvancedSearch->SearchValue2 = @$filter["y_inventory_id"];
+        $this->inventory_id->AdvancedSearch->SearchOperator2 = @$filter["w_inventory_id"];
+        $this->inventory_id->AdvancedSearch->save();
+
+        // Field platform_id
+        $this->platform_id->AdvancedSearch->SearchValue = @$filter["x_platform_id"];
+        $this->platform_id->AdvancedSearch->SearchOperator = @$filter["z_platform_id"];
+        $this->platform_id->AdvancedSearch->SearchCondition = @$filter["v_platform_id"];
+        $this->platform_id->AdvancedSearch->SearchValue2 = @$filter["y_platform_id"];
+        $this->platform_id->AdvancedSearch->SearchOperator2 = @$filter["w_platform_id"];
+        $this->platform_id->AdvancedSearch->save();
+
+        // Field operator_id
+        $this->operator_id->AdvancedSearch->SearchValue = @$filter["x_operator_id"];
+        $this->operator_id->AdvancedSearch->SearchOperator = @$filter["z_operator_id"];
+        $this->operator_id->AdvancedSearch->SearchCondition = @$filter["v_operator_id"];
+        $this->operator_id->AdvancedSearch->SearchValue2 = @$filter["y_operator_id"];
+        $this->operator_id->AdvancedSearch->SearchOperator2 = @$filter["w_operator_id"];
+        $this->operator_id->AdvancedSearch->save();
+
+        // Field bus_size_id
+        $this->bus_size_id->AdvancedSearch->SearchValue = @$filter["x_bus_size_id"];
+        $this->bus_size_id->AdvancedSearch->SearchOperator = @$filter["z_bus_size_id"];
+        $this->bus_size_id->AdvancedSearch->SearchCondition = @$filter["v_bus_size_id"];
+        $this->bus_size_id->AdvancedSearch->SearchValue2 = @$filter["y_bus_size_id"];
+        $this->bus_size_id->AdvancedSearch->SearchOperator2 = @$filter["w_bus_size_id"];
+        $this->bus_size_id->AdvancedSearch->save();
+
+        // Field total
+        $this->total->AdvancedSearch->SearchValue = @$filter["x_total"];
+        $this->total->AdvancedSearch->SearchOperator = @$filter["z_total"];
+        $this->total->AdvancedSearch->SearchCondition = @$filter["v_total"];
+        $this->total->AdvancedSearch->SearchValue2 = @$filter["y_total"];
+        $this->total->AdvancedSearch->SearchOperator2 = @$filter["w_total"];
+        $this->total->AdvancedSearch->save();
+
+        // Field start_date
+        $this->start_date->AdvancedSearch->SearchValue = @$filter["x_start_date"];
+        $this->start_date->AdvancedSearch->SearchOperator = @$filter["z_start_date"];
+        $this->start_date->AdvancedSearch->SearchCondition = @$filter["v_start_date"];
+        $this->start_date->AdvancedSearch->SearchValue2 = @$filter["y_start_date"];
+        $this->start_date->AdvancedSearch->SearchOperator2 = @$filter["w_start_date"];
+        $this->start_date->AdvancedSearch->save();
+
+        // Field end_date
+        $this->end_date->AdvancedSearch->SearchValue = @$filter["x_end_date"];
+        $this->end_date->AdvancedSearch->SearchOperator = @$filter["z_end_date"];
+        $this->end_date->AdvancedSearch->SearchCondition = @$filter["v_end_date"];
+        $this->end_date->AdvancedSearch->SearchValue2 = @$filter["y_end_date"];
+        $this->end_date->AdvancedSearch->SearchOperator2 = @$filter["w_end_date"];
+        $this->end_date->AdvancedSearch->save();
         $this->BasicSearch->setKeyword(@$filter[Config("TABLE_BASIC_SEARCH")]);
         $this->BasicSearch->setType(@$filter[Config("TABLE_BASIC_SEARCH_TYPE")]);
     }
@@ -1092,17 +1154,15 @@ class ViewCampaignsPendingList extends ViewCampaignsPending
     protected function basicSearchSql($arKeywords, $type)
     {
         $where = "";
-        $this->buildBasicSearchSql($where, $this->campaign_name, $arKeywords, $type);
-        $this->buildBasicSearchSql($where, $this->campaign_status, $arKeywords, $type);
-        $this->buildBasicSearchSql($where, $this->print_status, $arKeywords, $type);
+        $this->buildBasicSearchSql($where, $this->campaign, $arKeywords, $type);
+        $this->buildBasicSearchSql($where, $this->transaction_status, $arKeywords, $type);
         $this->buildBasicSearchSql($where, $this->payment_status, $arKeywords, $type);
-        $this->buildBasicSearchSql($where, $this->vendor, $arKeywords, $type);
-        $this->buildBasicSearchSql($where, $this->operator, $arKeywords, $type);
-        $this->buildBasicSearchSql($where, $this->platform, $arKeywords, $type);
         $this->buildBasicSearchSql($where, $this->inventory, $arKeywords, $type);
         $this->buildBasicSearchSql($where, $this->bus_size, $arKeywords, $type);
+        $this->buildBasicSearchSql($where, $this->vendor, $arKeywords, $type);
+        $this->buildBasicSearchSql($where, $this->operator, $arKeywords, $type);
         $this->buildBasicSearchSql($where, $this->print_stage, $arKeywords, $type);
-        $this->buildBasicSearchSql($where, $this->price_details, $arKeywords, $type);
+        $this->buildBasicSearchSql($where, $this->platform, $arKeywords, $type);
         return $where;
     }
 
@@ -1266,22 +1326,17 @@ class ViewCampaignsPendingList extends ViewCampaignsPending
             $this->CurrentOrder = Get("order");
             $this->CurrentOrderType = Get("ordertype", "");
             $this->updateSort($this->transaction_id); // transaction_id
-            $this->updateSort($this->campaign_id); // campaign_id
-            $this->updateSort($this->quantity); // quantity
-            $this->updateSort($this->campaign_status); // campaign_status
-            $this->updateSort($this->print_status); // print_status
-            $this->updateSort($this->payment_status); // payment_status
-            $this->updateSort($this->start_date); // start_date
-            $this->updateSort($this->end_date); // end_date
+            $this->updateSort($this->campaign); // campaign
+            $this->updateSort($this->transaction_status); // transaction_status
+            $this->updateSort($this->status_id); // status_id
+            $this->updateSort($this->payment_date); // payment_date
+            $this->updateSort($this->inventory); // inventory
+            $this->updateSort($this->bus_size); // bus_size
             $this->updateSort($this->vendor); // vendor
             $this->updateSort($this->operator); // operator
-            $this->updateSort($this->platform); // platform
-            $this->updateSort($this->price); // price
+            $this->updateSort($this->quantity); // quantity
             $this->updateSort($this->operator_fee); // operator_fee
-            $this->updateSort($this->agency_fee); // agency_fee
-            $this->updateSort($this->lamata_fee); // lamata_fee
-            $this->updateSort($this->lasaa_fee); // lasaa_fee
-            $this->updateSort($this->printers_fee); // printers_fee
+            $this->updateSort($this->total); // total
             $this->setStartRecordNumber(1); // Reset start position
         }
     }
@@ -1291,10 +1346,14 @@ class ViewCampaignsPendingList extends ViewCampaignsPending
     {
         $orderBy = $this->getSessionOrderBy(); // Get ORDER BY from Session
         if ($orderBy == "") {
-            $this->DefaultSort = "";
+            $this->DefaultSort = "\"status_id\" DESC";
             if ($this->getSqlOrderBy() != "") {
                 $useDefaultSort = true;
+                if ($this->status_id->getSort() != "") {
+                    $useDefaultSort = false;
+                }
                 if ($useDefaultSort) {
+                    $this->status_id->setSort("DESC");
                     $orderBy = $this->getSqlOrderBy();
                     $this->setSessionOrderBy($orderBy);
                 } else {
@@ -1322,27 +1381,33 @@ class ViewCampaignsPendingList extends ViewCampaignsPending
                 $orderBy = "";
                 $this->setSessionOrderBy($orderBy);
                 $this->transaction_id->setSort("");
-                $this->campaign_id->setSort("");
-                $this->campaign_name->setSort("");
-                $this->quantity->setSort("");
-                $this->campaign_status->setSort("");
-                $this->print_status->setSort("");
+                $this->campaign->setSort("");
+                $this->transaction_status->setSort("");
+                $this->status_id->setSort("");
                 $this->payment_status->setSort("");
-                $this->start_date->setSort("");
-                $this->end_date->setSort("");
-                $this->vendor->setSort("");
-                $this->operator->setSort("");
-                $this->platform->setSort("");
+                $this->payment_date->setSort("");
                 $this->inventory->setSort("");
                 $this->bus_size->setSort("");
+                $this->vendor->setSort("");
+                $this->operator->setSort("");
                 $this->print_stage->setSort("");
-                $this->price->setSort("");
+                $this->platform->setSort("");
+                $this->quantity->setSort("");
                 $this->operator_fee->setSort("");
-                $this->agency_fee->setSort("");
+                $this->price->setSort("");
                 $this->lamata_fee->setSort("");
+                $this->agency_fee->setSort("");
                 $this->lasaa_fee->setSort("");
                 $this->printers_fee->setSort("");
-                $this->price_details->setSort("");
+                $this->payment_status_id->setSort("");
+                $this->vendor_id->setSort("");
+                $this->inventory_id->setSort("");
+                $this->platform_id->setSort("");
+                $this->operator_id->setSort("");
+                $this->bus_size_id->setSort("");
+                $this->total->setSort("");
+                $this->start_date->setSort("");
+                $this->end_date->setSort("");
             }
 
             // Reset start position
@@ -1361,6 +1426,33 @@ class ViewCampaignsPendingList extends ViewCampaignsPending
         $item->Body = "";
         $item->OnLeft = false;
         $item->Visible = false;
+
+        // "view"
+        $item = &$this->ListOptions->add("view");
+        $item->CssClass = "text-nowrap";
+        $item->Visible = $Security->canView();
+        $item->OnLeft = false;
+
+        // "detail_view_buses_assigned"
+        $item = &$this->ListOptions->add("detail_view_buses_assigned");
+        $item->CssClass = "text-nowrap";
+        $item->Visible = $Security->allowList(CurrentProjectID() . 'view_buses_assigned') && !$this->ShowMultipleDetails;
+        $item->OnLeft = false;
+        $item->ShowInButtonGroup = false;
+
+        // Multiple details
+        if ($this->ShowMultipleDetails) {
+            $item = &$this->ListOptions->add("details");
+            $item->CssClass = "text-nowrap";
+            $item->Visible = $this->ShowMultipleDetails;
+            $item->OnLeft = false;
+            $item->ShowInButtonGroup = false;
+        }
+
+        // Set up detail pages
+        $pages = new SubPages();
+        $pages->add("view_buses_assigned");
+        $this->DetailPages = $pages;
 
         // List actions
         $item = &$this->ListOptions->add("listactions");
@@ -1404,7 +1496,15 @@ class ViewCampaignsPendingList extends ViewCampaignsPending
         // Call ListOptions_Rendering event
         $this->listOptionsRendering();
         $pageUrl = $this->pageUrl();
-        if ($this->CurrentMode == "view") { // View mode
+        if ($this->CurrentMode == "view") {
+            // "view"
+            $opt = $this->ListOptions["view"];
+            $viewcaption = HtmlTitle($Language->phrase("ViewLink"));
+            if ($Security->canView()) {
+                $opt->Body = "<a class=\"ew-row-link ew-view\" title=\"" . $viewcaption . "\" data-caption=\"" . $viewcaption . "\" href=\"" . HtmlEncode(GetUrl($this->ViewUrl)) . "\">" . $Language->phrase("ViewLink") . "</a>";
+            } else {
+                $opt->Body = "";
+            }
         } // End View mode
 
         // Set up list action buttons
@@ -1437,9 +1537,61 @@ class ViewCampaignsPendingList extends ViewCampaignsPending
                 $opt->Visible = true;
             }
         }
+        $detailViewTblVar = "";
+        $detailCopyTblVar = "";
+        $detailEditTblVar = "";
+
+        // "detail_view_buses_assigned"
+        $opt = $this->ListOptions["detail_view_buses_assigned"];
+        if ($Security->allowList(CurrentProjectID() . 'view_buses_assigned')) {
+            $body = $Language->phrase("DetailLink") . $Language->TablePhrase("view_buses_assigned", "TblCaption");
+            $body = "<a class=\"btn btn-default ew-row-link ew-detail\" data-action=\"list\" href=\"" . HtmlEncode("viewbusesassignedlist?" . Config("TABLE_SHOW_MASTER") . "=view_campaigns_pending&" . GetForeignKeyUrl("fk_transaction_id", $this->transaction_id->CurrentValue) . "") . "\">" . $body . "</a>";
+            $links = "";
+            $detailPage = Container("ViewBusesAssignedGrid");
+            if ($detailPage->DetailView && $Security->canView() && $Security->allowView(CurrentProjectID() . 'view_campaigns_pending')) {
+                $caption = $Language->phrase("MasterDetailViewLink");
+                $url = $this->getViewUrl(Config("TABLE_SHOW_DETAIL") . "=view_buses_assigned");
+                $links .= "<li><a class=\"dropdown-item ew-row-link ew-detail-view\" data-action=\"view\" data-caption=\"" . HtmlTitle($caption) . "\" href=\"" . HtmlEncode($url) . "\">" . HtmlImageAndText($caption) . "</a></li>";
+                if ($detailViewTblVar != "") {
+                    $detailViewTblVar .= ",";
+                }
+                $detailViewTblVar .= "view_buses_assigned";
+            }
+            if ($links != "") {
+                $body .= "<button class=\"dropdown-toggle btn btn-default ew-detail\" data-toggle=\"dropdown\"></button>";
+                $body .= "<ul class=\"dropdown-menu\">" . $links . "</ul>";
+            }
+            $body = "<div class=\"btn-group btn-group-sm ew-btn-group\">" . $body . "</div>";
+            $opt->Body = $body;
+            if ($this->ShowMultipleDetails) {
+                $opt->Visible = false;
+            }
+        }
+        if ($this->ShowMultipleDetails) {
+            $body = "<div class=\"btn-group btn-group-sm ew-btn-group\">";
+            $links = "";
+            if ($detailViewTblVar != "") {
+                $links .= "<li><a class=\"dropdown-item ew-row-link ew-detail-view\" data-action=\"view\" data-caption=\"" . HtmlTitle($Language->phrase("MasterDetailViewLink")) . "\" href=\"" . HtmlEncode($this->getViewUrl(Config("TABLE_SHOW_DETAIL") . "=" . $detailViewTblVar)) . "\">" . HtmlImageAndText($Language->phrase("MasterDetailViewLink")) . "</a></li>";
+            }
+            if ($detailEditTblVar != "") {
+                $links .= "<li><a class=\"dropdown-item ew-row-link ew-detail-edit\" data-action=\"edit\" data-caption=\"" . HtmlTitle($Language->phrase("MasterDetailEditLink")) . "\" href=\"" . HtmlEncode($this->getEditUrl(Config("TABLE_SHOW_DETAIL") . "=" . $detailEditTblVar)) . "\">" . HtmlImageAndText($Language->phrase("MasterDetailEditLink")) . "</a></li>";
+            }
+            if ($detailCopyTblVar != "") {
+                $links .= "<li><a class=\"dropdown-item ew-row-link ew-detail-copy\" data-action=\"add\" data-caption=\"" . HtmlTitle($Language->phrase("MasterDetailCopyLink")) . "\" href=\"" . HtmlEncode($this->GetCopyUrl(Config("TABLE_SHOW_DETAIL") . "=" . $detailCopyTblVar)) . "\">" . HtmlImageAndText($Language->phrase("MasterDetailCopyLink")) . "</a></li>";
+            }
+            if ($links != "") {
+                $body .= "<button class=\"dropdown-toggle btn btn-default ew-master-detail\" title=\"" . HtmlTitle($Language->phrase("MultipleMasterDetails")) . "\" data-toggle=\"dropdown\">" . $Language->phrase("MultipleMasterDetails") . "</button>";
+                $body .= "<ul class=\"dropdown-menu ew-menu\">" . $links . "</ul>";
+            }
+            $body .= "</div>";
+            // Multiple details
+            $opt = $this->ListOptions["details"];
+            $opt->Body = $body;
+        }
 
         // "checkbox"
         $opt = $this->ListOptions["checkbox"];
+        $opt->Body = "<div class=\"custom-control custom-checkbox d-inline-block\"><input type=\"checkbox\" id=\"key_m_" . $this->RowCount . "\" name=\"key_m[]\" class=\"custom-control-input ew-multi-select\" value=\"" . HtmlEncode($this->transaction_id->CurrentValue) . "\" onclick=\"ew.clickMultiCheckbox(event);\"><label class=\"custom-control-label\" for=\"key_m_" . $this->RowCount . "\"></label></div>";
         $this->renderListOptionsExt();
 
         // Call ListOptions_Rendered event
@@ -1683,27 +1835,33 @@ class ViewCampaignsPendingList extends ViewCampaignsPending
             return;
         }
         $this->transaction_id->setDbValue($row['transaction_id']);
-        $this->campaign_id->setDbValue($row['campaign_id']);
-        $this->campaign_name->setDbValue($row['campaign_name']);
-        $this->quantity->setDbValue($row['quantity']);
-        $this->campaign_status->setDbValue($row['campaign_status']);
-        $this->print_status->setDbValue($row['print_status']);
+        $this->campaign->setDbValue($row['campaign']);
+        $this->transaction_status->setDbValue($row['transaction_status']);
+        $this->status_id->setDbValue($row['status_id']);
         $this->payment_status->setDbValue($row['payment_status']);
-        $this->start_date->setDbValue($row['start_date']);
-        $this->end_date->setDbValue($row['end_date']);
-        $this->vendor->setDbValue($row['vendor']);
-        $this->operator->setDbValue($row['operator']);
-        $this->platform->setDbValue($row['platform']);
+        $this->payment_date->setDbValue($row['payment_date']);
         $this->inventory->setDbValue($row['inventory']);
         $this->bus_size->setDbValue($row['bus_size']);
+        $this->vendor->setDbValue($row['vendor']);
+        $this->operator->setDbValue($row['operator']);
         $this->print_stage->setDbValue($row['print_stage']);
-        $this->price->setDbValue($row['price']);
+        $this->platform->setDbValue($row['platform']);
+        $this->quantity->setDbValue($row['quantity']);
         $this->operator_fee->setDbValue($row['operator_fee']);
-        $this->agency_fee->setDbValue($row['agency_fee']);
+        $this->price->setDbValue($row['price']);
         $this->lamata_fee->setDbValue($row['lamata_fee']);
+        $this->agency_fee->setDbValue($row['agency_fee']);
         $this->lasaa_fee->setDbValue($row['lasaa_fee']);
         $this->printers_fee->setDbValue($row['printers_fee']);
-        $this->price_details->setDbValue($row['price_details']);
+        $this->payment_status_id->setDbValue($row['payment_status_id']);
+        $this->vendor_id->setDbValue($row['vendor_id']);
+        $this->inventory_id->setDbValue($row['inventory_id']);
+        $this->platform_id->setDbValue($row['platform_id']);
+        $this->operator_id->setDbValue($row['operator_id']);
+        $this->bus_size_id->setDbValue($row['bus_size_id']);
+        $this->total->setDbValue($row['total']);
+        $this->start_date->setDbValue($row['start_date']);
+        $this->end_date->setDbValue($row['end_date']);
     }
 
     // Return a row with default values
@@ -1711,34 +1869,50 @@ class ViewCampaignsPendingList extends ViewCampaignsPending
     {
         $row = [];
         $row['transaction_id'] = null;
-        $row['campaign_id'] = null;
-        $row['campaign_name'] = null;
-        $row['quantity'] = null;
-        $row['campaign_status'] = null;
-        $row['print_status'] = null;
+        $row['campaign'] = null;
+        $row['transaction_status'] = null;
+        $row['status_id'] = null;
         $row['payment_status'] = null;
-        $row['start_date'] = null;
-        $row['end_date'] = null;
-        $row['vendor'] = null;
-        $row['operator'] = null;
-        $row['platform'] = null;
+        $row['payment_date'] = null;
         $row['inventory'] = null;
         $row['bus_size'] = null;
+        $row['vendor'] = null;
+        $row['operator'] = null;
         $row['print_stage'] = null;
-        $row['price'] = null;
+        $row['platform'] = null;
+        $row['quantity'] = null;
         $row['operator_fee'] = null;
-        $row['agency_fee'] = null;
+        $row['price'] = null;
         $row['lamata_fee'] = null;
+        $row['agency_fee'] = null;
         $row['lasaa_fee'] = null;
         $row['printers_fee'] = null;
-        $row['price_details'] = null;
+        $row['payment_status_id'] = null;
+        $row['vendor_id'] = null;
+        $row['inventory_id'] = null;
+        $row['platform_id'] = null;
+        $row['operator_id'] = null;
+        $row['bus_size_id'] = null;
+        $row['total'] = null;
+        $row['start_date'] = null;
+        $row['end_date'] = null;
         return $row;
     }
 
     // Load old record
     protected function loadOldRecord()
     {
-        return false;
+        // Load old record
+        $this->OldRecordset = null;
+        $validKey = $this->OldKey != "";
+        if ($validKey) {
+            $this->CurrentFilter = $this->getRecordFilter();
+            $sql = $this->getCurrentSql();
+            $conn = $this->getConnection();
+            $this->OldRecordset = LoadRecordset($sql, $conn);
+        }
+        $this->loadRowValues($this->OldRecordset); // Load row values
+        return $validKey;
     }
 
     // Render row values based on field settings
@@ -1760,85 +1934,154 @@ class ViewCampaignsPendingList extends ViewCampaignsPending
         // Common render codes for all row types
 
         // transaction_id
+        $this->transaction_id->CellCssStyle = "white-space: nowrap;";
 
-        // campaign_id
+        // campaign
+        $this->campaign->CellCssStyle = "white-space: nowrap;";
 
-        // campaign_name
+        // transaction_status
+        $this->transaction_status->CellCssStyle = "white-space: nowrap;";
 
-        // quantity
-
-        // campaign_status
-
-        // print_status
+        // status_id
+        $this->status_id->CellCssStyle = "white-space: nowrap;";
 
         // payment_status
+        $this->payment_status->CellCssStyle = "white-space: nowrap;";
 
-        // start_date
-
-        // end_date
-
-        // vendor
-
-        // operator
-
-        // platform
+        // payment_date
+        $this->payment_date->CellCssStyle = "white-space: nowrap;";
 
         // inventory
+        $this->inventory->CellCssStyle = "white-space: nowrap;";
 
         // bus_size
+        $this->bus_size->CellCssStyle = "white-space: nowrap;";
+
+        // vendor
+        $this->vendor->CellCssStyle = "white-space: nowrap;";
+
+        // operator
+        $this->operator->CellCssStyle = "white-space: nowrap;";
 
         // print_stage
+        $this->print_stage->CellCssStyle = "white-space: nowrap;";
 
-        // price
+        // platform
+        $this->platform->CellCssStyle = "white-space: nowrap;";
+
+        // quantity
+        $this->quantity->CellCssStyle = "white-space: nowrap;";
 
         // operator_fee
+        $this->operator_fee->CellCssStyle = "white-space: nowrap;";
 
-        // agency_fee
+        // price
+        $this->price->CellCssStyle = "white-space: nowrap;";
 
         // lamata_fee
+        $this->lamata_fee->CellCssStyle = "white-space: nowrap;";
+
+        // agency_fee
+        $this->agency_fee->CellCssStyle = "white-space: nowrap;";
 
         // lasaa_fee
+        $this->lasaa_fee->CellCssStyle = "white-space: nowrap;";
 
         // printers_fee
+        $this->printers_fee->CellCssStyle = "white-space: nowrap;";
 
-        // price_details
+        // payment_status_id
+        $this->payment_status_id->CellCssStyle = "white-space: nowrap;";
+
+        // vendor_id
+        $this->vendor_id->CellCssStyle = "white-space: nowrap;";
+
+        // inventory_id
+        $this->inventory_id->CellCssStyle = "white-space: nowrap;";
+
+        // platform_id
+        $this->platform_id->CellCssStyle = "white-space: nowrap;";
+
+        // operator_id
+        $this->operator_id->CellCssStyle = "white-space: nowrap;";
+
+        // bus_size_id
+        $this->bus_size_id->CellCssStyle = "white-space: nowrap;";
+
+        // total
+        $this->total->CellCssStyle = "white-space: nowrap;";
+
+        // start_date
+        $this->start_date->CellCssStyle = "white-space: nowrap;";
+
+        // end_date
+        $this->end_date->CellCssStyle = "white-space: nowrap;";
+
+        // Accumulate aggregate value
+        if ($this->RowType != ROWTYPE_AGGREGATEINIT && $this->RowType != ROWTYPE_AGGREGATE) {
+            if (is_numeric($this->quantity->CurrentValue)) {
+                $this->quantity->Total += $this->quantity->CurrentValue; // Accumulate total
+            }
+            if (is_numeric($this->operator_fee->CurrentValue)) {
+                $this->operator_fee->Total += $this->operator_fee->CurrentValue; // Accumulate total
+            }
+        }
         if ($this->RowType == ROWTYPE_VIEW) {
             // transaction_id
             $this->transaction_id->ViewValue = $this->transaction_id->CurrentValue;
             $this->transaction_id->ViewValue = FormatNumber($this->transaction_id->ViewValue, 0, -2, -2, -2);
             $this->transaction_id->ViewCustomAttributes = "";
 
-            // campaign_id
-            $this->campaign_id->ViewValue = $this->campaign_id->CurrentValue;
-            $this->campaign_id->ViewValue = FormatNumber($this->campaign_id->ViewValue, 0, -2, -2, -2);
-            $this->campaign_id->ViewCustomAttributes = "";
+            // campaign
+            $this->campaign->ViewValue = $this->campaign->CurrentValue;
+            $this->campaign->CssClass = "font-weight-bold";
+            $this->campaign->ViewCustomAttributes = "";
 
-            // quantity
-            $this->quantity->ViewValue = $this->quantity->CurrentValue;
-            $this->quantity->ViewValue = FormatNumber($this->quantity->ViewValue, 0, -2, -2, -2);
-            $this->quantity->ViewCustomAttributes = "";
+            // transaction_status
+            $this->transaction_status->ViewValue = $this->transaction_status->CurrentValue;
+            $this->transaction_status->CellCssStyle .= "text-align: center;";
+            $this->transaction_status->ViewCustomAttributes = "";
 
-            // campaign_status
-            $this->campaign_status->ViewValue = $this->campaign_status->CurrentValue;
-            $this->campaign_status->ViewCustomAttributes = "";
-
-            // print_status
-            $this->print_status->ViewValue = $this->print_status->CurrentValue;
-            $this->print_status->ViewCustomAttributes = "";
+            // status_id
+            $curVal = strval($this->status_id->CurrentValue);
+            if ($curVal != "") {
+                $this->status_id->ViewValue = $this->status_id->lookupCacheOption($curVal);
+                if ($this->status_id->ViewValue === null) { // Lookup from database
+                    $filterWrk = "\"id\"" . SearchString("=", $curVal, DATATYPE_NUMBER, "");
+                    $sqlWrk = $this->status_id->Lookup->getSql(false, $filterWrk, '', $this, true);
+                    $rswrk = Conn()->executeQuery($sqlWrk)->fetchAll(\PDO::FETCH_BOTH);
+                    $ari = count($rswrk);
+                    if ($ari > 0) { // Lookup values found
+                        $arwrk = $this->status_id->Lookup->renderViewRow($rswrk[0]);
+                        $this->status_id->ViewValue = $this->status_id->displayValue($arwrk);
+                    } else {
+                        $this->status_id->ViewValue = $this->status_id->CurrentValue;
+                    }
+                }
+            } else {
+                $this->status_id->ViewValue = null;
+            }
+            $this->status_id->CellCssStyle .= "text-align: center;";
+            $this->status_id->ViewCustomAttributes = "";
 
             // payment_status
             $this->payment_status->ViewValue = $this->payment_status->CurrentValue;
-            $this->payment_status->ViewCustomAttributes = "";
+            $this->payment_status->CellCssStyle .= "text-align: center;";
+            $this->payment_status->ViewCustomAttributes = 'class="badge bg-success"';
 
-            // start_date
-            $this->start_date->ViewValue = $this->start_date->CurrentValue;
-            $this->start_date->ViewValue = FormatDateTime($this->start_date->ViewValue, 0);
-            $this->start_date->ViewCustomAttributes = "";
+            // payment_date
+            $this->payment_date->ViewValue = $this->payment_date->CurrentValue;
+            $this->payment_date->ViewValue = FormatDateTime($this->payment_date->ViewValue, 0);
+            $this->payment_date->CellCssStyle .= "text-align: center;";
+            $this->payment_date->ViewCustomAttributes = "";
 
-            // end_date
-            $this->end_date->ViewValue = $this->end_date->CurrentValue;
-            $this->end_date->ViewValue = FormatDateTime($this->end_date->ViewValue, 0);
-            $this->end_date->ViewCustomAttributes = "";
+            // inventory
+            $this->inventory->ViewValue = $this->inventory->CurrentValue;
+            $this->inventory->ViewCustomAttributes = "";
+
+            // bus_size
+            $this->bus_size->ViewValue = $this->bus_size->CurrentValue;
+            $this->bus_size->ViewCustomAttributes = "";
 
             // vendor
             $this->vendor->ViewValue = $this->vendor->CurrentValue;
@@ -1848,29 +2091,40 @@ class ViewCampaignsPendingList extends ViewCampaignsPending
             $this->operator->ViewValue = $this->operator->CurrentValue;
             $this->operator->ViewCustomAttributes = "";
 
+            // print_stage
+            $this->print_stage->ViewValue = $this->print_stage->CurrentValue;
+            $this->print_stage->ViewCustomAttributes = "";
+
             // platform
             $this->platform->ViewValue = $this->platform->CurrentValue;
             $this->platform->ViewCustomAttributes = "";
+
+            // quantity
+            $this->quantity->ViewValue = $this->quantity->CurrentValue;
+            $this->quantity->ViewValue = FormatNumber($this->quantity->ViewValue, 0, -2, -2, -2);
+            $this->quantity->CellCssStyle .= "text-align: right;";
+            $this->quantity->ViewCustomAttributes = "";
+
+            // operator_fee
+            $this->operator_fee->ViewValue = $this->operator_fee->CurrentValue;
+            $this->operator_fee->ViewValue = FormatNumber($this->operator_fee->ViewValue, 0, -2, -2, -2);
+            $this->operator_fee->CellCssStyle .= "text-align: right;";
+            $this->operator_fee->ViewCustomAttributes = "";
 
             // price
             $this->price->ViewValue = $this->price->CurrentValue;
             $this->price->ViewValue = FormatNumber($this->price->ViewValue, 0, -2, -2, -2);
             $this->price->ViewCustomAttributes = "";
 
-            // operator_fee
-            $this->operator_fee->ViewValue = $this->operator_fee->CurrentValue;
-            $this->operator_fee->ViewValue = FormatNumber($this->operator_fee->ViewValue, 0, -2, -2, -2);
-            $this->operator_fee->ViewCustomAttributes = "";
+            // lamata_fee
+            $this->lamata_fee->ViewValue = $this->lamata_fee->CurrentValue;
+            $this->lamata_fee->ViewValue = FormatNumber($this->lamata_fee->ViewValue, 0, -2, -2, -2);
+            $this->lamata_fee->ViewCustomAttributes = "";
 
             // agency_fee
             $this->agency_fee->ViewValue = $this->agency_fee->CurrentValue;
             $this->agency_fee->ViewValue = FormatNumber($this->agency_fee->ViewValue, 0, -2, -2, -2);
             $this->agency_fee->ViewCustomAttributes = "";
-
-            // lamata_fee
-            $this->lamata_fee->ViewValue = $this->lamata_fee->CurrentValue;
-            $this->lamata_fee->ViewValue = FormatNumber($this->lamata_fee->ViewValue, 0, -2, -2, -2);
-            $this->lamata_fee->ViewCustomAttributes = "";
 
             // lasaa_fee
             $this->lasaa_fee->ViewValue = $this->lasaa_fee->CurrentValue;
@@ -1882,45 +2136,79 @@ class ViewCampaignsPendingList extends ViewCampaignsPending
             $this->printers_fee->ViewValue = FormatNumber($this->printers_fee->ViewValue, 0, -2, -2, -2);
             $this->printers_fee->ViewCustomAttributes = "";
 
+            // payment_status_id
+            $this->payment_status_id->ViewValue = $this->payment_status_id->CurrentValue;
+            $this->payment_status_id->ViewValue = FormatNumber($this->payment_status_id->ViewValue, 0, -2, -2, -2);
+            $this->payment_status_id->ViewCustomAttributes = "";
+
+            // total
+            $this->total->ViewValue = $this->total->CurrentValue;
+            $this->total->ViewValue = FormatNumber($this->total->ViewValue, 0, -2, -2, -2);
+            $this->total->CssClass = "font-weight-bold";
+            $this->total->CellCssStyle .= "text-align: right;";
+            $this->total->ViewCustomAttributes = "";
+
+            // start_date
+            $this->start_date->ViewValue = $this->start_date->CurrentValue;
+            $this->start_date->ViewValue = FormatDateTime($this->start_date->ViewValue, 0);
+            $this->start_date->ViewCustomAttributes = "";
+
+            // end_date
+            $this->end_date->ViewValue = $this->end_date->CurrentValue;
+            $this->end_date->ViewValue = FormatDateTime($this->end_date->ViewValue, 0);
+            $this->end_date->ViewCustomAttributes = "";
+
             // transaction_id
             $this->transaction_id->LinkCustomAttributes = "";
             $this->transaction_id->HrefValue = "";
             $this->transaction_id->TooltipValue = "";
 
-            // campaign_id
-            $this->campaign_id->LinkCustomAttributes = "";
-            $this->campaign_id->HrefValue = "";
-            $this->campaign_id->TooltipValue = "";
+            // campaign
+            $this->campaign->LinkCustomAttributes = "";
+            $this->campaign->HrefValue = "";
+            $this->campaign->TooltipValue = "";
 
-            // quantity
-            $this->quantity->LinkCustomAttributes = "";
-            $this->quantity->HrefValue = "";
-            $this->quantity->TooltipValue = "";
+            // transaction_status
+            $this->transaction_status->LinkCustomAttributes = "";
+            $this->transaction_status->HrefValue = "";
+            $this->transaction_status->TooltipValue = "";
 
-            // campaign_status
-            $this->campaign_status->LinkCustomAttributes = "";
-            $this->campaign_status->HrefValue = "";
-            $this->campaign_status->TooltipValue = "";
+            // status_id
+            $this->status_id->LinkCustomAttributes = "";
+            if (!EmptyValue($this->transaction_id->CurrentValue)) {
+                $this->status_id->HrefValue = (!empty($this->transaction_id->ViewValue) && !is_array($this->transaction_id->ViewValue) ? RemoveHtml($this->transaction_id->ViewValue) : $this->transaction_id->CurrentValue); // Add prefix/suffix
+                $this->status_id->LinkAttrs["target"] = ""; // Add target
+                if ($this->isExport()) {
+                    $this->status_id->HrefValue = FullUrl($this->status_id->HrefValue, "href");
+                }
+            } else {
+                $this->status_id->HrefValue = "";
+            }
+            $this->status_id->TooltipValue = "";
 
-            // print_status
-            $this->print_status->LinkCustomAttributes = "";
-            $this->print_status->HrefValue = "";
-            $this->print_status->TooltipValue = "";
+            // payment_date
+            $this->payment_date->LinkCustomAttributes = "";
+            $this->payment_date->HrefValue = "";
+            $this->payment_date->TooltipValue = "";
 
-            // payment_status
-            $this->payment_status->LinkCustomAttributes = "";
-            $this->payment_status->HrefValue = "";
-            $this->payment_status->TooltipValue = "";
+            // inventory
+            $this->inventory->LinkCustomAttributes = "";
+            $this->inventory->HrefValue = "";
+            if (!$this->isExport()) {
+                $this->inventory->TooltipValue = strval($this->print_stage->CurrentValue);
+                if ($this->inventory->HrefValue == "") {
+                    $this->inventory->HrefValue = "javascript:void(0);";
+                }
+                $this->inventory->LinkAttrs->appendClass("ew-tooltip-link");
+                $this->inventory->LinkAttrs["data-tooltip-id"] = "tt_view_campaigns_pending_x" . $this->RowCount . "_inventory";
+                $this->inventory->LinkAttrs["data-tooltip-width"] = $this->inventory->TooltipWidth;
+                $this->inventory->LinkAttrs["data-placement"] = Config("CSS_FLIP") ? "left" : "right";
+            }
 
-            // start_date
-            $this->start_date->LinkCustomAttributes = "";
-            $this->start_date->HrefValue = "";
-            $this->start_date->TooltipValue = "";
-
-            // end_date
-            $this->end_date->LinkCustomAttributes = "";
-            $this->end_date->HrefValue = "";
-            $this->end_date->TooltipValue = "";
+            // bus_size
+            $this->bus_size->LinkCustomAttributes = "";
+            $this->bus_size->HrefValue = "";
+            $this->bus_size->TooltipValue = "";
 
             // vendor
             $this->vendor->LinkCustomAttributes = "";
@@ -1932,40 +2220,36 @@ class ViewCampaignsPendingList extends ViewCampaignsPending
             $this->operator->HrefValue = "";
             $this->operator->TooltipValue = "";
 
-            // platform
-            $this->platform->LinkCustomAttributes = "";
-            $this->platform->HrefValue = "";
-            $this->platform->TooltipValue = "";
-
-            // price
-            $this->price->LinkCustomAttributes = "";
-            $this->price->HrefValue = "";
-            $this->price->TooltipValue = "";
+            // quantity
+            $this->quantity->LinkCustomAttributes = "";
+            $this->quantity->HrefValue = "";
+            $this->quantity->TooltipValue = "";
 
             // operator_fee
             $this->operator_fee->LinkCustomAttributes = "";
             $this->operator_fee->HrefValue = "";
             $this->operator_fee->TooltipValue = "";
 
-            // agency_fee
-            $this->agency_fee->LinkCustomAttributes = "";
-            $this->agency_fee->HrefValue = "";
-            $this->agency_fee->TooltipValue = "";
-
-            // lamata_fee
-            $this->lamata_fee->LinkCustomAttributes = "";
-            $this->lamata_fee->HrefValue = "";
-            $this->lamata_fee->TooltipValue = "";
-
-            // lasaa_fee
-            $this->lasaa_fee->LinkCustomAttributes = "";
-            $this->lasaa_fee->HrefValue = "";
-            $this->lasaa_fee->TooltipValue = "";
-
-            // printers_fee
-            $this->printers_fee->LinkCustomAttributes = "";
-            $this->printers_fee->HrefValue = "";
-            $this->printers_fee->TooltipValue = "";
+            // total
+            $this->total->LinkCustomAttributes = "";
+            $this->total->HrefValue = "";
+            $this->total->TooltipValue = "";
+        } elseif ($this->RowType == ROWTYPE_AGGREGATEINIT) { // Initialize aggregate row
+                    $this->quantity->Total = 0; // Initialize total
+                    $this->operator_fee->Total = 0; // Initialize total
+        } elseif ($this->RowType == ROWTYPE_AGGREGATE) { // Aggregate row
+            $this->quantity->CurrentValue = $this->quantity->Total;
+            $this->quantity->ViewValue = $this->quantity->CurrentValue;
+            $this->quantity->ViewValue = FormatNumber($this->quantity->ViewValue, 0, -2, -2, -2);
+            $this->quantity->CellCssStyle .= "text-align: right;";
+            $this->quantity->ViewCustomAttributes = "";
+            $this->quantity->HrefValue = ""; // Clear href value
+            $this->operator_fee->CurrentValue = $this->operator_fee->Total;
+            $this->operator_fee->ViewValue = $this->operator_fee->CurrentValue;
+            $this->operator_fee->ViewValue = FormatNumber($this->operator_fee->ViewValue, 0, -2, -2, -2);
+            $this->operator_fee->CellCssStyle .= "text-align: right;";
+            $this->operator_fee->ViewCustomAttributes = "";
+            $this->operator_fee->HrefValue = ""; // Clear href value
         }
 
         // Call Row Rendered event
@@ -2036,6 +2320,8 @@ class ViewCampaignsPendingList extends ViewCampaignsPending
 
             // Set up lookup SQL and connection
             switch ($fld->FieldVar) {
+                case "x_status_id":
+                    break;
                 default:
                     $lookupFilter = "";
                     break;
@@ -2189,7 +2475,113 @@ class ViewCampaignsPendingList extends ViewCampaignsPending
     // Row Custom Action event
     public function rowCustomAction($action, $row)
     {
+    	require_once 'views\PrivateFunctions.php';
+
         // Return false to abort
+        $this->UpdateTable = '"main_transactions"';
+
+        // APPROVE 
+        if ($action == "approve") { // Check action name
+                $rsnew = ["status_id" => 2]; // Array of field(s) to be updated
+                $result = $this->update($rsnew, "id = " . $row["transaction_id"],NULL,FALSE); // Update the current record only (the second argument is WHERE clause for UPDATE statement)
+                if (!$result) { // Failure
+                        $this->setFailureMessage("Failed to Approve campaign (". $row["campaign"]."). Please contact Support! ");
+                        return false; // Abort and rollback
+                } elseif ($this->SelectedIndex == $this->SelectedCount) { // Last row
+                        $this->setSuccessMessage("Your campaign approval request for (". $row["campaign"].") was successful. An email will be sent to all relevant parties.");
+                        #===============================================================================================================
+                        	$username = "Transit Media Vendor";
+                            $email = "";
+                            $msg = "";
+                            $msgtxt = "";
+                            $subject = "";
+                            $camp_id = $row["transaction_id"];
+                            $sql = "select
+                            c.name, name, t.start_date, t.end_date,
+                            (t.end_date::timestamp - t.start_date::timestamp) as duration,
+                            t.quantity,
+                            to_char(
+                            t.quantity * (select price FROM public.z_price_settings p where p.id = c.price_id)
+                            , 'N999,999,999,990'::text) as amount,
+                            (select value from z_core_settings where name = 'ext_account_details' ) as account_details,
+                            (select name from y_vendors v where v.id = vendor_id) as vendor,
+                            (select name from y_operators o where o.id = t.operator_id) as operator,
+                            (select email from y_operators o where o.id = t.operator_id) as operator_email,
+                            (select contact_name from y_operators o where o.id = t.operator_id) as operator_contact_name
+                            from main_campaigns c, main_transactions t 
+                            where 
+                            t.campaign_id = c.id and
+                            t.id = {$camp_id} ;";
+                            $camp_details = ExecuteRow($sql);
+                            $operator = $camp_details["operator"];
+                            $operator_email = $camp_details["operator_email"];
+                            $operator_contact_name =  $camp_details["operator_contact_name"];
+                            $rowssql = "select email from main_users where vendor_id in ";
+                            $rowssql .= "(select vendor_id from main_campaigns where id in (select campaign_id from main_transactions where id = " . $camp_id . "));";
+                            $rows = ExecuteRows($rowssql);
+                            $emailslist_array = [];
+                            foreach ($rows as $v) {
+                                if(strlen($v['email']) > 2 ){
+                                    $emailslist_array[] = $v['email'];
+                                }
+                            }
+                            $emailslist = implode(',', $emailslist_array);
+
+                            // $email = $val['email'];
+                            $email = $emailslist;
+                            $vendor = $camp_details['vendor'];
+                            $username = $vendor;
+                            $search_replace = [
+                                '[x_campaign]' => $camp_details['name'],
+                                '[x_quantity]' => $camp_details['quantity'],
+                                '[x_vendor]' => $vendor,
+                                '[x_supportemail] ' => 'info@transitmedia.com.ng',
+                            ];
+                            $search = array_keys($search_replace);
+                            $replace = array_values($search_replace);
+                            $x_camp_name = $camp_details['name'];
+
+                        //if ($rsold["status_id"] != 2 && $rsnew["status_id"] == 2) {
+                            //Campaign Approved
+                            $sql_msg = "select value from z_core_settings where name = 'campaign_approved';";
+                            $editmsg = ExecuteScalar($sql_msg);
+                            $msg = str_replace($search, $replace, $editmsg);
+                            $msgtxt = strip_tags($msg);
+                            $subject = "APPROVED CAMPAIGN REQUEST ({$vendor}) - TRANSIT MEDIA ADMIN";
+                            $subject = "{$x_camp_name} - ({$vendor}) - TRANSIT MEDIA ADMIN";
+                            sendTMmail('admin@transitmedia.com.ng', $email, $subject, $msg, $msgtxt);
+
+                            // Email to TM
+                            $sql_msg = "select value from z_core_settings where name = 'campaign_approved_transitmedia';";
+                            $editmsg = ExecuteScalar($sql_msg);
+                            $msg = str_replace($search, $replace, $editmsg);
+                            $msgtxt = strip_tags($msg);
+                            $subject = "APPROVED CAMPAIGN REQUEST ({$vendor}) - TRANSIT MEDIA ADMIN";
+                            $subject = "{$x_camp_name} - ({$vendor}) - TRANSIT MEDIA ADMIN";
+                            $email = 'info@transitmedia.com.ng';
+                            sendTMmail('admin@transitmedia.com.ng', $email, $subject, $msg, $msgtxt);
+
+                            // Email to PO
+                            //??
+
+                            //`nohup /opt/lampp/bin/php /opt/tmscripts/TMDOC_generate_invoice_test.php {$camp_id} 1 &`;
+                            //`nohup /opt/lampp/bin/php /opt/tmscripts/TMDOC_generate_invoice_test.php {$camp_id} 2 &`;
+                        //}
+                }
+                return true; // Success
+        }
+        // DENY
+        if ($action == "deny") { // Check action name
+                $rsnew = ["status_id" => 3]; // Array of field(s) to be updated
+                $result = $this->update($rsnew, "id = " . $row["transaction_id"],NULL,FALSE); // Update the current record only (the second argument is WHERE clause for UPDATE statement)
+                if (!$result) { // Failure
+                        $this->setFailureMessage("Failed to Deny campaign (". $row["campaign"]."). Please contact Support! ");
+                        return false; // Abort and rollback
+                } elseif ($this->SelectedIndex == $this->SelectedCount) { // Last row
+                        $this->setSuccessMessage("Your campaign (". $row["campaign"].") has been successfully denied.");                
+                }
+                return true; // Success
+        }
         return true;
     }
 

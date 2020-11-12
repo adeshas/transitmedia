@@ -30,6 +30,8 @@ class XTransactionStatus extends DbTable
     // Fields
     public $id;
     public $name;
+    public $admin_name;
+    public $operator_name;
 
     // Page ID
     public $PageID = ""; // To be overridden by subclass
@@ -67,18 +69,30 @@ class XTransactionStatus extends DbTable
         $this->BasicSearch = new BasicSearch($this->TableVar);
 
         // id
-        $this->id = new DbField('x_transaction_status', 'x_transaction_status', 'x_id', 'id', '"id"', 'CAST("id" AS varchar(255))', 3, 4, -1, false, '"id"', false, false, false, 'FORMATTED TEXT', 'TEXT');
+        $this->id = new DbField('x_transaction_status', 'x_transaction_status', 'x_id', 'id', '"id"', 'CAST("id" AS varchar(255))', 3, 4, -1, false, '"id"', false, false, false, 'FORMATTED TEXT', 'NO');
+        $this->id->IsAutoIncrement = true; // Autoincrement field
+        $this->id->IsPrimaryKey = true; // Primary key field
         $this->id->Nullable = false; // NOT NULL field
         $this->id->Sortable = true; // Allow sort
         $this->id->DefaultErrorMessage = $Language->phrase("IncorrectInteger");
         $this->Fields['id'] = &$this->id;
 
         // name
-        $this->name = new DbField('x_transaction_status', 'x_transaction_status', 'x_name', 'name', '"name"', '"name"', 201, 0, -1, false, '"name"', false, false, false, 'FORMATTED TEXT', 'TEXT');
+        $this->name = new DbField('x_transaction_status', 'x_transaction_status', 'x_name', 'name', '"name"', '"name"', 200, 0, -1, false, '"name"', false, false, false, 'FORMATTED TEXT', 'TEXT');
         $this->name->Nullable = false; // NOT NULL field
         $this->name->Required = true; // Required field
         $this->name->Sortable = true; // Allow sort
         $this->Fields['name'] = &$this->name;
+
+        // admin_name
+        $this->admin_name = new DbField('x_transaction_status', 'x_transaction_status', 'x_admin_name', 'admin_name', '"admin_name"', '"admin_name"', 200, 0, -1, false, '"admin_name"', false, false, false, 'FORMATTED TEXT', 'TEXT');
+        $this->admin_name->Sortable = true; // Allow sort
+        $this->Fields['admin_name'] = &$this->admin_name;
+
+        // operator_name
+        $this->operator_name = new DbField('x_transaction_status', 'x_transaction_status', 'x_operator_name', 'operator_name', '"operator_name"', '"operator_name"', 200, 0, -1, false, '"operator_name"', false, false, false, 'FORMATTED TEXT', 'TEXT');
+        $this->operator_name->Sortable = true; // Allow sort
+        $this->Fields['operator_name'] = &$this->operator_name;
     }
 
     // Field Visibility
@@ -402,6 +416,9 @@ class XTransactionStatus extends DbTable
         $conn = $this->getConnection();
         $success = $this->insertSql($rs)->execute();
         if ($success) {
+            // Get insert id if necessary
+            $this->id->setDbValue($conn->fetchColumn("SELECT currval('campaign_status_id_seq'::regclass)"));
+            $rs['id'] = $this->id->DbValue;
         }
         return $success;
     }
@@ -461,6 +478,9 @@ class XTransactionStatus extends DbTable
             $where = $this->arrayToFilter($where);
         }
         if ($rs) {
+            if (array_key_exists('id', $rs)) {
+                AddFilter($where, QuotedName('id', $this->Dbid) . '=' . QuotedValue($rs['id'], $this->id->DataType, $this->Dbid));
+            }
         }
         $filter = ($curfilter) ? $this->CurrentFilter : "";
         AddFilter($filter, $where);
@@ -485,6 +505,8 @@ class XTransactionStatus extends DbTable
         }
         $this->id->DbValue = $row['id'];
         $this->name->DbValue = $row['name'];
+        $this->admin_name->DbValue = $row['admin_name'];
+        $this->operator_name->DbValue = $row['operator_name'];
     }
 
     // Delete uploaded files
@@ -496,13 +518,19 @@ class XTransactionStatus extends DbTable
     // Record filter WHERE clause
     protected function sqlKeyFilter()
     {
-        return "";
+        return "\"id\" = @id@";
     }
 
     // Get Key
     public function getKey($current = false)
     {
         $keys = [];
+        $val = $current ? $this->id->CurrentValue : $this->id->OldValue;
+        if (EmptyValue($val)) {
+            return "";
+        } else {
+            $keys[] = $val;
+        }
         return implode(Config("COMPOSITE_KEY_SEPARATOR"), $keys);
     }
 
@@ -511,7 +539,12 @@ class XTransactionStatus extends DbTable
     {
         $this->OldKey = strval($key);
         $keys = explode(Config("COMPOSITE_KEY_SEPARATOR"), $this->OldKey);
-        if (count($keys) == 0) {
+        if (count($keys) == 1) {
+            if ($current) {
+                $this->id->CurrentValue = $keys[0];
+            } else {
+                $this->id->OldValue = $keys[0];
+            }
         }
     }
 
@@ -519,6 +552,19 @@ class XTransactionStatus extends DbTable
     public function getRecordFilter($row = null)
     {
         $keyFilter = $this->sqlKeyFilter();
+        if (is_array($row)) {
+            $val = array_key_exists('id', $row) ? $row['id'] : null;
+        } else {
+            $val = $this->id->OldValue !== null ? $this->id->OldValue : $this->id->CurrentValue;
+        }
+        if (!is_numeric($val)) {
+            return "0=1"; // Invalid key
+        }
+        if ($val === null) {
+            return "0=1"; // Invalid key
+        } else {
+            $keyFilter = str_replace("@id@", AdjustSql($val, $this->Dbid), $keyFilter); // Replace key value
+        }
         return $keyFilter;
     }
 
@@ -647,6 +693,7 @@ class XTransactionStatus extends DbTable
     public function keyToJson($htmlEncode = false)
     {
         $json = "";
+        $json .= "id:" . JsonEncode($this->id->CurrentValue, "number");
         $json = "{" . $json . "}";
         if ($htmlEncode) {
             $json = HtmlEncode($json);
@@ -657,6 +704,11 @@ class XTransactionStatus extends DbTable
     // Add key value to URL
     public function keyUrl($url, $parm = "")
     {
+        if ($this->id->CurrentValue !== null) {
+            $url .= "/" . rawurlencode($this->id->CurrentValue);
+        } else {
+            return "javascript:ew.alert(ew.language.phrase('InvalidRecord'));";
+        }
         if ($parm != "") {
             $url .= "?" . $parm;
         }
@@ -715,12 +767,23 @@ SORTHTML;
             $arKeys = Param("key_m");
             $cnt = count($arKeys);
         } else {
+            if (($keyValue = Param("id") ?? Route("id")) !== null) {
+                $arKeys[] = $keyValue;
+            } elseif (IsApi() && (($keyValue = Key(0) ?? Route(2)) !== null)) {
+                $arKeys[] = $keyValue;
+            } else {
+                $arKeys = null; // Do not setup
+            }
+
             //return $arKeys; // Do not return yet, so the values will also be checked by the following code
         }
         // Check keys
         $ar = [];
         if (is_array($arKeys)) {
             foreach ($arKeys as $key) {
+                if (!is_numeric($key)) {
+                    continue;
+                }
                 $ar[] = $key;
             }
         }
@@ -735,6 +798,11 @@ SORTHTML;
         foreach ($arKeys as $key) {
             if ($keyFilter != "") {
                 $keyFilter .= " OR ";
+            }
+            if ($setCurrent) {
+                $this->id->CurrentValue = $key;
+            } else {
+                $this->id->OldValue = $key;
             }
             $keyFilter .= "(" . $this->getRecordFilter() . ")";
         }
@@ -762,6 +830,8 @@ SORTHTML;
         }
         $this->id->setDbValue($row['id']);
         $this->name->setDbValue($row['name']);
+        $this->admin_name->setDbValue($row['admin_name']);
+        $this->operator_name->setDbValue($row['operator_name']);
     }
 
     // Render list row values
@@ -778,14 +848,25 @@ SORTHTML;
 
         // name
 
+        // admin_name
+
+        // operator_name
+
         // id
         $this->id->ViewValue = $this->id->CurrentValue;
-        $this->id->ViewValue = FormatNumber($this->id->ViewValue, 0, -2, -2, -2);
         $this->id->ViewCustomAttributes = "";
 
         // name
         $this->name->ViewValue = $this->name->CurrentValue;
         $this->name->ViewCustomAttributes = "";
+
+        // admin_name
+        $this->admin_name->ViewValue = $this->admin_name->CurrentValue;
+        $this->admin_name->ViewCustomAttributes = "";
+
+        // operator_name
+        $this->operator_name->ViewValue = $this->operator_name->CurrentValue;
+        $this->operator_name->ViewCustomAttributes = "";
 
         // id
         $this->id->LinkCustomAttributes = "";
@@ -796,6 +877,16 @@ SORTHTML;
         $this->name->LinkCustomAttributes = "";
         $this->name->HrefValue = "";
         $this->name->TooltipValue = "";
+
+        // admin_name
+        $this->admin_name->LinkCustomAttributes = "";
+        $this->admin_name->HrefValue = "";
+        $this->admin_name->TooltipValue = "";
+
+        // operator_name
+        $this->operator_name->LinkCustomAttributes = "";
+        $this->operator_name->HrefValue = "";
+        $this->operator_name->TooltipValue = "";
 
         // Call Row Rendered event
         $this->rowRendered();
@@ -816,7 +907,7 @@ SORTHTML;
         $this->id->EditAttrs["class"] = "form-control";
         $this->id->EditCustomAttributes = "";
         $this->id->EditValue = $this->id->CurrentValue;
-        $this->id->PlaceHolder = RemoveHtml($this->id->caption());
+        $this->id->ViewCustomAttributes = "";
 
         // name
         $this->name->EditAttrs["class"] = "form-control";
@@ -826,6 +917,24 @@ SORTHTML;
         }
         $this->name->EditValue = $this->name->CurrentValue;
         $this->name->PlaceHolder = RemoveHtml($this->name->caption());
+
+        // admin_name
+        $this->admin_name->EditAttrs["class"] = "form-control";
+        $this->admin_name->EditCustomAttributes = "";
+        if (!$this->admin_name->Raw) {
+            $this->admin_name->CurrentValue = HtmlDecode($this->admin_name->CurrentValue);
+        }
+        $this->admin_name->EditValue = $this->admin_name->CurrentValue;
+        $this->admin_name->PlaceHolder = RemoveHtml($this->admin_name->caption());
+
+        // operator_name
+        $this->operator_name->EditAttrs["class"] = "form-control";
+        $this->operator_name->EditCustomAttributes = "";
+        if (!$this->operator_name->Raw) {
+            $this->operator_name->CurrentValue = HtmlDecode($this->operator_name->CurrentValue);
+        }
+        $this->operator_name->EditValue = $this->operator_name->CurrentValue;
+        $this->operator_name->PlaceHolder = RemoveHtml($this->operator_name->caption());
 
         // Call Row Rendered event
         $this->rowRendered();
@@ -857,9 +966,13 @@ SORTHTML;
                 if ($exportPageType == "view") {
                     $doc->exportCaption($this->id);
                     $doc->exportCaption($this->name);
+                    $doc->exportCaption($this->admin_name);
+                    $doc->exportCaption($this->operator_name);
                 } else {
                     $doc->exportCaption($this->id);
                     $doc->exportCaption($this->name);
+                    $doc->exportCaption($this->admin_name);
+                    $doc->exportCaption($this->operator_name);
                 }
                 $doc->endExportRow();
             }
@@ -891,9 +1004,13 @@ SORTHTML;
                     if ($exportPageType == "view") {
                         $doc->exportField($this->id);
                         $doc->exportField($this->name);
+                        $doc->exportField($this->admin_name);
+                        $doc->exportField($this->operator_name);
                     } else {
                         $doc->exportField($this->id);
                         $doc->exportField($this->name);
+                        $doc->exportField($this->admin_name);
+                        $doc->exportField($this->operator_name);
                     }
                     $doc->endExportRow($rowCnt);
                 }

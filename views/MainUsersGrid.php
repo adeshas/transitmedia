@@ -27,7 +27,7 @@ loadjs.ready("head", function () {
         ["_email", [fields._email.required ? ew.Validators.required(fields._email.caption) : null, ew.Validators.email], fields._email.isInvalid],
         ["user_type", [fields.user_type.required ? ew.Validators.required(fields.user_type.caption) : null], fields.user_type.isInvalid],
         ["vendor_id", [fields.vendor_id.required ? ew.Validators.required(fields.vendor_id.caption) : null], fields.vendor_id.isInvalid],
-        ["reportsto", [fields.reportsto.required ? ew.Validators.required(fields.reportsto.caption) : null, ew.Validators.integer], fields.reportsto.isInvalid]
+        ["reportsto", [fields.reportsto.required ? ew.Validators.required(fields.reportsto.caption) : null], fields.reportsto.isInvalid]
     ]);
 
     // Set invalid fields
@@ -509,10 +509,30 @@ loadjs.ready("head", function() {
 <input type="hidden" id="x<?= $Grid->RowIndex ?>_vendor_id" name="x<?= $Grid->RowIndex ?>_vendor_id" value="<?= HtmlEncode($Grid->vendor_id->CurrentValue) ?>" data-hidden="1">
 <?php } elseif (!$Security->isAdmin() && $Security->isLoggedIn() && !$Grid->userIDAllow("grid")) { // Non system admin ?>
 <span id="el<?= $Grid->RowCount ?>_main_users_vendor_id" class="form-group">
-<span<?= $Grid->vendor_id->viewAttributes() ?>>
-<input type="text" readonly class="form-control-plaintext" value="<?= HtmlEncode(RemoveHtml($Grid->vendor_id->getDisplayValue($Grid->vendor_id->EditValue))) ?>"></span>
+    <select
+        id="x<?= $Grid->RowIndex ?>_vendor_id"
+        name="x<?= $Grid->RowIndex ?>_vendor_id"
+        class="form-control ew-select<?= $Grid->vendor_id->isInvalidClass() ?>"
+        data-select2-id="main_users_x<?= $Grid->RowIndex ?>_vendor_id"
+        data-table="main_users"
+        data-field="x_vendor_id"
+        data-value-separator="<?= $Grid->vendor_id->displayValueSeparatorAttribute() ?>"
+        data-placeholder="<?= HtmlEncode($Grid->vendor_id->getPlaceHolder()) ?>"
+        <?= $Grid->vendor_id->editAttributes() ?>>
+        <?= $Grid->vendor_id->selectOptionListHtml("x{$Grid->RowIndex}_vendor_id") ?>
+    </select>
+    <div class="invalid-feedback"><?= $Grid->vendor_id->getErrorMessage() ?></div>
+<?= $Grid->vendor_id->Lookup->getParamTag($Grid, "p_x" . $Grid->RowIndex . "_vendor_id") ?>
+<script>
+loadjs.ready("head", function() {
+    var el = document.querySelector("select[data-select2-id='main_users_x<?= $Grid->RowIndex ?>_vendor_id']"),
+        options = { name: "x<?= $Grid->RowIndex ?>_vendor_id", selectId: "main_users_x<?= $Grid->RowIndex ?>_vendor_id", language: ew.LANGUAGE_ID, dir: ew.IS_RTL ? "rtl" : "ltr" };
+    options.dropdownParent = $(el).closest("#ew-modal-dialog, #ew-add-opt-dialog")[0];
+    Object.assign(options, ew.vars.tables.main_users.fields.vendor_id.selectOptions);
+    ew.createSelect(options);
+});
+</script>
 </span>
-<input type="hidden" data-table="main_users" data-field="x_vendor_id" data-hidden="1" name="x<?= $Grid->RowIndex ?>_vendor_id" id="x<?= $Grid->RowIndex ?>_vendor_id" value="<?= HtmlEncode($Grid->vendor_id->CurrentValue) ?>">
 <?php } else { ?>
 <span id="el<?= $Grid->RowCount ?>_main_users_vendor_id" class="form-group">
     <select
@@ -551,10 +571,30 @@ loadjs.ready("head", function() {
 <input type="hidden" id="x<?= $Grid->RowIndex ?>_vendor_id" name="x<?= $Grid->RowIndex ?>_vendor_id" value="<?= HtmlEncode($Grid->vendor_id->CurrentValue) ?>" data-hidden="1">
 <?php } elseif (!$Security->isAdmin() && $Security->isLoggedIn() && !$Grid->userIDAllow("grid")) { // Non system admin ?>
 <span id="el<?= $Grid->RowCount ?>_main_users_vendor_id" class="form-group">
-<span<?= $Grid->vendor_id->viewAttributes() ?>>
-<input type="text" readonly class="form-control-plaintext" value="<?= HtmlEncode(RemoveHtml($Grid->vendor_id->getDisplayValue($Grid->vendor_id->EditValue))) ?>"></span>
+    <select
+        id="x<?= $Grid->RowIndex ?>_vendor_id"
+        name="x<?= $Grid->RowIndex ?>_vendor_id"
+        class="form-control ew-select<?= $Grid->vendor_id->isInvalidClass() ?>"
+        data-select2-id="main_users_x<?= $Grid->RowIndex ?>_vendor_id"
+        data-table="main_users"
+        data-field="x_vendor_id"
+        data-value-separator="<?= $Grid->vendor_id->displayValueSeparatorAttribute() ?>"
+        data-placeholder="<?= HtmlEncode($Grid->vendor_id->getPlaceHolder()) ?>"
+        <?= $Grid->vendor_id->editAttributes() ?>>
+        <?= $Grid->vendor_id->selectOptionListHtml("x{$Grid->RowIndex}_vendor_id") ?>
+    </select>
+    <div class="invalid-feedback"><?= $Grid->vendor_id->getErrorMessage() ?></div>
+<?= $Grid->vendor_id->Lookup->getParamTag($Grid, "p_x" . $Grid->RowIndex . "_vendor_id") ?>
+<script>
+loadjs.ready("head", function() {
+    var el = document.querySelector("select[data-select2-id='main_users_x<?= $Grid->RowIndex ?>_vendor_id']"),
+        options = { name: "x<?= $Grid->RowIndex ?>_vendor_id", selectId: "main_users_x<?= $Grid->RowIndex ?>_vendor_id", language: ew.LANGUAGE_ID, dir: ew.IS_RTL ? "rtl" : "ltr" };
+    options.dropdownParent = $(el).closest("#ew-modal-dialog, #ew-add-opt-dialog")[0];
+    Object.assign(options, ew.vars.tables.main_users.fields.vendor_id.selectOptions);
+    ew.createSelect(options);
+});
+</script>
 </span>
-<input type="hidden" data-table="main_users" data-field="x_vendor_id" data-hidden="1" name="x<?= $Grid->RowIndex ?>_vendor_id" id="x<?= $Grid->RowIndex ?>_vendor_id" value="<?= HtmlEncode($Grid->vendor_id->CurrentValue) ?>">
 <?php } else { ?>
 <span id="el<?= $Grid->RowCount ?>_main_users_vendor_id" class="form-group">
     <select
@@ -598,45 +638,123 @@ loadjs.ready("head", function() {
     <?php if ($Grid->reportsto->Visible) { // reportsto ?>
         <td data-name="reportsto" <?= $Grid->reportsto->cellAttributes() ?>>
 <?php if ($Grid->RowType == ROWTYPE_ADD) { // Add record ?>
+<?php if (!$Security->isAdmin() && $Security->isLoggedIn()) { // Non system admin ?>
 <span id="el<?= $Grid->RowCount ?>_main_users_reportsto" class="form-group">
-<?php
-$onchange = $Grid->reportsto->EditAttrs->prepend("onchange", "");
-$onchange = ($onchange) ? ' onchange="' . JsEncode($onchange) . '"' : '';
-$Grid->reportsto->EditAttrs["onchange"] = "";
-?>
-<span id="as_x<?= $Grid->RowIndex ?>_reportsto" class="ew-auto-suggest">
-    <input type="<?= $Grid->reportsto->getInputTextType() ?>" class="form-control" name="sv_x<?= $Grid->RowIndex ?>_reportsto" id="sv_x<?= $Grid->RowIndex ?>_reportsto" value="<?= RemoveHtml($Grid->reportsto->EditValue) ?>" size="30" placeholder="<?= HtmlEncode($Grid->reportsto->getPlaceHolder()) ?>" data-placeholder="<?= HtmlEncode($Grid->reportsto->getPlaceHolder()) ?>"<?= $Grid->reportsto->editAttributes() ?>>
-</span>
-<input type="hidden" is="selection-list" class="form-control" data-table="main_users" data-field="x_reportsto" data-input="sv_x<?= $Grid->RowIndex ?>_reportsto" data-value-separator="<?= $Grid->reportsto->displayValueSeparatorAttribute() ?>" name="x<?= $Grid->RowIndex ?>_reportsto" id="x<?= $Grid->RowIndex ?>_reportsto" value="<?= HtmlEncode($Grid->reportsto->CurrentValue) ?>"<?= $onchange ?>>
-<div class="invalid-feedback"><?= $Grid->reportsto->getErrorMessage() ?></div>
+    <select
+        id="x<?= $Grid->RowIndex ?>_reportsto"
+        name="x<?= $Grid->RowIndex ?>_reportsto"
+        class="form-control ew-select<?= $Grid->reportsto->isInvalidClass() ?>"
+        data-select2-id="main_users_x<?= $Grid->RowIndex ?>_reportsto"
+        data-table="main_users"
+        data-field="x_reportsto"
+        data-value-separator="<?= $Grid->reportsto->displayValueSeparatorAttribute() ?>"
+        data-placeholder="<?= HtmlEncode($Grid->reportsto->getPlaceHolder()) ?>"
+        <?= $Grid->reportsto->editAttributes() ?>>
+        <?= $Grid->reportsto->selectOptionListHtml("x{$Grid->RowIndex}_reportsto") ?>
+    </select>
+    <div class="invalid-feedback"><?= $Grid->reportsto->getErrorMessage() ?></div>
+<?= $Grid->reportsto->Lookup->getParamTag($Grid, "p_x" . $Grid->RowIndex . "_reportsto") ?>
 <script>
-loadjs.ready(["fmain_usersgrid"], function() {
-    fmain_usersgrid.createAutoSuggest(Object.assign({"id":"x<?= $Grid->RowIndex ?>_reportsto","forceSelect":false}, ew.vars.tables.main_users.fields.reportsto.autoSuggestOptions));
+loadjs.ready("head", function() {
+    var el = document.querySelector("select[data-select2-id='main_users_x<?= $Grid->RowIndex ?>_reportsto']"),
+        options = { name: "x<?= $Grid->RowIndex ?>_reportsto", selectId: "main_users_x<?= $Grid->RowIndex ?>_reportsto", language: ew.LANGUAGE_ID, dir: ew.IS_RTL ? "rtl" : "ltr" };
+    options.dropdownParent = $(el).closest("#ew-modal-dialog, #ew-add-opt-dialog")[0];
+    Object.assign(options, ew.vars.tables.main_users.fields.reportsto.selectOptions);
+    ew.createSelect(options);
 });
 </script>
-<?= $Grid->reportsto->Lookup->getParamTag($Grid, "p_x" . $Grid->RowIndex . "_reportsto") ?>
 </span>
+<?php } else { ?>
+<span id="el<?= $Grid->RowCount ?>_main_users_reportsto" class="form-group">
+    <select
+        id="x<?= $Grid->RowIndex ?>_reportsto"
+        name="x<?= $Grid->RowIndex ?>_reportsto"
+        class="form-control ew-select<?= $Grid->reportsto->isInvalidClass() ?>"
+        data-select2-id="main_users_x<?= $Grid->RowIndex ?>_reportsto"
+        data-table="main_users"
+        data-field="x_reportsto"
+        data-value-separator="<?= $Grid->reportsto->displayValueSeparatorAttribute() ?>"
+        data-placeholder="<?= HtmlEncode($Grid->reportsto->getPlaceHolder()) ?>"
+        <?= $Grid->reportsto->editAttributes() ?>>
+        <?= $Grid->reportsto->selectOptionListHtml("x{$Grid->RowIndex}_reportsto") ?>
+    </select>
+    <div class="invalid-feedback"><?= $Grid->reportsto->getErrorMessage() ?></div>
+<?= $Grid->reportsto->Lookup->getParamTag($Grid, "p_x" . $Grid->RowIndex . "_reportsto") ?>
+<script>
+loadjs.ready("head", function() {
+    var el = document.querySelector("select[data-select2-id='main_users_x<?= $Grid->RowIndex ?>_reportsto']"),
+        options = { name: "x<?= $Grid->RowIndex ?>_reportsto", selectId: "main_users_x<?= $Grid->RowIndex ?>_reportsto", language: ew.LANGUAGE_ID, dir: ew.IS_RTL ? "rtl" : "ltr" };
+    options.dropdownParent = $(el).closest("#ew-modal-dialog, #ew-add-opt-dialog")[0];
+    Object.assign(options, ew.vars.tables.main_users.fields.reportsto.selectOptions);
+    ew.createSelect(options);
+});
+</script>
+</span>
+<?php } ?>
 <input type="hidden" data-table="main_users" data-field="x_reportsto" data-hidden="1" name="o<?= $Grid->RowIndex ?>_reportsto" id="o<?= $Grid->RowIndex ?>_reportsto" value="<?= HtmlEncode($Grid->reportsto->OldValue) ?>">
 <?php } ?>
 <?php if ($Grid->RowType == ROWTYPE_EDIT) { // Edit record ?>
+<?php if (!$Security->isAdmin() && $Security->isLoggedIn()) { // Non system admin ?>
+<?php if (SameString($Grid->vendor_id->CurrentValue, CurrentUserID())) { ?>
+    <span id="el<?= $Grid->RowCount ?>_main_users_reportsto" class="form-group">
+    <span<?= $Grid->reportsto->viewAttributes() ?>>
+    <input type="text" readonly class="form-control-plaintext" value="<?= HtmlEncode(RemoveHtml($Grid->reportsto->getDisplayValue($Grid->reportsto->EditValue))) ?>"></span>
+    </span>
+    <input type="hidden" data-table="main_users" data-field="x_reportsto" data-hidden="1" name="x<?= $Grid->RowIndex ?>_reportsto" id="x<?= $Grid->RowIndex ?>_reportsto" value="<?= HtmlEncode($Grid->reportsto->CurrentValue) ?>">
+<?php } else { ?>
 <span id="el<?= $Grid->RowCount ?>_main_users_reportsto" class="form-group">
-<?php
-$onchange = $Grid->reportsto->EditAttrs->prepend("onchange", "");
-$onchange = ($onchange) ? ' onchange="' . JsEncode($onchange) . '"' : '';
-$Grid->reportsto->EditAttrs["onchange"] = "";
-?>
-<span id="as_x<?= $Grid->RowIndex ?>_reportsto" class="ew-auto-suggest">
-    <input type="<?= $Grid->reportsto->getInputTextType() ?>" class="form-control" name="sv_x<?= $Grid->RowIndex ?>_reportsto" id="sv_x<?= $Grid->RowIndex ?>_reportsto" value="<?= RemoveHtml($Grid->reportsto->EditValue) ?>" size="30" placeholder="<?= HtmlEncode($Grid->reportsto->getPlaceHolder()) ?>" data-placeholder="<?= HtmlEncode($Grid->reportsto->getPlaceHolder()) ?>"<?= $Grid->reportsto->editAttributes() ?>>
-</span>
-<input type="hidden" is="selection-list" class="form-control" data-table="main_users" data-field="x_reportsto" data-input="sv_x<?= $Grid->RowIndex ?>_reportsto" data-value-separator="<?= $Grid->reportsto->displayValueSeparatorAttribute() ?>" name="x<?= $Grid->RowIndex ?>_reportsto" id="x<?= $Grid->RowIndex ?>_reportsto" value="<?= HtmlEncode($Grid->reportsto->CurrentValue) ?>"<?= $onchange ?>>
-<div class="invalid-feedback"><?= $Grid->reportsto->getErrorMessage() ?></div>
+    <select
+        id="x<?= $Grid->RowIndex ?>_reportsto"
+        name="x<?= $Grid->RowIndex ?>_reportsto"
+        class="form-control ew-select<?= $Grid->reportsto->isInvalidClass() ?>"
+        data-select2-id="main_users_x<?= $Grid->RowIndex ?>_reportsto"
+        data-table="main_users"
+        data-field="x_reportsto"
+        data-value-separator="<?= $Grid->reportsto->displayValueSeparatorAttribute() ?>"
+        data-placeholder="<?= HtmlEncode($Grid->reportsto->getPlaceHolder()) ?>"
+        <?= $Grid->reportsto->editAttributes() ?>>
+        <?= $Grid->reportsto->selectOptionListHtml("x{$Grid->RowIndex}_reportsto") ?>
+    </select>
+    <div class="invalid-feedback"><?= $Grid->reportsto->getErrorMessage() ?></div>
+<?= $Grid->reportsto->Lookup->getParamTag($Grid, "p_x" . $Grid->RowIndex . "_reportsto") ?>
 <script>
-loadjs.ready(["fmain_usersgrid"], function() {
-    fmain_usersgrid.createAutoSuggest(Object.assign({"id":"x<?= $Grid->RowIndex ?>_reportsto","forceSelect":false}, ew.vars.tables.main_users.fields.reportsto.autoSuggestOptions));
+loadjs.ready("head", function() {
+    var el = document.querySelector("select[data-select2-id='main_users_x<?= $Grid->RowIndex ?>_reportsto']"),
+        options = { name: "x<?= $Grid->RowIndex ?>_reportsto", selectId: "main_users_x<?= $Grid->RowIndex ?>_reportsto", language: ew.LANGUAGE_ID, dir: ew.IS_RTL ? "rtl" : "ltr" };
+    options.dropdownParent = $(el).closest("#ew-modal-dialog, #ew-add-opt-dialog")[0];
+    Object.assign(options, ew.vars.tables.main_users.fields.reportsto.selectOptions);
+    ew.createSelect(options);
 });
 </script>
-<?= $Grid->reportsto->Lookup->getParamTag($Grid, "p_x" . $Grid->RowIndex . "_reportsto") ?>
 </span>
+<?php } ?>
+<?php } else { ?>
+<span id="el<?= $Grid->RowCount ?>_main_users_reportsto" class="form-group">
+    <select
+        id="x<?= $Grid->RowIndex ?>_reportsto"
+        name="x<?= $Grid->RowIndex ?>_reportsto"
+        class="form-control ew-select<?= $Grid->reportsto->isInvalidClass() ?>"
+        data-select2-id="main_users_x<?= $Grid->RowIndex ?>_reportsto"
+        data-table="main_users"
+        data-field="x_reportsto"
+        data-value-separator="<?= $Grid->reportsto->displayValueSeparatorAttribute() ?>"
+        data-placeholder="<?= HtmlEncode($Grid->reportsto->getPlaceHolder()) ?>"
+        <?= $Grid->reportsto->editAttributes() ?>>
+        <?= $Grid->reportsto->selectOptionListHtml("x{$Grid->RowIndex}_reportsto") ?>
+    </select>
+    <div class="invalid-feedback"><?= $Grid->reportsto->getErrorMessage() ?></div>
+<?= $Grid->reportsto->Lookup->getParamTag($Grid, "p_x" . $Grid->RowIndex . "_reportsto") ?>
+<script>
+loadjs.ready("head", function() {
+    var el = document.querySelector("select[data-select2-id='main_users_x<?= $Grid->RowIndex ?>_reportsto']"),
+        options = { name: "x<?= $Grid->RowIndex ?>_reportsto", selectId: "main_users_x<?= $Grid->RowIndex ?>_reportsto", language: ew.LANGUAGE_ID, dir: ew.IS_RTL ? "rtl" : "ltr" };
+    options.dropdownParent = $(el).closest("#ew-modal-dialog, #ew-add-opt-dialog")[0];
+    Object.assign(options, ew.vars.tables.main_users.fields.reportsto.selectOptions);
+    ew.createSelect(options);
+});
+</script>
+</span>
+<?php } ?>
 <?php } ?>
 <?php if ($Grid->RowType == ROWTYPE_VIEW) { // View record ?>
 <span id="el<?= $Grid->RowCount ?>_main_users_reportsto">
@@ -834,10 +952,30 @@ loadjs.ready("head", function() {
 <input type="hidden" id="x<?= $Grid->RowIndex ?>_vendor_id" name="x<?= $Grid->RowIndex ?>_vendor_id" value="<?= HtmlEncode($Grid->vendor_id->CurrentValue) ?>" data-hidden="1">
 <?php } elseif (!$Security->isAdmin() && $Security->isLoggedIn() && !$Grid->userIDAllow("grid")) { // Non system admin ?>
 <span id="el$rowindex$_main_users_vendor_id" class="form-group main_users_vendor_id">
-<span<?= $Grid->vendor_id->viewAttributes() ?>>
-<input type="text" readonly class="form-control-plaintext" value="<?= HtmlEncode(RemoveHtml($Grid->vendor_id->getDisplayValue($Grid->vendor_id->EditValue))) ?>"></span>
+    <select
+        id="x<?= $Grid->RowIndex ?>_vendor_id"
+        name="x<?= $Grid->RowIndex ?>_vendor_id"
+        class="form-control ew-select<?= $Grid->vendor_id->isInvalidClass() ?>"
+        data-select2-id="main_users_x<?= $Grid->RowIndex ?>_vendor_id"
+        data-table="main_users"
+        data-field="x_vendor_id"
+        data-value-separator="<?= $Grid->vendor_id->displayValueSeparatorAttribute() ?>"
+        data-placeholder="<?= HtmlEncode($Grid->vendor_id->getPlaceHolder()) ?>"
+        <?= $Grid->vendor_id->editAttributes() ?>>
+        <?= $Grid->vendor_id->selectOptionListHtml("x{$Grid->RowIndex}_vendor_id") ?>
+    </select>
+    <div class="invalid-feedback"><?= $Grid->vendor_id->getErrorMessage() ?></div>
+<?= $Grid->vendor_id->Lookup->getParamTag($Grid, "p_x" . $Grid->RowIndex . "_vendor_id") ?>
+<script>
+loadjs.ready("head", function() {
+    var el = document.querySelector("select[data-select2-id='main_users_x<?= $Grid->RowIndex ?>_vendor_id']"),
+        options = { name: "x<?= $Grid->RowIndex ?>_vendor_id", selectId: "main_users_x<?= $Grid->RowIndex ?>_vendor_id", language: ew.LANGUAGE_ID, dir: ew.IS_RTL ? "rtl" : "ltr" };
+    options.dropdownParent = $(el).closest("#ew-modal-dialog, #ew-add-opt-dialog")[0];
+    Object.assign(options, ew.vars.tables.main_users.fields.vendor_id.selectOptions);
+    ew.createSelect(options);
+});
+</script>
 </span>
-<input type="hidden" data-table="main_users" data-field="x_vendor_id" data-hidden="1" name="x<?= $Grid->RowIndex ?>_vendor_id" id="x<?= $Grid->RowIndex ?>_vendor_id" value="<?= HtmlEncode($Grid->vendor_id->CurrentValue) ?>">
 <?php } else { ?>
 <span id="el$rowindex$_main_users_vendor_id" class="form-group main_users_vendor_id">
     <select
@@ -878,24 +1016,59 @@ loadjs.ready("head", function() {
     <?php if ($Grid->reportsto->Visible) { // reportsto ?>
         <td data-name="reportsto">
 <?php if (!$Grid->isConfirm()) { ?>
+<?php if (!$Security->isAdmin() && $Security->isLoggedIn()) { // Non system admin ?>
 <span id="el$rowindex$_main_users_reportsto" class="form-group main_users_reportsto">
-<?php
-$onchange = $Grid->reportsto->EditAttrs->prepend("onchange", "");
-$onchange = ($onchange) ? ' onchange="' . JsEncode($onchange) . '"' : '';
-$Grid->reportsto->EditAttrs["onchange"] = "";
-?>
-<span id="as_x<?= $Grid->RowIndex ?>_reportsto" class="ew-auto-suggest">
-    <input type="<?= $Grid->reportsto->getInputTextType() ?>" class="form-control" name="sv_x<?= $Grid->RowIndex ?>_reportsto" id="sv_x<?= $Grid->RowIndex ?>_reportsto" value="<?= RemoveHtml($Grid->reportsto->EditValue) ?>" size="30" placeholder="<?= HtmlEncode($Grid->reportsto->getPlaceHolder()) ?>" data-placeholder="<?= HtmlEncode($Grid->reportsto->getPlaceHolder()) ?>"<?= $Grid->reportsto->editAttributes() ?>>
-</span>
-<input type="hidden" is="selection-list" class="form-control" data-table="main_users" data-field="x_reportsto" data-input="sv_x<?= $Grid->RowIndex ?>_reportsto" data-value-separator="<?= $Grid->reportsto->displayValueSeparatorAttribute() ?>" name="x<?= $Grid->RowIndex ?>_reportsto" id="x<?= $Grid->RowIndex ?>_reportsto" value="<?= HtmlEncode($Grid->reportsto->CurrentValue) ?>"<?= $onchange ?>>
-<div class="invalid-feedback"><?= $Grid->reportsto->getErrorMessage() ?></div>
+    <select
+        id="x<?= $Grid->RowIndex ?>_reportsto"
+        name="x<?= $Grid->RowIndex ?>_reportsto"
+        class="form-control ew-select<?= $Grid->reportsto->isInvalidClass() ?>"
+        data-select2-id="main_users_x<?= $Grid->RowIndex ?>_reportsto"
+        data-table="main_users"
+        data-field="x_reportsto"
+        data-value-separator="<?= $Grid->reportsto->displayValueSeparatorAttribute() ?>"
+        data-placeholder="<?= HtmlEncode($Grid->reportsto->getPlaceHolder()) ?>"
+        <?= $Grid->reportsto->editAttributes() ?>>
+        <?= $Grid->reportsto->selectOptionListHtml("x{$Grid->RowIndex}_reportsto") ?>
+    </select>
+    <div class="invalid-feedback"><?= $Grid->reportsto->getErrorMessage() ?></div>
+<?= $Grid->reportsto->Lookup->getParamTag($Grid, "p_x" . $Grid->RowIndex . "_reportsto") ?>
 <script>
-loadjs.ready(["fmain_usersgrid"], function() {
-    fmain_usersgrid.createAutoSuggest(Object.assign({"id":"x<?= $Grid->RowIndex ?>_reportsto","forceSelect":false}, ew.vars.tables.main_users.fields.reportsto.autoSuggestOptions));
+loadjs.ready("head", function() {
+    var el = document.querySelector("select[data-select2-id='main_users_x<?= $Grid->RowIndex ?>_reportsto']"),
+        options = { name: "x<?= $Grid->RowIndex ?>_reportsto", selectId: "main_users_x<?= $Grid->RowIndex ?>_reportsto", language: ew.LANGUAGE_ID, dir: ew.IS_RTL ? "rtl" : "ltr" };
+    options.dropdownParent = $(el).closest("#ew-modal-dialog, #ew-add-opt-dialog")[0];
+    Object.assign(options, ew.vars.tables.main_users.fields.reportsto.selectOptions);
+    ew.createSelect(options);
 });
 </script>
-<?= $Grid->reportsto->Lookup->getParamTag($Grid, "p_x" . $Grid->RowIndex . "_reportsto") ?>
 </span>
+<?php } else { ?>
+<span id="el$rowindex$_main_users_reportsto" class="form-group main_users_reportsto">
+    <select
+        id="x<?= $Grid->RowIndex ?>_reportsto"
+        name="x<?= $Grid->RowIndex ?>_reportsto"
+        class="form-control ew-select<?= $Grid->reportsto->isInvalidClass() ?>"
+        data-select2-id="main_users_x<?= $Grid->RowIndex ?>_reportsto"
+        data-table="main_users"
+        data-field="x_reportsto"
+        data-value-separator="<?= $Grid->reportsto->displayValueSeparatorAttribute() ?>"
+        data-placeholder="<?= HtmlEncode($Grid->reportsto->getPlaceHolder()) ?>"
+        <?= $Grid->reportsto->editAttributes() ?>>
+        <?= $Grid->reportsto->selectOptionListHtml("x{$Grid->RowIndex}_reportsto") ?>
+    </select>
+    <div class="invalid-feedback"><?= $Grid->reportsto->getErrorMessage() ?></div>
+<?= $Grid->reportsto->Lookup->getParamTag($Grid, "p_x" . $Grid->RowIndex . "_reportsto") ?>
+<script>
+loadjs.ready("head", function() {
+    var el = document.querySelector("select[data-select2-id='main_users_x<?= $Grid->RowIndex ?>_reportsto']"),
+        options = { name: "x<?= $Grid->RowIndex ?>_reportsto", selectId: "main_users_x<?= $Grid->RowIndex ?>_reportsto", language: ew.LANGUAGE_ID, dir: ew.IS_RTL ? "rtl" : "ltr" };
+    options.dropdownParent = $(el).closest("#ew-modal-dialog, #ew-add-opt-dialog")[0];
+    Object.assign(options, ew.vars.tables.main_users.fields.reportsto.selectOptions);
+    ew.createSelect(options);
+});
+</script>
+</span>
+<?php } ?>
 <?php } else { ?>
 <span id="el$rowindex$_main_users_reportsto" class="form-group main_users_reportsto">
 <span<?= $Grid->reportsto->viewAttributes() ?>>

@@ -7,6 +7,7 @@ $YOperatorsList = &$Page;
 ?>
 <?php if (!$Page->isExport()) { ?>
 <script>
+if (!ew.vars.tables.y_operators) ew.vars.tables.y_operators = <?= JsonEncode(GetClientVar("tables", "y_operators")) ?>;
 var currentForm, currentPageID;
 var fy_operatorslist;
 loadjs.ready("head", function () {
@@ -15,6 +16,73 @@ loadjs.ready("head", function () {
     currentPageID = ew.PAGE_ID = "list";
     fy_operatorslist = currentForm = new ew.Form("fy_operatorslist", "list");
     fy_operatorslist.formKeyCountName = '<?= $Page->FormKeyCountName ?>';
+
+    // Add fields
+    var fields = ew.vars.tables.y_operators.fields;
+    fy_operatorslist.addFields([
+        ["id", [fields.id.required ? ew.Validators.required(fields.id.caption) : null], fields.id.isInvalid],
+        ["name", [fields.name.required ? ew.Validators.required(fields.name.caption) : null], fields.name.isInvalid],
+        ["shortname", [fields.shortname.required ? ew.Validators.required(fields.shortname.caption) : null], fields.shortname.isInvalid],
+        ["platform_id", [fields.platform_id.required ? ew.Validators.required(fields.platform_id.caption) : null], fields.platform_id.isInvalid],
+        ["_email", [fields._email.required ? ew.Validators.required(fields._email.caption) : null], fields._email.isInvalid],
+        ["contact_name", [fields.contact_name.required ? ew.Validators.required(fields.contact_name.caption) : null], fields.contact_name.isInvalid]
+    ]);
+
+    // Set invalid fields
+    $(function() {
+        var f = fy_operatorslist,
+            fobj = f.getForm(),
+            $fobj = $(fobj),
+            $k = $fobj.find("#" + f.formKeyCountName), // Get key_count
+            rowcnt = ($k[0]) ? parseInt($k.val(), 10) : 1,
+            startcnt = (rowcnt == 0) ? 0 : 1; // Check rowcnt == 0 => Inline-Add
+        for (var i = startcnt; i <= rowcnt; i++) {
+            var rowIndex = ($k[0]) ? String(i) : "";
+            f.setInvalid(rowIndex);
+        }
+    });
+
+    // Validate form
+    fy_operatorslist.validate = function () {
+        if (!this.validateRequired)
+            return true; // Ignore validation
+        var fobj = this.getForm(),
+            $fobj = $(fobj);
+        if ($fobj.find("#confirm").val() == "confirm")
+            return true;
+        var addcnt = 0,
+            $k = $fobj.find("#" + this.formKeyCountName), // Get key_count
+            rowcnt = ($k[0]) ? parseInt($k.val(), 10) : 1,
+            startcnt = (rowcnt == 0) ? 0 : 1, // Check rowcnt == 0 => Inline-Add
+            gridinsert = ["insert", "gridinsert"].includes($fobj.find("#action").val()) && $k[0];
+        for (var i = startcnt; i <= rowcnt; i++) {
+            var rowIndex = ($k[0]) ? String(i) : "";
+            $fobj.data("rowindex", rowIndex);
+
+            // Validate fields
+            if (!this.validateFields(rowIndex))
+                return false;
+
+            // Call Form_CustomValidate event
+            if (!this.customValidate(fobj)) {
+                this.focus();
+                return false;
+            }
+        }
+        return true;
+    }
+
+    // Form_CustomValidate
+    fy_operatorslist.customValidate = function(fobj) { // DO NOT CHANGE THIS LINE!
+        // Your custom validation code here, return false if invalid.
+        return true;
+    }
+
+    // Use JavaScript validation or not
+    fy_operatorslist.validateRequired = <?= Config("CLIENT_VALIDATE") ? "true" : "false" ?>;
+
+    // Dynamic selection lists
+    fy_operatorslist.lists.platform_id = <?= $Page->platform_id->toClientList($Page) ?>;
     loadjs.done("fy_operatorslist");
 });
 var fy_operatorslistsrch, currentSearchForm, currentAdvancedSearchForm;
@@ -123,7 +191,7 @@ $Page->showMessage();
 <input type="hidden" name="fk_id" value="<?= HtmlEncode($Page->platform_id->getSessionValue()) ?>">
 <?php } ?>
 <div id="gmp_y_operators" class="<?= ResponsiveTableClass() ?>card-body ew-grid-middle-panel">
-<?php if ($Page->TotalRecords > 0 || $Page->isGridEdit()) { ?>
+<?php if ($Page->TotalRecords > 0 || $Page->isAdd() || $Page->isCopy() || $Page->isGridEdit()) { ?>
 <table id="tbl_y_operatorslist" class="table ew-table"><!-- .ew-table -->
 <thead>
     <tr class="ew-table-header">
@@ -149,6 +217,12 @@ $Page->ListOptions->render("header", "left");
 <?php if ($Page->platform_id->Visible) { // platform_id ?>
         <th data-name="platform_id" class="<?= $Page->platform_id->headerCellClass() ?>"><div id="elh_y_operators_platform_id" class="y_operators_platform_id"><?= $Page->renderSort($Page->platform_id) ?></div></th>
 <?php } ?>
+<?php if ($Page->_email->Visible) { // email ?>
+        <th data-name="_email" class="<?= $Page->_email->headerCellClass() ?>"><div id="elh_y_operators__email" class="y_operators__email"><?= $Page->renderSort($Page->_email) ?></div></th>
+<?php } ?>
+<?php if ($Page->contact_name->Visible) { // contact_name ?>
+        <th data-name="contact_name" class="<?= $Page->contact_name->headerCellClass() ?>"><div id="elh_y_operators_contact_name" class="y_operators_contact_name"><?= $Page->renderSort($Page->contact_name) ?></div></th>
+<?php } ?>
 <?php
 // Render list options (header, right)
 $Page->ListOptions->render("header", "right");
@@ -156,6 +230,125 @@ $Page->ListOptions->render("header", "right");
     </tr>
 </thead>
 <tbody>
+<?php
+    if ($Page->isAdd() || $Page->isCopy()) {
+        $Page->RowIndex = 0;
+        $Page->KeyCount = $Page->RowIndex;
+        if ($Page->isAdd())
+            $Page->loadRowValues();
+        if ($Page->EventCancelled) // Insert failed
+            $Page->restoreFormValues(); // Restore form values
+
+        // Set row properties
+        $Page->resetAttributes();
+        $Page->RowAttrs->merge(["data-rowindex" => 0, "id" => "r0_y_operators", "data-rowtype" => ROWTYPE_ADD]);
+        $Page->RowType = ROWTYPE_ADD;
+
+        // Render row
+        $Page->renderRow();
+
+        // Render list options
+        $Page->renderListOptions();
+        $Page->StartRowCount = 0;
+?>
+    <tr <?= $Page->rowAttributes() ?>>
+<?php
+// Render list options (body, left)
+$Page->ListOptions->render("body", "left", $Page->RowCount);
+?>
+    <?php if ($Page->id->Visible) { // id ?>
+        <td data-name="id">
+<span id="el<?= $Page->RowCount ?>_y_operators_id" class="form-group y_operators_id"></span>
+<input type="hidden" data-table="y_operators" data-field="x_id" data-hidden="1" name="o<?= $Page->RowIndex ?>_id" id="o<?= $Page->RowIndex ?>_id" value="<?= HtmlEncode($Page->id->OldValue) ?>">
+</td>
+    <?php } ?>
+    <?php if ($Page->name->Visible) { // name ?>
+        <td data-name="name">
+<span id="el<?= $Page->RowCount ?>_y_operators_name" class="form-group y_operators_name">
+<input type="<?= $Page->name->getInputTextType() ?>" data-table="y_operators" data-field="x_name" name="x<?= $Page->RowIndex ?>_name" id="x<?= $Page->RowIndex ?>_name" size="30" maxlength="50" placeholder="<?= HtmlEncode($Page->name->getPlaceHolder()) ?>" value="<?= $Page->name->EditValue ?>"<?= $Page->name->editAttributes() ?>>
+<div class="invalid-feedback"><?= $Page->name->getErrorMessage() ?></div>
+</span>
+<input type="hidden" data-table="y_operators" data-field="x_name" data-hidden="1" name="o<?= $Page->RowIndex ?>_name" id="o<?= $Page->RowIndex ?>_name" value="<?= HtmlEncode($Page->name->OldValue) ?>">
+</td>
+    <?php } ?>
+    <?php if ($Page->shortname->Visible) { // shortname ?>
+        <td data-name="shortname">
+<span id="el<?= $Page->RowCount ?>_y_operators_shortname" class="form-group y_operators_shortname">
+<input type="<?= $Page->shortname->getInputTextType() ?>" data-table="y_operators" data-field="x_shortname" name="x<?= $Page->RowIndex ?>_shortname" id="x<?= $Page->RowIndex ?>_shortname" size="30" maxlength="50" placeholder="<?= HtmlEncode($Page->shortname->getPlaceHolder()) ?>" value="<?= $Page->shortname->EditValue ?>"<?= $Page->shortname->editAttributes() ?>>
+<div class="invalid-feedback"><?= $Page->shortname->getErrorMessage() ?></div>
+</span>
+<input type="hidden" data-table="y_operators" data-field="x_shortname" data-hidden="1" name="o<?= $Page->RowIndex ?>_shortname" id="o<?= $Page->RowIndex ?>_shortname" value="<?= HtmlEncode($Page->shortname->OldValue) ?>">
+</td>
+    <?php } ?>
+    <?php if ($Page->platform_id->Visible) { // platform_id ?>
+        <td data-name="platform_id">
+<?php if ($Page->platform_id->getSessionValue() != "") { ?>
+<span id="el<?= $Page->RowCount ?>_y_operators_platform_id" class="form-group y_operators_platform_id">
+<span<?= $Page->platform_id->viewAttributes() ?>>
+<input type="text" readonly class="form-control-plaintext" value="<?= HtmlEncode(RemoveHtml($Page->platform_id->getDisplayValue($Page->platform_id->ViewValue))) ?>"></span>
+</span>
+<input type="hidden" id="x<?= $Page->RowIndex ?>_platform_id" name="x<?= $Page->RowIndex ?>_platform_id" value="<?= HtmlEncode($Page->platform_id->CurrentValue) ?>" data-hidden="1">
+<?php } else { ?>
+<span id="el<?= $Page->RowCount ?>_y_operators_platform_id" class="form-group y_operators_platform_id">
+    <select
+        id="x<?= $Page->RowIndex ?>_platform_id"
+        name="x<?= $Page->RowIndex ?>_platform_id"
+        class="form-control ew-select<?= $Page->platform_id->isInvalidClass() ?>"
+        data-select2-id="y_operators_x<?= $Page->RowIndex ?>_platform_id"
+        data-table="y_operators"
+        data-field="x_platform_id"
+        data-value-separator="<?= $Page->platform_id->displayValueSeparatorAttribute() ?>"
+        data-placeholder="<?= HtmlEncode($Page->platform_id->getPlaceHolder()) ?>"
+        <?= $Page->platform_id->editAttributes() ?>>
+        <?= $Page->platform_id->selectOptionListHtml("x{$Page->RowIndex}_platform_id") ?>
+    </select>
+    <div class="invalid-feedback"><?= $Page->platform_id->getErrorMessage() ?></div>
+<?= $Page->platform_id->Lookup->getParamTag($Page, "p_x" . $Page->RowIndex . "_platform_id") ?>
+<script>
+loadjs.ready("head", function() {
+    var el = document.querySelector("select[data-select2-id='y_operators_x<?= $Page->RowIndex ?>_platform_id']"),
+        options = { name: "x<?= $Page->RowIndex ?>_platform_id", selectId: "y_operators_x<?= $Page->RowIndex ?>_platform_id", language: ew.LANGUAGE_ID, dir: ew.IS_RTL ? "rtl" : "ltr" };
+    options.dropdownParent = $(el).closest("#ew-modal-dialog, #ew-add-opt-dialog")[0];
+    Object.assign(options, ew.vars.tables.y_operators.fields.platform_id.selectOptions);
+    ew.createSelect(options);
+});
+</script>
+</span>
+<?php } ?>
+<input type="hidden" data-table="y_operators" data-field="x_platform_id" data-hidden="1" name="o<?= $Page->RowIndex ?>_platform_id" id="o<?= $Page->RowIndex ?>_platform_id" value="<?= HtmlEncode($Page->platform_id->OldValue) ?>">
+</td>
+    <?php } ?>
+    <?php if ($Page->_email->Visible) { // email ?>
+        <td data-name="_email">
+<span id="el<?= $Page->RowCount ?>_y_operators__email" class="form-group y_operators__email">
+<input type="<?= $Page->_email->getInputTextType() ?>" data-table="y_operators" data-field="x__email" name="x<?= $Page->RowIndex ?>__email" id="x<?= $Page->RowIndex ?>__email" size="30" placeholder="<?= HtmlEncode($Page->_email->getPlaceHolder()) ?>" value="<?= $Page->_email->EditValue ?>"<?= $Page->_email->editAttributes() ?>>
+<div class="invalid-feedback"><?= $Page->_email->getErrorMessage() ?></div>
+</span>
+<input type="hidden" data-table="y_operators" data-field="x__email" data-hidden="1" name="o<?= $Page->RowIndex ?>__email" id="o<?= $Page->RowIndex ?>__email" value="<?= HtmlEncode($Page->_email->OldValue) ?>">
+</td>
+    <?php } ?>
+    <?php if ($Page->contact_name->Visible) { // contact_name ?>
+        <td data-name="contact_name">
+<span id="el<?= $Page->RowCount ?>_y_operators_contact_name" class="form-group y_operators_contact_name">
+<input type="<?= $Page->contact_name->getInputTextType() ?>" data-table="y_operators" data-field="x_contact_name" name="x<?= $Page->RowIndex ?>_contact_name" id="x<?= $Page->RowIndex ?>_contact_name" size="30" placeholder="<?= HtmlEncode($Page->contact_name->getPlaceHolder()) ?>" value="<?= $Page->contact_name->EditValue ?>"<?= $Page->contact_name->editAttributes() ?>>
+<div class="invalid-feedback"><?= $Page->contact_name->getErrorMessage() ?></div>
+</span>
+<input type="hidden" data-table="y_operators" data-field="x_contact_name" data-hidden="1" name="o<?= $Page->RowIndex ?>_contact_name" id="o<?= $Page->RowIndex ?>_contact_name" value="<?= HtmlEncode($Page->contact_name->OldValue) ?>">
+</td>
+    <?php } ?>
+<?php
+// Render list options (body, right)
+$Page->ListOptions->render("body", "right", $Page->RowCount);
+?>
+<script>
+loadjs.ready(["fy_operatorslist","load"], function() {
+    fy_operatorslist.updateLists(<?= $Page->RowIndex ?>);
+});
+</script>
+    </tr>
+<?php
+    }
+?>
 <?php
 if ($Page->ExportAll && $Page->isExport()) {
     $Page->StopRecord = $Page->TotalRecords;
@@ -165,6 +358,15 @@ if ($Page->ExportAll && $Page->isExport()) {
         $Page->StopRecord = $Page->StartRecord + $Page->DisplayRecords - 1;
     } else {
         $Page->StopRecord = $Page->TotalRecords;
+    }
+}
+
+// Restore number of post back records
+if ($CurrentForm && ($Page->isConfirm() || $Page->EventCancelled)) {
+    $CurrentForm->Index = -1;
+    if ($CurrentForm->hasValue($Page->FormKeyCountName) && ($Page->isGridAdd() || $Page->isGridEdit() || $Page->isConfirm())) {
+        $Page->KeyCount = $CurrentForm->getValue($Page->FormKeyCountName);
+        $Page->StopRecord = $Page->StartRecord + $Page->KeyCount - 1;
     }
 }
 $Page->RecordCount = $Page->StartRecord - 1;
@@ -178,10 +380,26 @@ if ($Page->Recordset && !$Page->Recordset->EOF) {
 $Page->RowType = ROWTYPE_AGGREGATEINIT;
 $Page->resetAttributes();
 $Page->renderRow();
+$Page->EditRowCount = 0;
+if ($Page->isEdit())
+    $Page->RowIndex = 1;
+if ($Page->isGridEdit())
+    $Page->RowIndex = 0;
 while ($Page->RecordCount < $Page->StopRecord) {
     $Page->RecordCount++;
     if ($Page->RecordCount >= $Page->StartRecord) {
         $Page->RowCount++;
+        if ($Page->isGridAdd() || $Page->isGridEdit() || $Page->isConfirm()) {
+            $Page->RowIndex++;
+            $CurrentForm->Index = $Page->RowIndex;
+            if ($CurrentForm->hasValue($Page->FormActionName) && ($Page->isConfirm() || $Page->EventCancelled)) {
+                $Page->RowAction = strval($CurrentForm->getValue($Page->FormActionName));
+            } elseif ($Page->isGridAdd()) {
+                $Page->RowAction = "insert";
+            } else {
+                $Page->RowAction = "";
+            }
+        }
 
         // Set up key count
         $Page->KeyCount = $Page->RowIndex;
@@ -201,6 +419,31 @@ while ($Page->RecordCount < $Page->StopRecord) {
             }
         }
         $Page->RowType = ROWTYPE_VIEW; // Render view
+        if ($Page->isEdit()) {
+            if ($Page->checkInlineEditKey() && $Page->EditRowCount == 0) { // Inline edit
+                $Page->RowType = ROWTYPE_EDIT; // Render edit
+            }
+        }
+        if ($Page->isGridEdit()) { // Grid edit
+            if ($Page->EventCancelled) {
+                $Page->restoreCurrentRowFormValues($Page->RowIndex); // Restore form values
+            }
+            if ($Page->RowAction == "insert") {
+                $Page->RowType = ROWTYPE_ADD; // Render add
+            } else {
+                $Page->RowType = ROWTYPE_EDIT; // Render edit
+            }
+        }
+        if ($Page->isEdit() && $Page->RowType == ROWTYPE_EDIT && $Page->EventCancelled) { // Update failed
+            $CurrentForm->Index = 1;
+            $Page->restoreFormValues(); // Restore form values
+        }
+        if ($Page->isGridEdit() && ($Page->RowType == ROWTYPE_EDIT || $Page->RowType == ROWTYPE_ADD) && $Page->EventCancelled) { // Update failed
+            $Page->restoreCurrentRowFormValues($Page->RowIndex); // Restore form values
+        }
+        if ($Page->RowType == ROWTYPE_EDIT) { // Edit row
+            $Page->EditRowCount++;
+        }
 
         // Set up row id / data-rowindex
         $Page->RowAttrs->merge(["data-rowindex" => $Page->RowCount, "id" => "r" . $Page->RowCount . "_y_operators", "data-rowtype" => $Page->RowType]);
@@ -210,6 +453,9 @@ while ($Page->RecordCount < $Page->StopRecord) {
 
         // Render list options
         $Page->renderListOptions();
+
+        // Skip delete row / empty row for confirm page
+        if ($Page->RowAction != "delete" && $Page->RowAction != "insertdelete" && !($Page->RowAction == "insert" && $Page->isConfirm() && $Page->emptyRow())) {
 ?>
     <tr <?= $Page->rowAttributes() ?>>
 <?php
@@ -218,34 +464,196 @@ $Page->ListOptions->render("body", "left", $Page->RowCount);
 ?>
     <?php if ($Page->id->Visible) { // id ?>
         <td data-name="id" <?= $Page->id->cellAttributes() ?>>
+<?php if ($Page->RowType == ROWTYPE_ADD) { // Add record ?>
+<span id="el<?= $Page->RowCount ?>_y_operators_id" class="form-group"></span>
+<input type="hidden" data-table="y_operators" data-field="x_id" data-hidden="1" name="o<?= $Page->RowIndex ?>_id" id="o<?= $Page->RowIndex ?>_id" value="<?= HtmlEncode($Page->id->OldValue) ?>">
+<?php } ?>
+<?php if ($Page->RowType == ROWTYPE_EDIT) { // Edit record ?>
+<span id="el<?= $Page->RowCount ?>_y_operators_id" class="form-group">
+<span<?= $Page->id->viewAttributes() ?>>
+<input type="text" readonly class="form-control-plaintext" value="<?= HtmlEncode(RemoveHtml($Page->id->getDisplayValue($Page->id->EditValue))) ?>"></span>
+</span>
+<input type="hidden" data-table="y_operators" data-field="x_id" data-hidden="1" name="x<?= $Page->RowIndex ?>_id" id="x<?= $Page->RowIndex ?>_id" value="<?= HtmlEncode($Page->id->CurrentValue) ?>">
+<?php } ?>
+<?php if ($Page->RowType == ROWTYPE_VIEW) { // View record ?>
 <span id="el<?= $Page->RowCount ?>_y_operators_id">
 <span<?= $Page->id->viewAttributes() ?>>
 <?= $Page->id->getViewValue() ?></span>
 </span>
+<?php } ?>
 </td>
     <?php } ?>
     <?php if ($Page->name->Visible) { // name ?>
         <td data-name="name" <?= $Page->name->cellAttributes() ?>>
+<?php if ($Page->RowType == ROWTYPE_ADD) { // Add record ?>
+<span id="el<?= $Page->RowCount ?>_y_operators_name" class="form-group">
+<input type="<?= $Page->name->getInputTextType() ?>" data-table="y_operators" data-field="x_name" name="x<?= $Page->RowIndex ?>_name" id="x<?= $Page->RowIndex ?>_name" size="30" maxlength="50" placeholder="<?= HtmlEncode($Page->name->getPlaceHolder()) ?>" value="<?= $Page->name->EditValue ?>"<?= $Page->name->editAttributes() ?>>
+<div class="invalid-feedback"><?= $Page->name->getErrorMessage() ?></div>
+</span>
+<input type="hidden" data-table="y_operators" data-field="x_name" data-hidden="1" name="o<?= $Page->RowIndex ?>_name" id="o<?= $Page->RowIndex ?>_name" value="<?= HtmlEncode($Page->name->OldValue) ?>">
+<?php } ?>
+<?php if ($Page->RowType == ROWTYPE_EDIT) { // Edit record ?>
+<span id="el<?= $Page->RowCount ?>_y_operators_name" class="form-group">
+<input type="<?= $Page->name->getInputTextType() ?>" data-table="y_operators" data-field="x_name" name="x<?= $Page->RowIndex ?>_name" id="x<?= $Page->RowIndex ?>_name" size="30" maxlength="50" placeholder="<?= HtmlEncode($Page->name->getPlaceHolder()) ?>" value="<?= $Page->name->EditValue ?>"<?= $Page->name->editAttributes() ?>>
+<div class="invalid-feedback"><?= $Page->name->getErrorMessage() ?></div>
+</span>
+<?php } ?>
+<?php if ($Page->RowType == ROWTYPE_VIEW) { // View record ?>
 <span id="el<?= $Page->RowCount ?>_y_operators_name">
 <span<?= $Page->name->viewAttributes() ?>>
 <?= $Page->name->getViewValue() ?></span>
 </span>
+<?php } ?>
 </td>
     <?php } ?>
     <?php if ($Page->shortname->Visible) { // shortname ?>
         <td data-name="shortname" <?= $Page->shortname->cellAttributes() ?>>
+<?php if ($Page->RowType == ROWTYPE_ADD) { // Add record ?>
+<span id="el<?= $Page->RowCount ?>_y_operators_shortname" class="form-group">
+<input type="<?= $Page->shortname->getInputTextType() ?>" data-table="y_operators" data-field="x_shortname" name="x<?= $Page->RowIndex ?>_shortname" id="x<?= $Page->RowIndex ?>_shortname" size="30" maxlength="50" placeholder="<?= HtmlEncode($Page->shortname->getPlaceHolder()) ?>" value="<?= $Page->shortname->EditValue ?>"<?= $Page->shortname->editAttributes() ?>>
+<div class="invalid-feedback"><?= $Page->shortname->getErrorMessage() ?></div>
+</span>
+<input type="hidden" data-table="y_operators" data-field="x_shortname" data-hidden="1" name="o<?= $Page->RowIndex ?>_shortname" id="o<?= $Page->RowIndex ?>_shortname" value="<?= HtmlEncode($Page->shortname->OldValue) ?>">
+<?php } ?>
+<?php if ($Page->RowType == ROWTYPE_EDIT) { // Edit record ?>
+<span id="el<?= $Page->RowCount ?>_y_operators_shortname" class="form-group">
+<input type="<?= $Page->shortname->getInputTextType() ?>" data-table="y_operators" data-field="x_shortname" name="x<?= $Page->RowIndex ?>_shortname" id="x<?= $Page->RowIndex ?>_shortname" size="30" maxlength="50" placeholder="<?= HtmlEncode($Page->shortname->getPlaceHolder()) ?>" value="<?= $Page->shortname->EditValue ?>"<?= $Page->shortname->editAttributes() ?>>
+<div class="invalid-feedback"><?= $Page->shortname->getErrorMessage() ?></div>
+</span>
+<?php } ?>
+<?php if ($Page->RowType == ROWTYPE_VIEW) { // View record ?>
 <span id="el<?= $Page->RowCount ?>_y_operators_shortname">
 <span<?= $Page->shortname->viewAttributes() ?>>
 <?= $Page->shortname->getViewValue() ?></span>
 </span>
+<?php } ?>
 </td>
     <?php } ?>
     <?php if ($Page->platform_id->Visible) { // platform_id ?>
         <td data-name="platform_id" <?= $Page->platform_id->cellAttributes() ?>>
+<?php if ($Page->RowType == ROWTYPE_ADD) { // Add record ?>
+<?php if ($Page->platform_id->getSessionValue() != "") { ?>
+<span id="el<?= $Page->RowCount ?>_y_operators_platform_id" class="form-group">
+<span<?= $Page->platform_id->viewAttributes() ?>>
+<input type="text" readonly class="form-control-plaintext" value="<?= HtmlEncode(RemoveHtml($Page->platform_id->getDisplayValue($Page->platform_id->ViewValue))) ?>"></span>
+</span>
+<input type="hidden" id="x<?= $Page->RowIndex ?>_platform_id" name="x<?= $Page->RowIndex ?>_platform_id" value="<?= HtmlEncode($Page->platform_id->CurrentValue) ?>" data-hidden="1">
+<?php } else { ?>
+<span id="el<?= $Page->RowCount ?>_y_operators_platform_id" class="form-group">
+    <select
+        id="x<?= $Page->RowIndex ?>_platform_id"
+        name="x<?= $Page->RowIndex ?>_platform_id"
+        class="form-control ew-select<?= $Page->platform_id->isInvalidClass() ?>"
+        data-select2-id="y_operators_x<?= $Page->RowIndex ?>_platform_id"
+        data-table="y_operators"
+        data-field="x_platform_id"
+        data-value-separator="<?= $Page->platform_id->displayValueSeparatorAttribute() ?>"
+        data-placeholder="<?= HtmlEncode($Page->platform_id->getPlaceHolder()) ?>"
+        <?= $Page->platform_id->editAttributes() ?>>
+        <?= $Page->platform_id->selectOptionListHtml("x{$Page->RowIndex}_platform_id") ?>
+    </select>
+    <div class="invalid-feedback"><?= $Page->platform_id->getErrorMessage() ?></div>
+<?= $Page->platform_id->Lookup->getParamTag($Page, "p_x" . $Page->RowIndex . "_platform_id") ?>
+<script>
+loadjs.ready("head", function() {
+    var el = document.querySelector("select[data-select2-id='y_operators_x<?= $Page->RowIndex ?>_platform_id']"),
+        options = { name: "x<?= $Page->RowIndex ?>_platform_id", selectId: "y_operators_x<?= $Page->RowIndex ?>_platform_id", language: ew.LANGUAGE_ID, dir: ew.IS_RTL ? "rtl" : "ltr" };
+    options.dropdownParent = $(el).closest("#ew-modal-dialog, #ew-add-opt-dialog")[0];
+    Object.assign(options, ew.vars.tables.y_operators.fields.platform_id.selectOptions);
+    ew.createSelect(options);
+});
+</script>
+</span>
+<?php } ?>
+<input type="hidden" data-table="y_operators" data-field="x_platform_id" data-hidden="1" name="o<?= $Page->RowIndex ?>_platform_id" id="o<?= $Page->RowIndex ?>_platform_id" value="<?= HtmlEncode($Page->platform_id->OldValue) ?>">
+<?php } ?>
+<?php if ($Page->RowType == ROWTYPE_EDIT) { // Edit record ?>
+<?php if ($Page->platform_id->getSessionValue() != "") { ?>
+<span id="el<?= $Page->RowCount ?>_y_operators_platform_id" class="form-group">
+<span<?= $Page->platform_id->viewAttributes() ?>>
+<input type="text" readonly class="form-control-plaintext" value="<?= HtmlEncode(RemoveHtml($Page->platform_id->getDisplayValue($Page->platform_id->ViewValue))) ?>"></span>
+</span>
+<input type="hidden" id="x<?= $Page->RowIndex ?>_platform_id" name="x<?= $Page->RowIndex ?>_platform_id" value="<?= HtmlEncode($Page->platform_id->CurrentValue) ?>" data-hidden="1">
+<?php } else { ?>
+<span id="el<?= $Page->RowCount ?>_y_operators_platform_id" class="form-group">
+    <select
+        id="x<?= $Page->RowIndex ?>_platform_id"
+        name="x<?= $Page->RowIndex ?>_platform_id"
+        class="form-control ew-select<?= $Page->platform_id->isInvalidClass() ?>"
+        data-select2-id="y_operators_x<?= $Page->RowIndex ?>_platform_id"
+        data-table="y_operators"
+        data-field="x_platform_id"
+        data-value-separator="<?= $Page->platform_id->displayValueSeparatorAttribute() ?>"
+        data-placeholder="<?= HtmlEncode($Page->platform_id->getPlaceHolder()) ?>"
+        <?= $Page->platform_id->editAttributes() ?>>
+        <?= $Page->platform_id->selectOptionListHtml("x{$Page->RowIndex}_platform_id") ?>
+    </select>
+    <div class="invalid-feedback"><?= $Page->platform_id->getErrorMessage() ?></div>
+<?= $Page->platform_id->Lookup->getParamTag($Page, "p_x" . $Page->RowIndex . "_platform_id") ?>
+<script>
+loadjs.ready("head", function() {
+    var el = document.querySelector("select[data-select2-id='y_operators_x<?= $Page->RowIndex ?>_platform_id']"),
+        options = { name: "x<?= $Page->RowIndex ?>_platform_id", selectId: "y_operators_x<?= $Page->RowIndex ?>_platform_id", language: ew.LANGUAGE_ID, dir: ew.IS_RTL ? "rtl" : "ltr" };
+    options.dropdownParent = $(el).closest("#ew-modal-dialog, #ew-add-opt-dialog")[0];
+    Object.assign(options, ew.vars.tables.y_operators.fields.platform_id.selectOptions);
+    ew.createSelect(options);
+});
+</script>
+</span>
+<?php } ?>
+<?php } ?>
+<?php if ($Page->RowType == ROWTYPE_VIEW) { // View record ?>
 <span id="el<?= $Page->RowCount ?>_y_operators_platform_id">
 <span<?= $Page->platform_id->viewAttributes() ?>>
 <?= $Page->platform_id->getViewValue() ?></span>
 </span>
+<?php } ?>
+</td>
+    <?php } ?>
+    <?php if ($Page->_email->Visible) { // email ?>
+        <td data-name="_email" <?= $Page->_email->cellAttributes() ?>>
+<?php if ($Page->RowType == ROWTYPE_ADD) { // Add record ?>
+<span id="el<?= $Page->RowCount ?>_y_operators__email" class="form-group">
+<input type="<?= $Page->_email->getInputTextType() ?>" data-table="y_operators" data-field="x__email" name="x<?= $Page->RowIndex ?>__email" id="x<?= $Page->RowIndex ?>__email" size="30" placeholder="<?= HtmlEncode($Page->_email->getPlaceHolder()) ?>" value="<?= $Page->_email->EditValue ?>"<?= $Page->_email->editAttributes() ?>>
+<div class="invalid-feedback"><?= $Page->_email->getErrorMessage() ?></div>
+</span>
+<input type="hidden" data-table="y_operators" data-field="x__email" data-hidden="1" name="o<?= $Page->RowIndex ?>__email" id="o<?= $Page->RowIndex ?>__email" value="<?= HtmlEncode($Page->_email->OldValue) ?>">
+<?php } ?>
+<?php if ($Page->RowType == ROWTYPE_EDIT) { // Edit record ?>
+<span id="el<?= $Page->RowCount ?>_y_operators__email" class="form-group">
+<input type="<?= $Page->_email->getInputTextType() ?>" data-table="y_operators" data-field="x__email" name="x<?= $Page->RowIndex ?>__email" id="x<?= $Page->RowIndex ?>__email" size="30" placeholder="<?= HtmlEncode($Page->_email->getPlaceHolder()) ?>" value="<?= $Page->_email->EditValue ?>"<?= $Page->_email->editAttributes() ?>>
+<div class="invalid-feedback"><?= $Page->_email->getErrorMessage() ?></div>
+</span>
+<?php } ?>
+<?php if ($Page->RowType == ROWTYPE_VIEW) { // View record ?>
+<span id="el<?= $Page->RowCount ?>_y_operators__email">
+<span<?= $Page->_email->viewAttributes() ?>>
+<?= $Page->_email->getViewValue() ?></span>
+</span>
+<?php } ?>
+</td>
+    <?php } ?>
+    <?php if ($Page->contact_name->Visible) { // contact_name ?>
+        <td data-name="contact_name" <?= $Page->contact_name->cellAttributes() ?>>
+<?php if ($Page->RowType == ROWTYPE_ADD) { // Add record ?>
+<span id="el<?= $Page->RowCount ?>_y_operators_contact_name" class="form-group">
+<input type="<?= $Page->contact_name->getInputTextType() ?>" data-table="y_operators" data-field="x_contact_name" name="x<?= $Page->RowIndex ?>_contact_name" id="x<?= $Page->RowIndex ?>_contact_name" size="30" placeholder="<?= HtmlEncode($Page->contact_name->getPlaceHolder()) ?>" value="<?= $Page->contact_name->EditValue ?>"<?= $Page->contact_name->editAttributes() ?>>
+<div class="invalid-feedback"><?= $Page->contact_name->getErrorMessage() ?></div>
+</span>
+<input type="hidden" data-table="y_operators" data-field="x_contact_name" data-hidden="1" name="o<?= $Page->RowIndex ?>_contact_name" id="o<?= $Page->RowIndex ?>_contact_name" value="<?= HtmlEncode($Page->contact_name->OldValue) ?>">
+<?php } ?>
+<?php if ($Page->RowType == ROWTYPE_EDIT) { // Edit record ?>
+<span id="el<?= $Page->RowCount ?>_y_operators_contact_name" class="form-group">
+<input type="<?= $Page->contact_name->getInputTextType() ?>" data-table="y_operators" data-field="x_contact_name" name="x<?= $Page->RowIndex ?>_contact_name" id="x<?= $Page->RowIndex ?>_contact_name" size="30" placeholder="<?= HtmlEncode($Page->contact_name->getPlaceHolder()) ?>" value="<?= $Page->contact_name->EditValue ?>"<?= $Page->contact_name->editAttributes() ?>>
+<div class="invalid-feedback"><?= $Page->contact_name->getErrorMessage() ?></div>
+</span>
+<?php } ?>
+<?php if ($Page->RowType == ROWTYPE_VIEW) { // View record ?>
+<span id="el<?= $Page->RowCount ?>_y_operators_contact_name">
+<span<?= $Page->contact_name->viewAttributes() ?>>
+<?= $Page->contact_name->getViewValue() ?></span>
+</span>
+<?php } ?>
 </td>
     <?php } ?>
 <?php
@@ -253,17 +661,155 @@ $Page->ListOptions->render("body", "left", $Page->RowCount);
 $Page->ListOptions->render("body", "right", $Page->RowCount);
 ?>
     </tr>
+<?php if ($Page->RowType == ROWTYPE_ADD || $Page->RowType == ROWTYPE_EDIT) { ?>
+<script>
+loadjs.ready(["fy_operatorslist","load"], function () {
+    fy_operatorslist.updateLists(<?= $Page->RowIndex ?>);
+});
+</script>
+<?php } ?>
 <?php
     }
-    if (!$Page->isGridAdd()) {
-        $Page->Recordset->moveNext();
-    }
+    } // End delete row checking
+    if (!$Page->isGridAdd())
+        if (!$Page->Recordset->EOF) {
+            $Page->Recordset->moveNext();
+        }
 }
+?>
+<?php
+    if ($Page->isGridAdd() || $Page->isGridEdit()) {
+        $Page->RowIndex = '$rowindex$';
+        $Page->loadRowValues();
+
+        // Set row properties
+        $Page->resetAttributes();
+        $Page->RowAttrs->merge(["data-rowindex" => $Page->RowIndex, "id" => "r0_y_operators", "data-rowtype" => ROWTYPE_ADD]);
+        $Page->RowAttrs->appendClass("ew-template");
+        $Page->RowType = ROWTYPE_ADD;
+
+        // Render row
+        $Page->renderRow();
+
+        // Render list options
+        $Page->renderListOptions();
+        $Page->StartRowCount = 0;
+?>
+    <tr <?= $Page->rowAttributes() ?>>
+<?php
+// Render list options (body, left)
+$Page->ListOptions->render("body", "left", $Page->RowIndex);
+?>
+    <?php if ($Page->id->Visible) { // id ?>
+        <td data-name="id">
+<span id="el$rowindex$_y_operators_id" class="form-group y_operators_id"></span>
+<input type="hidden" data-table="y_operators" data-field="x_id" data-hidden="1" name="o<?= $Page->RowIndex ?>_id" id="o<?= $Page->RowIndex ?>_id" value="<?= HtmlEncode($Page->id->OldValue) ?>">
+</td>
+    <?php } ?>
+    <?php if ($Page->name->Visible) { // name ?>
+        <td data-name="name">
+<span id="el$rowindex$_y_operators_name" class="form-group y_operators_name">
+<input type="<?= $Page->name->getInputTextType() ?>" data-table="y_operators" data-field="x_name" name="x<?= $Page->RowIndex ?>_name" id="x<?= $Page->RowIndex ?>_name" size="30" maxlength="50" placeholder="<?= HtmlEncode($Page->name->getPlaceHolder()) ?>" value="<?= $Page->name->EditValue ?>"<?= $Page->name->editAttributes() ?>>
+<div class="invalid-feedback"><?= $Page->name->getErrorMessage() ?></div>
+</span>
+<input type="hidden" data-table="y_operators" data-field="x_name" data-hidden="1" name="o<?= $Page->RowIndex ?>_name" id="o<?= $Page->RowIndex ?>_name" value="<?= HtmlEncode($Page->name->OldValue) ?>">
+</td>
+    <?php } ?>
+    <?php if ($Page->shortname->Visible) { // shortname ?>
+        <td data-name="shortname">
+<span id="el$rowindex$_y_operators_shortname" class="form-group y_operators_shortname">
+<input type="<?= $Page->shortname->getInputTextType() ?>" data-table="y_operators" data-field="x_shortname" name="x<?= $Page->RowIndex ?>_shortname" id="x<?= $Page->RowIndex ?>_shortname" size="30" maxlength="50" placeholder="<?= HtmlEncode($Page->shortname->getPlaceHolder()) ?>" value="<?= $Page->shortname->EditValue ?>"<?= $Page->shortname->editAttributes() ?>>
+<div class="invalid-feedback"><?= $Page->shortname->getErrorMessage() ?></div>
+</span>
+<input type="hidden" data-table="y_operators" data-field="x_shortname" data-hidden="1" name="o<?= $Page->RowIndex ?>_shortname" id="o<?= $Page->RowIndex ?>_shortname" value="<?= HtmlEncode($Page->shortname->OldValue) ?>">
+</td>
+    <?php } ?>
+    <?php if ($Page->platform_id->Visible) { // platform_id ?>
+        <td data-name="platform_id">
+<?php if ($Page->platform_id->getSessionValue() != "") { ?>
+<span id="el$rowindex$_y_operators_platform_id" class="form-group y_operators_platform_id">
+<span<?= $Page->platform_id->viewAttributes() ?>>
+<input type="text" readonly class="form-control-plaintext" value="<?= HtmlEncode(RemoveHtml($Page->platform_id->getDisplayValue($Page->platform_id->ViewValue))) ?>"></span>
+</span>
+<input type="hidden" id="x<?= $Page->RowIndex ?>_platform_id" name="x<?= $Page->RowIndex ?>_platform_id" value="<?= HtmlEncode($Page->platform_id->CurrentValue) ?>" data-hidden="1">
+<?php } else { ?>
+<span id="el$rowindex$_y_operators_platform_id" class="form-group y_operators_platform_id">
+    <select
+        id="x<?= $Page->RowIndex ?>_platform_id"
+        name="x<?= $Page->RowIndex ?>_platform_id"
+        class="form-control ew-select<?= $Page->platform_id->isInvalidClass() ?>"
+        data-select2-id="y_operators_x<?= $Page->RowIndex ?>_platform_id"
+        data-table="y_operators"
+        data-field="x_platform_id"
+        data-value-separator="<?= $Page->platform_id->displayValueSeparatorAttribute() ?>"
+        data-placeholder="<?= HtmlEncode($Page->platform_id->getPlaceHolder()) ?>"
+        <?= $Page->platform_id->editAttributes() ?>>
+        <?= $Page->platform_id->selectOptionListHtml("x{$Page->RowIndex}_platform_id") ?>
+    </select>
+    <div class="invalid-feedback"><?= $Page->platform_id->getErrorMessage() ?></div>
+<?= $Page->platform_id->Lookup->getParamTag($Page, "p_x" . $Page->RowIndex . "_platform_id") ?>
+<script>
+loadjs.ready("head", function() {
+    var el = document.querySelector("select[data-select2-id='y_operators_x<?= $Page->RowIndex ?>_platform_id']"),
+        options = { name: "x<?= $Page->RowIndex ?>_platform_id", selectId: "y_operators_x<?= $Page->RowIndex ?>_platform_id", language: ew.LANGUAGE_ID, dir: ew.IS_RTL ? "rtl" : "ltr" };
+    options.dropdownParent = $(el).closest("#ew-modal-dialog, #ew-add-opt-dialog")[0];
+    Object.assign(options, ew.vars.tables.y_operators.fields.platform_id.selectOptions);
+    ew.createSelect(options);
+});
+</script>
+</span>
+<?php } ?>
+<input type="hidden" data-table="y_operators" data-field="x_platform_id" data-hidden="1" name="o<?= $Page->RowIndex ?>_platform_id" id="o<?= $Page->RowIndex ?>_platform_id" value="<?= HtmlEncode($Page->platform_id->OldValue) ?>">
+</td>
+    <?php } ?>
+    <?php if ($Page->_email->Visible) { // email ?>
+        <td data-name="_email">
+<span id="el$rowindex$_y_operators__email" class="form-group y_operators__email">
+<input type="<?= $Page->_email->getInputTextType() ?>" data-table="y_operators" data-field="x__email" name="x<?= $Page->RowIndex ?>__email" id="x<?= $Page->RowIndex ?>__email" size="30" placeholder="<?= HtmlEncode($Page->_email->getPlaceHolder()) ?>" value="<?= $Page->_email->EditValue ?>"<?= $Page->_email->editAttributes() ?>>
+<div class="invalid-feedback"><?= $Page->_email->getErrorMessage() ?></div>
+</span>
+<input type="hidden" data-table="y_operators" data-field="x__email" data-hidden="1" name="o<?= $Page->RowIndex ?>__email" id="o<?= $Page->RowIndex ?>__email" value="<?= HtmlEncode($Page->_email->OldValue) ?>">
+</td>
+    <?php } ?>
+    <?php if ($Page->contact_name->Visible) { // contact_name ?>
+        <td data-name="contact_name">
+<span id="el$rowindex$_y_operators_contact_name" class="form-group y_operators_contact_name">
+<input type="<?= $Page->contact_name->getInputTextType() ?>" data-table="y_operators" data-field="x_contact_name" name="x<?= $Page->RowIndex ?>_contact_name" id="x<?= $Page->RowIndex ?>_contact_name" size="30" placeholder="<?= HtmlEncode($Page->contact_name->getPlaceHolder()) ?>" value="<?= $Page->contact_name->EditValue ?>"<?= $Page->contact_name->editAttributes() ?>>
+<div class="invalid-feedback"><?= $Page->contact_name->getErrorMessage() ?></div>
+</span>
+<input type="hidden" data-table="y_operators" data-field="x_contact_name" data-hidden="1" name="o<?= $Page->RowIndex ?>_contact_name" id="o<?= $Page->RowIndex ?>_contact_name" value="<?= HtmlEncode($Page->contact_name->OldValue) ?>">
+</td>
+    <?php } ?>
+<?php
+// Render list options (body, right)
+$Page->ListOptions->render("body", "right", $Page->RowIndex);
+?>
+<script>
+loadjs.ready(["fy_operatorslist","load"], function() {
+    fy_operatorslist.updateLists(<?= $Page->RowIndex ?>);
+});
+</script>
+    </tr>
+<?php
+    }
 ?>
 </tbody>
 </table><!-- /.ew-table -->
 <?php } ?>
 </div><!-- /.ew-grid-middle-panel -->
+<?php if ($Page->isAdd() || $Page->isCopy()) { ?>
+<input type="hidden" name="<?= $Page->FormKeyCountName ?>" id="<?= $Page->FormKeyCountName ?>" value="<?= $Page->KeyCount ?>">
+<input type="hidden" name="<?= $Page->OldKeyName ?>" value="<?= $Page->OldKey ?>">
+<?php } ?>
+<?php if ($Page->isEdit()) { ?>
+<input type="hidden" name="<?= $Page->FormKeyCountName ?>" id="<?= $Page->FormKeyCountName ?>" value="<?= $Page->KeyCount ?>">
+<input type="hidden" name="<?= $Page->OldKeyName ?>" value="<?= $Page->OldKey ?>">
+<?php } ?>
+<?php if ($Page->isGridEdit()) { ?>
+<input type="hidden" name="action" id="action" value="gridupdate">
+<input type="hidden" name="<?= $Page->FormKeyCountName ?>" id="<?= $Page->FormKeyCountName ?>" value="<?= $Page->KeyCount ?>">
+<?= $Page->MultiSelectKey ?>
+<?php } ?>
 <?php if (!$Page->CurrentAction) { ?>
 <input type="hidden" name="action" id="action" value="">
 <?php } ?>

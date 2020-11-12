@@ -1177,26 +1177,6 @@ SORTHTML;
         $this->vendor_id->EditAttrs["class"] = "form-control";
         $this->vendor_id->EditCustomAttributes = "";
         if (!$Security->isAdmin() && $Security->isLoggedIn() && !$this->userIDAllow("info")) { // Non system admin
-            $this->vendor_id->CurrentValue = CurrentUserID();
-            $curVal = strval($this->vendor_id->CurrentValue);
-            if ($curVal != "") {
-                $this->vendor_id->EditValue = $this->vendor_id->lookupCacheOption($curVal);
-                if ($this->vendor_id->EditValue === null) { // Lookup from database
-                    $filterWrk = "\"id\"" . SearchString("=", $curVal, DATATYPE_NUMBER, "");
-                    $sqlWrk = $this->vendor_id->Lookup->getSql(false, $filterWrk, '', $this, true);
-                    $rswrk = Conn()->executeQuery($sqlWrk)->fetchAll(\PDO::FETCH_BOTH);
-                    $ari = count($rswrk);
-                    if ($ari > 0) { // Lookup values found
-                        $arwrk = $this->vendor_id->Lookup->renderViewRow($rswrk[0]);
-                        $this->vendor_id->EditValue = $this->vendor_id->displayValue($arwrk);
-                    } else {
-                        $this->vendor_id->EditValue = $this->vendor_id->CurrentValue;
-                    }
-                }
-            } else {
-                $this->vendor_id->EditValue = null;
-            }
-            $this->vendor_id->ViewCustomAttributes = "";
         } else {
             $this->vendor_id->PlaceHolder = RemoveHtml($this->vendor_id->caption());
         }

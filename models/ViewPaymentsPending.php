@@ -32,7 +32,7 @@ class ViewPaymentsPending extends DbTable
     public $campaign_id;
     public $campaign_name;
     public $quantity;
-    public $campaign_status;
+    public $transaction_status;
     public $print_status;
     public $payment_status;
     public $start_date;
@@ -109,10 +109,10 @@ class ViewPaymentsPending extends DbTable
         $this->quantity->DefaultErrorMessage = $Language->phrase("IncorrectInteger");
         $this->Fields['quantity'] = &$this->quantity;
 
-        // campaign_status
-        $this->campaign_status = new DbField('view_payments_pending', 'view_payments_pending', 'x_campaign_status', 'campaign_status', '"campaign_status"', '"campaign_status"', 200, 0, -1, false, '"campaign_status"', false, false, false, 'FORMATTED TEXT', 'TEXT');
-        $this->campaign_status->Sortable = true; // Allow sort
-        $this->Fields['campaign_status'] = &$this->campaign_status;
+        // transaction_status
+        $this->transaction_status = new DbField('view_payments_pending', 'view_payments_pending', 'x_transaction_status', 'transaction_status', '"transaction_status"', '"transaction_status"', 200, 0, -1, false, '"transaction_status"', false, false, false, 'FORMATTED TEXT', 'TEXT');
+        $this->transaction_status->Sortable = true; // Allow sort
+        $this->Fields['transaction_status'] = &$this->transaction_status;
 
         // print_status
         $this->print_status = new DbField('view_payments_pending', 'view_payments_pending', 'x_print_status', 'print_status', '"print_status"', '"print_status"', 200, 0, -1, false, '"print_status"', false, false, false, 'FORMATTED TEXT', 'TEXT');
@@ -614,7 +614,7 @@ class ViewPaymentsPending extends DbTable
         $this->campaign_id->DbValue = $row['campaign_id'];
         $this->campaign_name->DbValue = $row['campaign_name'];
         $this->quantity->DbValue = $row['quantity'];
-        $this->campaign_status->DbValue = $row['campaign_status'];
+        $this->transaction_status->DbValue = $row['transaction_status'];
         $this->print_status->DbValue = $row['print_status'];
         $this->payment_status->DbValue = $row['payment_status'];
         $this->start_date->DbValue = $row['start_date'];
@@ -911,7 +911,7 @@ SORTHTML;
         $this->campaign_id->setDbValue($row['campaign_id']);
         $this->campaign_name->setDbValue($row['campaign_name']);
         $this->quantity->setDbValue($row['quantity']);
-        $this->campaign_status->setDbValue($row['campaign_status']);
+        $this->transaction_status->setDbValue($row['transaction_status']);
         $this->print_status->setDbValue($row['print_status']);
         $this->payment_status->setDbValue($row['payment_status']);
         $this->start_date->setDbValue($row['start_date']);
@@ -949,7 +949,7 @@ SORTHTML;
 
         // quantity
 
-        // campaign_status
+        // transaction_status
 
         // print_status
 
@@ -1004,9 +1004,9 @@ SORTHTML;
         $this->quantity->ViewValue = FormatNumber($this->quantity->ViewValue, 0, -2, -2, -2);
         $this->quantity->ViewCustomAttributes = "";
 
-        // campaign_status
-        $this->campaign_status->ViewValue = $this->campaign_status->CurrentValue;
-        $this->campaign_status->ViewCustomAttributes = "";
+        // transaction_status
+        $this->transaction_status->ViewValue = $this->transaction_status->CurrentValue;
+        $this->transaction_status->ViewCustomAttributes = "";
 
         // print_status
         $this->print_status->ViewValue = $this->print_status->CurrentValue;
@@ -1104,10 +1104,10 @@ SORTHTML;
         $this->quantity->HrefValue = "";
         $this->quantity->TooltipValue = "";
 
-        // campaign_status
-        $this->campaign_status->LinkCustomAttributes = "";
-        $this->campaign_status->HrefValue = "";
-        $this->campaign_status->TooltipValue = "";
+        // transaction_status
+        $this->transaction_status->LinkCustomAttributes = "";
+        $this->transaction_status->HrefValue = "";
+        $this->transaction_status->TooltipValue = "";
 
         // print_status
         $this->print_status->LinkCustomAttributes = "";
@@ -1233,14 +1233,14 @@ SORTHTML;
         $this->quantity->EditValue = $this->quantity->CurrentValue;
         $this->quantity->PlaceHolder = RemoveHtml($this->quantity->caption());
 
-        // campaign_status
-        $this->campaign_status->EditAttrs["class"] = "form-control";
-        $this->campaign_status->EditCustomAttributes = "";
-        if (!$this->campaign_status->Raw) {
-            $this->campaign_status->CurrentValue = HtmlDecode($this->campaign_status->CurrentValue);
+        // transaction_status
+        $this->transaction_status->EditAttrs["class"] = "form-control";
+        $this->transaction_status->EditCustomAttributes = "";
+        if (!$this->transaction_status->Raw) {
+            $this->transaction_status->CurrentValue = HtmlDecode($this->transaction_status->CurrentValue);
         }
-        $this->campaign_status->EditValue = $this->campaign_status->CurrentValue;
-        $this->campaign_status->PlaceHolder = RemoveHtml($this->campaign_status->caption());
+        $this->transaction_status->EditValue = $this->transaction_status->CurrentValue;
+        $this->transaction_status->PlaceHolder = RemoveHtml($this->transaction_status->caption());
 
         // print_status
         $this->print_status->EditAttrs["class"] = "form-control";
@@ -1391,7 +1391,7 @@ SORTHTML;
                     $doc->exportCaption($this->campaign_id);
                     $doc->exportCaption($this->campaign_name);
                     $doc->exportCaption($this->quantity);
-                    $doc->exportCaption($this->campaign_status);
+                    $doc->exportCaption($this->transaction_status);
                     $doc->exportCaption($this->print_status);
                     $doc->exportCaption($this->payment_status);
                     $doc->exportCaption($this->start_date);
@@ -1413,7 +1413,7 @@ SORTHTML;
                     $doc->exportCaption($this->transaction_id);
                     $doc->exportCaption($this->campaign_id);
                     $doc->exportCaption($this->quantity);
-                    $doc->exportCaption($this->campaign_status);
+                    $doc->exportCaption($this->transaction_status);
                     $doc->exportCaption($this->print_status);
                     $doc->exportCaption($this->payment_status);
                     $doc->exportCaption($this->start_date);
@@ -1460,7 +1460,7 @@ SORTHTML;
                         $doc->exportField($this->campaign_id);
                         $doc->exportField($this->campaign_name);
                         $doc->exportField($this->quantity);
-                        $doc->exportField($this->campaign_status);
+                        $doc->exportField($this->transaction_status);
                         $doc->exportField($this->print_status);
                         $doc->exportField($this->payment_status);
                         $doc->exportField($this->start_date);
@@ -1482,7 +1482,7 @@ SORTHTML;
                         $doc->exportField($this->transaction_id);
                         $doc->exportField($this->campaign_id);
                         $doc->exportField($this->quantity);
-                        $doc->exportField($this->campaign_status);
+                        $doc->exportField($this->transaction_status);
                         $doc->exportField($this->print_status);
                         $doc->exportField($this->payment_status);
                         $doc->exportField($this->start_date);

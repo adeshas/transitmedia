@@ -502,6 +502,7 @@ class AdvancedSecurity
                     $_SESSION[SESSION_SYS_ADMIN] = 0; // Non System Administrator
                     $this->setCurrentUserName(GetUserInfo(Config("LOGIN_USERNAME_FIELD_NAME"), $row)); // Load user name
                     $this->setSessionUserID(GetUserInfo(Config("USER_ID_FIELD_NAME"), $row)); // Load User ID
+                    $this->setSessionParentUserID(GetUserInfo(Config("PARENT_USER_ID_FIELD_NAME"), $row)); // Load parent User ID
                     if (GetUserInfo(Config("USER_LEVEL_FIELD_NAME"), $row) === null) {
                         $this->setSessionUserLevelID(0);
                     } else {
@@ -1047,6 +1048,20 @@ class AdvancedSecurity
             foreach ($rows as $row) {
                 $this->addUserID(GetUserInfo(Config("USER_ID_FIELD_NAME"), $row));
             }
+
+            // Recurse all levels
+            $curUserIDList = $this->userIDList();
+            $userIDList = "";
+            while ($userIDList != $curUserIDList) {
+                $filter = '"reportsto" IN (' . $curUserIDList . ')';
+                $sql = $UserTable->getSql($filter);
+                $rows = Conn($UserTable->Dbid)->fetchAll($sql);
+                foreach ($rows as $row) {
+                    $this->addUserID($row['vendor_id']);
+                }
+                $userIDList = $curUserIDList;
+                $curUserIDList = $this->userIDList();
+            }
         }
     }
 
@@ -1101,6 +1116,28 @@ class AdvancedSecurity
         return implode(", ", array_map(function ($userId) {
             return QuotedValue($userId, DATATYPE_NUMBER, Config("USER_TABLE_DBID"));
         }, $this->UserID));
+    }
+
+    // Parent User ID list
+    public function parentUserIDList($userId)
+    {
+        // Own record
+        if (SameString($userId, CurrentUserID())) {
+            if (strval(CurrentParentUserID()) != "") {
+                return QuotedValue(CurrentParentUserID(), DATATYPE_NUMBER, Config("USER_TABLE_DBID"));
+            }
+        }
+
+        // All users except user ID
+        $ar = $this->UserID;
+        $len = count($ar);
+        $res = [];
+        for ($i = 0; $i < $len; $i++) {
+            if (!SameString($ar[$i], $userId)) {
+                $res[] = QuotedValue($ar[$i], DATATYPE_NUMBER, Config("USER_TABLE_DBID"));
+            }
+        }
+        return implode(", ", $res);
     }
 
     // List of allowed User IDs for this user

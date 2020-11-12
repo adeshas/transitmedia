@@ -329,6 +329,7 @@ class XTransactionStatusAdd extends XTransactionStatus
     {
         $key = "";
         if (is_array($ar)) {
+            $key .= @$ar['id'];
         }
         return $key;
     }
@@ -340,6 +341,9 @@ class XTransactionStatusAdd extends XTransactionStatus
      */
     protected function hideFieldsForAddEdit()
     {
+        if ($this->isAdd() || $this->isCopy() || $this->isGridAdd()) {
+            $this->id->Visible = false;
+        }
     }
 
     // Lookup data
@@ -434,6 +438,8 @@ class XTransactionStatusAdd extends XTransactionStatus
         $this->CurrentAction = Param("action"); // Set up current action
         $this->id->Visible = false;
         $this->name->setVisibility();
+        $this->admin_name->setVisibility();
+        $this->operator_name->setVisibility();
         $this->hideFieldsForAddEdit();
 
         // Do not use lookup cache
@@ -465,8 +471,13 @@ class XTransactionStatusAdd extends XTransactionStatus
             $this->CurrentAction = Post("action"); // Get form action
             $this->setKey(Post($this->OldKeyName));
             $postBack = true;
-        } else { // Not post back
-            $this->CopyRecord = false;
+        } else {
+            // Load key values from QueryString
+            if (($keyValue = Get("id") ?? Route("id")) !== null) {
+                $this->id->setQueryStringValue($keyValue);
+            }
+            $this->OldKey = $this->getKey(true); // Get from CurrentValue
+            $this->CopyRecord = !EmptyValue($this->OldKey);
             if ($this->CopyRecord) {
                 $this->CurrentAction = "copy"; // Copy record
             } else {
@@ -539,7 +550,11 @@ class XTransactionStatusAdd extends XTransactionStatus
         $this->setupBreadcrumb();
 
         // Render row based on row type
-        $this->RowType = ROWTYPE_ADD; // Render add type
+        if ($this->isConfirm()) { // Confirm page
+            $this->RowType = ROWTYPE_VIEW; // Render view type
+        } else {
+            $this->RowType = ROWTYPE_ADD; // Render add type
+        }
 
         // Render row
         $this->resetAttributes();
@@ -579,6 +594,10 @@ class XTransactionStatusAdd extends XTransactionStatus
         $this->id->OldValue = $this->id->CurrentValue;
         $this->name->CurrentValue = null;
         $this->name->OldValue = $this->name->CurrentValue;
+        $this->admin_name->CurrentValue = null;
+        $this->admin_name->OldValue = $this->admin_name->CurrentValue;
+        $this->operator_name->CurrentValue = null;
+        $this->operator_name->OldValue = $this->operator_name->CurrentValue;
     }
 
     // Load form values
@@ -596,6 +615,29 @@ class XTransactionStatusAdd extends XTransactionStatus
                 $this->name->setFormValue($val);
             }
         }
+
+        // Check field name 'admin_name' first before field var 'x_admin_name'
+        $val = $CurrentForm->hasValue("admin_name") ? $CurrentForm->getValue("admin_name") : $CurrentForm->getValue("x_admin_name");
+        if (!$this->admin_name->IsDetailKey) {
+            if (IsApi() && $val === null) {
+                $this->admin_name->Visible = false; // Disable update for API request
+            } else {
+                $this->admin_name->setFormValue($val);
+            }
+        }
+
+        // Check field name 'operator_name' first before field var 'x_operator_name'
+        $val = $CurrentForm->hasValue("operator_name") ? $CurrentForm->getValue("operator_name") : $CurrentForm->getValue("x_operator_name");
+        if (!$this->operator_name->IsDetailKey) {
+            if (IsApi() && $val === null) {
+                $this->operator_name->Visible = false; // Disable update for API request
+            } else {
+                $this->operator_name->setFormValue($val);
+            }
+        }
+
+        // Check field name 'id' first before field var 'x_id'
+        $val = $CurrentForm->hasValue("id") ? $CurrentForm->getValue("id") : $CurrentForm->getValue("x_id");
     }
 
     // Restore form values
@@ -603,6 +645,8 @@ class XTransactionStatusAdd extends XTransactionStatus
     {
         global $CurrentForm;
         $this->name->CurrentValue = $this->name->FormValue;
+        $this->admin_name->CurrentValue = $this->admin_name->FormValue;
+        $this->operator_name->CurrentValue = $this->operator_name->FormValue;
     }
 
     /**
@@ -654,6 +698,8 @@ class XTransactionStatusAdd extends XTransactionStatus
         }
         $this->id->setDbValue($row['id']);
         $this->name->setDbValue($row['name']);
+        $this->admin_name->setDbValue($row['admin_name']);
+        $this->operator_name->setDbValue($row['operator_name']);
     }
 
     // Return a row with default values
@@ -663,13 +709,25 @@ class XTransactionStatusAdd extends XTransactionStatus
         $row = [];
         $row['id'] = $this->id->CurrentValue;
         $row['name'] = $this->name->CurrentValue;
+        $row['admin_name'] = $this->admin_name->CurrentValue;
+        $row['operator_name'] = $this->operator_name->CurrentValue;
         return $row;
     }
 
     // Load old record
     protected function loadOldRecord()
     {
-        return false;
+        // Load old record
+        $this->OldRecordset = null;
+        $validKey = $this->OldKey != "";
+        if ($validKey) {
+            $this->CurrentFilter = $this->getRecordFilter();
+            $sql = $this->getCurrentSql();
+            $conn = $this->getConnection();
+            $this->OldRecordset = LoadRecordset($sql, $conn);
+        }
+        $this->loadRowValues($this->OldRecordset); // Load row values
+        return $validKey;
     }
 
     // Render row values based on field settings
@@ -687,20 +745,41 @@ class XTransactionStatusAdd extends XTransactionStatus
         // id
 
         // name
+
+        // admin_name
+
+        // operator_name
         if ($this->RowType == ROWTYPE_VIEW) {
             // id
             $this->id->ViewValue = $this->id->CurrentValue;
-            $this->id->ViewValue = FormatNumber($this->id->ViewValue, 0, -2, -2, -2);
             $this->id->ViewCustomAttributes = "";
 
             // name
             $this->name->ViewValue = $this->name->CurrentValue;
             $this->name->ViewCustomAttributes = "";
 
+            // admin_name
+            $this->admin_name->ViewValue = $this->admin_name->CurrentValue;
+            $this->admin_name->ViewCustomAttributes = "";
+
+            // operator_name
+            $this->operator_name->ViewValue = $this->operator_name->CurrentValue;
+            $this->operator_name->ViewCustomAttributes = "";
+
             // name
             $this->name->LinkCustomAttributes = "";
             $this->name->HrefValue = "";
             $this->name->TooltipValue = "";
+
+            // admin_name
+            $this->admin_name->LinkCustomAttributes = "";
+            $this->admin_name->HrefValue = "";
+            $this->admin_name->TooltipValue = "";
+
+            // operator_name
+            $this->operator_name->LinkCustomAttributes = "";
+            $this->operator_name->HrefValue = "";
+            $this->operator_name->TooltipValue = "";
         } elseif ($this->RowType == ROWTYPE_ADD) {
             // name
             $this->name->EditAttrs["class"] = "form-control";
@@ -711,11 +790,37 @@ class XTransactionStatusAdd extends XTransactionStatus
             $this->name->EditValue = HtmlEncode($this->name->CurrentValue);
             $this->name->PlaceHolder = RemoveHtml($this->name->caption());
 
+            // admin_name
+            $this->admin_name->EditAttrs["class"] = "form-control";
+            $this->admin_name->EditCustomAttributes = "";
+            if (!$this->admin_name->Raw) {
+                $this->admin_name->CurrentValue = HtmlDecode($this->admin_name->CurrentValue);
+            }
+            $this->admin_name->EditValue = HtmlEncode($this->admin_name->CurrentValue);
+            $this->admin_name->PlaceHolder = RemoveHtml($this->admin_name->caption());
+
+            // operator_name
+            $this->operator_name->EditAttrs["class"] = "form-control";
+            $this->operator_name->EditCustomAttributes = "";
+            if (!$this->operator_name->Raw) {
+                $this->operator_name->CurrentValue = HtmlDecode($this->operator_name->CurrentValue);
+            }
+            $this->operator_name->EditValue = HtmlEncode($this->operator_name->CurrentValue);
+            $this->operator_name->PlaceHolder = RemoveHtml($this->operator_name->caption());
+
             // Add refer script
 
             // name
             $this->name->LinkCustomAttributes = "";
             $this->name->HrefValue = "";
+
+            // admin_name
+            $this->admin_name->LinkCustomAttributes = "";
+            $this->admin_name->HrefValue = "";
+
+            // operator_name
+            $this->operator_name->LinkCustomAttributes = "";
+            $this->operator_name->HrefValue = "";
         }
         if ($this->RowType == ROWTYPE_ADD || $this->RowType == ROWTYPE_EDIT || $this->RowType == ROWTYPE_SEARCH) { // Add/Edit/Search row
             $this->setupFieldTitles();
@@ -739,6 +844,16 @@ class XTransactionStatusAdd extends XTransactionStatus
         if ($this->name->Required) {
             if (!$this->name->IsDetailKey && EmptyValue($this->name->FormValue)) {
                 $this->name->addErrorMessage(str_replace("%s", $this->name->caption(), $this->name->RequiredErrorMessage));
+            }
+        }
+        if ($this->admin_name->Required) {
+            if (!$this->admin_name->IsDetailKey && EmptyValue($this->admin_name->FormValue)) {
+                $this->admin_name->addErrorMessage(str_replace("%s", $this->admin_name->caption(), $this->admin_name->RequiredErrorMessage));
+            }
+        }
+        if ($this->operator_name->Required) {
+            if (!$this->operator_name->IsDetailKey && EmptyValue($this->operator_name->FormValue)) {
+                $this->operator_name->addErrorMessage(str_replace("%s", $this->operator_name->caption(), $this->operator_name->RequiredErrorMessage));
             }
         }
 
@@ -768,6 +883,12 @@ class XTransactionStatusAdd extends XTransactionStatus
 
         // name
         $this->name->setDbValueDef($rsnew, $this->name->CurrentValue, "", false);
+
+        // admin_name
+        $this->admin_name->setDbValueDef($rsnew, $this->admin_name->CurrentValue, null, false);
+
+        // operator_name
+        $this->operator_name->setDbValueDef($rsnew, $this->operator_name->CurrentValue, null, false);
 
         // Call Row Inserting event
         $insertRow = $this->rowInserting($rsold, $rsnew);

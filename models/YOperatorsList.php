@@ -529,6 +529,9 @@ class YOperatorsList extends YOperators
     public function run()
     {
         global $ExportType, $CustomExportType, $ExportFileName, $UserProfile, $Language, $Security, $CurrentForm;
+
+        // Create form object
+        $CurrentForm = new HttpForm();
         $this->CurrentAction = Param("action"); // Set up current action
 
         // Get grid add count
@@ -543,6 +546,8 @@ class YOperatorsList extends YOperators
         $this->name->setVisibility();
         $this->shortname->setVisibility();
         $this->platform_id->setVisibility();
+        $this->_email->setVisibility();
+        $this->contact_name->setVisibility();
         $this->hideFieldsForAddEdit();
 
         // Global Page Loading event (in userfn*.php)
@@ -600,6 +605,67 @@ class YOperatorsList extends YOperators
                 $this->setupBreadcrumb();
             }
 
+            // Check QueryString parameters
+            if (Get("action") !== null) {
+                $this->CurrentAction = Get("action");
+
+                // Clear inline mode
+                if ($this->isCancel()) {
+                    $this->clearInlineMode();
+                }
+
+                // Switch to grid edit mode
+                if ($this->isGridEdit()) {
+                    $this->gridEditMode();
+                }
+
+                // Switch to inline edit mode
+                if ($this->isEdit()) {
+                    $this->inlineEditMode();
+                }
+
+                // Switch to inline add mode
+                if ($this->isAdd() || $this->isCopy()) {
+                    $this->inlineAddMode();
+                }
+            } else {
+                if (Post("action") !== null) {
+                    $this->CurrentAction = Post("action"); // Get action
+
+                    // Grid Update
+                    if (($this->isGridUpdate() || $this->isGridOverwrite()) && @$_SESSION[SESSION_INLINE_MODE] == "gridedit") {
+                        if ($this->validateGridForm()) {
+                            $gridUpdate = $this->gridUpdate();
+                        } else {
+                            $gridUpdate = false;
+                        }
+                        if ($gridUpdate) {
+                        } else {
+                            $this->EventCancelled = true;
+                            $this->gridEditMode(); // Stay in Grid edit mode
+                        }
+                    }
+
+                    // Inline Update
+                    if (($this->isUpdate() || $this->isOverwrite()) && @$_SESSION[SESSION_INLINE_MODE] == "edit") {
+                        $this->setKey(Post($this->OldKeyName));
+                        $this->inlineUpdate();
+                    }
+
+                    // Insert Inline
+                    if ($this->isInsert() && @$_SESSION[SESSION_INLINE_MODE] == "add") {
+                        $this->setKey(Post($this->OldKeyName));
+                        $this->inlineInsert();
+                    }
+                } elseif (@$_SESSION[SESSION_INLINE_MODE] == "gridedit") { // Previously in grid edit mode
+                    if (Get(Config("TABLE_START_REC")) !== null || Get(Config("TABLE_PAGE_NO")) !== null) { // Stay in grid edit mode if paging
+                        $this->gridEditMode();
+                    } else { // Reset grid edit
+                        $this->clearInlineMode();
+                    }
+                }
+            }
+
             // Hide list options
             if ($this->isExport()) {
                 $this->ListOptions->hideAllOptions(["sequence"]);
@@ -621,6 +687,16 @@ class YOperatorsList extends YOperators
             // Hide other options
             if ($this->isExport()) {
                 $this->OtherOptions->hideAllOptions();
+            }
+
+            // Show grid delete link for grid add / grid edit
+            if ($this->AllowAddDeleteRow) {
+                if ($this->isGridAdd() || $this->isGridEdit()) {
+                    $item = $this->ListOptions["griddelete"];
+                    if ($item) {
+                        $item->Visible = true;
+                    }
+                }
             }
 
             // Get default search criteria
@@ -818,6 +894,225 @@ class YOperatorsList extends YOperators
         }
     }
 
+    // Exit inline mode
+    protected function clearInlineMode()
+    {
+        $this->LastAction = $this->CurrentAction; // Save last action
+        $this->CurrentAction = ""; // Clear action
+        $_SESSION[SESSION_INLINE_MODE] = ""; // Clear inline mode
+    }
+
+    // Switch to Grid Edit mode
+    protected function gridEditMode()
+    {
+        $this->CurrentAction = "gridedit";
+        $_SESSION[SESSION_INLINE_MODE] = "gridedit";
+        $this->hideFieldsForAddEdit();
+    }
+
+    // Switch to Inline Edit mode
+    protected function inlineEditMode()
+    {
+        global $Security, $Language;
+        if (!$Security->canEdit()) {
+            return false; // Edit not allowed
+        }
+        $inlineEdit = true;
+        if (($keyValue = Get("id") ?? Route("id")) !== null) {
+            $this->id->setQueryStringValue($keyValue);
+        } else {
+            $inlineEdit = false;
+        }
+        if ($inlineEdit) {
+            if ($this->loadRow()) {
+                $this->OldKey = $this->getKey(true); // Get from CurrentValue
+                $this->setKey($this->OldKey); // Set to OldValue
+                $_SESSION[SESSION_INLINE_MODE] = "edit"; // Enable inline edit
+            }
+        }
+        return true;
+    }
+
+    // Perform update to Inline Edit record
+    protected function inlineUpdate()
+    {
+        global $Language, $CurrentForm;
+        $CurrentForm->Index = 1;
+        $this->loadFormValues(); // Get form values
+
+        // Validate form
+        $inlineUpdate = true;
+        if (!$this->validateForm()) {
+            $inlineUpdate = false; // Form error, reset action
+        } else {
+            $inlineUpdate = false;
+            $this->SendEmail = true; // Send email on update success
+            $inlineUpdate = $this->editRow(); // Update record
+        }
+        if ($inlineUpdate) { // Update success
+            if ($this->getSuccessMessage() == "") {
+                $this->setSuccessMessage($Language->phrase("UpdateSuccess")); // Set up success message
+            }
+            $this->clearInlineMode(); // Clear inline edit mode
+        } else {
+            if ($this->getFailureMessage() == "") {
+                $this->setFailureMessage($Language->phrase("UpdateFailed")); // Set update failed message
+            }
+            $this->EventCancelled = true; // Cancel event
+            $this->CurrentAction = "edit"; // Stay in edit mode
+        }
+    }
+
+    // Check Inline Edit key
+    public function checkInlineEditKey()
+    {
+        if (!SameString($this->id->OldValue, $this->id->CurrentValue)) {
+            return false;
+        }
+        return true;
+    }
+
+    // Switch to Inline Add mode
+    protected function inlineAddMode()
+    {
+        global $Security, $Language;
+        if (!$Security->canAdd()) {
+            return false; // Add not allowed
+        }
+        $this->CurrentAction = "add";
+        $_SESSION[SESSION_INLINE_MODE] = "add"; // Enable inline add
+        return true;
+    }
+
+    // Perform update to Inline Add/Copy record
+    protected function inlineInsert()
+    {
+        global $Language, $CurrentForm;
+        $this->loadOldRecord(); // Load old record
+        $CurrentForm->Index = 0;
+        $this->loadFormValues(); // Get form values
+
+        // Validate form
+        if (!$this->validateForm()) {
+            $this->EventCancelled = true; // Set event cancelled
+            $this->CurrentAction = "add"; // Stay in add mode
+            return;
+        }
+        $this->SendEmail = true; // Send email on add success
+        if ($this->addRow($this->OldRecordset)) { // Add record
+            if ($this->getSuccessMessage() == "") {
+                $this->setSuccessMessage($Language->phrase("AddSuccess")); // Set up add success message
+            }
+            $this->clearInlineMode(); // Clear inline add mode
+        } else { // Add failed
+            $this->EventCancelled = true; // Set event cancelled
+            $this->CurrentAction = "add"; // Stay in add mode
+        }
+    }
+
+    // Perform update to grid
+    public function gridUpdate()
+    {
+        global $Language, $CurrentForm;
+        $gridUpdate = true;
+
+        // Get old recordset
+        $this->CurrentFilter = $this->buildKeyFilter();
+        if ($this->CurrentFilter == "") {
+            $this->CurrentFilter = "0=1";
+        }
+        $sql = $this->getCurrentSql();
+        $conn = $this->getConnection();
+        if ($rs = $conn->executeQuery($sql)) {
+            $rsold = $rs->fetchAll();
+            $rs->closeCursor();
+        }
+
+        // Call Grid Updating event
+        if (!$this->gridUpdating($rsold)) {
+            if ($this->getFailureMessage() == "") {
+                $this->setFailureMessage($Language->phrase("GridEditCancelled")); // Set grid edit cancelled message
+            }
+            return false;
+        }
+
+        // Begin transaction
+        $conn->beginTransaction();
+        $key = "";
+
+        // Update row index and get row key
+        $CurrentForm->Index = -1;
+        $rowcnt = strval($CurrentForm->getValue($this->FormKeyCountName));
+        if ($rowcnt == "" || !is_numeric($rowcnt)) {
+            $rowcnt = 0;
+        }
+
+        // Update all rows based on key
+        for ($rowindex = 1; $rowindex <= $rowcnt; $rowindex++) {
+            $CurrentForm->Index = $rowindex;
+            $this->setKey($CurrentForm->getValue($this->OldKeyName));
+            $rowaction = strval($CurrentForm->getValue($this->FormActionName));
+
+            // Load all values and keys
+            if ($rowaction != "insertdelete") { // Skip insert then deleted rows
+                $this->loadFormValues(); // Get form values
+                if ($rowaction == "" || $rowaction == "edit" || $rowaction == "delete") {
+                    $gridUpdate = $this->OldKey != ""; // Key must not be empty
+                } else {
+                    $gridUpdate = true;
+                }
+
+                // Skip empty row
+                if ($rowaction == "insert" && $this->emptyRow()) {
+                // Validate form and insert/update/delete record
+                } elseif ($gridUpdate) {
+                    if ($rowaction == "delete") {
+                        $this->CurrentFilter = $this->getRecordFilter();
+                        $gridUpdate = $this->deleteRows(); // Delete this row
+                    //} elseif (!$this->validateForm()) { // Already done in validateGridForm
+                    //    $gridUpdate = false; // Form error, reset action
+                    } else {
+                        if ($rowaction == "insert") {
+                            $gridUpdate = $this->addRow(); // Insert this row
+                        } else {
+                            if ($this->OldKey != "") {
+                                $this->SendEmail = false; // Do not send email on update success
+                                $gridUpdate = $this->editRow(); // Update this row
+                            }
+                        } // End update
+                    }
+                }
+                if ($gridUpdate) {
+                    if ($key != "") {
+                        $key .= ", ";
+                    }
+                    $key .= $this->OldKey;
+                } else {
+                    break;
+                }
+            }
+        }
+        if ($gridUpdate) {
+            $conn->commit(); // Commit transaction
+
+            // Get new records
+            $rsnew = $conn->fetchAll($sql);
+
+            // Call Grid_Updated event
+            $this->gridUpdated($rsold, $rsnew);
+            if ($this->getSuccessMessage() == "") {
+                $this->setSuccessMessage($Language->phrase("UpdateSuccess")); // Set up update success message
+            }
+            $this->clearInlineMode(); // Clear inline edit mode
+        } else {
+            $conn->rollback(); // Rollback transaction
+            if ($this->getFailureMessage() == "") {
+                $this->setFailureMessage($Language->phrase("UpdateFailed")); // Set update failed message
+            }
+        }
+        return $gridUpdate;
+    }
+
     // Build filter for all keys
     protected function buildKeyFilter()
     {
@@ -849,6 +1144,114 @@ class YOperatorsList extends YOperators
         return $wrkFilter;
     }
 
+    // Check if empty row
+    public function emptyRow()
+    {
+        global $CurrentForm;
+        if ($CurrentForm->hasValue("x_name") && $CurrentForm->hasValue("o_name") && $this->name->CurrentValue != $this->name->OldValue) {
+            return false;
+        }
+        if ($CurrentForm->hasValue("x_shortname") && $CurrentForm->hasValue("o_shortname") && $this->shortname->CurrentValue != $this->shortname->OldValue) {
+            return false;
+        }
+        if ($CurrentForm->hasValue("x_platform_id") && $CurrentForm->hasValue("o_platform_id") && $this->platform_id->CurrentValue != $this->platform_id->OldValue) {
+            return false;
+        }
+        if ($CurrentForm->hasValue("x__email") && $CurrentForm->hasValue("o__email") && $this->_email->CurrentValue != $this->_email->OldValue) {
+            return false;
+        }
+        if ($CurrentForm->hasValue("x_contact_name") && $CurrentForm->hasValue("o_contact_name") && $this->contact_name->CurrentValue != $this->contact_name->OldValue) {
+            return false;
+        }
+        return true;
+    }
+
+    // Validate grid form
+    public function validateGridForm()
+    {
+        global $CurrentForm;
+        // Get row count
+        $CurrentForm->Index = -1;
+        $rowcnt = strval($CurrentForm->getValue($this->FormKeyCountName));
+        if ($rowcnt == "" || !is_numeric($rowcnt)) {
+            $rowcnt = 0;
+        }
+
+        // Validate all records
+        for ($rowindex = 1; $rowindex <= $rowcnt; $rowindex++) {
+            // Load current row values
+            $CurrentForm->Index = $rowindex;
+            $rowaction = strval($CurrentForm->getValue($this->FormActionName));
+            if ($rowaction != "delete" && $rowaction != "insertdelete") {
+                $this->loadFormValues(); // Get form values
+                if ($rowaction == "insert" && $this->emptyRow()) {
+                    // Ignore
+                } elseif (!$this->validateForm()) {
+                    return false;
+                }
+            }
+        }
+        return true;
+    }
+
+    // Get all form values of the grid
+    public function getGridFormValues()
+    {
+        global $CurrentForm;
+        // Get row count
+        $CurrentForm->Index = -1;
+        $rowcnt = strval($CurrentForm->getValue($this->FormKeyCountName));
+        if ($rowcnt == "" || !is_numeric($rowcnt)) {
+            $rowcnt = 0;
+        }
+        $rows = [];
+
+        // Loop through all records
+        for ($rowindex = 1; $rowindex <= $rowcnt; $rowindex++) {
+            // Load current row values
+            $CurrentForm->Index = $rowindex;
+            $rowaction = strval($CurrentForm->getValue($this->FormActionName));
+            if ($rowaction != "delete" && $rowaction != "insertdelete") {
+                $this->loadFormValues(); // Get form values
+                if ($rowaction == "insert" && $this->emptyRow()) {
+                    // Ignore
+                } else {
+                    $rows[] = $this->getFieldValues("FormValue"); // Return row as array
+                }
+            }
+        }
+        return $rows; // Return as array of array
+    }
+
+    // Restore form values for current row
+    public function restoreCurrentRowFormValues($idx)
+    {
+        global $CurrentForm;
+
+        // Get row based on current index
+        $CurrentForm->Index = $idx;
+        $rowaction = strval($CurrentForm->getValue($this->FormActionName));
+        $this->loadFormValues(); // Load form values
+        // Set up invalid status correctly
+        $this->resetFormError();
+        if ($rowaction == "insert" && $this->emptyRow()) {
+            // Ignore
+        } else {
+            $this->validateForm();
+        }
+    }
+
+    // Reset form status
+    public function resetFormError()
+    {
+        $this->id->clearErrorMessage();
+        $this->name->clearErrorMessage();
+        $this->shortname->clearErrorMessage();
+        $this->platform_id->clearErrorMessage();
+        $this->_email->clearErrorMessage();
+        $this->contact_name->clearErrorMessage();
+    }
+
     // Get list of filters
     public function getFilterList()
     {
@@ -861,6 +1264,8 @@ class YOperatorsList extends YOperators
         $filterList = Concat($filterList, $this->name->AdvancedSearch->toJson(), ","); // Field name
         $filterList = Concat($filterList, $this->shortname->AdvancedSearch->toJson(), ","); // Field shortname
         $filterList = Concat($filterList, $this->platform_id->AdvancedSearch->toJson(), ","); // Field platform_id
+        $filterList = Concat($filterList, $this->_email->AdvancedSearch->toJson(), ","); // Field email
+        $filterList = Concat($filterList, $this->contact_name->AdvancedSearch->toJson(), ","); // Field contact_name
         if ($this->BasicSearch->Keyword != "") {
             $wrk = "\"" . Config("TABLE_BASIC_SEARCH") . "\":\"" . JsEncode($this->BasicSearch->Keyword) . "\",\"" . Config("TABLE_BASIC_SEARCH_TYPE") . "\":\"" . JsEncode($this->BasicSearch->Type) . "\"";
             $filterList = Concat($filterList, $wrk, ",");
@@ -932,6 +1337,22 @@ class YOperatorsList extends YOperators
         $this->platform_id->AdvancedSearch->SearchValue2 = @$filter["y_platform_id"];
         $this->platform_id->AdvancedSearch->SearchOperator2 = @$filter["w_platform_id"];
         $this->platform_id->AdvancedSearch->save();
+
+        // Field email
+        $this->_email->AdvancedSearch->SearchValue = @$filter["x__email"];
+        $this->_email->AdvancedSearch->SearchOperator = @$filter["z__email"];
+        $this->_email->AdvancedSearch->SearchCondition = @$filter["v__email"];
+        $this->_email->AdvancedSearch->SearchValue2 = @$filter["y__email"];
+        $this->_email->AdvancedSearch->SearchOperator2 = @$filter["w__email"];
+        $this->_email->AdvancedSearch->save();
+
+        // Field contact_name
+        $this->contact_name->AdvancedSearch->SearchValue = @$filter["x_contact_name"];
+        $this->contact_name->AdvancedSearch->SearchOperator = @$filter["z_contact_name"];
+        $this->contact_name->AdvancedSearch->SearchCondition = @$filter["v_contact_name"];
+        $this->contact_name->AdvancedSearch->SearchValue2 = @$filter["y_contact_name"];
+        $this->contact_name->AdvancedSearch->SearchOperator2 = @$filter["w_contact_name"];
+        $this->contact_name->AdvancedSearch->save();
         $this->BasicSearch->setKeyword(@$filter[Config("TABLE_BASIC_SEARCH")]);
         $this->BasicSearch->setType(@$filter[Config("TABLE_BASIC_SEARCH_TYPE")]);
     }
@@ -942,6 +1363,8 @@ class YOperatorsList extends YOperators
         $where = "";
         $this->buildBasicSearchSql($where, $this->name, $arKeywords, $type);
         $this->buildBasicSearchSql($where, $this->shortname, $arKeywords, $type);
+        $this->buildBasicSearchSql($where, $this->_email, $arKeywords, $type);
+        $this->buildBasicSearchSql($where, $this->contact_name, $arKeywords, $type);
         return $where;
     }
 
@@ -1108,6 +1531,8 @@ class YOperatorsList extends YOperators
             $this->updateSort($this->name); // name
             $this->updateSort($this->shortname); // shortname
             $this->updateSort($this->platform_id); // platform_id
+            $this->updateSort($this->_email); // email
+            $this->updateSort($this->contact_name); // contact_name
             $this->setStartRecordNumber(1); // Reset start position
         }
     }
@@ -1159,6 +1584,8 @@ class YOperatorsList extends YOperators
                 $this->name->setSort("");
                 $this->shortname->setSort("");
                 $this->platform_id->setSort("");
+                $this->_email->setSort("");
+                $this->contact_name->setSort("");
             }
 
             // Reset start position
@@ -1172,6 +1599,14 @@ class YOperatorsList extends YOperators
     {
         global $Security, $Language;
 
+        // "griddelete"
+        if ($this->AllowAddDeleteRow) {
+            $item = &$this->ListOptions->add("griddelete");
+            $item->CssClass = "text-nowrap";
+            $item->OnLeft = false;
+            $item->Visible = false; // Default hidden
+        }
+
         // Add group option item
         $item = &$this->ListOptions->add($this->ListOptions->GroupOptionName);
         $item->Body = "";
@@ -1182,6 +1617,24 @@ class YOperatorsList extends YOperators
         $item = &$this->ListOptions->add("view");
         $item->CssClass = "text-nowrap";
         $item->Visible = $Security->canView();
+        $item->OnLeft = false;
+
+        // "edit"
+        $item = &$this->ListOptions->add("edit");
+        $item->CssClass = "text-nowrap";
+        $item->Visible = $Security->canEdit();
+        $item->OnLeft = false;
+
+        // "copy"
+        $item = &$this->ListOptions->add("copy");
+        $item->CssClass = "text-nowrap";
+        $item->Visible = $Security->canAdd() && $this->isAdd();
+        $item->OnLeft = false;
+
+        // "delete"
+        $item = &$this->ListOptions->add("delete");
+        $item->CssClass = "text-nowrap";
+        $item->Visible = $Security->canDelete();
         $item->OnLeft = false;
 
         // "detail_main_transactions"
@@ -1215,7 +1668,7 @@ class YOperatorsList extends YOperators
 
         // "checkbox"
         $item = &$this->ListOptions->add("checkbox");
-        $item->Visible = false;
+        $item->Visible = $Security->canEdit();
         $item->OnLeft = false;
         $item->Header = "<div class=\"custom-control custom-checkbox d-inline-block\"><input type=\"checkbox\" name=\"key\" id=\"key\" class=\"custom-control-input\" onclick=\"ew.selectAllKey(this);\"><label class=\"custom-control-label\" for=\"key\"></label></div>";
         $item->ShowInDropDown = false;
@@ -1246,13 +1699,89 @@ class YOperatorsList extends YOperators
 
         // Call ListOptions_Rendering event
         $this->listOptionsRendering();
+
+        // Set up row action and key
+        $keyName = "";
+        if ($CurrentForm && is_numeric($this->RowIndex) && $this->RowType != "view") {
+            $CurrentForm->Index = $this->RowIndex;
+            $actionName = str_replace("k_", "k" . $this->RowIndex . "_", $this->FormActionName);
+            $oldKeyName = str_replace("k_", "k" . $this->RowIndex . "_", $this->OldKeyName);
+            $blankRowName = str_replace("k_", "k" . $this->RowIndex . "_", $this->FormBlankRowName);
+            if ($this->RowAction != "") {
+                $this->MultiSelectKey .= "<input type=\"hidden\" name=\"" . $actionName . "\" id=\"" . $actionName . "\" value=\"" . $this->RowAction . "\">";
+            }
+            $oldKey = $this->getKey(false); // Get from OldValue
+            if ($oldKeyName != "" && $oldKey != "") {
+                $this->MultiSelectKey .= "<input type=\"hidden\" name=\"" . $oldKeyName . "\" id=\"" . $oldKeyName . "\" value=\"" . HtmlEncode($oldKey) . "\">";
+            }
+            if ($this->RowAction == "insert" && $this->isConfirm() && $this->emptyRow()) {
+                $this->MultiSelectKey .= "<input type=\"hidden\" name=\"" . $blankRowName . "\" id=\"" . $blankRowName . "\" value=\"1\">";
+            }
+        }
+
+        // "delete"
+        if ($this->AllowAddDeleteRow) {
+            if ($this->isGridAdd() || $this->isGridEdit()) {
+                $options = &$this->ListOptions;
+                $options->UseButtonGroup = true; // Use button group for grid delete button
+                $opt = $options["griddelete"];
+                if (!$Security->canDelete() && is_numeric($this->RowIndex) && ($this->RowAction == "" || $this->RowAction == "edit")) { // Do not allow delete existing record
+                    $opt->Body = "&nbsp;";
+                } else {
+                    $opt->Body = "<a class=\"ew-grid-link ew-grid-delete\" title=\"" . HtmlTitle($Language->phrase("DeleteLink")) . "\" data-caption=\"" . HtmlTitle($Language->phrase("DeleteLink")) . "\" onclick=\"return ew.deleteGridRow(this, " . $this->RowIndex . ");\">" . $Language->phrase("DeleteLink") . "</a>";
+                }
+            }
+        }
         $pageUrl = $this->pageUrl();
+
+        // "copy"
+        $opt = $this->ListOptions["copy"];
+        if ($this->isInlineAddRow() || $this->isInlineCopyRow()) { // Inline Add/Copy
+            $this->ListOptions->CustomItem = "copy"; // Show copy column only
+            $cancelurl = $this->addMasterUrl($pageUrl . "action=cancel");
+            $opt->Body = "<div" . (($opt->OnLeft) ? " class=\"text-right\"" : "") . ">" .
+            "<a class=\"ew-grid-link ew-inline-insert\" title=\"" . HtmlTitle($Language->phrase("InsertLink")) . "\" data-caption=\"" . HtmlTitle($Language->phrase("InsertLink")) . "\" href=\"#\" onclick=\"return ew.forms.get(this).submit('" . $this->pageName() . "');\">" . $Language->phrase("InsertLink") . "</a>&nbsp;" .
+            "<a class=\"ew-grid-link ew-inline-cancel\" title=\"" . HtmlTitle($Language->phrase("CancelLink")) . "\" data-caption=\"" . HtmlTitle($Language->phrase("CancelLink")) . "\" href=\"" . $cancelurl . "\">" . $Language->phrase("CancelLink") . "</a>" .
+            "<input type=\"hidden\" name=\"action\" id=\"action\" value=\"insert\"></div>";
+            return;
+        }
+
+        // "edit"
+        $opt = $this->ListOptions["edit"];
+        if ($this->isInlineEditRow()) { // Inline-Edit
+            $this->ListOptions->CustomItem = "edit"; // Show edit column only
+            $cancelurl = $this->addMasterUrl($pageUrl . "action=cancel");
+                $opt->Body = "<div" . (($opt->OnLeft) ? " class=\"text-right\"" : "") . ">" .
+                "<a class=\"ew-grid-link ew-inline-update\" title=\"" . HtmlTitle($Language->phrase("UpdateLink")) . "\" data-caption=\"" . HtmlTitle($Language->phrase("UpdateLink")) . "\" href=\"#\" onclick=\"return ew.forms.get(this).submit('" . UrlAddHash($this->pageName(), "r" . $this->RowCount . "_" . $this->TableVar) . "');\">" . $Language->phrase("UpdateLink") . "</a>&nbsp;" .
+                "<a class=\"ew-grid-link ew-inline-cancel\" title=\"" . HtmlTitle($Language->phrase("CancelLink")) . "\" data-caption=\"" . HtmlTitle($Language->phrase("CancelLink")) . "\" href=\"" . $cancelurl . "\">" . $Language->phrase("CancelLink") . "</a>" .
+                "<input type=\"hidden\" name=\"action\" id=\"action\" value=\"update\"></div>";
+            $opt->Body .= "<input type=\"hidden\" name=\"k" . $this->RowIndex . "_key\" id=\"k" . $this->RowIndex . "_key\" value=\"" . HtmlEncode($this->id->CurrentValue) . "\">";
+            return;
+        }
         if ($this->CurrentMode == "view") {
             // "view"
             $opt = $this->ListOptions["view"];
             $viewcaption = HtmlTitle($Language->phrase("ViewLink"));
             if ($Security->canView()) {
                 $opt->Body = "<a class=\"ew-row-link ew-view\" title=\"" . $viewcaption . "\" data-caption=\"" . $viewcaption . "\" href=\"" . HtmlEncode(GetUrl($this->ViewUrl)) . "\">" . $Language->phrase("ViewLink") . "</a>";
+            } else {
+                $opt->Body = "";
+            }
+
+            // "edit"
+            $opt = $this->ListOptions["edit"];
+            $editcaption = HtmlTitle($Language->phrase("EditLink"));
+            if ($Security->canEdit()) {
+                $opt->Body = "<a class=\"ew-row-link ew-edit\" title=\"" . HtmlTitle($Language->phrase("EditLink")) . "\" data-caption=\"" . HtmlTitle($Language->phrase("EditLink")) . "\" href=\"" . HtmlEncode(GetUrl($this->EditUrl)) . "\">" . $Language->phrase("EditLink") . "</a>";
+                $opt->Body .= "<a class=\"ew-row-link ew-inline-edit\" title=\"" . HtmlTitle($Language->phrase("InlineEditLink")) . "\" data-caption=\"" . HtmlTitle($Language->phrase("InlineEditLink")) . "\" href=\"" . HtmlEncode(UrlAddHash(GetUrl($this->InlineEditUrl), "r" . $this->RowCount . "_" . $this->TableVar)) . "\">" . $Language->phrase("InlineEditLink") . "</a>";
+            } else {
+                $opt->Body = "";
+            }
+
+            // "delete"
+            $opt = $this->ListOptions["delete"];
+            if ($Security->canDelete()) {
+            $opt->Body = "<a class=\"ew-row-link ew-delete\"" . "" . " title=\"" . HtmlTitle($Language->phrase("DeleteLink")) . "\" data-caption=\"" . HtmlTitle($Language->phrase("DeleteLink")) . "\" href=\"" . HtmlEncode(GetUrl($this->DeleteUrl)) . "\">" . $Language->phrase("DeleteLink") . "</a>";
             } else {
                 $opt->Body = "";
             }
@@ -1308,6 +1837,15 @@ class YOperatorsList extends YOperators
                 }
                 $detailViewTblVar .= "main_transactions";
             }
+            if ($detailPage->DetailEdit && $Security->canEdit() && $Security->allowEdit(CurrentProjectID() . 'y_operators')) {
+                $caption = $Language->phrase("MasterDetailEditLink");
+                $url = $this->getEditUrl(Config("TABLE_SHOW_DETAIL") . "=main_transactions");
+                $links .= "<li><a class=\"dropdown-item ew-row-link ew-detail-edit\" data-action=\"edit\" data-caption=\"" . HtmlTitle($caption) . "\" href=\"" . HtmlEncode($url) . "\">" . HtmlImageAndText($caption) . "</a></li>";
+                if ($detailEditTblVar != "") {
+                    $detailEditTblVar .= ",";
+                }
+                $detailEditTblVar .= "main_transactions";
+            }
             if ($links != "") {
                 $body .= "<button class=\"dropdown-toggle btn btn-default ew-detail\" data-toggle=\"dropdown\"></button>";
                 $body .= "<ul class=\"dropdown-menu\">" . $links . "</ul>";
@@ -1343,6 +1881,11 @@ class YOperatorsList extends YOperators
         // "checkbox"
         $opt = $this->ListOptions["checkbox"];
         $opt->Body = "<div class=\"custom-control custom-checkbox d-inline-block\"><input type=\"checkbox\" id=\"key_m_" . $this->RowCount . "\" name=\"key_m[]\" class=\"custom-control-input ew-multi-select\" value=\"" . HtmlEncode($this->id->CurrentValue) . "\" onclick=\"ew.clickMultiCheckbox(event);\"><label class=\"custom-control-label\" for=\"key_m_" . $this->RowCount . "\"></label></div>";
+        if ($this->isGridEdit() && is_numeric($this->RowIndex)) {
+            if ($keyName != "") {
+                $this->MultiSelectKey .= "<input type=\"hidden\" name=\"" . $keyName . "\" id=\"" . $keyName . "\" value=\"" . $this->id->CurrentValue . "\">";
+            }
+        }
         $this->renderListOptionsExt();
 
         // Call ListOptions_Rendered event
@@ -1354,7 +1897,61 @@ class YOperatorsList extends YOperators
     {
         global $Language, $Security;
         $options = &$this->OtherOptions;
+        $option = $options["addedit"];
+
+        // Add
+        $item = &$option->add("add");
+        $addcaption = HtmlTitle($Language->phrase("AddLink"));
+        $item->Body = "<a class=\"ew-add-edit ew-add\" title=\"" . $addcaption . "\" data-caption=\"" . $addcaption . "\" href=\"" . HtmlEncode(GetUrl($this->AddUrl)) . "\">" . $Language->phrase("AddLink") . "</a>";
+        $item->Visible = $this->AddUrl != "" && $Security->canAdd();
+
+        // Inline Add
+        $item = &$option->add("inlineadd");
+        $item->Body = "<a class=\"ew-add-edit ew-inline-add\" title=\"" . HtmlTitle($Language->phrase("InlineAddLink")) . "\" data-caption=\"" . HtmlTitle($Language->phrase("InlineAddLink")) . "\" href=\"" . HtmlEncode(GetUrl($this->InlineAddUrl)) . "\">" . $Language->phrase("InlineAddLink") . "</a>";
+        $item->Visible = $this->InlineAddUrl != "" && $Security->canAdd();
+        $option = $options["detail"];
+        $detailTableLink = "";
+                $item = &$option->add("detailadd_main_transactions");
+                $url = $this->getAddUrl(Config("TABLE_SHOW_DETAIL") . "=main_transactions");
+                $detailPage = Container("MainTransactionsGrid");
+                $caption = $Language->phrase("Add") . "&nbsp;" . $this->tableCaption() . "/" . $detailPage->tableCaption();
+                $item->Body = "<a class=\"ew-detail-add-group ew-detail-add\" title=\"" . HtmlTitle($caption) . "\" data-caption=\"" . HtmlTitle($caption) . "\" href=\"" . HtmlEncode(GetUrl($url)) . "\">" . $caption . "</a>";
+                $item->Visible = ($detailPage->DetailAdd && $Security->allowAdd(CurrentProjectID() . 'y_operators') && $Security->canAdd());
+                if ($item->Visible) {
+                    if ($detailTableLink != "") {
+                        $detailTableLink .= ",";
+                    }
+                    $detailTableLink .= "main_transactions";
+                }
+
+        // Add multiple details
+        if ($this->ShowMultipleDetails) {
+            $item = &$option->add("detailsadd");
+            $url = $this->getAddUrl(Config("TABLE_SHOW_DETAIL") . "=" . $detailTableLink);
+            $caption = $Language->phrase("AddMasterDetailLink");
+            $item->Body = "<a class=\"ew-detail-add-group ew-detail-add\" title=\"" . HtmlTitle($caption) . "\" data-caption=\"" . HtmlTitle($caption) . "\" href=\"" . HtmlEncode(GetUrl($url)) . "\">" . $caption . "</a>";
+            $item->Visible = $detailTableLink != "" && $Security->canAdd();
+            // Hide single master/detail items
+            $ar = explode(",", $detailTableLink);
+            $cnt = count($ar);
+            for ($i = 0; $i < $cnt; $i++) {
+                if ($item = $option["detailadd_" . $ar[$i]]) {
+                    $item->Visible = false;
+                }
+            }
+        }
+
+        // Add grid edit
+        $option = $options["addedit"];
+        $item = &$option->add("gridedit");
+        $item->Body = "<a class=\"ew-add-edit ew-grid-edit\" title=\"" . HtmlTitle($Language->phrase("GridEditLink")) . "\" data-caption=\"" . HtmlTitle($Language->phrase("GridEditLink")) . "\" href=\"" . HtmlEncode(GetUrl($this->GridEditUrl)) . "\">" . $Language->phrase("GridEditLink") . "</a>";
+        $item->Visible = $this->GridEditUrl != "" && $Security->canEdit();
         $option = $options["action"];
+
+        // Add multi update
+        $item = &$option->add("multiupdate");
+        $item->Body = "<a class=\"ew-action ew-multi-update\" title=\"" . HtmlTitle($Language->phrase("UpdateSelectedLink")) . "\" data-table=\"y_operators\" data-caption=\"" . HtmlTitle($Language->phrase("UpdateSelectedLink")) . "\" href=\"#\" onclick=\"return ew.submitAction(event, {f:document.fy_operatorslist,url:'" . GetUrl($this->MultiUpdateUrl) . "'});return false;\">" . $Language->phrase("UpdateSelectedLink") . "</a>";
+        $item->Visible = $Security->canEdit();
 
         // Set up options default
         foreach ($options as $option) {
@@ -1391,27 +1988,54 @@ class YOperatorsList extends YOperators
     {
         global $Language, $Security;
         $options = &$this->OtherOptions;
-        $option = $options["action"];
-        // Set up list action buttons
-        foreach ($this->ListActions->Items as $listaction) {
-            if ($listaction->Select == ACTION_MULTIPLE) {
-                $item = &$option->add("custom_" . $listaction->Action);
-                $caption = $listaction->Caption;
-                $icon = ($listaction->Icon != "") ? '<i class="' . HtmlEncode($listaction->Icon) . '" data-caption="' . HtmlEncode($caption) . '"></i>' . $caption : $caption;
-                $item->Body = '<a class="ew-action ew-list-action" title="' . HtmlEncode($caption) . '" data-caption="' . HtmlEncode($caption) . '" href="#" onclick="return ew.submitAction(event,jQuery.extend({f:document.fy_operatorslist},' . $listaction->toJson(true) . '));">' . $icon . '</a>';
-                $item->Visible = $listaction->Allow;
-            }
-        }
-
-        // Hide grid edit and other options
-        if ($this->TotalRecords <= 0) {
-            $option = $options["addedit"];
-            $item = $option["gridedit"];
-            if ($item) {
-                $item->Visible = false;
-            }
+        if (!$this->isGridAdd() && !$this->isGridEdit()) { // Not grid add/edit mode
             $option = $options["action"];
-            $option->hideAllOptions();
+            // Set up list action buttons
+            foreach ($this->ListActions->Items as $listaction) {
+                if ($listaction->Select == ACTION_MULTIPLE) {
+                    $item = &$option->add("custom_" . $listaction->Action);
+                    $caption = $listaction->Caption;
+                    $icon = ($listaction->Icon != "") ? '<i class="' . HtmlEncode($listaction->Icon) . '" data-caption="' . HtmlEncode($caption) . '"></i>' . $caption : $caption;
+                    $item->Body = '<a class="ew-action ew-list-action" title="' . HtmlEncode($caption) . '" data-caption="' . HtmlEncode($caption) . '" href="#" onclick="return ew.submitAction(event,jQuery.extend({f:document.fy_operatorslist},' . $listaction->toJson(true) . '));">' . $icon . '</a>';
+                    $item->Visible = $listaction->Allow;
+                }
+            }
+
+            // Hide grid edit and other options
+            if ($this->TotalRecords <= 0) {
+                $option = $options["addedit"];
+                $item = $option["gridedit"];
+                if ($item) {
+                    $item->Visible = false;
+                }
+                $option = $options["action"];
+                $option->hideAllOptions();
+            }
+        } else { // Grid add/edit mode
+            // Hide all options first
+            foreach ($options as $option) {
+                $option->hideAllOptions();
+            }
+            $pageUrl = $this->pageUrl();
+
+            // Grid-Edit
+            if ($this->isGridEdit()) {
+                if ($this->AllowAddDeleteRow) {
+                    // Add add blank row
+                    $option = $options["addedit"];
+                    $option->UseDropDownButton = false;
+                    $item = &$option->add("addblankrow");
+                    $item->Body = "<a class=\"ew-add-edit ew-add-blank-row\" title=\"" . HtmlTitle($Language->phrase("AddBlankRow")) . "\" data-caption=\"" . HtmlTitle($Language->phrase("AddBlankRow")) . "\" href=\"#\" onclick=\"return ew.addGridRow(this);\">" . $Language->phrase("AddBlankRow") . "</a>";
+                    $item->Visible = $Security->canAdd();
+                }
+                $option = $options["action"];
+                $option->UseDropDownButton = false;
+                    $item = &$option->add("gridsave");
+                    $item->Body = "<a class=\"ew-action ew-grid-save\" title=\"" . HtmlTitle($Language->phrase("GridSaveLink")) . "\" data-caption=\"" . HtmlTitle($Language->phrase("GridSaveLink")) . "\" href=\"#\" onclick=\"return ew.forms.get(this).submit('" . $this->pageName() . "');\">" . $Language->phrase("GridSaveLink") . "</a>";
+                    $item = &$option->add("gridcancel");
+                    $cancelurl = $this->addMasterUrl($pageUrl . "action=cancel");
+                    $item->Body = "<a class=\"ew-action ew-grid-cancel\" title=\"" . HtmlTitle($Language->phrase("GridCancelLink")) . "\" data-caption=\"" . HtmlTitle($Language->phrase("GridCancelLink")) . "\" href=\"" . $cancelurl . "\">" . $Language->phrase("GridCancelLink") . "</a>";
+            }
         }
     }
 
@@ -1507,6 +2131,23 @@ class YOperatorsList extends YOperators
     {
     }
 
+    // Load default values
+    protected function loadDefaultValues()
+    {
+        $this->id->CurrentValue = null;
+        $this->id->OldValue = $this->id->CurrentValue;
+        $this->name->CurrentValue = null;
+        $this->name->OldValue = $this->name->CurrentValue;
+        $this->shortname->CurrentValue = null;
+        $this->shortname->OldValue = $this->shortname->CurrentValue;
+        $this->platform_id->CurrentValue = null;
+        $this->platform_id->OldValue = $this->platform_id->CurrentValue;
+        $this->_email->CurrentValue = null;
+        $this->_email->OldValue = $this->_email->CurrentValue;
+        $this->contact_name->CurrentValue = null;
+        $this->contact_name->OldValue = $this->contact_name->CurrentValue;
+    }
+
     // Load basic search values
     protected function loadBasicSearchValues()
     {
@@ -1515,6 +2156,83 @@ class YOperatorsList extends YOperators
             $this->Command = "search";
         }
         $this->BasicSearch->setType(Get(Config("TABLE_BASIC_SEARCH_TYPE"), ""), false);
+    }
+
+    // Load form values
+    protected function loadFormValues()
+    {
+        // Load from form
+        global $CurrentForm;
+
+        // Check field name 'id' first before field var 'x_id'
+        $val = $CurrentForm->hasValue("id") ? $CurrentForm->getValue("id") : $CurrentForm->getValue("x_id");
+        if (!$this->id->IsDetailKey && !$this->isGridAdd() && !$this->isAdd()) {
+            $this->id->setFormValue($val);
+        }
+
+        // Check field name 'name' first before field var 'x_name'
+        $val = $CurrentForm->hasValue("name") ? $CurrentForm->getValue("name") : $CurrentForm->getValue("x_name");
+        if (!$this->name->IsDetailKey) {
+            if (IsApi() && $val === null) {
+                $this->name->Visible = false; // Disable update for API request
+            } else {
+                $this->name->setFormValue($val);
+            }
+        }
+
+        // Check field name 'shortname' first before field var 'x_shortname'
+        $val = $CurrentForm->hasValue("shortname") ? $CurrentForm->getValue("shortname") : $CurrentForm->getValue("x_shortname");
+        if (!$this->shortname->IsDetailKey) {
+            if (IsApi() && $val === null) {
+                $this->shortname->Visible = false; // Disable update for API request
+            } else {
+                $this->shortname->setFormValue($val);
+            }
+        }
+
+        // Check field name 'platform_id' first before field var 'x_platform_id'
+        $val = $CurrentForm->hasValue("platform_id") ? $CurrentForm->getValue("platform_id") : $CurrentForm->getValue("x_platform_id");
+        if (!$this->platform_id->IsDetailKey) {
+            if (IsApi() && $val === null) {
+                $this->platform_id->Visible = false; // Disable update for API request
+            } else {
+                $this->platform_id->setFormValue($val);
+            }
+        }
+
+        // Check field name 'email' first before field var 'x__email'
+        $val = $CurrentForm->hasValue("email") ? $CurrentForm->getValue("email") : $CurrentForm->getValue("x__email");
+        if (!$this->_email->IsDetailKey) {
+            if (IsApi() && $val === null) {
+                $this->_email->Visible = false; // Disable update for API request
+            } else {
+                $this->_email->setFormValue($val);
+            }
+        }
+
+        // Check field name 'contact_name' first before field var 'x_contact_name'
+        $val = $CurrentForm->hasValue("contact_name") ? $CurrentForm->getValue("contact_name") : $CurrentForm->getValue("x_contact_name");
+        if (!$this->contact_name->IsDetailKey) {
+            if (IsApi() && $val === null) {
+                $this->contact_name->Visible = false; // Disable update for API request
+            } else {
+                $this->contact_name->setFormValue($val);
+            }
+        }
+    }
+
+    // Restore form values
+    public function restoreFormValues()
+    {
+        global $CurrentForm;
+        if (!$this->isGridAdd() && !$this->isAdd()) {
+            $this->id->CurrentValue = $this->id->FormValue;
+        }
+        $this->name->CurrentValue = $this->name->FormValue;
+        $this->shortname->CurrentValue = $this->shortname->FormValue;
+        $this->platform_id->CurrentValue = $this->platform_id->FormValue;
+        $this->_email->CurrentValue = $this->_email->FormValue;
+        $this->contact_name->CurrentValue = $this->contact_name->FormValue;
     }
 
     // Load recordset
@@ -1560,6 +2278,9 @@ class YOperatorsList extends YOperators
         if ($row) {
             $res = true;
             $this->loadRowValues($row); // Load row values
+            if (!$this->EventCancelled) {
+                $this->HashValue = $this->getRowHash($row); // Get hash value for record
+            }
         }
         return $res;
     }
@@ -1589,16 +2310,21 @@ class YOperatorsList extends YOperators
         $this->name->setDbValue($row['name']);
         $this->shortname->setDbValue($row['shortname']);
         $this->platform_id->setDbValue($row['platform_id']);
+        $this->_email->setDbValue($row['email']);
+        $this->contact_name->setDbValue($row['contact_name']);
     }
 
     // Return a row with default values
     protected function newRow()
     {
+        $this->loadDefaultValues();
         $row = [];
-        $row['id'] = null;
-        $row['name'] = null;
-        $row['shortname'] = null;
-        $row['platform_id'] = null;
+        $row['id'] = $this->id->CurrentValue;
+        $row['name'] = $this->name->CurrentValue;
+        $row['shortname'] = $this->shortname->CurrentValue;
+        $row['platform_id'] = $this->platform_id->CurrentValue;
+        $row['email'] = $this->_email->CurrentValue;
+        $row['contact_name'] = $this->contact_name->CurrentValue;
         return $row;
     }
 
@@ -1643,6 +2369,10 @@ class YOperatorsList extends YOperators
         // shortname
 
         // platform_id
+
+        // email
+
+        // contact_name
         if ($this->RowType == ROWTYPE_VIEW) {
             // id
             $this->id->ViewValue = $this->id->CurrentValue;
@@ -1677,6 +2407,14 @@ class YOperatorsList extends YOperators
             }
             $this->platform_id->ViewCustomAttributes = "";
 
+            // email
+            $this->_email->ViewValue = $this->_email->CurrentValue;
+            $this->_email->ViewCustomAttributes = "";
+
+            // contact_name
+            $this->contact_name->ViewValue = $this->contact_name->CurrentValue;
+            $this->contact_name->ViewCustomAttributes = "";
+
             // id
             $this->id->LinkCustomAttributes = "";
             $this->id->HrefValue = "";
@@ -1696,12 +2434,545 @@ class YOperatorsList extends YOperators
             $this->platform_id->LinkCustomAttributes = "";
             $this->platform_id->HrefValue = "";
             $this->platform_id->TooltipValue = "";
+
+            // email
+            $this->_email->LinkCustomAttributes = "";
+            $this->_email->HrefValue = "";
+            $this->_email->TooltipValue = "";
+
+            // contact_name
+            $this->contact_name->LinkCustomAttributes = "";
+            $this->contact_name->HrefValue = "";
+            $this->contact_name->TooltipValue = "";
+        } elseif ($this->RowType == ROWTYPE_ADD) {
+            // id
+
+            // name
+            $this->name->EditAttrs["class"] = "form-control";
+            $this->name->EditCustomAttributes = "";
+            if (!$this->name->Raw) {
+                $this->name->CurrentValue = HtmlDecode($this->name->CurrentValue);
+            }
+            $this->name->EditValue = HtmlEncode($this->name->CurrentValue);
+            $this->name->PlaceHolder = RemoveHtml($this->name->caption());
+
+            // shortname
+            $this->shortname->EditAttrs["class"] = "form-control";
+            $this->shortname->EditCustomAttributes = "";
+            if (!$this->shortname->Raw) {
+                $this->shortname->CurrentValue = HtmlDecode($this->shortname->CurrentValue);
+            }
+            $this->shortname->EditValue = HtmlEncode($this->shortname->CurrentValue);
+            $this->shortname->PlaceHolder = RemoveHtml($this->shortname->caption());
+
+            // platform_id
+            $this->platform_id->EditAttrs["class"] = "form-control";
+            $this->platform_id->EditCustomAttributes = "";
+            if ($this->platform_id->getSessionValue() != "") {
+                $this->platform_id->CurrentValue = GetForeignKeyValue($this->platform_id->getSessionValue());
+                $curVal = strval($this->platform_id->CurrentValue);
+                if ($curVal != "") {
+                    $this->platform_id->ViewValue = $this->platform_id->lookupCacheOption($curVal);
+                    if ($this->platform_id->ViewValue === null) { // Lookup from database
+                        $filterWrk = "\"id\"" . SearchString("=", $curVal, DATATYPE_NUMBER, "");
+                        $sqlWrk = $this->platform_id->Lookup->getSql(false, $filterWrk, '', $this, true);
+                        $rswrk = Conn()->executeQuery($sqlWrk)->fetchAll(\PDO::FETCH_BOTH);
+                        $ari = count($rswrk);
+                        if ($ari > 0) { // Lookup values found
+                            $arwrk = $this->platform_id->Lookup->renderViewRow($rswrk[0]);
+                            $this->platform_id->ViewValue = $this->platform_id->displayValue($arwrk);
+                        } else {
+                            $this->platform_id->ViewValue = $this->platform_id->CurrentValue;
+                        }
+                    }
+                } else {
+                    $this->platform_id->ViewValue = null;
+                }
+                $this->platform_id->ViewCustomAttributes = "";
+            } else {
+                $curVal = trim(strval($this->platform_id->CurrentValue));
+                if ($curVal != "") {
+                    $this->platform_id->ViewValue = $this->platform_id->lookupCacheOption($curVal);
+                } else {
+                    $this->platform_id->ViewValue = $this->platform_id->Lookup !== null && is_array($this->platform_id->Lookup->Options) ? $curVal : null;
+                }
+                if ($this->platform_id->ViewValue !== null) { // Load from cache
+                    $this->platform_id->EditValue = array_values($this->platform_id->Lookup->Options);
+                } else { // Lookup from database
+                    if ($curVal == "") {
+                        $filterWrk = "0=1";
+                    } else {
+                        $filterWrk = "\"id\"" . SearchString("=", $this->platform_id->CurrentValue, DATATYPE_NUMBER, "");
+                    }
+                    $sqlWrk = $this->platform_id->Lookup->getSql(true, $filterWrk, '', $this);
+                    $rswrk = Conn()->executeQuery($sqlWrk)->fetchAll(\PDO::FETCH_BOTH);
+                    $ari = count($rswrk);
+                    $arwrk = $rswrk;
+                    $this->platform_id->EditValue = $arwrk;
+                }
+                $this->platform_id->PlaceHolder = RemoveHtml($this->platform_id->caption());
+            }
+
+            // email
+            $this->_email->EditAttrs["class"] = "form-control";
+            $this->_email->EditCustomAttributes = "";
+            if (!$this->_email->Raw) {
+                $this->_email->CurrentValue = HtmlDecode($this->_email->CurrentValue);
+            }
+            $this->_email->EditValue = HtmlEncode($this->_email->CurrentValue);
+            $this->_email->PlaceHolder = RemoveHtml($this->_email->caption());
+
+            // contact_name
+            $this->contact_name->EditAttrs["class"] = "form-control";
+            $this->contact_name->EditCustomAttributes = "";
+            if (!$this->contact_name->Raw) {
+                $this->contact_name->CurrentValue = HtmlDecode($this->contact_name->CurrentValue);
+            }
+            $this->contact_name->EditValue = HtmlEncode($this->contact_name->CurrentValue);
+            $this->contact_name->PlaceHolder = RemoveHtml($this->contact_name->caption());
+
+            // Add refer script
+
+            // id
+            $this->id->LinkCustomAttributes = "";
+            $this->id->HrefValue = "";
+
+            // name
+            $this->name->LinkCustomAttributes = "";
+            $this->name->HrefValue = "";
+
+            // shortname
+            $this->shortname->LinkCustomAttributes = "";
+            $this->shortname->HrefValue = "";
+
+            // platform_id
+            $this->platform_id->LinkCustomAttributes = "";
+            $this->platform_id->HrefValue = "";
+
+            // email
+            $this->_email->LinkCustomAttributes = "";
+            $this->_email->HrefValue = "";
+
+            // contact_name
+            $this->contact_name->LinkCustomAttributes = "";
+            $this->contact_name->HrefValue = "";
+        } elseif ($this->RowType == ROWTYPE_EDIT) {
+            // id
+            $this->id->EditAttrs["class"] = "form-control";
+            $this->id->EditCustomAttributes = "";
+            $this->id->EditValue = $this->id->CurrentValue;
+            $this->id->ViewCustomAttributes = "";
+
+            // name
+            $this->name->EditAttrs["class"] = "form-control";
+            $this->name->EditCustomAttributes = "";
+            if (!$this->name->Raw) {
+                $this->name->CurrentValue = HtmlDecode($this->name->CurrentValue);
+            }
+            $this->name->EditValue = HtmlEncode($this->name->CurrentValue);
+            $this->name->PlaceHolder = RemoveHtml($this->name->caption());
+
+            // shortname
+            $this->shortname->EditAttrs["class"] = "form-control";
+            $this->shortname->EditCustomAttributes = "";
+            if (!$this->shortname->Raw) {
+                $this->shortname->CurrentValue = HtmlDecode($this->shortname->CurrentValue);
+            }
+            $this->shortname->EditValue = HtmlEncode($this->shortname->CurrentValue);
+            $this->shortname->PlaceHolder = RemoveHtml($this->shortname->caption());
+
+            // platform_id
+            $this->platform_id->EditAttrs["class"] = "form-control";
+            $this->platform_id->EditCustomAttributes = "";
+            if ($this->platform_id->getSessionValue() != "") {
+                $this->platform_id->CurrentValue = GetForeignKeyValue($this->platform_id->getSessionValue());
+                $curVal = strval($this->platform_id->CurrentValue);
+                if ($curVal != "") {
+                    $this->platform_id->ViewValue = $this->platform_id->lookupCacheOption($curVal);
+                    if ($this->platform_id->ViewValue === null) { // Lookup from database
+                        $filterWrk = "\"id\"" . SearchString("=", $curVal, DATATYPE_NUMBER, "");
+                        $sqlWrk = $this->platform_id->Lookup->getSql(false, $filterWrk, '', $this, true);
+                        $rswrk = Conn()->executeQuery($sqlWrk)->fetchAll(\PDO::FETCH_BOTH);
+                        $ari = count($rswrk);
+                        if ($ari > 0) { // Lookup values found
+                            $arwrk = $this->platform_id->Lookup->renderViewRow($rswrk[0]);
+                            $this->platform_id->ViewValue = $this->platform_id->displayValue($arwrk);
+                        } else {
+                            $this->platform_id->ViewValue = $this->platform_id->CurrentValue;
+                        }
+                    }
+                } else {
+                    $this->platform_id->ViewValue = null;
+                }
+                $this->platform_id->ViewCustomAttributes = "";
+            } else {
+                $curVal = trim(strval($this->platform_id->CurrentValue));
+                if ($curVal != "") {
+                    $this->platform_id->ViewValue = $this->platform_id->lookupCacheOption($curVal);
+                } else {
+                    $this->platform_id->ViewValue = $this->platform_id->Lookup !== null && is_array($this->platform_id->Lookup->Options) ? $curVal : null;
+                }
+                if ($this->platform_id->ViewValue !== null) { // Load from cache
+                    $this->platform_id->EditValue = array_values($this->platform_id->Lookup->Options);
+                } else { // Lookup from database
+                    if ($curVal == "") {
+                        $filterWrk = "0=1";
+                    } else {
+                        $filterWrk = "\"id\"" . SearchString("=", $this->platform_id->CurrentValue, DATATYPE_NUMBER, "");
+                    }
+                    $sqlWrk = $this->platform_id->Lookup->getSql(true, $filterWrk, '', $this);
+                    $rswrk = Conn()->executeQuery($sqlWrk)->fetchAll(\PDO::FETCH_BOTH);
+                    $ari = count($rswrk);
+                    $arwrk = $rswrk;
+                    $this->platform_id->EditValue = $arwrk;
+                }
+                $this->platform_id->PlaceHolder = RemoveHtml($this->platform_id->caption());
+            }
+
+            // email
+            $this->_email->EditAttrs["class"] = "form-control";
+            $this->_email->EditCustomAttributes = "";
+            if (!$this->_email->Raw) {
+                $this->_email->CurrentValue = HtmlDecode($this->_email->CurrentValue);
+            }
+            $this->_email->EditValue = HtmlEncode($this->_email->CurrentValue);
+            $this->_email->PlaceHolder = RemoveHtml($this->_email->caption());
+
+            // contact_name
+            $this->contact_name->EditAttrs["class"] = "form-control";
+            $this->contact_name->EditCustomAttributes = "";
+            if (!$this->contact_name->Raw) {
+                $this->contact_name->CurrentValue = HtmlDecode($this->contact_name->CurrentValue);
+            }
+            $this->contact_name->EditValue = HtmlEncode($this->contact_name->CurrentValue);
+            $this->contact_name->PlaceHolder = RemoveHtml($this->contact_name->caption());
+
+            // Edit refer script
+
+            // id
+            $this->id->LinkCustomAttributes = "";
+            $this->id->HrefValue = "";
+
+            // name
+            $this->name->LinkCustomAttributes = "";
+            $this->name->HrefValue = "";
+
+            // shortname
+            $this->shortname->LinkCustomAttributes = "";
+            $this->shortname->HrefValue = "";
+
+            // platform_id
+            $this->platform_id->LinkCustomAttributes = "";
+            $this->platform_id->HrefValue = "";
+
+            // email
+            $this->_email->LinkCustomAttributes = "";
+            $this->_email->HrefValue = "";
+
+            // contact_name
+            $this->contact_name->LinkCustomAttributes = "";
+            $this->contact_name->HrefValue = "";
+        }
+        if ($this->RowType == ROWTYPE_ADD || $this->RowType == ROWTYPE_EDIT || $this->RowType == ROWTYPE_SEARCH) { // Add/Edit/Search row
+            $this->setupFieldTitles();
         }
 
         // Call Row Rendered event
         if ($this->RowType != ROWTYPE_AGGREGATEINIT) {
             $this->rowRendered();
         }
+    }
+
+    // Validate form
+    protected function validateForm()
+    {
+        global $Language;
+
+        // Check if validation required
+        if (!Config("SERVER_VALIDATE")) {
+            return true;
+        }
+        if ($this->id->Required) {
+            if (!$this->id->IsDetailKey && EmptyValue($this->id->FormValue)) {
+                $this->id->addErrorMessage(str_replace("%s", $this->id->caption(), $this->id->RequiredErrorMessage));
+            }
+        }
+        if ($this->name->Required) {
+            if (!$this->name->IsDetailKey && EmptyValue($this->name->FormValue)) {
+                $this->name->addErrorMessage(str_replace("%s", $this->name->caption(), $this->name->RequiredErrorMessage));
+            }
+        }
+        if ($this->shortname->Required) {
+            if (!$this->shortname->IsDetailKey && EmptyValue($this->shortname->FormValue)) {
+                $this->shortname->addErrorMessage(str_replace("%s", $this->shortname->caption(), $this->shortname->RequiredErrorMessage));
+            }
+        }
+        if ($this->platform_id->Required) {
+            if (!$this->platform_id->IsDetailKey && EmptyValue($this->platform_id->FormValue)) {
+                $this->platform_id->addErrorMessage(str_replace("%s", $this->platform_id->caption(), $this->platform_id->RequiredErrorMessage));
+            }
+        }
+        if ($this->_email->Required) {
+            if (!$this->_email->IsDetailKey && EmptyValue($this->_email->FormValue)) {
+                $this->_email->addErrorMessage(str_replace("%s", $this->_email->caption(), $this->_email->RequiredErrorMessage));
+            }
+        }
+        if ($this->contact_name->Required) {
+            if (!$this->contact_name->IsDetailKey && EmptyValue($this->contact_name->FormValue)) {
+                $this->contact_name->addErrorMessage(str_replace("%s", $this->contact_name->caption(), $this->contact_name->RequiredErrorMessage));
+            }
+        }
+
+        // Return validate result
+        $validateForm = !$this->hasInvalidFields();
+
+        // Call Form_CustomValidate event
+        $formCustomError = "";
+        $validateForm = $validateForm && $this->formCustomValidate($formCustomError);
+        if ($formCustomError != "") {
+            $this->setFailureMessage($formCustomError);
+        }
+        return $validateForm;
+    }
+
+    // Delete records based on current filter
+    protected function deleteRows()
+    {
+        global $Language, $Security;
+        if (!$Security->canDelete()) {
+            $this->setFailureMessage($Language->phrase("NoDeletePermission")); // No delete permission
+            return false;
+        }
+        $deleteRows = true;
+        $sql = $this->getCurrentSql();
+        $conn = $this->getConnection();
+        $rows = $conn->fetchAll($sql);
+        if (count($rows) == 0) {
+            $this->setFailureMessage($Language->phrase("NoRecord")); // No record found
+            return false;
+        }
+
+        // Clone old rows
+        $rsold = $rows;
+
+        // Call row deleting event
+        if ($deleteRows) {
+            foreach ($rsold as $row) {
+                $deleteRows = $this->rowDeleting($row);
+                if (!$deleteRows) {
+                    break;
+                }
+            }
+        }
+        if ($deleteRows) {
+            $key = "";
+            foreach ($rsold as $row) {
+                $thisKey = "";
+                if ($thisKey != "") {
+                    $thisKey .= Config("COMPOSITE_KEY_SEPARATOR");
+                }
+                $thisKey .= $row['id'];
+                if (Config("DELETE_UPLOADED_FILES")) { // Delete old files
+                    $this->deleteUploadedFiles($row);
+                }
+                $deleteRows = $this->delete($row); // Delete
+                if ($deleteRows === false) {
+                    break;
+                }
+                if ($key != "") {
+                    $key .= ", ";
+                }
+                $key .= $thisKey;
+            }
+        }
+        if (!$deleteRows) {
+            // Set up error message
+            if ($this->getSuccessMessage() != "" || $this->getFailureMessage() != "") {
+                // Use the message, do nothing
+            } elseif ($this->CancelMessage != "") {
+                $this->setFailureMessage($this->CancelMessage);
+                $this->CancelMessage = "";
+            } else {
+                $this->setFailureMessage($Language->phrase("DeleteCancelled"));
+            }
+        }
+
+        // Call Row Deleted event
+        if ($deleteRows) {
+            foreach ($rsold as $row) {
+                $this->rowDeleted($row);
+            }
+        }
+
+        // Write JSON for API request
+        if (IsApi() && $deleteRows) {
+            $row = $this->getRecordsFromRecordset($rsold);
+            WriteJson(["success" => true, $this->TableVar => $row]);
+        }
+        return $deleteRows;
+    }
+
+    // Update record based on key values
+    protected function editRow()
+    {
+        global $Security, $Language;
+        $oldKeyFilter = $this->getRecordFilter();
+        $filter = $this->applyUserIDFilters($oldKeyFilter);
+        $conn = $this->getConnection();
+        $this->CurrentFilter = $filter;
+        $sql = $this->getCurrentSql();
+        $rsold = $conn->fetchAssoc($sql);
+        if (!$rsold) {
+            $this->setFailureMessage($Language->phrase("NoRecord")); // Set no record message
+            $editRow = false; // Update Failed
+        } else {
+            // Save old values
+            $this->loadDbValues($rsold);
+            $rsnew = [];
+
+            // name
+            $this->name->setDbValueDef($rsnew, $this->name->CurrentValue, null, $this->name->ReadOnly);
+
+            // shortname
+            $this->shortname->setDbValueDef($rsnew, $this->shortname->CurrentValue, null, $this->shortname->ReadOnly);
+
+            // platform_id
+            $this->platform_id->setDbValueDef($rsnew, $this->platform_id->CurrentValue, null, $this->platform_id->ReadOnly);
+
+            // email
+            $this->_email->setDbValueDef($rsnew, $this->_email->CurrentValue, null, $this->_email->ReadOnly);
+
+            // contact_name
+            $this->contact_name->setDbValueDef($rsnew, $this->contact_name->CurrentValue, null, $this->contact_name->ReadOnly);
+
+            // Call Row Updating event
+            $updateRow = $this->rowUpdating($rsold, $rsnew);
+            if ($updateRow) {
+                if (count($rsnew) > 0) {
+                    $editRow = $this->update($rsnew, "", $rsold);
+                } else {
+                    $editRow = true; // No field to update
+                }
+                if ($editRow) {
+                }
+            } else {
+                if ($this->getSuccessMessage() != "" || $this->getFailureMessage() != "") {
+                    // Use the message, do nothing
+                } elseif ($this->CancelMessage != "") {
+                    $this->setFailureMessage($this->CancelMessage);
+                    $this->CancelMessage = "";
+                } else {
+                    $this->setFailureMessage($Language->phrase("UpdateCancelled"));
+                }
+                $editRow = false;
+            }
+        }
+
+        // Call Row_Updated event
+        if ($editRow) {
+            $this->rowUpdated($rsold, $rsnew);
+        }
+
+        // Clean upload path if any
+        if ($editRow) {
+        }
+
+        // Write JSON for API request
+        if (IsApi() && $editRow) {
+            $row = $this->getRecordsFromRecordset([$rsnew], true);
+            WriteJson(["success" => true, $this->TableVar => $row]);
+        }
+        return $editRow;
+    }
+
+    // Load row hash
+    protected function loadRowHash()
+    {
+        $filter = $this->getRecordFilter();
+
+        // Load SQL based on filter
+        $this->CurrentFilter = $filter;
+        $sql = $this->getCurrentSql();
+        $conn = $this->getConnection();
+        $row = $conn->fetchAssoc($sql);
+        $this->HashValue = $row ? $this->getRowHash($row) : ""; // Get hash value for record
+    }
+
+    // Get Row Hash
+    public function getRowHash(&$rs)
+    {
+        if (!$rs) {
+            return "";
+        }
+        $row = ($rs instanceof Recordset) ? $rs->fields : $rs;
+        $hash = "";
+        $hash .= GetFieldHash($row['name']); // name
+        $hash .= GetFieldHash($row['shortname']); // shortname
+        $hash .= GetFieldHash($row['platform_id']); // platform_id
+        $hash .= GetFieldHash($row['email']); // email
+        $hash .= GetFieldHash($row['contact_name']); // contact_name
+        return md5($hash);
+    }
+
+    // Add record
+    protected function addRow($rsold = null)
+    {
+        global $Language, $Security;
+        $conn = $this->getConnection();
+
+        // Load db values from rsold
+        $this->loadDbValues($rsold);
+        if ($rsold) {
+        }
+        $rsnew = [];
+
+        // name
+        $this->name->setDbValueDef($rsnew, $this->name->CurrentValue, null, false);
+
+        // shortname
+        $this->shortname->setDbValueDef($rsnew, $this->shortname->CurrentValue, null, false);
+
+        // platform_id
+        $this->platform_id->setDbValueDef($rsnew, $this->platform_id->CurrentValue, null, false);
+
+        // email
+        $this->_email->setDbValueDef($rsnew, $this->_email->CurrentValue, null, false);
+
+        // contact_name
+        $this->contact_name->setDbValueDef($rsnew, $this->contact_name->CurrentValue, null, false);
+
+        // Call Row Inserting event
+        $insertRow = $this->rowInserting($rsold, $rsnew);
+        if ($insertRow) {
+            $addRow = $this->insert($rsnew);
+            if ($addRow) {
+            }
+        } else {
+            if ($this->getSuccessMessage() != "" || $this->getFailureMessage() != "") {
+                // Use the message, do nothing
+            } elseif ($this->CancelMessage != "") {
+                $this->setFailureMessage($this->CancelMessage);
+                $this->CancelMessage = "";
+            } else {
+                $this->setFailureMessage($Language->phrase("InsertCancelled"));
+            }
+            $addRow = false;
+        }
+        if ($addRow) {
+            // Call Row Inserted event
+            $this->rowInserted($rsold, $rsnew);
+        }
+
+        // Clean upload path if any
+        if ($addRow) {
+        }
+
+        // Write JSON for API request
+        if (IsApi() && $addRow) {
+            $row = $this->getRecordsFromRecordset([$rsnew], true);
+            WriteJson(["success" => true, $this->TableVar => $row]);
+        }
+        return $addRow;
     }
 
     // Set up search/sort options

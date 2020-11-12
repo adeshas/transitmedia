@@ -539,7 +539,7 @@ class ViewPaymentsPendingList extends ViewPaymentsPending
         $this->campaign_id->setVisibility();
         $this->campaign_name->Visible = false;
         $this->quantity->setVisibility();
-        $this->campaign_status->setVisibility();
+        $this->transaction_status->setVisibility();
         $this->print_status->setVisibility();
         $this->payment_status->setVisibility();
         $this->start_date->setVisibility();
@@ -851,7 +851,7 @@ class ViewPaymentsPendingList extends ViewPaymentsPending
         $filterList = Concat($filterList, $this->campaign_id->AdvancedSearch->toJson(), ","); // Field campaign_id
         $filterList = Concat($filterList, $this->campaign_name->AdvancedSearch->toJson(), ","); // Field campaign_name
         $filterList = Concat($filterList, $this->quantity->AdvancedSearch->toJson(), ","); // Field quantity
-        $filterList = Concat($filterList, $this->campaign_status->AdvancedSearch->toJson(), ","); // Field campaign_status
+        $filterList = Concat($filterList, $this->transaction_status->AdvancedSearch->toJson(), ","); // Field transaction_status
         $filterList = Concat($filterList, $this->print_status->AdvancedSearch->toJson(), ","); // Field print_status
         $filterList = Concat($filterList, $this->payment_status->AdvancedSearch->toJson(), ","); // Field payment_status
         $filterList = Concat($filterList, $this->start_date->AdvancedSearch->toJson(), ","); // Field start_date
@@ -941,13 +941,13 @@ class ViewPaymentsPendingList extends ViewPaymentsPending
         $this->quantity->AdvancedSearch->SearchOperator2 = @$filter["w_quantity"];
         $this->quantity->AdvancedSearch->save();
 
-        // Field campaign_status
-        $this->campaign_status->AdvancedSearch->SearchValue = @$filter["x_campaign_status"];
-        $this->campaign_status->AdvancedSearch->SearchOperator = @$filter["z_campaign_status"];
-        $this->campaign_status->AdvancedSearch->SearchCondition = @$filter["v_campaign_status"];
-        $this->campaign_status->AdvancedSearch->SearchValue2 = @$filter["y_campaign_status"];
-        $this->campaign_status->AdvancedSearch->SearchOperator2 = @$filter["w_campaign_status"];
-        $this->campaign_status->AdvancedSearch->save();
+        // Field transaction_status
+        $this->transaction_status->AdvancedSearch->SearchValue = @$filter["x_transaction_status"];
+        $this->transaction_status->AdvancedSearch->SearchOperator = @$filter["z_transaction_status"];
+        $this->transaction_status->AdvancedSearch->SearchCondition = @$filter["v_transaction_status"];
+        $this->transaction_status->AdvancedSearch->SearchValue2 = @$filter["y_transaction_status"];
+        $this->transaction_status->AdvancedSearch->SearchOperator2 = @$filter["w_transaction_status"];
+        $this->transaction_status->AdvancedSearch->save();
 
         // Field print_status
         $this->print_status->AdvancedSearch->SearchValue = @$filter["x_print_status"];
@@ -1093,7 +1093,7 @@ class ViewPaymentsPendingList extends ViewPaymentsPending
     {
         $where = "";
         $this->buildBasicSearchSql($where, $this->campaign_name, $arKeywords, $type);
-        $this->buildBasicSearchSql($where, $this->campaign_status, $arKeywords, $type);
+        $this->buildBasicSearchSql($where, $this->transaction_status, $arKeywords, $type);
         $this->buildBasicSearchSql($where, $this->print_status, $arKeywords, $type);
         $this->buildBasicSearchSql($where, $this->payment_status, $arKeywords, $type);
         $this->buildBasicSearchSql($where, $this->vendor, $arKeywords, $type);
@@ -1268,7 +1268,7 @@ class ViewPaymentsPendingList extends ViewPaymentsPending
             $this->updateSort($this->transaction_id); // transaction_id
             $this->updateSort($this->campaign_id); // campaign_id
             $this->updateSort($this->quantity); // quantity
-            $this->updateSort($this->campaign_status); // campaign_status
+            $this->updateSort($this->transaction_status); // transaction_status
             $this->updateSort($this->print_status); // print_status
             $this->updateSort($this->payment_status); // payment_status
             $this->updateSort($this->start_date); // start_date
@@ -1325,7 +1325,7 @@ class ViewPaymentsPendingList extends ViewPaymentsPending
                 $this->campaign_id->setSort("");
                 $this->campaign_name->setSort("");
                 $this->quantity->setSort("");
-                $this->campaign_status->setSort("");
+                $this->transaction_status->setSort("");
                 $this->print_status->setSort("");
                 $this->payment_status->setSort("");
                 $this->start_date->setSort("");
@@ -1686,7 +1686,7 @@ class ViewPaymentsPendingList extends ViewPaymentsPending
         $this->campaign_id->setDbValue($row['campaign_id']);
         $this->campaign_name->setDbValue($row['campaign_name']);
         $this->quantity->setDbValue($row['quantity']);
-        $this->campaign_status->setDbValue($row['campaign_status']);
+        $this->transaction_status->setDbValue($row['transaction_status']);
         $this->print_status->setDbValue($row['print_status']);
         $this->payment_status->setDbValue($row['payment_status']);
         $this->start_date->setDbValue($row['start_date']);
@@ -1714,7 +1714,7 @@ class ViewPaymentsPendingList extends ViewPaymentsPending
         $row['campaign_id'] = null;
         $row['campaign_name'] = null;
         $row['quantity'] = null;
-        $row['campaign_status'] = null;
+        $row['transaction_status'] = null;
         $row['print_status'] = null;
         $row['payment_status'] = null;
         $row['start_date'] = null;
@@ -1767,7 +1767,7 @@ class ViewPaymentsPendingList extends ViewPaymentsPending
 
         // quantity
 
-        // campaign_status
+        // transaction_status
 
         // print_status
 
@@ -1818,9 +1818,9 @@ class ViewPaymentsPendingList extends ViewPaymentsPending
             $this->quantity->ViewValue = FormatNumber($this->quantity->ViewValue, 0, -2, -2, -2);
             $this->quantity->ViewCustomAttributes = "";
 
-            // campaign_status
-            $this->campaign_status->ViewValue = $this->campaign_status->CurrentValue;
-            $this->campaign_status->ViewCustomAttributes = "";
+            // transaction_status
+            $this->transaction_status->ViewValue = $this->transaction_status->CurrentValue;
+            $this->transaction_status->ViewCustomAttributes = "";
 
             // print_status
             $this->print_status->ViewValue = $this->print_status->CurrentValue;
@@ -1897,10 +1897,10 @@ class ViewPaymentsPendingList extends ViewPaymentsPending
             $this->quantity->HrefValue = "";
             $this->quantity->TooltipValue = "";
 
-            // campaign_status
-            $this->campaign_status->LinkCustomAttributes = "";
-            $this->campaign_status->HrefValue = "";
-            $this->campaign_status->TooltipValue = "";
+            // transaction_status
+            $this->transaction_status->LinkCustomAttributes = "";
+            $this->transaction_status->HrefValue = "";
+            $this->transaction_status->TooltipValue = "";
 
             // print_status
             $this->print_status->LinkCustomAttributes = "";

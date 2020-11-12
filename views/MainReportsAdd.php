@@ -333,10 +333,31 @@ loadjs.ready(["fmain_reportsadd"], function() {
 <?php if (!$Page->isConfirm()) { ?>
 <?php if (!$Security->isAdmin() && $Security->isLoggedIn() && !$Page->userIDAllow("add")) { // Non system admin ?>
 <span id="el_main_reports_vendor_id">
-<span<?= $Page->vendor_id->viewAttributes() ?>>
-<input type="text" readonly class="form-control-plaintext" value="<?= HtmlEncode(RemoveHtml($Page->vendor_id->getDisplayValue($Page->vendor_id->EditValue))) ?>"></span>
+    <select
+        id="x_vendor_id"
+        name="x_vendor_id"
+        class="form-control ew-select<?= $Page->vendor_id->isInvalidClass() ?>"
+        data-select2-id="main_reports_x_vendor_id"
+        data-table="main_reports"
+        data-field="x_vendor_id"
+        data-value-separator="<?= $Page->vendor_id->displayValueSeparatorAttribute() ?>"
+        data-placeholder="<?= HtmlEncode($Page->vendor_id->getPlaceHolder()) ?>"
+        <?= $Page->vendor_id->editAttributes() ?>>
+        <?= $Page->vendor_id->selectOptionListHtml("x_vendor_id") ?>
+    </select>
+    <?= $Page->vendor_id->getCustomMessage() ?>
+    <div class="invalid-feedback"><?= $Page->vendor_id->getErrorMessage() ?></div>
+<?= $Page->vendor_id->Lookup->getParamTag($Page, "p_x_vendor_id") ?>
+<script>
+loadjs.ready("head", function() {
+    var el = document.querySelector("select[data-select2-id='main_reports_x_vendor_id']"),
+        options = { name: "x_vendor_id", selectId: "main_reports_x_vendor_id", language: ew.LANGUAGE_ID, dir: ew.IS_RTL ? "rtl" : "ltr" };
+    options.dropdownParent = $(el).closest("#ew-modal-dialog, #ew-add-opt-dialog")[0];
+    Object.assign(options, ew.vars.tables.main_reports.fields.vendor_id.selectOptions);
+    ew.createSelect(options);
+});
+</script>
 </span>
-<input type="hidden" data-table="main_reports" data-field="x_vendor_id" data-hidden="1" name="x_vendor_id" id="x_vendor_id" value="<?= HtmlEncode($Page->vendor_id->CurrentValue) ?>">
 <?php } else { ?>
 <span id="el_main_reports_vendor_id">
     <select

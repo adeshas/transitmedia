@@ -13,4 +13,22 @@ class XRenewalStageController extends ControllerBase
     {
         return $this->runPage($request, $response, $args, "XRenewalStageList");
     }
+
+    // add
+    public function add(Request $request, Response $response, array $args): Response
+    {
+        return $this->runPage($request, $response, $args, "XRenewalStageAdd");
+    }
+
+    // edit
+    public function edit(Request $request, Response $response, array $args): Response
+    {
+        return $this->runPage($request, $response, $args, "XRenewalStageEdit");
+    }
+
+    // delete
+    public function delete(Request $request, Response $response, array $args): Response
+    {
+        return $this->runPage($request, $response, $args, "XRenewalStageDelete");
+    }
 }

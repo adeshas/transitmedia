@@ -118,7 +118,7 @@ class MainUsers extends DbTable
         $this->user_type->UsePleaseSelect = true; // Use PleaseSelect by default
         $this->user_type->PleaseSelectText = $Language->phrase("PleaseSelect"); // "PleaseSelect" text
         $this->user_type->Lookup = new Lookup('user_type', 'main_users', false, '', ["","","",""], [], [], [], [], [], [], '', '');
-        $this->user_type->OptionCount = 7;
+        $this->user_type->OptionCount = 9;
         $this->user_type->DefaultErrorMessage = $Language->phrase("IncorrectInteger");
         $this->Fields['user_type'] = &$this->user_type;
 
@@ -133,9 +133,11 @@ class MainUsers extends DbTable
         $this->Fields['vendor_id'] = &$this->vendor_id;
 
         // reportsto
-        $this->reportsto = new DbField('main_users', 'main_users', 'x_reportsto', 'reportsto', '"reportsto"', 'CAST("reportsto" AS varchar(255))', 3, 4, -1, false, '"reportsto"', false, false, false, 'FORMATTED TEXT', 'TEXT');
+        $this->reportsto = new DbField('main_users', 'main_users', 'x_reportsto', 'reportsto', '"reportsto"', 'CAST("reportsto" AS varchar(255))', 3, 4, -1, false, '"reportsto"', false, false, false, 'FORMATTED TEXT', 'SELECT');
         $this->reportsto->Sortable = true; // Allow sort
-        $this->reportsto->Lookup = new Lookup('reportsto', 'main_users', false, 'id', ["name","id","",""], [], [], [], [], [], [], '', '');
+        $this->reportsto->UsePleaseSelect = true; // Use PleaseSelect by default
+        $this->reportsto->PleaseSelectText = $Language->phrase("PleaseSelect"); // "PleaseSelect" text
+        $this->reportsto->Lookup = new Lookup('reportsto', 'y_vendors', false, 'id', ["name","","",""], [], [], [], [], [], [], '', '');
         $this->reportsto->DefaultErrorMessage = $Language->phrase("IncorrectInteger");
         $this->Fields['reportsto'] = &$this->reportsto;
     }
@@ -1071,7 +1073,6 @@ SORTHTML;
         $this->vendor_id->ViewCustomAttributes = "";
 
         // reportsto
-        $this->reportsto->ViewValue = $this->reportsto->CurrentValue;
         $curVal = strval($this->reportsto->CurrentValue);
         if ($curVal != "") {
             $this->reportsto->ViewValue = $this->reportsto->lookupCacheOption($curVal);
@@ -1215,26 +1216,6 @@ SORTHTML;
             }
             $this->vendor_id->ViewCustomAttributes = "";
         } elseif (!$Security->isAdmin() && $Security->isLoggedIn() && !$this->userIDAllow("info")) { // Non system admin
-            $this->vendor_id->CurrentValue = CurrentUserID();
-            $curVal = strval($this->vendor_id->CurrentValue);
-            if ($curVal != "") {
-                $this->vendor_id->EditValue = $this->vendor_id->lookupCacheOption($curVal);
-                if ($this->vendor_id->EditValue === null) { // Lookup from database
-                    $filterWrk = "\"id\"" . SearchString("=", $curVal, DATATYPE_NUMBER, "");
-                    $sqlWrk = $this->vendor_id->Lookup->getSql(false, $filterWrk, '', $this, true);
-                    $rswrk = Conn()->executeQuery($sqlWrk)->fetchAll(\PDO::FETCH_BOTH);
-                    $ari = count($rswrk);
-                    if ($ari > 0) { // Lookup values found
-                        $arwrk = $this->vendor_id->Lookup->renderViewRow($rswrk[0]);
-                        $this->vendor_id->EditValue = $this->vendor_id->displayValue($arwrk);
-                    } else {
-                        $this->vendor_id->EditValue = $this->vendor_id->CurrentValue;
-                    }
-                }
-            } else {
-                $this->vendor_id->EditValue = null;
-            }
-            $this->vendor_id->ViewCustomAttributes = "";
         } else {
             $this->vendor_id->PlaceHolder = RemoveHtml($this->vendor_id->caption());
         }
@@ -1242,8 +1223,32 @@ SORTHTML;
         // reportsto
         $this->reportsto->EditAttrs["class"] = "form-control";
         $this->reportsto->EditCustomAttributes = "";
-        $this->reportsto->EditValue = $this->reportsto->CurrentValue;
-        $this->reportsto->PlaceHolder = RemoveHtml($this->reportsto->caption());
+        if (!$Security->isAdmin() && $Security->isLoggedIn()) { // Non system admin
+            if (SameString($this->vendor_id->CurrentValue, CurrentUserID())) {
+                $curVal = strval($this->reportsto->CurrentValue);
+                if ($curVal != "") {
+                    $this->reportsto->EditValue = $this->reportsto->lookupCacheOption($curVal);
+                    if ($this->reportsto->EditValue === null) { // Lookup from database
+                        $filterWrk = "\"id\"" . SearchString("=", $curVal, DATATYPE_NUMBER, "");
+                        $sqlWrk = $this->reportsto->Lookup->getSql(false, $filterWrk, '', $this, true);
+                        $rswrk = Conn()->executeQuery($sqlWrk)->fetchAll(\PDO::FETCH_BOTH);
+                        $ari = count($rswrk);
+                        if ($ari > 0) { // Lookup values found
+                            $arwrk = $this->reportsto->Lookup->renderViewRow($rswrk[0]);
+                            $this->reportsto->EditValue = $this->reportsto->displayValue($arwrk);
+                        } else {
+                            $this->reportsto->EditValue = $this->reportsto->CurrentValue;
+                        }
+                    }
+                } else {
+                    $this->reportsto->EditValue = null;
+                }
+                $this->reportsto->ViewCustomAttributes = "";
+            } else {
+            }
+        } else {
+            $this->reportsto->PlaceHolder = RemoveHtml($this->reportsto->caption());
+        }
 
         // Call Row Rendered event
         $this->rowRendered();
@@ -1350,6 +1355,8 @@ SORTHTML;
     public function getUserIDFilter($userId)
     {
         $userIdFilter = '"vendor_id" = ' . QuotedValue($userId, DATATYPE_NUMBER, Config("USER_TABLE_DBID"));
+        $parentUserIdFilter = '"vendor_id" IN (SELECT "vendor_id" FROM ' . "\"main_users\"" . ' WHERE "reportsto" = ' . QuotedValue($userId, DATATYPE_NUMBER, Config("USER_TABLE_DBID")) . ')';
+        $userIdFilter = "($userIdFilter) OR ($parentUserIdFilter)";
         return $userIdFilter;
     }
 
@@ -1370,6 +1377,20 @@ SORTHTML;
         $this->userIDFiltering($filterWrk);
         AddFilter($filter, $filterWrk);
         return $filter;
+    }
+
+    // Add Parent User ID filter
+    public function addParentUserIDFilter($userId)
+    {
+        global $Security;
+        if (!$Security->isAdmin()) {
+            $result = $Security->parentUserIDList($userId);
+            if ($result != "") {
+                $result = '"vendor_id" IN (' . $result . ')';
+            }
+            return $result;
+        }
+        return "";
     }
 
     // User ID subquery

@@ -25,7 +25,7 @@ loadjs.ready("head", function () {
         ["_email", [fields._email.required ? ew.Validators.required(fields._email.caption) : null, ew.Validators.email], fields._email.isInvalid],
         ["user_type", [fields.user_type.required ? ew.Validators.required(fields.user_type.caption) : null], fields.user_type.isInvalid],
         ["vendor_id", [fields.vendor_id.required ? ew.Validators.required(fields.vendor_id.caption) : null], fields.vendor_id.isInvalid],
-        ["reportsto", [fields.reportsto.required ? ew.Validators.required(fields.reportsto.caption) : null, ew.Validators.integer], fields.reportsto.isInvalid]
+        ["reportsto", [fields.reportsto.required ? ew.Validators.required(fields.reportsto.caption) : null], fields.reportsto.isInvalid]
     ]);
 
     // Set invalid fields
@@ -235,10 +235,31 @@ loadjs.ready("head", function() {
 <input type="hidden" id="x_vendor_id" name="x_vendor_id" value="<?= HtmlEncode($Page->vendor_id->CurrentValue) ?>" data-hidden="1">
 <?php } elseif (!$Security->isAdmin() && $Security->isLoggedIn() && !$Page->userIDAllow("edit")) { // Non system admin ?>
 <span id="el_main_users_vendor_id">
-<span<?= $Page->vendor_id->viewAttributes() ?>>
-<input type="text" readonly class="form-control-plaintext" value="<?= HtmlEncode(RemoveHtml($Page->vendor_id->getDisplayValue($Page->vendor_id->EditValue))) ?>"></span>
+    <select
+        id="x_vendor_id"
+        name="x_vendor_id"
+        class="form-control ew-select<?= $Page->vendor_id->isInvalidClass() ?>"
+        data-select2-id="main_users_x_vendor_id"
+        data-table="main_users"
+        data-field="x_vendor_id"
+        data-value-separator="<?= $Page->vendor_id->displayValueSeparatorAttribute() ?>"
+        data-placeholder="<?= HtmlEncode($Page->vendor_id->getPlaceHolder()) ?>"
+        <?= $Page->vendor_id->editAttributes() ?>>
+        <?= $Page->vendor_id->selectOptionListHtml("x_vendor_id") ?>
+    </select>
+    <?= $Page->vendor_id->getCustomMessage() ?>
+    <div class="invalid-feedback"><?= $Page->vendor_id->getErrorMessage() ?></div>
+<?= $Page->vendor_id->Lookup->getParamTag($Page, "p_x_vendor_id") ?>
+<script>
+loadjs.ready("head", function() {
+    var el = document.querySelector("select[data-select2-id='main_users_x_vendor_id']"),
+        options = { name: "x_vendor_id", selectId: "main_users_x_vendor_id", language: ew.LANGUAGE_ID, dir: ew.IS_RTL ? "rtl" : "ltr" };
+    options.dropdownParent = $(el).closest("#ew-modal-dialog, #ew-add-opt-dialog")[0];
+    Object.assign(options, ew.vars.tables.main_users.fields.vendor_id.selectOptions);
+    ew.createSelect(options);
+});
+</script>
 </span>
-<input type="hidden" data-table="main_users" data-field="x_vendor_id" data-hidden="1" name="x_vendor_id" id="x_vendor_id" value="<?= HtmlEncode($Page->vendor_id->CurrentValue) ?>">
 <?php } else { ?>
 <span id="el_main_users_vendor_id">
     <select
@@ -272,27 +293,71 @@ loadjs.ready("head", function() {
 <?php } ?>
 <?php if ($Page->reportsto->Visible) { // reportsto ?>
     <div id="r_reportsto" class="form-group row">
-        <label id="elh_main_users_reportsto" class="<?= $Page->LeftColumnClass ?>"><?= $Page->reportsto->caption() ?><?= $Page->reportsto->Required ? $Language->phrase("FieldRequiredIndicator") : "" ?></label>
+        <label id="elh_main_users_reportsto" for="x_reportsto" class="<?= $Page->LeftColumnClass ?>"><?= $Page->reportsto->caption() ?><?= $Page->reportsto->Required ? $Language->phrase("FieldRequiredIndicator") : "" ?></label>
         <div class="<?= $Page->RightColumnClass ?>"><div <?= $Page->reportsto->cellAttributes() ?>>
+<?php if (!$Security->isAdmin() && $Security->isLoggedIn()) { // Non system admin ?>
+<?php if (SameString($Page->vendor_id->CurrentValue, CurrentUserID())) { ?>
+    <span id="el_main_users_reportsto">
+    <span<?= $Page->reportsto->viewAttributes() ?>>
+    <input type="text" readonly class="form-control-plaintext" value="<?= HtmlEncode(RemoveHtml($Page->reportsto->getDisplayValue($Page->reportsto->EditValue))) ?>"></span>
+    </span>
+    <input type="hidden" data-table="main_users" data-field="x_reportsto" data-hidden="1" name="x_reportsto" id="x_reportsto" value="<?= HtmlEncode($Page->reportsto->CurrentValue) ?>">
+<?php } else { ?>
 <span id="el_main_users_reportsto">
-<?php
-$onchange = $Page->reportsto->EditAttrs->prepend("onchange", "");
-$onchange = ($onchange) ? ' onchange="' . JsEncode($onchange) . '"' : '';
-$Page->reportsto->EditAttrs["onchange"] = "";
-?>
-<span id="as_x_reportsto" class="ew-auto-suggest">
-    <input type="<?= $Page->reportsto->getInputTextType() ?>" class="form-control" name="sv_x_reportsto" id="sv_x_reportsto" value="<?= RemoveHtml($Page->reportsto->EditValue) ?>" size="30" placeholder="<?= HtmlEncode($Page->reportsto->getPlaceHolder()) ?>" data-placeholder="<?= HtmlEncode($Page->reportsto->getPlaceHolder()) ?>"<?= $Page->reportsto->editAttributes() ?> aria-describedby="x_reportsto_help">
-</span>
-<input type="hidden" is="selection-list" class="form-control" data-table="main_users" data-field="x_reportsto" data-input="sv_x_reportsto" data-value-separator="<?= $Page->reportsto->displayValueSeparatorAttribute() ?>" name="x_reportsto" id="x_reportsto" value="<?= HtmlEncode($Page->reportsto->CurrentValue) ?>"<?= $onchange ?>>
-<?= $Page->reportsto->getCustomMessage() ?>
-<div class="invalid-feedback"><?= $Page->reportsto->getErrorMessage() ?></div>
+    <select
+        id="x_reportsto"
+        name="x_reportsto"
+        class="form-control ew-select<?= $Page->reportsto->isInvalidClass() ?>"
+        data-select2-id="main_users_x_reportsto"
+        data-table="main_users"
+        data-field="x_reportsto"
+        data-value-separator="<?= $Page->reportsto->displayValueSeparatorAttribute() ?>"
+        data-placeholder="<?= HtmlEncode($Page->reportsto->getPlaceHolder()) ?>"
+        <?= $Page->reportsto->editAttributes() ?>>
+        <?= $Page->reportsto->selectOptionListHtml("x_reportsto") ?>
+    </select>
+    <?= $Page->reportsto->getCustomMessage() ?>
+    <div class="invalid-feedback"><?= $Page->reportsto->getErrorMessage() ?></div>
+<?= $Page->reportsto->Lookup->getParamTag($Page, "p_x_reportsto") ?>
 <script>
-loadjs.ready(["fmain_usersedit"], function() {
-    fmain_usersedit.createAutoSuggest(Object.assign({"id":"x_reportsto","forceSelect":false}, ew.vars.tables.main_users.fields.reportsto.autoSuggestOptions));
+loadjs.ready("head", function() {
+    var el = document.querySelector("select[data-select2-id='main_users_x_reportsto']"),
+        options = { name: "x_reportsto", selectId: "main_users_x_reportsto", language: ew.LANGUAGE_ID, dir: ew.IS_RTL ? "rtl" : "ltr" };
+    options.dropdownParent = $(el).closest("#ew-modal-dialog, #ew-add-opt-dialog")[0];
+    Object.assign(options, ew.vars.tables.main_users.fields.reportsto.selectOptions);
+    ew.createSelect(options);
 });
 </script>
-<?= $Page->reportsto->Lookup->getParamTag($Page, "p_x_reportsto") ?>
 </span>
+<?php } ?>
+<?php } else { ?>
+<span id="el_main_users_reportsto">
+    <select
+        id="x_reportsto"
+        name="x_reportsto"
+        class="form-control ew-select<?= $Page->reportsto->isInvalidClass() ?>"
+        data-select2-id="main_users_x_reportsto"
+        data-table="main_users"
+        data-field="x_reportsto"
+        data-value-separator="<?= $Page->reportsto->displayValueSeparatorAttribute() ?>"
+        data-placeholder="<?= HtmlEncode($Page->reportsto->getPlaceHolder()) ?>"
+        <?= $Page->reportsto->editAttributes() ?>>
+        <?= $Page->reportsto->selectOptionListHtml("x_reportsto") ?>
+    </select>
+    <?= $Page->reportsto->getCustomMessage() ?>
+    <div class="invalid-feedback"><?= $Page->reportsto->getErrorMessage() ?></div>
+<?= $Page->reportsto->Lookup->getParamTag($Page, "p_x_reportsto") ?>
+<script>
+loadjs.ready("head", function() {
+    var el = document.querySelector("select[data-select2-id='main_users_x_reportsto']"),
+        options = { name: "x_reportsto", selectId: "main_users_x_reportsto", language: ew.LANGUAGE_ID, dir: ew.IS_RTL ? "rtl" : "ltr" };
+    options.dropdownParent = $(el).closest("#ew-modal-dialog, #ew-add-opt-dialog")[0];
+    Object.assign(options, ew.vars.tables.main_users.fields.reportsto.selectOptions);
+    ew.createSelect(options);
+});
+</script>
+</span>
+<?php } ?>
 </div></div>
     </div>
 <?php } ?>

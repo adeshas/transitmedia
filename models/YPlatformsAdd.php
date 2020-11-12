@@ -440,6 +440,7 @@ class YPlatformsAdd extends YPlatforms
         $this->id->Visible = false;
         $this->name->setVisibility();
         $this->shortname->setVisibility();
+        $this->_email->setVisibility();
         $this->hideFieldsForAddEdit();
 
         // Do not use lookup cache
@@ -608,6 +609,8 @@ class YPlatformsAdd extends YPlatforms
         $this->name->OldValue = $this->name->CurrentValue;
         $this->shortname->CurrentValue = null;
         $this->shortname->OldValue = $this->shortname->CurrentValue;
+        $this->_email->CurrentValue = null;
+        $this->_email->OldValue = $this->_email->CurrentValue;
     }
 
     // Load form values
@@ -636,6 +639,16 @@ class YPlatformsAdd extends YPlatforms
             }
         }
 
+        // Check field name 'email' first before field var 'x__email'
+        $val = $CurrentForm->hasValue("email") ? $CurrentForm->getValue("email") : $CurrentForm->getValue("x__email");
+        if (!$this->_email->IsDetailKey) {
+            if (IsApi() && $val === null) {
+                $this->_email->Visible = false; // Disable update for API request
+            } else {
+                $this->_email->setFormValue($val);
+            }
+        }
+
         // Check field name 'id' first before field var 'x_id'
         $val = $CurrentForm->hasValue("id") ? $CurrentForm->getValue("id") : $CurrentForm->getValue("x_id");
     }
@@ -646,6 +659,7 @@ class YPlatformsAdd extends YPlatforms
         global $CurrentForm;
         $this->name->CurrentValue = $this->name->FormValue;
         $this->shortname->CurrentValue = $this->shortname->FormValue;
+        $this->_email->CurrentValue = $this->_email->FormValue;
     }
 
     /**
@@ -698,6 +712,7 @@ class YPlatformsAdd extends YPlatforms
         $this->id->setDbValue($row['id']);
         $this->name->setDbValue($row['name']);
         $this->shortname->setDbValue($row['shortname']);
+        $this->_email->setDbValue($row['email']);
     }
 
     // Return a row with default values
@@ -708,6 +723,7 @@ class YPlatformsAdd extends YPlatforms
         $row['id'] = $this->id->CurrentValue;
         $row['name'] = $this->name->CurrentValue;
         $row['shortname'] = $this->shortname->CurrentValue;
+        $row['email'] = $this->_email->CurrentValue;
         return $row;
     }
 
@@ -744,6 +760,8 @@ class YPlatformsAdd extends YPlatforms
         // name
 
         // shortname
+
+        // email
         if ($this->RowType == ROWTYPE_VIEW) {
             // id
             $this->id->ViewValue = $this->id->CurrentValue;
@@ -757,6 +775,10 @@ class YPlatformsAdd extends YPlatforms
             $this->shortname->ViewValue = $this->shortname->CurrentValue;
             $this->shortname->ViewCustomAttributes = "";
 
+            // email
+            $this->_email->ViewValue = $this->_email->CurrentValue;
+            $this->_email->ViewCustomAttributes = "";
+
             // name
             $this->name->LinkCustomAttributes = "";
             $this->name->HrefValue = "";
@@ -766,6 +788,11 @@ class YPlatformsAdd extends YPlatforms
             $this->shortname->LinkCustomAttributes = "";
             $this->shortname->HrefValue = "";
             $this->shortname->TooltipValue = "";
+
+            // email
+            $this->_email->LinkCustomAttributes = "";
+            $this->_email->HrefValue = "";
+            $this->_email->TooltipValue = "";
         } elseif ($this->RowType == ROWTYPE_ADD) {
             // name
             $this->name->EditAttrs["class"] = "form-control";
@@ -785,6 +812,15 @@ class YPlatformsAdd extends YPlatforms
             $this->shortname->EditValue = HtmlEncode($this->shortname->CurrentValue);
             $this->shortname->PlaceHolder = RemoveHtml($this->shortname->caption());
 
+            // email
+            $this->_email->EditAttrs["class"] = "form-control";
+            $this->_email->EditCustomAttributes = "";
+            if (!$this->_email->Raw) {
+                $this->_email->CurrentValue = HtmlDecode($this->_email->CurrentValue);
+            }
+            $this->_email->EditValue = HtmlEncode($this->_email->CurrentValue);
+            $this->_email->PlaceHolder = RemoveHtml($this->_email->caption());
+
             // Add refer script
 
             // name
@@ -794,6 +830,10 @@ class YPlatformsAdd extends YPlatforms
             // shortname
             $this->shortname->LinkCustomAttributes = "";
             $this->shortname->HrefValue = "";
+
+            // email
+            $this->_email->LinkCustomAttributes = "";
+            $this->_email->HrefValue = "";
         }
         if ($this->RowType == ROWTYPE_ADD || $this->RowType == ROWTYPE_EDIT || $this->RowType == ROWTYPE_SEARCH) { // Add/Edit/Search row
             $this->setupFieldTitles();
@@ -822,6 +862,11 @@ class YPlatformsAdd extends YPlatforms
         if ($this->shortname->Required) {
             if (!$this->shortname->IsDetailKey && EmptyValue($this->shortname->FormValue)) {
                 $this->shortname->addErrorMessage(str_replace("%s", $this->shortname->caption(), $this->shortname->RequiredErrorMessage));
+            }
+        }
+        if ($this->_email->Required) {
+            if (!$this->_email->IsDetailKey && EmptyValue($this->_email->FormValue)) {
+                $this->_email->addErrorMessage(str_replace("%s", $this->_email->caption(), $this->_email->RequiredErrorMessage));
             }
         }
 
@@ -870,6 +915,9 @@ class YPlatformsAdd extends YPlatforms
 
         // shortname
         $this->shortname->setDbValueDef($rsnew, $this->shortname->CurrentValue, null, false);
+
+        // email
+        $this->_email->setDbValueDef($rsnew, $this->_email->CurrentValue, null, false);
 
         // Call Row Inserting event
         $insertRow = $this->rowInserting($rsold, $rsnew);

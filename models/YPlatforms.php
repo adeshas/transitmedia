@@ -31,6 +31,7 @@ class YPlatforms extends DbTable
     public $id;
     public $name;
     public $shortname;
+    public $_email;
 
     // Page ID
     public $PageID = ""; // To be overridden by subclass
@@ -86,6 +87,11 @@ class YPlatforms extends DbTable
         $this->shortname = new DbField('y_platforms', 'y_platforms', 'x_shortname', 'shortname', '"shortname"', '"shortname"', 200, 50, -1, false, '"shortname"', false, false, false, 'FORMATTED TEXT', 'TEXT');
         $this->shortname->Sortable = true; // Allow sort
         $this->Fields['shortname'] = &$this->shortname;
+
+        // email
+        $this->_email = new DbField('y_platforms', 'y_platforms', 'x__email', 'email', '"email"', '"email"', 200, 0, -1, false, '"email"', false, false, false, 'FORMATTED TEXT', 'TEXT');
+        $this->_email->Sortable = true; // Allow sort
+        $this->Fields['email'] = &$this->_email;
     }
 
     // Field Visibility
@@ -529,6 +535,7 @@ class YPlatforms extends DbTable
         $this->id->DbValue = $row['id'];
         $this->name->DbValue = $row['name'];
         $this->shortname->DbValue = $row['shortname'];
+        $this->_email->DbValue = $row['email'];
     }
 
     // Delete uploaded files
@@ -861,6 +868,7 @@ SORTHTML;
         $this->id->setDbValue($row['id']);
         $this->name->setDbValue($row['name']);
         $this->shortname->setDbValue($row['shortname']);
+        $this->_email->setDbValue($row['email']);
     }
 
     // Render list row values
@@ -879,6 +887,8 @@ SORTHTML;
 
         // shortname
 
+        // email
+
         // id
         $this->id->ViewValue = $this->id->CurrentValue;
         $this->id->ViewCustomAttributes = "";
@@ -890,6 +900,10 @@ SORTHTML;
         // shortname
         $this->shortname->ViewValue = $this->shortname->CurrentValue;
         $this->shortname->ViewCustomAttributes = "";
+
+        // email
+        $this->_email->ViewValue = $this->_email->CurrentValue;
+        $this->_email->ViewCustomAttributes = "";
 
         // id
         $this->id->LinkCustomAttributes = "";
@@ -905,6 +919,11 @@ SORTHTML;
         $this->shortname->LinkCustomAttributes = "";
         $this->shortname->HrefValue = "";
         $this->shortname->TooltipValue = "";
+
+        // email
+        $this->_email->LinkCustomAttributes = "";
+        $this->_email->HrefValue = "";
+        $this->_email->TooltipValue = "";
 
         // Call Row Rendered event
         $this->rowRendered();
@@ -945,6 +964,15 @@ SORTHTML;
         $this->shortname->EditValue = $this->shortname->CurrentValue;
         $this->shortname->PlaceHolder = RemoveHtml($this->shortname->caption());
 
+        // email
+        $this->_email->EditAttrs["class"] = "form-control";
+        $this->_email->EditCustomAttributes = "";
+        if (!$this->_email->Raw) {
+            $this->_email->CurrentValue = HtmlDecode($this->_email->CurrentValue);
+        }
+        $this->_email->EditValue = $this->_email->CurrentValue;
+        $this->_email->PlaceHolder = RemoveHtml($this->_email->caption());
+
         // Call Row Rendered event
         $this->rowRendered();
     }
@@ -976,10 +1004,12 @@ SORTHTML;
                     $doc->exportCaption($this->id);
                     $doc->exportCaption($this->name);
                     $doc->exportCaption($this->shortname);
+                    $doc->exportCaption($this->_email);
                 } else {
                     $doc->exportCaption($this->id);
                     $doc->exportCaption($this->name);
                     $doc->exportCaption($this->shortname);
+                    $doc->exportCaption($this->_email);
                 }
                 $doc->endExportRow();
             }
@@ -1012,10 +1042,12 @@ SORTHTML;
                         $doc->exportField($this->id);
                         $doc->exportField($this->name);
                         $doc->exportField($this->shortname);
+                        $doc->exportField($this->_email);
                     } else {
                         $doc->exportField($this->id);
                         $doc->exportField($this->name);
                         $doc->exportField($this->shortname);
+                        $doc->exportField($this->_email);
                     }
                     $doc->endExportRow($rowCnt);
                 }

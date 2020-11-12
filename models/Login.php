@@ -452,6 +452,17 @@ class Login extends MainUsers
     {
         // Example:
         //$url = "your URL";
+        // DEFAULT PAGE
+            if (IsLoggedIn()){
+                if(CurrentUserLevel() == 5){
+                    //OPERATOR
+                    $url = "viewtransactionsperoperatorlist";
+                }
+                if(CurrentUserLevel() == 6){
+                    //PLATFORM
+                    $url = "viewtransactionsperplatformlist";
+                }
+            }
     }
 
     // Message Showing event

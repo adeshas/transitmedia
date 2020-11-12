@@ -617,6 +617,11 @@ class MainUsersList extends MainUsers
                     $this->clearInlineMode();
                 }
 
+                // Switch to grid edit mode
+                if ($this->isGridEdit()) {
+                    $this->gridEditMode();
+                }
+
                 // Switch to inline add mode
                 if ($this->isAdd() || $this->isCopy()) {
                     $this->inlineAddMode();
@@ -629,6 +634,20 @@ class MainUsersList extends MainUsers
             } else {
                 if (Post("action") !== null) {
                     $this->CurrentAction = Post("action"); // Get action
+
+                    // Grid Update
+                    if (($this->isGridUpdate() || $this->isGridOverwrite()) && @$_SESSION[SESSION_INLINE_MODE] == "gridedit") {
+                        if ($this->validateGridForm()) {
+                            $gridUpdate = $this->gridUpdate();
+                        } else {
+                            $gridUpdate = false;
+                        }
+                        if ($gridUpdate) {
+                        } else {
+                            $this->EventCancelled = true;
+                            $this->gridEditMode(); // Stay in Grid edit mode
+                        }
+                    }
 
                     // Insert Inline
                     if ($this->isInsert() && @$_SESSION[SESSION_INLINE_MODE] == "add") {
@@ -648,6 +667,12 @@ class MainUsersList extends MainUsers
                             $this->EventCancelled = true;
                             $this->gridAddMode(); // Stay in Grid add mode
                         }
+                    }
+                } elseif (@$_SESSION[SESSION_INLINE_MODE] == "gridedit") { // Previously in grid edit mode
+                    if (Get(Config("TABLE_START_REC")) !== null || Get(Config("TABLE_PAGE_NO")) !== null) { // Stay in grid edit mode if paging
+                        $this->gridEditMode();
+                    } else { // Reset grid edit
+                        $this->clearInlineMode();
                     }
                 }
             }
@@ -903,6 +928,14 @@ class MainUsersList extends MainUsers
         $this->hideFieldsForAddEdit();
     }
 
+    // Switch to Grid Edit mode
+    protected function gridEditMode()
+    {
+        $this->CurrentAction = "gridedit";
+        $_SESSION[SESSION_INLINE_MODE] = "gridedit";
+        $this->hideFieldsForAddEdit();
+    }
+
     // Switch to Inline Add mode
     protected function inlineAddMode()
     {
@@ -939,6 +972,109 @@ class MainUsersList extends MainUsers
             $this->EventCancelled = true; // Set event cancelled
             $this->CurrentAction = "add"; // Stay in add mode
         }
+    }
+
+    // Perform update to grid
+    public function gridUpdate()
+    {
+        global $Language, $CurrentForm;
+        $gridUpdate = true;
+
+        // Get old recordset
+        $this->CurrentFilter = $this->buildKeyFilter();
+        if ($this->CurrentFilter == "") {
+            $this->CurrentFilter = "0=1";
+        }
+        $sql = $this->getCurrentSql();
+        $conn = $this->getConnection();
+        if ($rs = $conn->executeQuery($sql)) {
+            $rsold = $rs->fetchAll();
+            $rs->closeCursor();
+        }
+
+        // Call Grid Updating event
+        if (!$this->gridUpdating($rsold)) {
+            if ($this->getFailureMessage() == "") {
+                $this->setFailureMessage($Language->phrase("GridEditCancelled")); // Set grid edit cancelled message
+            }
+            return false;
+        }
+
+        // Begin transaction
+        $conn->beginTransaction();
+        $key = "";
+
+        // Update row index and get row key
+        $CurrentForm->Index = -1;
+        $rowcnt = strval($CurrentForm->getValue($this->FormKeyCountName));
+        if ($rowcnt == "" || !is_numeric($rowcnt)) {
+            $rowcnt = 0;
+        }
+
+        // Update all rows based on key
+        for ($rowindex = 1; $rowindex <= $rowcnt; $rowindex++) {
+            $CurrentForm->Index = $rowindex;
+            $this->setKey($CurrentForm->getValue($this->OldKeyName));
+            $rowaction = strval($CurrentForm->getValue($this->FormActionName));
+
+            // Load all values and keys
+            if ($rowaction != "insertdelete") { // Skip insert then deleted rows
+                $this->loadFormValues(); // Get form values
+                if ($rowaction == "" || $rowaction == "edit" || $rowaction == "delete") {
+                    $gridUpdate = $this->OldKey != ""; // Key must not be empty
+                } else {
+                    $gridUpdate = true;
+                }
+
+                // Skip empty row
+                if ($rowaction == "insert" && $this->emptyRow()) {
+                // Validate form and insert/update/delete record
+                } elseif ($gridUpdate) {
+                    if ($rowaction == "delete") {
+                        $this->CurrentFilter = $this->getRecordFilter();
+                        $gridUpdate = $this->deleteRows(); // Delete this row
+                    //} elseif (!$this->validateForm()) { // Already done in validateGridForm
+                    //    $gridUpdate = false; // Form error, reset action
+                    } else {
+                        if ($rowaction == "insert") {
+                            $gridUpdate = $this->addRow(); // Insert this row
+                        } else {
+                            if ($this->OldKey != "") {
+                                $this->SendEmail = false; // Do not send email on update success
+                                $gridUpdate = $this->editRow(); // Update this row
+                            }
+                        } // End update
+                    }
+                }
+                if ($gridUpdate) {
+                    if ($key != "") {
+                        $key .= ", ";
+                    }
+                    $key .= $this->OldKey;
+                } else {
+                    break;
+                }
+            }
+        }
+        if ($gridUpdate) {
+            $conn->commit(); // Commit transaction
+
+            // Get new records
+            $rsnew = $conn->fetchAll($sql);
+
+            // Call Grid_Updated event
+            $this->gridUpdated($rsold, $rsnew);
+            if ($this->getSuccessMessage() == "") {
+                $this->setSuccessMessage($Language->phrase("UpdateSuccess")); // Set up update success message
+            }
+            $this->clearInlineMode(); // Clear inline edit mode
+        } else {
+            $conn->rollback(); // Rollback transaction
+            if ($this->getFailureMessage() == "") {
+                $this->setFailureMessage($Language->phrase("UpdateFailed")); // Set update failed message
+            }
+        }
+        return $gridUpdate;
     }
 
     // Build filter for all keys
@@ -1628,7 +1764,7 @@ class MainUsersList extends MainUsers
 
         // "checkbox"
         $item = &$this->ListOptions->add("checkbox");
-        $item->Visible = false;
+        $item->Visible = $Security->canEdit();
         $item->OnLeft = false;
         $item->Header = "<div class=\"custom-control custom-checkbox d-inline-block\"><input type=\"checkbox\" name=\"key\" id=\"key\" class=\"custom-control-input\" onclick=\"ew.selectAllKey(this);\"><label class=\"custom-control-label\" for=\"key\"></label></div>";
         $item->ShowInDropDown = false;
@@ -1845,6 +1981,11 @@ class MainUsersList extends MainUsers
         // "checkbox"
         $opt = $this->ListOptions["checkbox"];
         $opt->Body = "<div class=\"custom-control custom-checkbox d-inline-block\"><input type=\"checkbox\" id=\"key_m_" . $this->RowCount . "\" name=\"key_m[]\" class=\"custom-control-input ew-multi-select\" value=\"" . HtmlEncode($this->id->CurrentValue) . "\" onclick=\"ew.clickMultiCheckbox(event);\"><label class=\"custom-control-label\" for=\"key_m_" . $this->RowCount . "\"></label></div>";
+        if ($this->isGridEdit() && is_numeric($this->RowIndex)) {
+            if ($keyName != "") {
+                $this->MultiSelectKey .= "<input type=\"hidden\" name=\"" . $keyName . "\" id=\"" . $keyName . "\" value=\"" . $this->id->CurrentValue . "\">";
+            }
+        }
         $this->renderListOptionsExt();
 
         // Call ListOptions_Rendered event
@@ -1902,7 +2043,18 @@ class MainUsersList extends MainUsers
                 }
             }
         }
+
+        // Add grid edit
+        $option = $options["addedit"];
+        $item = &$option->add("gridedit");
+        $item->Body = "<a class=\"ew-add-edit ew-grid-edit\" title=\"" . HtmlTitle($Language->phrase("GridEditLink")) . "\" data-caption=\"" . HtmlTitle($Language->phrase("GridEditLink")) . "\" href=\"" . HtmlEncode(GetUrl($this->GridEditUrl)) . "\">" . $Language->phrase("GridEditLink") . "</a>";
+        $item->Visible = $this->GridEditUrl != "" && $Security->canEdit();
         $option = $options["action"];
+
+        // Add multi update
+        $item = &$option->add("multiupdate");
+        $item->Body = "<a class=\"ew-action ew-multi-update\" title=\"" . HtmlTitle($Language->phrase("UpdateSelectedLink")) . "\" data-table=\"main_users\" data-caption=\"" . HtmlTitle($Language->phrase("UpdateSelectedLink")) . "\" href=\"#\" onclick=\"return ew.submitAction(event, {f:document.fmain_userslist,url:'" . GetUrl($this->MultiUpdateUrl) . "'});return false;\">" . $Language->phrase("UpdateSelectedLink") . "</a>";
+        $item->Visible = $Security->canEdit();
 
         // Set up options default
         foreach ($options as $option) {
@@ -1988,6 +2140,25 @@ class MainUsersList extends MainUsers
                 $item = &$option->add("gridcancel");
                 $cancelurl = $this->addMasterUrl($pageUrl . "action=cancel");
                 $item->Body = "<a class=\"ew-action ew-grid-cancel\" title=\"" . HtmlTitle($Language->phrase("GridCancelLink")) . "\" data-caption=\"" . HtmlTitle($Language->phrase("GridCancelLink")) . "\" href=\"" . $cancelurl . "\">" . $Language->phrase("GridCancelLink") . "</a>";
+            }
+
+            // Grid-Edit
+            if ($this->isGridEdit()) {
+                if ($this->AllowAddDeleteRow) {
+                    // Add add blank row
+                    $option = $options["addedit"];
+                    $option->UseDropDownButton = false;
+                    $item = &$option->add("addblankrow");
+                    $item->Body = "<a class=\"ew-add-edit ew-add-blank-row\" title=\"" . HtmlTitle($Language->phrase("AddBlankRow")) . "\" data-caption=\"" . HtmlTitle($Language->phrase("AddBlankRow")) . "\" href=\"#\" onclick=\"return ew.addGridRow(this);\">" . $Language->phrase("AddBlankRow") . "</a>";
+                    $item->Visible = $Security->canAdd();
+                }
+                $option = $options["action"];
+                $option->UseDropDownButton = false;
+                    $item = &$option->add("gridsave");
+                    $item->Body = "<a class=\"ew-action ew-grid-save\" title=\"" . HtmlTitle($Language->phrase("GridSaveLink")) . "\" data-caption=\"" . HtmlTitle($Language->phrase("GridSaveLink")) . "\" href=\"#\" onclick=\"return ew.forms.get(this).submit('" . $this->pageName() . "');\">" . $Language->phrase("GridSaveLink") . "</a>";
+                    $item = &$option->add("gridcancel");
+                    $cancelurl = $this->addMasterUrl($pageUrl . "action=cancel");
+                    $item->Body = "<a class=\"ew-action ew-grid-cancel\" title=\"" . HtmlTitle($Language->phrase("GridCancelLink")) . "\" data-caption=\"" . HtmlTitle($Language->phrase("GridCancelLink")) . "\" href=\"" . $cancelurl . "\">" . $Language->phrase("GridCancelLink") . "</a>";
             }
         }
     }
@@ -2293,6 +2464,9 @@ class MainUsersList extends MainUsers
         if ($row) {
             $res = true;
             $this->loadRowValues($row); // Load row values
+            if (!$this->EventCancelled) {
+                $this->HashValue = $this->getRowHash($row); // Get hash value for record
+            }
         }
         return $res;
     }
@@ -2448,7 +2622,6 @@ class MainUsersList extends MainUsers
             $this->vendor_id->ViewCustomAttributes = "";
 
             // reportsto
-            $this->reportsto->ViewValue = $this->reportsto->CurrentValue;
             $curVal = strval($this->reportsto->CurrentValue);
             if ($curVal != "") {
                 $this->reportsto->ViewValue = $this->reportsto->lookupCacheOption($curVal);
@@ -2573,26 +2746,6 @@ class MainUsersList extends MainUsers
                 }
                 $this->vendor_id->ViewCustomAttributes = "";
             } elseif (!$Security->isAdmin() && $Security->isLoggedIn() && !$this->userIDAllow($this->CurrentAction)) { // Non system admin
-                $this->vendor_id->CurrentValue = CurrentUserID();
-                $curVal = strval($this->vendor_id->CurrentValue);
-                if ($curVal != "") {
-                    $this->vendor_id->EditValue = $this->vendor_id->lookupCacheOption($curVal);
-                    if ($this->vendor_id->EditValue === null) { // Lookup from database
-                        $filterWrk = "\"id\"" . SearchString("=", $curVal, DATATYPE_NUMBER, "");
-                        $sqlWrk = $this->vendor_id->Lookup->getSql(false, $filterWrk, '', $this, true);
-                        $rswrk = Conn()->executeQuery($sqlWrk)->fetchAll(\PDO::FETCH_BOTH);
-                        $ari = count($rswrk);
-                        if ($ari > 0) { // Lookup values found
-                            $arwrk = $this->vendor_id->Lookup->renderViewRow($rswrk[0]);
-                            $this->vendor_id->EditValue = $this->vendor_id->displayValue($arwrk);
-                        } else {
-                            $this->vendor_id->EditValue = $this->vendor_id->CurrentValue;
-                        }
-                    }
-                } else {
-                    $this->vendor_id->EditValue = null;
-                }
-                $this->vendor_id->ViewCustomAttributes = "";
             } else {
                 $curVal = trim(strval($this->vendor_id->CurrentValue));
                 if ($curVal != "") {
@@ -2620,28 +2773,227 @@ class MainUsersList extends MainUsers
             // reportsto
             $this->reportsto->EditAttrs["class"] = "form-control";
             $this->reportsto->EditCustomAttributes = "";
-            $this->reportsto->EditValue = HtmlEncode($this->reportsto->CurrentValue);
-            $curVal = strval($this->reportsto->CurrentValue);
-            if ($curVal != "") {
-                $this->reportsto->EditValue = $this->reportsto->lookupCacheOption($curVal);
-                if ($this->reportsto->EditValue === null) { // Lookup from database
-                    $filterWrk = "\"id\"" . SearchString("=", $curVal, DATATYPE_NUMBER, "");
-                    $sqlWrk = $this->reportsto->Lookup->getSql(false, $filterWrk, '', $this, true);
+            if (!$Security->isAdmin() && $Security->isLoggedIn()) { // Non system admin
+                if (trim(strval($this->reportsto->CurrentValue)) == "") {
+                    $filterWrk = "0=1";
+                } else {
+                    $filterWrk = "\"id\"" . SearchString("=", $this->reportsto->CurrentValue, DATATYPE_NUMBER, "");
+                }
+                $sqlWrk = $this->reportsto->Lookup->getSql(true, $filterWrk, '', $this);
+                $rswrk = Conn()->executeQuery($sqlWrk)->fetchAll(\PDO::FETCH_BOTH);
+                $arwrk = $rswrk;
+                $this->reportsto->EditValue = $arwrk;
+            } else {
+                $curVal = trim(strval($this->reportsto->CurrentValue));
+                if ($curVal != "") {
+                    $this->reportsto->ViewValue = $this->reportsto->lookupCacheOption($curVal);
+                } else {
+                    $this->reportsto->ViewValue = $this->reportsto->Lookup !== null && is_array($this->reportsto->Lookup->Options) ? $curVal : null;
+                }
+                if ($this->reportsto->ViewValue !== null) { // Load from cache
+                    $this->reportsto->EditValue = array_values($this->reportsto->Lookup->Options);
+                } else { // Lookup from database
+                    if ($curVal == "") {
+                        $filterWrk = "0=1";
+                    } else {
+                        $filterWrk = "\"id\"" . SearchString("=", $this->reportsto->CurrentValue, DATATYPE_NUMBER, "");
+                    }
+                    $sqlWrk = $this->reportsto->Lookup->getSql(true, $filterWrk, '', $this);
                     $rswrk = Conn()->executeQuery($sqlWrk)->fetchAll(\PDO::FETCH_BOTH);
                     $ari = count($rswrk);
-                    if ($ari > 0) { // Lookup values found
-                        $arwrk = $this->reportsto->Lookup->renderViewRow($rswrk[0]);
-                        $this->reportsto->EditValue = $this->reportsto->displayValue($arwrk);
-                    } else {
-                        $this->reportsto->EditValue = HtmlEncode($this->reportsto->CurrentValue);
-                    }
+                    $arwrk = $rswrk;
+                    $this->reportsto->EditValue = $arwrk;
                 }
-            } else {
-                $this->reportsto->EditValue = null;
+                $this->reportsto->PlaceHolder = RemoveHtml($this->reportsto->caption());
             }
-            $this->reportsto->PlaceHolder = RemoveHtml($this->reportsto->caption());
 
             // Add refer script
+
+            // id
+            $this->id->LinkCustomAttributes = "";
+            $this->id->HrefValue = "";
+
+            // name
+            $this->name->LinkCustomAttributes = "";
+            $this->name->HrefValue = "";
+
+            // username
+            $this->_username->LinkCustomAttributes = "";
+            $this->_username->HrefValue = "";
+
+            // password
+            $this->_password->LinkCustomAttributes = "";
+            $this->_password->HrefValue = "";
+
+            // email
+            $this->_email->LinkCustomAttributes = "";
+            $this->_email->HrefValue = "";
+
+            // user_type
+            $this->user_type->LinkCustomAttributes = "";
+            $this->user_type->HrefValue = "";
+
+            // vendor_id
+            $this->vendor_id->LinkCustomAttributes = "";
+            $this->vendor_id->HrefValue = "";
+
+            // reportsto
+            $this->reportsto->LinkCustomAttributes = "";
+            $this->reportsto->HrefValue = "";
+        } elseif ($this->RowType == ROWTYPE_EDIT) {
+            // id
+            $this->id->EditAttrs["class"] = "form-control";
+            $this->id->EditCustomAttributes = "";
+            $this->id->EditValue = $this->id->CurrentValue;
+            $this->id->ViewCustomAttributes = "";
+
+            // name
+            $this->name->EditAttrs["class"] = "form-control";
+            $this->name->EditCustomAttributes = "";
+            $this->name->EditValue = HtmlEncode($this->name->CurrentValue);
+            $this->name->PlaceHolder = RemoveHtml($this->name->caption());
+
+            // username
+            $this->_username->EditAttrs["class"] = "form-control";
+            $this->_username->EditCustomAttributes = "";
+            $this->_username->EditValue = HtmlEncode($this->_username->CurrentValue);
+            $this->_username->PlaceHolder = RemoveHtml($this->_username->caption());
+
+            // password
+            $this->_password->EditAttrs["class"] = "form-control";
+            $this->_password->EditCustomAttributes = "";
+            $this->_password->EditValue = $Language->phrase("PasswordMask"); // Show as masked password
+            $this->_password->PlaceHolder = RemoveHtml($this->_password->caption());
+
+            // email
+            $this->_email->EditAttrs["class"] = "form-control";
+            $this->_email->EditCustomAttributes = "";
+            if (!$this->_email->Raw) {
+                $this->_email->CurrentValue = HtmlDecode($this->_email->CurrentValue);
+            }
+            $this->_email->EditValue = HtmlEncode($this->_email->CurrentValue);
+            $this->_email->PlaceHolder = RemoveHtml($this->_email->caption());
+
+            // user_type
+            $this->user_type->EditAttrs["class"] = "form-control";
+            $this->user_type->EditCustomAttributes = "";
+            if (!$Security->canAdmin()) { // System admin
+                $this->user_type->EditValue = $Language->phrase("PasswordMask");
+            } else {
+                $this->user_type->EditValue = $this->user_type->options(true);
+                $this->user_type->PlaceHolder = RemoveHtml($this->user_type->caption());
+            }
+
+            // vendor_id
+            $this->vendor_id->EditAttrs["class"] = "form-control";
+            $this->vendor_id->EditCustomAttributes = "";
+            if ($this->vendor_id->getSessionValue() != "") {
+                $this->vendor_id->CurrentValue = GetForeignKeyValue($this->vendor_id->getSessionValue());
+                $this->vendor_id->OldValue = $this->vendor_id->CurrentValue;
+                $curVal = strval($this->vendor_id->CurrentValue);
+                if ($curVal != "") {
+                    $this->vendor_id->ViewValue = $this->vendor_id->lookupCacheOption($curVal);
+                    if ($this->vendor_id->ViewValue === null) { // Lookup from database
+                        $filterWrk = "\"id\"" . SearchString("=", $curVal, DATATYPE_NUMBER, "");
+                        $sqlWrk = $this->vendor_id->Lookup->getSql(false, $filterWrk, '', $this, true);
+                        $rswrk = Conn()->executeQuery($sqlWrk)->fetchAll(\PDO::FETCH_BOTH);
+                        $ari = count($rswrk);
+                        if ($ari > 0) { // Lookup values found
+                            $arwrk = $this->vendor_id->Lookup->renderViewRow($rswrk[0]);
+                            $this->vendor_id->ViewValue = $this->vendor_id->displayValue($arwrk);
+                        } else {
+                            $this->vendor_id->ViewValue = $this->vendor_id->CurrentValue;
+                        }
+                    }
+                } else {
+                    $this->vendor_id->ViewValue = null;
+                }
+                $this->vendor_id->ViewCustomAttributes = "";
+            } elseif (!$Security->isAdmin() && $Security->isLoggedIn() && !$this->userIDAllow($this->CurrentAction)) { // Non system admin
+            } else {
+                $curVal = trim(strval($this->vendor_id->CurrentValue));
+                if ($curVal != "") {
+                    $this->vendor_id->ViewValue = $this->vendor_id->lookupCacheOption($curVal);
+                } else {
+                    $this->vendor_id->ViewValue = $this->vendor_id->Lookup !== null && is_array($this->vendor_id->Lookup->Options) ? $curVal : null;
+                }
+                if ($this->vendor_id->ViewValue !== null) { // Load from cache
+                    $this->vendor_id->EditValue = array_values($this->vendor_id->Lookup->Options);
+                } else { // Lookup from database
+                    if ($curVal == "") {
+                        $filterWrk = "0=1";
+                    } else {
+                        $filterWrk = "\"id\"" . SearchString("=", $this->vendor_id->CurrentValue, DATATYPE_NUMBER, "");
+                    }
+                    $sqlWrk = $this->vendor_id->Lookup->getSql(true, $filterWrk, '', $this);
+                    $rswrk = Conn()->executeQuery($sqlWrk)->fetchAll(\PDO::FETCH_BOTH);
+                    $ari = count($rswrk);
+                    $arwrk = $rswrk;
+                    $this->vendor_id->EditValue = $arwrk;
+                }
+                $this->vendor_id->PlaceHolder = RemoveHtml($this->vendor_id->caption());
+            }
+
+            // reportsto
+            $this->reportsto->EditAttrs["class"] = "form-control";
+            $this->reportsto->EditCustomAttributes = "";
+            if (!$Security->isAdmin() && $Security->isLoggedIn()) { // Non system admin
+                if (SameString($this->vendor_id->CurrentValue, CurrentUserID())) {
+                    $curVal = strval($this->reportsto->CurrentValue);
+                    if ($curVal != "") {
+                        $this->reportsto->EditValue = $this->reportsto->lookupCacheOption($curVal);
+                        if ($this->reportsto->EditValue === null) { // Lookup from database
+                            $filterWrk = "\"id\"" . SearchString("=", $curVal, DATATYPE_NUMBER, "");
+                            $sqlWrk = $this->reportsto->Lookup->getSql(false, $filterWrk, '', $this, true);
+                            $rswrk = Conn()->executeQuery($sqlWrk)->fetchAll(\PDO::FETCH_BOTH);
+                            $ari = count($rswrk);
+                            if ($ari > 0) { // Lookup values found
+                                $arwrk = $this->reportsto->Lookup->renderViewRow($rswrk[0]);
+                                $this->reportsto->EditValue = $this->reportsto->displayValue($arwrk);
+                            } else {
+                                $this->reportsto->EditValue = $this->reportsto->CurrentValue;
+                            }
+                        }
+                    } else {
+                        $this->reportsto->EditValue = null;
+                    }
+                    $this->reportsto->ViewCustomAttributes = "";
+                } else {
+                if (trim(strval($this->reportsto->CurrentValue)) == "") {
+                    $filterWrk = "0=1";
+                } else {
+                    $filterWrk = "\"id\"" . SearchString("=", $this->reportsto->CurrentValue, DATATYPE_NUMBER, "");
+                }
+                $sqlWrk = $this->reportsto->Lookup->getSql(true, $filterWrk, '', $this);
+                $rswrk = Conn()->executeQuery($sqlWrk)->fetchAll(\PDO::FETCH_BOTH);
+                $arwrk = $rswrk;
+                $this->reportsto->EditValue = $arwrk;
+                }
+            } else {
+                $curVal = trim(strval($this->reportsto->CurrentValue));
+                if ($curVal != "") {
+                    $this->reportsto->ViewValue = $this->reportsto->lookupCacheOption($curVal);
+                } else {
+                    $this->reportsto->ViewValue = $this->reportsto->Lookup !== null && is_array($this->reportsto->Lookup->Options) ? $curVal : null;
+                }
+                if ($this->reportsto->ViewValue !== null) { // Load from cache
+                    $this->reportsto->EditValue = array_values($this->reportsto->Lookup->Options);
+                } else { // Lookup from database
+                    if ($curVal == "") {
+                        $filterWrk = "0=1";
+                    } else {
+                        $filterWrk = "\"id\"" . SearchString("=", $this->reportsto->CurrentValue, DATATYPE_NUMBER, "");
+                    }
+                    $sqlWrk = $this->reportsto->Lookup->getSql(true, $filterWrk, '', $this);
+                    $rswrk = Conn()->executeQuery($sqlWrk)->fetchAll(\PDO::FETCH_BOTH);
+                    $ari = count($rswrk);
+                    $arwrk = $rswrk;
+                    $this->reportsto->EditValue = $arwrk;
+                }
+                $this->reportsto->PlaceHolder = RemoveHtml($this->reportsto->caption());
+            }
+
+            // Edit refer script
 
             // id
             $this->id->LinkCustomAttributes = "";
@@ -2740,9 +3092,6 @@ class MainUsersList extends MainUsers
                 $this->reportsto->addErrorMessage(str_replace("%s", $this->reportsto->caption(), $this->reportsto->RequiredErrorMessage));
             }
         }
-        if (!CheckInteger($this->reportsto->FormValue)) {
-            $this->reportsto->addErrorMessage($this->reportsto->getErrorMessage(false));
-        }
 
         // Return validate result
         $validateForm = !$this->hasInvalidFields();
@@ -2833,6 +3182,120 @@ class MainUsersList extends MainUsers
         return $deleteRows;
     }
 
+    // Update record based on key values
+    protected function editRow()
+    {
+        global $Security, $Language;
+        $oldKeyFilter = $this->getRecordFilter();
+        $filter = $this->applyUserIDFilters($oldKeyFilter);
+        $conn = $this->getConnection();
+        $this->CurrentFilter = $filter;
+        $sql = $this->getCurrentSql();
+        $rsold = $conn->fetchAssoc($sql);
+        if (!$rsold) {
+            $this->setFailureMessage($Language->phrase("NoRecord")); // Set no record message
+            $editRow = false; // Update Failed
+        } else {
+            // Save old values
+            $this->loadDbValues($rsold);
+            $rsnew = [];
+
+            // name
+            $this->name->setDbValueDef($rsnew, $this->name->CurrentValue, "", $this->name->ReadOnly);
+
+            // username
+            $this->_username->setDbValueDef($rsnew, $this->_username->CurrentValue, "", $this->_username->ReadOnly);
+
+            // password
+            if (!IsMaskedPassword($this->_password->CurrentValue)) {
+                $this->_password->setDbValueDef($rsnew, $this->_password->CurrentValue, "", $this->_password->ReadOnly || Config("ENCRYPTED_PASSWORD") && $rsold['password'] == $this->_password->CurrentValue);
+            }
+
+            // email
+            $this->_email->setDbValueDef($rsnew, $this->_email->CurrentValue, null, $this->_email->ReadOnly);
+
+            // user_type
+            if ($Security->canAdmin()) { // System admin
+                $this->user_type->setDbValueDef($rsnew, $this->user_type->CurrentValue, null, $this->user_type->ReadOnly);
+            }
+
+            // vendor_id
+            $this->vendor_id->setDbValueDef($rsnew, $this->vendor_id->CurrentValue, null, $this->vendor_id->ReadOnly);
+
+            // reportsto
+            $this->reportsto->setDbValueDef($rsnew, $this->reportsto->CurrentValue, null, $this->reportsto->ReadOnly);
+
+            // Call Row Updating event
+            $updateRow = $this->rowUpdating($rsold, $rsnew);
+            if ($updateRow) {
+                if (count($rsnew) > 0) {
+                    $editRow = $this->update($rsnew, "", $rsold);
+                } else {
+                    $editRow = true; // No field to update
+                }
+                if ($editRow) {
+                }
+            } else {
+                if ($this->getSuccessMessage() != "" || $this->getFailureMessage() != "") {
+                    // Use the message, do nothing
+                } elseif ($this->CancelMessage != "") {
+                    $this->setFailureMessage($this->CancelMessage);
+                    $this->CancelMessage = "";
+                } else {
+                    $this->setFailureMessage($Language->phrase("UpdateCancelled"));
+                }
+                $editRow = false;
+            }
+        }
+
+        // Call Row_Updated event
+        if ($editRow) {
+            $this->rowUpdated($rsold, $rsnew);
+        }
+
+        // Clean upload path if any
+        if ($editRow) {
+        }
+
+        // Write JSON for API request
+        if (IsApi() && $editRow) {
+            $row = $this->getRecordsFromRecordset([$rsnew], true);
+            WriteJson(["success" => true, $this->TableVar => $row]);
+        }
+        return $editRow;
+    }
+
+    // Load row hash
+    protected function loadRowHash()
+    {
+        $filter = $this->getRecordFilter();
+
+        // Load SQL based on filter
+        $this->CurrentFilter = $filter;
+        $sql = $this->getCurrentSql();
+        $conn = $this->getConnection();
+        $row = $conn->fetchAssoc($sql);
+        $this->HashValue = $row ? $this->getRowHash($row) : ""; // Get hash value for record
+    }
+
+    // Get Row Hash
+    public function getRowHash(&$rs)
+    {
+        if (!$rs) {
+            return "";
+        }
+        $row = ($rs instanceof Recordset) ? $rs->fields : $rs;
+        $hash = "";
+        $hash .= GetFieldHash($row['name']); // name
+        $hash .= GetFieldHash($row['username']); // username
+        $hash .= GetFieldHash($row['password']); // password
+        $hash .= GetFieldHash($row['email']); // email
+        $hash .= GetFieldHash($row['user_type']); // user_type
+        $hash .= GetFieldHash($row['vendor_id']); // vendor_id
+        $hash .= GetFieldHash($row['reportsto']); // reportsto
+        return md5($hash);
+    }
+
     // Add record
     protected function addRow($rsold = null)
     {
@@ -2846,6 +3309,18 @@ class MainUsersList extends MainUsers
                 $userIdMsg = str_replace("%c", CurrentUserID(), $Language->phrase("UnAuthorizedUserID"));
                 $userIdMsg = str_replace("%u", $this->vendor_id->CurrentValue, $userIdMsg);
                 $this->setFailureMessage($userIdMsg);
+                return false;
+            }
+        }
+
+        // Check if valid Parent User ID
+        $validParentUser = false;
+        if ($Security->currentUserID() != "" && !EmptyValue($this->reportsto->CurrentValue) && !$Security->isAdmin()) { // Non system admin
+            $validParentUser = $Security->isValidUserID($this->reportsto->CurrentValue);
+            if (!$validParentUser) {
+                $parentUserIdMsg = str_replace("%c", CurrentUserID(), $Language->phrase("UnAuthorizedParentUserID"));
+                $parentUserIdMsg = str_replace("%p", $this->reportsto->CurrentValue, $parentUserIdMsg);
+                $this->setFailureMessage($parentUserIdMsg);
                 return false;
             }
         }

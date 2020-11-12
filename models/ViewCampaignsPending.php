@@ -29,27 +29,33 @@ class ViewCampaignsPending extends DbTable
 
     // Fields
     public $transaction_id;
-    public $campaign_id;
-    public $campaign_name;
-    public $quantity;
-    public $campaign_status;
-    public $print_status;
+    public $campaign;
+    public $transaction_status;
+    public $status_id;
     public $payment_status;
-    public $start_date;
-    public $end_date;
-    public $vendor;
-    public $operator;
-    public $platform;
+    public $payment_date;
     public $inventory;
     public $bus_size;
+    public $vendor;
+    public $operator;
     public $print_stage;
-    public $price;
+    public $platform;
+    public $quantity;
     public $operator_fee;
-    public $agency_fee;
+    public $price;
     public $lamata_fee;
+    public $agency_fee;
     public $lasaa_fee;
     public $printers_fee;
-    public $price_details;
+    public $payment_status_id;
+    public $vendor_id;
+    public $inventory_id;
+    public $platform_id;
+    public $operator_id;
+    public $bus_size_id;
+    public $total;
+    public $start_date;
+    public $end_date;
 
     // Page ID
     public $PageID = ""; // To be overridden by subclass
@@ -79,7 +85,7 @@ class ViewCampaignsPending extends DbTable
         $this->ExportWordColumnWidth = null; // Cell width (PHPWord only)
         $this->DetailAdd = false; // Allow detail add
         $this->DetailEdit = false; // Allow detail edit
-        $this->DetailView = false; // Allow detail view
+        $this->DetailView = true; // Allow detail view
         $this->ShowMultipleDetails = false; // Show multiple details
         $this->GridAddRowCount = 5;
         $this->AllowAddDeleteRow = true; // Allow add/delete row
@@ -88,68 +94,41 @@ class ViewCampaignsPending extends DbTable
 
         // transaction_id
         $this->transaction_id = new DbField('view_campaigns_pending', 'view_campaigns_pending', 'x_transaction_id', 'transaction_id', '"transaction_id"', 'CAST("transaction_id" AS varchar(255))', 3, 4, -1, false, '"transaction_id"', false, false, false, 'FORMATTED TEXT', 'TEXT');
+        $this->transaction_id->IsPrimaryKey = true; // Primary key field
+        $this->transaction_id->IsForeignKey = true; // Foreign key field
         $this->transaction_id->Sortable = true; // Allow sort
         $this->transaction_id->DefaultErrorMessage = $Language->phrase("IncorrectInteger");
         $this->Fields['transaction_id'] = &$this->transaction_id;
 
-        // campaign_id
-        $this->campaign_id = new DbField('view_campaigns_pending', 'view_campaigns_pending', 'x_campaign_id', 'campaign_id', '"campaign_id"', 'CAST("campaign_id" AS varchar(255))', 3, 4, -1, false, '"campaign_id"', false, false, false, 'FORMATTED TEXT', 'TEXT');
-        $this->campaign_id->Sortable = true; // Allow sort
-        $this->campaign_id->DefaultErrorMessage = $Language->phrase("IncorrectInteger");
-        $this->Fields['campaign_id'] = &$this->campaign_id;
+        // campaign
+        $this->campaign = new DbField('view_campaigns_pending', 'view_campaigns_pending', 'x_campaign', 'campaign', '"campaign"', '"campaign"', 201, 0, -1, false, '"campaign"', false, false, false, 'FORMATTED TEXT', 'TEXTAREA');
+        $this->campaign->Sortable = true; // Allow sort
+        $this->Fields['campaign'] = &$this->campaign;
 
-        // campaign_name
-        $this->campaign_name = new DbField('view_campaigns_pending', 'view_campaigns_pending', 'x_campaign_name', 'campaign_name', '"campaign_name"', '"campaign_name"', 201, 0, -1, false, '"campaign_name"', false, false, false, 'FORMATTED TEXT', 'TEXTAREA');
-        $this->campaign_name->Sortable = true; // Allow sort
-        $this->Fields['campaign_name'] = &$this->campaign_name;
+        // transaction_status
+        $this->transaction_status = new DbField('view_campaigns_pending', 'view_campaigns_pending', 'x_transaction_status', 'transaction_status', '"transaction_status"', '"transaction_status"', 200, 0, -1, false, '"transaction_status"', false, false, false, 'FORMATTED TEXT', 'TEXT');
+        $this->transaction_status->Sortable = true; // Allow sort
+        $this->Fields['transaction_status'] = &$this->transaction_status;
 
-        // quantity
-        $this->quantity = new DbField('view_campaigns_pending', 'view_campaigns_pending', 'x_quantity', 'quantity', '"quantity"', 'CAST("quantity" AS varchar(255))', 3, 4, -1, false, '"quantity"', false, false, false, 'FORMATTED TEXT', 'TEXT');
-        $this->quantity->Sortable = true; // Allow sort
-        $this->quantity->DefaultErrorMessage = $Language->phrase("IncorrectInteger");
-        $this->Fields['quantity'] = &$this->quantity;
-
-        // campaign_status
-        $this->campaign_status = new DbField('view_campaigns_pending', 'view_campaigns_pending', 'x_campaign_status', 'campaign_status', '"campaign_status"', '"campaign_status"', 200, 0, -1, false, '"campaign_status"', false, false, false, 'FORMATTED TEXT', 'TEXT');
-        $this->campaign_status->Sortable = true; // Allow sort
-        $this->Fields['campaign_status'] = &$this->campaign_status;
-
-        // print_status
-        $this->print_status = new DbField('view_campaigns_pending', 'view_campaigns_pending', 'x_print_status', 'print_status', '"print_status"', '"print_status"', 200, 0, -1, false, '"print_status"', false, false, false, 'FORMATTED TEXT', 'TEXT');
-        $this->print_status->Sortable = true; // Allow sort
-        $this->Fields['print_status'] = &$this->print_status;
+        // status_id
+        $this->status_id = new DbField('view_campaigns_pending', 'view_campaigns_pending', 'x_status_id', 'status_id', '"status_id"', 'CAST("status_id" AS varchar(255))', 3, 4, -1, false, '"status_id"', false, false, false, 'FORMATTED TEXT', 'SELECT');
+        $this->status_id->Sortable = true; // Allow sort
+        $this->status_id->UsePleaseSelect = true; // Use PleaseSelect by default
+        $this->status_id->PleaseSelectText = $Language->phrase("PleaseSelect"); // "PleaseSelect" text
+        $this->status_id->Lookup = new Lookup('status_id', 'x_transaction_status', false, 'id', ["name","","",""], [], [], [], [], [], [], '', '');
+        $this->status_id->DefaultErrorMessage = $Language->phrase("IncorrectInteger");
+        $this->Fields['status_id'] = &$this->status_id;
 
         // payment_status
         $this->payment_status = new DbField('view_campaigns_pending', 'view_campaigns_pending', 'x_payment_status', 'payment_status', '"payment_status"', '"payment_status"', 200, 0, -1, false, '"payment_status"', false, false, false, 'FORMATTED TEXT', 'TEXT');
         $this->payment_status->Sortable = true; // Allow sort
         $this->Fields['payment_status'] = &$this->payment_status;
 
-        // start_date
-        $this->start_date = new DbField('view_campaigns_pending', 'view_campaigns_pending', 'x_start_date', 'start_date', '"start_date"', CastDateFieldForLike("\"start_date\"", 0, "DB"), 133, 4, 0, false, '"start_date"', false, false, false, 'FORMATTED TEXT', 'TEXT');
-        $this->start_date->Sortable = true; // Allow sort
-        $this->start_date->DefaultErrorMessage = str_replace("%s", $GLOBALS["DATE_FORMAT"], $Language->phrase("IncorrectDate"));
-        $this->Fields['start_date'] = &$this->start_date;
-
-        // end_date
-        $this->end_date = new DbField('view_campaigns_pending', 'view_campaigns_pending', 'x_end_date', 'end_date', '"end_date"', CastDateFieldForLike("\"end_date\"", 0, "DB"), 133, 4, 0, false, '"end_date"', false, false, false, 'FORMATTED TEXT', 'TEXT');
-        $this->end_date->Sortable = true; // Allow sort
-        $this->end_date->DefaultErrorMessage = str_replace("%s", $GLOBALS["DATE_FORMAT"], $Language->phrase("IncorrectDate"));
-        $this->Fields['end_date'] = &$this->end_date;
-
-        // vendor
-        $this->vendor = new DbField('view_campaigns_pending', 'view_campaigns_pending', 'x_vendor', 'vendor', '"vendor"', '"vendor"', 200, 0, -1, false, '"vendor"', false, false, false, 'FORMATTED TEXT', 'TEXT');
-        $this->vendor->Sortable = true; // Allow sort
-        $this->Fields['vendor'] = &$this->vendor;
-
-        // operator
-        $this->operator = new DbField('view_campaigns_pending', 'view_campaigns_pending', 'x_operator', 'operator', '"operator"', '"operator"', 200, 50, -1, false, '"operator"', false, false, false, 'FORMATTED TEXT', 'TEXT');
-        $this->operator->Sortable = true; // Allow sort
-        $this->Fields['operator'] = &$this->operator;
-
-        // platform
-        $this->platform = new DbField('view_campaigns_pending', 'view_campaigns_pending', 'x_platform', 'platform', '"platform"', '"platform"', 200, 50, -1, false, '"platform"', false, false, false, 'FORMATTED TEXT', 'TEXT');
-        $this->platform->Sortable = true; // Allow sort
-        $this->Fields['platform'] = &$this->platform;
+        // payment_date
+        $this->payment_date = new DbField('view_campaigns_pending', 'view_campaigns_pending', 'x_payment_date', 'payment_date', '"payment_date"', CastDateFieldForLike("\"payment_date\"", 0, "DB"), 133, 4, 0, false, '"payment_date"', false, false, false, 'FORMATTED TEXT', 'TEXT');
+        $this->payment_date->Sortable = true; // Allow sort
+        $this->payment_date->DefaultErrorMessage = str_replace("%s", $GLOBALS["DATE_FORMAT"], $Language->phrase("IncorrectDate"));
+        $this->Fields['payment_date'] = &$this->payment_date;
 
         // inventory
         $this->inventory = new DbField('view_campaigns_pending', 'view_campaigns_pending', 'x_inventory', 'inventory', '"inventory"', '"inventory"', 201, 0, -1, false, '"inventory"', false, false, false, 'FORMATTED TEXT', 'TEXTAREA');
@@ -161,16 +140,31 @@ class ViewCampaignsPending extends DbTable
         $this->bus_size->Sortable = true; // Allow sort
         $this->Fields['bus_size'] = &$this->bus_size;
 
+        // vendor
+        $this->vendor = new DbField('view_campaigns_pending', 'view_campaigns_pending', 'x_vendor', 'vendor', '"vendor"', '"vendor"', 200, 0, -1, false, '"vendor"', false, false, false, 'FORMATTED TEXT', 'TEXT');
+        $this->vendor->Sortable = true; // Allow sort
+        $this->Fields['vendor'] = &$this->vendor;
+
+        // operator
+        $this->operator = new DbField('view_campaigns_pending', 'view_campaigns_pending', 'x_operator', 'operator', '"operator"', '"operator"', 200, 50, -1, false, '"operator"', false, false, false, 'FORMATTED TEXT', 'TEXT');
+        $this->operator->Sortable = true; // Allow sort
+        $this->Fields['operator'] = &$this->operator;
+
         // print_stage
         $this->print_stage = new DbField('view_campaigns_pending', 'view_campaigns_pending', 'x_print_stage', 'print_stage', '"print_stage"', '"print_stage"', 201, 0, -1, false, '"print_stage"', false, false, false, 'FORMATTED TEXT', 'TEXTAREA');
         $this->print_stage->Sortable = true; // Allow sort
         $this->Fields['print_stage'] = &$this->print_stage;
 
-        // price
-        $this->price = new DbField('view_campaigns_pending', 'view_campaigns_pending', 'x_price', 'price', '"price"', 'CAST("price" AS varchar(255))', 20, 8, -1, false, '"price"', false, false, false, 'FORMATTED TEXT', 'TEXT');
-        $this->price->Sortable = true; // Allow sort
-        $this->price->DefaultErrorMessage = $Language->phrase("IncorrectInteger");
-        $this->Fields['price'] = &$this->price;
+        // platform
+        $this->platform = new DbField('view_campaigns_pending', 'view_campaigns_pending', 'x_platform', 'platform', '"platform"', '"platform"', 200, 50, -1, false, '"platform"', false, false, false, 'FORMATTED TEXT', 'TEXT');
+        $this->platform->Sortable = true; // Allow sort
+        $this->Fields['platform'] = &$this->platform;
+
+        // quantity
+        $this->quantity = new DbField('view_campaigns_pending', 'view_campaigns_pending', 'x_quantity', 'quantity', '"quantity"', 'CAST("quantity" AS varchar(255))', 3, 4, -1, false, '"quantity"', false, false, false, 'FORMATTED TEXT', 'TEXT');
+        $this->quantity->Sortable = true; // Allow sort
+        $this->quantity->DefaultErrorMessage = $Language->phrase("IncorrectInteger");
+        $this->Fields['quantity'] = &$this->quantity;
 
         // operator_fee
         $this->operator_fee = new DbField('view_campaigns_pending', 'view_campaigns_pending', 'x_operator_fee', 'operator_fee', '"operator_fee"', 'CAST("operator_fee" AS varchar(255))', 20, 8, -1, false, '"operator_fee"', false, false, false, 'FORMATTED TEXT', 'TEXT');
@@ -178,17 +172,23 @@ class ViewCampaignsPending extends DbTable
         $this->operator_fee->DefaultErrorMessage = $Language->phrase("IncorrectInteger");
         $this->Fields['operator_fee'] = &$this->operator_fee;
 
-        // agency_fee
-        $this->agency_fee = new DbField('view_campaigns_pending', 'view_campaigns_pending', 'x_agency_fee', 'agency_fee', '"agency_fee"', 'CAST("agency_fee" AS varchar(255))', 20, 8, -1, false, '"agency_fee"', false, false, false, 'FORMATTED TEXT', 'TEXT');
-        $this->agency_fee->Sortable = true; // Allow sort
-        $this->agency_fee->DefaultErrorMessage = $Language->phrase("IncorrectInteger");
-        $this->Fields['agency_fee'] = &$this->agency_fee;
+        // price
+        $this->price = new DbField('view_campaigns_pending', 'view_campaigns_pending', 'x_price', 'price', '"price"', 'CAST("price" AS varchar(255))', 20, 8, -1, false, '"price"', false, false, false, 'FORMATTED TEXT', 'TEXT');
+        $this->price->Sortable = true; // Allow sort
+        $this->price->DefaultErrorMessage = $Language->phrase("IncorrectInteger");
+        $this->Fields['price'] = &$this->price;
 
         // lamata_fee
         $this->lamata_fee = new DbField('view_campaigns_pending', 'view_campaigns_pending', 'x_lamata_fee', 'lamata_fee', '"lamata_fee"', 'CAST("lamata_fee" AS varchar(255))', 20, 8, -1, false, '"lamata_fee"', false, false, false, 'FORMATTED TEXT', 'TEXT');
         $this->lamata_fee->Sortable = true; // Allow sort
         $this->lamata_fee->DefaultErrorMessage = $Language->phrase("IncorrectInteger");
         $this->Fields['lamata_fee'] = &$this->lamata_fee;
+
+        // agency_fee
+        $this->agency_fee = new DbField('view_campaigns_pending', 'view_campaigns_pending', 'x_agency_fee', 'agency_fee', '"agency_fee"', 'CAST("agency_fee" AS varchar(255))', 20, 8, -1, false, '"agency_fee"', false, false, false, 'FORMATTED TEXT', 'TEXT');
+        $this->agency_fee->Sortable = true; // Allow sort
+        $this->agency_fee->DefaultErrorMessage = $Language->phrase("IncorrectInteger");
+        $this->Fields['agency_fee'] = &$this->agency_fee;
 
         // lasaa_fee
         $this->lasaa_fee = new DbField('view_campaigns_pending', 'view_campaigns_pending', 'x_lasaa_fee', 'lasaa_fee', '"lasaa_fee"', 'CAST("lasaa_fee" AS varchar(255))', 20, 8, -1, false, '"lasaa_fee"', false, false, false, 'FORMATTED TEXT', 'TEXT');
@@ -202,10 +202,60 @@ class ViewCampaignsPending extends DbTable
         $this->printers_fee->DefaultErrorMessage = $Language->phrase("IncorrectInteger");
         $this->Fields['printers_fee'] = &$this->printers_fee;
 
-        // price_details
-        $this->price_details = new DbField('view_campaigns_pending', 'view_campaigns_pending', 'x_price_details', 'price_details', '"price_details"', '"price_details"', 201, 0, -1, false, '"price_details"', false, false, false, 'FORMATTED TEXT', 'TEXTAREA');
-        $this->price_details->Sortable = true; // Allow sort
-        $this->Fields['price_details'] = &$this->price_details;
+        // payment_status_id
+        $this->payment_status_id = new DbField('view_campaigns_pending', 'view_campaigns_pending', 'x_payment_status_id', 'payment_status_id', '"payment_status_id"', 'CAST("payment_status_id" AS varchar(255))', 3, 4, -1, false, '"payment_status_id"', false, false, false, 'FORMATTED TEXT', 'TEXT');
+        $this->payment_status_id->Sortable = true; // Allow sort
+        $this->payment_status_id->DefaultErrorMessage = $Language->phrase("IncorrectInteger");
+        $this->Fields['payment_status_id'] = &$this->payment_status_id;
+
+        // vendor_id
+        $this->vendor_id = new DbField('view_campaigns_pending', 'view_campaigns_pending', 'x_vendor_id', 'vendor_id', '"vendor_id"', 'CAST("vendor_id" AS varchar(255))', 3, 4, -1, false, '"vendor_id"', false, false, false, 'FORMATTED TEXT', 'TEXT');
+        $this->vendor_id->Sortable = true; // Allow sort
+        $this->vendor_id->DefaultErrorMessage = $Language->phrase("IncorrectInteger");
+        $this->Fields['vendor_id'] = &$this->vendor_id;
+
+        // inventory_id
+        $this->inventory_id = new DbField('view_campaigns_pending', 'view_campaigns_pending', 'x_inventory_id', 'inventory_id', '"inventory_id"', 'CAST("inventory_id" AS varchar(255))', 3, 4, -1, false, '"inventory_id"', false, false, false, 'FORMATTED TEXT', 'TEXT');
+        $this->inventory_id->Sortable = true; // Allow sort
+        $this->inventory_id->DefaultErrorMessage = $Language->phrase("IncorrectInteger");
+        $this->Fields['inventory_id'] = &$this->inventory_id;
+
+        // platform_id
+        $this->platform_id = new DbField('view_campaigns_pending', 'view_campaigns_pending', 'x_platform_id', 'platform_id', '"platform_id"', 'CAST("platform_id" AS varchar(255))', 3, 4, -1, false, '"platform_id"', false, false, false, 'FORMATTED TEXT', 'TEXT');
+        $this->platform_id->Sortable = true; // Allow sort
+        $this->platform_id->DefaultErrorMessage = $Language->phrase("IncorrectInteger");
+        $this->Fields['platform_id'] = &$this->platform_id;
+
+        // operator_id
+        $this->operator_id = new DbField('view_campaigns_pending', 'view_campaigns_pending', 'x_operator_id', 'operator_id', '"operator_id"', 'CAST("operator_id" AS varchar(255))', 3, 4, -1, false, '"operator_id"', false, false, false, 'FORMATTED TEXT', 'TEXT');
+        $this->operator_id->Sortable = true; // Allow sort
+        $this->operator_id->DefaultErrorMessage = $Language->phrase("IncorrectInteger");
+        $this->Fields['operator_id'] = &$this->operator_id;
+
+        // bus_size_id
+        $this->bus_size_id = new DbField('view_campaigns_pending', 'view_campaigns_pending', 'x_bus_size_id', 'bus_size_id', '"bus_size_id"', 'CAST("bus_size_id" AS varchar(255))', 3, 4, -1, false, '"bus_size_id"', false, false, false, 'FORMATTED TEXT', 'TEXT');
+        $this->bus_size_id->Sortable = true; // Allow sort
+        $this->bus_size_id->DefaultErrorMessage = $Language->phrase("IncorrectInteger");
+        $this->Fields['bus_size_id'] = &$this->bus_size_id;
+
+        // total
+        $this->total = new DbField('view_campaigns_pending', 'view_campaigns_pending', 'x_total', 'total', 'quantity * operator_fee', 'CAST(quantity * operator_fee AS varchar(255))', 20, 8, -1, false, 'quantity * operator_fee', false, false, false, 'FORMATTED TEXT', 'TEXT');
+        $this->total->IsCustom = true; // Custom field
+        $this->total->Sortable = true; // Allow sort
+        $this->total->DefaultErrorMessage = $Language->phrase("IncorrectInteger");
+        $this->Fields['total'] = &$this->total;
+
+        // start_date
+        $this->start_date = new DbField('view_campaigns_pending', 'view_campaigns_pending', 'x_start_date', 'start_date', '"start_date"', CastDateFieldForLike("\"start_date\"", 0, "DB"), 133, 4, 0, false, '"start_date"', false, false, false, 'FORMATTED TEXT', 'TEXT');
+        $this->start_date->Sortable = true; // Allow sort
+        $this->start_date->DefaultErrorMessage = str_replace("%s", $GLOBALS["DATE_FORMAT"], $Language->phrase("IncorrectDate"));
+        $this->Fields['start_date'] = &$this->start_date;
+
+        // end_date
+        $this->end_date = new DbField('view_campaigns_pending', 'view_campaigns_pending', 'x_end_date', 'end_date', '"end_date"', CastDateFieldForLike("\"end_date\"", 0, "DB"), 133, 4, 0, false, '"end_date"', false, false, false, 'FORMATTED TEXT', 'TEXT');
+        $this->end_date->Sortable = true; // Allow sort
+        $this->end_date->DefaultErrorMessage = str_replace("%s", $GLOBALS["DATE_FORMAT"], $Language->phrase("IncorrectDate"));
+        $this->Fields['end_date'] = &$this->end_date;
     }
 
     // Field Visibility
@@ -245,6 +295,32 @@ class ViewCampaignsPending extends DbTable
         }
     }
 
+    // Current detail table name
+    public function getCurrentDetailTable()
+    {
+        return @$_SESSION[PROJECT_NAME . "_" . $this->TableVar . "_" . Config("TABLE_DETAIL_TABLE")];
+    }
+
+    public function setCurrentDetailTable($v)
+    {
+        $_SESSION[PROJECT_NAME . "_" . $this->TableVar . "_" . Config("TABLE_DETAIL_TABLE")] = $v;
+    }
+
+    // Get detail url
+    public function getDetailUrl()
+    {
+        // Detail url
+        $detailUrl = "";
+        if ($this->getCurrentDetailTable() == "view_buses_assigned") {
+            $detailUrl = Container("view_buses_assigned")->getListUrl() . "?" . Config("TABLE_SHOW_MASTER") . "=" . $this->TableVar;
+            $detailUrl .= "&" . GetForeignKeyUrl("fk_transaction_id", $this->transaction_id->CurrentValue);
+        }
+        if ($detailUrl == "") {
+            $detailUrl = "viewcampaignspendinglist";
+        }
+        return $detailUrl;
+    }
+
     // Table level SQL
     public function getSqlFrom() // From
     {
@@ -263,7 +339,7 @@ class ViewCampaignsPending extends DbTable
 
     public function getSqlSelect() // Select
     {
-        return $this->SqlSelect ?? $this->getQueryBuilder()->select("*");
+        return $this->SqlSelect ?? $this->getQueryBuilder()->select("*, quantity * operator_fee AS \"total\"");
     }
 
     public function sqlSelect() // For backward compatibility
@@ -279,7 +355,7 @@ class ViewCampaignsPending extends DbTable
     public function getSqlWhere() // Where
     {
         $where = ($this->SqlWhere != "") ? $this->SqlWhere : "";
-        $this->DefaultFilter = "";
+        $this->DefaultFilter = "operator_id in (select operator_id from w_vendors_operators where vendor_id = ".Profile()->vendor_id.")";
         AddFilter($where, $this->DefaultFilter);
         return $where;
     }
@@ -588,6 +664,9 @@ class ViewCampaignsPending extends DbTable
             $where = $this->arrayToFilter($where);
         }
         if ($rs) {
+            if (array_key_exists('transaction_id', $rs)) {
+                AddFilter($where, QuotedName('transaction_id', $this->Dbid) . '=' . QuotedValue($rs['transaction_id'], $this->transaction_id->DataType, $this->Dbid));
+            }
         }
         $filter = ($curfilter) ? $this->CurrentFilter : "";
         AddFilter($filter, $where);
@@ -611,27 +690,33 @@ class ViewCampaignsPending extends DbTable
             return;
         }
         $this->transaction_id->DbValue = $row['transaction_id'];
-        $this->campaign_id->DbValue = $row['campaign_id'];
-        $this->campaign_name->DbValue = $row['campaign_name'];
-        $this->quantity->DbValue = $row['quantity'];
-        $this->campaign_status->DbValue = $row['campaign_status'];
-        $this->print_status->DbValue = $row['print_status'];
+        $this->campaign->DbValue = $row['campaign'];
+        $this->transaction_status->DbValue = $row['transaction_status'];
+        $this->status_id->DbValue = $row['status_id'];
         $this->payment_status->DbValue = $row['payment_status'];
-        $this->start_date->DbValue = $row['start_date'];
-        $this->end_date->DbValue = $row['end_date'];
-        $this->vendor->DbValue = $row['vendor'];
-        $this->operator->DbValue = $row['operator'];
-        $this->platform->DbValue = $row['platform'];
+        $this->payment_date->DbValue = $row['payment_date'];
         $this->inventory->DbValue = $row['inventory'];
         $this->bus_size->DbValue = $row['bus_size'];
+        $this->vendor->DbValue = $row['vendor'];
+        $this->operator->DbValue = $row['operator'];
         $this->print_stage->DbValue = $row['print_stage'];
-        $this->price->DbValue = $row['price'];
+        $this->platform->DbValue = $row['platform'];
+        $this->quantity->DbValue = $row['quantity'];
         $this->operator_fee->DbValue = $row['operator_fee'];
-        $this->agency_fee->DbValue = $row['agency_fee'];
+        $this->price->DbValue = $row['price'];
         $this->lamata_fee->DbValue = $row['lamata_fee'];
+        $this->agency_fee->DbValue = $row['agency_fee'];
         $this->lasaa_fee->DbValue = $row['lasaa_fee'];
         $this->printers_fee->DbValue = $row['printers_fee'];
-        $this->price_details->DbValue = $row['price_details'];
+        $this->payment_status_id->DbValue = $row['payment_status_id'];
+        $this->vendor_id->DbValue = $row['vendor_id'];
+        $this->inventory_id->DbValue = $row['inventory_id'];
+        $this->platform_id->DbValue = $row['platform_id'];
+        $this->operator_id->DbValue = $row['operator_id'];
+        $this->bus_size_id->DbValue = $row['bus_size_id'];
+        $this->total->DbValue = $row['total'];
+        $this->start_date->DbValue = $row['start_date'];
+        $this->end_date->DbValue = $row['end_date'];
     }
 
     // Delete uploaded files
@@ -643,13 +728,19 @@ class ViewCampaignsPending extends DbTable
     // Record filter WHERE clause
     protected function sqlKeyFilter()
     {
-        return "";
+        return "\"transaction_id\" = @transaction_id@";
     }
 
     // Get Key
     public function getKey($current = false)
     {
         $keys = [];
+        $val = $current ? $this->transaction_id->CurrentValue : $this->transaction_id->OldValue;
+        if (EmptyValue($val)) {
+            return "";
+        } else {
+            $keys[] = $val;
+        }
         return implode(Config("COMPOSITE_KEY_SEPARATOR"), $keys);
     }
 
@@ -658,7 +749,12 @@ class ViewCampaignsPending extends DbTable
     {
         $this->OldKey = strval($key);
         $keys = explode(Config("COMPOSITE_KEY_SEPARATOR"), $this->OldKey);
-        if (count($keys) == 0) {
+        if (count($keys) == 1) {
+            if ($current) {
+                $this->transaction_id->CurrentValue = $keys[0];
+            } else {
+                $this->transaction_id->OldValue = $keys[0];
+            }
         }
     }
 
@@ -666,6 +762,19 @@ class ViewCampaignsPending extends DbTable
     public function getRecordFilter($row = null)
     {
         $keyFilter = $this->sqlKeyFilter();
+        if (is_array($row)) {
+            $val = array_key_exists('transaction_id', $row) ? $row['transaction_id'] : null;
+        } else {
+            $val = $this->transaction_id->OldValue !== null ? $this->transaction_id->OldValue : $this->transaction_id->CurrentValue;
+        }
+        if (!is_numeric($val)) {
+            return "0=1"; // Invalid key
+        }
+        if ($val === null) {
+            return "0=1"; // Invalid key
+        } else {
+            $keyFilter = str_replace("@transaction_id@", AdjustSql($val, $this->Dbid), $keyFilter); // Replace key value
+        }
         return $keyFilter;
     }
 
@@ -754,7 +863,11 @@ class ViewCampaignsPending extends DbTable
     // Edit URL
     public function getEditUrl($parm = "")
     {
-        $url = $this->keyUrl("viewcampaignspendingedit", $this->getUrlParm($parm));
+        if ($parm != "") {
+            $url = $this->keyUrl("viewcampaignspendingedit", $this->getUrlParm($parm));
+        } else {
+            $url = $this->keyUrl("viewcampaignspendingedit", $this->getUrlParm(Config("TABLE_SHOW_DETAIL") . "="));
+        }
         return $this->addMasterUrl($url);
     }
 
@@ -768,7 +881,11 @@ class ViewCampaignsPending extends DbTable
     // Copy URL
     public function getCopyUrl($parm = "")
     {
-        $url = $this->keyUrl("viewcampaignspendingadd", $this->getUrlParm($parm));
+        if ($parm != "") {
+            $url = $this->keyUrl("viewcampaignspendingadd", $this->getUrlParm($parm));
+        } else {
+            $url = $this->keyUrl("viewcampaignspendingadd", $this->getUrlParm(Config("TABLE_SHOW_DETAIL") . "="));
+        }
         return $this->addMasterUrl($url);
     }
 
@@ -794,6 +911,7 @@ class ViewCampaignsPending extends DbTable
     public function keyToJson($htmlEncode = false)
     {
         $json = "";
+        $json .= "transaction_id:" . JsonEncode($this->transaction_id->CurrentValue, "number");
         $json = "{" . $json . "}";
         if ($htmlEncode) {
             $json = HtmlEncode($json);
@@ -804,6 +922,11 @@ class ViewCampaignsPending extends DbTable
     // Add key value to URL
     public function keyUrl($url, $parm = "")
     {
+        if ($this->transaction_id->CurrentValue !== null) {
+            $url .= "/" . rawurlencode($this->transaction_id->CurrentValue);
+        } else {
+            return "javascript:ew.alert(ew.language.phrase('InvalidRecord'));";
+        }
         if ($parm != "") {
             $url .= "?" . $parm;
         }
@@ -862,12 +985,23 @@ SORTHTML;
             $arKeys = Param("key_m");
             $cnt = count($arKeys);
         } else {
+            if (($keyValue = Param("transaction_id") ?? Route("transaction_id")) !== null) {
+                $arKeys[] = $keyValue;
+            } elseif (IsApi() && (($keyValue = Key(0) ?? Route(2)) !== null)) {
+                $arKeys[] = $keyValue;
+            } else {
+                $arKeys = null; // Do not setup
+            }
+
             //return $arKeys; // Do not return yet, so the values will also be checked by the following code
         }
         // Check keys
         $ar = [];
         if (is_array($arKeys)) {
             foreach ($arKeys as $key) {
+                if (!is_numeric($key)) {
+                    continue;
+                }
                 $ar[] = $key;
             }
         }
@@ -882,6 +1016,11 @@ SORTHTML;
         foreach ($arKeys as $key) {
             if ($keyFilter != "") {
                 $keyFilter .= " OR ";
+            }
+            if ($setCurrent) {
+                $this->transaction_id->CurrentValue = $key;
+            } else {
+                $this->transaction_id->OldValue = $key;
             }
             $keyFilter .= "(" . $this->getRecordFilter() . ")";
         }
@@ -908,27 +1047,33 @@ SORTHTML;
             return;
         }
         $this->transaction_id->setDbValue($row['transaction_id']);
-        $this->campaign_id->setDbValue($row['campaign_id']);
-        $this->campaign_name->setDbValue($row['campaign_name']);
-        $this->quantity->setDbValue($row['quantity']);
-        $this->campaign_status->setDbValue($row['campaign_status']);
-        $this->print_status->setDbValue($row['print_status']);
+        $this->campaign->setDbValue($row['campaign']);
+        $this->transaction_status->setDbValue($row['transaction_status']);
+        $this->status_id->setDbValue($row['status_id']);
         $this->payment_status->setDbValue($row['payment_status']);
-        $this->start_date->setDbValue($row['start_date']);
-        $this->end_date->setDbValue($row['end_date']);
-        $this->vendor->setDbValue($row['vendor']);
-        $this->operator->setDbValue($row['operator']);
-        $this->platform->setDbValue($row['platform']);
+        $this->payment_date->setDbValue($row['payment_date']);
         $this->inventory->setDbValue($row['inventory']);
         $this->bus_size->setDbValue($row['bus_size']);
+        $this->vendor->setDbValue($row['vendor']);
+        $this->operator->setDbValue($row['operator']);
         $this->print_stage->setDbValue($row['print_stage']);
-        $this->price->setDbValue($row['price']);
+        $this->platform->setDbValue($row['platform']);
+        $this->quantity->setDbValue($row['quantity']);
         $this->operator_fee->setDbValue($row['operator_fee']);
-        $this->agency_fee->setDbValue($row['agency_fee']);
+        $this->price->setDbValue($row['price']);
         $this->lamata_fee->setDbValue($row['lamata_fee']);
+        $this->agency_fee->setDbValue($row['agency_fee']);
         $this->lasaa_fee->setDbValue($row['lasaa_fee']);
         $this->printers_fee->setDbValue($row['printers_fee']);
-        $this->price_details->setDbValue($row['price_details']);
+        $this->payment_status_id->setDbValue($row['payment_status_id']);
+        $this->vendor_id->setDbValue($row['vendor_id']);
+        $this->inventory_id->setDbValue($row['inventory_id']);
+        $this->platform_id->setDbValue($row['platform_id']);
+        $this->operator_id->setDbValue($row['operator_id']);
+        $this->bus_size_id->setDbValue($row['bus_size_id']);
+        $this->total->setDbValue($row['total']);
+        $this->start_date->setDbValue($row['start_date']);
+        $this->end_date->setDbValue($row['end_date']);
     }
 
     // Render list row values
@@ -942,101 +1087,136 @@ SORTHTML;
         // Common render codes
 
         // transaction_id
+        $this->transaction_id->CellCssStyle = "white-space: nowrap;";
 
-        // campaign_id
+        // campaign
+        $this->campaign->CellCssStyle = "white-space: nowrap;";
 
-        // campaign_name
+        // transaction_status
+        $this->transaction_status->CellCssStyle = "white-space: nowrap;";
 
-        // quantity
-
-        // campaign_status
-
-        // print_status
+        // status_id
+        $this->status_id->CellCssStyle = "white-space: nowrap;";
 
         // payment_status
+        $this->payment_status->CellCssStyle = "white-space: nowrap;";
 
-        // start_date
-
-        // end_date
-
-        // vendor
-
-        // operator
-
-        // platform
+        // payment_date
+        $this->payment_date->CellCssStyle = "white-space: nowrap;";
 
         // inventory
+        $this->inventory->CellCssStyle = "white-space: nowrap;";
 
         // bus_size
+        $this->bus_size->CellCssStyle = "white-space: nowrap;";
+
+        // vendor
+        $this->vendor->CellCssStyle = "white-space: nowrap;";
+
+        // operator
+        $this->operator->CellCssStyle = "white-space: nowrap;";
 
         // print_stage
+        $this->print_stage->CellCssStyle = "white-space: nowrap;";
 
-        // price
+        // platform
+        $this->platform->CellCssStyle = "white-space: nowrap;";
+
+        // quantity
+        $this->quantity->CellCssStyle = "white-space: nowrap;";
 
         // operator_fee
+        $this->operator_fee->CellCssStyle = "white-space: nowrap;";
 
-        // agency_fee
+        // price
+        $this->price->CellCssStyle = "white-space: nowrap;";
 
         // lamata_fee
+        $this->lamata_fee->CellCssStyle = "white-space: nowrap;";
+
+        // agency_fee
+        $this->agency_fee->CellCssStyle = "white-space: nowrap;";
 
         // lasaa_fee
+        $this->lasaa_fee->CellCssStyle = "white-space: nowrap;";
 
         // printers_fee
+        $this->printers_fee->CellCssStyle = "white-space: nowrap;";
 
-        // price_details
+        // payment_status_id
+        $this->payment_status_id->CellCssStyle = "white-space: nowrap;";
+
+        // vendor_id
+        $this->vendor_id->CellCssStyle = "white-space: nowrap;";
+
+        // inventory_id
+        $this->inventory_id->CellCssStyle = "white-space: nowrap;";
+
+        // platform_id
+        $this->platform_id->CellCssStyle = "white-space: nowrap;";
+
+        // operator_id
+        $this->operator_id->CellCssStyle = "white-space: nowrap;";
+
+        // bus_size_id
+        $this->bus_size_id->CellCssStyle = "white-space: nowrap;";
+
+        // total
+        $this->total->CellCssStyle = "white-space: nowrap;";
+
+        // start_date
+        $this->start_date->CellCssStyle = "white-space: nowrap;";
+
+        // end_date
+        $this->end_date->CellCssStyle = "white-space: nowrap;";
 
         // transaction_id
         $this->transaction_id->ViewValue = $this->transaction_id->CurrentValue;
         $this->transaction_id->ViewValue = FormatNumber($this->transaction_id->ViewValue, 0, -2, -2, -2);
         $this->transaction_id->ViewCustomAttributes = "";
 
-        // campaign_id
-        $this->campaign_id->ViewValue = $this->campaign_id->CurrentValue;
-        $this->campaign_id->ViewValue = FormatNumber($this->campaign_id->ViewValue, 0, -2, -2, -2);
-        $this->campaign_id->ViewCustomAttributes = "";
+        // campaign
+        $this->campaign->ViewValue = $this->campaign->CurrentValue;
+        $this->campaign->CssClass = "font-weight-bold";
+        $this->campaign->ViewCustomAttributes = "";
 
-        // campaign_name
-        $this->campaign_name->ViewValue = $this->campaign_name->CurrentValue;
-        $this->campaign_name->ViewCustomAttributes = "";
+        // transaction_status
+        $this->transaction_status->ViewValue = $this->transaction_status->CurrentValue;
+        $this->transaction_status->CellCssStyle .= "text-align: center;";
+        $this->transaction_status->ViewCustomAttributes = "";
 
-        // quantity
-        $this->quantity->ViewValue = $this->quantity->CurrentValue;
-        $this->quantity->ViewValue = FormatNumber($this->quantity->ViewValue, 0, -2, -2, -2);
-        $this->quantity->ViewCustomAttributes = "";
-
-        // campaign_status
-        $this->campaign_status->ViewValue = $this->campaign_status->CurrentValue;
-        $this->campaign_status->ViewCustomAttributes = "";
-
-        // print_status
-        $this->print_status->ViewValue = $this->print_status->CurrentValue;
-        $this->print_status->ViewCustomAttributes = "";
+        // status_id
+        $curVal = strval($this->status_id->CurrentValue);
+        if ($curVal != "") {
+            $this->status_id->ViewValue = $this->status_id->lookupCacheOption($curVal);
+            if ($this->status_id->ViewValue === null) { // Lookup from database
+                $filterWrk = "\"id\"" . SearchString("=", $curVal, DATATYPE_NUMBER, "");
+                $sqlWrk = $this->status_id->Lookup->getSql(false, $filterWrk, '', $this, true);
+                $rswrk = Conn()->executeQuery($sqlWrk)->fetchAll(\PDO::FETCH_BOTH);
+                $ari = count($rswrk);
+                if ($ari > 0) { // Lookup values found
+                    $arwrk = $this->status_id->Lookup->renderViewRow($rswrk[0]);
+                    $this->status_id->ViewValue = $this->status_id->displayValue($arwrk);
+                } else {
+                    $this->status_id->ViewValue = $this->status_id->CurrentValue;
+                }
+            }
+        } else {
+            $this->status_id->ViewValue = null;
+        }
+        $this->status_id->CellCssStyle .= "text-align: center;";
+        $this->status_id->ViewCustomAttributes = "";
 
         // payment_status
         $this->payment_status->ViewValue = $this->payment_status->CurrentValue;
-        $this->payment_status->ViewCustomAttributes = "";
+        $this->payment_status->CellCssStyle .= "text-align: center;";
+        $this->payment_status->ViewCustomAttributes = 'class="badge bg-success"';
 
-        // start_date
-        $this->start_date->ViewValue = $this->start_date->CurrentValue;
-        $this->start_date->ViewValue = FormatDateTime($this->start_date->ViewValue, 0);
-        $this->start_date->ViewCustomAttributes = "";
-
-        // end_date
-        $this->end_date->ViewValue = $this->end_date->CurrentValue;
-        $this->end_date->ViewValue = FormatDateTime($this->end_date->ViewValue, 0);
-        $this->end_date->ViewCustomAttributes = "";
-
-        // vendor
-        $this->vendor->ViewValue = $this->vendor->CurrentValue;
-        $this->vendor->ViewCustomAttributes = "";
-
-        // operator
-        $this->operator->ViewValue = $this->operator->CurrentValue;
-        $this->operator->ViewCustomAttributes = "";
-
-        // platform
-        $this->platform->ViewValue = $this->platform->CurrentValue;
-        $this->platform->ViewCustomAttributes = "";
+        // payment_date
+        $this->payment_date->ViewValue = $this->payment_date->CurrentValue;
+        $this->payment_date->ViewValue = FormatDateTime($this->payment_date->ViewValue, 0);
+        $this->payment_date->CellCssStyle .= "text-align: center;";
+        $this->payment_date->ViewCustomAttributes = "";
 
         // inventory
         $this->inventory->ViewValue = $this->inventory->CurrentValue;
@@ -1046,29 +1226,48 @@ SORTHTML;
         $this->bus_size->ViewValue = $this->bus_size->CurrentValue;
         $this->bus_size->ViewCustomAttributes = "";
 
+        // vendor
+        $this->vendor->ViewValue = $this->vendor->CurrentValue;
+        $this->vendor->ViewCustomAttributes = "";
+
+        // operator
+        $this->operator->ViewValue = $this->operator->CurrentValue;
+        $this->operator->ViewCustomAttributes = "";
+
         // print_stage
         $this->print_stage->ViewValue = $this->print_stage->CurrentValue;
         $this->print_stage->ViewCustomAttributes = "";
+
+        // platform
+        $this->platform->ViewValue = $this->platform->CurrentValue;
+        $this->platform->ViewCustomAttributes = "";
+
+        // quantity
+        $this->quantity->ViewValue = $this->quantity->CurrentValue;
+        $this->quantity->ViewValue = FormatNumber($this->quantity->ViewValue, 0, -2, -2, -2);
+        $this->quantity->CellCssStyle .= "text-align: right;";
+        $this->quantity->ViewCustomAttributes = "";
+
+        // operator_fee
+        $this->operator_fee->ViewValue = $this->operator_fee->CurrentValue;
+        $this->operator_fee->ViewValue = FormatNumber($this->operator_fee->ViewValue, 0, -2, -2, -2);
+        $this->operator_fee->CellCssStyle .= "text-align: right;";
+        $this->operator_fee->ViewCustomAttributes = "";
 
         // price
         $this->price->ViewValue = $this->price->CurrentValue;
         $this->price->ViewValue = FormatNumber($this->price->ViewValue, 0, -2, -2, -2);
         $this->price->ViewCustomAttributes = "";
 
-        // operator_fee
-        $this->operator_fee->ViewValue = $this->operator_fee->CurrentValue;
-        $this->operator_fee->ViewValue = FormatNumber($this->operator_fee->ViewValue, 0, -2, -2, -2);
-        $this->operator_fee->ViewCustomAttributes = "";
+        // lamata_fee
+        $this->lamata_fee->ViewValue = $this->lamata_fee->CurrentValue;
+        $this->lamata_fee->ViewValue = FormatNumber($this->lamata_fee->ViewValue, 0, -2, -2, -2);
+        $this->lamata_fee->ViewCustomAttributes = "";
 
         // agency_fee
         $this->agency_fee->ViewValue = $this->agency_fee->CurrentValue;
         $this->agency_fee->ViewValue = FormatNumber($this->agency_fee->ViewValue, 0, -2, -2, -2);
         $this->agency_fee->ViewCustomAttributes = "";
-
-        // lamata_fee
-        $this->lamata_fee->ViewValue = $this->lamata_fee->CurrentValue;
-        $this->lamata_fee->ViewValue = FormatNumber($this->lamata_fee->ViewValue, 0, -2, -2, -2);
-        $this->lamata_fee->ViewCustomAttributes = "";
 
         // lasaa_fee
         $this->lasaa_fee->ViewValue = $this->lasaa_fee->CurrentValue;
@@ -1080,54 +1279,109 @@ SORTHTML;
         $this->printers_fee->ViewValue = FormatNumber($this->printers_fee->ViewValue, 0, -2, -2, -2);
         $this->printers_fee->ViewCustomAttributes = "";
 
-        // price_details
-        $this->price_details->ViewValue = $this->price_details->CurrentValue;
-        $this->price_details->ViewCustomAttributes = "";
+        // payment_status_id
+        $this->payment_status_id->ViewValue = $this->payment_status_id->CurrentValue;
+        $this->payment_status_id->ViewValue = FormatNumber($this->payment_status_id->ViewValue, 0, -2, -2, -2);
+        $this->payment_status_id->ViewCustomAttributes = "";
+
+        // vendor_id
+        $this->vendor_id->ViewValue = $this->vendor_id->CurrentValue;
+        $this->vendor_id->ViewValue = FormatNumber($this->vendor_id->ViewValue, 0, -2, -2, -2);
+        $this->vendor_id->ViewCustomAttributes = "";
+
+        // inventory_id
+        $this->inventory_id->ViewValue = $this->inventory_id->CurrentValue;
+        $this->inventory_id->ViewValue = FormatNumber($this->inventory_id->ViewValue, 0, -2, -2, -2);
+        $this->inventory_id->ViewCustomAttributes = "";
+
+        // platform_id
+        $this->platform_id->ViewValue = $this->platform_id->CurrentValue;
+        $this->platform_id->ViewValue = FormatNumber($this->platform_id->ViewValue, 0, -2, -2, -2);
+        $this->platform_id->ViewCustomAttributes = "";
+
+        // operator_id
+        $this->operator_id->ViewValue = $this->operator_id->CurrentValue;
+        $this->operator_id->ViewValue = FormatNumber($this->operator_id->ViewValue, 0, -2, -2, -2);
+        $this->operator_id->ViewCustomAttributes = "";
+
+        // bus_size_id
+        $this->bus_size_id->ViewValue = $this->bus_size_id->CurrentValue;
+        $this->bus_size_id->ViewValue = FormatNumber($this->bus_size_id->ViewValue, 0, -2, -2, -2);
+        $this->bus_size_id->ViewCustomAttributes = "";
+
+        // total
+        $this->total->ViewValue = $this->total->CurrentValue;
+        $this->total->ViewValue = FormatNumber($this->total->ViewValue, 0, -2, -2, -2);
+        $this->total->CssClass = "font-weight-bold";
+        $this->total->CellCssStyle .= "text-align: right;";
+        $this->total->ViewCustomAttributes = "";
+
+        // start_date
+        $this->start_date->ViewValue = $this->start_date->CurrentValue;
+        $this->start_date->ViewValue = FormatDateTime($this->start_date->ViewValue, 0);
+        $this->start_date->ViewCustomAttributes = "";
+
+        // end_date
+        $this->end_date->ViewValue = $this->end_date->CurrentValue;
+        $this->end_date->ViewValue = FormatDateTime($this->end_date->ViewValue, 0);
+        $this->end_date->ViewCustomAttributes = "";
 
         // transaction_id
         $this->transaction_id->LinkCustomAttributes = "";
         $this->transaction_id->HrefValue = "";
         $this->transaction_id->TooltipValue = "";
 
-        // campaign_id
-        $this->campaign_id->LinkCustomAttributes = "";
-        $this->campaign_id->HrefValue = "";
-        $this->campaign_id->TooltipValue = "";
+        // campaign
+        $this->campaign->LinkCustomAttributes = "";
+        $this->campaign->HrefValue = "";
+        $this->campaign->TooltipValue = "";
 
-        // campaign_name
-        $this->campaign_name->LinkCustomAttributes = "";
-        $this->campaign_name->HrefValue = "";
-        $this->campaign_name->TooltipValue = "";
+        // transaction_status
+        $this->transaction_status->LinkCustomAttributes = "";
+        $this->transaction_status->HrefValue = "";
+        $this->transaction_status->TooltipValue = "";
 
-        // quantity
-        $this->quantity->LinkCustomAttributes = "";
-        $this->quantity->HrefValue = "";
-        $this->quantity->TooltipValue = "";
-
-        // campaign_status
-        $this->campaign_status->LinkCustomAttributes = "";
-        $this->campaign_status->HrefValue = "";
-        $this->campaign_status->TooltipValue = "";
-
-        // print_status
-        $this->print_status->LinkCustomAttributes = "";
-        $this->print_status->HrefValue = "";
-        $this->print_status->TooltipValue = "";
+        // status_id
+        $this->status_id->LinkCustomAttributes = "";
+        if (!EmptyValue($this->transaction_id->CurrentValue)) {
+            $this->status_id->HrefValue = (!empty($this->transaction_id->ViewValue) && !is_array($this->transaction_id->ViewValue) ? RemoveHtml($this->transaction_id->ViewValue) : $this->transaction_id->CurrentValue); // Add prefix/suffix
+            $this->status_id->LinkAttrs["target"] = ""; // Add target
+            if ($this->isExport()) {
+                $this->status_id->HrefValue = FullUrl($this->status_id->HrefValue, "href");
+            }
+        } else {
+            $this->status_id->HrefValue = "";
+        }
+        $this->status_id->TooltipValue = "";
 
         // payment_status
         $this->payment_status->LinkCustomAttributes = "";
         $this->payment_status->HrefValue = "";
         $this->payment_status->TooltipValue = "";
 
-        // start_date
-        $this->start_date->LinkCustomAttributes = "";
-        $this->start_date->HrefValue = "";
-        $this->start_date->TooltipValue = "";
+        // payment_date
+        $this->payment_date->LinkCustomAttributes = "";
+        $this->payment_date->HrefValue = "";
+        $this->payment_date->TooltipValue = "";
 
-        // end_date
-        $this->end_date->LinkCustomAttributes = "";
-        $this->end_date->HrefValue = "";
-        $this->end_date->TooltipValue = "";
+        // inventory
+        $this->inventory->LinkCustomAttributes = "";
+        $this->inventory->HrefValue = "";
+        if (!$this->isExport()) {
+            $this->inventory->TooltipValue = strval($this->print_stage->CurrentValue);
+            if ($this->inventory->HrefValue == "") {
+                $this->inventory->HrefValue = "javascript:void(0);";
+            }
+            $this->inventory->LinkAttrs->appendClass("ew-tooltip-link");
+            $this->inventory->LinkAttrs["data-tooltip-id"] = "tt_view_campaigns_pending_x" . (($this->RowType != ROWTYPE_MASTER) ? @$this->RowCount : "") . "_inventory";
+            $this->inventory->LinkAttrs["data-tooltip-width"] = $this->inventory->TooltipWidth;
+            $this->inventory->LinkAttrs["data-placement"] = Config("CSS_FLIP") ? "left" : "right";
+        }
+
+        // bus_size
+        $this->bus_size->LinkCustomAttributes = "";
+        $this->bus_size->HrefValue = "";
+        $this->bus_size->TooltipValue = "";
 
         // vendor
         $this->vendor->LinkCustomAttributes = "";
@@ -1139,45 +1393,40 @@ SORTHTML;
         $this->operator->HrefValue = "";
         $this->operator->TooltipValue = "";
 
-        // platform
-        $this->platform->LinkCustomAttributes = "";
-        $this->platform->HrefValue = "";
-        $this->platform->TooltipValue = "";
-
-        // inventory
-        $this->inventory->LinkCustomAttributes = "";
-        $this->inventory->HrefValue = "";
-        $this->inventory->TooltipValue = "";
-
-        // bus_size
-        $this->bus_size->LinkCustomAttributes = "";
-        $this->bus_size->HrefValue = "";
-        $this->bus_size->TooltipValue = "";
-
         // print_stage
         $this->print_stage->LinkCustomAttributes = "";
         $this->print_stage->HrefValue = "";
         $this->print_stage->TooltipValue = "";
 
-        // price
-        $this->price->LinkCustomAttributes = "";
-        $this->price->HrefValue = "";
-        $this->price->TooltipValue = "";
+        // platform
+        $this->platform->LinkCustomAttributes = "";
+        $this->platform->HrefValue = "";
+        $this->platform->TooltipValue = "";
+
+        // quantity
+        $this->quantity->LinkCustomAttributes = "";
+        $this->quantity->HrefValue = "";
+        $this->quantity->TooltipValue = "";
 
         // operator_fee
         $this->operator_fee->LinkCustomAttributes = "";
         $this->operator_fee->HrefValue = "";
         $this->operator_fee->TooltipValue = "";
 
-        // agency_fee
-        $this->agency_fee->LinkCustomAttributes = "";
-        $this->agency_fee->HrefValue = "";
-        $this->agency_fee->TooltipValue = "";
+        // price
+        $this->price->LinkCustomAttributes = "";
+        $this->price->HrefValue = "";
+        $this->price->TooltipValue = "";
 
         // lamata_fee
         $this->lamata_fee->LinkCustomAttributes = "";
         $this->lamata_fee->HrefValue = "";
         $this->lamata_fee->TooltipValue = "";
+
+        // agency_fee
+        $this->agency_fee->LinkCustomAttributes = "";
+        $this->agency_fee->HrefValue = "";
+        $this->agency_fee->TooltipValue = "";
 
         // lasaa_fee
         $this->lasaa_fee->LinkCustomAttributes = "";
@@ -1189,10 +1438,50 @@ SORTHTML;
         $this->printers_fee->HrefValue = "";
         $this->printers_fee->TooltipValue = "";
 
-        // price_details
-        $this->price_details->LinkCustomAttributes = "";
-        $this->price_details->HrefValue = "";
-        $this->price_details->TooltipValue = "";
+        // payment_status_id
+        $this->payment_status_id->LinkCustomAttributes = "";
+        $this->payment_status_id->HrefValue = "";
+        $this->payment_status_id->TooltipValue = "";
+
+        // vendor_id
+        $this->vendor_id->LinkCustomAttributes = "";
+        $this->vendor_id->HrefValue = "";
+        $this->vendor_id->TooltipValue = "";
+
+        // inventory_id
+        $this->inventory_id->LinkCustomAttributes = "";
+        $this->inventory_id->HrefValue = "";
+        $this->inventory_id->TooltipValue = "";
+
+        // platform_id
+        $this->platform_id->LinkCustomAttributes = "";
+        $this->platform_id->HrefValue = "";
+        $this->platform_id->TooltipValue = "";
+
+        // operator_id
+        $this->operator_id->LinkCustomAttributes = "";
+        $this->operator_id->HrefValue = "";
+        $this->operator_id->TooltipValue = "";
+
+        // bus_size_id
+        $this->bus_size_id->LinkCustomAttributes = "";
+        $this->bus_size_id->HrefValue = "";
+        $this->bus_size_id->TooltipValue = "";
+
+        // total
+        $this->total->LinkCustomAttributes = "";
+        $this->total->HrefValue = "";
+        $this->total->TooltipValue = "";
+
+        // start_date
+        $this->start_date->LinkCustomAttributes = "";
+        $this->start_date->HrefValue = "";
+        $this->start_date->TooltipValue = "";
+
+        // end_date
+        $this->end_date->LinkCustomAttributes = "";
+        $this->end_date->HrefValue = "";
+        $this->end_date->TooltipValue = "";
 
         // Call Row Rendered event
         $this->rowRendered();
@@ -1215,41 +1504,25 @@ SORTHTML;
         $this->transaction_id->EditValue = $this->transaction_id->CurrentValue;
         $this->transaction_id->PlaceHolder = RemoveHtml($this->transaction_id->caption());
 
-        // campaign_id
-        $this->campaign_id->EditAttrs["class"] = "form-control";
-        $this->campaign_id->EditCustomAttributes = "";
-        $this->campaign_id->EditValue = $this->campaign_id->CurrentValue;
-        $this->campaign_id->PlaceHolder = RemoveHtml($this->campaign_id->caption());
+        // campaign
+        $this->campaign->EditAttrs["class"] = "form-control";
+        $this->campaign->EditCustomAttributes = "";
+        $this->campaign->EditValue = $this->campaign->CurrentValue;
+        $this->campaign->PlaceHolder = RemoveHtml($this->campaign->caption());
 
-        // campaign_name
-        $this->campaign_name->EditAttrs["class"] = "form-control";
-        $this->campaign_name->EditCustomAttributes = "";
-        $this->campaign_name->EditValue = $this->campaign_name->CurrentValue;
-        $this->campaign_name->PlaceHolder = RemoveHtml($this->campaign_name->caption());
-
-        // quantity
-        $this->quantity->EditAttrs["class"] = "form-control";
-        $this->quantity->EditCustomAttributes = "";
-        $this->quantity->EditValue = $this->quantity->CurrentValue;
-        $this->quantity->PlaceHolder = RemoveHtml($this->quantity->caption());
-
-        // campaign_status
-        $this->campaign_status->EditAttrs["class"] = "form-control";
-        $this->campaign_status->EditCustomAttributes = "";
-        if (!$this->campaign_status->Raw) {
-            $this->campaign_status->CurrentValue = HtmlDecode($this->campaign_status->CurrentValue);
+        // transaction_status
+        $this->transaction_status->EditAttrs["class"] = "form-control";
+        $this->transaction_status->EditCustomAttributes = "";
+        if (!$this->transaction_status->Raw) {
+            $this->transaction_status->CurrentValue = HtmlDecode($this->transaction_status->CurrentValue);
         }
-        $this->campaign_status->EditValue = $this->campaign_status->CurrentValue;
-        $this->campaign_status->PlaceHolder = RemoveHtml($this->campaign_status->caption());
+        $this->transaction_status->EditValue = $this->transaction_status->CurrentValue;
+        $this->transaction_status->PlaceHolder = RemoveHtml($this->transaction_status->caption());
 
-        // print_status
-        $this->print_status->EditAttrs["class"] = "form-control";
-        $this->print_status->EditCustomAttributes = "";
-        if (!$this->print_status->Raw) {
-            $this->print_status->CurrentValue = HtmlDecode($this->print_status->CurrentValue);
-        }
-        $this->print_status->EditValue = $this->print_status->CurrentValue;
-        $this->print_status->PlaceHolder = RemoveHtml($this->print_status->caption());
+        // status_id
+        $this->status_id->EditAttrs["class"] = "form-control";
+        $this->status_id->EditCustomAttributes = "";
+        $this->status_id->PlaceHolder = RemoveHtml($this->status_id->caption());
 
         // payment_status
         $this->payment_status->EditAttrs["class"] = "form-control";
@@ -1260,17 +1533,23 @@ SORTHTML;
         $this->payment_status->EditValue = $this->payment_status->CurrentValue;
         $this->payment_status->PlaceHolder = RemoveHtml($this->payment_status->caption());
 
-        // start_date
-        $this->start_date->EditAttrs["class"] = "form-control";
-        $this->start_date->EditCustomAttributes = "";
-        $this->start_date->EditValue = FormatDateTime($this->start_date->CurrentValue, 8);
-        $this->start_date->PlaceHolder = RemoveHtml($this->start_date->caption());
+        // payment_date
+        $this->payment_date->EditAttrs["class"] = "form-control";
+        $this->payment_date->EditCustomAttributes = "";
+        $this->payment_date->EditValue = FormatDateTime($this->payment_date->CurrentValue, 8);
+        $this->payment_date->PlaceHolder = RemoveHtml($this->payment_date->caption());
 
-        // end_date
-        $this->end_date->EditAttrs["class"] = "form-control";
-        $this->end_date->EditCustomAttributes = "";
-        $this->end_date->EditValue = FormatDateTime($this->end_date->CurrentValue, 8);
-        $this->end_date->PlaceHolder = RemoveHtml($this->end_date->caption());
+        // inventory
+        $this->inventory->EditAttrs["class"] = "form-control";
+        $this->inventory->EditCustomAttributes = "";
+        $this->inventory->EditValue = $this->inventory->CurrentValue;
+        $this->inventory->PlaceHolder = RemoveHtml($this->inventory->caption());
+
+        // bus_size
+        $this->bus_size->EditAttrs["class"] = "form-control";
+        $this->bus_size->EditCustomAttributes = "";
+        $this->bus_size->EditValue = $this->bus_size->CurrentValue;
+        $this->bus_size->PlaceHolder = RemoveHtml($this->bus_size->caption());
 
         // vendor
         $this->vendor->EditAttrs["class"] = "form-control";
@@ -1290,6 +1569,12 @@ SORTHTML;
         $this->operator->EditValue = $this->operator->CurrentValue;
         $this->operator->PlaceHolder = RemoveHtml($this->operator->caption());
 
+        // print_stage
+        $this->print_stage->EditAttrs["class"] = "form-control";
+        $this->print_stage->EditCustomAttributes = "";
+        $this->print_stage->EditValue = $this->print_stage->CurrentValue;
+        $this->print_stage->PlaceHolder = RemoveHtml($this->print_stage->caption());
+
         // platform
         $this->platform->EditAttrs["class"] = "form-control";
         $this->platform->EditCustomAttributes = "";
@@ -1299,29 +1584,11 @@ SORTHTML;
         $this->platform->EditValue = $this->platform->CurrentValue;
         $this->platform->PlaceHolder = RemoveHtml($this->platform->caption());
 
-        // inventory
-        $this->inventory->EditAttrs["class"] = "form-control";
-        $this->inventory->EditCustomAttributes = "";
-        $this->inventory->EditValue = $this->inventory->CurrentValue;
-        $this->inventory->PlaceHolder = RemoveHtml($this->inventory->caption());
-
-        // bus_size
-        $this->bus_size->EditAttrs["class"] = "form-control";
-        $this->bus_size->EditCustomAttributes = "";
-        $this->bus_size->EditValue = $this->bus_size->CurrentValue;
-        $this->bus_size->PlaceHolder = RemoveHtml($this->bus_size->caption());
-
-        // print_stage
-        $this->print_stage->EditAttrs["class"] = "form-control";
-        $this->print_stage->EditCustomAttributes = "";
-        $this->print_stage->EditValue = $this->print_stage->CurrentValue;
-        $this->print_stage->PlaceHolder = RemoveHtml($this->print_stage->caption());
-
-        // price
-        $this->price->EditAttrs["class"] = "form-control";
-        $this->price->EditCustomAttributes = "";
-        $this->price->EditValue = $this->price->CurrentValue;
-        $this->price->PlaceHolder = RemoveHtml($this->price->caption());
+        // quantity
+        $this->quantity->EditAttrs["class"] = "form-control";
+        $this->quantity->EditCustomAttributes = "";
+        $this->quantity->EditValue = $this->quantity->CurrentValue;
+        $this->quantity->PlaceHolder = RemoveHtml($this->quantity->caption());
 
         // operator_fee
         $this->operator_fee->EditAttrs["class"] = "form-control";
@@ -1329,17 +1596,23 @@ SORTHTML;
         $this->operator_fee->EditValue = $this->operator_fee->CurrentValue;
         $this->operator_fee->PlaceHolder = RemoveHtml($this->operator_fee->caption());
 
-        // agency_fee
-        $this->agency_fee->EditAttrs["class"] = "form-control";
-        $this->agency_fee->EditCustomAttributes = "";
-        $this->agency_fee->EditValue = $this->agency_fee->CurrentValue;
-        $this->agency_fee->PlaceHolder = RemoveHtml($this->agency_fee->caption());
+        // price
+        $this->price->EditAttrs["class"] = "form-control";
+        $this->price->EditCustomAttributes = "";
+        $this->price->EditValue = $this->price->CurrentValue;
+        $this->price->PlaceHolder = RemoveHtml($this->price->caption());
 
         // lamata_fee
         $this->lamata_fee->EditAttrs["class"] = "form-control";
         $this->lamata_fee->EditCustomAttributes = "";
         $this->lamata_fee->EditValue = $this->lamata_fee->CurrentValue;
         $this->lamata_fee->PlaceHolder = RemoveHtml($this->lamata_fee->caption());
+
+        // agency_fee
+        $this->agency_fee->EditAttrs["class"] = "form-control";
+        $this->agency_fee->EditCustomAttributes = "";
+        $this->agency_fee->EditValue = $this->agency_fee->CurrentValue;
+        $this->agency_fee->PlaceHolder = RemoveHtml($this->agency_fee->caption());
 
         // lasaa_fee
         $this->lasaa_fee->EditAttrs["class"] = "form-control";
@@ -1353,11 +1626,59 @@ SORTHTML;
         $this->printers_fee->EditValue = $this->printers_fee->CurrentValue;
         $this->printers_fee->PlaceHolder = RemoveHtml($this->printers_fee->caption());
 
-        // price_details
-        $this->price_details->EditAttrs["class"] = "form-control";
-        $this->price_details->EditCustomAttributes = "";
-        $this->price_details->EditValue = $this->price_details->CurrentValue;
-        $this->price_details->PlaceHolder = RemoveHtml($this->price_details->caption());
+        // payment_status_id
+        $this->payment_status_id->EditAttrs["class"] = "form-control";
+        $this->payment_status_id->EditCustomAttributes = "";
+        $this->payment_status_id->EditValue = $this->payment_status_id->CurrentValue;
+        $this->payment_status_id->PlaceHolder = RemoveHtml($this->payment_status_id->caption());
+
+        // vendor_id
+        $this->vendor_id->EditAttrs["class"] = "form-control";
+        $this->vendor_id->EditCustomAttributes = "";
+        $this->vendor_id->EditValue = $this->vendor_id->CurrentValue;
+        $this->vendor_id->PlaceHolder = RemoveHtml($this->vendor_id->caption());
+
+        // inventory_id
+        $this->inventory_id->EditAttrs["class"] = "form-control";
+        $this->inventory_id->EditCustomAttributes = "";
+        $this->inventory_id->EditValue = $this->inventory_id->CurrentValue;
+        $this->inventory_id->PlaceHolder = RemoveHtml($this->inventory_id->caption());
+
+        // platform_id
+        $this->platform_id->EditAttrs["class"] = "form-control";
+        $this->platform_id->EditCustomAttributes = "";
+        $this->platform_id->EditValue = $this->platform_id->CurrentValue;
+        $this->platform_id->PlaceHolder = RemoveHtml($this->platform_id->caption());
+
+        // operator_id
+        $this->operator_id->EditAttrs["class"] = "form-control";
+        $this->operator_id->EditCustomAttributes = "";
+        $this->operator_id->EditValue = $this->operator_id->CurrentValue;
+        $this->operator_id->PlaceHolder = RemoveHtml($this->operator_id->caption());
+
+        // bus_size_id
+        $this->bus_size_id->EditAttrs["class"] = "form-control";
+        $this->bus_size_id->EditCustomAttributes = "";
+        $this->bus_size_id->EditValue = $this->bus_size_id->CurrentValue;
+        $this->bus_size_id->PlaceHolder = RemoveHtml($this->bus_size_id->caption());
+
+        // total
+        $this->total->EditAttrs["class"] = "form-control";
+        $this->total->EditCustomAttributes = "";
+        $this->total->EditValue = $this->total->CurrentValue;
+        $this->total->PlaceHolder = RemoveHtml($this->total->caption());
+
+        // start_date
+        $this->start_date->EditAttrs["class"] = "form-control";
+        $this->start_date->EditCustomAttributes = "";
+        $this->start_date->EditValue = FormatDateTime($this->start_date->CurrentValue, 8);
+        $this->start_date->PlaceHolder = RemoveHtml($this->start_date->caption());
+
+        // end_date
+        $this->end_date->EditAttrs["class"] = "form-control";
+        $this->end_date->EditCustomAttributes = "";
+        $this->end_date->EditValue = FormatDateTime($this->end_date->CurrentValue, 8);
+        $this->end_date->PlaceHolder = RemoveHtml($this->end_date->caption());
 
         // Call Row Rendered event
         $this->rowRendered();
@@ -1366,11 +1687,30 @@ SORTHTML;
     // Aggregate list row values
     public function aggregateListRowValues()
     {
+            if (is_numeric($this->quantity->CurrentValue)) {
+                $this->quantity->Total += $this->quantity->CurrentValue; // Accumulate total
+            }
+            if (is_numeric($this->operator_fee->CurrentValue)) {
+                $this->operator_fee->Total += $this->operator_fee->CurrentValue; // Accumulate total
+            }
     }
 
     // Aggregate list row (for rendering)
     public function aggregateListRow()
     {
+            $this->quantity->CurrentValue = $this->quantity->Total;
+            $this->quantity->ViewValue = $this->quantity->CurrentValue;
+            $this->quantity->ViewValue = FormatNumber($this->quantity->ViewValue, 0, -2, -2, -2);
+            $this->quantity->CellCssStyle .= "text-align: right;";
+            $this->quantity->ViewCustomAttributes = "";
+            $this->quantity->HrefValue = ""; // Clear href value
+            $this->operator_fee->CurrentValue = $this->operator_fee->Total;
+            $this->operator_fee->ViewValue = $this->operator_fee->CurrentValue;
+            $this->operator_fee->ViewValue = FormatNumber($this->operator_fee->ViewValue, 0, -2, -2, -2);
+            $this->operator_fee->CellCssStyle .= "text-align: right;";
+            $this->operator_fee->ViewCustomAttributes = "";
+            $this->operator_fee->HrefValue = ""; // Clear href value
+
         // Call Row Rendered event
         $this->rowRendered();
     }
@@ -1388,45 +1728,48 @@ SORTHTML;
                 $doc->beginExportRow();
                 if ($exportPageType == "view") {
                     $doc->exportCaption($this->transaction_id);
-                    $doc->exportCaption($this->campaign_id);
-                    $doc->exportCaption($this->campaign_name);
-                    $doc->exportCaption($this->quantity);
-                    $doc->exportCaption($this->campaign_status);
-                    $doc->exportCaption($this->print_status);
+                    $doc->exportCaption($this->campaign);
+                    $doc->exportCaption($this->transaction_status);
                     $doc->exportCaption($this->payment_status);
-                    $doc->exportCaption($this->start_date);
-                    $doc->exportCaption($this->end_date);
-                    $doc->exportCaption($this->vendor);
-                    $doc->exportCaption($this->operator);
-                    $doc->exportCaption($this->platform);
+                    $doc->exportCaption($this->payment_date);
                     $doc->exportCaption($this->inventory);
                     $doc->exportCaption($this->bus_size);
-                    $doc->exportCaption($this->print_stage);
-                    $doc->exportCaption($this->price);
-                    $doc->exportCaption($this->operator_fee);
-                    $doc->exportCaption($this->agency_fee);
-                    $doc->exportCaption($this->lamata_fee);
-                    $doc->exportCaption($this->lasaa_fee);
-                    $doc->exportCaption($this->printers_fee);
-                    $doc->exportCaption($this->price_details);
-                } else {
-                    $doc->exportCaption($this->transaction_id);
-                    $doc->exportCaption($this->campaign_id);
-                    $doc->exportCaption($this->quantity);
-                    $doc->exportCaption($this->campaign_status);
-                    $doc->exportCaption($this->print_status);
-                    $doc->exportCaption($this->payment_status);
-                    $doc->exportCaption($this->start_date);
-                    $doc->exportCaption($this->end_date);
                     $doc->exportCaption($this->vendor);
                     $doc->exportCaption($this->operator);
+                    $doc->exportCaption($this->print_stage);
                     $doc->exportCaption($this->platform);
-                    $doc->exportCaption($this->price);
+                    $doc->exportCaption($this->quantity);
                     $doc->exportCaption($this->operator_fee);
-                    $doc->exportCaption($this->agency_fee);
+                    $doc->exportCaption($this->price);
                     $doc->exportCaption($this->lamata_fee);
+                    $doc->exportCaption($this->agency_fee);
                     $doc->exportCaption($this->lasaa_fee);
                     $doc->exportCaption($this->printers_fee);
+                    $doc->exportCaption($this->payment_status_id);
+                    $doc->exportCaption($this->total);
+                    $doc->exportCaption($this->start_date);
+                    $doc->exportCaption($this->end_date);
+                } else {
+                    $doc->exportCaption($this->transaction_id);
+                    $doc->exportCaption($this->transaction_status);
+                    $doc->exportCaption($this->payment_status);
+                    $doc->exportCaption($this->payment_date);
+                    $doc->exportCaption($this->inventory);
+                    $doc->exportCaption($this->vendor);
+                    $doc->exportCaption($this->operator);
+                    $doc->exportCaption($this->print_stage);
+                    $doc->exportCaption($this->platform);
+                    $doc->exportCaption($this->quantity);
+                    $doc->exportCaption($this->operator_fee);
+                    $doc->exportCaption($this->price);
+                    $doc->exportCaption($this->lamata_fee);
+                    $doc->exportCaption($this->agency_fee);
+                    $doc->exportCaption($this->lasaa_fee);
+                    $doc->exportCaption($this->printers_fee);
+                    $doc->exportCaption($this->payment_status_id);
+                    $doc->exportCaption($this->total);
+                    $doc->exportCaption($this->start_date);
+                    $doc->exportCaption($this->end_date);
                 }
                 $doc->endExportRow();
             }
@@ -1448,6 +1791,7 @@ SORTHTML;
                     }
                 }
                 $this->loadListRowValues($row);
+                $this->aggregateListRowValues(); // Aggregate row values
 
                 // Render row
                 $this->RowType = ROWTYPE_VIEW; // Render view
@@ -1457,45 +1801,48 @@ SORTHTML;
                     $doc->beginExportRow($rowCnt); // Allow CSS styles if enabled
                     if ($exportPageType == "view") {
                         $doc->exportField($this->transaction_id);
-                        $doc->exportField($this->campaign_id);
-                        $doc->exportField($this->campaign_name);
-                        $doc->exportField($this->quantity);
-                        $doc->exportField($this->campaign_status);
-                        $doc->exportField($this->print_status);
+                        $doc->exportField($this->campaign);
+                        $doc->exportField($this->transaction_status);
                         $doc->exportField($this->payment_status);
-                        $doc->exportField($this->start_date);
-                        $doc->exportField($this->end_date);
-                        $doc->exportField($this->vendor);
-                        $doc->exportField($this->operator);
-                        $doc->exportField($this->platform);
+                        $doc->exportField($this->payment_date);
                         $doc->exportField($this->inventory);
                         $doc->exportField($this->bus_size);
-                        $doc->exportField($this->print_stage);
-                        $doc->exportField($this->price);
-                        $doc->exportField($this->operator_fee);
-                        $doc->exportField($this->agency_fee);
-                        $doc->exportField($this->lamata_fee);
-                        $doc->exportField($this->lasaa_fee);
-                        $doc->exportField($this->printers_fee);
-                        $doc->exportField($this->price_details);
-                    } else {
-                        $doc->exportField($this->transaction_id);
-                        $doc->exportField($this->campaign_id);
-                        $doc->exportField($this->quantity);
-                        $doc->exportField($this->campaign_status);
-                        $doc->exportField($this->print_status);
-                        $doc->exportField($this->payment_status);
-                        $doc->exportField($this->start_date);
-                        $doc->exportField($this->end_date);
                         $doc->exportField($this->vendor);
                         $doc->exportField($this->operator);
+                        $doc->exportField($this->print_stage);
                         $doc->exportField($this->platform);
-                        $doc->exportField($this->price);
+                        $doc->exportField($this->quantity);
                         $doc->exportField($this->operator_fee);
-                        $doc->exportField($this->agency_fee);
+                        $doc->exportField($this->price);
                         $doc->exportField($this->lamata_fee);
+                        $doc->exportField($this->agency_fee);
                         $doc->exportField($this->lasaa_fee);
                         $doc->exportField($this->printers_fee);
+                        $doc->exportField($this->payment_status_id);
+                        $doc->exportField($this->total);
+                        $doc->exportField($this->start_date);
+                        $doc->exportField($this->end_date);
+                    } else {
+                        $doc->exportField($this->transaction_id);
+                        $doc->exportField($this->transaction_status);
+                        $doc->exportField($this->payment_status);
+                        $doc->exportField($this->payment_date);
+                        $doc->exportField($this->inventory);
+                        $doc->exportField($this->vendor);
+                        $doc->exportField($this->operator);
+                        $doc->exportField($this->print_stage);
+                        $doc->exportField($this->platform);
+                        $doc->exportField($this->quantity);
+                        $doc->exportField($this->operator_fee);
+                        $doc->exportField($this->price);
+                        $doc->exportField($this->lamata_fee);
+                        $doc->exportField($this->agency_fee);
+                        $doc->exportField($this->lasaa_fee);
+                        $doc->exportField($this->printers_fee);
+                        $doc->exportField($this->payment_status_id);
+                        $doc->exportField($this->total);
+                        $doc->exportField($this->start_date);
+                        $doc->exportField($this->end_date);
                     }
                     $doc->endExportRow($rowCnt);
                 }
@@ -1506,6 +1853,37 @@ SORTHTML;
                 $this->rowExport($row);
             }
             $recordset->moveNext();
+        }
+
+        // Export aggregates (horizontal format only)
+        if ($doc->Horizontal) {
+            $this->RowType = ROWTYPE_AGGREGATE;
+            $this->resetAttributes();
+            $this->aggregateListRow();
+            if (!$doc->ExportCustom) {
+                $doc->beginExportRow(-1);
+                $doc->exportAggregate($this->transaction_id, '');
+                $doc->exportAggregate($this->transaction_status, '');
+                $doc->exportAggregate($this->payment_status, '');
+                $doc->exportAggregate($this->payment_date, '');
+                $doc->exportAggregate($this->inventory, '');
+                $doc->exportAggregate($this->vendor, '');
+                $doc->exportAggregate($this->operator, '');
+                $doc->exportAggregate($this->print_stage, '');
+                $doc->exportAggregate($this->platform, '');
+                $doc->exportAggregate($this->quantity, 'TOTAL');
+                $doc->exportAggregate($this->operator_fee, 'TOTAL');
+                $doc->exportAggregate($this->price, '');
+                $doc->exportAggregate($this->lamata_fee, '');
+                $doc->exportAggregate($this->agency_fee, '');
+                $doc->exportAggregate($this->lasaa_fee, '');
+                $doc->exportAggregate($this->printers_fee, '');
+                $doc->exportAggregate($this->payment_status_id, '');
+                $doc->exportAggregate($this->total, '');
+                $doc->exportAggregate($this->start_date, '');
+                $doc->exportAggregate($this->end_date, '');
+                $doc->endExportRow();
+            }
         }
         if (!$doc->ExportCustom) {
             $doc->exportTableFooter();
@@ -1661,6 +2039,17 @@ SORTHTML;
     {
         // To view properties of field class, use:
         //var_dump($this-><FieldName>);
+          if($this->status_id->DbValue == 4){
+                // APPROVE / DENY TRANSACTIONS
+                $ws = 'style="white-space: nowrap;"';
+                $this->status_id->LinkCustomAttributes = "class='btn-group' ";
+                $onclick_approve = "onclick=\"return ew.submitAction(event, {action: 'approve', method: 'post', msg: 'Approve Campaign (".$this->campaign->ViewValue.") ?', key: " . $this->keyToJson(true) . "});\"";
+                $onclick_deny = "onclick=\"return ew.submitAction(event, {action: 'deny', method: 'post', msg: 'Deny Campaign (".$this->campaign->ViewValue.") ?', key: " . $this->keyToJson(true) . "});\"";
+                $btn_text = '<button type="button" '.$onclick_approve.' '.$ws.' class="btn btn-success">APPROVE</button>';
+                $btn_text .= '<button type="button" '.$onclick_deny.' '.$ws.' class="btn btn-danger">DENY</button>';
+                $this->status_id->ViewValue =  $btn_text;
+                $this->status_id->HrefValue = "#";
+            }
     }
 
     // User ID Filtering event

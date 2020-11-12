@@ -581,7 +581,11 @@ class ZEmailSettingsEdit extends ZEmailSettings
         $this->setupBreadcrumb();
 
         // Render the record
-        $this->RowType = ROWTYPE_EDIT; // Render as Edit
+        if ($this->isConfirm()) { // Confirm page
+            $this->RowType = ROWTYPE_VIEW; // Render as View
+        } else {
+            $this->RowType = ROWTYPE_EDIT; // Render as Edit
+        }
         $this->resetAttributes();
         $this->renderRow();
 

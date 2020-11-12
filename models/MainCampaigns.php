@@ -39,12 +39,10 @@ class MainCampaigns extends DbTable
     public $end_date;
     public $user_id;
     public $vendor_id;
-    public $status_id;
-    public $print_status_id;
-    public $payment_status_id;
     public $ts_last_update;
     public $ts_created;
     public $renewal_stage_id;
+    public $check_status;
 
     // Page ID
     public $PageID = ""; // To be overridden by subclass
@@ -92,6 +90,7 @@ class MainCampaigns extends DbTable
 
         // name
         $this->name = new DbField('main_campaigns', 'main_campaigns', 'x_name', 'name', '"name"', '"name"', 201, 0, -1, false, '"name"', false, false, false, 'FORMATTED TEXT', 'TEXT');
+        $this->name->Required = true; // Required field
         $this->name->Sortable = true; // Allow sort
         $this->name->Lookup = new Lookup('name', 'main_campaigns', false, 'name', ["name","","",""], [], [], [], [], [], [], '', '');
         $this->Fields['name'] = &$this->name;
@@ -138,6 +137,7 @@ class MainCampaigns extends DbTable
 
         // quantity
         $this->quantity = new DbField('main_campaigns', 'main_campaigns', 'x_quantity', 'quantity', '"quantity"', 'CAST("quantity" AS varchar(255))', 3, 4, -1, false, '"quantity"', false, false, false, 'FORMATTED TEXT', 'TEXT');
+        $this->quantity->Required = true; // Required field
         $this->quantity->Sortable = true; // Allow sort
         $this->quantity->DefaultErrorMessage = $Language->phrase("IncorrectInteger");
         $this->quantity->CustomMsg = $Language->FieldPhrase($this->TableVar, $this->quantity->Param, "CustomMsg");
@@ -171,42 +171,13 @@ class MainCampaigns extends DbTable
         // vendor_id
         $this->vendor_id = new DbField('main_campaigns', 'main_campaigns', 'x_vendor_id', 'vendor_id', '"vendor_id"', 'CAST("vendor_id" AS varchar(255))', 3, 4, -1, false, '"vendor_id"', false, false, false, 'FORMATTED TEXT', 'SELECT');
         $this->vendor_id->IsForeignKey = true; // Foreign key field
+        $this->vendor_id->Required = true; // Required field
         $this->vendor_id->Sortable = true; // Allow sort
         $this->vendor_id->UsePleaseSelect = true; // Use PleaseSelect by default
         $this->vendor_id->PleaseSelectText = $Language->phrase("PleaseSelect"); // "PleaseSelect" text
         $this->vendor_id->Lookup = new Lookup('vendor_id', 'y_vendors', false, 'id', ["name","","",""], [], [], [], [], [], [], '', '');
         $this->vendor_id->DefaultErrorMessage = $Language->phrase("IncorrectInteger");
         $this->Fields['vendor_id'] = &$this->vendor_id;
-
-        // status_id
-        $this->status_id = new DbField('main_campaigns', 'main_campaigns', 'x_status_id', 'status_id', '"status_id"', 'CAST("status_id" AS varchar(255))', 3, 4, -1, false, '"status_id"', false, false, false, 'FORMATTED TEXT', 'SELECT');
-        $this->status_id->Nullable = false; // NOT NULL field
-        $this->status_id->Sortable = true; // Allow sort
-        $this->status_id->UsePleaseSelect = true; // Use PleaseSelect by default
-        $this->status_id->PleaseSelectText = $Language->phrase("PleaseSelect"); // "PleaseSelect" text
-        $this->status_id->Lookup = new Lookup('status_id', 'x_campaign_status', false, 'id', ["name","","",""], [], [], [], [], [], [], '', '');
-        $this->status_id->DefaultErrorMessage = $Language->phrase("IncorrectInteger");
-        $this->Fields['status_id'] = &$this->status_id;
-
-        // print_status_id
-        $this->print_status_id = new DbField('main_campaigns', 'main_campaigns', 'x_print_status_id', 'print_status_id', '"print_status_id"', 'CAST("print_status_id" AS varchar(255))', 3, 4, -1, false, '"print_status_id"', false, false, false, 'FORMATTED TEXT', 'SELECT');
-        $this->print_status_id->Nullable = false; // NOT NULL field
-        $this->print_status_id->Sortable = true; // Allow sort
-        $this->print_status_id->UsePleaseSelect = true; // Use PleaseSelect by default
-        $this->print_status_id->PleaseSelectText = $Language->phrase("PleaseSelect"); // "PleaseSelect" text
-        $this->print_status_id->Lookup = new Lookup('print_status_id', 'x_print_status', false, 'id', ["name","","",""], [], [], [], [], [], [], '', '');
-        $this->print_status_id->DefaultErrorMessage = $Language->phrase("IncorrectInteger");
-        $this->Fields['print_status_id'] = &$this->print_status_id;
-
-        // payment_status_id
-        $this->payment_status_id = new DbField('main_campaigns', 'main_campaigns', 'x_payment_status_id', 'payment_status_id', '"payment_status_id"', 'CAST("payment_status_id" AS varchar(255))', 3, 4, -1, false, '"payment_status_id"', false, false, false, 'FORMATTED TEXT', 'SELECT');
-        $this->payment_status_id->Nullable = false; // NOT NULL field
-        $this->payment_status_id->Sortable = true; // Allow sort
-        $this->payment_status_id->UsePleaseSelect = true; // Use PleaseSelect by default
-        $this->payment_status_id->PleaseSelectText = $Language->phrase("PleaseSelect"); // "PleaseSelect" text
-        $this->payment_status_id->Lookup = new Lookup('payment_status_id', 'x_payment_status', false, 'id', ["name","","",""], [], [], [], [], [], [], '', '');
-        $this->payment_status_id->DefaultErrorMessage = $Language->phrase("IncorrectInteger");
-        $this->Fields['payment_status_id'] = &$this->payment_status_id;
 
         // ts_last_update
         $this->ts_last_update = new DbField('main_campaigns', 'main_campaigns', 'x_ts_last_update', 'ts_last_update', '"ts_last_update"', CastDateFieldForLike("\"ts_last_update\"", 0, "DB"), 135, 8, 0, false, '"ts_last_update"', false, false, false, 'FORMATTED TEXT', 'TEXT');
@@ -232,6 +203,12 @@ class MainCampaigns extends DbTable
         $this->renewal_stage_id->Lookup = new Lookup('renewal_stage_id', 'x_renewal_stage', false, 'id', ["name","","",""], [], [], [], [], [], [], '', '');
         $this->renewal_stage_id->DefaultErrorMessage = $Language->phrase("IncorrectInteger");
         $this->Fields['renewal_stage_id'] = &$this->renewal_stage_id;
+
+        // check_status
+        $this->check_status = new DbField('main_campaigns', 'main_campaigns', 'x_check_status', 'check_status', '(select status_json from view_campaign_status where id = main_campaigns.id)', '(select status_json from view_campaign_status where id = main_campaigns.id)', 201, 0, -1, false, '(select status_json from view_campaign_status where id = main_campaigns.id)', false, false, false, 'FORMATTED TEXT', 'TEXTAREA');
+        $this->check_status->IsCustom = true; // Custom field
+        $this->check_status->Sortable = true; // Allow sort
+        $this->Fields['check_status'] = &$this->check_status;
     }
 
     // Field Visibility
@@ -426,7 +403,7 @@ class MainCampaigns extends DbTable
 
     public function getSqlSelect() // Select
     {
-        return $this->SqlSelect ?? $this->getQueryBuilder()->select("*");
+        return $this->SqlSelect ?? $this->getQueryBuilder()->select("*, (select status_json from view_campaign_status where id = main_campaigns.id) AS \"check_status\"");
     }
 
     public function sqlSelect() // For backward compatibility
@@ -826,12 +803,10 @@ class MainCampaigns extends DbTable
         $this->end_date->DbValue = $row['end_date'];
         $this->user_id->DbValue = $row['user_id'];
         $this->vendor_id->DbValue = $row['vendor_id'];
-        $this->status_id->DbValue = $row['status_id'];
-        $this->print_status_id->DbValue = $row['print_status_id'];
-        $this->payment_status_id->DbValue = $row['payment_status_id'];
         $this->ts_last_update->DbValue = $row['ts_last_update'];
         $this->ts_created->DbValue = $row['ts_created'];
         $this->renewal_stage_id->DbValue = $row['renewal_stage_id'];
+        $this->check_status->DbValue = $row['check_status'];
     }
 
     // Delete uploaded files
@@ -1184,12 +1159,10 @@ SORTHTML;
         $this->end_date->setDbValue($row['end_date']);
         $this->user_id->setDbValue($row['user_id']);
         $this->vendor_id->setDbValue($row['vendor_id']);
-        $this->status_id->setDbValue($row['status_id']);
-        $this->print_status_id->setDbValue($row['print_status_id']);
-        $this->payment_status_id->setDbValue($row['payment_status_id']);
         $this->ts_last_update->setDbValue($row['ts_last_update']);
         $this->ts_created->setDbValue($row['ts_created']);
         $this->renewal_stage_id->setDbValue($row['renewal_stage_id']);
+        $this->check_status->setDbValue($row['check_status']);
     }
 
     // Render list row values
@@ -1224,17 +1197,13 @@ SORTHTML;
 
         // vendor_id
 
-        // status_id
-
-        // print_status_id
-
-        // payment_status_id
-
         // ts_last_update
 
         // ts_created
 
         // renewal_stage_id
+
+        // check_status
 
         // id
         $this->id->ViewValue = $this->id->CurrentValue;
@@ -1249,6 +1218,7 @@ SORTHTML;
         if ($dispVal != "") {
             $this->name->ViewValue = $dispVal;
         }
+        $this->name->CssClass = "font-weight-bold";
         $this->name->ViewCustomAttributes = "";
 
         // inventory_id
@@ -1361,7 +1331,11 @@ SORTHTML;
             $this->vendor_id->ViewValue = $this->vendor_id->lookupCacheOption($curVal);
             if ($this->vendor_id->ViewValue === null) { // Lookup from database
                 $filterWrk = "\"id\"" . SearchString("=", $curVal, DATATYPE_NUMBER, "");
-                $sqlWrk = $this->vendor_id->Lookup->getSql(false, $filterWrk, '', $this, true);
+                $lookupFilter = function() {
+                    return ((!IsAdmin())? " id = ".Profile()->vendor_id:"");
+                };
+                $lookupFilter = $lookupFilter->bindTo($this);
+                $sqlWrk = $this->vendor_id->Lookup->getSql(false, $filterWrk, $lookupFilter, $this, true);
                 $rswrk = Conn()->executeQuery($sqlWrk)->fetchAll(\PDO::FETCH_BOTH);
                 $ari = count($rswrk);
                 if ($ari > 0) { // Lookup values found
@@ -1375,69 +1349,6 @@ SORTHTML;
             $this->vendor_id->ViewValue = null;
         }
         $this->vendor_id->ViewCustomAttributes = "";
-
-        // status_id
-        $curVal = strval($this->status_id->CurrentValue);
-        if ($curVal != "") {
-            $this->status_id->ViewValue = $this->status_id->lookupCacheOption($curVal);
-            if ($this->status_id->ViewValue === null) { // Lookup from database
-                $filterWrk = "\"id\"" . SearchString("=", $curVal, DATATYPE_NUMBER, "");
-                $sqlWrk = $this->status_id->Lookup->getSql(false, $filterWrk, '', $this, true);
-                $rswrk = Conn()->executeQuery($sqlWrk)->fetchAll(\PDO::FETCH_BOTH);
-                $ari = count($rswrk);
-                if ($ari > 0) { // Lookup values found
-                    $arwrk = $this->status_id->Lookup->renderViewRow($rswrk[0]);
-                    $this->status_id->ViewValue = $this->status_id->displayValue($arwrk);
-                } else {
-                    $this->status_id->ViewValue = $this->status_id->CurrentValue;
-                }
-            }
-        } else {
-            $this->status_id->ViewValue = null;
-        }
-        $this->status_id->ViewCustomAttributes = "";
-
-        // print_status_id
-        $curVal = strval($this->print_status_id->CurrentValue);
-        if ($curVal != "") {
-            $this->print_status_id->ViewValue = $this->print_status_id->lookupCacheOption($curVal);
-            if ($this->print_status_id->ViewValue === null) { // Lookup from database
-                $filterWrk = "\"id\"" . SearchString("=", $curVal, DATATYPE_NUMBER, "");
-                $sqlWrk = $this->print_status_id->Lookup->getSql(false, $filterWrk, '', $this, true);
-                $rswrk = Conn()->executeQuery($sqlWrk)->fetchAll(\PDO::FETCH_BOTH);
-                $ari = count($rswrk);
-                if ($ari > 0) { // Lookup values found
-                    $arwrk = $this->print_status_id->Lookup->renderViewRow($rswrk[0]);
-                    $this->print_status_id->ViewValue = $this->print_status_id->displayValue($arwrk);
-                } else {
-                    $this->print_status_id->ViewValue = $this->print_status_id->CurrentValue;
-                }
-            }
-        } else {
-            $this->print_status_id->ViewValue = null;
-        }
-        $this->print_status_id->ViewCustomAttributes = "";
-
-        // payment_status_id
-        $curVal = strval($this->payment_status_id->CurrentValue);
-        if ($curVal != "") {
-            $this->payment_status_id->ViewValue = $this->payment_status_id->lookupCacheOption($curVal);
-            if ($this->payment_status_id->ViewValue === null) { // Lookup from database
-                $filterWrk = "\"id\"" . SearchString("=", $curVal, DATATYPE_NUMBER, "");
-                $sqlWrk = $this->payment_status_id->Lookup->getSql(false, $filterWrk, '', $this, true);
-                $rswrk = Conn()->executeQuery($sqlWrk)->fetchAll(\PDO::FETCH_BOTH);
-                $ari = count($rswrk);
-                if ($ari > 0) { // Lookup values found
-                    $arwrk = $this->payment_status_id->Lookup->renderViewRow($rswrk[0]);
-                    $this->payment_status_id->ViewValue = $this->payment_status_id->displayValue($arwrk);
-                } else {
-                    $this->payment_status_id->ViewValue = $this->payment_status_id->CurrentValue;
-                }
-            }
-        } else {
-            $this->payment_status_id->ViewValue = null;
-        }
-        $this->payment_status_id->ViewCustomAttributes = "";
 
         // ts_last_update
         $this->ts_last_update->ViewValue = $this->ts_last_update->CurrentValue;
@@ -1468,7 +1379,12 @@ SORTHTML;
         } else {
             $this->renewal_stage_id->ViewValue = null;
         }
+        $this->renewal_stage_id->CellCssStyle .= "text-align: center;";
         $this->renewal_stage_id->ViewCustomAttributes = "";
+
+        // check_status
+        $this->check_status->ViewValue = $this->check_status->CurrentValue;
+        $this->check_status->ViewCustomAttributes = "";
 
         // id
         $this->id->LinkCustomAttributes = "";
@@ -1525,21 +1441,6 @@ SORTHTML;
         $this->vendor_id->HrefValue = "";
         $this->vendor_id->TooltipValue = "";
 
-        // status_id
-        $this->status_id->LinkCustomAttributes = "";
-        $this->status_id->HrefValue = "";
-        $this->status_id->TooltipValue = "";
-
-        // print_status_id
-        $this->print_status_id->LinkCustomAttributes = "";
-        $this->print_status_id->HrefValue = "";
-        $this->print_status_id->TooltipValue = "";
-
-        // payment_status_id
-        $this->payment_status_id->LinkCustomAttributes = "";
-        $this->payment_status_id->HrefValue = "";
-        $this->payment_status_id->TooltipValue = "";
-
         // ts_last_update
         $this->ts_last_update->LinkCustomAttributes = "";
         $this->ts_last_update->HrefValue = "";
@@ -1552,8 +1453,29 @@ SORTHTML;
 
         // renewal_stage_id
         $this->renewal_stage_id->LinkCustomAttributes = "";
-        $this->renewal_stage_id->HrefValue = "";
+        if (!EmptyValue($this->id->CurrentValue)) {
+            $this->renewal_stage_id->HrefValue = (!empty($this->id->ViewValue) && !is_array($this->id->ViewValue) ? RemoveHtml($this->id->ViewValue) : $this->id->CurrentValue); // Add prefix/suffix
+            $this->renewal_stage_id->LinkAttrs["target"] = ""; // Add target
+            if ($this->isExport()) {
+                $this->renewal_stage_id->HrefValue = FullUrl($this->renewal_stage_id->HrefValue, "href");
+            }
+        } else {
+            $this->renewal_stage_id->HrefValue = "";
+        }
         $this->renewal_stage_id->TooltipValue = "";
+
+        // check_status
+        $this->check_status->LinkCustomAttributes = "";
+        if (!EmptyValue($this->id->CurrentValue)) {
+            $this->check_status->HrefValue = "paymentshandler.php?id=" . (!empty($this->id->ViewValue) && !is_array($this->id->ViewValue) ? RemoveHtml($this->id->ViewValue) : $this->id->CurrentValue); // Add prefix/suffix
+            $this->check_status->LinkAttrs["target"] = ""; // Add target
+            if ($this->isExport()) {
+                $this->check_status->HrefValue = FullUrl($this->check_status->HrefValue, "href");
+            }
+        } else {
+            $this->check_status->HrefValue = "";
+        }
+        $this->check_status->TooltipValue = "";
 
         // Call Row Rendered event
         $this->rowRendered();
@@ -1666,7 +1588,11 @@ SORTHTML;
                 $this->vendor_id->ViewValue = $this->vendor_id->lookupCacheOption($curVal);
                 if ($this->vendor_id->ViewValue === null) { // Lookup from database
                     $filterWrk = "\"id\"" . SearchString("=", $curVal, DATATYPE_NUMBER, "");
-                    $sqlWrk = $this->vendor_id->Lookup->getSql(false, $filterWrk, '', $this, true);
+                    $lookupFilter = function() {
+                        return ((!IsAdmin())? " id = ".Profile()->vendor_id:"");
+                    };
+                    $lookupFilter = $lookupFilter->bindTo($this);
+                    $sqlWrk = $this->vendor_id->Lookup->getSql(false, $filterWrk, $lookupFilter, $this, true);
                     $rswrk = Conn()->executeQuery($sqlWrk)->fetchAll(\PDO::FETCH_BOTH);
                     $ari = count($rswrk);
                     if ($ari > 0) { // Lookup values found
@@ -1681,44 +1607,9 @@ SORTHTML;
             }
             $this->vendor_id->ViewCustomAttributes = "";
         } elseif (!$Security->isAdmin() && $Security->isLoggedIn() && !$this->userIDAllow("info")) { // Non system admin
-            $this->vendor_id->CurrentValue = CurrentUserID();
-            $curVal = strval($this->vendor_id->CurrentValue);
-            if ($curVal != "") {
-                $this->vendor_id->EditValue = $this->vendor_id->lookupCacheOption($curVal);
-                if ($this->vendor_id->EditValue === null) { // Lookup from database
-                    $filterWrk = "\"id\"" . SearchString("=", $curVal, DATATYPE_NUMBER, "");
-                    $sqlWrk = $this->vendor_id->Lookup->getSql(false, $filterWrk, '', $this, true);
-                    $rswrk = Conn()->executeQuery($sqlWrk)->fetchAll(\PDO::FETCH_BOTH);
-                    $ari = count($rswrk);
-                    if ($ari > 0) { // Lookup values found
-                        $arwrk = $this->vendor_id->Lookup->renderViewRow($rswrk[0]);
-                        $this->vendor_id->EditValue = $this->vendor_id->displayValue($arwrk);
-                    } else {
-                        $this->vendor_id->EditValue = $this->vendor_id->CurrentValue;
-                    }
-                }
-            } else {
-                $this->vendor_id->EditValue = null;
-            }
-            $this->vendor_id->ViewCustomAttributes = "";
         } else {
             $this->vendor_id->PlaceHolder = RemoveHtml($this->vendor_id->caption());
         }
-
-        // status_id
-        $this->status_id->EditAttrs["class"] = "form-control";
-        $this->status_id->EditCustomAttributes = "";
-        $this->status_id->PlaceHolder = RemoveHtml($this->status_id->caption());
-
-        // print_status_id
-        $this->print_status_id->EditAttrs["class"] = "form-control";
-        $this->print_status_id->EditCustomAttributes = "";
-        $this->print_status_id->PlaceHolder = RemoveHtml($this->print_status_id->caption());
-
-        // payment_status_id
-        $this->payment_status_id->EditAttrs["class"] = "form-control";
-        $this->payment_status_id->EditCustomAttributes = "";
-        $this->payment_status_id->PlaceHolder = RemoveHtml($this->payment_status_id->caption());
 
         // ts_last_update
         $this->ts_last_update->EditAttrs["class"] = "form-control";
@@ -1736,6 +1627,12 @@ SORTHTML;
         $this->renewal_stage_id->EditAttrs["class"] = "form-control";
         $this->renewal_stage_id->EditCustomAttributes = "";
         $this->renewal_stage_id->PlaceHolder = RemoveHtml($this->renewal_stage_id->caption());
+
+        // check_status
+        $this->check_status->EditAttrs["class"] = "form-control";
+        $this->check_status->EditCustomAttributes = "";
+        $this->check_status->EditValue = $this->check_status->CurrentValue;
+        $this->check_status->PlaceHolder = RemoveHtml($this->check_status->caption());
 
         // Call Row Rendered event
         $this->rowRendered();
@@ -1785,9 +1682,6 @@ SORTHTML;
                     $doc->exportCaption($this->end_date);
                     $doc->exportCaption($this->user_id);
                     $doc->exportCaption($this->vendor_id);
-                    $doc->exportCaption($this->status_id);
-                    $doc->exportCaption($this->print_status_id);
-                    $doc->exportCaption($this->payment_status_id);
                     $doc->exportCaption($this->ts_last_update);
                     $doc->exportCaption($this->ts_created);
                     $doc->exportCaption($this->renewal_stage_id);
@@ -1803,9 +1697,6 @@ SORTHTML;
                     $doc->exportCaption($this->end_date);
                     $doc->exportCaption($this->user_id);
                     $doc->exportCaption($this->vendor_id);
-                    $doc->exportCaption($this->status_id);
-                    $doc->exportCaption($this->print_status_id);
-                    $doc->exportCaption($this->payment_status_id);
                     $doc->exportCaption($this->ts_last_update);
                     $doc->exportCaption($this->ts_created);
                     $doc->exportCaption($this->renewal_stage_id);
@@ -1850,9 +1741,6 @@ SORTHTML;
                         $doc->exportField($this->end_date);
                         $doc->exportField($this->user_id);
                         $doc->exportField($this->vendor_id);
-                        $doc->exportField($this->status_id);
-                        $doc->exportField($this->print_status_id);
-                        $doc->exportField($this->payment_status_id);
                         $doc->exportField($this->ts_last_update);
                         $doc->exportField($this->ts_created);
                         $doc->exportField($this->renewal_stage_id);
@@ -1868,9 +1756,6 @@ SORTHTML;
                         $doc->exportField($this->end_date);
                         $doc->exportField($this->user_id);
                         $doc->exportField($this->vendor_id);
-                        $doc->exportField($this->status_id);
-                        $doc->exportField($this->print_status_id);
-                        $doc->exportField($this->payment_status_id);
                         $doc->exportField($this->ts_last_update);
                         $doc->exportField($this->ts_created);
                         $doc->exportField($this->renewal_stage_id);
@@ -1904,9 +1789,6 @@ SORTHTML;
                 $doc->exportAggregate($this->end_date, '');
                 $doc->exportAggregate($this->user_id, '');
                 $doc->exportAggregate($this->vendor_id, '');
-                $doc->exportAggregate($this->status_id, '');
-                $doc->exportAggregate($this->print_status_id, '');
-                $doc->exportAggregate($this->payment_status_id, '');
                 $doc->exportAggregate($this->ts_last_update, '');
                 $doc->exportAggregate($this->ts_created, '');
                 $doc->exportAggregate($this->renewal_stage_id, '');
@@ -2055,43 +1937,168 @@ SORTHTML;
     }
 
     // Row Inserted event
-    public function rowInserted($rsold, &$rsnew) {
-    	/*
-    	 require_once 'emailrun.php';
-    	 $file = 'emailpeople.txt';
-    	 $sql = "select value from core_settings where name = 'new_campaign';";
-    	 $msg = ExecuteScalar($sql);
-    	 $sql1 = "select u.email, u.name, username, v.name as vendor from users u, vendors v where u.vendor_id = v.id and vendor_id = (
-    select vendor_id from users where username = '".CurrentUserName()."'
-    )";
+    public function rowInserted($rsold, &$rsnew)
+    {
+    	//echo "Row Inserted";
+        $test = false;
+        // GET SPECIAL FUNCTIONS
+        require_once 'views\PrivateFunctions.php';
+
+        // CHECK IF LINUX (PROD) OR WINDOWS (DEV) SERVER
+    	if (strpos($_SERVER['SERVER_NAME'], 'localhost') === false) {
+    		require_once 'emailrun.php';
+        }
+
+        // LOG FILE
+    	$file = 'emailpeople.txt';
+
+        // FETCH TEMPLATE MESSAGE FOR ADMIN
+    	$sql = "select value from z_core_settings where name = 'new_campaign_admin';";
+        $msg = ExecuteScalar($sql);
+
+        // FETCH VENDOR USER DETAILS (email,name,username,vendor name) TO RECEIVE EMAILS
+    	$sql1 = "select
+    	u.email,
+    	u.name,
+    	username,
+    	v.name as vendor,
+    	(select id  from main_campaigns where id = " . $rsnew["id"] . ") as platform_id -- 1 Primero / 2 LBR
+    	from
+    	main_users u,
+    	y_vendors v
+    	where
+    	u.vendor_id = v.id
+    	and
+    	vendor_id = (select vendor_id from main_campaigns where id = " . $rsnew["id"] . ")";
     	$rows = ExecuteRows($sql1);
-    	foreach ($rows as $val) {
-    		$email = $val['email'];
-    		$vendor = $val['vendor'];
-    		$details = <<<EOT
-    <strong>Campaign Name</strong>: {$rsnew[name]} ({$vendor})<br />
-    <strong>Email</strong>: {$email}<br />
-    <strong>Start Date</strong>: {$rsnew[start_date]}<br />
-    <strong>End Date</strong>: {$rsnew[end_date]}<br />
-    <strong>Buses</strong>: {$rsnew[quantity]}<br />
-    <strong>IP</strong>: {$_SERVER['REMOTE_ADDR']}<br />
+    	//$export = var_export($rows,true);
+    	//file_put_contents($file, $export, FILE_APPEND | LOCK_EX);
+        	$rsnewid = $rsnew["id"];
+        	$sql3 = "select
+        	 name, start_date, end_date,
+        (end_date::timestamp - start_date::timestamp) as duration,
+        quantity,
+        to_char(
+        quantity * (select price FROM public.z_price_settings p where p.id = c.price_id)
+        , 'N999,999,999,990'::text) as amount,
+        (select name from y_vendors v where v.id = vendor_id) as vendor,
+    	CASE WHEN platform_id = 1 THEN 
+    	(select value from z_core_settings where name = 'ext_account_details' )
+    	ELSE (select value from z_core_settings where name = 'ext_account_details2' )
+    	END as account_details
+        from main_campaigns c where id = {$rsnewid} ;";
+        	$userrows = ExecuteRows($sql3);
+
+    //
+    	$emailslist_array = [];
+    	$vendorslist_array = [];
+    	foreach ($rows as $v) {
+            if( (strlen($v['email']) > 2 ) && (strlen($v['vendor']) > 2 )){
+                $emailslist_array[] = $v['email'];
+                $vendorslist_array[] = $v['vendor'];
+            }
+    	}
+    	$emailslist = implode(',', $emailslist_array);
+    	$vendorslist = implode(',', array_unique($vendorslist_array));
+    	$vendoremail = $emailslist;
+    	$vendor = $vendorslist;
+        $price_breakdown = determine_price($rsnew['price_id'],$rsnew['quantity'],1);
+        $details1 = <<<EOT
+        <strong>Campaign Name</strong>: {$rsnew['name']} ({$vendor})<br />
+        <strong>Email</strong>: {$vendoremail}<br />
+        <strong>Start Date</strong>: {$rsnew['start_date']}<br />
+        <strong>End Date</strong>: {$rsnew['end_date']}<br />
+        <strong>Buses</strong>: {$rsnew['quantity']}<br /><br />
+        <div>
+            {$price_breakdown}
+        </div>
     EOT;
-    $msg = str_replace('[x_details]',$details,$msg);
+        	$details2 = <<<EOT
+        <strong>IP</strong>: {$_SERVER['REMOTE_ADDR']}<br />
+        <strong>U.A.</strong>: {$_SERVER['HTTP_USER_AGENT']}<br />
+    EOT;
+    	$details = $details1 . $details2;
+    	$msg = str_replace('[x_details]', $details, $msg);
+    	$details = $msg;
+    	// $details = str_replace('[x_unit_price]', $userrows[0]['unit_price'], $details);
+    	// $details = str_replace('[x_discount]', $userrows[0]['discount'], $details);
+    	// $details = str_replace('[x_discounted_unit_price]', $userrows[0]['discounted_unit_price'], $details);
+    	$msg = $details;
+    	//CurrentUserName()
 
-    	 //CurrentUserName()
+    	//Vendor and email
 
-    	 //Vendor and email
+    	//Replace
+    	$subject = "New Exterior Campaign {$rsnew['name']} - ({$vendor})";
+    	$subject = "{$rsnew['name']} - ({$vendor}) - TRANSIT MEDIA ADMIN";
+    	$msgtxt = strip_tags($msg);
+    	if(IsAdmin()){
+        		$msg_notification = "Your Campaign Request has been issued";
+        	}else{
+        		$msg_notification = "Your request has been logged but is still pending. An Approval will be sent to your email address once reviewed.";
+        	}
+    	$this->setSuccessMessage($msg_notification);
+    	#===============================================================
+    	$emailpayload = getEmailPayload('new_campaign_transitmedia');
+    	$exposed_emails = get_emails($emailpayload);
+    	extract($exposed_emails);
+    	$email = $final_to;
+    	$cc = $final_cc;
+    	$bcc = $final_bcc;
+    	debugdump("NEW CAMPAIGN email",$email);
+    	debugdump("NEW CAMPAIGN emailpayload",$emailpayload);
+    	debugdump("NEW CAMPAIGN exposed_emails",$exposed_emails);
+    	#===============================================================
+    	$cmd = "sendTMmail(\"admin@transitmedia.com.ng\", \"$email\", \"$subject\", \"$msg\", \"$msgtxt\");";
+    	if (strpos($_SERVER['SERVER_NAME'], 'localhost') === false) {
+    		//file_put_contents($file, $msg, FILE_APPEND | LOCK_EX);
+    		file_put_contents($file, date("Y-m-d H:i:s") . "\n" . CurrentUserName() . "\n" . $cmd, FILE_APPEND | LOCK_EX);
+    		sendTMmail('admin@transitmedia.com.ng', $email, $subject, $msg, $msgtxt, null, $cc, $bcc);
+    	} else {
+    		sendTMmail('admin@transitmedia.com.ng', $email, $subject, $msg, $msgtxt, null, $cc, $bcc);
+    		if($test){
+    			echo "\n<br>====================================<br>\n";
+    			echo "sendTMmail('admin@transitmedia.com.ng', $email, $subject, $msg, $msgtxt,NULL,$cc,$bcc);";
+    			echo "\n<br>====================================<br>\n";
+    		}
+    	}
+    	#BEGIN SEND EMAIL TO USER
+    	$sql2 = <<<EOT
+    select value from z_core_settings where name = 'new_campaign';
+    EOT;
+    	$msg_user = ExecuteScalar($sql2);
+    	foreach ($userrows as $v) {
+    		$msg_user = str_replace('[x_details]', $details1, $msg_user);
+        	$msg_user = str_replace('[x_amount]', $v['amount'], $msg_user);
+        	$msg_user = str_replace('[x_account_details]', $v['account_details'], $msg_user);
 
-    	 //Replace
-    	 $subject = "New Exterior Campaign {$rsnew[name]} - ({$vendor})";
-    	 $msgtxt = strip_tags($msg);
-    	 $cmd = "sendTMmail(\"admin@transitmedia.com.ng\", \"$email\", \"$subject\", \"$msg\", \"$msgtxt\");";
-
-    //file_put_contents($file, $msg, FILE_APPEND | LOCK_EX);
-    //file_put_contents($file, date("Y-m-d H:i:s")."\n".CurrentUserName()."\n".$cmd, FILE_APPEND | LOCK_EX);
-    	 sendTMmail('admin@transitmedia.com.ng', $email, $subject, $msg, $msgtxt);
-    	 }
-    	 */
+    		// $msg_user = str_replace('[x_unit_price]', $v['unit_price'], $msg_user);
+    		// $msg_user = str_replace('[x_discount]', $v['discount'], $msg_user);
+    		// $msg_user = str_replace('[x_discounted_unit_price]', $v['discounted_unit_price'], $msg_user);
+    		$msg_usertxt = strip_tags($msg_user);
+    		#===============================================================
+    		$emailpayload = getEmailPayload('new_campaign_vendor');
+    		$exposed_emails = get_emails($emailpayload, $vendoremail);
+    		extract($exposed_emails);
+    		$email = $final_to;
+    		$cc = $final_cc;
+    		$bcc = $final_bcc;
+    		debugdump("NEW CAMPAIGN USER email",$email);
+    		debugdump("NEW CAMPAIGN USER emailpayload",$emailpayload);
+    		debugdump("NEW CAMPAIGN USER exposed_emails",$exposed_emails);
+    		#===============================================================
+    		if (strpos($_SERVER['SERVER_NAME'], 'localhost') === false) {
+    			sendTMmail('admin@transitmedia.com.ng', $email, $subject, $msg_user, $msg_usertxt, null, $cc, $bcc);
+    		} else {
+    			sendTMmail('admin@transitmedia.com.ng', $email, $subject, $msg_user, $msg_usertxt, null, $cc, $bcc);
+    			if($test){
+    				echo "\n<br>====================================<br>\n";
+    				echo "sendTMmail('admin@transitmedia.com.ng', $email, $subject, $msg_user, $msg_usertxt,NULL,$cc,$bcc);";
+    				echo "\n<br>====================================<br>\n";
+    			}
+    		}
+    	}
+    	#END SEND EMAIL TO USER
     }
 
     // Row Updating event
@@ -2243,8 +2250,92 @@ SORTHTML;
     // Row Rendered event
     public function rowRendered()
     {
-        // To view properties of field class, use:
+    	// To view properties of field class, use:
         //var_dump($this-><FieldName>);
+        //var_dump($this->renewal_stage_id->ViewValue);
+
+        // RENEWAL
+        	$ws = 'style="white-space: nowrap;"';
+            if($this->renewal_stage_id->DbValue == 1){
+                // INACTIVE
+                $this->renewal_stage_id->LinkCustomAttributes = "$ws class='btn btn-block btn-default disabled' ";
+                // $this->renewal_stage_id->ViewValue = 'CLICK TO RENEW';
+                $this->renewal_stage_id->HrefValue = "#";
+            }
+            if($this->renewal_stage_id->DbValue == 2){
+                // RENEW - AVAILABLE FOR RENEWAL
+                $onclick_renew = "onclick=\"return ew.submitAction(event, {action: 'renew', method: 'ajax', post: 'Request Renewal for Campaign (".$this->name->ViewValue.") ?', key: " . $this->keyToJson(true) . "});\"";
+                $this->renewal_stage_id->LinkCustomAttributes = "$ws $onclick_renew class='btn btn-block btn-warning' ";
+                $this->renewal_stage_id->ViewValue = 'CLICK TO RENEW';
+                $this->renewal_stage_id->HrefValue = "#";
+            }
+            if($this->renewal_stage_id->DbValue == 3){
+                // PENDING RENEWAL APPROVAL
+                $this->renewal_stage_id->LinkCustomAttributes = "class='btn-group' ";
+                $onclick_cancel = "onclick=\"return ew.submitAction(event, {action: 'renewcancel', method: 'post', msg: 'Cancel Renewal Request (".$this->name->ViewValue.") ?', key: " . $this->keyToJson(true) . "});\"";
+                $this->renewal_stage_id->ViewValue = '<button type="button" '.$ws.' class="btn btn-secondary disabled">'.$this->renewal_stage_id->ViewValue.'</button> <button type="button" '.$onclick_cancel.' '.$ws.' class="btn btn-secondary"><i class="fas fa-times-circle"></i></button>';
+                $this->renewal_stage_id->HrefValue = "#";
+            }
+            if($this->renewal_stage_id->DbValue == 4){
+                // RENEWAL APPROVED
+                $this->renewal_stage_id->LinkCustomAttributes = "$ws class='btn btn-block btn-success disabled' ";
+                // $this->renewal_stage_id->ViewValue = 'CLICK TO RENEW';
+                $this->renewal_stage_id->HrefValue = "#";
+            }
+            if($this->renewal_stage_id->DbValue == 5){
+                // CANCELLED
+                $this->renewal_stage_id->LinkCustomAttributes = "$ws class='btn btn-block btn-danger disabled' ";
+                // $this->renewal_stage_id->ViewValue = 'CLICK TO RENEW';
+                $this->renewal_stage_id->HrefValue = "#";
+            }
+
+        // CHECK STATUS
+        $json_txt = $this->check_status->ViewValue;
+        $status_array = json_decode($json_txt,true);
+        if($status_array){
+                // Initialize    		
+                $pending  = (int) $status_array["pending"];
+                $denied  = (int) $status_array["denied"];
+                $approved = (int) $status_array["approved"];
+                $final_attr = "inactive";
+                $final_caption = "inactive";
+                $href_val = "#";
+                if ($pending + $denied + $approved == 0){
+                    // --inactive
+                    $final_attr = "class='btn btn-block btn-info'";
+                    $final_caption = "Inactive";
+                    $href_val = "#";
+                }elseif ($pending > 0 OR $denied + $approved == 0){
+        		    //   --pending
+                    $final_attr = "class='btn btn-block btn-warning'";
+                    $final_caption = "Pending";
+                    $href_val = "maincampaignsview/" . (!empty($this->id->ViewValue) && !is_array($this->id->ViewValue) ? RemoveHtml($this->id->ViewValue) : $this->id->CurrentValue)."?showdetail=main_transactions";
+        	    }else{
+        		    if($denied > 0 and $approved == 0){ 
+        	  		    // --denied
+                        $final_attr = "class='btn btn-block btn-danger'";
+                        $final_caption = "Denied";
+                        $href_val = "maincampaignsview/" . (!empty($this->id->ViewValue) && !is_array($this->id->ViewValue) ? RemoveHtml($this->id->ViewValue) : $this->id->CurrentValue)."?showdetail=main_transactions";
+        	  	    }else if($denied == 0 and $approved > 0){ 
+                          // --approved
+                          $final_attr = "class='btn btn-block btn-success'";
+                          $final_caption = "Approved";
+                          $href_val = "maincampaignsview/" . (!empty($this->id->ViewValue) && !is_array($this->id->ViewValue) ? RemoveHtml($this->id->ViewValue) : $this->id->CurrentValue)."?showdetail=main_transactions";
+        	  	    }else{
+                        //  --approved
+                        $final_attr = "class='btn btn-block btn-success'";
+                        $final_caption = "Approved";
+                        $href_val = "maincampaignsview/" . (!empty($this->id->ViewValue) && !is_array($this->id->ViewValue) ? RemoveHtml($this->id->ViewValue) : $this->id->CurrentValue)."?showdetail=main_transactions";
+        			}
+        	    }
+
+        	    //$ll = CurrentUserLevel();
+
+        	    // Effect the change
+        	    $this->check_status->LinkCustomAttributes = $final_attr;
+        	    $this->check_status->ViewValue = $final_caption; //." ".$ll;
+        	    $this->check_status->HrefValue = $href_val;
+            }
     }
 
     // User ID Filtering event

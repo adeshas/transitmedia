@@ -122,12 +122,18 @@ $Page->showMessage();
 <?php } ?>
 <?php if ($Page->value->Visible) { // value ?>
     <div id="r_value" class="form-group row">
-        <label id="elh_z_core_settings_value" for="x_value" class="<?= $Page->LeftColumnClass ?>"><?= $Page->value->caption() ?><?= $Page->value->Required ? $Language->phrase("FieldRequiredIndicator") : "" ?></label>
+        <label id="elh_z_core_settings_value" class="<?= $Page->LeftColumnClass ?>"><?= $Page->value->caption() ?><?= $Page->value->Required ? $Language->phrase("FieldRequiredIndicator") : "" ?></label>
         <div class="<?= $Page->RightColumnClass ?>"><div <?= $Page->value->cellAttributes() ?>>
 <span id="el_z_core_settings_value">
-<input type="<?= $Page->value->getInputTextType() ?>" data-table="z_core_settings" data-field="x_value" name="x_value" id="x_value" size="30" placeholder="<?= HtmlEncode($Page->value->getPlaceHolder()) ?>" value="<?= $Page->value->EditValue ?>"<?= $Page->value->editAttributes() ?> aria-describedby="x_value_help">
+<?php $Page->value->EditAttrs->appendClass("editor"); ?>
+<textarea data-table="z_core_settings" data-field="x_value" name="x_value" id="x_value" cols="35" rows="4" placeholder="<?= HtmlEncode($Page->value->getPlaceHolder()) ?>"<?= $Page->value->editAttributes() ?> aria-describedby="x_value_help"><?= $Page->value->EditValue ?></textarea>
 <?= $Page->value->getCustomMessage() ?>
 <div class="invalid-feedback"><?= $Page->value->getErrorMessage() ?></div>
+<script>
+loadjs.ready(["fz_core_settingsadd", "editor"], function() {
+	ew.createEditor("fz_core_settingsadd", "x_value", 0, 0, <?= $Page->value->ReadOnly || false ? "true" : "false" ?>);
+});
+</script>
 </span>
 </div></div>
     </div>

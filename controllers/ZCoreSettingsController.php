@@ -19,4 +19,10 @@ class ZCoreSettingsController extends ControllerBase
     {
         return $this->runPage($request, $response, $args, "ZCoreSettingsAdd");
     }
+
+    // edit
+    public function edit(Request $request, Response $response, array $args): Response
+    {
+        return $this->runPage($request, $response, $args, "ZCoreSettingsEdit");
+    }
 }

@@ -68,17 +68,11 @@ $Page->showMessage();
 <?php if ($Page->vendor_id->Visible) { // vendor_id ?>
         <th class="<?= $Page->vendor_id->headerCellClass() ?>"><span id="elh_main_campaigns_vendor_id" class="main_campaigns_vendor_id"><?= $Page->vendor_id->caption() ?></span></th>
 <?php } ?>
-<?php if ($Page->status_id->Visible) { // status_id ?>
-        <th class="<?= $Page->status_id->headerCellClass() ?>"><span id="elh_main_campaigns_status_id" class="main_campaigns_status_id"><?= $Page->status_id->caption() ?></span></th>
-<?php } ?>
-<?php if ($Page->print_status_id->Visible) { // print_status_id ?>
-        <th class="<?= $Page->print_status_id->headerCellClass() ?>"><span id="elh_main_campaigns_print_status_id" class="main_campaigns_print_status_id"><?= $Page->print_status_id->caption() ?></span></th>
-<?php } ?>
-<?php if ($Page->payment_status_id->Visible) { // payment_status_id ?>
-        <th class="<?= $Page->payment_status_id->headerCellClass() ?>"><span id="elh_main_campaigns_payment_status_id" class="main_campaigns_payment_status_id"><?= $Page->payment_status_id->caption() ?></span></th>
-<?php } ?>
 <?php if ($Page->renewal_stage_id->Visible) { // renewal_stage_id ?>
         <th class="<?= $Page->renewal_stage_id->headerCellClass() ?>"><span id="elh_main_campaigns_renewal_stage_id" class="main_campaigns_renewal_stage_id"><?= $Page->renewal_stage_id->caption() ?></span></th>
+<?php } ?>
+<?php if ($Page->check_status->Visible) { // check_status ?>
+        <th class="<?= $Page->check_status->headerCellClass() ?>"><span id="elh_main_campaigns_check_status" class="main_campaigns_check_status"><?= $Page->check_status->caption() ?></span></th>
 <?php } ?>
     </tr>
     </thead>
@@ -173,35 +167,29 @@ while (!$Page->Recordset->EOF) {
 </span>
 </td>
 <?php } ?>
-<?php if ($Page->status_id->Visible) { // status_id ?>
-        <td <?= $Page->status_id->cellAttributes() ?>>
-<span id="el<?= $Page->RowCount ?>_main_campaigns_status_id" class="main_campaigns_status_id">
-<span<?= $Page->status_id->viewAttributes() ?>>
-<?= $Page->status_id->getViewValue() ?></span>
-</span>
-</td>
-<?php } ?>
-<?php if ($Page->print_status_id->Visible) { // print_status_id ?>
-        <td <?= $Page->print_status_id->cellAttributes() ?>>
-<span id="el<?= $Page->RowCount ?>_main_campaigns_print_status_id" class="main_campaigns_print_status_id">
-<span<?= $Page->print_status_id->viewAttributes() ?>>
-<?= $Page->print_status_id->getViewValue() ?></span>
-</span>
-</td>
-<?php } ?>
-<?php if ($Page->payment_status_id->Visible) { // payment_status_id ?>
-        <td <?= $Page->payment_status_id->cellAttributes() ?>>
-<span id="el<?= $Page->RowCount ?>_main_campaigns_payment_status_id" class="main_campaigns_payment_status_id">
-<span<?= $Page->payment_status_id->viewAttributes() ?>>
-<?= $Page->payment_status_id->getViewValue() ?></span>
-</span>
-</td>
-<?php } ?>
 <?php if ($Page->renewal_stage_id->Visible) { // renewal_stage_id ?>
         <td <?= $Page->renewal_stage_id->cellAttributes() ?>>
 <span id="el<?= $Page->RowCount ?>_main_campaigns_renewal_stage_id" class="main_campaigns_renewal_stage_id">
 <span<?= $Page->renewal_stage_id->viewAttributes() ?>>
-<?= $Page->renewal_stage_id->getViewValue() ?></span>
+<?php if (!EmptyString($Page->renewal_stage_id->getViewValue()) && $Page->renewal_stage_id->linkAttributes() != "") { ?>
+<a<?= $Page->renewal_stage_id->linkAttributes() ?>><?= $Page->renewal_stage_id->getViewValue() ?></a>
+<?php } else { ?>
+<?= $Page->renewal_stage_id->getViewValue() ?>
+<?php } ?>
+</span>
+</span>
+</td>
+<?php } ?>
+<?php if ($Page->check_status->Visible) { // check_status ?>
+        <td <?= $Page->check_status->cellAttributes() ?>>
+<span id="el<?= $Page->RowCount ?>_main_campaigns_check_status" class="main_campaigns_check_status">
+<span<?= $Page->check_status->viewAttributes() ?>>
+<?php if (!EmptyString($Page->check_status->getViewValue()) && $Page->check_status->linkAttributes() != "") { ?>
+<a<?= $Page->check_status->linkAttributes() ?>><?= $Page->check_status->getViewValue() ?></a>
+<?php } else { ?>
+<?= $Page->check_status->getViewValue() ?>
+<?php } ?>
+</span>
 </span>
 </td>
 <?php } ?>

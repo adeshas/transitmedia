@@ -329,6 +329,7 @@ class ZCoreSettingsAdd extends ZCoreSettings
     {
         $key = "";
         if (is_array($ar)) {
+            $key .= @$ar['id'];
         }
         return $key;
     }
@@ -340,6 +341,9 @@ class ZCoreSettingsAdd extends ZCoreSettings
      */
     protected function hideFieldsForAddEdit()
     {
+        if ($this->isAdd() || $this->isCopy() || $this->isGridAdd()) {
+            $this->id->Visible = false;
+        }
     }
 
     // Lookup data
@@ -466,8 +470,13 @@ class ZCoreSettingsAdd extends ZCoreSettings
             $this->CurrentAction = Post("action"); // Get form action
             $this->setKey(Post($this->OldKeyName));
             $postBack = true;
-        } else { // Not post back
-            $this->CopyRecord = false;
+        } else {
+            // Load key values from QueryString
+            if (($keyValue = Get("id") ?? Route("id")) !== null) {
+                $this->id->setQueryStringValue($keyValue);
+            }
+            $this->OldKey = $this->getKey(true); // Get from CurrentValue
+            $this->CopyRecord = !EmptyValue($this->OldKey);
             if ($this->CopyRecord) {
                 $this->CurrentAction = "copy"; // Copy record
             } else {
@@ -609,6 +618,9 @@ class ZCoreSettingsAdd extends ZCoreSettings
                 $this->value->setFormValue($val);
             }
         }
+
+        // Check field name 'id' first before field var 'x_id'
+        $val = $CurrentForm->hasValue("id") ? $CurrentForm->getValue("id") : $CurrentForm->getValue("x_id");
     }
 
     // Restore form values
@@ -685,7 +697,17 @@ class ZCoreSettingsAdd extends ZCoreSettings
     // Load old record
     protected function loadOldRecord()
     {
-        return false;
+        // Load old record
+        $this->OldRecordset = null;
+        $validKey = $this->OldKey != "";
+        if ($validKey) {
+            $this->CurrentFilter = $this->getRecordFilter();
+            $sql = $this->getCurrentSql();
+            $conn = $this->getConnection();
+            $this->OldRecordset = LoadRecordset($sql, $conn);
+        }
+        $this->loadRowValues($this->OldRecordset); // Load row values
+        return $validKey;
     }
 
     // Render row values based on field settings
@@ -707,6 +729,7 @@ class ZCoreSettingsAdd extends ZCoreSettings
         // value
         if ($this->RowType == ROWTYPE_VIEW) {
             // id
+            $this->id->ViewValue = $this->id->CurrentValue;
             $this->id->ViewValue = FormatNumber($this->id->ViewValue, 0, -2, -2, -2);
             $this->id->ViewCustomAttributes = "";
 
@@ -740,9 +763,6 @@ class ZCoreSettingsAdd extends ZCoreSettings
             // value
             $this->value->EditAttrs["class"] = "form-control";
             $this->value->EditCustomAttributes = "";
-            if (!$this->value->Raw) {
-                $this->value->CurrentValue = HtmlDecode($this->value->CurrentValue);
-            }
             $this->value->EditValue = HtmlEncode($this->value->CurrentValue);
             $this->value->PlaceHolder = RemoveHtml($this->value->caption());
 

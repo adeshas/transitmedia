@@ -120,6 +120,22 @@ $Page->showMessage();
     </div>
 <?php } ?>
 </div><!-- /page* -->
+<?php
+    if (in_array("main_users", explode(",", $Page->getCurrentDetailTable())) && $main_users->DetailAdd) {
+?>
+<?php if ($Page->getCurrentDetailTable() != "") { ?>
+<h4 class="ew-detail-caption"><?= $Language->tablePhrase("main_users", "TblCaption") ?></h4>
+<?php } ?>
+<?php include_once "MainUsersGrid.php" ?>
+<?php } ?>
+<?php
+    if (in_array("main_campaigns", explode(",", $Page->getCurrentDetailTable())) && $main_campaigns->DetailAdd) {
+?>
+<?php if ($Page->getCurrentDetailTable() != "") { ?>
+<h4 class="ew-detail-caption"><?= $Language->tablePhrase("main_campaigns", "TblCaption") ?></h4>
+<?php } ?>
+<?php include_once "MainCampaignsGrid.php" ?>
+<?php } ?>
 <?php if (!$Page->IsModal) { ?>
 <div class="form-group row"><!-- buttons .form-group -->
     <div class="<?= $Page->OffsetColumnClass ?>"><!-- buttons offset -->

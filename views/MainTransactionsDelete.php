@@ -65,6 +65,9 @@ $Page->showMessage();
 <?php if ($Page->end_date->Visible) { // end_date ?>
         <th class="<?= $Page->end_date->headerCellClass() ?>"><span id="elh_main_transactions_end_date" class="main_transactions_end_date"><?= $Page->end_date->caption() ?></span></th>
 <?php } ?>
+<?php if ($Page->visible_status_id->Visible) { // visible_status_id ?>
+        <th class="<?= $Page->visible_status_id->headerCellClass() ?>"><span id="elh_main_transactions_visible_status_id" class="main_transactions_visible_status_id"><?= $Page->visible_status_id->caption() ?></span></th>
+<?php } ?>
 <?php if ($Page->status_id->Visible) { // status_id ?>
         <th class="<?= $Page->status_id->headerCellClass() ?>"><span id="elh_main_transactions_status_id" class="main_transactions_status_id"><?= $Page->status_id->caption() ?></span></th>
 <?php } ?>
@@ -159,6 +162,14 @@ while (!$Page->Recordset->EOF) {
 <span id="el<?= $Page->RowCount ?>_main_transactions_end_date" class="main_transactions_end_date">
 <span<?= $Page->end_date->viewAttributes() ?>>
 <?= $Page->end_date->getViewValue() ?></span>
+</span>
+</td>
+<?php } ?>
+<?php if ($Page->visible_status_id->Visible) { // visible_status_id ?>
+        <td <?= $Page->visible_status_id->cellAttributes() ?>>
+<span id="el<?= $Page->RowCount ?>_main_transactions_visible_status_id" class="main_transactions_visible_status_id">
+<span<?= $Page->visible_status_id->viewAttributes() ?>>
+<?= $Page->visible_status_id->getViewValue() ?></span>
 </span>
 </td>
 <?php } ?>

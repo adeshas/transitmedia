@@ -42,6 +42,17 @@ $y_platforms = Container("y_platforms");
 </td>
         </tr>
 <?php } ?>
+<?php if ($y_platforms->_email->Visible) { // email ?>
+        <tr id="r__email">
+            <td class="<?= $y_platforms->TableLeftColumnClass ?>"><?= $y_platforms->_email->caption() ?></td>
+            <td <?= $y_platforms->_email->cellAttributes() ?>>
+<span id="el_y_platforms__email">
+<span<?= $y_platforms->_email->viewAttributes() ?>>
+<?= $y_platforms->_email->getViewValue() ?></span>
+</span>
+</td>
+        </tr>
+<?php } ?>
     </tbody>
 </table>
 </div>

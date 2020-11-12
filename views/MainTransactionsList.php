@@ -28,6 +28,7 @@ loadjs.ready("head", function () {
         ["quantity", [fields.quantity.required ? ew.Validators.required(fields.quantity.caption) : null, ew.Validators.integer], fields.quantity.isInvalid],
         ["start_date", [fields.start_date.required ? ew.Validators.required(fields.start_date.caption) : null, ew.Validators.datetime(5)], fields.start_date.isInvalid],
         ["end_date", [fields.end_date.required ? ew.Validators.required(fields.end_date.caption) : null, ew.Validators.datetime(5)], fields.end_date.isInvalid],
+        ["visible_status_id", [fields.visible_status_id.required ? ew.Validators.required(fields.visible_status_id.caption) : null], fields.visible_status_id.isInvalid],
         ["status_id", [fields.status_id.required ? ew.Validators.required(fields.status_id.caption) : null], fields.status_id.isInvalid],
         ["print_status_id", [fields.print_status_id.required ? ew.Validators.required(fields.print_status_id.caption) : null], fields.print_status_id.isInvalid],
         ["payment_status_id", [fields.payment_status_id.required ? ew.Validators.required(fields.payment_status_id.caption) : null], fields.payment_status_id.isInvalid],
@@ -103,6 +104,8 @@ loadjs.ready("head", function () {
             return false;
         if (ew.valueChanged(fobj, rowIndex, "end_date", false))
             return false;
+        if (ew.valueChanged(fobj, rowIndex, "visible_status_id", false))
+            return false;
         if (ew.valueChanged(fobj, rowIndex, "status_id", false))
             return false;
         if (ew.valueChanged(fobj, rowIndex, "print_status_id", false))
@@ -127,6 +130,7 @@ loadjs.ready("head", function () {
     fmain_transactionslist.lists.campaign_id = <?= $Page->campaign_id->toClientList($Page) ?>;
     fmain_transactionslist.lists.operator_id = <?= $Page->operator_id->toClientList($Page) ?>;
     fmain_transactionslist.lists.price_id = <?= $Page->price_id->toClientList($Page) ?>;
+    fmain_transactionslist.lists.visible_status_id = <?= $Page->visible_status_id->toClientList($Page) ?>;
     fmain_transactionslist.lists.status_id = <?= $Page->status_id->toClientList($Page) ?>;
     fmain_transactionslist.lists.print_status_id = <?= $Page->print_status_id->toClientList($Page) ?>;
     fmain_transactionslist.lists.payment_status_id = <?= $Page->payment_status_id->toClientList($Page) ?>;
@@ -240,6 +244,9 @@ $Page->ListOptions->render("header", "left");
 <?php } ?>
 <?php if ($Page->end_date->Visible) { // end_date ?>
         <th data-name="end_date" class="<?= $Page->end_date->headerCellClass() ?>"><div id="elh_main_transactions_end_date" class="main_transactions_end_date"><?= $Page->renderSort($Page->end_date) ?></div></th>
+<?php } ?>
+<?php if ($Page->visible_status_id->Visible) { // visible_status_id ?>
+        <th data-name="visible_status_id" class="<?= $Page->visible_status_id->headerCellClass() ?>"><div id="elh_main_transactions_visible_status_id" class="main_transactions_visible_status_id"><?= $Page->renderSort($Page->visible_status_id) ?></div></th>
 <?php } ?>
 <?php if ($Page->status_id->Visible) { // status_id ?>
         <th data-name="status_id" class="<?= $Page->status_id->headerCellClass() ?>"><div id="elh_main_transactions_status_id" class="main_transactions_status_id"><?= $Page->renderSort($Page->status_id) ?></div></th>
@@ -765,6 +772,71 @@ loadjs.ready(["fmain_transactionslist", "datetimepicker"], function() {
 <?php } ?>
 </td>
     <?php } ?>
+    <?php if ($Page->visible_status_id->Visible) { // visible_status_id ?>
+        <td data-name="visible_status_id" <?= $Page->visible_status_id->cellAttributes() ?>>
+<?php if ($Page->RowType == ROWTYPE_ADD) { // Add record ?>
+<span id="el<?= $Page->RowCount ?>_main_transactions_visible_status_id" class="form-group">
+    <select
+        id="x<?= $Page->RowIndex ?>_visible_status_id"
+        name="x<?= $Page->RowIndex ?>_visible_status_id"
+        class="form-control ew-select<?= $Page->visible_status_id->isInvalidClass() ?>"
+        data-select2-id="main_transactions_x<?= $Page->RowIndex ?>_visible_status_id"
+        data-table="main_transactions"
+        data-field="x_visible_status_id"
+        data-value-separator="<?= $Page->visible_status_id->displayValueSeparatorAttribute() ?>"
+        data-placeholder="<?= HtmlEncode($Page->visible_status_id->getPlaceHolder()) ?>"
+        <?= $Page->visible_status_id->editAttributes() ?>>
+        <?= $Page->visible_status_id->selectOptionListHtml("x{$Page->RowIndex}_visible_status_id") ?>
+    </select>
+    <div class="invalid-feedback"><?= $Page->visible_status_id->getErrorMessage() ?></div>
+<?= $Page->visible_status_id->Lookup->getParamTag($Page, "p_x" . $Page->RowIndex . "_visible_status_id") ?>
+<script>
+loadjs.ready("head", function() {
+    var el = document.querySelector("select[data-select2-id='main_transactions_x<?= $Page->RowIndex ?>_visible_status_id']"),
+        options = { name: "x<?= $Page->RowIndex ?>_visible_status_id", selectId: "main_transactions_x<?= $Page->RowIndex ?>_visible_status_id", language: ew.LANGUAGE_ID, dir: ew.IS_RTL ? "rtl" : "ltr" };
+    options.dropdownParent = $(el).closest("#ew-modal-dialog, #ew-add-opt-dialog")[0];
+    Object.assign(options, ew.vars.tables.main_transactions.fields.visible_status_id.selectOptions);
+    ew.createSelect(options);
+});
+</script>
+</span>
+<input type="hidden" data-table="main_transactions" data-field="x_visible_status_id" data-hidden="1" name="o<?= $Page->RowIndex ?>_visible_status_id" id="o<?= $Page->RowIndex ?>_visible_status_id" value="<?= HtmlEncode($Page->visible_status_id->OldValue) ?>">
+<?php } ?>
+<?php if ($Page->RowType == ROWTYPE_EDIT) { // Edit record ?>
+<span id="el<?= $Page->RowCount ?>_main_transactions_visible_status_id" class="form-group">
+    <select
+        id="x<?= $Page->RowIndex ?>_visible_status_id"
+        name="x<?= $Page->RowIndex ?>_visible_status_id"
+        class="form-control ew-select<?= $Page->visible_status_id->isInvalidClass() ?>"
+        data-select2-id="main_transactions_x<?= $Page->RowIndex ?>_visible_status_id"
+        data-table="main_transactions"
+        data-field="x_visible_status_id"
+        data-value-separator="<?= $Page->visible_status_id->displayValueSeparatorAttribute() ?>"
+        data-placeholder="<?= HtmlEncode($Page->visible_status_id->getPlaceHolder()) ?>"
+        <?= $Page->visible_status_id->editAttributes() ?>>
+        <?= $Page->visible_status_id->selectOptionListHtml("x{$Page->RowIndex}_visible_status_id") ?>
+    </select>
+    <div class="invalid-feedback"><?= $Page->visible_status_id->getErrorMessage() ?></div>
+<?= $Page->visible_status_id->Lookup->getParamTag($Page, "p_x" . $Page->RowIndex . "_visible_status_id") ?>
+<script>
+loadjs.ready("head", function() {
+    var el = document.querySelector("select[data-select2-id='main_transactions_x<?= $Page->RowIndex ?>_visible_status_id']"),
+        options = { name: "x<?= $Page->RowIndex ?>_visible_status_id", selectId: "main_transactions_x<?= $Page->RowIndex ?>_visible_status_id", language: ew.LANGUAGE_ID, dir: ew.IS_RTL ? "rtl" : "ltr" };
+    options.dropdownParent = $(el).closest("#ew-modal-dialog, #ew-add-opt-dialog")[0];
+    Object.assign(options, ew.vars.tables.main_transactions.fields.visible_status_id.selectOptions);
+    ew.createSelect(options);
+});
+</script>
+</span>
+<?php } ?>
+<?php if ($Page->RowType == ROWTYPE_VIEW) { // View record ?>
+<span id="el<?= $Page->RowCount ?>_main_transactions_visible_status_id">
+<span<?= $Page->visible_status_id->viewAttributes() ?>>
+<?= $Page->visible_status_id->getViewValue() ?></span>
+</span>
+<?php } ?>
+</td>
+    <?php } ?>
     <?php if ($Page->status_id->Visible) { // status_id ?>
         <td data-name="status_id" <?= $Page->status_id->cellAttributes() ?>>
 <?php if ($Page->RowType == ROWTYPE_ADD) { // Add record ?>
@@ -1197,6 +1269,36 @@ loadjs.ready(["fmain_transactionslist", "datetimepicker"], function() {
 <input type="hidden" data-table="main_transactions" data-field="x_end_date" data-hidden="1" name="o<?= $Page->RowIndex ?>_end_date" id="o<?= $Page->RowIndex ?>_end_date" value="<?= HtmlEncode($Page->end_date->OldValue) ?>">
 </td>
     <?php } ?>
+    <?php if ($Page->visible_status_id->Visible) { // visible_status_id ?>
+        <td data-name="visible_status_id">
+<span id="el$rowindex$_main_transactions_visible_status_id" class="form-group main_transactions_visible_status_id">
+    <select
+        id="x<?= $Page->RowIndex ?>_visible_status_id"
+        name="x<?= $Page->RowIndex ?>_visible_status_id"
+        class="form-control ew-select<?= $Page->visible_status_id->isInvalidClass() ?>"
+        data-select2-id="main_transactions_x<?= $Page->RowIndex ?>_visible_status_id"
+        data-table="main_transactions"
+        data-field="x_visible_status_id"
+        data-value-separator="<?= $Page->visible_status_id->displayValueSeparatorAttribute() ?>"
+        data-placeholder="<?= HtmlEncode($Page->visible_status_id->getPlaceHolder()) ?>"
+        <?= $Page->visible_status_id->editAttributes() ?>>
+        <?= $Page->visible_status_id->selectOptionListHtml("x{$Page->RowIndex}_visible_status_id") ?>
+    </select>
+    <div class="invalid-feedback"><?= $Page->visible_status_id->getErrorMessage() ?></div>
+<?= $Page->visible_status_id->Lookup->getParamTag($Page, "p_x" . $Page->RowIndex . "_visible_status_id") ?>
+<script>
+loadjs.ready("head", function() {
+    var el = document.querySelector("select[data-select2-id='main_transactions_x<?= $Page->RowIndex ?>_visible_status_id']"),
+        options = { name: "x<?= $Page->RowIndex ?>_visible_status_id", selectId: "main_transactions_x<?= $Page->RowIndex ?>_visible_status_id", language: ew.LANGUAGE_ID, dir: ew.IS_RTL ? "rtl" : "ltr" };
+    options.dropdownParent = $(el).closest("#ew-modal-dialog, #ew-add-opt-dialog")[0];
+    Object.assign(options, ew.vars.tables.main_transactions.fields.visible_status_id.selectOptions);
+    ew.createSelect(options);
+});
+</script>
+</span>
+<input type="hidden" data-table="main_transactions" data-field="x_visible_status_id" data-hidden="1" name="o<?= $Page->RowIndex ?>_visible_status_id" id="o<?= $Page->RowIndex ?>_visible_status_id" value="<?= HtmlEncode($Page->visible_status_id->OldValue) ?>">
+</td>
+    <?php } ?>
     <?php if ($Page->status_id->Visible) { // status_id ?>
         <td data-name="status_id">
 <span id="el$rowindex$_main_transactions_status_id" class="form-group main_transactions_status_id">
@@ -1364,6 +1466,11 @@ $Page->ListOptions->render("footer", "left");
     <?php } ?>
     <?php if ($Page->end_date->Visible) { // end_date ?>
         <td data-name="end_date" class="<?= $Page->end_date->footerCellClass() ?>"><span id="elf_main_transactions_end_date" class="main_transactions_end_date">
+        &nbsp;
+        </span></td>
+    <?php } ?>
+    <?php if ($Page->visible_status_id->Visible) { // visible_status_id ?>
+        <td data-name="visible_status_id" class="<?= $Page->visible_status_id->footerCellClass() ?>"><span id="elf_main_transactions_visible_status_id" class="main_transactions_visible_status_id">
         &nbsp;
         </span></td>
     <?php } ?>

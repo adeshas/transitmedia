@@ -87,6 +87,9 @@ $Page->ListOptions->render("header", "left");
 <?php if ($Page->shortname->Visible) { // shortname ?>
         <th data-name="shortname" class="<?= $Page->shortname->headerCellClass() ?>"><div id="elh_y_platforms_shortname" class="y_platforms_shortname"><?= $Page->renderSort($Page->shortname) ?></div></th>
 <?php } ?>
+<?php if ($Page->_email->Visible) { // email ?>
+        <th data-name="_email" class="<?= $Page->_email->headerCellClass() ?>"><div id="elh_y_platforms__email" class="y_platforms__email"><?= $Page->renderSort($Page->_email) ?></div></th>
+<?php } ?>
 <?php
 // Render list options (header, right)
 $Page->ListOptions->render("header", "right");
@@ -175,6 +178,14 @@ $Page->ListOptions->render("body", "left", $Page->RowCount);
 <span id="el<?= $Page->RowCount ?>_y_platforms_shortname">
 <span<?= $Page->shortname->viewAttributes() ?>>
 <?= $Page->shortname->getViewValue() ?></span>
+</span>
+</td>
+    <?php } ?>
+    <?php if ($Page->_email->Visible) { // email ?>
+        <td data-name="_email" <?= $Page->_email->cellAttributes() ?>>
+<span id="el<?= $Page->RowCount ?>_y_platforms__email">
+<span<?= $Page->_email->viewAttributes() ?>>
+<?= $Page->_email->getViewValue() ?></span>
 </span>
 </td>
     <?php } ?>

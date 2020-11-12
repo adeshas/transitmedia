@@ -759,7 +759,6 @@ class Register extends MainUsers
             $this->vendor_id->ViewCustomAttributes = "";
 
             // reportsto
-            $this->reportsto->ViewValue = $this->reportsto->CurrentValue;
             $curVal = strval($this->reportsto->CurrentValue);
             if ($curVal != "") {
                 $this->reportsto->ViewValue = $this->reportsto->lookupCacheOption($curVal);
@@ -919,6 +918,18 @@ class Register extends MainUsers
             }
         }
 
+        // Check if valid Parent User ID
+        $validParentUser = false;
+        if ($Security->currentUserID() != "" && !EmptyValue($this->reportsto->CurrentValue) && !$Security->isAdmin()) { // Non system admin
+            $validParentUser = $Security->isValidUserID($this->reportsto->CurrentValue);
+            if (!$validParentUser) {
+                $parentUserIdMsg = str_replace("%c", CurrentUserID(), $Language->phrase("UnAuthorizedParentUserID"));
+                $parentUserIdMsg = str_replace("%p", $this->reportsto->CurrentValue, $parentUserIdMsg);
+                $this->setFailureMessage($parentUserIdMsg);
+                return false;
+            }
+        }
+
         // Check if valid key values for master user
         if ($Security->currentUserID() != "" && !$Security->isAdmin()) { // Non system admin
             $masterFilter = $this->sqlMasterFilter_y_vendors();
@@ -970,6 +981,8 @@ class Register extends MainUsers
         if ($this->vendor_id->getSessionValue() != "") {
             $rsnew['vendor_id'] = $this->vendor_id->getSessionValue();
         }
+
+        // reportsto
 
         // Call Row Inserting event
         $insertRow = $this->rowInserting($rsold, $rsnew);

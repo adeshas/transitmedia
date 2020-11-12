@@ -487,12 +487,10 @@ class MainCampaignsGrid extends MainCampaigns
         $this->end_date->setVisibility();
         $this->user_id->Visible = false;
         $this->vendor_id->setVisibility();
-        $this->status_id->setVisibility();
-        $this->print_status_id->setVisibility();
-        $this->payment_status_id->setVisibility();
         $this->ts_last_update->Visible = false;
         $this->ts_created->Visible = false;
         $this->renewal_stage_id->setVisibility();
+        $this->check_status->setVisibility();
         $this->hideFieldsForAddEdit();
 
         // Global Page Loading event (in userfn*.php)
@@ -516,9 +514,6 @@ class MainCampaignsGrid extends MainCampaigns
         $this->setupLookupOptions($this->bus_size_id);
         $this->setupLookupOptions($this->price_id);
         $this->setupLookupOptions($this->vendor_id);
-        $this->setupLookupOptions($this->status_id);
-        $this->setupLookupOptions($this->print_status_id);
-        $this->setupLookupOptions($this->payment_status_id);
         $this->setupLookupOptions($this->renewal_stage_id);
 
         // Search filters
@@ -994,16 +989,10 @@ class MainCampaignsGrid extends MainCampaigns
         if ($CurrentForm->hasValue("x_vendor_id") && $CurrentForm->hasValue("o_vendor_id") && $this->vendor_id->CurrentValue != $this->vendor_id->OldValue) {
             return false;
         }
-        if ($CurrentForm->hasValue("x_status_id") && $CurrentForm->hasValue("o_status_id") && $this->status_id->CurrentValue != $this->status_id->OldValue) {
-            return false;
-        }
-        if ($CurrentForm->hasValue("x_print_status_id") && $CurrentForm->hasValue("o_print_status_id") && $this->print_status_id->CurrentValue != $this->print_status_id->OldValue) {
-            return false;
-        }
-        if ($CurrentForm->hasValue("x_payment_status_id") && $CurrentForm->hasValue("o_payment_status_id") && $this->payment_status_id->CurrentValue != $this->payment_status_id->OldValue) {
-            return false;
-        }
         if ($CurrentForm->hasValue("x_renewal_stage_id") && $CurrentForm->hasValue("o_renewal_stage_id") && $this->renewal_stage_id->CurrentValue != $this->renewal_stage_id->OldValue) {
+            return false;
+        }
+        if ($CurrentForm->hasValue("x_check_status") && $CurrentForm->hasValue("o_check_status") && $this->check_status->CurrentValue != $this->check_status->OldValue) {
             return false;
         }
         return true;
@@ -1096,10 +1085,8 @@ class MainCampaignsGrid extends MainCampaigns
         $this->start_date->clearErrorMessage();
         $this->end_date->clearErrorMessage();
         $this->vendor_id->clearErrorMessage();
-        $this->status_id->clearErrorMessage();
-        $this->print_status_id->clearErrorMessage();
-        $this->payment_status_id->clearErrorMessage();
         $this->renewal_stage_id->clearErrorMessage();
+        $this->check_status->clearErrorMessage();
     }
 
     // Set up sort parameters
@@ -1383,18 +1370,14 @@ class MainCampaignsGrid extends MainCampaigns
         $this->user_id->OldValue = $this->user_id->CurrentValue;
         $this->vendor_id->CurrentValue = CurrentUserID();
         $this->vendor_id->OldValue = $this->vendor_id->CurrentValue;
-        $this->status_id->CurrentValue = null;
-        $this->status_id->OldValue = $this->status_id->CurrentValue;
-        $this->print_status_id->CurrentValue = null;
-        $this->print_status_id->OldValue = $this->print_status_id->CurrentValue;
-        $this->payment_status_id->CurrentValue = null;
-        $this->payment_status_id->OldValue = $this->payment_status_id->CurrentValue;
         $this->ts_last_update->CurrentValue = null;
         $this->ts_last_update->OldValue = $this->ts_last_update->CurrentValue;
         $this->ts_created->CurrentValue = null;
         $this->ts_created->OldValue = $this->ts_created->CurrentValue;
         $this->renewal_stage_id->CurrentValue = null;
         $this->renewal_stage_id->OldValue = $this->renewal_stage_id->CurrentValue;
+        $this->check_status->CurrentValue = null;
+        $this->check_status->OldValue = $this->check_status->CurrentValue;
     }
 
     // Load form values
@@ -1516,45 +1499,6 @@ class MainCampaignsGrid extends MainCampaigns
             $this->vendor_id->setOldValue($CurrentForm->getValue("o_vendor_id"));
         }
 
-        // Check field name 'status_id' first before field var 'x_status_id'
-        $val = $CurrentForm->hasValue("status_id") ? $CurrentForm->getValue("status_id") : $CurrentForm->getValue("x_status_id");
-        if (!$this->status_id->IsDetailKey) {
-            if (IsApi() && $val === null) {
-                $this->status_id->Visible = false; // Disable update for API request
-            } else {
-                $this->status_id->setFormValue($val);
-            }
-        }
-        if ($CurrentForm->hasValue("o_status_id")) {
-            $this->status_id->setOldValue($CurrentForm->getValue("o_status_id"));
-        }
-
-        // Check field name 'print_status_id' first before field var 'x_print_status_id'
-        $val = $CurrentForm->hasValue("print_status_id") ? $CurrentForm->getValue("print_status_id") : $CurrentForm->getValue("x_print_status_id");
-        if (!$this->print_status_id->IsDetailKey) {
-            if (IsApi() && $val === null) {
-                $this->print_status_id->Visible = false; // Disable update for API request
-            } else {
-                $this->print_status_id->setFormValue($val);
-            }
-        }
-        if ($CurrentForm->hasValue("o_print_status_id")) {
-            $this->print_status_id->setOldValue($CurrentForm->getValue("o_print_status_id"));
-        }
-
-        // Check field name 'payment_status_id' first before field var 'x_payment_status_id'
-        $val = $CurrentForm->hasValue("payment_status_id") ? $CurrentForm->getValue("payment_status_id") : $CurrentForm->getValue("x_payment_status_id");
-        if (!$this->payment_status_id->IsDetailKey) {
-            if (IsApi() && $val === null) {
-                $this->payment_status_id->Visible = false; // Disable update for API request
-            } else {
-                $this->payment_status_id->setFormValue($val);
-            }
-        }
-        if ($CurrentForm->hasValue("o_payment_status_id")) {
-            $this->payment_status_id->setOldValue($CurrentForm->getValue("o_payment_status_id"));
-        }
-
         // Check field name 'renewal_stage_id' first before field var 'x_renewal_stage_id'
         $val = $CurrentForm->hasValue("renewal_stage_id") ? $CurrentForm->getValue("renewal_stage_id") : $CurrentForm->getValue("x_renewal_stage_id");
         if (!$this->renewal_stage_id->IsDetailKey) {
@@ -1566,6 +1510,19 @@ class MainCampaignsGrid extends MainCampaigns
         }
         if ($CurrentForm->hasValue("o_renewal_stage_id")) {
             $this->renewal_stage_id->setOldValue($CurrentForm->getValue("o_renewal_stage_id"));
+        }
+
+        // Check field name 'check_status' first before field var 'x_check_status'
+        $val = $CurrentForm->hasValue("check_status") ? $CurrentForm->getValue("check_status") : $CurrentForm->getValue("x_check_status");
+        if (!$this->check_status->IsDetailKey) {
+            if (IsApi() && $val === null) {
+                $this->check_status->Visible = false; // Disable update for API request
+            } else {
+                $this->check_status->setFormValue($val);
+            }
+        }
+        if ($CurrentForm->hasValue("o_check_status")) {
+            $this->check_status->setOldValue($CurrentForm->getValue("o_check_status"));
         }
     }
 
@@ -1586,10 +1543,8 @@ class MainCampaignsGrid extends MainCampaigns
         $this->end_date->CurrentValue = $this->end_date->FormValue;
         $this->end_date->CurrentValue = UnFormatDateTime($this->end_date->CurrentValue, 0);
         $this->vendor_id->CurrentValue = $this->vendor_id->FormValue;
-        $this->status_id->CurrentValue = $this->status_id->FormValue;
-        $this->print_status_id->CurrentValue = $this->print_status_id->FormValue;
-        $this->payment_status_id->CurrentValue = $this->payment_status_id->FormValue;
         $this->renewal_stage_id->CurrentValue = $this->renewal_stage_id->FormValue;
+        $this->check_status->CurrentValue = $this->check_status->FormValue;
     }
 
     // Load recordset
@@ -1671,12 +1626,10 @@ class MainCampaignsGrid extends MainCampaigns
         $this->end_date->setDbValue($row['end_date']);
         $this->user_id->setDbValue($row['user_id']);
         $this->vendor_id->setDbValue($row['vendor_id']);
-        $this->status_id->setDbValue($row['status_id']);
-        $this->print_status_id->setDbValue($row['print_status_id']);
-        $this->payment_status_id->setDbValue($row['payment_status_id']);
         $this->ts_last_update->setDbValue($row['ts_last_update']);
         $this->ts_created->setDbValue($row['ts_created']);
         $this->renewal_stage_id->setDbValue($row['renewal_stage_id']);
+        $this->check_status->setDbValue($row['check_status']);
     }
 
     // Return a row with default values
@@ -1695,12 +1648,10 @@ class MainCampaignsGrid extends MainCampaigns
         $row['end_date'] = $this->end_date->CurrentValue;
         $row['user_id'] = $this->user_id->CurrentValue;
         $row['vendor_id'] = $this->vendor_id->CurrentValue;
-        $row['status_id'] = $this->status_id->CurrentValue;
-        $row['print_status_id'] = $this->print_status_id->CurrentValue;
-        $row['payment_status_id'] = $this->payment_status_id->CurrentValue;
         $row['ts_last_update'] = $this->ts_last_update->CurrentValue;
         $row['ts_created'] = $this->ts_created->CurrentValue;
         $row['renewal_stage_id'] = $this->renewal_stage_id->CurrentValue;
+        $row['check_status'] = $this->check_status->CurrentValue;
         return $row;
     }
 
@@ -1758,17 +1709,13 @@ class MainCampaignsGrid extends MainCampaigns
 
         // vendor_id
 
-        // status_id
-
-        // print_status_id
-
-        // payment_status_id
-
         // ts_last_update
 
         // ts_created
 
         // renewal_stage_id
+
+        // check_status
 
         // Accumulate aggregate value
         if ($this->RowType != ROWTYPE_AGGREGATEINIT && $this->RowType != ROWTYPE_AGGREGATE) {
@@ -1790,6 +1737,7 @@ class MainCampaignsGrid extends MainCampaigns
             if ($dispVal != "") {
                 $this->name->ViewValue = $dispVal;
             }
+            $this->name->CssClass = "font-weight-bold";
             $this->name->ViewCustomAttributes = "";
 
             // inventory_id
@@ -1902,7 +1850,11 @@ class MainCampaignsGrid extends MainCampaigns
                 $this->vendor_id->ViewValue = $this->vendor_id->lookupCacheOption($curVal);
                 if ($this->vendor_id->ViewValue === null) { // Lookup from database
                     $filterWrk = "\"id\"" . SearchString("=", $curVal, DATATYPE_NUMBER, "");
-                    $sqlWrk = $this->vendor_id->Lookup->getSql(false, $filterWrk, '', $this, true);
+                    $lookupFilter = function() {
+                        return ((!IsAdmin())? " id = ".Profile()->vendor_id:"");
+                    };
+                    $lookupFilter = $lookupFilter->bindTo($this);
+                    $sqlWrk = $this->vendor_id->Lookup->getSql(false, $filterWrk, $lookupFilter, $this, true);
                     $rswrk = Conn()->executeQuery($sqlWrk)->fetchAll(\PDO::FETCH_BOTH);
                     $ari = count($rswrk);
                     if ($ari > 0) { // Lookup values found
@@ -1916,69 +1868,6 @@ class MainCampaignsGrid extends MainCampaigns
                 $this->vendor_id->ViewValue = null;
             }
             $this->vendor_id->ViewCustomAttributes = "";
-
-            // status_id
-            $curVal = strval($this->status_id->CurrentValue);
-            if ($curVal != "") {
-                $this->status_id->ViewValue = $this->status_id->lookupCacheOption($curVal);
-                if ($this->status_id->ViewValue === null) { // Lookup from database
-                    $filterWrk = "\"id\"" . SearchString("=", $curVal, DATATYPE_NUMBER, "");
-                    $sqlWrk = $this->status_id->Lookup->getSql(false, $filterWrk, '', $this, true);
-                    $rswrk = Conn()->executeQuery($sqlWrk)->fetchAll(\PDO::FETCH_BOTH);
-                    $ari = count($rswrk);
-                    if ($ari > 0) { // Lookup values found
-                        $arwrk = $this->status_id->Lookup->renderViewRow($rswrk[0]);
-                        $this->status_id->ViewValue = $this->status_id->displayValue($arwrk);
-                    } else {
-                        $this->status_id->ViewValue = $this->status_id->CurrentValue;
-                    }
-                }
-            } else {
-                $this->status_id->ViewValue = null;
-            }
-            $this->status_id->ViewCustomAttributes = "";
-
-            // print_status_id
-            $curVal = strval($this->print_status_id->CurrentValue);
-            if ($curVal != "") {
-                $this->print_status_id->ViewValue = $this->print_status_id->lookupCacheOption($curVal);
-                if ($this->print_status_id->ViewValue === null) { // Lookup from database
-                    $filterWrk = "\"id\"" . SearchString("=", $curVal, DATATYPE_NUMBER, "");
-                    $sqlWrk = $this->print_status_id->Lookup->getSql(false, $filterWrk, '', $this, true);
-                    $rswrk = Conn()->executeQuery($sqlWrk)->fetchAll(\PDO::FETCH_BOTH);
-                    $ari = count($rswrk);
-                    if ($ari > 0) { // Lookup values found
-                        $arwrk = $this->print_status_id->Lookup->renderViewRow($rswrk[0]);
-                        $this->print_status_id->ViewValue = $this->print_status_id->displayValue($arwrk);
-                    } else {
-                        $this->print_status_id->ViewValue = $this->print_status_id->CurrentValue;
-                    }
-                }
-            } else {
-                $this->print_status_id->ViewValue = null;
-            }
-            $this->print_status_id->ViewCustomAttributes = "";
-
-            // payment_status_id
-            $curVal = strval($this->payment_status_id->CurrentValue);
-            if ($curVal != "") {
-                $this->payment_status_id->ViewValue = $this->payment_status_id->lookupCacheOption($curVal);
-                if ($this->payment_status_id->ViewValue === null) { // Lookup from database
-                    $filterWrk = "\"id\"" . SearchString("=", $curVal, DATATYPE_NUMBER, "");
-                    $sqlWrk = $this->payment_status_id->Lookup->getSql(false, $filterWrk, '', $this, true);
-                    $rswrk = Conn()->executeQuery($sqlWrk)->fetchAll(\PDO::FETCH_BOTH);
-                    $ari = count($rswrk);
-                    if ($ari > 0) { // Lookup values found
-                        $arwrk = $this->payment_status_id->Lookup->renderViewRow($rswrk[0]);
-                        $this->payment_status_id->ViewValue = $this->payment_status_id->displayValue($arwrk);
-                    } else {
-                        $this->payment_status_id->ViewValue = $this->payment_status_id->CurrentValue;
-                    }
-                }
-            } else {
-                $this->payment_status_id->ViewValue = null;
-            }
-            $this->payment_status_id->ViewCustomAttributes = "";
 
             // ts_last_update
             $this->ts_last_update->ViewValue = $this->ts_last_update->CurrentValue;
@@ -2009,7 +1898,12 @@ class MainCampaignsGrid extends MainCampaigns
             } else {
                 $this->renewal_stage_id->ViewValue = null;
             }
+            $this->renewal_stage_id->CellCssStyle .= "text-align: center;";
             $this->renewal_stage_id->ViewCustomAttributes = "";
+
+            // check_status
+            $this->check_status->ViewValue = $this->check_status->CurrentValue;
+            $this->check_status->ViewCustomAttributes = "";
 
             // id
             $this->id->LinkCustomAttributes = "";
@@ -2056,25 +1950,31 @@ class MainCampaignsGrid extends MainCampaigns
             $this->vendor_id->HrefValue = "";
             $this->vendor_id->TooltipValue = "";
 
-            // status_id
-            $this->status_id->LinkCustomAttributes = "";
-            $this->status_id->HrefValue = "";
-            $this->status_id->TooltipValue = "";
-
-            // print_status_id
-            $this->print_status_id->LinkCustomAttributes = "";
-            $this->print_status_id->HrefValue = "";
-            $this->print_status_id->TooltipValue = "";
-
-            // payment_status_id
-            $this->payment_status_id->LinkCustomAttributes = "";
-            $this->payment_status_id->HrefValue = "";
-            $this->payment_status_id->TooltipValue = "";
-
             // renewal_stage_id
             $this->renewal_stage_id->LinkCustomAttributes = "";
-            $this->renewal_stage_id->HrefValue = "";
+            if (!EmptyValue($this->id->CurrentValue)) {
+                $this->renewal_stage_id->HrefValue = (!empty($this->id->ViewValue) && !is_array($this->id->ViewValue) ? RemoveHtml($this->id->ViewValue) : $this->id->CurrentValue); // Add prefix/suffix
+                $this->renewal_stage_id->LinkAttrs["target"] = ""; // Add target
+                if ($this->isExport()) {
+                    $this->renewal_stage_id->HrefValue = FullUrl($this->renewal_stage_id->HrefValue, "href");
+                }
+            } else {
+                $this->renewal_stage_id->HrefValue = "";
+            }
             $this->renewal_stage_id->TooltipValue = "";
+
+            // check_status
+            $this->check_status->LinkCustomAttributes = "";
+            if (!EmptyValue($this->id->CurrentValue)) {
+                $this->check_status->HrefValue = "paymentshandler.php?id=" . (!empty($this->id->ViewValue) && !is_array($this->id->ViewValue) ? RemoveHtml($this->id->ViewValue) : $this->id->CurrentValue); // Add prefix/suffix
+                $this->check_status->LinkAttrs["target"] = ""; // Add target
+                if ($this->isExport()) {
+                    $this->check_status->HrefValue = FullUrl($this->check_status->HrefValue, "href");
+                }
+            } else {
+                $this->check_status->HrefValue = "";
+            }
+            $this->check_status->TooltipValue = "";
         } elseif ($this->RowType == ROWTYPE_ADD) {
             // id
 
@@ -2222,7 +2122,11 @@ class MainCampaignsGrid extends MainCampaigns
                     $this->vendor_id->ViewValue = $this->vendor_id->lookupCacheOption($curVal);
                     if ($this->vendor_id->ViewValue === null) { // Lookup from database
                         $filterWrk = "\"id\"" . SearchString("=", $curVal, DATATYPE_NUMBER, "");
-                        $sqlWrk = $this->vendor_id->Lookup->getSql(false, $filterWrk, '', $this, true);
+                        $lookupFilter = function() {
+                            return ((!IsAdmin())? " id = ".Profile()->vendor_id:"");
+                        };
+                        $lookupFilter = $lookupFilter->bindTo($this);
+                        $sqlWrk = $this->vendor_id->Lookup->getSql(false, $filterWrk, $lookupFilter, $this, true);
                         $rswrk = Conn()->executeQuery($sqlWrk)->fetchAll(\PDO::FETCH_BOTH);
                         $ari = count($rswrk);
                         if ($ari > 0) { // Lookup values found
@@ -2237,26 +2141,6 @@ class MainCampaignsGrid extends MainCampaigns
                 }
                 $this->vendor_id->ViewCustomAttributes = "";
             } elseif (!$Security->isAdmin() && $Security->isLoggedIn() && !$this->userIDAllow("grid")) { // Non system admin
-                $this->vendor_id->CurrentValue = CurrentUserID();
-                $curVal = strval($this->vendor_id->CurrentValue);
-                if ($curVal != "") {
-                    $this->vendor_id->EditValue = $this->vendor_id->lookupCacheOption($curVal);
-                    if ($this->vendor_id->EditValue === null) { // Lookup from database
-                        $filterWrk = "\"id\"" . SearchString("=", $curVal, DATATYPE_NUMBER, "");
-                        $sqlWrk = $this->vendor_id->Lookup->getSql(false, $filterWrk, '', $this, true);
-                        $rswrk = Conn()->executeQuery($sqlWrk)->fetchAll(\PDO::FETCH_BOTH);
-                        $ari = count($rswrk);
-                        if ($ari > 0) { // Lookup values found
-                            $arwrk = $this->vendor_id->Lookup->renderViewRow($rswrk[0]);
-                            $this->vendor_id->EditValue = $this->vendor_id->displayValue($arwrk);
-                        } else {
-                            $this->vendor_id->EditValue = $this->vendor_id->CurrentValue;
-                        }
-                    }
-                } else {
-                    $this->vendor_id->EditValue = null;
-                }
-                $this->vendor_id->ViewCustomAttributes = "";
             } else {
                 $curVal = trim(strval($this->vendor_id->CurrentValue));
                 if ($curVal != "") {
@@ -2272,7 +2156,11 @@ class MainCampaignsGrid extends MainCampaigns
                     } else {
                         $filterWrk = "\"id\"" . SearchString("=", $this->vendor_id->CurrentValue, DATATYPE_NUMBER, "");
                     }
-                    $sqlWrk = $this->vendor_id->Lookup->getSql(true, $filterWrk, '', $this);
+                    $lookupFilter = function() {
+                        return ((!IsAdmin())? " id = ".Profile()->vendor_id:"");
+                    };
+                    $lookupFilter = $lookupFilter->bindTo($this);
+                    $sqlWrk = $this->vendor_id->Lookup->getSql(true, $filterWrk, $lookupFilter, $this);
                     $rswrk = Conn()->executeQuery($sqlWrk)->fetchAll(\PDO::FETCH_BOTH);
                     $ari = count($rswrk);
                     $arwrk = $rswrk;
@@ -2280,81 +2168,6 @@ class MainCampaignsGrid extends MainCampaigns
                 }
                 $this->vendor_id->PlaceHolder = RemoveHtml($this->vendor_id->caption());
             }
-
-            // status_id
-            $this->status_id->EditAttrs["class"] = "form-control";
-            $this->status_id->EditCustomAttributes = "";
-            $curVal = trim(strval($this->status_id->CurrentValue));
-            if ($curVal != "") {
-                $this->status_id->ViewValue = $this->status_id->lookupCacheOption($curVal);
-            } else {
-                $this->status_id->ViewValue = $this->status_id->Lookup !== null && is_array($this->status_id->Lookup->Options) ? $curVal : null;
-            }
-            if ($this->status_id->ViewValue !== null) { // Load from cache
-                $this->status_id->EditValue = array_values($this->status_id->Lookup->Options);
-            } else { // Lookup from database
-                if ($curVal == "") {
-                    $filterWrk = "0=1";
-                } else {
-                    $filterWrk = "\"id\"" . SearchString("=", $this->status_id->CurrentValue, DATATYPE_NUMBER, "");
-                }
-                $sqlWrk = $this->status_id->Lookup->getSql(true, $filterWrk, '', $this);
-                $rswrk = Conn()->executeQuery($sqlWrk)->fetchAll(\PDO::FETCH_BOTH);
-                $ari = count($rswrk);
-                $arwrk = $rswrk;
-                $this->status_id->EditValue = $arwrk;
-            }
-            $this->status_id->PlaceHolder = RemoveHtml($this->status_id->caption());
-
-            // print_status_id
-            $this->print_status_id->EditAttrs["class"] = "form-control";
-            $this->print_status_id->EditCustomAttributes = "";
-            $curVal = trim(strval($this->print_status_id->CurrentValue));
-            if ($curVal != "") {
-                $this->print_status_id->ViewValue = $this->print_status_id->lookupCacheOption($curVal);
-            } else {
-                $this->print_status_id->ViewValue = $this->print_status_id->Lookup !== null && is_array($this->print_status_id->Lookup->Options) ? $curVal : null;
-            }
-            if ($this->print_status_id->ViewValue !== null) { // Load from cache
-                $this->print_status_id->EditValue = array_values($this->print_status_id->Lookup->Options);
-            } else { // Lookup from database
-                if ($curVal == "") {
-                    $filterWrk = "0=1";
-                } else {
-                    $filterWrk = "\"id\"" . SearchString("=", $this->print_status_id->CurrentValue, DATATYPE_NUMBER, "");
-                }
-                $sqlWrk = $this->print_status_id->Lookup->getSql(true, $filterWrk, '', $this);
-                $rswrk = Conn()->executeQuery($sqlWrk)->fetchAll(\PDO::FETCH_BOTH);
-                $ari = count($rswrk);
-                $arwrk = $rswrk;
-                $this->print_status_id->EditValue = $arwrk;
-            }
-            $this->print_status_id->PlaceHolder = RemoveHtml($this->print_status_id->caption());
-
-            // payment_status_id
-            $this->payment_status_id->EditAttrs["class"] = "form-control";
-            $this->payment_status_id->EditCustomAttributes = "";
-            $curVal = trim(strval($this->payment_status_id->CurrentValue));
-            if ($curVal != "") {
-                $this->payment_status_id->ViewValue = $this->payment_status_id->lookupCacheOption($curVal);
-            } else {
-                $this->payment_status_id->ViewValue = $this->payment_status_id->Lookup !== null && is_array($this->payment_status_id->Lookup->Options) ? $curVal : null;
-            }
-            if ($this->payment_status_id->ViewValue !== null) { // Load from cache
-                $this->payment_status_id->EditValue = array_values($this->payment_status_id->Lookup->Options);
-            } else { // Lookup from database
-                if ($curVal == "") {
-                    $filterWrk = "0=1";
-                } else {
-                    $filterWrk = "\"id\"" . SearchString("=", $this->payment_status_id->CurrentValue, DATATYPE_NUMBER, "");
-                }
-                $sqlWrk = $this->payment_status_id->Lookup->getSql(true, $filterWrk, '', $this);
-                $rswrk = Conn()->executeQuery($sqlWrk)->fetchAll(\PDO::FETCH_BOTH);
-                $ari = count($rswrk);
-                $arwrk = $rswrk;
-                $this->payment_status_id->EditValue = $arwrk;
-            }
-            $this->payment_status_id->PlaceHolder = RemoveHtml($this->payment_status_id->caption());
 
             // renewal_stage_id
             $this->renewal_stage_id->EditAttrs["class"] = "form-control";
@@ -2380,6 +2193,12 @@ class MainCampaignsGrid extends MainCampaigns
                 $this->renewal_stage_id->EditValue = $arwrk;
             }
             $this->renewal_stage_id->PlaceHolder = RemoveHtml($this->renewal_stage_id->caption());
+
+            // check_status
+            $this->check_status->EditAttrs["class"] = "form-control";
+            $this->check_status->EditCustomAttributes = "";
+            $this->check_status->EditValue = HtmlEncode($this->check_status->CurrentValue);
+            $this->check_status->PlaceHolder = RemoveHtml($this->check_status->caption());
 
             // Add refer script
 
@@ -2419,21 +2238,29 @@ class MainCampaignsGrid extends MainCampaigns
             $this->vendor_id->LinkCustomAttributes = "";
             $this->vendor_id->HrefValue = "";
 
-            // status_id
-            $this->status_id->LinkCustomAttributes = "";
-            $this->status_id->HrefValue = "";
-
-            // print_status_id
-            $this->print_status_id->LinkCustomAttributes = "";
-            $this->print_status_id->HrefValue = "";
-
-            // payment_status_id
-            $this->payment_status_id->LinkCustomAttributes = "";
-            $this->payment_status_id->HrefValue = "";
-
             // renewal_stage_id
             $this->renewal_stage_id->LinkCustomAttributes = "";
-            $this->renewal_stage_id->HrefValue = "";
+            if (!EmptyValue($this->id->CurrentValue)) {
+                $this->renewal_stage_id->HrefValue = (!empty($this->id->EditValue) && !is_array($this->id->EditValue) ? RemoveHtml($this->id->EditValue) : $this->id->CurrentValue); // Add prefix/suffix
+                $this->renewal_stage_id->LinkAttrs["target"] = ""; // Add target
+                if ($this->isExport()) {
+                    $this->renewal_stage_id->HrefValue = FullUrl($this->renewal_stage_id->HrefValue, "href");
+                }
+            } else {
+                $this->renewal_stage_id->HrefValue = "";
+            }
+
+            // check_status
+            $this->check_status->LinkCustomAttributes = "";
+            if (!EmptyValue($this->id->CurrentValue)) {
+                $this->check_status->HrefValue = "paymentshandler.php?id=" . (!empty($this->id->EditValue) && !is_array($this->id->EditValue) ? RemoveHtml($this->id->EditValue) : $this->id->CurrentValue); // Add prefix/suffix
+                $this->check_status->LinkAttrs["target"] = ""; // Add target
+                if ($this->isExport()) {
+                    $this->check_status->HrefValue = FullUrl($this->check_status->HrefValue, "href");
+                }
+            } else {
+                $this->check_status->HrefValue = "";
+            }
         } elseif ($this->RowType == ROWTYPE_EDIT) {
             // id
             $this->id->EditAttrs["class"] = "form-control";
@@ -2585,7 +2412,11 @@ class MainCampaignsGrid extends MainCampaigns
                     $this->vendor_id->ViewValue = $this->vendor_id->lookupCacheOption($curVal);
                     if ($this->vendor_id->ViewValue === null) { // Lookup from database
                         $filterWrk = "\"id\"" . SearchString("=", $curVal, DATATYPE_NUMBER, "");
-                        $sqlWrk = $this->vendor_id->Lookup->getSql(false, $filterWrk, '', $this, true);
+                        $lookupFilter = function() {
+                            return ((!IsAdmin())? " id = ".Profile()->vendor_id:"");
+                        };
+                        $lookupFilter = $lookupFilter->bindTo($this);
+                        $sqlWrk = $this->vendor_id->Lookup->getSql(false, $filterWrk, $lookupFilter, $this, true);
                         $rswrk = Conn()->executeQuery($sqlWrk)->fetchAll(\PDO::FETCH_BOTH);
                         $ari = count($rswrk);
                         if ($ari > 0) { // Lookup values found
@@ -2600,26 +2431,6 @@ class MainCampaignsGrid extends MainCampaigns
                 }
                 $this->vendor_id->ViewCustomAttributes = "";
             } elseif (!$Security->isAdmin() && $Security->isLoggedIn() && !$this->userIDAllow("grid")) { // Non system admin
-                $this->vendor_id->CurrentValue = CurrentUserID();
-                $curVal = strval($this->vendor_id->CurrentValue);
-                if ($curVal != "") {
-                    $this->vendor_id->EditValue = $this->vendor_id->lookupCacheOption($curVal);
-                    if ($this->vendor_id->EditValue === null) { // Lookup from database
-                        $filterWrk = "\"id\"" . SearchString("=", $curVal, DATATYPE_NUMBER, "");
-                        $sqlWrk = $this->vendor_id->Lookup->getSql(false, $filterWrk, '', $this, true);
-                        $rswrk = Conn()->executeQuery($sqlWrk)->fetchAll(\PDO::FETCH_BOTH);
-                        $ari = count($rswrk);
-                        if ($ari > 0) { // Lookup values found
-                            $arwrk = $this->vendor_id->Lookup->renderViewRow($rswrk[0]);
-                            $this->vendor_id->EditValue = $this->vendor_id->displayValue($arwrk);
-                        } else {
-                            $this->vendor_id->EditValue = $this->vendor_id->CurrentValue;
-                        }
-                    }
-                } else {
-                    $this->vendor_id->EditValue = null;
-                }
-                $this->vendor_id->ViewCustomAttributes = "";
             } else {
                 $curVal = trim(strval($this->vendor_id->CurrentValue));
                 if ($curVal != "") {
@@ -2635,7 +2446,11 @@ class MainCampaignsGrid extends MainCampaigns
                     } else {
                         $filterWrk = "\"id\"" . SearchString("=", $this->vendor_id->CurrentValue, DATATYPE_NUMBER, "");
                     }
-                    $sqlWrk = $this->vendor_id->Lookup->getSql(true, $filterWrk, '', $this);
+                    $lookupFilter = function() {
+                        return ((!IsAdmin())? " id = ".Profile()->vendor_id:"");
+                    };
+                    $lookupFilter = $lookupFilter->bindTo($this);
+                    $sqlWrk = $this->vendor_id->Lookup->getSql(true, $filterWrk, $lookupFilter, $this);
                     $rswrk = Conn()->executeQuery($sqlWrk)->fetchAll(\PDO::FETCH_BOTH);
                     $ari = count($rswrk);
                     $arwrk = $rswrk;
@@ -2643,81 +2458,6 @@ class MainCampaignsGrid extends MainCampaigns
                 }
                 $this->vendor_id->PlaceHolder = RemoveHtml($this->vendor_id->caption());
             }
-
-            // status_id
-            $this->status_id->EditAttrs["class"] = "form-control";
-            $this->status_id->EditCustomAttributes = "";
-            $curVal = trim(strval($this->status_id->CurrentValue));
-            if ($curVal != "") {
-                $this->status_id->ViewValue = $this->status_id->lookupCacheOption($curVal);
-            } else {
-                $this->status_id->ViewValue = $this->status_id->Lookup !== null && is_array($this->status_id->Lookup->Options) ? $curVal : null;
-            }
-            if ($this->status_id->ViewValue !== null) { // Load from cache
-                $this->status_id->EditValue = array_values($this->status_id->Lookup->Options);
-            } else { // Lookup from database
-                if ($curVal == "") {
-                    $filterWrk = "0=1";
-                } else {
-                    $filterWrk = "\"id\"" . SearchString("=", $this->status_id->CurrentValue, DATATYPE_NUMBER, "");
-                }
-                $sqlWrk = $this->status_id->Lookup->getSql(true, $filterWrk, '', $this);
-                $rswrk = Conn()->executeQuery($sqlWrk)->fetchAll(\PDO::FETCH_BOTH);
-                $ari = count($rswrk);
-                $arwrk = $rswrk;
-                $this->status_id->EditValue = $arwrk;
-            }
-            $this->status_id->PlaceHolder = RemoveHtml($this->status_id->caption());
-
-            // print_status_id
-            $this->print_status_id->EditAttrs["class"] = "form-control";
-            $this->print_status_id->EditCustomAttributes = "";
-            $curVal = trim(strval($this->print_status_id->CurrentValue));
-            if ($curVal != "") {
-                $this->print_status_id->ViewValue = $this->print_status_id->lookupCacheOption($curVal);
-            } else {
-                $this->print_status_id->ViewValue = $this->print_status_id->Lookup !== null && is_array($this->print_status_id->Lookup->Options) ? $curVal : null;
-            }
-            if ($this->print_status_id->ViewValue !== null) { // Load from cache
-                $this->print_status_id->EditValue = array_values($this->print_status_id->Lookup->Options);
-            } else { // Lookup from database
-                if ($curVal == "") {
-                    $filterWrk = "0=1";
-                } else {
-                    $filterWrk = "\"id\"" . SearchString("=", $this->print_status_id->CurrentValue, DATATYPE_NUMBER, "");
-                }
-                $sqlWrk = $this->print_status_id->Lookup->getSql(true, $filterWrk, '', $this);
-                $rswrk = Conn()->executeQuery($sqlWrk)->fetchAll(\PDO::FETCH_BOTH);
-                $ari = count($rswrk);
-                $arwrk = $rswrk;
-                $this->print_status_id->EditValue = $arwrk;
-            }
-            $this->print_status_id->PlaceHolder = RemoveHtml($this->print_status_id->caption());
-
-            // payment_status_id
-            $this->payment_status_id->EditAttrs["class"] = "form-control";
-            $this->payment_status_id->EditCustomAttributes = "";
-            $curVal = trim(strval($this->payment_status_id->CurrentValue));
-            if ($curVal != "") {
-                $this->payment_status_id->ViewValue = $this->payment_status_id->lookupCacheOption($curVal);
-            } else {
-                $this->payment_status_id->ViewValue = $this->payment_status_id->Lookup !== null && is_array($this->payment_status_id->Lookup->Options) ? $curVal : null;
-            }
-            if ($this->payment_status_id->ViewValue !== null) { // Load from cache
-                $this->payment_status_id->EditValue = array_values($this->payment_status_id->Lookup->Options);
-            } else { // Lookup from database
-                if ($curVal == "") {
-                    $filterWrk = "0=1";
-                } else {
-                    $filterWrk = "\"id\"" . SearchString("=", $this->payment_status_id->CurrentValue, DATATYPE_NUMBER, "");
-                }
-                $sqlWrk = $this->payment_status_id->Lookup->getSql(true, $filterWrk, '', $this);
-                $rswrk = Conn()->executeQuery($sqlWrk)->fetchAll(\PDO::FETCH_BOTH);
-                $ari = count($rswrk);
-                $arwrk = $rswrk;
-                $this->payment_status_id->EditValue = $arwrk;
-            }
-            $this->payment_status_id->PlaceHolder = RemoveHtml($this->payment_status_id->caption());
 
             // renewal_stage_id
             $this->renewal_stage_id->EditAttrs["class"] = "form-control";
@@ -2743,6 +2483,12 @@ class MainCampaignsGrid extends MainCampaigns
                 $this->renewal_stage_id->EditValue = $arwrk;
             }
             $this->renewal_stage_id->PlaceHolder = RemoveHtml($this->renewal_stage_id->caption());
+
+            // check_status
+            $this->check_status->EditAttrs["class"] = "form-control";
+            $this->check_status->EditCustomAttributes = "";
+            $this->check_status->EditValue = HtmlEncode($this->check_status->CurrentValue);
+            $this->check_status->PlaceHolder = RemoveHtml($this->check_status->caption());
 
             // Edit refer script
 
@@ -2782,21 +2528,29 @@ class MainCampaignsGrid extends MainCampaigns
             $this->vendor_id->LinkCustomAttributes = "";
             $this->vendor_id->HrefValue = "";
 
-            // status_id
-            $this->status_id->LinkCustomAttributes = "";
-            $this->status_id->HrefValue = "";
-
-            // print_status_id
-            $this->print_status_id->LinkCustomAttributes = "";
-            $this->print_status_id->HrefValue = "";
-
-            // payment_status_id
-            $this->payment_status_id->LinkCustomAttributes = "";
-            $this->payment_status_id->HrefValue = "";
-
             // renewal_stage_id
             $this->renewal_stage_id->LinkCustomAttributes = "";
-            $this->renewal_stage_id->HrefValue = "";
+            if (!EmptyValue($this->id->CurrentValue)) {
+                $this->renewal_stage_id->HrefValue = (!empty($this->id->EditValue) && !is_array($this->id->EditValue) ? RemoveHtml($this->id->EditValue) : $this->id->CurrentValue); // Add prefix/suffix
+                $this->renewal_stage_id->LinkAttrs["target"] = ""; // Add target
+                if ($this->isExport()) {
+                    $this->renewal_stage_id->HrefValue = FullUrl($this->renewal_stage_id->HrefValue, "href");
+                }
+            } else {
+                $this->renewal_stage_id->HrefValue = "";
+            }
+
+            // check_status
+            $this->check_status->LinkCustomAttributes = "";
+            if (!EmptyValue($this->id->CurrentValue)) {
+                $this->check_status->HrefValue = "paymentshandler.php?id=" . (!empty($this->id->EditValue) && !is_array($this->id->EditValue) ? RemoveHtml($this->id->EditValue) : $this->id->CurrentValue); // Add prefix/suffix
+                $this->check_status->LinkAttrs["target"] = ""; // Add target
+                if ($this->isExport()) {
+                    $this->check_status->HrefValue = FullUrl($this->check_status->HrefValue, "href");
+                }
+            } else {
+                $this->check_status->HrefValue = "";
+            }
         } elseif ($this->RowType == ROWTYPE_AGGREGATEINIT) { // Initialize aggregate row
                     $this->quantity->Total = 0; // Initialize total
         } elseif ($this->RowType == ROWTYPE_AGGREGATE) { // Aggregate row
@@ -2882,24 +2636,14 @@ class MainCampaignsGrid extends MainCampaigns
                 $this->vendor_id->addErrorMessage(str_replace("%s", $this->vendor_id->caption(), $this->vendor_id->RequiredErrorMessage));
             }
         }
-        if ($this->status_id->Required) {
-            if (!$this->status_id->IsDetailKey && EmptyValue($this->status_id->FormValue)) {
-                $this->status_id->addErrorMessage(str_replace("%s", $this->status_id->caption(), $this->status_id->RequiredErrorMessage));
-            }
-        }
-        if ($this->print_status_id->Required) {
-            if (!$this->print_status_id->IsDetailKey && EmptyValue($this->print_status_id->FormValue)) {
-                $this->print_status_id->addErrorMessage(str_replace("%s", $this->print_status_id->caption(), $this->print_status_id->RequiredErrorMessage));
-            }
-        }
-        if ($this->payment_status_id->Required) {
-            if (!$this->payment_status_id->IsDetailKey && EmptyValue($this->payment_status_id->FormValue)) {
-                $this->payment_status_id->addErrorMessage(str_replace("%s", $this->payment_status_id->caption(), $this->payment_status_id->RequiredErrorMessage));
-            }
-        }
         if ($this->renewal_stage_id->Required) {
             if (!$this->renewal_stage_id->IsDetailKey && EmptyValue($this->renewal_stage_id->FormValue)) {
                 $this->renewal_stage_id->addErrorMessage(str_replace("%s", $this->renewal_stage_id->caption(), $this->renewal_stage_id->RequiredErrorMessage));
+            }
+        }
+        if ($this->check_status->Required) {
+            if (!$this->check_status->IsDetailKey && EmptyValue($this->check_status->FormValue)) {
+                $this->check_status->addErrorMessage(str_replace("%s", $this->check_status->caption(), $this->check_status->RequiredErrorMessage));
             }
         }
 
@@ -3034,17 +2778,11 @@ class MainCampaignsGrid extends MainCampaigns
             // vendor_id
             $this->vendor_id->setDbValueDef($rsnew, $this->vendor_id->CurrentValue, null, $this->vendor_id->ReadOnly);
 
-            // status_id
-            $this->status_id->setDbValueDef($rsnew, $this->status_id->CurrentValue, 0, $this->status_id->ReadOnly);
-
-            // print_status_id
-            $this->print_status_id->setDbValueDef($rsnew, $this->print_status_id->CurrentValue, 0, $this->print_status_id->ReadOnly);
-
-            // payment_status_id
-            $this->payment_status_id->setDbValueDef($rsnew, $this->payment_status_id->CurrentValue, 0, $this->payment_status_id->ReadOnly);
-
             // renewal_stage_id
             $this->renewal_stage_id->setDbValueDef($rsnew, $this->renewal_stage_id->CurrentValue, null, $this->renewal_stage_id->ReadOnly);
+
+            // check_status
+            $this->check_status->setDbValueDef($rsnew, $this->check_status->CurrentValue, null, $this->check_status->ReadOnly);
 
             // Call Row Updating event
             $updateRow = $this->rowUpdating($rsold, $rsnew);
@@ -3193,17 +2931,11 @@ class MainCampaignsGrid extends MainCampaigns
         // vendor_id
         $this->vendor_id->setDbValueDef($rsnew, $this->vendor_id->CurrentValue, null, false);
 
-        // status_id
-        $this->status_id->setDbValueDef($rsnew, $this->status_id->CurrentValue, 0, strval($this->status_id->CurrentValue) == "");
-
-        // print_status_id
-        $this->print_status_id->setDbValueDef($rsnew, $this->print_status_id->CurrentValue, 0, strval($this->print_status_id->CurrentValue) == "");
-
-        // payment_status_id
-        $this->payment_status_id->setDbValueDef($rsnew, $this->payment_status_id->CurrentValue, 0, strval($this->payment_status_id->CurrentValue) == "");
-
         // renewal_stage_id
-        $this->renewal_stage_id->setDbValueDef($rsnew, $this->renewal_stage_id->CurrentValue, null, false);
+        $this->renewal_stage_id->setDbValueDef($rsnew, $this->renewal_stage_id->CurrentValue, null, strval($this->renewal_stage_id->CurrentValue) == "");
+
+        // check_status
+        $this->check_status->setDbValueDef($rsnew, $this->check_status->CurrentValue, null, false);
 
         // user_id
         if ($this->user_id->getSessionValue() != "") {
@@ -3312,12 +3044,10 @@ class MainCampaignsGrid extends MainCampaigns
                 case "x_price_id":
                     break;
                 case "x_vendor_id":
-                    break;
-                case "x_status_id":
-                    break;
-                case "x_print_status_id":
-                    break;
-                case "x_payment_status_id":
+                    $lookupFilter = function () {
+                        return ((!IsAdmin())? " id = ".Profile()->vendor_id:"");
+                    };
+                    $lookupFilter = $lookupFilter->bindTo($this);
                     break;
                 case "x_renewal_stage_id":
                     break;
@@ -3352,7 +3082,7 @@ class MainCampaignsGrid extends MainCampaigns
         //Log("Page Load");
         global $Language;
         $Language->setPhraseClass("addlink", ""); // remove icon to remove <span> element
-        $Language->setPhrase("addlink", "<span class='btn btn-block bg-gradient-primary btn-lg'>CREATE A NEW CAMPAIGN</span>"); // re-draw <span> element yourself 
+        $Language->setPhrase("addlink", "<span class='btn btn-block bg-gradient-primary btn-lg'>CREATE A NEW CAMPAIGN</span>"); // re-draw <span> element yourself
     }
 
     // Page Unload event

@@ -915,7 +915,6 @@ class MainUsersView extends MainUsers
             $this->vendor_id->ViewCustomAttributes = "";
 
             // reportsto
-            $this->reportsto->ViewValue = $this->reportsto->CurrentValue;
             $curVal = strval($this->reportsto->CurrentValue);
             if ($curVal != "") {
                 $this->reportsto->ViewValue = $this->reportsto->lookupCacheOption($curVal);

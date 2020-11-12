@@ -1105,26 +1105,15 @@ class MainReportsAdd extends MainReports
             $this->vendor_id->EditAttrs["class"] = "form-control";
             $this->vendor_id->EditCustomAttributes = "";
             if (!$Security->isAdmin() && $Security->isLoggedIn() && !$this->userIDAllow("add")) { // Non system admin
-                $this->vendor_id->CurrentValue = CurrentUserID();
-                $curVal = strval($this->vendor_id->CurrentValue);
-                if ($curVal != "") {
-                    $this->vendor_id->EditValue = $this->vendor_id->lookupCacheOption($curVal);
-                    if ($this->vendor_id->EditValue === null) { // Lookup from database
-                        $filterWrk = "\"id\"" . SearchString("=", $curVal, DATATYPE_NUMBER, "");
-                        $sqlWrk = $this->vendor_id->Lookup->getSql(false, $filterWrk, '', $this, true);
-                        $rswrk = Conn()->executeQuery($sqlWrk)->fetchAll(\PDO::FETCH_BOTH);
-                        $ari = count($rswrk);
-                        if ($ari > 0) { // Lookup values found
-                            $arwrk = $this->vendor_id->Lookup->renderViewRow($rswrk[0]);
-                            $this->vendor_id->EditValue = $this->vendor_id->displayValue($arwrk);
-                        } else {
-                            $this->vendor_id->EditValue = $this->vendor_id->CurrentValue;
-                        }
-                    }
+                if (trim(strval($this->vendor_id->CurrentValue)) == "") {
+                    $filterWrk = "0=1";
                 } else {
-                    $this->vendor_id->EditValue = null;
+                    $filterWrk = "\"id\"" . SearchString("=", $this->vendor_id->CurrentValue, DATATYPE_NUMBER, "");
                 }
-                $this->vendor_id->ViewCustomAttributes = "";
+                $sqlWrk = $this->vendor_id->Lookup->getSql(true, $filterWrk, '', $this);
+                $rswrk = Conn()->executeQuery($sqlWrk)->fetchAll(\PDO::FETCH_BOTH);
+                $arwrk = $rswrk;
+                $this->vendor_id->EditValue = $arwrk;
             } else {
                 $curVal = trim(strval($this->vendor_id->CurrentValue));
                 if ($curVal != "") {

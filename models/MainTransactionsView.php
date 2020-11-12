@@ -498,6 +498,7 @@ class MainTransactionsView extends MainTransactions
         $this->quantity->setVisibility();
         $this->start_date->setVisibility();
         $this->end_date->setVisibility();
+        $this->visible_status_id->setVisibility();
         $this->status_id->setVisibility();
         $this->print_status_id->setVisibility();
         $this->payment_status_id->setVisibility();
@@ -522,6 +523,7 @@ class MainTransactionsView extends MainTransactions
         $this->setupLookupOptions($this->campaign_id);
         $this->setupLookupOptions($this->operator_id);
         $this->setupLookupOptions($this->price_id);
+        $this->setupLookupOptions($this->visible_status_id);
         $this->setupLookupOptions($this->status_id);
         $this->setupLookupOptions($this->print_status_id);
         $this->setupLookupOptions($this->payment_status_id);
@@ -815,6 +817,7 @@ class MainTransactionsView extends MainTransactions
         $this->quantity->setDbValue($row['quantity']);
         $this->start_date->setDbValue($row['start_date']);
         $this->end_date->setDbValue($row['end_date']);
+        $this->visible_status_id->setDbValue($row['visible_status_id']);
         $this->status_id->setDbValue($row['status_id']);
         if (array_key_exists('EV__status_id', $row)) {
             $this->status_id->VirtualValue = $row['EV__status_id']; // Set up virtual field value
@@ -851,6 +854,7 @@ class MainTransactionsView extends MainTransactions
         $row['quantity'] = null;
         $row['start_date'] = null;
         $row['end_date'] = null;
+        $row['visible_status_id'] = null;
         $row['status_id'] = null;
         $row['print_status_id'] = null;
         $row['payment_status_id'] = null;
@@ -894,6 +898,8 @@ class MainTransactionsView extends MainTransactions
         // start_date
 
         // end_date
+
+        // visible_status_id
 
         // status_id
 
@@ -1004,6 +1010,27 @@ class MainTransactionsView extends MainTransactions
             $this->end_date->ViewValue = $this->end_date->CurrentValue;
             $this->end_date->ViewValue = FormatDateTime($this->end_date->ViewValue, 5);
             $this->end_date->ViewCustomAttributes = "";
+
+            // visible_status_id
+            $curVal = strval($this->visible_status_id->CurrentValue);
+            if ($curVal != "") {
+                $this->visible_status_id->ViewValue = $this->visible_status_id->lookupCacheOption($curVal);
+                if ($this->visible_status_id->ViewValue === null) { // Lookup from database
+                    $filterWrk = "\"id\"" . SearchString("=", $curVal, DATATYPE_NUMBER, "");
+                    $sqlWrk = $this->visible_status_id->Lookup->getSql(false, $filterWrk, '', $this, true);
+                    $rswrk = Conn()->executeQuery($sqlWrk)->fetchAll(\PDO::FETCH_BOTH);
+                    $ari = count($rswrk);
+                    if ($ari > 0) { // Lookup values found
+                        $arwrk = $this->visible_status_id->Lookup->renderViewRow($rswrk[0]);
+                        $this->visible_status_id->ViewValue = $this->visible_status_id->displayValue($arwrk);
+                    } else {
+                        $this->visible_status_id->ViewValue = $this->visible_status_id->CurrentValue;
+                    }
+                }
+            } else {
+                $this->visible_status_id->ViewValue = null;
+            }
+            $this->visible_status_id->ViewCustomAttributes = "";
 
             // status_id
             if ($this->status_id->VirtualValue != "") {
@@ -1155,6 +1182,11 @@ class MainTransactionsView extends MainTransactions
             $this->end_date->LinkCustomAttributes = "";
             $this->end_date->HrefValue = "";
             $this->end_date->TooltipValue = "";
+
+            // visible_status_id
+            $this->visible_status_id->LinkCustomAttributes = "";
+            $this->visible_status_id->HrefValue = "";
+            $this->visible_status_id->TooltipValue = "";
 
             // status_id
             $this->status_id->LinkCustomAttributes = "";
@@ -1360,6 +1392,8 @@ class MainTransactionsView extends MainTransactions
                     break;
                 case "x_price_id":
                     break;
+                case "x_visible_status_id":
+                    break;
                 case "x_status_id":
                     break;
                 case "x_print_status_id":
@@ -1436,6 +1470,19 @@ class MainTransactionsView extends MainTransactions
     public function pageLoad()
     {
         //Log("Page Load");
+        $levelid = CurrentUserLevel();
+        if(IsAdmin()){
+    			//ADMIN
+    			$this->visible_status_id->Visible = FALSE;
+    	}else{
+    			if($levelid > 0 ){
+    				// MANAGER
+    				$this->visible_status_id->Visible = FALSE;
+    			}else{
+    				// DEFAULT
+    				$this->status_id->Visible = FALSE;
+    			}
+    	}	
     }
 
     // Page Unload event

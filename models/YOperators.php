@@ -32,6 +32,8 @@ class YOperators extends DbTable
     public $name;
     public $shortname;
     public $platform_id;
+    public $_email;
+    public $contact_name;
 
     // Page ID
     public $PageID = ""; // To be overridden by subclass
@@ -97,6 +99,16 @@ class YOperators extends DbTable
         $this->platform_id->Lookup = new Lookup('platform_id', 'y_platforms', false, 'id', ["name","","",""], [], [], [], [], [], [], '', '');
         $this->platform_id->DefaultErrorMessage = $Language->phrase("IncorrectInteger");
         $this->Fields['platform_id'] = &$this->platform_id;
+
+        // email
+        $this->_email = new DbField('y_operators', 'y_operators', 'x__email', 'email', '"email"', '"email"', 200, 0, -1, false, '"email"', false, false, false, 'FORMATTED TEXT', 'TEXT');
+        $this->_email->Sortable = true; // Allow sort
+        $this->Fields['email'] = &$this->_email;
+
+        // contact_name
+        $this->contact_name = new DbField('y_operators', 'y_operators', 'x_contact_name', 'contact_name', '"contact_name"', '"contact_name"', 200, 0, -1, false, '"contact_name"', false, false, false, 'FORMATTED TEXT', 'TEXT');
+        $this->contact_name->Sortable = true; // Allow sort
+        $this->Fields['contact_name'] = &$this->contact_name;
     }
 
     // Field Visibility
@@ -589,6 +601,8 @@ class YOperators extends DbTable
         $this->name->DbValue = $row['name'];
         $this->shortname->DbValue = $row['shortname'];
         $this->platform_id->DbValue = $row['platform_id'];
+        $this->_email->DbValue = $row['email'];
+        $this->contact_name->DbValue = $row['contact_name'];
     }
 
     // Delete uploaded files
@@ -926,6 +940,8 @@ SORTHTML;
         $this->name->setDbValue($row['name']);
         $this->shortname->setDbValue($row['shortname']);
         $this->platform_id->setDbValue($row['platform_id']);
+        $this->_email->setDbValue($row['email']);
+        $this->contact_name->setDbValue($row['contact_name']);
     }
 
     // Render list row values
@@ -945,6 +961,10 @@ SORTHTML;
         // shortname
 
         // platform_id
+
+        // email
+
+        // contact_name
 
         // id
         $this->id->ViewValue = $this->id->CurrentValue;
@@ -979,6 +999,14 @@ SORTHTML;
         }
         $this->platform_id->ViewCustomAttributes = "";
 
+        // email
+        $this->_email->ViewValue = $this->_email->CurrentValue;
+        $this->_email->ViewCustomAttributes = "";
+
+        // contact_name
+        $this->contact_name->ViewValue = $this->contact_name->CurrentValue;
+        $this->contact_name->ViewCustomAttributes = "";
+
         // id
         $this->id->LinkCustomAttributes = "";
         $this->id->HrefValue = "";
@@ -998,6 +1026,16 @@ SORTHTML;
         $this->platform_id->LinkCustomAttributes = "";
         $this->platform_id->HrefValue = "";
         $this->platform_id->TooltipValue = "";
+
+        // email
+        $this->_email->LinkCustomAttributes = "";
+        $this->_email->HrefValue = "";
+        $this->_email->TooltipValue = "";
+
+        // contact_name
+        $this->contact_name->LinkCustomAttributes = "";
+        $this->contact_name->HrefValue = "";
+        $this->contact_name->TooltipValue = "";
 
         // Call Row Rendered event
         $this->rowRendered();
@@ -1066,6 +1104,24 @@ SORTHTML;
             $this->platform_id->PlaceHolder = RemoveHtml($this->platform_id->caption());
         }
 
+        // email
+        $this->_email->EditAttrs["class"] = "form-control";
+        $this->_email->EditCustomAttributes = "";
+        if (!$this->_email->Raw) {
+            $this->_email->CurrentValue = HtmlDecode($this->_email->CurrentValue);
+        }
+        $this->_email->EditValue = $this->_email->CurrentValue;
+        $this->_email->PlaceHolder = RemoveHtml($this->_email->caption());
+
+        // contact_name
+        $this->contact_name->EditAttrs["class"] = "form-control";
+        $this->contact_name->EditCustomAttributes = "";
+        if (!$this->contact_name->Raw) {
+            $this->contact_name->CurrentValue = HtmlDecode($this->contact_name->CurrentValue);
+        }
+        $this->contact_name->EditValue = $this->contact_name->CurrentValue;
+        $this->contact_name->PlaceHolder = RemoveHtml($this->contact_name->caption());
+
         // Call Row Rendered event
         $this->rowRendered();
     }
@@ -1098,11 +1154,15 @@ SORTHTML;
                     $doc->exportCaption($this->name);
                     $doc->exportCaption($this->shortname);
                     $doc->exportCaption($this->platform_id);
+                    $doc->exportCaption($this->_email);
+                    $doc->exportCaption($this->contact_name);
                 } else {
                     $doc->exportCaption($this->id);
                     $doc->exportCaption($this->name);
                     $doc->exportCaption($this->shortname);
                     $doc->exportCaption($this->platform_id);
+                    $doc->exportCaption($this->_email);
+                    $doc->exportCaption($this->contact_name);
                 }
                 $doc->endExportRow();
             }
@@ -1136,11 +1196,15 @@ SORTHTML;
                         $doc->exportField($this->name);
                         $doc->exportField($this->shortname);
                         $doc->exportField($this->platform_id);
+                        $doc->exportField($this->_email);
+                        $doc->exportField($this->contact_name);
                     } else {
                         $doc->exportField($this->id);
                         $doc->exportField($this->name);
                         $doc->exportField($this->shortname);
                         $doc->exportField($this->platform_id);
+                        $doc->exportField($this->_email);
+                        $doc->exportField($this->contact_name);
                     }
                     $doc->endExportRow($rowCnt);
                 }

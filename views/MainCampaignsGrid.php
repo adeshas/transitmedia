@@ -29,10 +29,8 @@ loadjs.ready("head", function () {
         ["start_date", [fields.start_date.required ? ew.Validators.required(fields.start_date.caption) : null, ew.Validators.datetime(0)], fields.start_date.isInvalid],
         ["end_date", [fields.end_date.required ? ew.Validators.required(fields.end_date.caption) : null, ew.Validators.datetime(0)], fields.end_date.isInvalid],
         ["vendor_id", [fields.vendor_id.required ? ew.Validators.required(fields.vendor_id.caption) : null], fields.vendor_id.isInvalid],
-        ["status_id", [fields.status_id.required ? ew.Validators.required(fields.status_id.caption) : null], fields.status_id.isInvalid],
-        ["print_status_id", [fields.print_status_id.required ? ew.Validators.required(fields.print_status_id.caption) : null], fields.print_status_id.isInvalid],
-        ["payment_status_id", [fields.payment_status_id.required ? ew.Validators.required(fields.payment_status_id.caption) : null], fields.payment_status_id.isInvalid],
-        ["renewal_stage_id", [fields.renewal_stage_id.required ? ew.Validators.required(fields.renewal_stage_id.caption) : null], fields.renewal_stage_id.isInvalid]
+        ["renewal_stage_id", [fields.renewal_stage_id.required ? ew.Validators.required(fields.renewal_stage_id.caption) : null], fields.renewal_stage_id.isInvalid],
+        ["check_status", [fields.check_status.required ? ew.Validators.required(fields.check_status.caption) : null], fields.check_status.isInvalid]
     ]);
 
     // Set invalid fields
@@ -102,13 +100,9 @@ loadjs.ready("head", function () {
             return false;
         if (ew.valueChanged(fobj, rowIndex, "vendor_id", false))
             return false;
-        if (ew.valueChanged(fobj, rowIndex, "status_id", false))
-            return false;
-        if (ew.valueChanged(fobj, rowIndex, "print_status_id", false))
-            return false;
-        if (ew.valueChanged(fobj, rowIndex, "payment_status_id", false))
-            return false;
         if (ew.valueChanged(fobj, rowIndex, "renewal_stage_id", false))
+            return false;
+        if (ew.valueChanged(fobj, rowIndex, "check_status", false))
             return false;
         return true;
     }
@@ -128,9 +122,6 @@ loadjs.ready("head", function () {
     fmain_campaignsgrid.lists.platform_id = <?= $Grid->platform_id->toClientList($Grid) ?>;
     fmain_campaignsgrid.lists.bus_size_id = <?= $Grid->bus_size_id->toClientList($Grid) ?>;
     fmain_campaignsgrid.lists.vendor_id = <?= $Grid->vendor_id->toClientList($Grid) ?>;
-    fmain_campaignsgrid.lists.status_id = <?= $Grid->status_id->toClientList($Grid) ?>;
-    fmain_campaignsgrid.lists.print_status_id = <?= $Grid->print_status_id->toClientList($Grid) ?>;
-    fmain_campaignsgrid.lists.payment_status_id = <?= $Grid->payment_status_id->toClientList($Grid) ?>;
     fmain_campaignsgrid.lists.renewal_stage_id = <?= $Grid->renewal_stage_id->toClientList($Grid) ?>;
     loadjs.done("fmain_campaignsgrid");
 });
@@ -189,17 +180,11 @@ $Grid->ListOptions->render("header", "left");
 <?php if ($Grid->vendor_id->Visible) { // vendor_id ?>
         <th data-name="vendor_id" class="<?= $Grid->vendor_id->headerCellClass() ?>"><div id="elh_main_campaigns_vendor_id" class="main_campaigns_vendor_id"><?= $Grid->renderSort($Grid->vendor_id) ?></div></th>
 <?php } ?>
-<?php if ($Grid->status_id->Visible) { // status_id ?>
-        <th data-name="status_id" class="<?= $Grid->status_id->headerCellClass() ?>"><div id="elh_main_campaigns_status_id" class="main_campaigns_status_id"><?= $Grid->renderSort($Grid->status_id) ?></div></th>
-<?php } ?>
-<?php if ($Grid->print_status_id->Visible) { // print_status_id ?>
-        <th data-name="print_status_id" class="<?= $Grid->print_status_id->headerCellClass() ?>"><div id="elh_main_campaigns_print_status_id" class="main_campaigns_print_status_id"><?= $Grid->renderSort($Grid->print_status_id) ?></div></th>
-<?php } ?>
-<?php if ($Grid->payment_status_id->Visible) { // payment_status_id ?>
-        <th data-name="payment_status_id" class="<?= $Grid->payment_status_id->headerCellClass() ?>"><div id="elh_main_campaigns_payment_status_id" class="main_campaigns_payment_status_id"><?= $Grid->renderSort($Grid->payment_status_id) ?></div></th>
-<?php } ?>
 <?php if ($Grid->renewal_stage_id->Visible) { // renewal_stage_id ?>
         <th data-name="renewal_stage_id" class="<?= $Grid->renewal_stage_id->headerCellClass() ?>"><div id="elh_main_campaigns_renewal_stage_id" class="main_campaigns_renewal_stage_id"><?= $Grid->renderSort($Grid->renewal_stage_id) ?></div></th>
+<?php } ?>
+<?php if ($Grid->check_status->Visible) { // check_status ?>
+        <th data-name="check_status" class="<?= $Grid->check_status->headerCellClass() ?>"><div id="elh_main_campaigns_check_status" class="main_campaigns_check_status"><?= $Grid->renderSort($Grid->check_status) ?></div></th>
 <?php } ?>
 <?php
 // Render list options (header, right)
@@ -741,10 +726,30 @@ loadjs.ready(["fmain_campaignsgrid", "datetimepicker"], function() {
 <input type="hidden" id="x<?= $Grid->RowIndex ?>_vendor_id" name="x<?= $Grid->RowIndex ?>_vendor_id" value="<?= HtmlEncode($Grid->vendor_id->CurrentValue) ?>" data-hidden="1">
 <?php } elseif (!$Security->isAdmin() && $Security->isLoggedIn() && !$Grid->userIDAllow("grid")) { // Non system admin ?>
 <span id="el<?= $Grid->RowCount ?>_main_campaigns_vendor_id" class="form-group">
-<span<?= $Grid->vendor_id->viewAttributes() ?>>
-<input type="text" readonly class="form-control-plaintext" value="<?= HtmlEncode(RemoveHtml($Grid->vendor_id->getDisplayValue($Grid->vendor_id->EditValue))) ?>"></span>
+    <select
+        id="x<?= $Grid->RowIndex ?>_vendor_id"
+        name="x<?= $Grid->RowIndex ?>_vendor_id"
+        class="form-control ew-select<?= $Grid->vendor_id->isInvalidClass() ?>"
+        data-select2-id="main_campaigns_x<?= $Grid->RowIndex ?>_vendor_id"
+        data-table="main_campaigns"
+        data-field="x_vendor_id"
+        data-value-separator="<?= $Grid->vendor_id->displayValueSeparatorAttribute() ?>"
+        data-placeholder="<?= HtmlEncode($Grid->vendor_id->getPlaceHolder()) ?>"
+        <?= $Grid->vendor_id->editAttributes() ?>>
+        <?= $Grid->vendor_id->selectOptionListHtml("x{$Grid->RowIndex}_vendor_id") ?>
+    </select>
+    <div class="invalid-feedback"><?= $Grid->vendor_id->getErrorMessage() ?></div>
+<?= $Grid->vendor_id->Lookup->getParamTag($Grid, "p_x" . $Grid->RowIndex . "_vendor_id") ?>
+<script>
+loadjs.ready("head", function() {
+    var el = document.querySelector("select[data-select2-id='main_campaigns_x<?= $Grid->RowIndex ?>_vendor_id']"),
+        options = { name: "x<?= $Grid->RowIndex ?>_vendor_id", selectId: "main_campaigns_x<?= $Grid->RowIndex ?>_vendor_id", language: ew.LANGUAGE_ID, dir: ew.IS_RTL ? "rtl" : "ltr" };
+    options.dropdownParent = $(el).closest("#ew-modal-dialog, #ew-add-opt-dialog")[0];
+    Object.assign(options, ew.vars.tables.main_campaigns.fields.vendor_id.selectOptions);
+    ew.createSelect(options);
+});
+</script>
 </span>
-<input type="hidden" data-table="main_campaigns" data-field="x_vendor_id" data-hidden="1" name="x<?= $Grid->RowIndex ?>_vendor_id" id="x<?= $Grid->RowIndex ?>_vendor_id" value="<?= HtmlEncode($Grid->vendor_id->CurrentValue) ?>">
 <?php } else { ?>
 <span id="el<?= $Grid->RowCount ?>_main_campaigns_vendor_id" class="form-group">
     <select
@@ -783,10 +788,30 @@ loadjs.ready("head", function() {
 <input type="hidden" id="x<?= $Grid->RowIndex ?>_vendor_id" name="x<?= $Grid->RowIndex ?>_vendor_id" value="<?= HtmlEncode($Grid->vendor_id->CurrentValue) ?>" data-hidden="1">
 <?php } elseif (!$Security->isAdmin() && $Security->isLoggedIn() && !$Grid->userIDAllow("grid")) { // Non system admin ?>
 <span id="el<?= $Grid->RowCount ?>_main_campaigns_vendor_id" class="form-group">
-<span<?= $Grid->vendor_id->viewAttributes() ?>>
-<input type="text" readonly class="form-control-plaintext" value="<?= HtmlEncode(RemoveHtml($Grid->vendor_id->getDisplayValue($Grid->vendor_id->EditValue))) ?>"></span>
+    <select
+        id="x<?= $Grid->RowIndex ?>_vendor_id"
+        name="x<?= $Grid->RowIndex ?>_vendor_id"
+        class="form-control ew-select<?= $Grid->vendor_id->isInvalidClass() ?>"
+        data-select2-id="main_campaigns_x<?= $Grid->RowIndex ?>_vendor_id"
+        data-table="main_campaigns"
+        data-field="x_vendor_id"
+        data-value-separator="<?= $Grid->vendor_id->displayValueSeparatorAttribute() ?>"
+        data-placeholder="<?= HtmlEncode($Grid->vendor_id->getPlaceHolder()) ?>"
+        <?= $Grid->vendor_id->editAttributes() ?>>
+        <?= $Grid->vendor_id->selectOptionListHtml("x{$Grid->RowIndex}_vendor_id") ?>
+    </select>
+    <div class="invalid-feedback"><?= $Grid->vendor_id->getErrorMessage() ?></div>
+<?= $Grid->vendor_id->Lookup->getParamTag($Grid, "p_x" . $Grid->RowIndex . "_vendor_id") ?>
+<script>
+loadjs.ready("head", function() {
+    var el = document.querySelector("select[data-select2-id='main_campaigns_x<?= $Grid->RowIndex ?>_vendor_id']"),
+        options = { name: "x<?= $Grid->RowIndex ?>_vendor_id", selectId: "main_campaigns_x<?= $Grid->RowIndex ?>_vendor_id", language: ew.LANGUAGE_ID, dir: ew.IS_RTL ? "rtl" : "ltr" };
+    options.dropdownParent = $(el).closest("#ew-modal-dialog, #ew-add-opt-dialog")[0];
+    Object.assign(options, ew.vars.tables.main_campaigns.fields.vendor_id.selectOptions);
+    ew.createSelect(options);
+});
+</script>
 </span>
-<input type="hidden" data-table="main_campaigns" data-field="x_vendor_id" data-hidden="1" name="x<?= $Grid->RowIndex ?>_vendor_id" id="x<?= $Grid->RowIndex ?>_vendor_id" value="<?= HtmlEncode($Grid->vendor_id->CurrentValue) ?>">
 <?php } else { ?>
 <span id="el<?= $Grid->RowCount ?>_main_campaigns_vendor_id" class="form-group">
     <select
@@ -823,213 +848,6 @@ loadjs.ready("head", function() {
 <?php if ($Grid->isConfirm()) { ?>
 <input type="hidden" data-table="main_campaigns" data-field="x_vendor_id" data-hidden="1" name="fmain_campaignsgrid$x<?= $Grid->RowIndex ?>_vendor_id" id="fmain_campaignsgrid$x<?= $Grid->RowIndex ?>_vendor_id" value="<?= HtmlEncode($Grid->vendor_id->FormValue) ?>">
 <input type="hidden" data-table="main_campaigns" data-field="x_vendor_id" data-hidden="1" name="fmain_campaignsgrid$o<?= $Grid->RowIndex ?>_vendor_id" id="fmain_campaignsgrid$o<?= $Grid->RowIndex ?>_vendor_id" value="<?= HtmlEncode($Grid->vendor_id->OldValue) ?>">
-<?php } ?>
-<?php } ?>
-</td>
-    <?php } ?>
-    <?php if ($Grid->status_id->Visible) { // status_id ?>
-        <td data-name="status_id" <?= $Grid->status_id->cellAttributes() ?>>
-<?php if ($Grid->RowType == ROWTYPE_ADD) { // Add record ?>
-<span id="el<?= $Grid->RowCount ?>_main_campaigns_status_id" class="form-group">
-    <select
-        id="x<?= $Grid->RowIndex ?>_status_id"
-        name="x<?= $Grid->RowIndex ?>_status_id"
-        class="form-control ew-select<?= $Grid->status_id->isInvalidClass() ?>"
-        data-select2-id="main_campaigns_x<?= $Grid->RowIndex ?>_status_id"
-        data-table="main_campaigns"
-        data-field="x_status_id"
-        data-value-separator="<?= $Grid->status_id->displayValueSeparatorAttribute() ?>"
-        data-placeholder="<?= HtmlEncode($Grid->status_id->getPlaceHolder()) ?>"
-        <?= $Grid->status_id->editAttributes() ?>>
-        <?= $Grid->status_id->selectOptionListHtml("x{$Grid->RowIndex}_status_id") ?>
-    </select>
-    <div class="invalid-feedback"><?= $Grid->status_id->getErrorMessage() ?></div>
-<?= $Grid->status_id->Lookup->getParamTag($Grid, "p_x" . $Grid->RowIndex . "_status_id") ?>
-<script>
-loadjs.ready("head", function() {
-    var el = document.querySelector("select[data-select2-id='main_campaigns_x<?= $Grid->RowIndex ?>_status_id']"),
-        options = { name: "x<?= $Grid->RowIndex ?>_status_id", selectId: "main_campaigns_x<?= $Grid->RowIndex ?>_status_id", language: ew.LANGUAGE_ID, dir: ew.IS_RTL ? "rtl" : "ltr" };
-    options.dropdownParent = $(el).closest("#ew-modal-dialog, #ew-add-opt-dialog")[0];
-    Object.assign(options, ew.vars.tables.main_campaigns.fields.status_id.selectOptions);
-    ew.createSelect(options);
-});
-</script>
-</span>
-<input type="hidden" data-table="main_campaigns" data-field="x_status_id" data-hidden="1" name="o<?= $Grid->RowIndex ?>_status_id" id="o<?= $Grid->RowIndex ?>_status_id" value="<?= HtmlEncode($Grid->status_id->OldValue) ?>">
-<?php } ?>
-<?php if ($Grid->RowType == ROWTYPE_EDIT) { // Edit record ?>
-<span id="el<?= $Grid->RowCount ?>_main_campaigns_status_id" class="form-group">
-    <select
-        id="x<?= $Grid->RowIndex ?>_status_id"
-        name="x<?= $Grid->RowIndex ?>_status_id"
-        class="form-control ew-select<?= $Grid->status_id->isInvalidClass() ?>"
-        data-select2-id="main_campaigns_x<?= $Grid->RowIndex ?>_status_id"
-        data-table="main_campaigns"
-        data-field="x_status_id"
-        data-value-separator="<?= $Grid->status_id->displayValueSeparatorAttribute() ?>"
-        data-placeholder="<?= HtmlEncode($Grid->status_id->getPlaceHolder()) ?>"
-        <?= $Grid->status_id->editAttributes() ?>>
-        <?= $Grid->status_id->selectOptionListHtml("x{$Grid->RowIndex}_status_id") ?>
-    </select>
-    <div class="invalid-feedback"><?= $Grid->status_id->getErrorMessage() ?></div>
-<?= $Grid->status_id->Lookup->getParamTag($Grid, "p_x" . $Grid->RowIndex . "_status_id") ?>
-<script>
-loadjs.ready("head", function() {
-    var el = document.querySelector("select[data-select2-id='main_campaigns_x<?= $Grid->RowIndex ?>_status_id']"),
-        options = { name: "x<?= $Grid->RowIndex ?>_status_id", selectId: "main_campaigns_x<?= $Grid->RowIndex ?>_status_id", language: ew.LANGUAGE_ID, dir: ew.IS_RTL ? "rtl" : "ltr" };
-    options.dropdownParent = $(el).closest("#ew-modal-dialog, #ew-add-opt-dialog")[0];
-    Object.assign(options, ew.vars.tables.main_campaigns.fields.status_id.selectOptions);
-    ew.createSelect(options);
-});
-</script>
-</span>
-<?php } ?>
-<?php if ($Grid->RowType == ROWTYPE_VIEW) { // View record ?>
-<span id="el<?= $Grid->RowCount ?>_main_campaigns_status_id">
-<span<?= $Grid->status_id->viewAttributes() ?>>
-<?= $Grid->status_id->getViewValue() ?></span>
-</span>
-<?php if ($Grid->isConfirm()) { ?>
-<input type="hidden" data-table="main_campaigns" data-field="x_status_id" data-hidden="1" name="fmain_campaignsgrid$x<?= $Grid->RowIndex ?>_status_id" id="fmain_campaignsgrid$x<?= $Grid->RowIndex ?>_status_id" value="<?= HtmlEncode($Grid->status_id->FormValue) ?>">
-<input type="hidden" data-table="main_campaigns" data-field="x_status_id" data-hidden="1" name="fmain_campaignsgrid$o<?= $Grid->RowIndex ?>_status_id" id="fmain_campaignsgrid$o<?= $Grid->RowIndex ?>_status_id" value="<?= HtmlEncode($Grid->status_id->OldValue) ?>">
-<?php } ?>
-<?php } ?>
-</td>
-    <?php } ?>
-    <?php if ($Grid->print_status_id->Visible) { // print_status_id ?>
-        <td data-name="print_status_id" <?= $Grid->print_status_id->cellAttributes() ?>>
-<?php if ($Grid->RowType == ROWTYPE_ADD) { // Add record ?>
-<span id="el<?= $Grid->RowCount ?>_main_campaigns_print_status_id" class="form-group">
-    <select
-        id="x<?= $Grid->RowIndex ?>_print_status_id"
-        name="x<?= $Grid->RowIndex ?>_print_status_id"
-        class="form-control ew-select<?= $Grid->print_status_id->isInvalidClass() ?>"
-        data-select2-id="main_campaigns_x<?= $Grid->RowIndex ?>_print_status_id"
-        data-table="main_campaigns"
-        data-field="x_print_status_id"
-        data-value-separator="<?= $Grid->print_status_id->displayValueSeparatorAttribute() ?>"
-        data-placeholder="<?= HtmlEncode($Grid->print_status_id->getPlaceHolder()) ?>"
-        <?= $Grid->print_status_id->editAttributes() ?>>
-        <?= $Grid->print_status_id->selectOptionListHtml("x{$Grid->RowIndex}_print_status_id") ?>
-    </select>
-    <div class="invalid-feedback"><?= $Grid->print_status_id->getErrorMessage() ?></div>
-<?= $Grid->print_status_id->Lookup->getParamTag($Grid, "p_x" . $Grid->RowIndex . "_print_status_id") ?>
-<script>
-loadjs.ready("head", function() {
-    var el = document.querySelector("select[data-select2-id='main_campaigns_x<?= $Grid->RowIndex ?>_print_status_id']"),
-        options = { name: "x<?= $Grid->RowIndex ?>_print_status_id", selectId: "main_campaigns_x<?= $Grid->RowIndex ?>_print_status_id", language: ew.LANGUAGE_ID, dir: ew.IS_RTL ? "rtl" : "ltr" };
-    options.dropdownParent = $(el).closest("#ew-modal-dialog, #ew-add-opt-dialog")[0];
-    Object.assign(options, ew.vars.tables.main_campaigns.fields.print_status_id.selectOptions);
-    ew.createSelect(options);
-});
-</script>
-</span>
-<input type="hidden" data-table="main_campaigns" data-field="x_print_status_id" data-hidden="1" name="o<?= $Grid->RowIndex ?>_print_status_id" id="o<?= $Grid->RowIndex ?>_print_status_id" value="<?= HtmlEncode($Grid->print_status_id->OldValue) ?>">
-<?php } ?>
-<?php if ($Grid->RowType == ROWTYPE_EDIT) { // Edit record ?>
-<span id="el<?= $Grid->RowCount ?>_main_campaigns_print_status_id" class="form-group">
-    <select
-        id="x<?= $Grid->RowIndex ?>_print_status_id"
-        name="x<?= $Grid->RowIndex ?>_print_status_id"
-        class="form-control ew-select<?= $Grid->print_status_id->isInvalidClass() ?>"
-        data-select2-id="main_campaigns_x<?= $Grid->RowIndex ?>_print_status_id"
-        data-table="main_campaigns"
-        data-field="x_print_status_id"
-        data-value-separator="<?= $Grid->print_status_id->displayValueSeparatorAttribute() ?>"
-        data-placeholder="<?= HtmlEncode($Grid->print_status_id->getPlaceHolder()) ?>"
-        <?= $Grid->print_status_id->editAttributes() ?>>
-        <?= $Grid->print_status_id->selectOptionListHtml("x{$Grid->RowIndex}_print_status_id") ?>
-    </select>
-    <div class="invalid-feedback"><?= $Grid->print_status_id->getErrorMessage() ?></div>
-<?= $Grid->print_status_id->Lookup->getParamTag($Grid, "p_x" . $Grid->RowIndex . "_print_status_id") ?>
-<script>
-loadjs.ready("head", function() {
-    var el = document.querySelector("select[data-select2-id='main_campaigns_x<?= $Grid->RowIndex ?>_print_status_id']"),
-        options = { name: "x<?= $Grid->RowIndex ?>_print_status_id", selectId: "main_campaigns_x<?= $Grid->RowIndex ?>_print_status_id", language: ew.LANGUAGE_ID, dir: ew.IS_RTL ? "rtl" : "ltr" };
-    options.dropdownParent = $(el).closest("#ew-modal-dialog, #ew-add-opt-dialog")[0];
-    Object.assign(options, ew.vars.tables.main_campaigns.fields.print_status_id.selectOptions);
-    ew.createSelect(options);
-});
-</script>
-</span>
-<?php } ?>
-<?php if ($Grid->RowType == ROWTYPE_VIEW) { // View record ?>
-<span id="el<?= $Grid->RowCount ?>_main_campaigns_print_status_id">
-<span<?= $Grid->print_status_id->viewAttributes() ?>>
-<?= $Grid->print_status_id->getViewValue() ?></span>
-</span>
-<?php if ($Grid->isConfirm()) { ?>
-<input type="hidden" data-table="main_campaigns" data-field="x_print_status_id" data-hidden="1" name="fmain_campaignsgrid$x<?= $Grid->RowIndex ?>_print_status_id" id="fmain_campaignsgrid$x<?= $Grid->RowIndex ?>_print_status_id" value="<?= HtmlEncode($Grid->print_status_id->FormValue) ?>">
-<input type="hidden" data-table="main_campaigns" data-field="x_print_status_id" data-hidden="1" name="fmain_campaignsgrid$o<?= $Grid->RowIndex ?>_print_status_id" id="fmain_campaignsgrid$o<?= $Grid->RowIndex ?>_print_status_id" value="<?= HtmlEncode($Grid->print_status_id->OldValue) ?>">
-<?php } ?>
-<?php } ?>
-</td>
-    <?php } ?>
-    <?php if ($Grid->payment_status_id->Visible) { // payment_status_id ?>
-        <td data-name="payment_status_id" <?= $Grid->payment_status_id->cellAttributes() ?>>
-<?php if ($Grid->RowType == ROWTYPE_ADD) { // Add record ?>
-<span id="el<?= $Grid->RowCount ?>_main_campaigns_payment_status_id" class="form-group">
-    <select
-        id="x<?= $Grid->RowIndex ?>_payment_status_id"
-        name="x<?= $Grid->RowIndex ?>_payment_status_id"
-        class="form-control ew-select<?= $Grid->payment_status_id->isInvalidClass() ?>"
-        data-select2-id="main_campaigns_x<?= $Grid->RowIndex ?>_payment_status_id"
-        data-table="main_campaigns"
-        data-field="x_payment_status_id"
-        data-value-separator="<?= $Grid->payment_status_id->displayValueSeparatorAttribute() ?>"
-        data-placeholder="<?= HtmlEncode($Grid->payment_status_id->getPlaceHolder()) ?>"
-        <?= $Grid->payment_status_id->editAttributes() ?>>
-        <?= $Grid->payment_status_id->selectOptionListHtml("x{$Grid->RowIndex}_payment_status_id") ?>
-    </select>
-    <div class="invalid-feedback"><?= $Grid->payment_status_id->getErrorMessage() ?></div>
-<?= $Grid->payment_status_id->Lookup->getParamTag($Grid, "p_x" . $Grid->RowIndex . "_payment_status_id") ?>
-<script>
-loadjs.ready("head", function() {
-    var el = document.querySelector("select[data-select2-id='main_campaigns_x<?= $Grid->RowIndex ?>_payment_status_id']"),
-        options = { name: "x<?= $Grid->RowIndex ?>_payment_status_id", selectId: "main_campaigns_x<?= $Grid->RowIndex ?>_payment_status_id", language: ew.LANGUAGE_ID, dir: ew.IS_RTL ? "rtl" : "ltr" };
-    options.dropdownParent = $(el).closest("#ew-modal-dialog, #ew-add-opt-dialog")[0];
-    Object.assign(options, ew.vars.tables.main_campaigns.fields.payment_status_id.selectOptions);
-    ew.createSelect(options);
-});
-</script>
-</span>
-<input type="hidden" data-table="main_campaigns" data-field="x_payment_status_id" data-hidden="1" name="o<?= $Grid->RowIndex ?>_payment_status_id" id="o<?= $Grid->RowIndex ?>_payment_status_id" value="<?= HtmlEncode($Grid->payment_status_id->OldValue) ?>">
-<?php } ?>
-<?php if ($Grid->RowType == ROWTYPE_EDIT) { // Edit record ?>
-<span id="el<?= $Grid->RowCount ?>_main_campaigns_payment_status_id" class="form-group">
-    <select
-        id="x<?= $Grid->RowIndex ?>_payment_status_id"
-        name="x<?= $Grid->RowIndex ?>_payment_status_id"
-        class="form-control ew-select<?= $Grid->payment_status_id->isInvalidClass() ?>"
-        data-select2-id="main_campaigns_x<?= $Grid->RowIndex ?>_payment_status_id"
-        data-table="main_campaigns"
-        data-field="x_payment_status_id"
-        data-value-separator="<?= $Grid->payment_status_id->displayValueSeparatorAttribute() ?>"
-        data-placeholder="<?= HtmlEncode($Grid->payment_status_id->getPlaceHolder()) ?>"
-        <?= $Grid->payment_status_id->editAttributes() ?>>
-        <?= $Grid->payment_status_id->selectOptionListHtml("x{$Grid->RowIndex}_payment_status_id") ?>
-    </select>
-    <div class="invalid-feedback"><?= $Grid->payment_status_id->getErrorMessage() ?></div>
-<?= $Grid->payment_status_id->Lookup->getParamTag($Grid, "p_x" . $Grid->RowIndex . "_payment_status_id") ?>
-<script>
-loadjs.ready("head", function() {
-    var el = document.querySelector("select[data-select2-id='main_campaigns_x<?= $Grid->RowIndex ?>_payment_status_id']"),
-        options = { name: "x<?= $Grid->RowIndex ?>_payment_status_id", selectId: "main_campaigns_x<?= $Grid->RowIndex ?>_payment_status_id", language: ew.LANGUAGE_ID, dir: ew.IS_RTL ? "rtl" : "ltr" };
-    options.dropdownParent = $(el).closest("#ew-modal-dialog, #ew-add-opt-dialog")[0];
-    Object.assign(options, ew.vars.tables.main_campaigns.fields.payment_status_id.selectOptions);
-    ew.createSelect(options);
-});
-</script>
-</span>
-<?php } ?>
-<?php if ($Grid->RowType == ROWTYPE_VIEW) { // View record ?>
-<span id="el<?= $Grid->RowCount ?>_main_campaigns_payment_status_id">
-<span<?= $Grid->payment_status_id->viewAttributes() ?>>
-<?= $Grid->payment_status_id->getViewValue() ?></span>
-</span>
-<?php if ($Grid->isConfirm()) { ?>
-<input type="hidden" data-table="main_campaigns" data-field="x_payment_status_id" data-hidden="1" name="fmain_campaignsgrid$x<?= $Grid->RowIndex ?>_payment_status_id" id="fmain_campaignsgrid$x<?= $Grid->RowIndex ?>_payment_status_id" value="<?= HtmlEncode($Grid->payment_status_id->FormValue) ?>">
-<input type="hidden" data-table="main_campaigns" data-field="x_payment_status_id" data-hidden="1" name="fmain_campaignsgrid$o<?= $Grid->RowIndex ?>_payment_status_id" id="fmain_campaignsgrid$o<?= $Grid->RowIndex ?>_payment_status_id" value="<?= HtmlEncode($Grid->payment_status_id->OldValue) ?>">
 <?php } ?>
 <?php } ?>
 </td>
@@ -1094,11 +912,48 @@ loadjs.ready("head", function() {
 <?php if ($Grid->RowType == ROWTYPE_VIEW) { // View record ?>
 <span id="el<?= $Grid->RowCount ?>_main_campaigns_renewal_stage_id">
 <span<?= $Grid->renewal_stage_id->viewAttributes() ?>>
-<?= $Grid->renewal_stage_id->getViewValue() ?></span>
+<?php if (!EmptyString($Grid->renewal_stage_id->getViewValue()) && $Grid->renewal_stage_id->linkAttributes() != "") { ?>
+<a<?= $Grid->renewal_stage_id->linkAttributes() ?>><?= $Grid->renewal_stage_id->getViewValue() ?></a>
+<?php } else { ?>
+<?= $Grid->renewal_stage_id->getViewValue() ?>
+<?php } ?>
+</span>
 </span>
 <?php if ($Grid->isConfirm()) { ?>
 <input type="hidden" data-table="main_campaigns" data-field="x_renewal_stage_id" data-hidden="1" name="fmain_campaignsgrid$x<?= $Grid->RowIndex ?>_renewal_stage_id" id="fmain_campaignsgrid$x<?= $Grid->RowIndex ?>_renewal_stage_id" value="<?= HtmlEncode($Grid->renewal_stage_id->FormValue) ?>">
 <input type="hidden" data-table="main_campaigns" data-field="x_renewal_stage_id" data-hidden="1" name="fmain_campaignsgrid$o<?= $Grid->RowIndex ?>_renewal_stage_id" id="fmain_campaignsgrid$o<?= $Grid->RowIndex ?>_renewal_stage_id" value="<?= HtmlEncode($Grid->renewal_stage_id->OldValue) ?>">
+<?php } ?>
+<?php } ?>
+</td>
+    <?php } ?>
+    <?php if ($Grid->check_status->Visible) { // check_status ?>
+        <td data-name="check_status" <?= $Grid->check_status->cellAttributes() ?>>
+<?php if ($Grid->RowType == ROWTYPE_ADD) { // Add record ?>
+<span id="el<?= $Grid->RowCount ?>_main_campaigns_check_status" class="form-group">
+<textarea data-table="main_campaigns" data-field="x_check_status" name="x<?= $Grid->RowIndex ?>_check_status" id="x<?= $Grid->RowIndex ?>_check_status" cols="35" rows="4" placeholder="<?= HtmlEncode($Grid->check_status->getPlaceHolder()) ?>"<?= $Grid->check_status->editAttributes() ?>><?= $Grid->check_status->EditValue ?></textarea>
+<div class="invalid-feedback"><?= $Grid->check_status->getErrorMessage() ?></div>
+</span>
+<input type="hidden" data-table="main_campaigns" data-field="x_check_status" data-hidden="1" name="o<?= $Grid->RowIndex ?>_check_status" id="o<?= $Grid->RowIndex ?>_check_status" value="<?= HtmlEncode($Grid->check_status->OldValue) ?>">
+<?php } ?>
+<?php if ($Grid->RowType == ROWTYPE_EDIT) { // Edit record ?>
+<span id="el<?= $Grid->RowCount ?>_main_campaigns_check_status" class="form-group">
+<textarea data-table="main_campaigns" data-field="x_check_status" name="x<?= $Grid->RowIndex ?>_check_status" id="x<?= $Grid->RowIndex ?>_check_status" cols="35" rows="4" placeholder="<?= HtmlEncode($Grid->check_status->getPlaceHolder()) ?>"<?= $Grid->check_status->editAttributes() ?>><?= $Grid->check_status->EditValue ?></textarea>
+<div class="invalid-feedback"><?= $Grid->check_status->getErrorMessage() ?></div>
+</span>
+<?php } ?>
+<?php if ($Grid->RowType == ROWTYPE_VIEW) { // View record ?>
+<span id="el<?= $Grid->RowCount ?>_main_campaigns_check_status">
+<span<?= $Grid->check_status->viewAttributes() ?>>
+<?php if (!EmptyString($Grid->check_status->getViewValue()) && $Grid->check_status->linkAttributes() != "") { ?>
+<a<?= $Grid->check_status->linkAttributes() ?>><?= $Grid->check_status->getViewValue() ?></a>
+<?php } else { ?>
+<?= $Grid->check_status->getViewValue() ?>
+<?php } ?>
+</span>
+</span>
+<?php if ($Grid->isConfirm()) { ?>
+<input type="hidden" data-table="main_campaigns" data-field="x_check_status" data-hidden="1" name="fmain_campaignsgrid$x<?= $Grid->RowIndex ?>_check_status" id="fmain_campaignsgrid$x<?= $Grid->RowIndex ?>_check_status" value="<?= HtmlEncode($Grid->check_status->FormValue) ?>">
+<input type="hidden" data-table="main_campaigns" data-field="x_check_status" data-hidden="1" name="fmain_campaignsgrid$o<?= $Grid->RowIndex ?>_check_status" id="fmain_campaignsgrid$o<?= $Grid->RowIndex ?>_check_status" value="<?= HtmlEncode($Grid->check_status->OldValue) ?>">
 <?php } ?>
 <?php } ?>
 </td>
@@ -1392,10 +1247,30 @@ loadjs.ready(["fmain_campaignsgrid", "datetimepicker"], function() {
 <input type="hidden" id="x<?= $Grid->RowIndex ?>_vendor_id" name="x<?= $Grid->RowIndex ?>_vendor_id" value="<?= HtmlEncode($Grid->vendor_id->CurrentValue) ?>" data-hidden="1">
 <?php } elseif (!$Security->isAdmin() && $Security->isLoggedIn() && !$Grid->userIDAllow("grid")) { // Non system admin ?>
 <span id="el$rowindex$_main_campaigns_vendor_id" class="form-group main_campaigns_vendor_id">
-<span<?= $Grid->vendor_id->viewAttributes() ?>>
-<input type="text" readonly class="form-control-plaintext" value="<?= HtmlEncode(RemoveHtml($Grid->vendor_id->getDisplayValue($Grid->vendor_id->EditValue))) ?>"></span>
+    <select
+        id="x<?= $Grid->RowIndex ?>_vendor_id"
+        name="x<?= $Grid->RowIndex ?>_vendor_id"
+        class="form-control ew-select<?= $Grid->vendor_id->isInvalidClass() ?>"
+        data-select2-id="main_campaigns_x<?= $Grid->RowIndex ?>_vendor_id"
+        data-table="main_campaigns"
+        data-field="x_vendor_id"
+        data-value-separator="<?= $Grid->vendor_id->displayValueSeparatorAttribute() ?>"
+        data-placeholder="<?= HtmlEncode($Grid->vendor_id->getPlaceHolder()) ?>"
+        <?= $Grid->vendor_id->editAttributes() ?>>
+        <?= $Grid->vendor_id->selectOptionListHtml("x{$Grid->RowIndex}_vendor_id") ?>
+    </select>
+    <div class="invalid-feedback"><?= $Grid->vendor_id->getErrorMessage() ?></div>
+<?= $Grid->vendor_id->Lookup->getParamTag($Grid, "p_x" . $Grid->RowIndex . "_vendor_id") ?>
+<script>
+loadjs.ready("head", function() {
+    var el = document.querySelector("select[data-select2-id='main_campaigns_x<?= $Grid->RowIndex ?>_vendor_id']"),
+        options = { name: "x<?= $Grid->RowIndex ?>_vendor_id", selectId: "main_campaigns_x<?= $Grid->RowIndex ?>_vendor_id", language: ew.LANGUAGE_ID, dir: ew.IS_RTL ? "rtl" : "ltr" };
+    options.dropdownParent = $(el).closest("#ew-modal-dialog, #ew-add-opt-dialog")[0];
+    Object.assign(options, ew.vars.tables.main_campaigns.fields.vendor_id.selectOptions);
+    ew.createSelect(options);
+});
+</script>
 </span>
-<input type="hidden" data-table="main_campaigns" data-field="x_vendor_id" data-hidden="1" name="x<?= $Grid->RowIndex ?>_vendor_id" id="x<?= $Grid->RowIndex ?>_vendor_id" value="<?= HtmlEncode($Grid->vendor_id->CurrentValue) ?>">
 <?php } else { ?>
 <span id="el$rowindex$_main_campaigns_vendor_id" class="form-group main_campaigns_vendor_id">
     <select
@@ -1433,120 +1308,6 @@ loadjs.ready("head", function() {
 <input type="hidden" data-table="main_campaigns" data-field="x_vendor_id" data-hidden="1" name="o<?= $Grid->RowIndex ?>_vendor_id" id="o<?= $Grid->RowIndex ?>_vendor_id" value="<?= HtmlEncode($Grid->vendor_id->OldValue) ?>">
 </td>
     <?php } ?>
-    <?php if ($Grid->status_id->Visible) { // status_id ?>
-        <td data-name="status_id">
-<?php if (!$Grid->isConfirm()) { ?>
-<span id="el$rowindex$_main_campaigns_status_id" class="form-group main_campaigns_status_id">
-    <select
-        id="x<?= $Grid->RowIndex ?>_status_id"
-        name="x<?= $Grid->RowIndex ?>_status_id"
-        class="form-control ew-select<?= $Grid->status_id->isInvalidClass() ?>"
-        data-select2-id="main_campaigns_x<?= $Grid->RowIndex ?>_status_id"
-        data-table="main_campaigns"
-        data-field="x_status_id"
-        data-value-separator="<?= $Grid->status_id->displayValueSeparatorAttribute() ?>"
-        data-placeholder="<?= HtmlEncode($Grid->status_id->getPlaceHolder()) ?>"
-        <?= $Grid->status_id->editAttributes() ?>>
-        <?= $Grid->status_id->selectOptionListHtml("x{$Grid->RowIndex}_status_id") ?>
-    </select>
-    <div class="invalid-feedback"><?= $Grid->status_id->getErrorMessage() ?></div>
-<?= $Grid->status_id->Lookup->getParamTag($Grid, "p_x" . $Grid->RowIndex . "_status_id") ?>
-<script>
-loadjs.ready("head", function() {
-    var el = document.querySelector("select[data-select2-id='main_campaigns_x<?= $Grid->RowIndex ?>_status_id']"),
-        options = { name: "x<?= $Grid->RowIndex ?>_status_id", selectId: "main_campaigns_x<?= $Grid->RowIndex ?>_status_id", language: ew.LANGUAGE_ID, dir: ew.IS_RTL ? "rtl" : "ltr" };
-    options.dropdownParent = $(el).closest("#ew-modal-dialog, #ew-add-opt-dialog")[0];
-    Object.assign(options, ew.vars.tables.main_campaigns.fields.status_id.selectOptions);
-    ew.createSelect(options);
-});
-</script>
-</span>
-<?php } else { ?>
-<span id="el$rowindex$_main_campaigns_status_id" class="form-group main_campaigns_status_id">
-<span<?= $Grid->status_id->viewAttributes() ?>>
-<input type="text" readonly class="form-control-plaintext" value="<?= HtmlEncode(RemoveHtml($Grid->status_id->getDisplayValue($Grid->status_id->ViewValue))) ?>"></span>
-</span>
-<input type="hidden" data-table="main_campaigns" data-field="x_status_id" data-hidden="1" name="x<?= $Grid->RowIndex ?>_status_id" id="x<?= $Grid->RowIndex ?>_status_id" value="<?= HtmlEncode($Grid->status_id->FormValue) ?>">
-<?php } ?>
-<input type="hidden" data-table="main_campaigns" data-field="x_status_id" data-hidden="1" name="o<?= $Grid->RowIndex ?>_status_id" id="o<?= $Grid->RowIndex ?>_status_id" value="<?= HtmlEncode($Grid->status_id->OldValue) ?>">
-</td>
-    <?php } ?>
-    <?php if ($Grid->print_status_id->Visible) { // print_status_id ?>
-        <td data-name="print_status_id">
-<?php if (!$Grid->isConfirm()) { ?>
-<span id="el$rowindex$_main_campaigns_print_status_id" class="form-group main_campaigns_print_status_id">
-    <select
-        id="x<?= $Grid->RowIndex ?>_print_status_id"
-        name="x<?= $Grid->RowIndex ?>_print_status_id"
-        class="form-control ew-select<?= $Grid->print_status_id->isInvalidClass() ?>"
-        data-select2-id="main_campaigns_x<?= $Grid->RowIndex ?>_print_status_id"
-        data-table="main_campaigns"
-        data-field="x_print_status_id"
-        data-value-separator="<?= $Grid->print_status_id->displayValueSeparatorAttribute() ?>"
-        data-placeholder="<?= HtmlEncode($Grid->print_status_id->getPlaceHolder()) ?>"
-        <?= $Grid->print_status_id->editAttributes() ?>>
-        <?= $Grid->print_status_id->selectOptionListHtml("x{$Grid->RowIndex}_print_status_id") ?>
-    </select>
-    <div class="invalid-feedback"><?= $Grid->print_status_id->getErrorMessage() ?></div>
-<?= $Grid->print_status_id->Lookup->getParamTag($Grid, "p_x" . $Grid->RowIndex . "_print_status_id") ?>
-<script>
-loadjs.ready("head", function() {
-    var el = document.querySelector("select[data-select2-id='main_campaigns_x<?= $Grid->RowIndex ?>_print_status_id']"),
-        options = { name: "x<?= $Grid->RowIndex ?>_print_status_id", selectId: "main_campaigns_x<?= $Grid->RowIndex ?>_print_status_id", language: ew.LANGUAGE_ID, dir: ew.IS_RTL ? "rtl" : "ltr" };
-    options.dropdownParent = $(el).closest("#ew-modal-dialog, #ew-add-opt-dialog")[0];
-    Object.assign(options, ew.vars.tables.main_campaigns.fields.print_status_id.selectOptions);
-    ew.createSelect(options);
-});
-</script>
-</span>
-<?php } else { ?>
-<span id="el$rowindex$_main_campaigns_print_status_id" class="form-group main_campaigns_print_status_id">
-<span<?= $Grid->print_status_id->viewAttributes() ?>>
-<input type="text" readonly class="form-control-plaintext" value="<?= HtmlEncode(RemoveHtml($Grid->print_status_id->getDisplayValue($Grid->print_status_id->ViewValue))) ?>"></span>
-</span>
-<input type="hidden" data-table="main_campaigns" data-field="x_print_status_id" data-hidden="1" name="x<?= $Grid->RowIndex ?>_print_status_id" id="x<?= $Grid->RowIndex ?>_print_status_id" value="<?= HtmlEncode($Grid->print_status_id->FormValue) ?>">
-<?php } ?>
-<input type="hidden" data-table="main_campaigns" data-field="x_print_status_id" data-hidden="1" name="o<?= $Grid->RowIndex ?>_print_status_id" id="o<?= $Grid->RowIndex ?>_print_status_id" value="<?= HtmlEncode($Grid->print_status_id->OldValue) ?>">
-</td>
-    <?php } ?>
-    <?php if ($Grid->payment_status_id->Visible) { // payment_status_id ?>
-        <td data-name="payment_status_id">
-<?php if (!$Grid->isConfirm()) { ?>
-<span id="el$rowindex$_main_campaigns_payment_status_id" class="form-group main_campaigns_payment_status_id">
-    <select
-        id="x<?= $Grid->RowIndex ?>_payment_status_id"
-        name="x<?= $Grid->RowIndex ?>_payment_status_id"
-        class="form-control ew-select<?= $Grid->payment_status_id->isInvalidClass() ?>"
-        data-select2-id="main_campaigns_x<?= $Grid->RowIndex ?>_payment_status_id"
-        data-table="main_campaigns"
-        data-field="x_payment_status_id"
-        data-value-separator="<?= $Grid->payment_status_id->displayValueSeparatorAttribute() ?>"
-        data-placeholder="<?= HtmlEncode($Grid->payment_status_id->getPlaceHolder()) ?>"
-        <?= $Grid->payment_status_id->editAttributes() ?>>
-        <?= $Grid->payment_status_id->selectOptionListHtml("x{$Grid->RowIndex}_payment_status_id") ?>
-    </select>
-    <div class="invalid-feedback"><?= $Grid->payment_status_id->getErrorMessage() ?></div>
-<?= $Grid->payment_status_id->Lookup->getParamTag($Grid, "p_x" . $Grid->RowIndex . "_payment_status_id") ?>
-<script>
-loadjs.ready("head", function() {
-    var el = document.querySelector("select[data-select2-id='main_campaigns_x<?= $Grid->RowIndex ?>_payment_status_id']"),
-        options = { name: "x<?= $Grid->RowIndex ?>_payment_status_id", selectId: "main_campaigns_x<?= $Grid->RowIndex ?>_payment_status_id", language: ew.LANGUAGE_ID, dir: ew.IS_RTL ? "rtl" : "ltr" };
-    options.dropdownParent = $(el).closest("#ew-modal-dialog, #ew-add-opt-dialog")[0];
-    Object.assign(options, ew.vars.tables.main_campaigns.fields.payment_status_id.selectOptions);
-    ew.createSelect(options);
-});
-</script>
-</span>
-<?php } else { ?>
-<span id="el$rowindex$_main_campaigns_payment_status_id" class="form-group main_campaigns_payment_status_id">
-<span<?= $Grid->payment_status_id->viewAttributes() ?>>
-<input type="text" readonly class="form-control-plaintext" value="<?= HtmlEncode(RemoveHtml($Grid->payment_status_id->getDisplayValue($Grid->payment_status_id->ViewValue))) ?>"></span>
-</span>
-<input type="hidden" data-table="main_campaigns" data-field="x_payment_status_id" data-hidden="1" name="x<?= $Grid->RowIndex ?>_payment_status_id" id="x<?= $Grid->RowIndex ?>_payment_status_id" value="<?= HtmlEncode($Grid->payment_status_id->FormValue) ?>">
-<?php } ?>
-<input type="hidden" data-table="main_campaigns" data-field="x_payment_status_id" data-hidden="1" name="o<?= $Grid->RowIndex ?>_payment_status_id" id="o<?= $Grid->RowIndex ?>_payment_status_id" value="<?= HtmlEncode($Grid->payment_status_id->OldValue) ?>">
-</td>
-    <?php } ?>
     <?php if ($Grid->renewal_stage_id->Visible) { // renewal_stage_id ?>
         <td data-name="renewal_stage_id">
 <?php if (!$Grid->isConfirm()) { ?>
@@ -1578,11 +1339,38 @@ loadjs.ready("head", function() {
 <?php } else { ?>
 <span id="el$rowindex$_main_campaigns_renewal_stage_id" class="form-group main_campaigns_renewal_stage_id">
 <span<?= $Grid->renewal_stage_id->viewAttributes() ?>>
-<input type="text" readonly class="form-control-plaintext" value="<?= HtmlEncode(RemoveHtml($Grid->renewal_stage_id->getDisplayValue($Grid->renewal_stage_id->ViewValue))) ?>"></span>
+<?php if (!EmptyString($Grid->renewal_stage_id->ViewValue) && $Grid->renewal_stage_id->linkAttributes() != "") { ?>
+<a<?= $Grid->renewal_stage_id->linkAttributes() ?>><input type="text" readonly class="form-control-plaintext" value="<?= HtmlEncode(RemoveHtml($Grid->renewal_stage_id->getDisplayValue($Grid->renewal_stage_id->ViewValue))) ?>"></a>
+<?php } else { ?>
+<input type="text" readonly class="form-control-plaintext" value="<?= HtmlEncode(RemoveHtml($Grid->renewal_stage_id->getDisplayValue($Grid->renewal_stage_id->ViewValue))) ?>">
+<?php } ?>
+</span>
 </span>
 <input type="hidden" data-table="main_campaigns" data-field="x_renewal_stage_id" data-hidden="1" name="x<?= $Grid->RowIndex ?>_renewal_stage_id" id="x<?= $Grid->RowIndex ?>_renewal_stage_id" value="<?= HtmlEncode($Grid->renewal_stage_id->FormValue) ?>">
 <?php } ?>
 <input type="hidden" data-table="main_campaigns" data-field="x_renewal_stage_id" data-hidden="1" name="o<?= $Grid->RowIndex ?>_renewal_stage_id" id="o<?= $Grid->RowIndex ?>_renewal_stage_id" value="<?= HtmlEncode($Grid->renewal_stage_id->OldValue) ?>">
+</td>
+    <?php } ?>
+    <?php if ($Grid->check_status->Visible) { // check_status ?>
+        <td data-name="check_status">
+<?php if (!$Grid->isConfirm()) { ?>
+<span id="el$rowindex$_main_campaigns_check_status" class="form-group main_campaigns_check_status">
+<textarea data-table="main_campaigns" data-field="x_check_status" name="x<?= $Grid->RowIndex ?>_check_status" id="x<?= $Grid->RowIndex ?>_check_status" cols="35" rows="4" placeholder="<?= HtmlEncode($Grid->check_status->getPlaceHolder()) ?>"<?= $Grid->check_status->editAttributes() ?>><?= $Grid->check_status->EditValue ?></textarea>
+<div class="invalid-feedback"><?= $Grid->check_status->getErrorMessage() ?></div>
+</span>
+<?php } else { ?>
+<span id="el$rowindex$_main_campaigns_check_status" class="form-group main_campaigns_check_status">
+<span<?= $Grid->check_status->viewAttributes() ?>>
+<?php if (!EmptyString($Grid->check_status->ViewValue) && $Grid->check_status->linkAttributes() != "") { ?>
+<a<?= $Grid->check_status->linkAttributes() ?>><?= $Grid->check_status->ViewValue ?></a>
+<?php } else { ?>
+<?= $Grid->check_status->ViewValue ?>
+<?php } ?>
+</span>
+</span>
+<input type="hidden" data-table="main_campaigns" data-field="x_check_status" data-hidden="1" name="x<?= $Grid->RowIndex ?>_check_status" id="x<?= $Grid->RowIndex ?>_check_status" value="<?= HtmlEncode($Grid->check_status->FormValue) ?>">
+<?php } ?>
+<input type="hidden" data-table="main_campaigns" data-field="x_check_status" data-hidden="1" name="o<?= $Grid->RowIndex ?>_check_status" id="o<?= $Grid->RowIndex ?>_check_status" value="<?= HtmlEncode($Grid->check_status->OldValue) ?>">
 </td>
     <?php } ?>
 <?php
@@ -1661,23 +1449,13 @@ $Grid->ListOptions->render("footer", "left");
         &nbsp;
         </span></td>
     <?php } ?>
-    <?php if ($Grid->status_id->Visible) { // status_id ?>
-        <td data-name="status_id" class="<?= $Grid->status_id->footerCellClass() ?>"><span id="elf_main_campaigns_status_id" class="main_campaigns_status_id">
-        &nbsp;
-        </span></td>
-    <?php } ?>
-    <?php if ($Grid->print_status_id->Visible) { // print_status_id ?>
-        <td data-name="print_status_id" class="<?= $Grid->print_status_id->footerCellClass() ?>"><span id="elf_main_campaigns_print_status_id" class="main_campaigns_print_status_id">
-        &nbsp;
-        </span></td>
-    <?php } ?>
-    <?php if ($Grid->payment_status_id->Visible) { // payment_status_id ?>
-        <td data-name="payment_status_id" class="<?= $Grid->payment_status_id->footerCellClass() ?>"><span id="elf_main_campaigns_payment_status_id" class="main_campaigns_payment_status_id">
-        &nbsp;
-        </span></td>
-    <?php } ?>
     <?php if ($Grid->renewal_stage_id->Visible) { // renewal_stage_id ?>
         <td data-name="renewal_stage_id" class="<?= $Grid->renewal_stage_id->footerCellClass() ?>"><span id="elf_main_campaigns_renewal_stage_id" class="main_campaigns_renewal_stage_id">
+        &nbsp;
+        </span></td>
+    <?php } ?>
+    <?php if ($Grid->check_status->Visible) { // check_status ?>
+        <td data-name="check_status" class="<?= $Grid->check_status->footerCellClass() ?>"><span id="elf_main_campaigns_check_status" class="main_campaigns_check_status">
         &nbsp;
         </span></td>
     <?php } ?>

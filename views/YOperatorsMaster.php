@@ -53,6 +53,28 @@ $y_operators = Container("y_operators");
 </td>
         </tr>
 <?php } ?>
+<?php if ($y_operators->_email->Visible) { // email ?>
+        <tr id="r__email">
+            <td class="<?= $y_operators->TableLeftColumnClass ?>"><?= $y_operators->_email->caption() ?></td>
+            <td <?= $y_operators->_email->cellAttributes() ?>>
+<span id="el_y_operators__email">
+<span<?= $y_operators->_email->viewAttributes() ?>>
+<?= $y_operators->_email->getViewValue() ?></span>
+</span>
+</td>
+        </tr>
+<?php } ?>
+<?php if ($y_operators->contact_name->Visible) { // contact_name ?>
+        <tr id="r_contact_name">
+            <td class="<?= $y_operators->TableLeftColumnClass ?>"><?= $y_operators->contact_name->caption() ?></td>
+            <td <?= $y_operators->contact_name->cellAttributes() ?>>
+<span id="el_y_operators_contact_name">
+<span<?= $y_operators->contact_name->viewAttributes() ?>>
+<?= $y_operators->contact_name->getViewValue() ?></span>
+</span>
+</td>
+        </tr>
+<?php } ?>
     </tbody>
 </table>
 </div>

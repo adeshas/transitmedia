@@ -66,7 +66,9 @@ class YVendors extends DbTable
         $this->BasicSearch = new BasicSearch($this->TableVar);
 
         // id
-        $this->id = new DbField('y_vendors', 'y_vendors', 'x_id', 'id', '"id"', 'CAST("id" AS varchar(255))', 3, 4, -1, false, '"id"', false, false, false, 'FORMATTED TEXT', 'TEXT');
+        $this->id = new DbField('y_vendors', 'y_vendors', 'x_id', 'id', '"id"', 'CAST("id" AS varchar(255))', 3, 4, -1, false, '"id"', false, false, false, 'FORMATTED TEXT', 'NO');
+        $this->id->IsAutoIncrement = true; // Autoincrement field
+        $this->id->IsPrimaryKey = true; // Primary key field
         $this->id->IsForeignKey = true; // Foreign key field
         $this->id->Nullable = false; // NOT NULL field
         $this->id->Sortable = true; // Allow sort
@@ -437,6 +439,9 @@ class YVendors extends DbTable
         $conn = $this->getConnection();
         $success = $this->insertSql($rs)->execute();
         if ($success) {
+            // Get insert id if necessary
+            $this->id->setDbValue($conn->fetchColumn("SELECT currval('vendors_id_seq'::regclass)"));
+            $rs['id'] = $this->id->DbValue;
         }
         return $success;
     }
@@ -496,6 +501,9 @@ class YVendors extends DbTable
             $where = $this->arrayToFilter($where);
         }
         if ($rs) {
+            if (array_key_exists('id', $rs)) {
+                AddFilter($where, QuotedName('id', $this->Dbid) . '=' . QuotedValue($rs['id'], $this->id->DataType, $this->Dbid));
+            }
         }
         $filter = ($curfilter) ? $this->CurrentFilter : "";
         AddFilter($filter, $where);
@@ -531,13 +539,19 @@ class YVendors extends DbTable
     // Record filter WHERE clause
     protected function sqlKeyFilter()
     {
-        return "";
+        return "\"id\" = @id@";
     }
 
     // Get Key
     public function getKey($current = false)
     {
         $keys = [];
+        $val = $current ? $this->id->CurrentValue : $this->id->OldValue;
+        if (EmptyValue($val)) {
+            return "";
+        } else {
+            $keys[] = $val;
+        }
         return implode(Config("COMPOSITE_KEY_SEPARATOR"), $keys);
     }
 
@@ -546,7 +560,12 @@ class YVendors extends DbTable
     {
         $this->OldKey = strval($key);
         $keys = explode(Config("COMPOSITE_KEY_SEPARATOR"), $this->OldKey);
-        if (count($keys) == 0) {
+        if (count($keys) == 1) {
+            if ($current) {
+                $this->id->CurrentValue = $keys[0];
+            } else {
+                $this->id->OldValue = $keys[0];
+            }
         }
     }
 
@@ -554,6 +573,19 @@ class YVendors extends DbTable
     public function getRecordFilter($row = null)
     {
         $keyFilter = $this->sqlKeyFilter();
+        if (is_array($row)) {
+            $val = array_key_exists('id', $row) ? $row['id'] : null;
+        } else {
+            $val = $this->id->OldValue !== null ? $this->id->OldValue : $this->id->CurrentValue;
+        }
+        if (!is_numeric($val)) {
+            return "0=1"; // Invalid key
+        }
+        if ($val === null) {
+            return "0=1"; // Invalid key
+        } else {
+            $keyFilter = str_replace("@id@", AdjustSql($val, $this->Dbid), $keyFilter); // Replace key value
+        }
         return $keyFilter;
     }
 
@@ -642,7 +674,11 @@ class YVendors extends DbTable
     // Edit URL
     public function getEditUrl($parm = "")
     {
-        $url = $this->keyUrl("yvendorsedit", $this->getUrlParm($parm));
+        if ($parm != "") {
+            $url = $this->keyUrl("yvendorsedit", $this->getUrlParm($parm));
+        } else {
+            $url = $this->keyUrl("yvendorsedit", $this->getUrlParm(Config("TABLE_SHOW_DETAIL") . "="));
+        }
         return $this->addMasterUrl($url);
     }
 
@@ -656,7 +692,11 @@ class YVendors extends DbTable
     // Copy URL
     public function getCopyUrl($parm = "")
     {
-        $url = $this->keyUrl("yvendorsadd", $this->getUrlParm($parm));
+        if ($parm != "") {
+            $url = $this->keyUrl("yvendorsadd", $this->getUrlParm($parm));
+        } else {
+            $url = $this->keyUrl("yvendorsadd", $this->getUrlParm(Config("TABLE_SHOW_DETAIL") . "="));
+        }
         return $this->addMasterUrl($url);
     }
 
@@ -682,6 +722,7 @@ class YVendors extends DbTable
     public function keyToJson($htmlEncode = false)
     {
         $json = "";
+        $json .= "id:" . JsonEncode($this->id->CurrentValue, "number");
         $json = "{" . $json . "}";
         if ($htmlEncode) {
             $json = HtmlEncode($json);
@@ -692,6 +733,11 @@ class YVendors extends DbTable
     // Add key value to URL
     public function keyUrl($url, $parm = "")
     {
+        if ($this->id->CurrentValue !== null) {
+            $url .= "/" . rawurlencode($this->id->CurrentValue);
+        } else {
+            return "javascript:ew.alert(ew.language.phrase('InvalidRecord'));";
+        }
         if ($parm != "") {
             $url .= "?" . $parm;
         }
@@ -750,12 +796,23 @@ SORTHTML;
             $arKeys = Param("key_m");
             $cnt = count($arKeys);
         } else {
+            if (($keyValue = Param("id") ?? Route("id")) !== null) {
+                $arKeys[] = $keyValue;
+            } elseif (IsApi() && (($keyValue = Key(0) ?? Route(2)) !== null)) {
+                $arKeys[] = $keyValue;
+            } else {
+                $arKeys = null; // Do not setup
+            }
+
             //return $arKeys; // Do not return yet, so the values will also be checked by the following code
         }
         // Check keys
         $ar = [];
         if (is_array($arKeys)) {
             foreach ($arKeys as $key) {
+                if (!is_numeric($key)) {
+                    continue;
+                }
                 $ar[] = $key;
             }
         }
@@ -770,6 +827,11 @@ SORTHTML;
         foreach ($arKeys as $key) {
             if ($keyFilter != "") {
                 $keyFilter .= " OR ";
+            }
+            if ($setCurrent) {
+                $this->id->CurrentValue = $key;
+            } else {
+                $this->id->OldValue = $key;
             }
             $keyFilter .= "(" . $this->getRecordFilter() . ")";
         }
@@ -850,15 +912,9 @@ SORTHTML;
         // id
         $this->id->EditAttrs["class"] = "form-control";
         $this->id->EditCustomAttributes = "";
-        if (!$Security->isAdmin() && $Security->isLoggedIn() && !$this->userIDAllow("info")) { // Non system admin
-            $this->id->CurrentValue = CurrentUserID();
-            $this->id->EditValue = $this->id->CurrentValue;
-            $this->id->EditValue = FormatNumber($this->id->EditValue, 0, -2, -2, -2);
-            $this->id->ViewCustomAttributes = "";
-        } else {
-            $this->id->EditValue = $this->id->CurrentValue;
-            $this->id->PlaceHolder = RemoveHtml($this->id->caption());
-        }
+        $this->id->EditValue = $this->id->CurrentValue;
+        $this->id->EditValue = FormatNumber($this->id->EditValue, 0, -2, -2, -2);
+        $this->id->ViewCustomAttributes = "";
 
         // name
         $this->name->EditAttrs["class"] = "form-control";

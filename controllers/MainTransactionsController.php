@@ -32,6 +32,12 @@ class MainTransactionsController extends ControllerBase
         return $this->runPage($request, $response, $args, "MainTransactionsEdit");
     }
 
+    // update
+    public function update(Request $request, Response $response, array $args): Response
+    {
+        return $this->runPage($request, $response, $args, "MainTransactionsUpdate");
+    }
+
     // delete
     public function delete(Request $request, Response $response, array $args): Response
     {

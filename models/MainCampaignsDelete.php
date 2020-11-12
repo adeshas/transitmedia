@@ -357,12 +357,10 @@ class MainCampaignsDelete extends MainCampaigns
         $this->end_date->setVisibility();
         $this->user_id->Visible = false;
         $this->vendor_id->setVisibility();
-        $this->status_id->setVisibility();
-        $this->print_status_id->setVisibility();
-        $this->payment_status_id->setVisibility();
         $this->ts_last_update->Visible = false;
         $this->ts_created->Visible = false;
         $this->renewal_stage_id->setVisibility();
+        $this->check_status->setVisibility();
         $this->hideFieldsForAddEdit();
 
         // Do not use lookup cache
@@ -383,9 +381,6 @@ class MainCampaignsDelete extends MainCampaigns
         $this->setupLookupOptions($this->bus_size_id);
         $this->setupLookupOptions($this->price_id);
         $this->setupLookupOptions($this->vendor_id);
-        $this->setupLookupOptions($this->status_id);
-        $this->setupLookupOptions($this->print_status_id);
-        $this->setupLookupOptions($this->payment_status_id);
         $this->setupLookupOptions($this->renewal_stage_id);
 
         // Set up master/detail parameters
@@ -568,12 +563,10 @@ class MainCampaignsDelete extends MainCampaigns
         $this->end_date->setDbValue($row['end_date']);
         $this->user_id->setDbValue($row['user_id']);
         $this->vendor_id->setDbValue($row['vendor_id']);
-        $this->status_id->setDbValue($row['status_id']);
-        $this->print_status_id->setDbValue($row['print_status_id']);
-        $this->payment_status_id->setDbValue($row['payment_status_id']);
         $this->ts_last_update->setDbValue($row['ts_last_update']);
         $this->ts_created->setDbValue($row['ts_created']);
         $this->renewal_stage_id->setDbValue($row['renewal_stage_id']);
+        $this->check_status->setDbValue($row['check_status']);
     }
 
     // Return a row with default values
@@ -591,12 +584,10 @@ class MainCampaignsDelete extends MainCampaigns
         $row['end_date'] = null;
         $row['user_id'] = null;
         $row['vendor_id'] = null;
-        $row['status_id'] = null;
-        $row['print_status_id'] = null;
-        $row['payment_status_id'] = null;
         $row['ts_last_update'] = null;
         $row['ts_created'] = null;
         $row['renewal_stage_id'] = null;
+        $row['check_status'] = null;
         return $row;
     }
 
@@ -634,17 +625,13 @@ class MainCampaignsDelete extends MainCampaigns
 
         // vendor_id
 
-        // status_id
-
-        // print_status_id
-
-        // payment_status_id
-
         // ts_last_update
 
         // ts_created
 
         // renewal_stage_id
+
+        // check_status
         if ($this->RowType == ROWTYPE_VIEW) {
             // id
             $this->id->ViewValue = $this->id->CurrentValue;
@@ -659,6 +646,7 @@ class MainCampaignsDelete extends MainCampaigns
             if ($dispVal != "") {
                 $this->name->ViewValue = $dispVal;
             }
+            $this->name->CssClass = "font-weight-bold";
             $this->name->ViewCustomAttributes = "";
 
             // inventory_id
@@ -771,7 +759,11 @@ class MainCampaignsDelete extends MainCampaigns
                 $this->vendor_id->ViewValue = $this->vendor_id->lookupCacheOption($curVal);
                 if ($this->vendor_id->ViewValue === null) { // Lookup from database
                     $filterWrk = "\"id\"" . SearchString("=", $curVal, DATATYPE_NUMBER, "");
-                    $sqlWrk = $this->vendor_id->Lookup->getSql(false, $filterWrk, '', $this, true);
+                    $lookupFilter = function() {
+                        return ((!IsAdmin())? " id = ".Profile()->vendor_id:"");
+                    };
+                    $lookupFilter = $lookupFilter->bindTo($this);
+                    $sqlWrk = $this->vendor_id->Lookup->getSql(false, $filterWrk, $lookupFilter, $this, true);
                     $rswrk = Conn()->executeQuery($sqlWrk)->fetchAll(\PDO::FETCH_BOTH);
                     $ari = count($rswrk);
                     if ($ari > 0) { // Lookup values found
@@ -785,69 +777,6 @@ class MainCampaignsDelete extends MainCampaigns
                 $this->vendor_id->ViewValue = null;
             }
             $this->vendor_id->ViewCustomAttributes = "";
-
-            // status_id
-            $curVal = strval($this->status_id->CurrentValue);
-            if ($curVal != "") {
-                $this->status_id->ViewValue = $this->status_id->lookupCacheOption($curVal);
-                if ($this->status_id->ViewValue === null) { // Lookup from database
-                    $filterWrk = "\"id\"" . SearchString("=", $curVal, DATATYPE_NUMBER, "");
-                    $sqlWrk = $this->status_id->Lookup->getSql(false, $filterWrk, '', $this, true);
-                    $rswrk = Conn()->executeQuery($sqlWrk)->fetchAll(\PDO::FETCH_BOTH);
-                    $ari = count($rswrk);
-                    if ($ari > 0) { // Lookup values found
-                        $arwrk = $this->status_id->Lookup->renderViewRow($rswrk[0]);
-                        $this->status_id->ViewValue = $this->status_id->displayValue($arwrk);
-                    } else {
-                        $this->status_id->ViewValue = $this->status_id->CurrentValue;
-                    }
-                }
-            } else {
-                $this->status_id->ViewValue = null;
-            }
-            $this->status_id->ViewCustomAttributes = "";
-
-            // print_status_id
-            $curVal = strval($this->print_status_id->CurrentValue);
-            if ($curVal != "") {
-                $this->print_status_id->ViewValue = $this->print_status_id->lookupCacheOption($curVal);
-                if ($this->print_status_id->ViewValue === null) { // Lookup from database
-                    $filterWrk = "\"id\"" . SearchString("=", $curVal, DATATYPE_NUMBER, "");
-                    $sqlWrk = $this->print_status_id->Lookup->getSql(false, $filterWrk, '', $this, true);
-                    $rswrk = Conn()->executeQuery($sqlWrk)->fetchAll(\PDO::FETCH_BOTH);
-                    $ari = count($rswrk);
-                    if ($ari > 0) { // Lookup values found
-                        $arwrk = $this->print_status_id->Lookup->renderViewRow($rswrk[0]);
-                        $this->print_status_id->ViewValue = $this->print_status_id->displayValue($arwrk);
-                    } else {
-                        $this->print_status_id->ViewValue = $this->print_status_id->CurrentValue;
-                    }
-                }
-            } else {
-                $this->print_status_id->ViewValue = null;
-            }
-            $this->print_status_id->ViewCustomAttributes = "";
-
-            // payment_status_id
-            $curVal = strval($this->payment_status_id->CurrentValue);
-            if ($curVal != "") {
-                $this->payment_status_id->ViewValue = $this->payment_status_id->lookupCacheOption($curVal);
-                if ($this->payment_status_id->ViewValue === null) { // Lookup from database
-                    $filterWrk = "\"id\"" . SearchString("=", $curVal, DATATYPE_NUMBER, "");
-                    $sqlWrk = $this->payment_status_id->Lookup->getSql(false, $filterWrk, '', $this, true);
-                    $rswrk = Conn()->executeQuery($sqlWrk)->fetchAll(\PDO::FETCH_BOTH);
-                    $ari = count($rswrk);
-                    if ($ari > 0) { // Lookup values found
-                        $arwrk = $this->payment_status_id->Lookup->renderViewRow($rswrk[0]);
-                        $this->payment_status_id->ViewValue = $this->payment_status_id->displayValue($arwrk);
-                    } else {
-                        $this->payment_status_id->ViewValue = $this->payment_status_id->CurrentValue;
-                    }
-                }
-            } else {
-                $this->payment_status_id->ViewValue = null;
-            }
-            $this->payment_status_id->ViewCustomAttributes = "";
 
             // ts_last_update
             $this->ts_last_update->ViewValue = $this->ts_last_update->CurrentValue;
@@ -878,7 +807,12 @@ class MainCampaignsDelete extends MainCampaigns
             } else {
                 $this->renewal_stage_id->ViewValue = null;
             }
+            $this->renewal_stage_id->CellCssStyle .= "text-align: center;";
             $this->renewal_stage_id->ViewCustomAttributes = "";
+
+            // check_status
+            $this->check_status->ViewValue = $this->check_status->CurrentValue;
+            $this->check_status->ViewCustomAttributes = "";
 
             // id
             $this->id->LinkCustomAttributes = "";
@@ -925,25 +859,31 @@ class MainCampaignsDelete extends MainCampaigns
             $this->vendor_id->HrefValue = "";
             $this->vendor_id->TooltipValue = "";
 
-            // status_id
-            $this->status_id->LinkCustomAttributes = "";
-            $this->status_id->HrefValue = "";
-            $this->status_id->TooltipValue = "";
-
-            // print_status_id
-            $this->print_status_id->LinkCustomAttributes = "";
-            $this->print_status_id->HrefValue = "";
-            $this->print_status_id->TooltipValue = "";
-
-            // payment_status_id
-            $this->payment_status_id->LinkCustomAttributes = "";
-            $this->payment_status_id->HrefValue = "";
-            $this->payment_status_id->TooltipValue = "";
-
             // renewal_stage_id
             $this->renewal_stage_id->LinkCustomAttributes = "";
-            $this->renewal_stage_id->HrefValue = "";
+            if (!EmptyValue($this->id->CurrentValue)) {
+                $this->renewal_stage_id->HrefValue = (!empty($this->id->ViewValue) && !is_array($this->id->ViewValue) ? RemoveHtml($this->id->ViewValue) : $this->id->CurrentValue); // Add prefix/suffix
+                $this->renewal_stage_id->LinkAttrs["target"] = ""; // Add target
+                if ($this->isExport()) {
+                    $this->renewal_stage_id->HrefValue = FullUrl($this->renewal_stage_id->HrefValue, "href");
+                }
+            } else {
+                $this->renewal_stage_id->HrefValue = "";
+            }
             $this->renewal_stage_id->TooltipValue = "";
+
+            // check_status
+            $this->check_status->LinkCustomAttributes = "";
+            if (!EmptyValue($this->id->CurrentValue)) {
+                $this->check_status->HrefValue = "paymentshandler.php?id=" . (!empty($this->id->ViewValue) && !is_array($this->id->ViewValue) ? RemoveHtml($this->id->ViewValue) : $this->id->CurrentValue); // Add prefix/suffix
+                $this->check_status->LinkAttrs["target"] = ""; // Add target
+                if ($this->isExport()) {
+                    $this->check_status->HrefValue = FullUrl($this->check_status->HrefValue, "href");
+                }
+            } else {
+                $this->check_status->HrefValue = "";
+            }
+            $this->check_status->TooltipValue = "";
         }
 
         // Call Row Rendered event
@@ -1219,12 +1159,10 @@ class MainCampaignsDelete extends MainCampaigns
                 case "x_price_id":
                     break;
                 case "x_vendor_id":
-                    break;
-                case "x_status_id":
-                    break;
-                case "x_print_status_id":
-                    break;
-                case "x_payment_status_id":
+                    $lookupFilter = function () {
+                        return ((!IsAdmin())? " id = ".Profile()->vendor_id:"");
+                    };
+                    $lookupFilter = $lookupFilter->bindTo($this);
                     break;
                 case "x_renewal_stage_id":
                     break;

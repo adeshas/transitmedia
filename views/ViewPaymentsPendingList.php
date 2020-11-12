@@ -133,8 +133,8 @@ $Page->ListOptions->render("header", "left");
 <?php if ($Page->quantity->Visible) { // quantity ?>
         <th data-name="quantity" class="<?= $Page->quantity->headerCellClass() ?>"><div id="elh_view_payments_pending_quantity" class="view_payments_pending_quantity"><?= $Page->renderSort($Page->quantity) ?></div></th>
 <?php } ?>
-<?php if ($Page->campaign_status->Visible) { // campaign_status ?>
-        <th data-name="campaign_status" class="<?= $Page->campaign_status->headerCellClass() ?>"><div id="elh_view_payments_pending_campaign_status" class="view_payments_pending_campaign_status"><?= $Page->renderSort($Page->campaign_status) ?></div></th>
+<?php if ($Page->transaction_status->Visible) { // transaction_status ?>
+        <th data-name="transaction_status" class="<?= $Page->transaction_status->headerCellClass() ?>"><div id="elh_view_payments_pending_transaction_status" class="view_payments_pending_transaction_status"><?= $Page->renderSort($Page->transaction_status) ?></div></th>
 <?php } ?>
 <?php if ($Page->print_status->Visible) { // print_status ?>
         <th data-name="print_status" class="<?= $Page->print_status->headerCellClass() ?>"><div id="elh_view_payments_pending_print_status" class="view_payments_pending_print_status"><?= $Page->renderSort($Page->print_status) ?></div></th>
@@ -266,11 +266,11 @@ $Page->ListOptions->render("body", "left", $Page->RowCount);
 </span>
 </td>
     <?php } ?>
-    <?php if ($Page->campaign_status->Visible) { // campaign_status ?>
-        <td data-name="campaign_status" <?= $Page->campaign_status->cellAttributes() ?>>
-<span id="el<?= $Page->RowCount ?>_view_payments_pending_campaign_status">
-<span<?= $Page->campaign_status->viewAttributes() ?>>
-<?= $Page->campaign_status->getViewValue() ?></span>
+    <?php if ($Page->transaction_status->Visible) { // transaction_status ?>
+        <td data-name="transaction_status" <?= $Page->transaction_status->cellAttributes() ?>>
+<span id="el<?= $Page->RowCount ?>_view_payments_pending_transaction_status">
+<span<?= $Page->transaction_status->viewAttributes() ?>>
+<?= $Page->transaction_status->getViewValue() ?></span>
 </span>
 </td>
     <?php } ?>

@@ -171,6 +171,9 @@ loadjs.ready("datetimepicker", function() {
     });
 });
 </script>
+<script>
+ew.ready("head", [ew.PATH_BASE + "ckeditor/ckeditor.js", ew.PATH_BASE + "js/eweditor.js"], "editor");
+</script>
 <!-- Navbar -->
 <script type="text/html" id="navbar-menu-items" class="ew-js-template" data-name="navbar" data-seq="10" data-data="navbar" data-method="appendTo" data-target="#ew-navbar">
 {{if items}}
@@ -357,6 +360,16 @@ if (isset($DebugTimer)) {
         <div class="ew-footer-text"><?= $Language->projectPhrase("FooterText") ?></div>
         <div class="float-right d-none d-sm-inline-block"></div>
     </footer>
+    <aside class="control-sidebar control-sidebar-light">
+         <div class="p-3">
+         <?php #echo "CurrentUserLevel = ".CurrentUserLevel(); ?>
+         </div>
+     </aside>
+    <script type="text/html" class="ew-js-template" data-name="myControlSidebar" data-method="prependTo" data-target="#ew-navbar-right" data-seq="10">
+        <li class="nav-item">
+            <a class="nav-link" data-widget="control-sidebar" data-slide="true" href="#"><i class="fas fa-th-large"></i></a>
+        </li>
+    </script>
 </div>
 <!-- ./wrapper -->
 <?php } ?>

@@ -36,6 +36,7 @@ class MainTransactions extends DbTable
     public $quantity;
     public $start_date;
     public $end_date;
+    public $visible_status_id;
     public $status_id;
     public $print_status_id;
     public $payment_status_id;
@@ -121,6 +122,7 @@ class MainTransactions extends DbTable
 
         // price_id
         $this->price_id = new DbField('main_transactions', 'main_transactions', 'x_price_id', 'price_id', '"price_id"', 'CAST("price_id" AS varchar(255))', 3, 4, -1, false, '"EV__price_id"', true, true, true, 'FORMATTED TEXT', 'SELECT');
+        $this->price_id->Required = true; // Required field
         $this->price_id->Sortable = true; // Allow sort
         $this->price_id->UsePleaseSelect = true; // Use PleaseSelect by default
         $this->price_id->PleaseSelectText = $Language->phrase("PleaseSelect"); // "PleaseSelect" text
@@ -149,13 +151,23 @@ class MainTransactions extends DbTable
         $this->end_date->CustomMsg = $Language->FieldPhrase($this->TableVar, $this->end_date->Param, "CustomMsg");
         $this->Fields['end_date'] = &$this->end_date;
 
+        // visible_status_id
+        $this->visible_status_id = new DbField('main_transactions', 'main_transactions', 'x_visible_status_id', 'visible_status_id', 'status_id', 'CAST(status_id AS varchar(255))', 3, 4, -1, false, 'status_id', false, false, false, 'FORMATTED TEXT', 'SELECT');
+        $this->visible_status_id->IsCustom = true; // Custom field
+        $this->visible_status_id->Sortable = true; // Allow sort
+        $this->visible_status_id->UsePleaseSelect = true; // Use PleaseSelect by default
+        $this->visible_status_id->PleaseSelectText = $Language->phrase("PleaseSelect"); // "PleaseSelect" text
+        $this->visible_status_id->Lookup = new Lookup('visible_status_id', 'x_transaction_status', false, 'id', ["name","","",""], [], [], [], [], [], [], '', '');
+        $this->visible_status_id->DefaultErrorMessage = $Language->phrase("IncorrectInteger");
+        $this->Fields['visible_status_id'] = &$this->visible_status_id;
+
         // status_id
         $this->status_id = new DbField('main_transactions', 'main_transactions', 'x_status_id', 'status_id', '"status_id"', 'CAST("status_id" AS varchar(255))', 3, 4, -1, false, '"EV__status_id"', true, true, true, 'FORMATTED TEXT', 'SELECT');
         $this->status_id->Nullable = false; // NOT NULL field
         $this->status_id->Sortable = true; // Allow sort
         $this->status_id->UsePleaseSelect = true; // Use PleaseSelect by default
         $this->status_id->PleaseSelectText = $Language->phrase("PleaseSelect"); // "PleaseSelect" text
-        $this->status_id->Lookup = new Lookup('status_id', 'x_campaign_status', false, 'id', ["name","","",""], [], [], [], [], [], [], '', '');
+        $this->status_id->Lookup = new Lookup('status_id', 'x_transaction_status', false, 'id', ["admin_name","","",""], [], [], [], [], [], [], '', '');
         $this->status_id->DefaultErrorMessage = $Language->phrase("IncorrectInteger");
         $this->Fields['status_id'] = &$this->status_id;
 
@@ -385,7 +397,7 @@ class MainTransactions extends DbTable
 
     public function getSqlSelect() // Select
     {
-        return $this->SqlSelect ?? $this->getQueryBuilder()->select("*, quantity * (select v.price from view_pricing_all v where v.id = price_id) AS \"total\"");
+        return $this->SqlSelect ?? $this->getQueryBuilder()->select("*, status_id AS \"visible_status_id\", quantity * (select v.price from view_pricing_all v where v.id = price_id) AS \"total\"");
     }
 
     public function sqlSelect() // For backward compatibility
@@ -403,7 +415,7 @@ class MainTransactions extends DbTable
         if ($this->SqlSelectList) {
             return $this->SqlSelectList;
         }
-        $from = "(SELECT *, quantity * (select v.price from view_pricing_all v where v.id = price_id) AS \"total\", (SELECT \"name\" || '" . ValueSeparator(1, $this->campaign_id) . "' || \"quantity\" || '" . ValueSeparator(2, $this->campaign_id) . "' || \"bus_size_id\" || '" . ValueSeparator(3, $this->campaign_id) . "' || \"end_date\" FROM \"main_campaigns\" \"TMP_LOOKUPTABLE\" WHERE \"TMP_LOOKUPTABLE\".\"id\" = \"main_transactions\".\"campaign_id\" LIMIT 1) AS \"EV__campaign_id\", (SELECT \"price_details\" || '" . ValueSeparator(1, $this->price_id) . "' || \"platform_inventory\" FROM \"view_pricing_options\" \"TMP_LOOKUPTABLE\" WHERE \"TMP_LOOKUPTABLE\".\"price_id\" = \"main_transactions\".\"price_id\" LIMIT 1) AS \"EV__price_id\", (SELECT \"name\" FROM \"x_campaign_status\" \"TMP_LOOKUPTABLE\" WHERE \"TMP_LOOKUPTABLE\".\"id\" = \"main_transactions\".\"status_id\" LIMIT 1) AS \"EV__status_id\", (SELECT \"name\" FROM \"x_print_status\" \"TMP_LOOKUPTABLE\" WHERE \"TMP_LOOKUPTABLE\".\"id\" = \"main_transactions\".\"print_status_id\" LIMIT 1) AS \"EV__print_status_id\", (SELECT \"name\" FROM \"x_payment_status\" \"TMP_LOOKUPTABLE\" WHERE \"TMP_LOOKUPTABLE\".\"id\" = \"main_transactions\".\"payment_status_id\" LIMIT 1) AS \"EV__payment_status_id\" FROM \"main_transactions\")";
+        $from = "(SELECT *, status_id AS \"visible_status_id\", quantity * (select v.price from view_pricing_all v where v.id = price_id) AS \"total\", (SELECT \"name\" || '" . ValueSeparator(1, $this->campaign_id) . "' || \"quantity\" || '" . ValueSeparator(2, $this->campaign_id) . "' || \"bus_size_id\" || '" . ValueSeparator(3, $this->campaign_id) . "' || \"end_date\" FROM \"main_campaigns\" \"TMP_LOOKUPTABLE\" WHERE \"TMP_LOOKUPTABLE\".\"id\" = \"main_transactions\".\"campaign_id\" LIMIT 1) AS \"EV__campaign_id\", (SELECT \"price_details\" || '" . ValueSeparator(1, $this->price_id) . "' || \"platform_inventory\" FROM \"view_pricing_options\" \"TMP_LOOKUPTABLE\" WHERE \"TMP_LOOKUPTABLE\".\"price_id\" = \"main_transactions\".\"price_id\" LIMIT 1) AS \"EV__price_id\", (SELECT \"admin_name\" FROM \"x_transaction_status\" \"TMP_LOOKUPTABLE\" WHERE \"TMP_LOOKUPTABLE\".\"id\" = \"main_transactions\".\"status_id\" LIMIT 1) AS \"EV__status_id\", (SELECT \"name\" FROM \"x_print_status\" \"TMP_LOOKUPTABLE\" WHERE \"TMP_LOOKUPTABLE\".\"id\" = \"main_transactions\".\"print_status_id\" LIMIT 1) AS \"EV__print_status_id\", (SELECT \"name\" FROM \"x_payment_status\" \"TMP_LOOKUPTABLE\" WHERE \"TMP_LOOKUPTABLE\".\"id\" = \"main_transactions\".\"payment_status_id\" LIMIT 1) AS \"EV__payment_status_id\" FROM \"main_transactions\")";
         return $from . " \"TMP_TABLE\"";
     }
 
@@ -849,6 +861,7 @@ class MainTransactions extends DbTable
         $this->quantity->DbValue = $row['quantity'];
         $this->start_date->DbValue = $row['start_date'];
         $this->end_date->DbValue = $row['end_date'];
+        $this->visible_status_id->DbValue = $row['visible_status_id'];
         $this->status_id->DbValue = $row['status_id'];
         $this->print_status_id->DbValue = $row['print_status_id'];
         $this->payment_status_id->DbValue = $row['payment_status_id'];
@@ -1201,6 +1214,7 @@ SORTHTML;
         $this->quantity->setDbValue($row['quantity']);
         $this->start_date->setDbValue($row['start_date']);
         $this->end_date->setDbValue($row['end_date']);
+        $this->visible_status_id->setDbValue($row['visible_status_id']);
         $this->status_id->setDbValue($row['status_id']);
         $this->print_status_id->setDbValue($row['print_status_id']);
         $this->payment_status_id->setDbValue($row['payment_status_id']);
@@ -1235,6 +1249,8 @@ SORTHTML;
         // start_date
 
         // end_date
+
+        // visible_status_id
 
         // status_id
 
@@ -1345,6 +1361,27 @@ SORTHTML;
         $this->end_date->ViewValue = $this->end_date->CurrentValue;
         $this->end_date->ViewValue = FormatDateTime($this->end_date->ViewValue, 5);
         $this->end_date->ViewCustomAttributes = "";
+
+        // visible_status_id
+        $curVal = strval($this->visible_status_id->CurrentValue);
+        if ($curVal != "") {
+            $this->visible_status_id->ViewValue = $this->visible_status_id->lookupCacheOption($curVal);
+            if ($this->visible_status_id->ViewValue === null) { // Lookup from database
+                $filterWrk = "\"id\"" . SearchString("=", $curVal, DATATYPE_NUMBER, "");
+                $sqlWrk = $this->visible_status_id->Lookup->getSql(false, $filterWrk, '', $this, true);
+                $rswrk = Conn()->executeQuery($sqlWrk)->fetchAll(\PDO::FETCH_BOTH);
+                $ari = count($rswrk);
+                if ($ari > 0) { // Lookup values found
+                    $arwrk = $this->visible_status_id->Lookup->renderViewRow($rswrk[0]);
+                    $this->visible_status_id->ViewValue = $this->visible_status_id->displayValue($arwrk);
+                } else {
+                    $this->visible_status_id->ViewValue = $this->visible_status_id->CurrentValue;
+                }
+            }
+        } else {
+            $this->visible_status_id->ViewValue = null;
+        }
+        $this->visible_status_id->ViewCustomAttributes = "";
 
         // status_id
         if ($this->status_id->VirtualValue != "") {
@@ -1497,6 +1534,11 @@ SORTHTML;
         $this->end_date->HrefValue = "";
         $this->end_date->TooltipValue = "";
 
+        // visible_status_id
+        $this->visible_status_id->LinkCustomAttributes = "";
+        $this->visible_status_id->HrefValue = "";
+        $this->visible_status_id->TooltipValue = "";
+
         // status_id
         $this->status_id->LinkCustomAttributes = "";
         $this->status_id->HrefValue = "";
@@ -1643,6 +1685,11 @@ SORTHTML;
         $this->end_date->EditValue = FormatDateTime($this->end_date->CurrentValue, 5);
         $this->end_date->PlaceHolder = RemoveHtml($this->end_date->caption());
 
+        // visible_status_id
+        $this->visible_status_id->EditAttrs["class"] = "form-control";
+        $this->visible_status_id->EditCustomAttributes = "";
+        $this->visible_status_id->PlaceHolder = RemoveHtml($this->visible_status_id->caption());
+
         // status_id
         $this->status_id->EditAttrs["class"] = "form-control";
         $this->status_id->EditCustomAttributes = "";
@@ -1734,6 +1781,7 @@ SORTHTML;
                     $doc->exportCaption($this->quantity);
                     $doc->exportCaption($this->start_date);
                     $doc->exportCaption($this->end_date);
+                    $doc->exportCaption($this->visible_status_id);
                     $doc->exportCaption($this->status_id);
                     $doc->exportCaption($this->print_status_id);
                     $doc->exportCaption($this->payment_status_id);
@@ -1750,6 +1798,7 @@ SORTHTML;
                     $doc->exportCaption($this->quantity);
                     $doc->exportCaption($this->start_date);
                     $doc->exportCaption($this->end_date);
+                    $doc->exportCaption($this->visible_status_id);
                     $doc->exportCaption($this->status_id);
                     $doc->exportCaption($this->print_status_id);
                     $doc->exportCaption($this->payment_status_id);
@@ -1795,6 +1844,7 @@ SORTHTML;
                         $doc->exportField($this->quantity);
                         $doc->exportField($this->start_date);
                         $doc->exportField($this->end_date);
+                        $doc->exportField($this->visible_status_id);
                         $doc->exportField($this->status_id);
                         $doc->exportField($this->print_status_id);
                         $doc->exportField($this->payment_status_id);
@@ -1811,6 +1861,7 @@ SORTHTML;
                         $doc->exportField($this->quantity);
                         $doc->exportField($this->start_date);
                         $doc->exportField($this->end_date);
+                        $doc->exportField($this->visible_status_id);
                         $doc->exportField($this->status_id);
                         $doc->exportField($this->print_status_id);
                         $doc->exportField($this->payment_status_id);
@@ -1845,6 +1896,7 @@ SORTHTML;
                 $doc->exportAggregate($this->quantity, 'TOTAL');
                 $doc->exportAggregate($this->start_date, '');
                 $doc->exportAggregate($this->end_date, '');
+                $doc->exportAggregate($this->visible_status_id, '');
                 $doc->exportAggregate($this->status_id, '');
                 $doc->exportAggregate($this->print_status_id, '');
                 $doc->exportAggregate($this->payment_status_id, '');
@@ -1957,7 +2009,200 @@ SORTHTML;
     // Row Updated event
     public function rowUpdated($rsold, &$rsnew)
     {
-        //Log("Row Updated");
+    	//echo "Row Updated";
+    	require_once 'views\PrivateFunctions.php';
+
+    	//if (strpos($_SERVER['SERVER_NAME'], 'localhost') === false) {
+    	//	require_once 'emailrun.php';
+    	//}
+    	$username = "Transit Media Vendor";
+    	$email = "";
+    	$msg = "";
+    	$msgtxt = "";
+    	$subject = "";
+    	$camp_id = $rsold["id"];
+    	$sql = "select
+        c.name, name, t.start_date, t.end_date,
+        (t.end_date::timestamp - t.start_date::timestamp) as duration,
+        t.quantity,
+        to_char(
+        t.quantity * (select price FROM public.z_price_settings p where p.id = c.price_id)
+        , 'N999,999,999,990'::text) as amount,
+        (select value from z_core_settings where name = 'ext_account_details' ) as account_details,
+        (select name from y_vendors v where v.id = vendor_id) as vendor,
+    	(select name from y_operators o where o.id = t.operator_id) as operator,
+    	(select email from y_operators o where o.id = t.operator_id) as operator_email,
+    	(select contact_name from y_operators o where o.id = t.operator_id) as operator_contact_name
+        from main_campaigns c, main_transactions t 
+    	where 
+    	t.campaign_id = c.id and
+    	t.id = {$camp_id} ;";
+    	$camp_details = ExecuteRow($sql);
+    	$operator = $camp_details["operator"];
+    	$operator_email = $camp_details["operator_email"];
+    	$operator_contact_name =  $camp_details["operator_contact_name"];
+    	$rowssql = "select email from main_users where vendor_id in ";
+    	$rowssql .= "(select vendor_id from main_campaigns where id in (select campaign_id from main_transactions where id = " . $camp_id . "));";
+    	$rows = ExecuteRows($rowssql);
+    	$emailslist_array = [];
+    	foreach ($rows as $v) {
+    		if(strlen($v['email']) > 2 ){
+    			$emailslist_array[] = $v['email'];
+    		}
+    	}
+    	$emailslist = implode(',', $emailslist_array);
+
+    	// $email = $val['email'];
+    	$email = $emailslist;
+    	$vendor = $camp_details['vendor'];
+    	$username = $vendor;
+    	$search_replace = [
+    		'[x_campaign]' => $camp_details['name'],
+    		'[x_quantity]' => $camp_details['quantity'],
+    		'[x_vendor]' => $vendor,
+    		'[x_supportemail] ' => 'info@transitmedia.com.ng',
+    	];
+    	$search = array_keys($search_replace);
+    	$replace = array_values($search_replace);
+    	$x_camp_name = $camp_details['name'];
+    	if ($rsold["status_id"] != 3 && $rsnew["status_id"] == 3) {
+    		//Campaign Denied
+    		$sql_msg = "select value from z_core_settings where name = 'campaign_denied';";
+    		$editmsg = ExecuteScalar($sql_msg);
+    		$msg = str_replace($search, $replace, $editmsg);
+    		$msgtxt = strip_tags($msg);
+    		$subject = "DENIED CAMPAIGN REQUEST ({$vendor}) - TRANSIT MEDIA ADMIN";
+    		$subject = "{$x_camp_name} - ({$vendor}) - TRANSIT MEDIA ADMIN";
+    		#===============================================================
+    		$emailpayload = getEmailPayload('updates_to_campaign_vendor');
+    		$exposed_emails = get_emails($emailpayload, $email);
+    		extract($exposed_emails);
+    		$email = $final_to;
+    		$cc = $final_cc;
+    		$bcc = $final_bcc;
+    		#===============================================================
+    		if (strpos($_SERVER['SERVER_NAME'], 'localhost') === false) {
+    			sendTMmail('admin@transitmedia.com.ng', $email, $subject, $msg, $msgtxt, null, $cc, $bcc);
+    		} else {
+    			sendTMmail('admin@transitmedia.com.ng', $email, $subject, $msg, $msgtxt, null, $cc, $bcc);
+    			echo "\n<br>====================================<br>\n";
+    			echo "sendTMmail('admin@transitmedia.com.ng', $email, $subject, $msg, $msgtxt,NULL,$cc,$bcc);";
+    			echo "\n<br>====================================<br>\n";
+    		}
+    	}
+    	if ($rsold["print_status_id"] != 2 && $rsnew["print_status_id"] == 2) {
+    		//Print Approved
+    		$sql_msg = "select value from z_core_settings where name = 'print_approved';";
+    		$editmsg = ExecuteScalar($sql_msg);
+    		$msg = str_replace($search, $replace, $editmsg);
+    		$msgtxt = strip_tags($msg);
+    		$subject = "PRINT APPROVAL ({$vendor}) - TRANSIT MEDIA ADMIN";
+    		$subject = "{$x_camp_name} - ({$vendor}) - TRANSIT MEDIA ADMIN";
+    		#===============================================================
+    		$emailpayload = getEmailPayload('updates_to_campaign_vendor');
+    		$exposed_emails = get_emails($emailpayload, $email);
+    		extract($exposed_emails);
+    		$email = $final_to;
+    		$cc = $final_cc;
+    		$bcc = $final_bcc;
+    		#===============================================================
+    		if (strpos($_SERVER['SERVER_NAME'], 'localhost') === false) {
+    			sendTMmail('admin@transitmedia.com.ng', $email, $subject, $msg, $msgtxt, null, $cc, $bcc);
+    		} else {
+    			sendTMmail('admin@transitmedia.com.ng', $email, $subject, $msg, $msgtxt, null, $cc, $bcc);
+    			echo "\n<br>====================================<br>\n";
+    			echo "sendTMmail('admin@transitmedia.com.ng', $email, $subject, $msg, $msgtxt,NULL,$cc,$bcc);";
+    			echo "\n<br>====================================<br>\n";
+    		}
+    	}
+    	if ($rsold["print_status_id"] != 3 && $rsnew["print_status_id"] == 3) {
+    		//Print Denied
+    		$sql_msg = "select value from z_core_settings where name = 'print_denied';";
+    		$editmsg = ExecuteScalar($sql_msg);
+    		$msg = str_replace($search, $replace, $editmsg);
+    		$msgtxt = strip_tags($msg);
+    		$subject = "PRINT REFUSAL ({$vendor}) - TRANSIT MEDIA ADMIN";
+    		$subject = "{$x_camp_name} - ({$vendor}) - TRANSIT MEDIA ADMIN";
+    		#===============================================================
+    		$emailpayload = getEmailPayload('updates_to_campaign_vendor');
+    		$exposed_emails = get_emails($emailpayload, $email);
+    		extract($exposed_emails);
+    		$email = $final_to;
+    		$cc = $final_cc;
+    		$bcc = $final_bcc;
+    		#===============================================================
+    		if (strpos($_SERVER['SERVER_NAME'], 'localhost') === false) {
+    			sendTMmail('admin@transitmedia.com.ng', $email, $subject, $msg, $msgtxt, null, $cc, $bcc);
+    		} else {
+    			sendTMmail('admin@transitmedia.com.ng', $email, $subject, $msg, $msgtxt, null, $cc, $bcc);
+    			echo "\n<br>====================================<br>\n";
+    			echo "sendTMmail('admin@transitmedia.com.ng', $email, $subject, $msg, $msgtxt,NULL,$cc,$bcc);";
+    			echo "\n<br>====================================<br>\n";
+    		}
+    	}
+    	if ($rsold["payment_status_id"] != 2 && $rsnew["payment_status_id"] == 2) {
+    		//Payment Approved
+    		$sql_msg = "select value from z_core_settings where name = 'payment_approved';";
+    		$editmsg = ExecuteScalar($sql_msg);
+    		$msg = str_replace($search, $replace, $editmsg);
+    		$msgtxt = strip_tags($msg);
+    		$subject = "PAYMENT CONFIRMATION ({$vendor}) - TRANSIT MEDIA ADMIN";
+    		#===============================================================
+    		$emailpayload = getEmailPayload('updates_to_campaign_vendor');
+    		$exposed_emails = get_emails($emailpayload, $email);
+    		extract($exposed_emails);
+    		$email = $final_to;
+    		$cc = $final_cc;
+    		$bcc = $final_bcc;
+    		#===============================================================
+    		if (strpos($_SERVER['SERVER_NAME'], 'localhost') === false) {
+    			sendTMmail('admin@transitmedia.com.ng', $email, $subject, $msg, $msgtxt, null, $cc, $bcc);
+    		} else {
+    			sendTMmail('admin@transitmedia.com.ng', $email, $subject, $msg, $msgtxt, null, $cc, $bcc);
+    			echo "\n<br>====================================<br>\n";
+    			echo "sendTMmail('admin@transitmedia.com.ng', $email, $subject, $msg, $msgtxt,NULL,$cc,$bcc);";
+    			echo "\n<br>====================================<br>\n";
+    		}
+    	}
+
+    	//if (($rsnew["payment_status_id"] == 2 && $rsnew["print_status_id"] == 2) && ($rsold["payment_status_id"] != 2 || $rsold["print_status_id"] != 2)) {
+    	if (($rsnew["payment_status_id"] == 2) && ($rsold["payment_status_id"] != 2)) {
+    		//Print & Payment Approved. Send mail to operator
+    		$msg = "Your request has been sent to the Operator for Approval. You will be notified by email once a decision is made.";	
+    		$this->setSuccessMessage($msg);
+    		$sql_msg = "select value from z_core_settings where name = 'print_and_payment_approved_primero';";
+    		$editmsg = ExecuteScalar($sql_msg);
+    		$msg = str_replace($search, $replace, $editmsg);
+    		$msgtxt = strip_tags($msg);
+    		$subject = "PENDING APPROVAL - PRINT & PAYMENT CONFIRMATION ({$vendor}) - TRANSIT MEDIA ADMIN - {$operator}";
+    		$subject = "{$x_camp_name} - ({$vendor}) - TRANSIT MEDIA ADMIN - {$operator}";
+
+    		// GET OPERATOR EMAIL
+    		$sqloperator = "select o.name, o.email from main_transactions t, y_operators o where o.id = t.operator_id and t.id = {$camp_id} LIMIT 1;";
+    		$operator_vals = ExecuteRow($sqloperator);
+    		#===============================================================
+    		$emailpayload = getEmailPayload('updates_to_campaign_operator');
+    		$exposed_emails = get_emails($emailpayload);
+    		extract($exposed_emails);
+    		$email = $operator_vals['name'] . " <" . $operator_vals['email'] .">";
+    		$cc = $final_cc;
+    		$bcc = $final_bcc;
+    		#===============================================================
+
+    		// UPDATE STATUS to PENDING OPERATOR APPROVAL
+    		$updatesql = "UPDATE main_transactions SET status_id = 4 WHERE id = {$camp_id}";
+    		ExecuteUpdate($updatesql);
+    		if (strpos($_SERVER['SERVER_NAME'], 'localhost') === false) {
+    			sendTMmail('admin@transitmedia.com.ng', $email, $subject, $msg, $msgtxt, null, $cc, $bcc);
+    		} else {
+    			sendTMmail('admin@transitmedia.com.ng', $email, $subject, $msg, $msgtxt, null, $cc, $bcc);
+    			echo "\n<br>====================================<br>\n";
+    			echo "sendTMmail('admin@transitmedia.com.ng', $email, $subject, $msg, $msgtxt,NULL,$cc,$bcc);";
+    			echo "\n<br>====================================<br>\n";
+    		}
+    	}
+
+    //exit;
     }
 
     // Row Update Conflict event

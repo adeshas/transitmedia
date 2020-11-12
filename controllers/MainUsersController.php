@@ -32,6 +32,12 @@ class MainUsersController extends ControllerBase
         return $this->runPage($request, $response, $args, "MainUsersEdit");
     }
 
+    // update
+    public function update(Request $request, Response $response, array $args): Response
+    {
+        return $this->runPage($request, $response, $args, "MainUsersUpdate");
+    }
+
     // delete
     public function delete(Request $request, Response $response, array $args): Response
     {

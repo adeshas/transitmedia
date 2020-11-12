@@ -480,6 +480,8 @@ class YOperatorsGrid extends YOperators
         $this->name->setVisibility();
         $this->shortname->setVisibility();
         $this->platform_id->setVisibility();
+        $this->_email->setVisibility();
+        $this->contact_name->setVisibility();
         $this->hideFieldsForAddEdit();
 
         // Global Page Loading event (in userfn*.php)
@@ -912,6 +914,12 @@ class YOperatorsGrid extends YOperators
         if ($CurrentForm->hasValue("x_platform_id") && $CurrentForm->hasValue("o_platform_id") && $this->platform_id->CurrentValue != $this->platform_id->OldValue) {
             return false;
         }
+        if ($CurrentForm->hasValue("x__email") && $CurrentForm->hasValue("o__email") && $this->_email->CurrentValue != $this->_email->OldValue) {
+            return false;
+        }
+        if ($CurrentForm->hasValue("x_contact_name") && $CurrentForm->hasValue("o_contact_name") && $this->contact_name->CurrentValue != $this->contact_name->OldValue) {
+            return false;
+        }
         return true;
     }
 
@@ -997,6 +1005,8 @@ class YOperatorsGrid extends YOperators
         $this->name->clearErrorMessage();
         $this->shortname->clearErrorMessage();
         $this->platform_id->clearErrorMessage();
+        $this->_email->clearErrorMessage();
+        $this->contact_name->clearErrorMessage();
     }
 
     // Set up sort parameters
@@ -1081,6 +1091,18 @@ class YOperatorsGrid extends YOperators
         $item->Visible = $Security->canView();
         $item->OnLeft = false;
 
+        // "edit"
+        $item = &$this->ListOptions->add("edit");
+        $item->CssClass = "text-nowrap";
+        $item->Visible = $Security->canEdit();
+        $item->OnLeft = false;
+
+        // "delete"
+        $item = &$this->ListOptions->add("delete");
+        $item->CssClass = "text-nowrap";
+        $item->Visible = $Security->canDelete();
+        $item->OnLeft = false;
+
         // Drop down button for ListOptions
         $this->ListOptions->UseDropDownButton = false;
         $this->ListOptions->DropDownButtonPhrase = $Language->phrase("ButtonListOptions");
@@ -1131,7 +1153,7 @@ class YOperatorsGrid extends YOperators
                 $options = &$this->ListOptions;
                 $options->UseButtonGroup = true; // Use button group for grid delete button
                 $opt = $options["griddelete"];
-                if (is_numeric($this->RowIndex) && ($this->RowAction == "" || $this->RowAction == "edit")) { // Do not allow delete existing record
+                if (!$Security->canDelete() && is_numeric($this->RowIndex) && ($this->RowAction == "" || $this->RowAction == "edit")) { // Do not allow delete existing record
                     $opt->Body = "&nbsp;";
                 } else {
                     $opt->Body = "<a class=\"ew-grid-link ew-grid-delete\" title=\"" . HtmlTitle($Language->phrase("DeleteLink")) . "\" data-caption=\"" . HtmlTitle($Language->phrase("DeleteLink")) . "\" onclick=\"return ew.deleteGridRow(this, " . $this->RowIndex . ");\">" . $Language->phrase("DeleteLink") . "</a>";
@@ -1144,6 +1166,23 @@ class YOperatorsGrid extends YOperators
             $viewcaption = HtmlTitle($Language->phrase("ViewLink"));
             if ($Security->canView()) {
                 $opt->Body = "<a class=\"ew-row-link ew-view\" title=\"" . $viewcaption . "\" data-caption=\"" . $viewcaption . "\" href=\"" . HtmlEncode(GetUrl($this->ViewUrl)) . "\">" . $Language->phrase("ViewLink") . "</a>";
+            } else {
+                $opt->Body = "";
+            }
+
+            // "edit"
+            $opt = $this->ListOptions["edit"];
+            $editcaption = HtmlTitle($Language->phrase("EditLink"));
+            if ($Security->canEdit()) {
+                $opt->Body = "<a class=\"ew-row-link ew-edit\" title=\"" . HtmlTitle($Language->phrase("EditLink")) . "\" data-caption=\"" . HtmlTitle($Language->phrase("EditLink")) . "\" href=\"" . HtmlEncode(GetUrl($this->EditUrl)) . "\">" . $Language->phrase("EditLink") . "</a>";
+            } else {
+                $opt->Body = "";
+            }
+
+            // "delete"
+            $opt = $this->ListOptions["delete"];
+            if ($Security->canDelete()) {
+            $opt->Body = "<a class=\"ew-row-link ew-delete\"" . "" . " title=\"" . HtmlTitle($Language->phrase("DeleteLink")) . "\" data-caption=\"" . HtmlTitle($Language->phrase("DeleteLink")) . "\" href=\"" . HtmlEncode(GetUrl($this->DeleteUrl)) . "\">" . $Language->phrase("DeleteLink") . "</a>";
             } else {
                 $opt->Body = "";
             }
@@ -1171,6 +1210,15 @@ class YOperatorsGrid extends YOperators
         $item = &$option->add($option->GroupOptionName);
         $item->Body = "";
         $item->Visible = false;
+
+        // Add
+        if ($this->CurrentMode == "view") { // Check view mode
+            $item = &$option->add("add");
+            $addcaption = HtmlTitle($Language->phrase("AddLink"));
+            $this->AddUrl = $this->getAddUrl();
+            $item->Body = "<a class=\"ew-add-edit ew-add\" title=\"" . $addcaption . "\" data-caption=\"" . $addcaption . "\" href=\"" . HtmlEncode(GetUrl($this->AddUrl)) . "\">" . $Language->phrase("AddLink") . "</a>";
+            $item->Visible = $this->AddUrl != "" && $Security->canAdd();
+        }
     }
 
     // Render other options
@@ -1184,7 +1232,7 @@ class YOperatorsGrid extends YOperators
                 $option->UseDropDownButton = false;
                 $item = &$option->add("addblankrow");
                 $item->Body = "<a class=\"ew-add-edit ew-add-blank-row\" title=\"" . HtmlTitle($Language->phrase("AddBlankRow")) . "\" data-caption=\"" . HtmlTitle($Language->phrase("AddBlankRow")) . "\" href=\"#\" onclick=\"return ew.addGridRow(this);\">" . $Language->phrase("AddBlankRow") . "</a>";
-                $item->Visible = false;
+                $item->Visible = $Security->canAdd();
                 $this->ShowOtherOptions = $item->Visible;
             }
         }
@@ -1222,6 +1270,10 @@ class YOperatorsGrid extends YOperators
         $this->shortname->OldValue = $this->shortname->CurrentValue;
         $this->platform_id->CurrentValue = null;
         $this->platform_id->OldValue = $this->platform_id->CurrentValue;
+        $this->_email->CurrentValue = null;
+        $this->_email->OldValue = $this->_email->CurrentValue;
+        $this->contact_name->CurrentValue = null;
+        $this->contact_name->OldValue = $this->contact_name->CurrentValue;
     }
 
     // Load form values
@@ -1275,6 +1327,32 @@ class YOperatorsGrid extends YOperators
         if ($CurrentForm->hasValue("o_platform_id")) {
             $this->platform_id->setOldValue($CurrentForm->getValue("o_platform_id"));
         }
+
+        // Check field name 'email' first before field var 'x__email'
+        $val = $CurrentForm->hasValue("email") ? $CurrentForm->getValue("email") : $CurrentForm->getValue("x__email");
+        if (!$this->_email->IsDetailKey) {
+            if (IsApi() && $val === null) {
+                $this->_email->Visible = false; // Disable update for API request
+            } else {
+                $this->_email->setFormValue($val);
+            }
+        }
+        if ($CurrentForm->hasValue("o__email")) {
+            $this->_email->setOldValue($CurrentForm->getValue("o__email"));
+        }
+
+        // Check field name 'contact_name' first before field var 'x_contact_name'
+        $val = $CurrentForm->hasValue("contact_name") ? $CurrentForm->getValue("contact_name") : $CurrentForm->getValue("x_contact_name");
+        if (!$this->contact_name->IsDetailKey) {
+            if (IsApi() && $val === null) {
+                $this->contact_name->Visible = false; // Disable update for API request
+            } else {
+                $this->contact_name->setFormValue($val);
+            }
+        }
+        if ($CurrentForm->hasValue("o_contact_name")) {
+            $this->contact_name->setOldValue($CurrentForm->getValue("o_contact_name"));
+        }
     }
 
     // Restore form values
@@ -1287,6 +1365,8 @@ class YOperatorsGrid extends YOperators
         $this->name->CurrentValue = $this->name->FormValue;
         $this->shortname->CurrentValue = $this->shortname->FormValue;
         $this->platform_id->CurrentValue = $this->platform_id->FormValue;
+        $this->_email->CurrentValue = $this->_email->FormValue;
+        $this->contact_name->CurrentValue = $this->contact_name->FormValue;
     }
 
     // Load recordset
@@ -1361,6 +1441,8 @@ class YOperatorsGrid extends YOperators
         $this->name->setDbValue($row['name']);
         $this->shortname->setDbValue($row['shortname']);
         $this->platform_id->setDbValue($row['platform_id']);
+        $this->_email->setDbValue($row['email']);
+        $this->contact_name->setDbValue($row['contact_name']);
     }
 
     // Return a row with default values
@@ -1372,6 +1454,8 @@ class YOperatorsGrid extends YOperators
         $row['name'] = $this->name->CurrentValue;
         $row['shortname'] = $this->shortname->CurrentValue;
         $row['platform_id'] = $this->platform_id->CurrentValue;
+        $row['email'] = $this->_email->CurrentValue;
+        $row['contact_name'] = $this->contact_name->CurrentValue;
         return $row;
     }
 
@@ -1414,6 +1498,10 @@ class YOperatorsGrid extends YOperators
         // shortname
 
         // platform_id
+
+        // email
+
+        // contact_name
         if ($this->RowType == ROWTYPE_VIEW) {
             // id
             $this->id->ViewValue = $this->id->CurrentValue;
@@ -1448,6 +1536,14 @@ class YOperatorsGrid extends YOperators
             }
             $this->platform_id->ViewCustomAttributes = "";
 
+            // email
+            $this->_email->ViewValue = $this->_email->CurrentValue;
+            $this->_email->ViewCustomAttributes = "";
+
+            // contact_name
+            $this->contact_name->ViewValue = $this->contact_name->CurrentValue;
+            $this->contact_name->ViewCustomAttributes = "";
+
             // id
             $this->id->LinkCustomAttributes = "";
             $this->id->HrefValue = "";
@@ -1467,6 +1563,16 @@ class YOperatorsGrid extends YOperators
             $this->platform_id->LinkCustomAttributes = "";
             $this->platform_id->HrefValue = "";
             $this->platform_id->TooltipValue = "";
+
+            // email
+            $this->_email->LinkCustomAttributes = "";
+            $this->_email->HrefValue = "";
+            $this->_email->TooltipValue = "";
+
+            // contact_name
+            $this->contact_name->LinkCustomAttributes = "";
+            $this->contact_name->HrefValue = "";
+            $this->contact_name->TooltipValue = "";
         } elseif ($this->RowType == ROWTYPE_ADD) {
             // id
 
@@ -1537,6 +1643,24 @@ class YOperatorsGrid extends YOperators
                 $this->platform_id->PlaceHolder = RemoveHtml($this->platform_id->caption());
             }
 
+            // email
+            $this->_email->EditAttrs["class"] = "form-control";
+            $this->_email->EditCustomAttributes = "";
+            if (!$this->_email->Raw) {
+                $this->_email->CurrentValue = HtmlDecode($this->_email->CurrentValue);
+            }
+            $this->_email->EditValue = HtmlEncode($this->_email->CurrentValue);
+            $this->_email->PlaceHolder = RemoveHtml($this->_email->caption());
+
+            // contact_name
+            $this->contact_name->EditAttrs["class"] = "form-control";
+            $this->contact_name->EditCustomAttributes = "";
+            if (!$this->contact_name->Raw) {
+                $this->contact_name->CurrentValue = HtmlDecode($this->contact_name->CurrentValue);
+            }
+            $this->contact_name->EditValue = HtmlEncode($this->contact_name->CurrentValue);
+            $this->contact_name->PlaceHolder = RemoveHtml($this->contact_name->caption());
+
             // Add refer script
 
             // id
@@ -1554,6 +1678,14 @@ class YOperatorsGrid extends YOperators
             // platform_id
             $this->platform_id->LinkCustomAttributes = "";
             $this->platform_id->HrefValue = "";
+
+            // email
+            $this->_email->LinkCustomAttributes = "";
+            $this->_email->HrefValue = "";
+
+            // contact_name
+            $this->contact_name->LinkCustomAttributes = "";
+            $this->contact_name->HrefValue = "";
         } elseif ($this->RowType == ROWTYPE_EDIT) {
             // id
             $this->id->EditAttrs["class"] = "form-control";
@@ -1628,6 +1760,24 @@ class YOperatorsGrid extends YOperators
                 $this->platform_id->PlaceHolder = RemoveHtml($this->platform_id->caption());
             }
 
+            // email
+            $this->_email->EditAttrs["class"] = "form-control";
+            $this->_email->EditCustomAttributes = "";
+            if (!$this->_email->Raw) {
+                $this->_email->CurrentValue = HtmlDecode($this->_email->CurrentValue);
+            }
+            $this->_email->EditValue = HtmlEncode($this->_email->CurrentValue);
+            $this->_email->PlaceHolder = RemoveHtml($this->_email->caption());
+
+            // contact_name
+            $this->contact_name->EditAttrs["class"] = "form-control";
+            $this->contact_name->EditCustomAttributes = "";
+            if (!$this->contact_name->Raw) {
+                $this->contact_name->CurrentValue = HtmlDecode($this->contact_name->CurrentValue);
+            }
+            $this->contact_name->EditValue = HtmlEncode($this->contact_name->CurrentValue);
+            $this->contact_name->PlaceHolder = RemoveHtml($this->contact_name->caption());
+
             // Edit refer script
 
             // id
@@ -1645,6 +1795,14 @@ class YOperatorsGrid extends YOperators
             // platform_id
             $this->platform_id->LinkCustomAttributes = "";
             $this->platform_id->HrefValue = "";
+
+            // email
+            $this->_email->LinkCustomAttributes = "";
+            $this->_email->HrefValue = "";
+
+            // contact_name
+            $this->contact_name->LinkCustomAttributes = "";
+            $this->contact_name->HrefValue = "";
         }
         if ($this->RowType == ROWTYPE_ADD || $this->RowType == ROWTYPE_EDIT || $this->RowType == ROWTYPE_SEARCH) { // Add/Edit/Search row
             $this->setupFieldTitles();
@@ -1683,6 +1841,16 @@ class YOperatorsGrid extends YOperators
         if ($this->platform_id->Required) {
             if (!$this->platform_id->IsDetailKey && EmptyValue($this->platform_id->FormValue)) {
                 $this->platform_id->addErrorMessage(str_replace("%s", $this->platform_id->caption(), $this->platform_id->RequiredErrorMessage));
+            }
+        }
+        if ($this->_email->Required) {
+            if (!$this->_email->IsDetailKey && EmptyValue($this->_email->FormValue)) {
+                $this->_email->addErrorMessage(str_replace("%s", $this->_email->caption(), $this->_email->RequiredErrorMessage));
+            }
+        }
+        if ($this->contact_name->Required) {
+            if (!$this->contact_name->IsDetailKey && EmptyValue($this->contact_name->FormValue)) {
+                $this->contact_name->addErrorMessage(str_replace("%s", $this->contact_name->caption(), $this->contact_name->RequiredErrorMessage));
             }
         }
 
@@ -1802,6 +1970,12 @@ class YOperatorsGrid extends YOperators
             // platform_id
             $this->platform_id->setDbValueDef($rsnew, $this->platform_id->CurrentValue, null, $this->platform_id->ReadOnly);
 
+            // email
+            $this->_email->setDbValueDef($rsnew, $this->_email->CurrentValue, null, $this->_email->ReadOnly);
+
+            // contact_name
+            $this->contact_name->setDbValueDef($rsnew, $this->contact_name->CurrentValue, null, $this->contact_name->ReadOnly);
+
             // Call Row Updating event
             $updateRow = $this->rowUpdating($rsold, $rsnew);
             if ($updateRow) {
@@ -1867,6 +2041,12 @@ class YOperatorsGrid extends YOperators
 
         // platform_id
         $this->platform_id->setDbValueDef($rsnew, $this->platform_id->CurrentValue, null, false);
+
+        // email
+        $this->_email->setDbValueDef($rsnew, $this->_email->CurrentValue, null, false);
+
+        // contact_name
+        $this->contact_name->setDbValueDef($rsnew, $this->contact_name->CurrentValue, null, false);
 
         // Call Row Inserting event
         $insertRow = $this->rowInserting($rsold, $rsnew);

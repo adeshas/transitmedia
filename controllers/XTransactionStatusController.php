@@ -19,4 +19,22 @@ class XTransactionStatusController extends ControllerBase
     {
         return $this->runPage($request, $response, $args, "XTransactionStatusAdd");
     }
+
+    // view
+    public function view(Request $request, Response $response, array $args): Response
+    {
+        return $this->runPage($request, $response, $args, "XTransactionStatusView");
+    }
+
+    // edit
+    public function edit(Request $request, Response $response, array $args): Response
+    {
+        return $this->runPage($request, $response, $args, "XTransactionStatusEdit");
+    }
+
+    // delete
+    public function delete(Request $request, Response $response, array $args): Response
+    {
+        return $this->runPage($request, $response, $args, "XTransactionStatusDelete");
+    }
 }

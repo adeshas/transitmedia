@@ -50,6 +50,9 @@ $Page->showMessage();
 <?php if ($Page->shortname->Visible) { // shortname ?>
         <th class="<?= $Page->shortname->headerCellClass() ?>"><span id="elh_y_platforms_shortname" class="y_platforms_shortname"><?= $Page->shortname->caption() ?></span></th>
 <?php } ?>
+<?php if ($Page->_email->Visible) { // email ?>
+        <th class="<?= $Page->_email->headerCellClass() ?>"><span id="elh_y_platforms__email" class="y_platforms__email"><?= $Page->_email->caption() ?></span></th>
+<?php } ?>
     </tr>
     </thead>
     <tbody>
@@ -92,6 +95,14 @@ while (!$Page->Recordset->EOF) {
 <span id="el<?= $Page->RowCount ?>_y_platforms_shortname" class="y_platforms_shortname">
 <span<?= $Page->shortname->viewAttributes() ?>>
 <?= $Page->shortname->getViewValue() ?></span>
+</span>
+</td>
+<?php } ?>
+<?php if ($Page->_email->Visible) { // email ?>
+        <td <?= $Page->_email->cellAttributes() ?>>
+<span id="el<?= $Page->RowCount ?>_y_platforms__email" class="y_platforms__email">
+<span<?= $Page->_email->viewAttributes() ?>>
+<?= $Page->_email->getViewValue() ?></span>
 </span>
 </td>
 <?php } ?>

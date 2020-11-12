@@ -349,6 +349,7 @@ class YPlatformsDelete extends YPlatforms
         $this->id->setVisibility();
         $this->name->setVisibility();
         $this->shortname->setVisibility();
+        $this->_email->setVisibility();
         $this->hideFieldsForAddEdit();
 
         // Do not use lookup cache
@@ -514,6 +515,7 @@ class YPlatformsDelete extends YPlatforms
         $this->id->setDbValue($row['id']);
         $this->name->setDbValue($row['name']);
         $this->shortname->setDbValue($row['shortname']);
+        $this->_email->setDbValue($row['email']);
     }
 
     // Return a row with default values
@@ -523,6 +525,7 @@ class YPlatformsDelete extends YPlatforms
         $row['id'] = null;
         $row['name'] = null;
         $row['shortname'] = null;
+        $row['email'] = null;
         return $row;
     }
 
@@ -543,6 +546,8 @@ class YPlatformsDelete extends YPlatforms
         // name
 
         // shortname
+
+        // email
         if ($this->RowType == ROWTYPE_VIEW) {
             // id
             $this->id->ViewValue = $this->id->CurrentValue;
@@ -555,6 +560,10 @@ class YPlatformsDelete extends YPlatforms
             // shortname
             $this->shortname->ViewValue = $this->shortname->CurrentValue;
             $this->shortname->ViewCustomAttributes = "";
+
+            // email
+            $this->_email->ViewValue = $this->_email->CurrentValue;
+            $this->_email->ViewCustomAttributes = "";
 
             // id
             $this->id->LinkCustomAttributes = "";
@@ -570,6 +579,11 @@ class YPlatformsDelete extends YPlatforms
             $this->shortname->LinkCustomAttributes = "";
             $this->shortname->HrefValue = "";
             $this->shortname->TooltipValue = "";
+
+            // email
+            $this->_email->LinkCustomAttributes = "";
+            $this->_email->HrefValue = "";
+            $this->_email->TooltipValue = "";
         }
 
         // Call Row Rendered event

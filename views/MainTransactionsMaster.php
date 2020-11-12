@@ -97,6 +97,17 @@ $main_transactions = Container("main_transactions");
 </td>
         </tr>
 <?php } ?>
+<?php if ($main_transactions->visible_status_id->Visible) { // visible_status_id ?>
+        <tr id="r_visible_status_id">
+            <td class="<?= $main_transactions->TableLeftColumnClass ?>"><?= $main_transactions->visible_status_id->caption() ?></td>
+            <td <?= $main_transactions->visible_status_id->cellAttributes() ?>>
+<span id="el_main_transactions_visible_status_id">
+<span<?= $main_transactions->visible_status_id->viewAttributes() ?>>
+<?= $main_transactions->visible_status_id->getViewValue() ?></span>
+</span>
+</td>
+        </tr>
+<?php } ?>
 <?php if ($main_transactions->status_id->Visible) { // status_id ?>
         <tr id="r_status_id">
             <td class="<?= $main_transactions->TableLeftColumnClass ?>"><?= $main_transactions->status_id->caption() ?></td>

@@ -550,6 +550,7 @@ class MainTransactionsList extends MainTransactions
         $this->quantity->setVisibility();
         $this->start_date->setVisibility();
         $this->end_date->setVisibility();
+        $this->visible_status_id->setVisibility();
         $this->status_id->setVisibility();
         $this->print_status_id->setVisibility();
         $this->payment_status_id->setVisibility();
@@ -590,6 +591,7 @@ class MainTransactionsList extends MainTransactions
         $this->setupLookupOptions($this->campaign_id);
         $this->setupLookupOptions($this->operator_id);
         $this->setupLookupOptions($this->price_id);
+        $this->setupLookupOptions($this->visible_status_id);
         $this->setupLookupOptions($this->status_id);
         $this->setupLookupOptions($this->print_status_id);
         $this->setupLookupOptions($this->payment_status_id);
@@ -1236,6 +1238,9 @@ class MainTransactionsList extends MainTransactions
         if ($CurrentForm->hasValue("x_end_date") && $CurrentForm->hasValue("o_end_date") && $this->end_date->CurrentValue != $this->end_date->OldValue) {
             return false;
         }
+        if ($CurrentForm->hasValue("x_visible_status_id") && $CurrentForm->hasValue("o_visible_status_id") && $this->visible_status_id->CurrentValue != $this->visible_status_id->OldValue) {
+            return false;
+        }
         if ($CurrentForm->hasValue("x_status_id") && $CurrentForm->hasValue("o_status_id") && $this->status_id->CurrentValue != $this->status_id->OldValue) {
             return false;
         }
@@ -1337,6 +1342,7 @@ class MainTransactionsList extends MainTransactions
         $this->quantity->clearErrorMessage();
         $this->start_date->clearErrorMessage();
         $this->end_date->clearErrorMessage();
+        $this->visible_status_id->clearErrorMessage();
         $this->status_id->clearErrorMessage();
         $this->print_status_id->clearErrorMessage();
         $this->payment_status_id->clearErrorMessage();
@@ -1358,6 +1364,7 @@ class MainTransactionsList extends MainTransactions
             $this->updateSort($this->quantity); // quantity
             $this->updateSort($this->start_date); // start_date
             $this->updateSort($this->end_date); // end_date
+            $this->updateSort($this->visible_status_id); // visible_status_id
             $this->updateSort($this->status_id); // status_id
             $this->updateSort($this->print_status_id); // print_status_id
             $this->updateSort($this->payment_status_id); // payment_status_id
@@ -1418,6 +1425,7 @@ class MainTransactionsList extends MainTransactions
                 $this->quantity->setSort("");
                 $this->start_date->setSort("");
                 $this->end_date->setSort("");
+                $this->visible_status_id->setSort("");
                 $this->status_id->setSort("");
                 $this->print_status_id->setSort("");
                 $this->payment_status_id->setSort("");
@@ -1501,7 +1509,7 @@ class MainTransactionsList extends MainTransactions
 
         // "checkbox"
         $item = &$this->ListOptions->add("checkbox");
-        $item->Visible = false;
+        $item->Visible = $Security->canEdit();
         $item->OnLeft = false;
         $item->Header = "<div class=\"custom-control custom-checkbox d-inline-block\"><input type=\"checkbox\" name=\"key\" id=\"key\" class=\"custom-control-input\" onclick=\"ew.selectAllKey(this);\"><label class=\"custom-control-label\" for=\"key\"></label></div>";
         $item->ShowInDropDown = false;
@@ -1767,6 +1775,11 @@ class MainTransactionsList extends MainTransactions
         $item->Visible = $this->GridEditUrl != "" && $Security->canEdit();
         $option = $options["action"];
 
+        // Add multi update
+        $item = &$option->add("multiupdate");
+        $item->Body = "<a class=\"ew-action ew-multi-update\" title=\"" . HtmlTitle($Language->phrase("UpdateSelectedLink")) . "\" data-table=\"main_transactions\" data-caption=\"" . HtmlTitle($Language->phrase("UpdateSelectedLink")) . "\" href=\"#\" onclick=\"return ew.modalDialogShow({lnk:this,btn:'UpdateBtn',f:document.fmain_transactionslist,url:'" . GetUrl($this->MultiUpdateUrl) . "'});return false;\">" . $Language->phrase("UpdateSelectedLink") . "</a>";
+        $item->Visible = $Security->canEdit();
+
         // Set up options default
         foreach ($options as $option) {
             $option->UseDropDownButton = false;
@@ -1975,7 +1988,7 @@ class MainTransactionsList extends MainTransactions
         $this->campaign_id->OldValue = $this->campaign_id->CurrentValue;
         $this->operator_id->CurrentValue = null;
         $this->operator_id->OldValue = $this->operator_id->CurrentValue;
-        $this->payment_date->CurrentValue = CurrentDate();
+        $this->payment_date->CurrentValue = null;
         $this->payment_date->OldValue = $this->payment_date->CurrentValue;
         $this->price_id->CurrentValue = null;
         $this->price_id->OldValue = $this->price_id->CurrentValue;
@@ -1985,6 +1998,8 @@ class MainTransactionsList extends MainTransactions
         $this->start_date->OldValue = $this->start_date->CurrentValue;
         $this->end_date->CurrentValue = null;
         $this->end_date->OldValue = $this->end_date->CurrentValue;
+        $this->visible_status_id->CurrentValue = null;
+        $this->visible_status_id->OldValue = $this->visible_status_id->CurrentValue;
         $this->status_id->CurrentValue = null;
         $this->status_id->OldValue = $this->status_id->CurrentValue;
         $this->print_status_id->CurrentValue = null;
@@ -2107,6 +2122,19 @@ class MainTransactionsList extends MainTransactions
             $this->end_date->setOldValue($CurrentForm->getValue("o_end_date"));
         }
 
+        // Check field name 'visible_status_id' first before field var 'x_visible_status_id'
+        $val = $CurrentForm->hasValue("visible_status_id") ? $CurrentForm->getValue("visible_status_id") : $CurrentForm->getValue("x_visible_status_id");
+        if (!$this->visible_status_id->IsDetailKey) {
+            if (IsApi() && $val === null) {
+                $this->visible_status_id->Visible = false; // Disable update for API request
+            } else {
+                $this->visible_status_id->setFormValue($val);
+            }
+        }
+        if ($CurrentForm->hasValue("o_visible_status_id")) {
+            $this->visible_status_id->setOldValue($CurrentForm->getValue("o_visible_status_id"));
+        }
+
         // Check field name 'status_id' first before field var 'x_status_id'
         $val = $CurrentForm->hasValue("status_id") ? $CurrentForm->getValue("status_id") : $CurrentForm->getValue("x_status_id");
         if (!$this->status_id->IsDetailKey) {
@@ -2177,6 +2205,7 @@ class MainTransactionsList extends MainTransactions
         $this->start_date->CurrentValue = UnFormatDateTime($this->start_date->CurrentValue, 5);
         $this->end_date->CurrentValue = $this->end_date->FormValue;
         $this->end_date->CurrentValue = UnFormatDateTime($this->end_date->CurrentValue, 5);
+        $this->visible_status_id->CurrentValue = $this->visible_status_id->FormValue;
         $this->status_id->CurrentValue = $this->status_id->FormValue;
         $this->print_status_id->CurrentValue = $this->print_status_id->FormValue;
         $this->payment_status_id->CurrentValue = $this->payment_status_id->FormValue;
@@ -2272,6 +2301,7 @@ class MainTransactionsList extends MainTransactions
         $this->quantity->setDbValue($row['quantity']);
         $this->start_date->setDbValue($row['start_date']);
         $this->end_date->setDbValue($row['end_date']);
+        $this->visible_status_id->setDbValue($row['visible_status_id']);
         $this->status_id->setDbValue($row['status_id']);
         if (array_key_exists('EV__status_id', $row)) {
             $this->status_id->VirtualValue = $row['EV__status_id']; // Set up virtual field value
@@ -2309,6 +2339,7 @@ class MainTransactionsList extends MainTransactions
         $row['quantity'] = $this->quantity->CurrentValue;
         $row['start_date'] = $this->start_date->CurrentValue;
         $row['end_date'] = $this->end_date->CurrentValue;
+        $row['visible_status_id'] = $this->visible_status_id->CurrentValue;
         $row['status_id'] = $this->status_id->CurrentValue;
         $row['print_status_id'] = $this->print_status_id->CurrentValue;
         $row['payment_status_id'] = $this->payment_status_id->CurrentValue;
@@ -2368,6 +2399,8 @@ class MainTransactionsList extends MainTransactions
         // start_date
 
         // end_date
+
+        // visible_status_id
 
         // status_id
 
@@ -2488,6 +2521,27 @@ class MainTransactionsList extends MainTransactions
             $this->end_date->ViewValue = $this->end_date->CurrentValue;
             $this->end_date->ViewValue = FormatDateTime($this->end_date->ViewValue, 5);
             $this->end_date->ViewCustomAttributes = "";
+
+            // visible_status_id
+            $curVal = strval($this->visible_status_id->CurrentValue);
+            if ($curVal != "") {
+                $this->visible_status_id->ViewValue = $this->visible_status_id->lookupCacheOption($curVal);
+                if ($this->visible_status_id->ViewValue === null) { // Lookup from database
+                    $filterWrk = "\"id\"" . SearchString("=", $curVal, DATATYPE_NUMBER, "");
+                    $sqlWrk = $this->visible_status_id->Lookup->getSql(false, $filterWrk, '', $this, true);
+                    $rswrk = Conn()->executeQuery($sqlWrk)->fetchAll(\PDO::FETCH_BOTH);
+                    $ari = count($rswrk);
+                    if ($ari > 0) { // Lookup values found
+                        $arwrk = $this->visible_status_id->Lookup->renderViewRow($rswrk[0]);
+                        $this->visible_status_id->ViewValue = $this->visible_status_id->displayValue($arwrk);
+                    } else {
+                        $this->visible_status_id->ViewValue = $this->visible_status_id->CurrentValue;
+                    }
+                }
+            } else {
+                $this->visible_status_id->ViewValue = null;
+            }
+            $this->visible_status_id->ViewCustomAttributes = "";
 
             // status_id
             if ($this->status_id->VirtualValue != "") {
@@ -2639,6 +2693,11 @@ class MainTransactionsList extends MainTransactions
             $this->end_date->LinkCustomAttributes = "";
             $this->end_date->HrefValue = "";
             $this->end_date->TooltipValue = "";
+
+            // visible_status_id
+            $this->visible_status_id->LinkCustomAttributes = "";
+            $this->visible_status_id->HrefValue = "";
+            $this->visible_status_id->TooltipValue = "";
 
             // status_id
             $this->status_id->LinkCustomAttributes = "";
@@ -2815,6 +2874,31 @@ class MainTransactionsList extends MainTransactions
             $this->end_date->EditValue = HtmlEncode(FormatDateTime($this->end_date->CurrentValue, 5));
             $this->end_date->PlaceHolder = RemoveHtml($this->end_date->caption());
 
+            // visible_status_id
+            $this->visible_status_id->EditAttrs["class"] = "form-control";
+            $this->visible_status_id->EditCustomAttributes = "";
+            $curVal = trim(strval($this->visible_status_id->CurrentValue));
+            if ($curVal != "") {
+                $this->visible_status_id->ViewValue = $this->visible_status_id->lookupCacheOption($curVal);
+            } else {
+                $this->visible_status_id->ViewValue = $this->visible_status_id->Lookup !== null && is_array($this->visible_status_id->Lookup->Options) ? $curVal : null;
+            }
+            if ($this->visible_status_id->ViewValue !== null) { // Load from cache
+                $this->visible_status_id->EditValue = array_values($this->visible_status_id->Lookup->Options);
+            } else { // Lookup from database
+                if ($curVal == "") {
+                    $filterWrk = "0=1";
+                } else {
+                    $filterWrk = "\"id\"" . SearchString("=", $this->visible_status_id->CurrentValue, DATATYPE_NUMBER, "");
+                }
+                $sqlWrk = $this->visible_status_id->Lookup->getSql(true, $filterWrk, '', $this);
+                $rswrk = Conn()->executeQuery($sqlWrk)->fetchAll(\PDO::FETCH_BOTH);
+                $ari = count($rswrk);
+                $arwrk = $rswrk;
+                $this->visible_status_id->EditValue = $arwrk;
+            }
+            $this->visible_status_id->PlaceHolder = RemoveHtml($this->visible_status_id->caption());
+
             // status_id
             $this->status_id->EditAttrs["class"] = "form-control";
             $this->status_id->EditCustomAttributes = "";
@@ -2929,6 +3013,10 @@ class MainTransactionsList extends MainTransactions
             // end_date
             $this->end_date->LinkCustomAttributes = "";
             $this->end_date->HrefValue = "";
+
+            // visible_status_id
+            $this->visible_status_id->LinkCustomAttributes = "";
+            $this->visible_status_id->HrefValue = "";
 
             // status_id
             $this->status_id->LinkCustomAttributes = "";
@@ -3106,6 +3194,31 @@ class MainTransactionsList extends MainTransactions
             $this->end_date->EditValue = HtmlEncode(FormatDateTime($this->end_date->CurrentValue, 5));
             $this->end_date->PlaceHolder = RemoveHtml($this->end_date->caption());
 
+            // visible_status_id
+            $this->visible_status_id->EditAttrs["class"] = "form-control";
+            $this->visible_status_id->EditCustomAttributes = "";
+            $curVal = trim(strval($this->visible_status_id->CurrentValue));
+            if ($curVal != "") {
+                $this->visible_status_id->ViewValue = $this->visible_status_id->lookupCacheOption($curVal);
+            } else {
+                $this->visible_status_id->ViewValue = $this->visible_status_id->Lookup !== null && is_array($this->visible_status_id->Lookup->Options) ? $curVal : null;
+            }
+            if ($this->visible_status_id->ViewValue !== null) { // Load from cache
+                $this->visible_status_id->EditValue = array_values($this->visible_status_id->Lookup->Options);
+            } else { // Lookup from database
+                if ($curVal == "") {
+                    $filterWrk = "0=1";
+                } else {
+                    $filterWrk = "\"id\"" . SearchString("=", $this->visible_status_id->CurrentValue, DATATYPE_NUMBER, "");
+                }
+                $sqlWrk = $this->visible_status_id->Lookup->getSql(true, $filterWrk, '', $this);
+                $rswrk = Conn()->executeQuery($sqlWrk)->fetchAll(\PDO::FETCH_BOTH);
+                $ari = count($rswrk);
+                $arwrk = $rswrk;
+                $this->visible_status_id->EditValue = $arwrk;
+            }
+            $this->visible_status_id->PlaceHolder = RemoveHtml($this->visible_status_id->caption());
+
             // status_id
             $this->status_id->EditAttrs["class"] = "form-control";
             $this->status_id->EditCustomAttributes = "";
@@ -3221,6 +3334,10 @@ class MainTransactionsList extends MainTransactions
             $this->end_date->LinkCustomAttributes = "";
             $this->end_date->HrefValue = "";
 
+            // visible_status_id
+            $this->visible_status_id->LinkCustomAttributes = "";
+            $this->visible_status_id->HrefValue = "";
+
             // status_id
             $this->status_id->LinkCustomAttributes = "";
             $this->status_id->HrefValue = "";
@@ -3321,6 +3438,11 @@ class MainTransactionsList extends MainTransactions
         }
         if (!CheckStdDate($this->end_date->FormValue)) {
             $this->end_date->addErrorMessage($this->end_date->getErrorMessage(false));
+        }
+        if ($this->visible_status_id->Required) {
+            if (!$this->visible_status_id->IsDetailKey && EmptyValue($this->visible_status_id->FormValue)) {
+                $this->visible_status_id->addErrorMessage(str_replace("%s", $this->visible_status_id->caption(), $this->visible_status_id->RequiredErrorMessage));
+            }
         }
         if ($this->status_id->Required) {
             if (!$this->status_id->IsDetailKey && EmptyValue($this->status_id->FormValue)) {
@@ -3471,6 +3593,9 @@ class MainTransactionsList extends MainTransactions
             // end_date
             $this->end_date->setDbValueDef($rsnew, UnFormatDateTime($this->end_date->CurrentValue, 5), null, $this->end_date->ReadOnly);
 
+            // visible_status_id
+            $this->visible_status_id->setDbValueDef($rsnew, $this->visible_status_id->CurrentValue, 0, $this->visible_status_id->ReadOnly);
+
             // status_id
             $this->status_id->setDbValueDef($rsnew, $this->status_id->CurrentValue, 0, $this->status_id->ReadOnly);
 
@@ -3551,6 +3676,7 @@ class MainTransactionsList extends MainTransactions
         $hash .= GetFieldHash($row['quantity']); // quantity
         $hash .= GetFieldHash($row['start_date']); // start_date
         $hash .= GetFieldHash($row['end_date']); // end_date
+        $hash .= GetFieldHash($row['visible_status_id']); // visible_status_id
         $hash .= GetFieldHash($row['status_id']); // status_id
         $hash .= GetFieldHash($row['print_status_id']); // print_status_id
         $hash .= GetFieldHash($row['payment_status_id']); // payment_status_id
@@ -3616,6 +3742,9 @@ class MainTransactionsList extends MainTransactions
 
         // end_date
         $this->end_date->setDbValueDef($rsnew, UnFormatDateTime($this->end_date->CurrentValue, 5), null, false);
+
+        // visible_status_id
+        $this->visible_status_id->setDbValueDef($rsnew, $this->visible_status_id->CurrentValue, 0, false);
 
         // status_id
         $this->status_id->setDbValueDef($rsnew, $this->status_id->CurrentValue, 0, strval($this->status_id->CurrentValue) == "");
@@ -3828,6 +3957,8 @@ class MainTransactionsList extends MainTransactions
                     break;
                 case "x_price_id":
                     break;
+                case "x_visible_status_id":
+                    break;
                 case "x_status_id":
                     break;
                 case "x_print_status_id":
@@ -3905,6 +4036,19 @@ class MainTransactionsList extends MainTransactions
     {
         //Log("Page Load");
         $this->total->ReadOnly = TRUE;
+        $levelid = CurrentUserLevel();
+        if(IsAdmin()){
+    			//ADMIN
+    			$this->visible_status_id->Visible = FALSE;
+    	}else{
+    			if($levelid > 0 ){
+    				// MANAGER
+    				$this->visible_status_id->Visible = FALSE;
+    			}else{
+    				// DEFAULT
+    				$this->status_id->Visible = FALSE;
+    			}
+    	}	
         //var_dump($this->status_id);
     }
 

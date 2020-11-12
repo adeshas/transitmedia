@@ -436,6 +436,7 @@ class YPlatformsEdit extends YPlatforms
         $this->id->setVisibility();
         $this->name->setVisibility();
         $this->shortname->setVisibility();
+        $this->_email->setVisibility();
         $this->hideFieldsForAddEdit();
 
         // Do not use lookup cache
@@ -657,6 +658,16 @@ class YPlatformsEdit extends YPlatforms
                 $this->shortname->setFormValue($val);
             }
         }
+
+        // Check field name 'email' first before field var 'x__email'
+        $val = $CurrentForm->hasValue("email") ? $CurrentForm->getValue("email") : $CurrentForm->getValue("x__email");
+        if (!$this->_email->IsDetailKey) {
+            if (IsApi() && $val === null) {
+                $this->_email->Visible = false; // Disable update for API request
+            } else {
+                $this->_email->setFormValue($val);
+            }
+        }
     }
 
     // Restore form values
@@ -666,6 +677,7 @@ class YPlatformsEdit extends YPlatforms
         $this->id->CurrentValue = $this->id->FormValue;
         $this->name->CurrentValue = $this->name->FormValue;
         $this->shortname->CurrentValue = $this->shortname->FormValue;
+        $this->_email->CurrentValue = $this->_email->FormValue;
     }
 
     /**
@@ -718,6 +730,7 @@ class YPlatformsEdit extends YPlatforms
         $this->id->setDbValue($row['id']);
         $this->name->setDbValue($row['name']);
         $this->shortname->setDbValue($row['shortname']);
+        $this->_email->setDbValue($row['email']);
     }
 
     // Return a row with default values
@@ -727,6 +740,7 @@ class YPlatformsEdit extends YPlatforms
         $row['id'] = null;
         $row['name'] = null;
         $row['shortname'] = null;
+        $row['email'] = null;
         return $row;
     }
 
@@ -763,6 +777,8 @@ class YPlatformsEdit extends YPlatforms
         // name
 
         // shortname
+
+        // email
         if ($this->RowType == ROWTYPE_VIEW) {
             // id
             $this->id->ViewValue = $this->id->CurrentValue;
@@ -775,6 +791,10 @@ class YPlatformsEdit extends YPlatforms
             // shortname
             $this->shortname->ViewValue = $this->shortname->CurrentValue;
             $this->shortname->ViewCustomAttributes = "";
+
+            // email
+            $this->_email->ViewValue = $this->_email->CurrentValue;
+            $this->_email->ViewCustomAttributes = "";
 
             // id
             $this->id->LinkCustomAttributes = "";
@@ -790,6 +810,11 @@ class YPlatformsEdit extends YPlatforms
             $this->shortname->LinkCustomAttributes = "";
             $this->shortname->HrefValue = "";
             $this->shortname->TooltipValue = "";
+
+            // email
+            $this->_email->LinkCustomAttributes = "";
+            $this->_email->HrefValue = "";
+            $this->_email->TooltipValue = "";
         } elseif ($this->RowType == ROWTYPE_EDIT) {
             // id
             $this->id->EditAttrs["class"] = "form-control";
@@ -815,6 +840,15 @@ class YPlatformsEdit extends YPlatforms
             $this->shortname->EditValue = HtmlEncode($this->shortname->CurrentValue);
             $this->shortname->PlaceHolder = RemoveHtml($this->shortname->caption());
 
+            // email
+            $this->_email->EditAttrs["class"] = "form-control";
+            $this->_email->EditCustomAttributes = "";
+            if (!$this->_email->Raw) {
+                $this->_email->CurrentValue = HtmlDecode($this->_email->CurrentValue);
+            }
+            $this->_email->EditValue = HtmlEncode($this->_email->CurrentValue);
+            $this->_email->PlaceHolder = RemoveHtml($this->_email->caption());
+
             // Edit refer script
 
             // id
@@ -828,6 +862,10 @@ class YPlatformsEdit extends YPlatforms
             // shortname
             $this->shortname->LinkCustomAttributes = "";
             $this->shortname->HrefValue = "";
+
+            // email
+            $this->_email->LinkCustomAttributes = "";
+            $this->_email->HrefValue = "";
         }
         if ($this->RowType == ROWTYPE_ADD || $this->RowType == ROWTYPE_EDIT || $this->RowType == ROWTYPE_SEARCH) { // Add/Edit/Search row
             $this->setupFieldTitles();
@@ -861,6 +899,11 @@ class YPlatformsEdit extends YPlatforms
         if ($this->shortname->Required) {
             if (!$this->shortname->IsDetailKey && EmptyValue($this->shortname->FormValue)) {
                 $this->shortname->addErrorMessage(str_replace("%s", $this->shortname->caption(), $this->shortname->RequiredErrorMessage));
+            }
+        }
+        if ($this->_email->Required) {
+            if (!$this->_email->IsDetailKey && EmptyValue($this->_email->FormValue)) {
+                $this->_email->addErrorMessage(str_replace("%s", $this->_email->caption(), $this->_email->RequiredErrorMessage));
             }
         }
 
@@ -915,6 +958,9 @@ class YPlatformsEdit extends YPlatforms
 
             // shortname
             $this->shortname->setDbValueDef($rsnew, $this->shortname->CurrentValue, null, $this->shortname->ReadOnly);
+
+            // email
+            $this->_email->setDbValueDef($rsnew, $this->_email->CurrentValue, null, $this->_email->ReadOnly);
 
             // Call Row Updating event
             $updateRow = $this->rowUpdating($rsold, $rsnew);

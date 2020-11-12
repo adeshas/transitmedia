@@ -448,12 +448,10 @@ class MainCampaignsAdd extends MainCampaigns
         $this->end_date->setVisibility();
         $this->user_id->setVisibility();
         $this->vendor_id->setVisibility();
-        $this->status_id->Visible = false;
-        $this->print_status_id->Visible = false;
-        $this->payment_status_id->Visible = false;
         $this->ts_last_update->Visible = false;
         $this->ts_created->Visible = false;
         $this->renewal_stage_id->Visible = false;
+        $this->check_status->Visible = false;
         $this->hideFieldsForAddEdit();
 
         // Do not use lookup cache
@@ -477,9 +475,6 @@ class MainCampaignsAdd extends MainCampaigns
         $this->setupLookupOptions($this->bus_size_id);
         $this->setupLookupOptions($this->price_id);
         $this->setupLookupOptions($this->vendor_id);
-        $this->setupLookupOptions($this->status_id);
-        $this->setupLookupOptions($this->print_status_id);
-        $this->setupLookupOptions($this->payment_status_id);
         $this->setupLookupOptions($this->renewal_stage_id);
 
         // Check modal
@@ -651,18 +646,14 @@ class MainCampaignsAdd extends MainCampaigns
         $this->user_id->CurrentValue = null;
         $this->user_id->OldValue = $this->user_id->CurrentValue;
         $this->vendor_id->CurrentValue = CurrentUserID();
-        $this->status_id->CurrentValue = null;
-        $this->status_id->OldValue = $this->status_id->CurrentValue;
-        $this->print_status_id->CurrentValue = null;
-        $this->print_status_id->OldValue = $this->print_status_id->CurrentValue;
-        $this->payment_status_id->CurrentValue = null;
-        $this->payment_status_id->OldValue = $this->payment_status_id->CurrentValue;
         $this->ts_last_update->CurrentValue = null;
         $this->ts_last_update->OldValue = $this->ts_last_update->CurrentValue;
         $this->ts_created->CurrentValue = null;
         $this->ts_created->OldValue = $this->ts_created->CurrentValue;
         $this->renewal_stage_id->CurrentValue = null;
         $this->renewal_stage_id->OldValue = $this->renewal_stage_id->CurrentValue;
+        $this->check_status->CurrentValue = null;
+        $this->check_status->OldValue = $this->check_status->CurrentValue;
     }
 
     // Load form values
@@ -863,12 +854,10 @@ class MainCampaignsAdd extends MainCampaigns
         $this->end_date->setDbValue($row['end_date']);
         $this->user_id->setDbValue($row['user_id']);
         $this->vendor_id->setDbValue($row['vendor_id']);
-        $this->status_id->setDbValue($row['status_id']);
-        $this->print_status_id->setDbValue($row['print_status_id']);
-        $this->payment_status_id->setDbValue($row['payment_status_id']);
         $this->ts_last_update->setDbValue($row['ts_last_update']);
         $this->ts_created->setDbValue($row['ts_created']);
         $this->renewal_stage_id->setDbValue($row['renewal_stage_id']);
+        $this->check_status->setDbValue($row['check_status']);
     }
 
     // Return a row with default values
@@ -887,12 +876,10 @@ class MainCampaignsAdd extends MainCampaigns
         $row['end_date'] = $this->end_date->CurrentValue;
         $row['user_id'] = $this->user_id->CurrentValue;
         $row['vendor_id'] = $this->vendor_id->CurrentValue;
-        $row['status_id'] = $this->status_id->CurrentValue;
-        $row['print_status_id'] = $this->print_status_id->CurrentValue;
-        $row['payment_status_id'] = $this->payment_status_id->CurrentValue;
         $row['ts_last_update'] = $this->ts_last_update->CurrentValue;
         $row['ts_created'] = $this->ts_created->CurrentValue;
         $row['renewal_stage_id'] = $this->renewal_stage_id->CurrentValue;
+        $row['check_status'] = $this->check_status->CurrentValue;
         return $row;
     }
 
@@ -946,17 +933,13 @@ class MainCampaignsAdd extends MainCampaigns
 
         // vendor_id
 
-        // status_id
-
-        // print_status_id
-
-        // payment_status_id
-
         // ts_last_update
 
         // ts_created
 
         // renewal_stage_id
+
+        // check_status
         if ($this->RowType == ROWTYPE_VIEW) {
             // id
             $this->id->ViewValue = $this->id->CurrentValue;
@@ -971,6 +954,7 @@ class MainCampaignsAdd extends MainCampaigns
             if ($dispVal != "") {
                 $this->name->ViewValue = $dispVal;
             }
+            $this->name->CssClass = "font-weight-bold";
             $this->name->ViewCustomAttributes = "";
 
             // inventory_id
@@ -1083,7 +1067,11 @@ class MainCampaignsAdd extends MainCampaigns
                 $this->vendor_id->ViewValue = $this->vendor_id->lookupCacheOption($curVal);
                 if ($this->vendor_id->ViewValue === null) { // Lookup from database
                     $filterWrk = "\"id\"" . SearchString("=", $curVal, DATATYPE_NUMBER, "");
-                    $sqlWrk = $this->vendor_id->Lookup->getSql(false, $filterWrk, '', $this, true);
+                    $lookupFilter = function() {
+                        return ((!IsAdmin())? " id = ".Profile()->vendor_id:"");
+                    };
+                    $lookupFilter = $lookupFilter->bindTo($this);
+                    $sqlWrk = $this->vendor_id->Lookup->getSql(false, $filterWrk, $lookupFilter, $this, true);
                     $rswrk = Conn()->executeQuery($sqlWrk)->fetchAll(\PDO::FETCH_BOTH);
                     $ari = count($rswrk);
                     if ($ari > 0) { // Lookup values found
@@ -1097,69 +1085,6 @@ class MainCampaignsAdd extends MainCampaigns
                 $this->vendor_id->ViewValue = null;
             }
             $this->vendor_id->ViewCustomAttributes = "";
-
-            // status_id
-            $curVal = strval($this->status_id->CurrentValue);
-            if ($curVal != "") {
-                $this->status_id->ViewValue = $this->status_id->lookupCacheOption($curVal);
-                if ($this->status_id->ViewValue === null) { // Lookup from database
-                    $filterWrk = "\"id\"" . SearchString("=", $curVal, DATATYPE_NUMBER, "");
-                    $sqlWrk = $this->status_id->Lookup->getSql(false, $filterWrk, '', $this, true);
-                    $rswrk = Conn()->executeQuery($sqlWrk)->fetchAll(\PDO::FETCH_BOTH);
-                    $ari = count($rswrk);
-                    if ($ari > 0) { // Lookup values found
-                        $arwrk = $this->status_id->Lookup->renderViewRow($rswrk[0]);
-                        $this->status_id->ViewValue = $this->status_id->displayValue($arwrk);
-                    } else {
-                        $this->status_id->ViewValue = $this->status_id->CurrentValue;
-                    }
-                }
-            } else {
-                $this->status_id->ViewValue = null;
-            }
-            $this->status_id->ViewCustomAttributes = "";
-
-            // print_status_id
-            $curVal = strval($this->print_status_id->CurrentValue);
-            if ($curVal != "") {
-                $this->print_status_id->ViewValue = $this->print_status_id->lookupCacheOption($curVal);
-                if ($this->print_status_id->ViewValue === null) { // Lookup from database
-                    $filterWrk = "\"id\"" . SearchString("=", $curVal, DATATYPE_NUMBER, "");
-                    $sqlWrk = $this->print_status_id->Lookup->getSql(false, $filterWrk, '', $this, true);
-                    $rswrk = Conn()->executeQuery($sqlWrk)->fetchAll(\PDO::FETCH_BOTH);
-                    $ari = count($rswrk);
-                    if ($ari > 0) { // Lookup values found
-                        $arwrk = $this->print_status_id->Lookup->renderViewRow($rswrk[0]);
-                        $this->print_status_id->ViewValue = $this->print_status_id->displayValue($arwrk);
-                    } else {
-                        $this->print_status_id->ViewValue = $this->print_status_id->CurrentValue;
-                    }
-                }
-            } else {
-                $this->print_status_id->ViewValue = null;
-            }
-            $this->print_status_id->ViewCustomAttributes = "";
-
-            // payment_status_id
-            $curVal = strval($this->payment_status_id->CurrentValue);
-            if ($curVal != "") {
-                $this->payment_status_id->ViewValue = $this->payment_status_id->lookupCacheOption($curVal);
-                if ($this->payment_status_id->ViewValue === null) { // Lookup from database
-                    $filterWrk = "\"id\"" . SearchString("=", $curVal, DATATYPE_NUMBER, "");
-                    $sqlWrk = $this->payment_status_id->Lookup->getSql(false, $filterWrk, '', $this, true);
-                    $rswrk = Conn()->executeQuery($sqlWrk)->fetchAll(\PDO::FETCH_BOTH);
-                    $ari = count($rswrk);
-                    if ($ari > 0) { // Lookup values found
-                        $arwrk = $this->payment_status_id->Lookup->renderViewRow($rswrk[0]);
-                        $this->payment_status_id->ViewValue = $this->payment_status_id->displayValue($arwrk);
-                    } else {
-                        $this->payment_status_id->ViewValue = $this->payment_status_id->CurrentValue;
-                    }
-                }
-            } else {
-                $this->payment_status_id->ViewValue = null;
-            }
-            $this->payment_status_id->ViewCustomAttributes = "";
 
             // ts_last_update
             $this->ts_last_update->ViewValue = $this->ts_last_update->CurrentValue;
@@ -1190,6 +1115,7 @@ class MainCampaignsAdd extends MainCampaigns
             } else {
                 $this->renewal_stage_id->ViewValue = null;
             }
+            $this->renewal_stage_id->CellCssStyle .= "text-align: center;";
             $this->renewal_stage_id->ViewCustomAttributes = "";
 
             // name
@@ -1441,7 +1367,11 @@ class MainCampaignsAdd extends MainCampaigns
                     $this->vendor_id->ViewValue = $this->vendor_id->lookupCacheOption($curVal);
                     if ($this->vendor_id->ViewValue === null) { // Lookup from database
                         $filterWrk = "\"id\"" . SearchString("=", $curVal, DATATYPE_NUMBER, "");
-                        $sqlWrk = $this->vendor_id->Lookup->getSql(false, $filterWrk, '', $this, true);
+                        $lookupFilter = function() {
+                            return ((!IsAdmin())? " id = ".Profile()->vendor_id:"");
+                        };
+                        $lookupFilter = $lookupFilter->bindTo($this);
+                        $sqlWrk = $this->vendor_id->Lookup->getSql(false, $filterWrk, $lookupFilter, $this, true);
                         $rswrk = Conn()->executeQuery($sqlWrk)->fetchAll(\PDO::FETCH_BOTH);
                         $ari = count($rswrk);
                         if ($ari > 0) { // Lookup values found
@@ -1456,26 +1386,6 @@ class MainCampaignsAdd extends MainCampaigns
                 }
                 $this->vendor_id->ViewCustomAttributes = "";
             } elseif (!$Security->isAdmin() && $Security->isLoggedIn() && !$this->userIDAllow("add")) { // Non system admin
-                $this->vendor_id->CurrentValue = CurrentUserID();
-                $curVal = strval($this->vendor_id->CurrentValue);
-                if ($curVal != "") {
-                    $this->vendor_id->EditValue = $this->vendor_id->lookupCacheOption($curVal);
-                    if ($this->vendor_id->EditValue === null) { // Lookup from database
-                        $filterWrk = "\"id\"" . SearchString("=", $curVal, DATATYPE_NUMBER, "");
-                        $sqlWrk = $this->vendor_id->Lookup->getSql(false, $filterWrk, '', $this, true);
-                        $rswrk = Conn()->executeQuery($sqlWrk)->fetchAll(\PDO::FETCH_BOTH);
-                        $ari = count($rswrk);
-                        if ($ari > 0) { // Lookup values found
-                            $arwrk = $this->vendor_id->Lookup->renderViewRow($rswrk[0]);
-                            $this->vendor_id->EditValue = $this->vendor_id->displayValue($arwrk);
-                        } else {
-                            $this->vendor_id->EditValue = $this->vendor_id->CurrentValue;
-                        }
-                    }
-                } else {
-                    $this->vendor_id->EditValue = null;
-                }
-                $this->vendor_id->ViewCustomAttributes = "";
             } else {
                 $curVal = trim(strval($this->vendor_id->CurrentValue));
                 if ($curVal != "") {
@@ -1491,7 +1401,11 @@ class MainCampaignsAdd extends MainCampaigns
                     } else {
                         $filterWrk = "\"id\"" . SearchString("=", $this->vendor_id->CurrentValue, DATATYPE_NUMBER, "");
                     }
-                    $sqlWrk = $this->vendor_id->Lookup->getSql(true, $filterWrk, '', $this);
+                    $lookupFilter = function() {
+                        return ((!IsAdmin())? " id = ".Profile()->vendor_id:"");
+                    };
+                    $lookupFilter = $lookupFilter->bindTo($this);
+                    $sqlWrk = $this->vendor_id->Lookup->getSql(true, $filterWrk, $lookupFilter, $this);
                     $rswrk = Conn()->executeQuery($sqlWrk)->fetchAll(\PDO::FETCH_BOTH);
                     $ari = count($rswrk);
                     $arwrk = $rswrk;
@@ -2158,12 +2072,10 @@ class MainCampaignsAdd extends MainCampaigns
                 case "x_price_id":
                     break;
                 case "x_vendor_id":
-                    break;
-                case "x_status_id":
-                    break;
-                case "x_print_status_id":
-                    break;
-                case "x_payment_status_id":
+                    $lookupFilter = function () {
+                        return ((!IsAdmin())? " id = ".Profile()->vendor_id:"");
+                    };
+                    $lookupFilter = $lookupFilter->bindTo($this);
                     break;
                 case "x_renewal_stage_id":
                     break;

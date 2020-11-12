@@ -29,9 +29,6 @@ loadjs.ready("head", function () {
         ["end_date", [fields.end_date.required ? ew.Validators.required(fields.end_date.caption) : null, ew.Validators.datetime(0)], fields.end_date.isInvalid],
         ["user_id", [fields.user_id.required ? ew.Validators.required(fields.user_id.caption) : null], fields.user_id.isInvalid],
         ["vendor_id", [fields.vendor_id.required ? ew.Validators.required(fields.vendor_id.caption) : null], fields.vendor_id.isInvalid],
-        ["status_id", [fields.status_id.required ? ew.Validators.required(fields.status_id.caption) : null], fields.status_id.isInvalid],
-        ["print_status_id", [fields.print_status_id.required ? ew.Validators.required(fields.print_status_id.caption) : null], fields.print_status_id.isInvalid],
-        ["payment_status_id", [fields.payment_status_id.required ? ew.Validators.required(fields.payment_status_id.caption) : null], fields.payment_status_id.isInvalid],
         ["ts_last_update", [fields.ts_last_update.required ? ew.Validators.required(fields.ts_last_update.caption) : null, ew.Validators.datetime(0)], fields.ts_last_update.isInvalid],
         ["ts_created", [fields.ts_created.required ? ew.Validators.required(fields.ts_created.caption) : null, ew.Validators.datetime(0)], fields.ts_created.isInvalid],
         ["renewal_stage_id", [fields.renewal_stage_id.required ? ew.Validators.required(fields.renewal_stage_id.caption) : null], fields.renewal_stage_id.isInvalid]
@@ -107,9 +104,6 @@ loadjs.ready("head", function () {
     fmain_campaignsedit.lists.bus_size_id = <?= $Page->bus_size_id->toClientList($Page) ?>;
     fmain_campaignsedit.lists.price_id = <?= $Page->price_id->toClientList($Page) ?>;
     fmain_campaignsedit.lists.vendor_id = <?= $Page->vendor_id->toClientList($Page) ?>;
-    fmain_campaignsedit.lists.status_id = <?= $Page->status_id->toClientList($Page) ?>;
-    fmain_campaignsedit.lists.print_status_id = <?= $Page->print_status_id->toClientList($Page) ?>;
-    fmain_campaignsedit.lists.payment_status_id = <?= $Page->payment_status_id->toClientList($Page) ?>;
     fmain_campaignsedit.lists.renewal_stage_id = <?= $Page->renewal_stage_id->toClientList($Page) ?>;
     loadjs.done("fmain_campaignsedit");
 });
@@ -388,10 +382,31 @@ loadjs.ready(["fmain_campaignsedit", "datetimepicker"], function() {
 <input type="hidden" id="x_vendor_id" name="x_vendor_id" value="<?= HtmlEncode($Page->vendor_id->CurrentValue) ?>" data-hidden="1">
 <?php } elseif (!$Security->isAdmin() && $Security->isLoggedIn() && !$Page->userIDAllow("edit")) { // Non system admin ?>
 <span id="el_main_campaigns_vendor_id">
-<span<?= $Page->vendor_id->viewAttributes() ?>>
-<input type="text" readonly class="form-control-plaintext" value="<?= HtmlEncode(RemoveHtml($Page->vendor_id->getDisplayValue($Page->vendor_id->EditValue))) ?>"></span>
+    <select
+        id="x_vendor_id"
+        name="x_vendor_id"
+        class="form-control ew-select<?= $Page->vendor_id->isInvalidClass() ?>"
+        data-select2-id="main_campaigns_x_vendor_id"
+        data-table="main_campaigns"
+        data-field="x_vendor_id"
+        data-value-separator="<?= $Page->vendor_id->displayValueSeparatorAttribute() ?>"
+        data-placeholder="<?= HtmlEncode($Page->vendor_id->getPlaceHolder()) ?>"
+        <?= $Page->vendor_id->editAttributes() ?>>
+        <?= $Page->vendor_id->selectOptionListHtml("x_vendor_id") ?>
+    </select>
+    <?= $Page->vendor_id->getCustomMessage() ?>
+    <div class="invalid-feedback"><?= $Page->vendor_id->getErrorMessage() ?></div>
+<?= $Page->vendor_id->Lookup->getParamTag($Page, "p_x_vendor_id") ?>
+<script>
+loadjs.ready("head", function() {
+    var el = document.querySelector("select[data-select2-id='main_campaigns_x_vendor_id']"),
+        options = { name: "x_vendor_id", selectId: "main_campaigns_x_vendor_id", language: ew.LANGUAGE_ID, dir: ew.IS_RTL ? "rtl" : "ltr" };
+    options.dropdownParent = $(el).closest("#ew-modal-dialog, #ew-add-opt-dialog")[0];
+    Object.assign(options, ew.vars.tables.main_campaigns.fields.vendor_id.selectOptions);
+    ew.createSelect(options);
+});
+</script>
 </span>
-<input type="hidden" data-table="main_campaigns" data-field="x_vendor_id" data-hidden="1" name="x_vendor_id" id="x_vendor_id" value="<?= HtmlEncode($Page->vendor_id->CurrentValue) ?>">
 <?php } else { ?>
 <span id="el_main_campaigns_vendor_id">
     <select
@@ -420,105 +435,6 @@ loadjs.ready("head", function() {
 </script>
 </span>
 <?php } ?>
-</div></div>
-    </div>
-<?php } ?>
-<?php if ($Page->status_id->Visible) { // status_id ?>
-    <div id="r_status_id" class="form-group row">
-        <label id="elh_main_campaigns_status_id" for="x_status_id" class="<?= $Page->LeftColumnClass ?>"><?= $Page->status_id->caption() ?><?= $Page->status_id->Required ? $Language->phrase("FieldRequiredIndicator") : "" ?></label>
-        <div class="<?= $Page->RightColumnClass ?>"><div <?= $Page->status_id->cellAttributes() ?>>
-<span id="el_main_campaigns_status_id">
-    <select
-        id="x_status_id"
-        name="x_status_id"
-        class="form-control ew-select<?= $Page->status_id->isInvalidClass() ?>"
-        data-select2-id="main_campaigns_x_status_id"
-        data-table="main_campaigns"
-        data-field="x_status_id"
-        data-value-separator="<?= $Page->status_id->displayValueSeparatorAttribute() ?>"
-        data-placeholder="<?= HtmlEncode($Page->status_id->getPlaceHolder()) ?>"
-        <?= $Page->status_id->editAttributes() ?>>
-        <?= $Page->status_id->selectOptionListHtml("x_status_id") ?>
-    </select>
-    <?= $Page->status_id->getCustomMessage() ?>
-    <div class="invalid-feedback"><?= $Page->status_id->getErrorMessage() ?></div>
-<?= $Page->status_id->Lookup->getParamTag($Page, "p_x_status_id") ?>
-<script>
-loadjs.ready("head", function() {
-    var el = document.querySelector("select[data-select2-id='main_campaigns_x_status_id']"),
-        options = { name: "x_status_id", selectId: "main_campaigns_x_status_id", language: ew.LANGUAGE_ID, dir: ew.IS_RTL ? "rtl" : "ltr" };
-    options.dropdownParent = $(el).closest("#ew-modal-dialog, #ew-add-opt-dialog")[0];
-    Object.assign(options, ew.vars.tables.main_campaigns.fields.status_id.selectOptions);
-    ew.createSelect(options);
-});
-</script>
-</span>
-</div></div>
-    </div>
-<?php } ?>
-<?php if ($Page->print_status_id->Visible) { // print_status_id ?>
-    <div id="r_print_status_id" class="form-group row">
-        <label id="elh_main_campaigns_print_status_id" for="x_print_status_id" class="<?= $Page->LeftColumnClass ?>"><?= $Page->print_status_id->caption() ?><?= $Page->print_status_id->Required ? $Language->phrase("FieldRequiredIndicator") : "" ?></label>
-        <div class="<?= $Page->RightColumnClass ?>"><div <?= $Page->print_status_id->cellAttributes() ?>>
-<span id="el_main_campaigns_print_status_id">
-    <select
-        id="x_print_status_id"
-        name="x_print_status_id"
-        class="form-control ew-select<?= $Page->print_status_id->isInvalidClass() ?>"
-        data-select2-id="main_campaigns_x_print_status_id"
-        data-table="main_campaigns"
-        data-field="x_print_status_id"
-        data-value-separator="<?= $Page->print_status_id->displayValueSeparatorAttribute() ?>"
-        data-placeholder="<?= HtmlEncode($Page->print_status_id->getPlaceHolder()) ?>"
-        <?= $Page->print_status_id->editAttributes() ?>>
-        <?= $Page->print_status_id->selectOptionListHtml("x_print_status_id") ?>
-    </select>
-    <?= $Page->print_status_id->getCustomMessage() ?>
-    <div class="invalid-feedback"><?= $Page->print_status_id->getErrorMessage() ?></div>
-<?= $Page->print_status_id->Lookup->getParamTag($Page, "p_x_print_status_id") ?>
-<script>
-loadjs.ready("head", function() {
-    var el = document.querySelector("select[data-select2-id='main_campaigns_x_print_status_id']"),
-        options = { name: "x_print_status_id", selectId: "main_campaigns_x_print_status_id", language: ew.LANGUAGE_ID, dir: ew.IS_RTL ? "rtl" : "ltr" };
-    options.dropdownParent = $(el).closest("#ew-modal-dialog, #ew-add-opt-dialog")[0];
-    Object.assign(options, ew.vars.tables.main_campaigns.fields.print_status_id.selectOptions);
-    ew.createSelect(options);
-});
-</script>
-</span>
-</div></div>
-    </div>
-<?php } ?>
-<?php if ($Page->payment_status_id->Visible) { // payment_status_id ?>
-    <div id="r_payment_status_id" class="form-group row">
-        <label id="elh_main_campaigns_payment_status_id" for="x_payment_status_id" class="<?= $Page->LeftColumnClass ?>"><?= $Page->payment_status_id->caption() ?><?= $Page->payment_status_id->Required ? $Language->phrase("FieldRequiredIndicator") : "" ?></label>
-        <div class="<?= $Page->RightColumnClass ?>"><div <?= $Page->payment_status_id->cellAttributes() ?>>
-<span id="el_main_campaigns_payment_status_id">
-    <select
-        id="x_payment_status_id"
-        name="x_payment_status_id"
-        class="form-control ew-select<?= $Page->payment_status_id->isInvalidClass() ?>"
-        data-select2-id="main_campaigns_x_payment_status_id"
-        data-table="main_campaigns"
-        data-field="x_payment_status_id"
-        data-value-separator="<?= $Page->payment_status_id->displayValueSeparatorAttribute() ?>"
-        data-placeholder="<?= HtmlEncode($Page->payment_status_id->getPlaceHolder()) ?>"
-        <?= $Page->payment_status_id->editAttributes() ?>>
-        <?= $Page->payment_status_id->selectOptionListHtml("x_payment_status_id") ?>
-    </select>
-    <?= $Page->payment_status_id->getCustomMessage() ?>
-    <div class="invalid-feedback"><?= $Page->payment_status_id->getErrorMessage() ?></div>
-<?= $Page->payment_status_id->Lookup->getParamTag($Page, "p_x_payment_status_id") ?>
-<script>
-loadjs.ready("head", function() {
-    var el = document.querySelector("select[data-select2-id='main_campaigns_x_payment_status_id']"),
-        options = { name: "x_payment_status_id", selectId: "main_campaigns_x_payment_status_id", language: ew.LANGUAGE_ID, dir: ew.IS_RTL ? "rtl" : "ltr" };
-    options.dropdownParent = $(el).closest("#ew-modal-dialog, #ew-add-opt-dialog")[0];
-    Object.assign(options, ew.vars.tables.main_campaigns.fields.payment_status_id.selectOptions);
-    ew.createSelect(options);
-});
-</script>
-</span>
 </div></div>
     </div>
 <?php } ?>

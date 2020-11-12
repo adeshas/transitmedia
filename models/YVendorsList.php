@@ -182,7 +182,7 @@ class YVendorsList extends YVendors
         $this->ExportHtmlUrl = $pageUrl . "export=html";
         $this->ExportXmlUrl = $pageUrl . "export=xml";
         $this->ExportCsvUrl = $pageUrl . "export=csv";
-        $this->AddUrl = "yvendorsadd";
+        $this->AddUrl = "yvendorsadd?" . Config("TABLE_SHOW_DETAIL") . "=";
         $this->InlineAddUrl = $pageUrl . "action=add";
         $this->GridAddUrl = $pageUrl . "action=gridadd";
         $this->GridEditUrl = $pageUrl . "action=gridedit";
@@ -398,6 +398,7 @@ class YVendorsList extends YVendors
     {
         $key = "";
         if (is_array($ar)) {
+            $key .= @$ar['id'];
         }
         return $key;
     }
@@ -409,6 +410,9 @@ class YVendorsList extends YVendors
      */
     protected function hideFieldsForAddEdit()
     {
+        if ($this->isAdd() || $this->isCopy() || $this->isGridAdd()) {
+            $this->id->Visible = false;
+        }
     }
 
     // Lookup data
@@ -1118,6 +1122,18 @@ class YVendorsList extends YVendors
         $item->OnLeft = false;
         $item->Visible = false;
 
+        // "edit"
+        $item = &$this->ListOptions->add("edit");
+        $item->CssClass = "text-nowrap";
+        $item->Visible = $Security->canEdit();
+        $item->OnLeft = false;
+
+        // "delete"
+        $item = &$this->ListOptions->add("delete");
+        $item->CssClass = "text-nowrap";
+        $item->Visible = $Security->canDelete();
+        $item->OnLeft = false;
+
         // "detail_main_users"
         $item = &$this->ListOptions->add("detail_main_users");
         $item->CssClass = "text-nowrap";
@@ -1189,7 +1205,23 @@ class YVendorsList extends YVendors
         // Call ListOptions_Rendering event
         $this->listOptionsRendering();
         $pageUrl = $this->pageUrl();
-        if ($this->CurrentMode == "view") { // View mode
+        if ($this->CurrentMode == "view") {
+            // "edit"
+            $opt = $this->ListOptions["edit"];
+            $editcaption = HtmlTitle($Language->phrase("EditLink"));
+            if ($Security->canEdit() && $this->showOptionLink("edit")) {
+                $opt->Body = "<a class=\"ew-row-link ew-edit\" title=\"" . HtmlTitle($Language->phrase("EditLink")) . "\" data-caption=\"" . HtmlTitle($Language->phrase("EditLink")) . "\" href=\"" . HtmlEncode(GetUrl($this->EditUrl)) . "\">" . $Language->phrase("EditLink") . "</a>";
+            } else {
+                $opt->Body = "";
+            }
+
+            // "delete"
+            $opt = $this->ListOptions["delete"];
+            if ($Security->canDelete() && $this->showOptionLink("delete")) {
+            $opt->Body = "<a class=\"ew-row-link ew-delete\"" . "" . " title=\"" . HtmlTitle($Language->phrase("DeleteLink")) . "\" data-caption=\"" . HtmlTitle($Language->phrase("DeleteLink")) . "\" href=\"" . HtmlEncode(GetUrl($this->DeleteUrl)) . "\">" . $Language->phrase("DeleteLink") . "</a>";
+            } else {
+                $opt->Body = "";
+            }
         } // End View mode
 
         // Set up list action buttons
@@ -1233,6 +1265,15 @@ class YVendorsList extends YVendors
             $body = "<a class=\"btn btn-default ew-row-link ew-detail\" data-action=\"list\" href=\"" . HtmlEncode("mainuserslist?" . Config("TABLE_SHOW_MASTER") . "=y_vendors&" . GetForeignKeyUrl("fk_id", $this->id->CurrentValue) . "") . "\">" . $body . "</a>";
             $links = "";
             $detailPage = Container("MainUsersGrid");
+            if ($detailPage->DetailEdit && $Security->canEdit() && $this->showOptionLink("edit") && $Security->allowEdit(CurrentProjectID() . 'y_vendors')) {
+                $caption = $Language->phrase("MasterDetailEditLink");
+                $url = $this->getEditUrl(Config("TABLE_SHOW_DETAIL") . "=main_users");
+                $links .= "<li><a class=\"dropdown-item ew-row-link ew-detail-edit\" data-action=\"edit\" data-caption=\"" . HtmlTitle($caption) . "\" href=\"" . HtmlEncode($url) . "\">" . HtmlImageAndText($caption) . "</a></li>";
+                if ($detailEditTblVar != "") {
+                    $detailEditTblVar .= ",";
+                }
+                $detailEditTblVar .= "main_users";
+            }
             if ($links != "") {
                 $body .= "<button class=\"dropdown-toggle btn btn-default ew-detail\" data-toggle=\"dropdown\"></button>";
                 $body .= "<ul class=\"dropdown-menu\">" . $links . "</ul>";
@@ -1251,6 +1292,15 @@ class YVendorsList extends YVendors
             $body = "<a class=\"btn btn-default ew-row-link ew-detail\" data-action=\"list\" href=\"" . HtmlEncode("maincampaignslist?" . Config("TABLE_SHOW_MASTER") . "=y_vendors&" . GetForeignKeyUrl("fk_id", $this->id->CurrentValue) . "") . "\">" . $body . "</a>";
             $links = "";
             $detailPage = Container("MainCampaignsGrid");
+            if ($detailPage->DetailEdit && $Security->canEdit() && $this->showOptionLink("edit") && $Security->allowEdit(CurrentProjectID() . 'y_vendors')) {
+                $caption = $Language->phrase("MasterDetailEditLink");
+                $url = $this->getEditUrl(Config("TABLE_SHOW_DETAIL") . "=main_campaigns");
+                $links .= "<li><a class=\"dropdown-item ew-row-link ew-detail-edit\" data-action=\"edit\" data-caption=\"" . HtmlTitle($caption) . "\" href=\"" . HtmlEncode($url) . "\">" . HtmlImageAndText($caption) . "</a></li>";
+                if ($detailEditTblVar != "") {
+                    $detailEditTblVar .= ",";
+                }
+                $detailEditTblVar .= "main_campaigns";
+            }
             if ($links != "") {
                 $body .= "<button class=\"dropdown-toggle btn btn-default ew-detail\" data-toggle=\"dropdown\"></button>";
                 $body .= "<ul class=\"dropdown-menu\">" . $links . "</ul>";
@@ -1285,6 +1335,7 @@ class YVendorsList extends YVendors
 
         // "checkbox"
         $opt = $this->ListOptions["checkbox"];
+        $opt->Body = "<div class=\"custom-control custom-checkbox d-inline-block\"><input type=\"checkbox\" id=\"key_m_" . $this->RowCount . "\" name=\"key_m[]\" class=\"custom-control-input ew-multi-select\" value=\"" . HtmlEncode($this->id->CurrentValue) . "\" onclick=\"ew.clickMultiCheckbox(event);\"><label class=\"custom-control-label\" for=\"key_m_" . $this->RowCount . "\"></label></div>";
         $this->renderListOptionsExt();
 
         // Call ListOptions_Rendered event
@@ -1303,6 +1354,49 @@ class YVendorsList extends YVendors
         $addcaption = HtmlTitle($Language->phrase("AddLink"));
         $item->Body = "<a class=\"ew-add-edit ew-add\" title=\"" . $addcaption . "\" data-caption=\"" . $addcaption . "\" href=\"" . HtmlEncode(GetUrl($this->AddUrl)) . "\">" . $Language->phrase("AddLink") . "</a>";
         $item->Visible = $this->AddUrl != "" && $Security->canAdd();
+        $option = $options["detail"];
+        $detailTableLink = "";
+                $item = &$option->add("detailadd_main_users");
+                $url = $this->getAddUrl(Config("TABLE_SHOW_DETAIL") . "=main_users");
+                $detailPage = Container("MainUsersGrid");
+                $caption = $Language->phrase("Add") . "&nbsp;" . $this->tableCaption() . "/" . $detailPage->tableCaption();
+                $item->Body = "<a class=\"ew-detail-add-group ew-detail-add\" title=\"" . HtmlTitle($caption) . "\" data-caption=\"" . HtmlTitle($caption) . "\" href=\"" . HtmlEncode(GetUrl($url)) . "\">" . $caption . "</a>";
+                $item->Visible = ($detailPage->DetailAdd && $Security->allowAdd(CurrentProjectID() . 'y_vendors') && $Security->canAdd());
+                if ($item->Visible) {
+                    if ($detailTableLink != "") {
+                        $detailTableLink .= ",";
+                    }
+                    $detailTableLink .= "main_users";
+                }
+                $item = &$option->add("detailadd_main_campaigns");
+                $url = $this->getAddUrl(Config("TABLE_SHOW_DETAIL") . "=main_campaigns");
+                $detailPage = Container("MainCampaignsGrid");
+                $caption = $Language->phrase("Add") . "&nbsp;" . $this->tableCaption() . "/" . $detailPage->tableCaption();
+                $item->Body = "<a class=\"ew-detail-add-group ew-detail-add\" title=\"" . HtmlTitle($caption) . "\" data-caption=\"" . HtmlTitle($caption) . "\" href=\"" . HtmlEncode(GetUrl($url)) . "\">" . $caption . "</a>";
+                $item->Visible = ($detailPage->DetailAdd && $Security->allowAdd(CurrentProjectID() . 'y_vendors') && $Security->canAdd());
+                if ($item->Visible) {
+                    if ($detailTableLink != "") {
+                        $detailTableLink .= ",";
+                    }
+                    $detailTableLink .= "main_campaigns";
+                }
+
+        // Add multiple details
+        if ($this->ShowMultipleDetails) {
+            $item = &$option->add("detailsadd");
+            $url = $this->getAddUrl(Config("TABLE_SHOW_DETAIL") . "=" . $detailTableLink);
+            $caption = $Language->phrase("AddMasterDetailLink");
+            $item->Body = "<a class=\"ew-detail-add-group ew-detail-add\" title=\"" . HtmlTitle($caption) . "\" data-caption=\"" . HtmlTitle($caption) . "\" href=\"" . HtmlEncode(GetUrl($url)) . "\">" . $caption . "</a>";
+            $item->Visible = $detailTableLink != "" && $Security->canAdd();
+            // Hide single master/detail items
+            $ar = explode(",", $detailTableLink);
+            $cnt = count($ar);
+            for ($i = 0; $i < $cnt; $i++) {
+                if ($item = $option["detailadd_" . $ar[$i]]) {
+                    $item->Visible = false;
+                }
+            }
+        }
         $option = $options["action"];
 
         // Set up options default
@@ -1550,7 +1644,17 @@ class YVendorsList extends YVendors
     // Load old record
     protected function loadOldRecord()
     {
-        return false;
+        // Load old record
+        $this->OldRecordset = null;
+        $validKey = $this->OldKey != "";
+        if ($validKey) {
+            $this->CurrentFilter = $this->getRecordFilter();
+            $sql = $this->getCurrentSql();
+            $conn = $this->getConnection();
+            $this->OldRecordset = LoadRecordset($sql, $conn);
+        }
+        $this->loadRowValues($this->OldRecordset); // Load row values
+        return $validKey;
     }
 
     // Render row values based on field settings

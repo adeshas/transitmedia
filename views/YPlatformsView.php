@@ -75,6 +75,17 @@ $Page->showMessage();
 </td>
     </tr>
 <?php } ?>
+<?php if ($Page->_email->Visible) { // email ?>
+    <tr id="r__email">
+        <td class="<?= $Page->TableLeftColumnClass ?>"><span id="elh_y_platforms__email"><?= $Page->_email->caption() ?></span></td>
+        <td data-name="_email" <?= $Page->_email->cellAttributes() ?>>
+<span id="el_y_platforms__email">
+<span<?= $Page->_email->viewAttributes() ?>>
+<?= $Page->_email->getViewValue() ?></span>
+</span>
+</td>
+    </tr>
+<?php } ?>
 </table>
 <?php if ($Page->getCurrentDetailTable() != "") { ?>
 <?php
