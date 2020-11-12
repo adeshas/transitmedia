@@ -359,6 +359,9 @@ class AdvancedSecurity
             $pwd = @$_SESSION[PROJECT_NAME . "_Password"];
             $autologin = $this->validateUser($usr, $pwd, true);
         }
+        if ($autologin) {
+            WriteAuditLog($usr, $GLOBALS["Language"]->phrase("AuditTrailAutoLogin"), CurrentUserIP(), "", "", "", "");
+        }
         return $autologin;
     }
 

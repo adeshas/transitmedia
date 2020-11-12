@@ -190,6 +190,7 @@ class Logout
                 WriteCookie("Username", ""); // Clear user name cookie
             WriteCookie("Password", ""); // Clear password cookie
             WriteCookie("LastUrl", ""); // Clear last URL
+            $this->writeAuditTrailOnLogout($username);
 
             // Call User LoggedOut event
             $this->userLoggedOut($username);
@@ -239,6 +240,13 @@ class Logout
                 $this->pageRender();
             }
         }
+    }
+
+    // Write audit trail on logout
+    protected function writeAuditTrailOnLogout($usr)
+    {
+        global $Language;
+        WriteAuditLog($usr, $Language->phrase("AuditTrailLogout"), CurrentUserIP(), "", "", "", "");
     }
 
     // Page Load event
