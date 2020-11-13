@@ -55,12 +55,13 @@ function MenuItem_Adding($item)
 
     // IF OPERATOR REMOVE SOME TOP MENU's
     if(CurrentUserLevel() == 5){
-        if( in_array($item->id, [32,98, 132,129])){
+        if( in_array($item->id, [174, 35,133])){
             return false;
         }
     }
+    //IF PLATFORMREMOVE SOME
     if(CurrentUserLevel() == 6){
-        if( in_array($item->id, [32,98, 132,129])){
+        if( in_array($item->id, [32, 132,129,174])){
             return false;
         }
     }

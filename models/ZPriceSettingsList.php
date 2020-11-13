@@ -529,6 +529,51 @@ class ZPriceSettingsList extends ZPriceSettings
     public function run()
     {
         global $ExportType, $CustomExportType, $ExportFileName, $UserProfile, $Language, $Security, $CurrentForm;
+
+        // Create form object
+        $CurrentForm = new HttpForm();
+
+        // Get export parameters
+        $custom = "";
+        if (Param("export") !== null) {
+            $this->Export = Param("export");
+            $custom = Param("custom", "");
+        } elseif (IsPost()) {
+            if (Post("exporttype") !== null) {
+                $this->Export = Post("exporttype");
+            }
+            $custom = Post("custom", "");
+        } elseif (Get("cmd") == "json") {
+            $this->Export = Get("cmd");
+        } else {
+            $this->setExportReturnUrl(CurrentUrl());
+        }
+        $ExportFileName = $this->TableVar; // Get export file, used in header
+
+        // Get custom export parameters
+        if ($this->isExport() && $custom != "") {
+            $this->CustomExport = $this->Export;
+            $this->Export = "print";
+        }
+        $CustomExportType = $this->CustomExport;
+        $ExportType = $this->Export; // Get export parameter, used in header
+
+        // Update Export URLs
+        if (Config("USE_PHPEXCEL")) {
+            $this->ExportExcelCustom = false;
+        }
+        if (Config("USE_PHPWORD")) {
+            $this->ExportWordCustom = false;
+        }
+        if ($this->ExportExcelCustom) {
+            $this->ExportExcelUrl .= "&amp;custom=1";
+        }
+        if ($this->ExportWordCustom) {
+            $this->ExportWordUrl .= "&amp;custom=1";
+        }
+        if ($this->ExportPdfCustom) {
+            $this->ExportPdfUrl .= "&amp;custom=1";
+        }
         $this->CurrentAction = Param("action"); // Set up current action
 
         // Get grid add count
@@ -539,6 +584,9 @@ class ZPriceSettingsList extends ZPriceSettings
 
         // Set up list options
         $this->setupListOptions();
+
+        // Setup export options
+        $this->setupExportOptions();
         $this->id->setVisibility();
         $this->platform_id->setVisibility();
         $this->inventory_id->setVisibility();
@@ -610,6 +658,56 @@ class ZPriceSettingsList extends ZPriceSettings
                 $this->setupBreadcrumb();
             }
 
+            // Check QueryString parameters
+            if (Get("action") !== null) {
+                $this->CurrentAction = Get("action");
+
+                // Clear inline mode
+                if ($this->isCancel()) {
+                    $this->clearInlineMode();
+                }
+
+                // Switch to grid edit mode
+                if ($this->isGridEdit()) {
+                    $this->gridEditMode();
+                }
+
+                // Switch to inline edit mode
+                if ($this->isEdit()) {
+                    $this->inlineEditMode();
+                }
+            } else {
+                if (Post("action") !== null) {
+                    $this->CurrentAction = Post("action"); // Get action
+
+                    // Grid Update
+                    if (($this->isGridUpdate() || $this->isGridOverwrite()) && @$_SESSION[SESSION_INLINE_MODE] == "gridedit") {
+                        if ($this->validateGridForm()) {
+                            $gridUpdate = $this->gridUpdate();
+                        } else {
+                            $gridUpdate = false;
+                        }
+                        if ($gridUpdate) {
+                        } else {
+                            $this->EventCancelled = true;
+                            $this->gridEditMode(); // Stay in Grid edit mode
+                        }
+                    }
+
+                    // Inline Update
+                    if (($this->isUpdate() || $this->isOverwrite()) && @$_SESSION[SESSION_INLINE_MODE] == "edit") {
+                        $this->setKey(Post($this->OldKeyName));
+                        $this->inlineUpdate();
+                    }
+                } elseif (@$_SESSION[SESSION_INLINE_MODE] == "gridedit") { // Previously in grid edit mode
+                    if (Get(Config("TABLE_START_REC")) !== null || Get(Config("TABLE_PAGE_NO")) !== null) { // Stay in grid edit mode if paging
+                        $this->gridEditMode();
+                    } else { // Reset grid edit
+                        $this->clearInlineMode();
+                    }
+                }
+            }
+
             // Hide list options
             if ($this->isExport()) {
                 $this->ListOptions->hideAllOptions(["sequence"]);
@@ -633,8 +731,46 @@ class ZPriceSettingsList extends ZPriceSettings
                 $this->OtherOptions->hideAllOptions();
             }
 
+            // Show grid delete link for grid add / grid edit
+            if ($this->AllowAddDeleteRow) {
+                if ($this->isGridAdd() || $this->isGridEdit()) {
+                    $item = $this->ListOptions["griddelete"];
+                    if ($item) {
+                        $item->Visible = true;
+                    }
+                }
+            }
+
+            // Get default search criteria
+            AddFilter($this->DefaultSearchWhere, $this->advancedSearchWhere(true));
+
+            // Get and validate search values for advanced search
+            $this->loadSearchValues(); // Get search values
+
+            // Process filter list
+            if ($this->processFilterList()) {
+                $this->terminate();
+                return;
+            }
+            if (!$this->validateSearch()) {
+                // Nothing to do
+            }
+
+            // Restore search parms from Session if not searching / reset / export
+            if (($this->isExport() || $this->Command != "search" && $this->Command != "reset" && $this->Command != "resetall") && $this->Command != "json" && $this->checkSearchParms()) {
+                $this->restoreSearchParms();
+            }
+
+            // Call Recordset SearchValidated event
+            $this->recordsetSearchValidated();
+
             // Set up sorting order
             $this->setupSortOrder();
+
+            // Get search criteria for advanced search
+            if (!$this->hasInvalidFields()) {
+                $srchAdvanced = $this->advancedSearchWhere();
+            }
         }
 
         // Restore display records
@@ -648,6 +784,35 @@ class ZPriceSettingsList extends ZPriceSettings
         // Load Sorting Order
         if ($this->Command != "json") {
             $this->loadSortOrder();
+        }
+
+        // Load search default if no existing search criteria
+        if (!$this->checkSearchParms()) {
+            // Load advanced search from default
+            if ($this->loadAdvancedSearchDefault()) {
+                $srchAdvanced = $this->advancedSearchWhere();
+            }
+        }
+
+        // Restore search settings from Session
+        if (!$this->hasInvalidFields()) {
+            $this->loadAdvancedSearch();
+        }
+
+        // Build search criteria
+        AddFilter($this->SearchWhere, $srchAdvanced);
+        AddFilter($this->SearchWhere, $srchBasic);
+
+        // Call Recordset_Searching event
+        $this->recordsetSearching($this->SearchWhere);
+
+        // Save search criteria
+        if ($this->Command == "search" && !$this->RestoreSearch) {
+            $this->setSearchWhere($this->SearchWhere); // Save to Session
+            $this->StartRecord = 1; // Reset start record counter
+            $this->setStartRecordNumber($this->StartRecord);
+        } elseif ($this->Command != "json") {
+            $this->SearchWhere = $this->getSearchWhere();
         }
 
         // Build filter
@@ -665,6 +830,13 @@ class ZPriceSettingsList extends ZPriceSettings
         } else {
             $this->setSessionWhere($filter);
             $this->CurrentFilter = "";
+        }
+
+        // Export data only
+        if (!$this->CustomExport && in_array($this->Export, array_keys(Config("EXPORT_CLASSES")))) {
+            $this->exportData();
+            $this->terminate();
+            return;
         }
         if ($this->isGridAdd()) {
             $this->CurrentFilter = "0=1";
@@ -758,6 +930,187 @@ class ZPriceSettingsList extends ZPriceSettings
         }
     }
 
+    // Exit inline mode
+    protected function clearInlineMode()
+    {
+        $this->LastAction = $this->CurrentAction; // Save last action
+        $this->CurrentAction = ""; // Clear action
+        $_SESSION[SESSION_INLINE_MODE] = ""; // Clear inline mode
+    }
+
+    // Switch to Grid Edit mode
+    protected function gridEditMode()
+    {
+        $this->CurrentAction = "gridedit";
+        $_SESSION[SESSION_INLINE_MODE] = "gridedit";
+        $this->hideFieldsForAddEdit();
+    }
+
+    // Switch to Inline Edit mode
+    protected function inlineEditMode()
+    {
+        global $Security, $Language;
+        if (!$Security->canEdit()) {
+            return false; // Edit not allowed
+        }
+        $inlineEdit = true;
+        if (($keyValue = Get("id") ?? Route("id")) !== null) {
+            $this->id->setQueryStringValue($keyValue);
+        } else {
+            $inlineEdit = false;
+        }
+        if ($inlineEdit) {
+            if ($this->loadRow()) {
+                $this->OldKey = $this->getKey(true); // Get from CurrentValue
+                $this->setKey($this->OldKey); // Set to OldValue
+                $_SESSION[SESSION_INLINE_MODE] = "edit"; // Enable inline edit
+            }
+        }
+        return true;
+    }
+
+    // Perform update to Inline Edit record
+    protected function inlineUpdate()
+    {
+        global $Language, $CurrentForm;
+        $CurrentForm->Index = 1;
+        $this->loadFormValues(); // Get form values
+
+        // Validate form
+        $inlineUpdate = true;
+        if (!$this->validateForm()) {
+            $inlineUpdate = false; // Form error, reset action
+        } else {
+            $inlineUpdate = false;
+            $this->SendEmail = true; // Send email on update success
+            $inlineUpdate = $this->editRow(); // Update record
+        }
+        if ($inlineUpdate) { // Update success
+            if ($this->getSuccessMessage() == "") {
+                $this->setSuccessMessage($Language->phrase("UpdateSuccess")); // Set up success message
+            }
+            $this->clearInlineMode(); // Clear inline edit mode
+        } else {
+            if ($this->getFailureMessage() == "") {
+                $this->setFailureMessage($Language->phrase("UpdateFailed")); // Set update failed message
+            }
+            $this->EventCancelled = true; // Cancel event
+            $this->CurrentAction = "edit"; // Stay in edit mode
+        }
+    }
+
+    // Check Inline Edit key
+    public function checkInlineEditKey()
+    {
+        if (!SameString($this->id->OldValue, $this->id->CurrentValue)) {
+            return false;
+        }
+        return true;
+    }
+
+    // Perform update to grid
+    public function gridUpdate()
+    {
+        global $Language, $CurrentForm;
+        $gridUpdate = true;
+
+        // Get old recordset
+        $this->CurrentFilter = $this->buildKeyFilter();
+        if ($this->CurrentFilter == "") {
+            $this->CurrentFilter = "0=1";
+        }
+        $sql = $this->getCurrentSql();
+        $conn = $this->getConnection();
+        if ($rs = $conn->executeQuery($sql)) {
+            $rsold = $rs->fetchAll();
+            $rs->closeCursor();
+        }
+
+        // Call Grid Updating event
+        if (!$this->gridUpdating($rsold)) {
+            if ($this->getFailureMessage() == "") {
+                $this->setFailureMessage($Language->phrase("GridEditCancelled")); // Set grid edit cancelled message
+            }
+            return false;
+        }
+
+        // Begin transaction
+        $conn->beginTransaction();
+        $key = "";
+
+        // Update row index and get row key
+        $CurrentForm->Index = -1;
+        $rowcnt = strval($CurrentForm->getValue($this->FormKeyCountName));
+        if ($rowcnt == "" || !is_numeric($rowcnt)) {
+            $rowcnt = 0;
+        }
+
+        // Update all rows based on key
+        for ($rowindex = 1; $rowindex <= $rowcnt; $rowindex++) {
+            $CurrentForm->Index = $rowindex;
+            $this->setKey($CurrentForm->getValue($this->OldKeyName));
+            $rowaction = strval($CurrentForm->getValue($this->FormActionName));
+
+            // Load all values and keys
+            if ($rowaction != "insertdelete") { // Skip insert then deleted rows
+                $this->loadFormValues(); // Get form values
+                if ($rowaction == "" || $rowaction == "edit" || $rowaction == "delete") {
+                    $gridUpdate = $this->OldKey != ""; // Key must not be empty
+                } else {
+                    $gridUpdate = true;
+                }
+
+                // Skip empty row
+                if ($rowaction == "insert" && $this->emptyRow()) {
+                // Validate form and insert/update/delete record
+                } elseif ($gridUpdate) {
+                    if ($rowaction == "delete") {
+                        $this->CurrentFilter = $this->getRecordFilter();
+                        $gridUpdate = $this->deleteRows(); // Delete this row
+                    //} elseif (!$this->validateForm()) { // Already done in validateGridForm
+                    //    $gridUpdate = false; // Form error, reset action
+                    } else {
+                        if ($rowaction == "insert") {
+                            $gridUpdate = $this->addRow(); // Insert this row
+                        } else {
+                            if ($this->OldKey != "") {
+                                $this->SendEmail = false; // Do not send email on update success
+                                $gridUpdate = $this->editRow(); // Update this row
+                            }
+                        } // End update
+                    }
+                }
+                if ($gridUpdate) {
+                    if ($key != "") {
+                        $key .= ", ";
+                    }
+                    $key .= $this->OldKey;
+                } else {
+                    break;
+                }
+            }
+        }
+        if ($gridUpdate) {
+            $conn->commit(); // Commit transaction
+
+            // Get new records
+            $rsnew = $conn->fetchAll($sql);
+
+            // Call Grid_Updated event
+            $this->gridUpdated($rsold, $rsnew);
+            if ($this->getSuccessMessage() == "") {
+                $this->setSuccessMessage($Language->phrase("UpdateSuccess")); // Set up update success message
+            }
+            $this->clearInlineMode(); // Clear inline edit mode
+        } else {
+            $conn->rollback(); // Rollback transaction
+            if ($this->getFailureMessage() == "") {
+                $this->setFailureMessage($Language->phrase("UpdateFailed")); // Set update failed message
+            }
+        }
+        return $gridUpdate;
+    }
+
     // Build filter for all keys
     protected function buildKeyFilter()
     {
@@ -787,6 +1140,526 @@ class ZPriceSettingsList extends ZPriceSettings
             $thisKey = strval($CurrentForm->getValue($this->OldKeyName));
         }
         return $wrkFilter;
+    }
+
+    // Check if empty row
+    public function emptyRow()
+    {
+        global $CurrentForm;
+        if ($CurrentForm->hasValue("x_platform_id") && $CurrentForm->hasValue("o_platform_id") && $this->platform_id->CurrentValue != $this->platform_id->OldValue) {
+            return false;
+        }
+        if ($CurrentForm->hasValue("x_inventory_id") && $CurrentForm->hasValue("o_inventory_id") && $this->inventory_id->CurrentValue != $this->inventory_id->OldValue) {
+            return false;
+        }
+        if ($CurrentForm->hasValue("x_print_stage_id") && $CurrentForm->hasValue("o_print_stage_id") && $this->print_stage_id->CurrentValue != $this->print_stage_id->OldValue) {
+            return false;
+        }
+        if ($CurrentForm->hasValue("x_bus_size_id") && $CurrentForm->hasValue("o_bus_size_id") && $this->bus_size_id->CurrentValue != $this->bus_size_id->OldValue) {
+            return false;
+        }
+        if ($CurrentForm->hasValue("x_max_limit") && $CurrentForm->hasValue("o_max_limit") && $this->max_limit->CurrentValue != $this->max_limit->OldValue) {
+            return false;
+        }
+        if ($CurrentForm->hasValue("x_min_limit") && $CurrentForm->hasValue("o_min_limit") && $this->min_limit->CurrentValue != $this->min_limit->OldValue) {
+            return false;
+        }
+        if ($CurrentForm->hasValue("x_price") && $CurrentForm->hasValue("o_price") && $this->price->CurrentValue != $this->price->OldValue) {
+            return false;
+        }
+        if ($CurrentForm->hasValue("x_operator_fee") && $CurrentForm->hasValue("o_operator_fee") && $this->operator_fee->CurrentValue != $this->operator_fee->OldValue) {
+            return false;
+        }
+        if ($CurrentForm->hasValue("x_agency_fee") && $CurrentForm->hasValue("o_agency_fee") && $this->agency_fee->CurrentValue != $this->agency_fee->OldValue) {
+            return false;
+        }
+        if ($CurrentForm->hasValue("x_lamata_fee") && $CurrentForm->hasValue("o_lamata_fee") && $this->lamata_fee->CurrentValue != $this->lamata_fee->OldValue) {
+            return false;
+        }
+        if ($CurrentForm->hasValue("x_lasaa_fee") && $CurrentForm->hasValue("o_lasaa_fee") && $this->lasaa_fee->CurrentValue != $this->lasaa_fee->OldValue) {
+            return false;
+        }
+        if ($CurrentForm->hasValue("x_printers_fee") && $CurrentForm->hasValue("o_printers_fee") && $this->printers_fee->CurrentValue != $this->printers_fee->OldValue) {
+            return false;
+        }
+        return true;
+    }
+
+    // Validate grid form
+    public function validateGridForm()
+    {
+        global $CurrentForm;
+        // Get row count
+        $CurrentForm->Index = -1;
+        $rowcnt = strval($CurrentForm->getValue($this->FormKeyCountName));
+        if ($rowcnt == "" || !is_numeric($rowcnt)) {
+            $rowcnt = 0;
+        }
+
+        // Validate all records
+        for ($rowindex = 1; $rowindex <= $rowcnt; $rowindex++) {
+            // Load current row values
+            $CurrentForm->Index = $rowindex;
+            $rowaction = strval($CurrentForm->getValue($this->FormActionName));
+            if ($rowaction != "delete" && $rowaction != "insertdelete") {
+                $this->loadFormValues(); // Get form values
+                if ($rowaction == "insert" && $this->emptyRow()) {
+                    // Ignore
+                } elseif (!$this->validateForm()) {
+                    return false;
+                }
+            }
+        }
+        return true;
+    }
+
+    // Get all form values of the grid
+    public function getGridFormValues()
+    {
+        global $CurrentForm;
+        // Get row count
+        $CurrentForm->Index = -1;
+        $rowcnt = strval($CurrentForm->getValue($this->FormKeyCountName));
+        if ($rowcnt == "" || !is_numeric($rowcnt)) {
+            $rowcnt = 0;
+        }
+        $rows = [];
+
+        // Loop through all records
+        for ($rowindex = 1; $rowindex <= $rowcnt; $rowindex++) {
+            // Load current row values
+            $CurrentForm->Index = $rowindex;
+            $rowaction = strval($CurrentForm->getValue($this->FormActionName));
+            if ($rowaction != "delete" && $rowaction != "insertdelete") {
+                $this->loadFormValues(); // Get form values
+                if ($rowaction == "insert" && $this->emptyRow()) {
+                    // Ignore
+                } else {
+                    $rows[] = $this->getFieldValues("FormValue"); // Return row as array
+                }
+            }
+        }
+        return $rows; // Return as array of array
+    }
+
+    // Restore form values for current row
+    public function restoreCurrentRowFormValues($idx)
+    {
+        global $CurrentForm;
+
+        // Get row based on current index
+        $CurrentForm->Index = $idx;
+        $rowaction = strval($CurrentForm->getValue($this->FormActionName));
+        $this->loadFormValues(); // Load form values
+        // Set up invalid status correctly
+        $this->resetFormError();
+        if ($rowaction == "insert" && $this->emptyRow()) {
+            // Ignore
+        } else {
+            $this->validateForm();
+        }
+    }
+
+    // Reset form status
+    public function resetFormError()
+    {
+        $this->id->clearErrorMessage();
+        $this->platform_id->clearErrorMessage();
+        $this->inventory_id->clearErrorMessage();
+        $this->print_stage_id->clearErrorMessage();
+        $this->bus_size_id->clearErrorMessage();
+        $this->max_limit->clearErrorMessage();
+        $this->min_limit->clearErrorMessage();
+        $this->price->clearErrorMessage();
+        $this->operator_fee->clearErrorMessage();
+        $this->agency_fee->clearErrorMessage();
+        $this->lamata_fee->clearErrorMessage();
+        $this->lasaa_fee->clearErrorMessage();
+        $this->printers_fee->clearErrorMessage();
+    }
+
+    // Get list of filters
+    public function getFilterList()
+    {
+        global $UserProfile;
+
+        // Initialize
+        $filterList = "";
+        $savedFilterList = "";
+        $filterList = Concat($filterList, $this->id->AdvancedSearch->toJson(), ","); // Field id
+        $filterList = Concat($filterList, $this->platform_id->AdvancedSearch->toJson(), ","); // Field platform_id
+        $filterList = Concat($filterList, $this->inventory_id->AdvancedSearch->toJson(), ","); // Field inventory_id
+        $filterList = Concat($filterList, $this->print_stage_id->AdvancedSearch->toJson(), ","); // Field print_stage_id
+        $filterList = Concat($filterList, $this->bus_size_id->AdvancedSearch->toJson(), ","); // Field bus_size_id
+        $filterList = Concat($filterList, $this->details->AdvancedSearch->toJson(), ","); // Field details
+        $filterList = Concat($filterList, $this->max_limit->AdvancedSearch->toJson(), ","); // Field max_limit
+        $filterList = Concat($filterList, $this->min_limit->AdvancedSearch->toJson(), ","); // Field min_limit
+        $filterList = Concat($filterList, $this->price->AdvancedSearch->toJson(), ","); // Field price
+        $filterList = Concat($filterList, $this->operator_fee->AdvancedSearch->toJson(), ","); // Field operator_fee
+        $filterList = Concat($filterList, $this->agency_fee->AdvancedSearch->toJson(), ","); // Field agency_fee
+        $filterList = Concat($filterList, $this->lamata_fee->AdvancedSearch->toJson(), ","); // Field lamata_fee
+        $filterList = Concat($filterList, $this->lasaa_fee->AdvancedSearch->toJson(), ","); // Field lasaa_fee
+        $filterList = Concat($filterList, $this->printers_fee->AdvancedSearch->toJson(), ","); // Field printers_fee
+
+        // Return filter list in JSON
+        if ($filterList != "") {
+            $filterList = "\"data\":{" . $filterList . "}";
+        }
+        if ($savedFilterList != "") {
+            $filterList = Concat($filterList, "\"filters\":" . $savedFilterList, ",");
+        }
+        return ($filterList != "") ? "{" . $filterList . "}" : "null";
+    }
+
+    // Process filter list
+    protected function processFilterList()
+    {
+        global $UserProfile;
+        if (Post("ajax") == "savefilters") { // Save filter request (Ajax)
+            $filters = Post("filters");
+            $UserProfile->setSearchFilters(CurrentUserName(), "fz_price_settingslistsrch", $filters);
+            WriteJson([["success" => true]]); // Success
+            return true;
+        } elseif (Post("cmd") == "resetfilter") {
+            $this->restoreFilterList();
+        }
+        return false;
+    }
+
+    // Restore list of filters
+    protected function restoreFilterList()
+    {
+        // Return if not reset filter
+        if (Post("cmd") !== "resetfilter") {
+            return false;
+        }
+        $filter = json_decode(Post("filter"), true);
+        $this->Command = "search";
+
+        // Field id
+        $this->id->AdvancedSearch->SearchValue = @$filter["x_id"];
+        $this->id->AdvancedSearch->SearchOperator = @$filter["z_id"];
+        $this->id->AdvancedSearch->SearchCondition = @$filter["v_id"];
+        $this->id->AdvancedSearch->SearchValue2 = @$filter["y_id"];
+        $this->id->AdvancedSearch->SearchOperator2 = @$filter["w_id"];
+        $this->id->AdvancedSearch->save();
+
+        // Field platform_id
+        $this->platform_id->AdvancedSearch->SearchValue = @$filter["x_platform_id"];
+        $this->platform_id->AdvancedSearch->SearchOperator = @$filter["z_platform_id"];
+        $this->platform_id->AdvancedSearch->SearchCondition = @$filter["v_platform_id"];
+        $this->platform_id->AdvancedSearch->SearchValue2 = @$filter["y_platform_id"];
+        $this->platform_id->AdvancedSearch->SearchOperator2 = @$filter["w_platform_id"];
+        $this->platform_id->AdvancedSearch->save();
+
+        // Field inventory_id
+        $this->inventory_id->AdvancedSearch->SearchValue = @$filter["x_inventory_id"];
+        $this->inventory_id->AdvancedSearch->SearchOperator = @$filter["z_inventory_id"];
+        $this->inventory_id->AdvancedSearch->SearchCondition = @$filter["v_inventory_id"];
+        $this->inventory_id->AdvancedSearch->SearchValue2 = @$filter["y_inventory_id"];
+        $this->inventory_id->AdvancedSearch->SearchOperator2 = @$filter["w_inventory_id"];
+        $this->inventory_id->AdvancedSearch->save();
+
+        // Field print_stage_id
+        $this->print_stage_id->AdvancedSearch->SearchValue = @$filter["x_print_stage_id"];
+        $this->print_stage_id->AdvancedSearch->SearchOperator = @$filter["z_print_stage_id"];
+        $this->print_stage_id->AdvancedSearch->SearchCondition = @$filter["v_print_stage_id"];
+        $this->print_stage_id->AdvancedSearch->SearchValue2 = @$filter["y_print_stage_id"];
+        $this->print_stage_id->AdvancedSearch->SearchOperator2 = @$filter["w_print_stage_id"];
+        $this->print_stage_id->AdvancedSearch->save();
+
+        // Field bus_size_id
+        $this->bus_size_id->AdvancedSearch->SearchValue = @$filter["x_bus_size_id"];
+        $this->bus_size_id->AdvancedSearch->SearchOperator = @$filter["z_bus_size_id"];
+        $this->bus_size_id->AdvancedSearch->SearchCondition = @$filter["v_bus_size_id"];
+        $this->bus_size_id->AdvancedSearch->SearchValue2 = @$filter["y_bus_size_id"];
+        $this->bus_size_id->AdvancedSearch->SearchOperator2 = @$filter["w_bus_size_id"];
+        $this->bus_size_id->AdvancedSearch->save();
+
+        // Field details
+        $this->details->AdvancedSearch->SearchValue = @$filter["x_details"];
+        $this->details->AdvancedSearch->SearchOperator = @$filter["z_details"];
+        $this->details->AdvancedSearch->SearchCondition = @$filter["v_details"];
+        $this->details->AdvancedSearch->SearchValue2 = @$filter["y_details"];
+        $this->details->AdvancedSearch->SearchOperator2 = @$filter["w_details"];
+        $this->details->AdvancedSearch->save();
+
+        // Field max_limit
+        $this->max_limit->AdvancedSearch->SearchValue = @$filter["x_max_limit"];
+        $this->max_limit->AdvancedSearch->SearchOperator = @$filter["z_max_limit"];
+        $this->max_limit->AdvancedSearch->SearchCondition = @$filter["v_max_limit"];
+        $this->max_limit->AdvancedSearch->SearchValue2 = @$filter["y_max_limit"];
+        $this->max_limit->AdvancedSearch->SearchOperator2 = @$filter["w_max_limit"];
+        $this->max_limit->AdvancedSearch->save();
+
+        // Field min_limit
+        $this->min_limit->AdvancedSearch->SearchValue = @$filter["x_min_limit"];
+        $this->min_limit->AdvancedSearch->SearchOperator = @$filter["z_min_limit"];
+        $this->min_limit->AdvancedSearch->SearchCondition = @$filter["v_min_limit"];
+        $this->min_limit->AdvancedSearch->SearchValue2 = @$filter["y_min_limit"];
+        $this->min_limit->AdvancedSearch->SearchOperator2 = @$filter["w_min_limit"];
+        $this->min_limit->AdvancedSearch->save();
+
+        // Field price
+        $this->price->AdvancedSearch->SearchValue = @$filter["x_price"];
+        $this->price->AdvancedSearch->SearchOperator = @$filter["z_price"];
+        $this->price->AdvancedSearch->SearchCondition = @$filter["v_price"];
+        $this->price->AdvancedSearch->SearchValue2 = @$filter["y_price"];
+        $this->price->AdvancedSearch->SearchOperator2 = @$filter["w_price"];
+        $this->price->AdvancedSearch->save();
+
+        // Field operator_fee
+        $this->operator_fee->AdvancedSearch->SearchValue = @$filter["x_operator_fee"];
+        $this->operator_fee->AdvancedSearch->SearchOperator = @$filter["z_operator_fee"];
+        $this->operator_fee->AdvancedSearch->SearchCondition = @$filter["v_operator_fee"];
+        $this->operator_fee->AdvancedSearch->SearchValue2 = @$filter["y_operator_fee"];
+        $this->operator_fee->AdvancedSearch->SearchOperator2 = @$filter["w_operator_fee"];
+        $this->operator_fee->AdvancedSearch->save();
+
+        // Field agency_fee
+        $this->agency_fee->AdvancedSearch->SearchValue = @$filter["x_agency_fee"];
+        $this->agency_fee->AdvancedSearch->SearchOperator = @$filter["z_agency_fee"];
+        $this->agency_fee->AdvancedSearch->SearchCondition = @$filter["v_agency_fee"];
+        $this->agency_fee->AdvancedSearch->SearchValue2 = @$filter["y_agency_fee"];
+        $this->agency_fee->AdvancedSearch->SearchOperator2 = @$filter["w_agency_fee"];
+        $this->agency_fee->AdvancedSearch->save();
+
+        // Field lamata_fee
+        $this->lamata_fee->AdvancedSearch->SearchValue = @$filter["x_lamata_fee"];
+        $this->lamata_fee->AdvancedSearch->SearchOperator = @$filter["z_lamata_fee"];
+        $this->lamata_fee->AdvancedSearch->SearchCondition = @$filter["v_lamata_fee"];
+        $this->lamata_fee->AdvancedSearch->SearchValue2 = @$filter["y_lamata_fee"];
+        $this->lamata_fee->AdvancedSearch->SearchOperator2 = @$filter["w_lamata_fee"];
+        $this->lamata_fee->AdvancedSearch->save();
+
+        // Field lasaa_fee
+        $this->lasaa_fee->AdvancedSearch->SearchValue = @$filter["x_lasaa_fee"];
+        $this->lasaa_fee->AdvancedSearch->SearchOperator = @$filter["z_lasaa_fee"];
+        $this->lasaa_fee->AdvancedSearch->SearchCondition = @$filter["v_lasaa_fee"];
+        $this->lasaa_fee->AdvancedSearch->SearchValue2 = @$filter["y_lasaa_fee"];
+        $this->lasaa_fee->AdvancedSearch->SearchOperator2 = @$filter["w_lasaa_fee"];
+        $this->lasaa_fee->AdvancedSearch->save();
+
+        // Field printers_fee
+        $this->printers_fee->AdvancedSearch->SearchValue = @$filter["x_printers_fee"];
+        $this->printers_fee->AdvancedSearch->SearchOperator = @$filter["z_printers_fee"];
+        $this->printers_fee->AdvancedSearch->SearchCondition = @$filter["v_printers_fee"];
+        $this->printers_fee->AdvancedSearch->SearchValue2 = @$filter["y_printers_fee"];
+        $this->printers_fee->AdvancedSearch->SearchOperator2 = @$filter["w_printers_fee"];
+        $this->printers_fee->AdvancedSearch->save();
+    }
+
+    // Advanced search WHERE clause based on QueryString
+    protected function advancedSearchWhere($default = false)
+    {
+        global $Security;
+        $where = "";
+        if (!$Security->canSearch()) {
+            return "";
+        }
+        $this->buildSearchSql($where, $this->id, $default, false); // id
+        $this->buildSearchSql($where, $this->platform_id, $default, false); // platform_id
+        $this->buildSearchSql($where, $this->inventory_id, $default, false); // inventory_id
+        $this->buildSearchSql($where, $this->print_stage_id, $default, false); // print_stage_id
+        $this->buildSearchSql($where, $this->bus_size_id, $default, false); // bus_size_id
+        $this->buildSearchSql($where, $this->details, $default, false); // details
+        $this->buildSearchSql($where, $this->max_limit, $default, false); // max_limit
+        $this->buildSearchSql($where, $this->min_limit, $default, false); // min_limit
+        $this->buildSearchSql($where, $this->price, $default, false); // price
+        $this->buildSearchSql($where, $this->operator_fee, $default, false); // operator_fee
+        $this->buildSearchSql($where, $this->agency_fee, $default, false); // agency_fee
+        $this->buildSearchSql($where, $this->lamata_fee, $default, false); // lamata_fee
+        $this->buildSearchSql($where, $this->lasaa_fee, $default, false); // lasaa_fee
+        $this->buildSearchSql($where, $this->printers_fee, $default, false); // printers_fee
+
+        // Set up search parm
+        if (!$default && $where != "" && in_array($this->Command, ["", "reset", "resetall"])) {
+            $this->Command = "search";
+        }
+        if (!$default && $this->Command == "search") {
+            $this->id->AdvancedSearch->save(); // id
+            $this->platform_id->AdvancedSearch->save(); // platform_id
+            $this->inventory_id->AdvancedSearch->save(); // inventory_id
+            $this->print_stage_id->AdvancedSearch->save(); // print_stage_id
+            $this->bus_size_id->AdvancedSearch->save(); // bus_size_id
+            $this->details->AdvancedSearch->save(); // details
+            $this->max_limit->AdvancedSearch->save(); // max_limit
+            $this->min_limit->AdvancedSearch->save(); // min_limit
+            $this->price->AdvancedSearch->save(); // price
+            $this->operator_fee->AdvancedSearch->save(); // operator_fee
+            $this->agency_fee->AdvancedSearch->save(); // agency_fee
+            $this->lamata_fee->AdvancedSearch->save(); // lamata_fee
+            $this->lasaa_fee->AdvancedSearch->save(); // lasaa_fee
+            $this->printers_fee->AdvancedSearch->save(); // printers_fee
+        }
+        return $where;
+    }
+
+    // Build search SQL
+    protected function buildSearchSql(&$where, &$fld, $default, $multiValue)
+    {
+        $fldParm = $fld->Param;
+        $fldVal = ($default) ? $fld->AdvancedSearch->SearchValueDefault : $fld->AdvancedSearch->SearchValue;
+        $fldOpr = ($default) ? $fld->AdvancedSearch->SearchOperatorDefault : $fld->AdvancedSearch->SearchOperator;
+        $fldCond = ($default) ? $fld->AdvancedSearch->SearchConditionDefault : $fld->AdvancedSearch->SearchCondition;
+        $fldVal2 = ($default) ? $fld->AdvancedSearch->SearchValue2Default : $fld->AdvancedSearch->SearchValue2;
+        $fldOpr2 = ($default) ? $fld->AdvancedSearch->SearchOperator2Default : $fld->AdvancedSearch->SearchOperator2;
+        $wrk = "";
+        if (is_array($fldVal)) {
+            $fldVal = implode(Config("MULTIPLE_OPTION_SEPARATOR"), $fldVal);
+        }
+        if (is_array($fldVal2)) {
+            $fldVal2 = implode(Config("MULTIPLE_OPTION_SEPARATOR"), $fldVal2);
+        }
+        $fldOpr = strtoupper(trim($fldOpr));
+        if ($fldOpr == "") {
+            $fldOpr = "=";
+        }
+        $fldOpr2 = strtoupper(trim($fldOpr2));
+        if ($fldOpr2 == "") {
+            $fldOpr2 = "=";
+        }
+        if (Config("SEARCH_MULTI_VALUE_OPTION") == 1 || !IsMultiSearchOperator($fldOpr)) {
+            $multiValue = false;
+        }
+        if ($multiValue) {
+            $wrk1 = ($fldVal != "") ? GetMultiSearchSql($fld, $fldOpr, $fldVal, $this->Dbid) : ""; // Field value 1
+            $wrk2 = ($fldVal2 != "") ? GetMultiSearchSql($fld, $fldOpr2, $fldVal2, $this->Dbid) : ""; // Field value 2
+            $wrk = $wrk1; // Build final SQL
+            if ($wrk2 != "") {
+                $wrk = ($wrk != "") ? "($wrk) $fldCond ($wrk2)" : $wrk2;
+            }
+        } else {
+            $fldVal = $this->convertSearchValue($fld, $fldVal);
+            $fldVal2 = $this->convertSearchValue($fld, $fldVal2);
+            $wrk = GetSearchSql($fld, $fldVal, $fldOpr, $fldCond, $fldVal2, $fldOpr2, $this->Dbid);
+        }
+        AddFilter($where, $wrk);
+    }
+
+    // Convert search value
+    protected function convertSearchValue(&$fld, $fldVal)
+    {
+        if ($fldVal == Config("NULL_VALUE") || $fldVal == Config("NOT_NULL_VALUE")) {
+            return $fldVal;
+        }
+        $value = $fldVal;
+        if ($fld->isBoolean()) {
+            if ($fldVal != "") {
+                $value = (SameText($fldVal, "1") || SameText($fldVal, "y") || SameText($fldVal, "t")) ? $fld->TrueValue : $fld->FalseValue;
+            }
+        } elseif ($fld->DataType == DATATYPE_DATE || $fld->DataType == DATATYPE_TIME) {
+            if ($fldVal != "") {
+                $value = UnFormatDateTime($fldVal, $fld->DateTimeFormat);
+            }
+        }
+        return $value;
+    }
+
+    // Check if search parm exists
+    protected function checkSearchParms()
+    {
+        if ($this->id->AdvancedSearch->issetSession()) {
+            return true;
+        }
+        if ($this->platform_id->AdvancedSearch->issetSession()) {
+            return true;
+        }
+        if ($this->inventory_id->AdvancedSearch->issetSession()) {
+            return true;
+        }
+        if ($this->print_stage_id->AdvancedSearch->issetSession()) {
+            return true;
+        }
+        if ($this->bus_size_id->AdvancedSearch->issetSession()) {
+            return true;
+        }
+        if ($this->details->AdvancedSearch->issetSession()) {
+            return true;
+        }
+        if ($this->max_limit->AdvancedSearch->issetSession()) {
+            return true;
+        }
+        if ($this->min_limit->AdvancedSearch->issetSession()) {
+            return true;
+        }
+        if ($this->price->AdvancedSearch->issetSession()) {
+            return true;
+        }
+        if ($this->operator_fee->AdvancedSearch->issetSession()) {
+            return true;
+        }
+        if ($this->agency_fee->AdvancedSearch->issetSession()) {
+            return true;
+        }
+        if ($this->lamata_fee->AdvancedSearch->issetSession()) {
+            return true;
+        }
+        if ($this->lasaa_fee->AdvancedSearch->issetSession()) {
+            return true;
+        }
+        if ($this->printers_fee->AdvancedSearch->issetSession()) {
+            return true;
+        }
+        return false;
+    }
+
+    // Clear all search parameters
+    protected function resetSearchParms()
+    {
+        // Clear search WHERE clause
+        $this->SearchWhere = "";
+        $this->setSearchWhere($this->SearchWhere);
+
+        // Clear advanced search parameters
+        $this->resetAdvancedSearchParms();
+    }
+
+    // Load advanced search default values
+    protected function loadAdvancedSearchDefault()
+    {
+        return false;
+    }
+
+    // Clear all advanced search parameters
+    protected function resetAdvancedSearchParms()
+    {
+                $this->id->AdvancedSearch->unsetSession();
+                $this->platform_id->AdvancedSearch->unsetSession();
+                $this->inventory_id->AdvancedSearch->unsetSession();
+                $this->print_stage_id->AdvancedSearch->unsetSession();
+                $this->bus_size_id->AdvancedSearch->unsetSession();
+                $this->details->AdvancedSearch->unsetSession();
+                $this->max_limit->AdvancedSearch->unsetSession();
+                $this->min_limit->AdvancedSearch->unsetSession();
+                $this->price->AdvancedSearch->unsetSession();
+                $this->operator_fee->AdvancedSearch->unsetSession();
+                $this->agency_fee->AdvancedSearch->unsetSession();
+                $this->lamata_fee->AdvancedSearch->unsetSession();
+                $this->lasaa_fee->AdvancedSearch->unsetSession();
+                $this->printers_fee->AdvancedSearch->unsetSession();
+    }
+
+    // Restore all search parameters
+    protected function restoreSearchParms()
+    {
+        $this->RestoreSearch = true;
+
+        // Restore advanced search values
+                $this->id->AdvancedSearch->load();
+                $this->platform_id->AdvancedSearch->load();
+                $this->inventory_id->AdvancedSearch->load();
+                $this->print_stage_id->AdvancedSearch->load();
+                $this->bus_size_id->AdvancedSearch->load();
+                $this->details->AdvancedSearch->load();
+                $this->max_limit->AdvancedSearch->load();
+                $this->min_limit->AdvancedSearch->load();
+                $this->price->AdvancedSearch->load();
+                $this->operator_fee->AdvancedSearch->load();
+                $this->agency_fee->AdvancedSearch->load();
+                $this->lamata_fee->AdvancedSearch->load();
+                $this->lasaa_fee->AdvancedSearch->load();
+                $this->printers_fee->AdvancedSearch->load();
     }
 
     // Set up sort parameters
@@ -839,6 +1712,11 @@ class ZPriceSettingsList extends ZPriceSettings
     {
         // Check if reset command
         if (StartsString("reset", $this->Command)) {
+            // Reset search criteria
+            if ($this->Command == "reset" || $this->Command == "resetall") {
+                $this->resetSearchParms();
+            }
+
             // Reset (clear) sorting order
             if ($this->Command == "resetsort") {
                 $orderBy = "";
@@ -870,6 +1748,14 @@ class ZPriceSettingsList extends ZPriceSettings
     {
         global $Security, $Language;
 
+        // "griddelete"
+        if ($this->AllowAddDeleteRow) {
+            $item = &$this->ListOptions->add("griddelete");
+            $item->CssClass = "text-nowrap";
+            $item->OnLeft = false;
+            $item->Visible = false; // Default hidden
+        }
+
         // Add group option item
         $item = &$this->ListOptions->add($this->ListOptions->GroupOptionName);
         $item->Body = "";
@@ -882,6 +1768,12 @@ class ZPriceSettingsList extends ZPriceSettings
         $item->Visible = $Security->canView();
         $item->OnLeft = false;
 
+        // "edit"
+        $item = &$this->ListOptions->add("edit");
+        $item->CssClass = "text-nowrap";
+        $item->Visible = $Security->canEdit();
+        $item->OnLeft = false;
+
         // List actions
         $item = &$this->ListOptions->add("listactions");
         $item->CssClass = "text-nowrap";
@@ -892,7 +1784,7 @@ class ZPriceSettingsList extends ZPriceSettings
 
         // "checkbox"
         $item = &$this->ListOptions->add("checkbox");
-        $item->Visible = false;
+        $item->Visible = $Security->canEdit();
         $item->OnLeft = false;
         $item->Header = "<div class=\"custom-control custom-checkbox d-inline-block\"><input type=\"checkbox\" name=\"key\" id=\"key\" class=\"custom-control-input\" onclick=\"ew.selectAllKey(this);\"><label class=\"custom-control-label\" for=\"key\"></label></div>";
         $item->ShowInDropDown = false;
@@ -923,13 +1815,69 @@ class ZPriceSettingsList extends ZPriceSettings
 
         // Call ListOptions_Rendering event
         $this->listOptionsRendering();
+
+        // Set up row action and key
+        $keyName = "";
+        if ($CurrentForm && is_numeric($this->RowIndex) && $this->RowType != "view") {
+            $CurrentForm->Index = $this->RowIndex;
+            $actionName = str_replace("k_", "k" . $this->RowIndex . "_", $this->FormActionName);
+            $oldKeyName = str_replace("k_", "k" . $this->RowIndex . "_", $this->OldKeyName);
+            $blankRowName = str_replace("k_", "k" . $this->RowIndex . "_", $this->FormBlankRowName);
+            if ($this->RowAction != "") {
+                $this->MultiSelectKey .= "<input type=\"hidden\" name=\"" . $actionName . "\" id=\"" . $actionName . "\" value=\"" . $this->RowAction . "\">";
+            }
+            $oldKey = $this->getKey(false); // Get from OldValue
+            if ($oldKeyName != "" && $oldKey != "") {
+                $this->MultiSelectKey .= "<input type=\"hidden\" name=\"" . $oldKeyName . "\" id=\"" . $oldKeyName . "\" value=\"" . HtmlEncode($oldKey) . "\">";
+            }
+            if ($this->RowAction == "insert" && $this->isConfirm() && $this->emptyRow()) {
+                $this->MultiSelectKey .= "<input type=\"hidden\" name=\"" . $blankRowName . "\" id=\"" . $blankRowName . "\" value=\"1\">";
+            }
+        }
+
+        // "delete"
+        if ($this->AllowAddDeleteRow) {
+            if ($this->isGridAdd() || $this->isGridEdit()) {
+                $options = &$this->ListOptions;
+                $options->UseButtonGroup = true; // Use button group for grid delete button
+                $opt = $options["griddelete"];
+                if (is_numeric($this->RowIndex) && ($this->RowAction == "" || $this->RowAction == "edit")) { // Do not allow delete existing record
+                    $opt->Body = "&nbsp;";
+                } else {
+                    $opt->Body = "<a class=\"ew-grid-link ew-grid-delete\" title=\"" . HtmlTitle($Language->phrase("DeleteLink")) . "\" data-caption=\"" . HtmlTitle($Language->phrase("DeleteLink")) . "\" onclick=\"return ew.deleteGridRow(this, " . $this->RowIndex . ");\">" . $Language->phrase("DeleteLink") . "</a>";
+                }
+            }
+        }
         $pageUrl = $this->pageUrl();
+
+        // "edit"
+        $opt = $this->ListOptions["edit"];
+        if ($this->isInlineEditRow()) { // Inline-Edit
+            $this->ListOptions->CustomItem = "edit"; // Show edit column only
+            $cancelurl = $this->addMasterUrl($pageUrl . "action=cancel");
+                $opt->Body = "<div" . (($opt->OnLeft) ? " class=\"text-right\"" : "") . ">" .
+                "<a class=\"ew-grid-link ew-inline-update\" title=\"" . HtmlTitle($Language->phrase("UpdateLink")) . "\" data-caption=\"" . HtmlTitle($Language->phrase("UpdateLink")) . "\" href=\"#\" onclick=\"return ew.forms.get(this).submit('" . UrlAddHash($this->pageName(), "r" . $this->RowCount . "_" . $this->TableVar) . "');\">" . $Language->phrase("UpdateLink") . "</a>&nbsp;" .
+                "<a class=\"ew-grid-link ew-inline-cancel\" title=\"" . HtmlTitle($Language->phrase("CancelLink")) . "\" data-caption=\"" . HtmlTitle($Language->phrase("CancelLink")) . "\" href=\"" . $cancelurl . "\">" . $Language->phrase("CancelLink") . "</a>" .
+                "<input type=\"hidden\" name=\"action\" id=\"action\" value=\"update\"></div>";
+            $opt->Body .= "<input type=\"hidden\" name=\"k" . $this->RowIndex . "_key\" id=\"k" . $this->RowIndex . "_key\" value=\"" . HtmlEncode($this->id->CurrentValue) . "\">";
+            return;
+        }
         if ($this->CurrentMode == "view") {
             // "view"
             $opt = $this->ListOptions["view"];
             $viewcaption = HtmlTitle($Language->phrase("ViewLink"));
             if ($Security->canView()) {
                 $opt->Body = "<a class=\"ew-row-link ew-view\" title=\"" . $viewcaption . "\" data-caption=\"" . $viewcaption . "\" href=\"" . HtmlEncode(GetUrl($this->ViewUrl)) . "\">" . $Language->phrase("ViewLink") . "</a>";
+            } else {
+                $opt->Body = "";
+            }
+
+            // "edit"
+            $opt = $this->ListOptions["edit"];
+            $editcaption = HtmlTitle($Language->phrase("EditLink"));
+            if ($Security->canEdit()) {
+                $opt->Body = "<a class=\"ew-row-link ew-edit\" title=\"" . HtmlTitle($Language->phrase("EditLink")) . "\" data-caption=\"" . HtmlTitle($Language->phrase("EditLink")) . "\" href=\"" . HtmlEncode(GetUrl($this->EditUrl)) . "\">" . $Language->phrase("EditLink") . "</a>";
+                $opt->Body .= "<a class=\"ew-row-link ew-inline-edit\" title=\"" . HtmlTitle($Language->phrase("InlineEditLink")) . "\" data-caption=\"" . HtmlTitle($Language->phrase("InlineEditLink")) . "\" href=\"" . HtmlEncode(UrlAddHash(GetUrl($this->InlineEditUrl), "r" . $this->RowCount . "_" . $this->TableVar)) . "\">" . $Language->phrase("InlineEditLink") . "</a>";
             } else {
                 $opt->Body = "";
             }
@@ -969,6 +1917,11 @@ class ZPriceSettingsList extends ZPriceSettings
         // "checkbox"
         $opt = $this->ListOptions["checkbox"];
         $opt->Body = "<div class=\"custom-control custom-checkbox d-inline-block\"><input type=\"checkbox\" id=\"key_m_" . $this->RowCount . "\" name=\"key_m[]\" class=\"custom-control-input ew-multi-select\" value=\"" . HtmlEncode($this->id->CurrentValue) . "\" onclick=\"ew.clickMultiCheckbox(event);\"><label class=\"custom-control-label\" for=\"key_m_" . $this->RowCount . "\"></label></div>";
+        if ($this->isGridEdit() && is_numeric($this->RowIndex)) {
+            if ($keyName != "") {
+                $this->MultiSelectKey .= "<input type=\"hidden\" name=\"" . $keyName . "\" id=\"" . $keyName . "\" value=\"" . $this->id->CurrentValue . "\">";
+            }
+        }
         $this->renderListOptionsExt();
 
         // Call ListOptions_Rendered event
@@ -980,7 +1933,18 @@ class ZPriceSettingsList extends ZPriceSettings
     {
         global $Language, $Security;
         $options = &$this->OtherOptions;
+
+        // Add grid edit
+        $option = $options["addedit"];
+        $item = &$option->add("gridedit");
+        $item->Body = "<a class=\"ew-add-edit ew-grid-edit\" title=\"" . HtmlTitle($Language->phrase("GridEditLink")) . "\" data-caption=\"" . HtmlTitle($Language->phrase("GridEditLink")) . "\" href=\"" . HtmlEncode(GetUrl($this->GridEditUrl)) . "\">" . $Language->phrase("GridEditLink") . "</a>";
+        $item->Visible = $this->GridEditUrl != "" && $Security->canEdit();
         $option = $options["action"];
+
+        // Add multi update
+        $item = &$option->add("multiupdate");
+        $item->Body = "<a class=\"ew-action ew-multi-update\" title=\"" . HtmlTitle($Language->phrase("UpdateSelectedLink")) . "\" data-table=\"z_price_settings\" data-caption=\"" . HtmlTitle($Language->phrase("UpdateSelectedLink")) . "\" href=\"#\" onclick=\"return ew.submitAction(event, {f:document.fz_price_settingslist,url:'" . GetUrl($this->MultiUpdateUrl) . "'});return false;\">" . $Language->phrase("UpdateSelectedLink") . "</a>";
+        $item->Visible = $Security->canEdit();
 
         // Set up options default
         foreach ($options as $option) {
@@ -998,10 +1962,10 @@ class ZPriceSettingsList extends ZPriceSettings
         // Filter button
         $item = &$this->FilterOptions->add("savecurrentfilter");
         $item->Body = "<a class=\"ew-save-filter\" data-form=\"fz_price_settingslistsrch\" href=\"#\" onclick=\"return false;\">" . $Language->phrase("SaveCurrentFilter") . "</a>";
-        $item->Visible = false;
+        $item->Visible = true;
         $item = &$this->FilterOptions->add("deletefilter");
         $item->Body = "<a class=\"ew-delete-filter\" data-form=\"fz_price_settingslistsrch\" href=\"#\" onclick=\"return false;\">" . $Language->phrase("DeleteFilter") . "</a>";
-        $item->Visible = false;
+        $item->Visible = true;
         $this->FilterOptions->UseDropDownButton = true;
         $this->FilterOptions->UseButtonGroup = !$this->FilterOptions->UseDropDownButton;
         $this->FilterOptions->DropDownButtonPhrase = $Language->phrase("Filters");
@@ -1017,27 +1981,54 @@ class ZPriceSettingsList extends ZPriceSettings
     {
         global $Language, $Security;
         $options = &$this->OtherOptions;
-        $option = $options["action"];
-        // Set up list action buttons
-        foreach ($this->ListActions->Items as $listaction) {
-            if ($listaction->Select == ACTION_MULTIPLE) {
-                $item = &$option->add("custom_" . $listaction->Action);
-                $caption = $listaction->Caption;
-                $icon = ($listaction->Icon != "") ? '<i class="' . HtmlEncode($listaction->Icon) . '" data-caption="' . HtmlEncode($caption) . '"></i>' . $caption : $caption;
-                $item->Body = '<a class="ew-action ew-list-action" title="' . HtmlEncode($caption) . '" data-caption="' . HtmlEncode($caption) . '" href="#" onclick="return ew.submitAction(event,jQuery.extend({f:document.fz_price_settingslist},' . $listaction->toJson(true) . '));">' . $icon . '</a>';
-                $item->Visible = $listaction->Allow;
-            }
-        }
-
-        // Hide grid edit and other options
-        if ($this->TotalRecords <= 0) {
-            $option = $options["addedit"];
-            $item = $option["gridedit"];
-            if ($item) {
-                $item->Visible = false;
-            }
+        if (!$this->isGridAdd() && !$this->isGridEdit()) { // Not grid add/edit mode
             $option = $options["action"];
-            $option->hideAllOptions();
+            // Set up list action buttons
+            foreach ($this->ListActions->Items as $listaction) {
+                if ($listaction->Select == ACTION_MULTIPLE) {
+                    $item = &$option->add("custom_" . $listaction->Action);
+                    $caption = $listaction->Caption;
+                    $icon = ($listaction->Icon != "") ? '<i class="' . HtmlEncode($listaction->Icon) . '" data-caption="' . HtmlEncode($caption) . '"></i>' . $caption : $caption;
+                    $item->Body = '<a class="ew-action ew-list-action" title="' . HtmlEncode($caption) . '" data-caption="' . HtmlEncode($caption) . '" href="#" onclick="return ew.submitAction(event,jQuery.extend({f:document.fz_price_settingslist},' . $listaction->toJson(true) . '));">' . $icon . '</a>';
+                    $item->Visible = $listaction->Allow;
+                }
+            }
+
+            // Hide grid edit and other options
+            if ($this->TotalRecords <= 0) {
+                $option = $options["addedit"];
+                $item = $option["gridedit"];
+                if ($item) {
+                    $item->Visible = false;
+                }
+                $option = $options["action"];
+                $option->hideAllOptions();
+            }
+        } else { // Grid add/edit mode
+            // Hide all options first
+            foreach ($options as $option) {
+                $option->hideAllOptions();
+            }
+            $pageUrl = $this->pageUrl();
+
+            // Grid-Edit
+            if ($this->isGridEdit()) {
+                if ($this->AllowAddDeleteRow) {
+                    // Add add blank row
+                    $option = $options["addedit"];
+                    $option->UseDropDownButton = false;
+                    $item = &$option->add("addblankrow");
+                    $item->Body = "<a class=\"ew-add-edit ew-add-blank-row\" title=\"" . HtmlTitle($Language->phrase("AddBlankRow")) . "\" data-caption=\"" . HtmlTitle($Language->phrase("AddBlankRow")) . "\" href=\"#\" onclick=\"return ew.addGridRow(this);\">" . $Language->phrase("AddBlankRow") . "</a>";
+                    $item->Visible = false;
+                }
+                $option = $options["action"];
+                $option->UseDropDownButton = false;
+                    $item = &$option->add("gridsave");
+                    $item->Body = "<a class=\"ew-action ew-grid-save\" title=\"" . HtmlTitle($Language->phrase("GridSaveLink")) . "\" data-caption=\"" . HtmlTitle($Language->phrase("GridSaveLink")) . "\" href=\"#\" onclick=\"return ew.forms.get(this).submit('" . $this->pageName() . "');\">" . $Language->phrase("GridSaveLink") . "</a>";
+                    $item = &$option->add("gridcancel");
+                    $cancelurl = $this->addMasterUrl($pageUrl . "action=cancel");
+                    $item->Body = "<a class=\"ew-action ew-grid-cancel\" title=\"" . HtmlTitle($Language->phrase("GridCancelLink")) . "\" data-caption=\"" . HtmlTitle($Language->phrase("GridCancelLink")) . "\" href=\"" . $cancelurl . "\">" . $Language->phrase("GridCancelLink") . "</a>";
+            }
         }
     }
 
@@ -1133,6 +2124,313 @@ class ZPriceSettingsList extends ZPriceSettings
     {
     }
 
+    // Load default values
+    protected function loadDefaultValues()
+    {
+        $this->id->CurrentValue = null;
+        $this->id->OldValue = $this->id->CurrentValue;
+        $this->platform_id->CurrentValue = null;
+        $this->platform_id->OldValue = $this->platform_id->CurrentValue;
+        $this->inventory_id->CurrentValue = null;
+        $this->inventory_id->OldValue = $this->inventory_id->CurrentValue;
+        $this->print_stage_id->CurrentValue = null;
+        $this->print_stage_id->OldValue = $this->print_stage_id->CurrentValue;
+        $this->bus_size_id->CurrentValue = null;
+        $this->bus_size_id->OldValue = $this->bus_size_id->CurrentValue;
+        $this->details->CurrentValue = null;
+        $this->details->OldValue = $this->details->CurrentValue;
+        $this->max_limit->CurrentValue = null;
+        $this->max_limit->OldValue = $this->max_limit->CurrentValue;
+        $this->min_limit->CurrentValue = null;
+        $this->min_limit->OldValue = $this->min_limit->CurrentValue;
+        $this->price->CurrentValue = null;
+        $this->price->OldValue = $this->price->CurrentValue;
+        $this->operator_fee->CurrentValue = null;
+        $this->operator_fee->OldValue = $this->operator_fee->CurrentValue;
+        $this->agency_fee->CurrentValue = null;
+        $this->agency_fee->OldValue = $this->agency_fee->CurrentValue;
+        $this->lamata_fee->CurrentValue = null;
+        $this->lamata_fee->OldValue = $this->lamata_fee->CurrentValue;
+        $this->lasaa_fee->CurrentValue = null;
+        $this->lasaa_fee->OldValue = $this->lasaa_fee->CurrentValue;
+        $this->printers_fee->CurrentValue = null;
+        $this->printers_fee->OldValue = $this->printers_fee->CurrentValue;
+    }
+
+    // Load search values for validation
+    protected function loadSearchValues()
+    {
+        // Load search values
+        $hasValue = false;
+
+        // id
+        if (!$this->isAddOrEdit() && $this->id->AdvancedSearch->get()) {
+            $hasValue = true;
+            if (($this->id->AdvancedSearch->SearchValue != "" || $this->id->AdvancedSearch->SearchValue2 != "") && $this->Command == "") {
+                $this->Command = "search";
+            }
+        }
+
+        // platform_id
+        if (!$this->isAddOrEdit() && $this->platform_id->AdvancedSearch->get()) {
+            $hasValue = true;
+            if (($this->platform_id->AdvancedSearch->SearchValue != "" || $this->platform_id->AdvancedSearch->SearchValue2 != "") && $this->Command == "") {
+                $this->Command = "search";
+            }
+        }
+
+        // inventory_id
+        if (!$this->isAddOrEdit() && $this->inventory_id->AdvancedSearch->get()) {
+            $hasValue = true;
+            if (($this->inventory_id->AdvancedSearch->SearchValue != "" || $this->inventory_id->AdvancedSearch->SearchValue2 != "") && $this->Command == "") {
+                $this->Command = "search";
+            }
+        }
+
+        // print_stage_id
+        if (!$this->isAddOrEdit() && $this->print_stage_id->AdvancedSearch->get()) {
+            $hasValue = true;
+            if (($this->print_stage_id->AdvancedSearch->SearchValue != "" || $this->print_stage_id->AdvancedSearch->SearchValue2 != "") && $this->Command == "") {
+                $this->Command = "search";
+            }
+        }
+
+        // bus_size_id
+        if (!$this->isAddOrEdit() && $this->bus_size_id->AdvancedSearch->get()) {
+            $hasValue = true;
+            if (($this->bus_size_id->AdvancedSearch->SearchValue != "" || $this->bus_size_id->AdvancedSearch->SearchValue2 != "") && $this->Command == "") {
+                $this->Command = "search";
+            }
+        }
+
+        // details
+        if (!$this->isAddOrEdit() && $this->details->AdvancedSearch->get()) {
+            $hasValue = true;
+            if (($this->details->AdvancedSearch->SearchValue != "" || $this->details->AdvancedSearch->SearchValue2 != "") && $this->Command == "") {
+                $this->Command = "search";
+            }
+        }
+
+        // max_limit
+        if (!$this->isAddOrEdit() && $this->max_limit->AdvancedSearch->get()) {
+            $hasValue = true;
+            if (($this->max_limit->AdvancedSearch->SearchValue != "" || $this->max_limit->AdvancedSearch->SearchValue2 != "") && $this->Command == "") {
+                $this->Command = "search";
+            }
+        }
+
+        // min_limit
+        if (!$this->isAddOrEdit() && $this->min_limit->AdvancedSearch->get()) {
+            $hasValue = true;
+            if (($this->min_limit->AdvancedSearch->SearchValue != "" || $this->min_limit->AdvancedSearch->SearchValue2 != "") && $this->Command == "") {
+                $this->Command = "search";
+            }
+        }
+
+        // price
+        if (!$this->isAddOrEdit() && $this->price->AdvancedSearch->get()) {
+            $hasValue = true;
+            if (($this->price->AdvancedSearch->SearchValue != "" || $this->price->AdvancedSearch->SearchValue2 != "") && $this->Command == "") {
+                $this->Command = "search";
+            }
+        }
+
+        // operator_fee
+        if (!$this->isAddOrEdit() && $this->operator_fee->AdvancedSearch->get()) {
+            $hasValue = true;
+            if (($this->operator_fee->AdvancedSearch->SearchValue != "" || $this->operator_fee->AdvancedSearch->SearchValue2 != "") && $this->Command == "") {
+                $this->Command = "search";
+            }
+        }
+
+        // agency_fee
+        if (!$this->isAddOrEdit() && $this->agency_fee->AdvancedSearch->get()) {
+            $hasValue = true;
+            if (($this->agency_fee->AdvancedSearch->SearchValue != "" || $this->agency_fee->AdvancedSearch->SearchValue2 != "") && $this->Command == "") {
+                $this->Command = "search";
+            }
+        }
+
+        // lamata_fee
+        if (!$this->isAddOrEdit() && $this->lamata_fee->AdvancedSearch->get()) {
+            $hasValue = true;
+            if (($this->lamata_fee->AdvancedSearch->SearchValue != "" || $this->lamata_fee->AdvancedSearch->SearchValue2 != "") && $this->Command == "") {
+                $this->Command = "search";
+            }
+        }
+
+        // lasaa_fee
+        if (!$this->isAddOrEdit() && $this->lasaa_fee->AdvancedSearch->get()) {
+            $hasValue = true;
+            if (($this->lasaa_fee->AdvancedSearch->SearchValue != "" || $this->lasaa_fee->AdvancedSearch->SearchValue2 != "") && $this->Command == "") {
+                $this->Command = "search";
+            }
+        }
+
+        // printers_fee
+        if (!$this->isAddOrEdit() && $this->printers_fee->AdvancedSearch->get()) {
+            $hasValue = true;
+            if (($this->printers_fee->AdvancedSearch->SearchValue != "" || $this->printers_fee->AdvancedSearch->SearchValue2 != "") && $this->Command == "") {
+                $this->Command = "search";
+            }
+        }
+        return $hasValue;
+    }
+
+    // Load form values
+    protected function loadFormValues()
+    {
+        // Load from form
+        global $CurrentForm;
+
+        // Check field name 'id' first before field var 'x_id'
+        $val = $CurrentForm->hasValue("id") ? $CurrentForm->getValue("id") : $CurrentForm->getValue("x_id");
+        if (!$this->id->IsDetailKey && !$this->isGridAdd() && !$this->isAdd()) {
+            $this->id->setFormValue($val);
+        }
+
+        // Check field name 'platform_id' first before field var 'x_platform_id'
+        $val = $CurrentForm->hasValue("platform_id") ? $CurrentForm->getValue("platform_id") : $CurrentForm->getValue("x_platform_id");
+        if (!$this->platform_id->IsDetailKey) {
+            if (IsApi() && $val === null) {
+                $this->platform_id->Visible = false; // Disable update for API request
+            } else {
+                $this->platform_id->setFormValue($val);
+            }
+        }
+
+        // Check field name 'inventory_id' first before field var 'x_inventory_id'
+        $val = $CurrentForm->hasValue("inventory_id") ? $CurrentForm->getValue("inventory_id") : $CurrentForm->getValue("x_inventory_id");
+        if (!$this->inventory_id->IsDetailKey) {
+            if (IsApi() && $val === null) {
+                $this->inventory_id->Visible = false; // Disable update for API request
+            } else {
+                $this->inventory_id->setFormValue($val);
+            }
+        }
+
+        // Check field name 'print_stage_id' first before field var 'x_print_stage_id'
+        $val = $CurrentForm->hasValue("print_stage_id") ? $CurrentForm->getValue("print_stage_id") : $CurrentForm->getValue("x_print_stage_id");
+        if (!$this->print_stage_id->IsDetailKey) {
+            if (IsApi() && $val === null) {
+                $this->print_stage_id->Visible = false; // Disable update for API request
+            } else {
+                $this->print_stage_id->setFormValue($val);
+            }
+        }
+
+        // Check field name 'bus_size_id' first before field var 'x_bus_size_id'
+        $val = $CurrentForm->hasValue("bus_size_id") ? $CurrentForm->getValue("bus_size_id") : $CurrentForm->getValue("x_bus_size_id");
+        if (!$this->bus_size_id->IsDetailKey) {
+            if (IsApi() && $val === null) {
+                $this->bus_size_id->Visible = false; // Disable update for API request
+            } else {
+                $this->bus_size_id->setFormValue($val);
+            }
+        }
+
+        // Check field name 'max_limit' first before field var 'x_max_limit'
+        $val = $CurrentForm->hasValue("max_limit") ? $CurrentForm->getValue("max_limit") : $CurrentForm->getValue("x_max_limit");
+        if (!$this->max_limit->IsDetailKey) {
+            if (IsApi() && $val === null) {
+                $this->max_limit->Visible = false; // Disable update for API request
+            } else {
+                $this->max_limit->setFormValue($val);
+            }
+        }
+
+        // Check field name 'min_limit' first before field var 'x_min_limit'
+        $val = $CurrentForm->hasValue("min_limit") ? $CurrentForm->getValue("min_limit") : $CurrentForm->getValue("x_min_limit");
+        if (!$this->min_limit->IsDetailKey) {
+            if (IsApi() && $val === null) {
+                $this->min_limit->Visible = false; // Disable update for API request
+            } else {
+                $this->min_limit->setFormValue($val);
+            }
+        }
+
+        // Check field name 'price' first before field var 'x_price'
+        $val = $CurrentForm->hasValue("price") ? $CurrentForm->getValue("price") : $CurrentForm->getValue("x_price");
+        if (!$this->price->IsDetailKey) {
+            if (IsApi() && $val === null) {
+                $this->price->Visible = false; // Disable update for API request
+            } else {
+                $this->price->setFormValue($val);
+            }
+        }
+
+        // Check field name 'operator_fee' first before field var 'x_operator_fee'
+        $val = $CurrentForm->hasValue("operator_fee") ? $CurrentForm->getValue("operator_fee") : $CurrentForm->getValue("x_operator_fee");
+        if (!$this->operator_fee->IsDetailKey) {
+            if (IsApi() && $val === null) {
+                $this->operator_fee->Visible = false; // Disable update for API request
+            } else {
+                $this->operator_fee->setFormValue($val);
+            }
+        }
+
+        // Check field name 'agency_fee' first before field var 'x_agency_fee'
+        $val = $CurrentForm->hasValue("agency_fee") ? $CurrentForm->getValue("agency_fee") : $CurrentForm->getValue("x_agency_fee");
+        if (!$this->agency_fee->IsDetailKey) {
+            if (IsApi() && $val === null) {
+                $this->agency_fee->Visible = false; // Disable update for API request
+            } else {
+                $this->agency_fee->setFormValue($val);
+            }
+        }
+
+        // Check field name 'lamata_fee' first before field var 'x_lamata_fee'
+        $val = $CurrentForm->hasValue("lamata_fee") ? $CurrentForm->getValue("lamata_fee") : $CurrentForm->getValue("x_lamata_fee");
+        if (!$this->lamata_fee->IsDetailKey) {
+            if (IsApi() && $val === null) {
+                $this->lamata_fee->Visible = false; // Disable update for API request
+            } else {
+                $this->lamata_fee->setFormValue($val);
+            }
+        }
+
+        // Check field name 'lasaa_fee' first before field var 'x_lasaa_fee'
+        $val = $CurrentForm->hasValue("lasaa_fee") ? $CurrentForm->getValue("lasaa_fee") : $CurrentForm->getValue("x_lasaa_fee");
+        if (!$this->lasaa_fee->IsDetailKey) {
+            if (IsApi() && $val === null) {
+                $this->lasaa_fee->Visible = false; // Disable update for API request
+            } else {
+                $this->lasaa_fee->setFormValue($val);
+            }
+        }
+
+        // Check field name 'printers_fee' first before field var 'x_printers_fee'
+        $val = $CurrentForm->hasValue("printers_fee") ? $CurrentForm->getValue("printers_fee") : $CurrentForm->getValue("x_printers_fee");
+        if (!$this->printers_fee->IsDetailKey) {
+            if (IsApi() && $val === null) {
+                $this->printers_fee->Visible = false; // Disable update for API request
+            } else {
+                $this->printers_fee->setFormValue($val);
+            }
+        }
+    }
+
+    // Restore form values
+    public function restoreFormValues()
+    {
+        global $CurrentForm;
+        if (!$this->isGridAdd() && !$this->isAdd()) {
+            $this->id->CurrentValue = $this->id->FormValue;
+        }
+        $this->platform_id->CurrentValue = $this->platform_id->FormValue;
+        $this->inventory_id->CurrentValue = $this->inventory_id->FormValue;
+        $this->print_stage_id->CurrentValue = $this->print_stage_id->FormValue;
+        $this->bus_size_id->CurrentValue = $this->bus_size_id->FormValue;
+        $this->max_limit->CurrentValue = $this->max_limit->FormValue;
+        $this->min_limit->CurrentValue = $this->min_limit->FormValue;
+        $this->price->CurrentValue = $this->price->FormValue;
+        $this->operator_fee->CurrentValue = $this->operator_fee->FormValue;
+        $this->agency_fee->CurrentValue = $this->agency_fee->FormValue;
+        $this->lamata_fee->CurrentValue = $this->lamata_fee->FormValue;
+        $this->lasaa_fee->CurrentValue = $this->lasaa_fee->FormValue;
+        $this->printers_fee->CurrentValue = $this->printers_fee->FormValue;
+    }
+
     // Load recordset
     public function loadRecordset($offset = -1, $rowcnt = -1)
     {
@@ -1176,6 +2474,9 @@ class ZPriceSettingsList extends ZPriceSettings
         if ($row) {
             $res = true;
             $this->loadRowValues($row); // Load row values
+            if (!$this->EventCancelled) {
+                $this->HashValue = $this->getRowHash($row); // Get hash value for record
+            }
         }
         return $res;
     }
@@ -1220,21 +2521,22 @@ class ZPriceSettingsList extends ZPriceSettings
     // Return a row with default values
     protected function newRow()
     {
+        $this->loadDefaultValues();
         $row = [];
-        $row['id'] = null;
-        $row['platform_id'] = null;
-        $row['inventory_id'] = null;
-        $row['print_stage_id'] = null;
-        $row['bus_size_id'] = null;
-        $row['details'] = null;
-        $row['max_limit'] = null;
-        $row['min_limit'] = null;
-        $row['price'] = null;
-        $row['operator_fee'] = null;
-        $row['agency_fee'] = null;
-        $row['lamata_fee'] = null;
-        $row['lasaa_fee'] = null;
-        $row['printers_fee'] = null;
+        $row['id'] = $this->id->CurrentValue;
+        $row['platform_id'] = $this->platform_id->CurrentValue;
+        $row['inventory_id'] = $this->inventory_id->CurrentValue;
+        $row['print_stage_id'] = $this->print_stage_id->CurrentValue;
+        $row['bus_size_id'] = $this->bus_size_id->CurrentValue;
+        $row['details'] = $this->details->CurrentValue;
+        $row['max_limit'] = $this->max_limit->CurrentValue;
+        $row['min_limit'] = $this->min_limit->CurrentValue;
+        $row['price'] = $this->price->CurrentValue;
+        $row['operator_fee'] = $this->operator_fee->CurrentValue;
+        $row['agency_fee'] = $this->agency_fee->CurrentValue;
+        $row['lamata_fee'] = $this->lamata_fee->CurrentValue;
+        $row['lasaa_fee'] = $this->lasaa_fee->CurrentValue;
+        $row['printers_fee'] = $this->printers_fee->CurrentValue;
         return $row;
     }
 
@@ -1492,12 +2794,1116 @@ class ZPriceSettingsList extends ZPriceSettings
             $this->printers_fee->LinkCustomAttributes = "";
             $this->printers_fee->HrefValue = "";
             $this->printers_fee->TooltipValue = "";
+        } elseif ($this->RowType == ROWTYPE_ADD) {
+            // id
+
+            // platform_id
+            $this->platform_id->EditAttrs["class"] = "form-control";
+            $this->platform_id->EditCustomAttributes = "";
+            $curVal = trim(strval($this->platform_id->CurrentValue));
+            if ($curVal != "") {
+                $this->platform_id->ViewValue = $this->platform_id->lookupCacheOption($curVal);
+            } else {
+                $this->platform_id->ViewValue = $this->platform_id->Lookup !== null && is_array($this->platform_id->Lookup->Options) ? $curVal : null;
+            }
+            if ($this->platform_id->ViewValue !== null) { // Load from cache
+                $this->platform_id->EditValue = array_values($this->platform_id->Lookup->Options);
+            } else { // Lookup from database
+                if ($curVal == "") {
+                    $filterWrk = "0=1";
+                } else {
+                    $filterWrk = "\"id\"" . SearchString("=", $this->platform_id->CurrentValue, DATATYPE_NUMBER, "");
+                }
+                $sqlWrk = $this->platform_id->Lookup->getSql(true, $filterWrk, '', $this);
+                $rswrk = Conn()->executeQuery($sqlWrk)->fetchAll(\PDO::FETCH_BOTH);
+                $ari = count($rswrk);
+                $arwrk = $rswrk;
+                $this->platform_id->EditValue = $arwrk;
+            }
+            $this->platform_id->PlaceHolder = RemoveHtml($this->platform_id->caption());
+
+            // inventory_id
+            $this->inventory_id->EditAttrs["class"] = "form-control";
+            $this->inventory_id->EditCustomAttributes = "";
+            $curVal = trim(strval($this->inventory_id->CurrentValue));
+            if ($curVal != "") {
+                $this->inventory_id->ViewValue = $this->inventory_id->lookupCacheOption($curVal);
+            } else {
+                $this->inventory_id->ViewValue = $this->inventory_id->Lookup !== null && is_array($this->inventory_id->Lookup->Options) ? $curVal : null;
+            }
+            if ($this->inventory_id->ViewValue !== null) { // Load from cache
+                $this->inventory_id->EditValue = array_values($this->inventory_id->Lookup->Options);
+            } else { // Lookup from database
+                if ($curVal == "") {
+                    $filterWrk = "0=1";
+                } else {
+                    $filterWrk = "\"id\"" . SearchString("=", $this->inventory_id->CurrentValue, DATATYPE_NUMBER, "");
+                }
+                $sqlWrk = $this->inventory_id->Lookup->getSql(true, $filterWrk, '', $this);
+                $rswrk = Conn()->executeQuery($sqlWrk)->fetchAll(\PDO::FETCH_BOTH);
+                $ari = count($rswrk);
+                $arwrk = $rswrk;
+                $this->inventory_id->EditValue = $arwrk;
+            }
+            $this->inventory_id->PlaceHolder = RemoveHtml($this->inventory_id->caption());
+
+            // print_stage_id
+            $this->print_stage_id->EditAttrs["class"] = "form-control";
+            $this->print_stage_id->EditCustomAttributes = "";
+            $curVal = trim(strval($this->print_stage_id->CurrentValue));
+            if ($curVal != "") {
+                $this->print_stage_id->ViewValue = $this->print_stage_id->lookupCacheOption($curVal);
+            } else {
+                $this->print_stage_id->ViewValue = $this->print_stage_id->Lookup !== null && is_array($this->print_stage_id->Lookup->Options) ? $curVal : null;
+            }
+            if ($this->print_stage_id->ViewValue !== null) { // Load from cache
+                $this->print_stage_id->EditValue = array_values($this->print_stage_id->Lookup->Options);
+            } else { // Lookup from database
+                if ($curVal == "") {
+                    $filterWrk = "0=1";
+                } else {
+                    $filterWrk = "\"id\"" . SearchString("=", $this->print_stage_id->CurrentValue, DATATYPE_NUMBER, "");
+                }
+                $sqlWrk = $this->print_stage_id->Lookup->getSql(true, $filterWrk, '', $this);
+                $rswrk = Conn()->executeQuery($sqlWrk)->fetchAll(\PDO::FETCH_BOTH);
+                $ari = count($rswrk);
+                $arwrk = $rswrk;
+                $this->print_stage_id->EditValue = $arwrk;
+            }
+            $this->print_stage_id->PlaceHolder = RemoveHtml($this->print_stage_id->caption());
+
+            // bus_size_id
+            $this->bus_size_id->EditAttrs["class"] = "form-control";
+            $this->bus_size_id->EditCustomAttributes = "";
+            $curVal = trim(strval($this->bus_size_id->CurrentValue));
+            if ($curVal != "") {
+                $this->bus_size_id->ViewValue = $this->bus_size_id->lookupCacheOption($curVal);
+            } else {
+                $this->bus_size_id->ViewValue = $this->bus_size_id->Lookup !== null && is_array($this->bus_size_id->Lookup->Options) ? $curVal : null;
+            }
+            if ($this->bus_size_id->ViewValue !== null) { // Load from cache
+                $this->bus_size_id->EditValue = array_values($this->bus_size_id->Lookup->Options);
+            } else { // Lookup from database
+                if ($curVal == "") {
+                    $filterWrk = "0=1";
+                } else {
+                    $filterWrk = "\"id\"" . SearchString("=", $this->bus_size_id->CurrentValue, DATATYPE_NUMBER, "");
+                }
+                $sqlWrk = $this->bus_size_id->Lookup->getSql(true, $filterWrk, '', $this);
+                $rswrk = Conn()->executeQuery($sqlWrk)->fetchAll(\PDO::FETCH_BOTH);
+                $ari = count($rswrk);
+                $arwrk = $rswrk;
+                $this->bus_size_id->EditValue = $arwrk;
+            }
+            $this->bus_size_id->PlaceHolder = RemoveHtml($this->bus_size_id->caption());
+
+            // max_limit
+            $this->max_limit->EditAttrs["class"] = "form-control";
+            $this->max_limit->EditCustomAttributes = "";
+            $this->max_limit->EditValue = HtmlEncode($this->max_limit->CurrentValue);
+            $this->max_limit->PlaceHolder = RemoveHtml($this->max_limit->caption());
+
+            // min_limit
+            $this->min_limit->EditAttrs["class"] = "form-control";
+            $this->min_limit->EditCustomAttributes = "";
+            $this->min_limit->EditValue = HtmlEncode($this->min_limit->CurrentValue);
+            $this->min_limit->PlaceHolder = RemoveHtml($this->min_limit->caption());
+
+            // price
+            $this->price->EditAttrs["class"] = "form-control";
+            $this->price->EditCustomAttributes = "";
+            $this->price->EditValue = HtmlEncode($this->price->CurrentValue);
+            $this->price->PlaceHolder = RemoveHtml($this->price->caption());
+
+            // operator_fee
+            $this->operator_fee->EditAttrs["class"] = "form-control";
+            $this->operator_fee->EditCustomAttributes = "";
+            $this->operator_fee->EditValue = HtmlEncode($this->operator_fee->CurrentValue);
+            $this->operator_fee->PlaceHolder = RemoveHtml($this->operator_fee->caption());
+
+            // agency_fee
+            $this->agency_fee->EditAttrs["class"] = "form-control";
+            $this->agency_fee->EditCustomAttributes = "";
+            $this->agency_fee->EditValue = HtmlEncode($this->agency_fee->CurrentValue);
+            $this->agency_fee->PlaceHolder = RemoveHtml($this->agency_fee->caption());
+
+            // lamata_fee
+            $this->lamata_fee->EditAttrs["class"] = "form-control";
+            $this->lamata_fee->EditCustomAttributes = "";
+            $this->lamata_fee->EditValue = HtmlEncode($this->lamata_fee->CurrentValue);
+            $this->lamata_fee->PlaceHolder = RemoveHtml($this->lamata_fee->caption());
+
+            // lasaa_fee
+            $this->lasaa_fee->EditAttrs["class"] = "form-control";
+            $this->lasaa_fee->EditCustomAttributes = "";
+            $this->lasaa_fee->EditValue = HtmlEncode($this->lasaa_fee->CurrentValue);
+            $this->lasaa_fee->PlaceHolder = RemoveHtml($this->lasaa_fee->caption());
+
+            // printers_fee
+            $this->printers_fee->EditAttrs["class"] = "form-control";
+            $this->printers_fee->EditCustomAttributes = "";
+            $this->printers_fee->EditValue = HtmlEncode($this->printers_fee->CurrentValue);
+            $this->printers_fee->PlaceHolder = RemoveHtml($this->printers_fee->caption());
+
+            // Add refer script
+
+            // id
+            $this->id->LinkCustomAttributes = "";
+            $this->id->HrefValue = "";
+
+            // platform_id
+            $this->platform_id->LinkCustomAttributes = "";
+            $this->platform_id->HrefValue = "";
+
+            // inventory_id
+            $this->inventory_id->LinkCustomAttributes = "";
+            $this->inventory_id->HrefValue = "";
+
+            // print_stage_id
+            $this->print_stage_id->LinkCustomAttributes = "";
+            $this->print_stage_id->HrefValue = "";
+
+            // bus_size_id
+            $this->bus_size_id->LinkCustomAttributes = "";
+            $this->bus_size_id->HrefValue = "";
+
+            // max_limit
+            $this->max_limit->LinkCustomAttributes = "";
+            $this->max_limit->HrefValue = "";
+
+            // min_limit
+            $this->min_limit->LinkCustomAttributes = "";
+            $this->min_limit->HrefValue = "";
+
+            // price
+            $this->price->LinkCustomAttributes = "";
+            $this->price->HrefValue = "";
+
+            // operator_fee
+            $this->operator_fee->LinkCustomAttributes = "";
+            $this->operator_fee->HrefValue = "";
+
+            // agency_fee
+            $this->agency_fee->LinkCustomAttributes = "";
+            $this->agency_fee->HrefValue = "";
+
+            // lamata_fee
+            $this->lamata_fee->LinkCustomAttributes = "";
+            $this->lamata_fee->HrefValue = "";
+
+            // lasaa_fee
+            $this->lasaa_fee->LinkCustomAttributes = "";
+            $this->lasaa_fee->HrefValue = "";
+
+            // printers_fee
+            $this->printers_fee->LinkCustomAttributes = "";
+            $this->printers_fee->HrefValue = "";
+        } elseif ($this->RowType == ROWTYPE_EDIT) {
+            // id
+            $this->id->EditAttrs["class"] = "form-control";
+            $this->id->EditCustomAttributes = "";
+            $this->id->EditValue = $this->id->CurrentValue;
+            $this->id->ViewCustomAttributes = "";
+
+            // platform_id
+            $this->platform_id->EditAttrs["class"] = "form-control";
+            $this->platform_id->EditCustomAttributes = "";
+            $curVal = trim(strval($this->platform_id->CurrentValue));
+            if ($curVal != "") {
+                $this->platform_id->ViewValue = $this->platform_id->lookupCacheOption($curVal);
+            } else {
+                $this->platform_id->ViewValue = $this->platform_id->Lookup !== null && is_array($this->platform_id->Lookup->Options) ? $curVal : null;
+            }
+            if ($this->platform_id->ViewValue !== null) { // Load from cache
+                $this->platform_id->EditValue = array_values($this->platform_id->Lookup->Options);
+            } else { // Lookup from database
+                if ($curVal == "") {
+                    $filterWrk = "0=1";
+                } else {
+                    $filterWrk = "\"id\"" . SearchString("=", $this->platform_id->CurrentValue, DATATYPE_NUMBER, "");
+                }
+                $sqlWrk = $this->platform_id->Lookup->getSql(true, $filterWrk, '', $this);
+                $rswrk = Conn()->executeQuery($sqlWrk)->fetchAll(\PDO::FETCH_BOTH);
+                $ari = count($rswrk);
+                $arwrk = $rswrk;
+                $this->platform_id->EditValue = $arwrk;
+            }
+            $this->platform_id->PlaceHolder = RemoveHtml($this->platform_id->caption());
+
+            // inventory_id
+            $this->inventory_id->EditAttrs["class"] = "form-control";
+            $this->inventory_id->EditCustomAttributes = "";
+            $curVal = trim(strval($this->inventory_id->CurrentValue));
+            if ($curVal != "") {
+                $this->inventory_id->ViewValue = $this->inventory_id->lookupCacheOption($curVal);
+            } else {
+                $this->inventory_id->ViewValue = $this->inventory_id->Lookup !== null && is_array($this->inventory_id->Lookup->Options) ? $curVal : null;
+            }
+            if ($this->inventory_id->ViewValue !== null) { // Load from cache
+                $this->inventory_id->EditValue = array_values($this->inventory_id->Lookup->Options);
+            } else { // Lookup from database
+                if ($curVal == "") {
+                    $filterWrk = "0=1";
+                } else {
+                    $filterWrk = "\"id\"" . SearchString("=", $this->inventory_id->CurrentValue, DATATYPE_NUMBER, "");
+                }
+                $sqlWrk = $this->inventory_id->Lookup->getSql(true, $filterWrk, '', $this);
+                $rswrk = Conn()->executeQuery($sqlWrk)->fetchAll(\PDO::FETCH_BOTH);
+                $ari = count($rswrk);
+                $arwrk = $rswrk;
+                $this->inventory_id->EditValue = $arwrk;
+            }
+            $this->inventory_id->PlaceHolder = RemoveHtml($this->inventory_id->caption());
+
+            // print_stage_id
+            $this->print_stage_id->EditAttrs["class"] = "form-control";
+            $this->print_stage_id->EditCustomAttributes = "";
+            $curVal = trim(strval($this->print_stage_id->CurrentValue));
+            if ($curVal != "") {
+                $this->print_stage_id->ViewValue = $this->print_stage_id->lookupCacheOption($curVal);
+            } else {
+                $this->print_stage_id->ViewValue = $this->print_stage_id->Lookup !== null && is_array($this->print_stage_id->Lookup->Options) ? $curVal : null;
+            }
+            if ($this->print_stage_id->ViewValue !== null) { // Load from cache
+                $this->print_stage_id->EditValue = array_values($this->print_stage_id->Lookup->Options);
+            } else { // Lookup from database
+                if ($curVal == "") {
+                    $filterWrk = "0=1";
+                } else {
+                    $filterWrk = "\"id\"" . SearchString("=", $this->print_stage_id->CurrentValue, DATATYPE_NUMBER, "");
+                }
+                $sqlWrk = $this->print_stage_id->Lookup->getSql(true, $filterWrk, '', $this);
+                $rswrk = Conn()->executeQuery($sqlWrk)->fetchAll(\PDO::FETCH_BOTH);
+                $ari = count($rswrk);
+                $arwrk = $rswrk;
+                $this->print_stage_id->EditValue = $arwrk;
+            }
+            $this->print_stage_id->PlaceHolder = RemoveHtml($this->print_stage_id->caption());
+
+            // bus_size_id
+            $this->bus_size_id->EditAttrs["class"] = "form-control";
+            $this->bus_size_id->EditCustomAttributes = "";
+            $curVal = trim(strval($this->bus_size_id->CurrentValue));
+            if ($curVal != "") {
+                $this->bus_size_id->ViewValue = $this->bus_size_id->lookupCacheOption($curVal);
+            } else {
+                $this->bus_size_id->ViewValue = $this->bus_size_id->Lookup !== null && is_array($this->bus_size_id->Lookup->Options) ? $curVal : null;
+            }
+            if ($this->bus_size_id->ViewValue !== null) { // Load from cache
+                $this->bus_size_id->EditValue = array_values($this->bus_size_id->Lookup->Options);
+            } else { // Lookup from database
+                if ($curVal == "") {
+                    $filterWrk = "0=1";
+                } else {
+                    $filterWrk = "\"id\"" . SearchString("=", $this->bus_size_id->CurrentValue, DATATYPE_NUMBER, "");
+                }
+                $sqlWrk = $this->bus_size_id->Lookup->getSql(true, $filterWrk, '', $this);
+                $rswrk = Conn()->executeQuery($sqlWrk)->fetchAll(\PDO::FETCH_BOTH);
+                $ari = count($rswrk);
+                $arwrk = $rswrk;
+                $this->bus_size_id->EditValue = $arwrk;
+            }
+            $this->bus_size_id->PlaceHolder = RemoveHtml($this->bus_size_id->caption());
+
+            // max_limit
+            $this->max_limit->EditAttrs["class"] = "form-control";
+            $this->max_limit->EditCustomAttributes = "";
+            $this->max_limit->EditValue = HtmlEncode($this->max_limit->CurrentValue);
+            $this->max_limit->PlaceHolder = RemoveHtml($this->max_limit->caption());
+
+            // min_limit
+            $this->min_limit->EditAttrs["class"] = "form-control";
+            $this->min_limit->EditCustomAttributes = "";
+            $this->min_limit->EditValue = HtmlEncode($this->min_limit->CurrentValue);
+            $this->min_limit->PlaceHolder = RemoveHtml($this->min_limit->caption());
+
+            // price
+            $this->price->EditAttrs["class"] = "form-control";
+            $this->price->EditCustomAttributes = "";
+            $this->price->EditValue = HtmlEncode($this->price->CurrentValue);
+            $this->price->PlaceHolder = RemoveHtml($this->price->caption());
+
+            // operator_fee
+            $this->operator_fee->EditAttrs["class"] = "form-control";
+            $this->operator_fee->EditCustomAttributes = "";
+            $this->operator_fee->EditValue = HtmlEncode($this->operator_fee->CurrentValue);
+            $this->operator_fee->PlaceHolder = RemoveHtml($this->operator_fee->caption());
+
+            // agency_fee
+            $this->agency_fee->EditAttrs["class"] = "form-control";
+            $this->agency_fee->EditCustomAttributes = "";
+            $this->agency_fee->EditValue = HtmlEncode($this->agency_fee->CurrentValue);
+            $this->agency_fee->PlaceHolder = RemoveHtml($this->agency_fee->caption());
+
+            // lamata_fee
+            $this->lamata_fee->EditAttrs["class"] = "form-control";
+            $this->lamata_fee->EditCustomAttributes = "";
+            $this->lamata_fee->EditValue = HtmlEncode($this->lamata_fee->CurrentValue);
+            $this->lamata_fee->PlaceHolder = RemoveHtml($this->lamata_fee->caption());
+
+            // lasaa_fee
+            $this->lasaa_fee->EditAttrs["class"] = "form-control";
+            $this->lasaa_fee->EditCustomAttributes = "";
+            $this->lasaa_fee->EditValue = HtmlEncode($this->lasaa_fee->CurrentValue);
+            $this->lasaa_fee->PlaceHolder = RemoveHtml($this->lasaa_fee->caption());
+
+            // printers_fee
+            $this->printers_fee->EditAttrs["class"] = "form-control";
+            $this->printers_fee->EditCustomAttributes = "";
+            $this->printers_fee->EditValue = HtmlEncode($this->printers_fee->CurrentValue);
+            $this->printers_fee->PlaceHolder = RemoveHtml($this->printers_fee->caption());
+
+            // Edit refer script
+
+            // id
+            $this->id->LinkCustomAttributes = "";
+            $this->id->HrefValue = "";
+
+            // platform_id
+            $this->platform_id->LinkCustomAttributes = "";
+            $this->platform_id->HrefValue = "";
+
+            // inventory_id
+            $this->inventory_id->LinkCustomAttributes = "";
+            $this->inventory_id->HrefValue = "";
+
+            // print_stage_id
+            $this->print_stage_id->LinkCustomAttributes = "";
+            $this->print_stage_id->HrefValue = "";
+
+            // bus_size_id
+            $this->bus_size_id->LinkCustomAttributes = "";
+            $this->bus_size_id->HrefValue = "";
+
+            // max_limit
+            $this->max_limit->LinkCustomAttributes = "";
+            $this->max_limit->HrefValue = "";
+
+            // min_limit
+            $this->min_limit->LinkCustomAttributes = "";
+            $this->min_limit->HrefValue = "";
+
+            // price
+            $this->price->LinkCustomAttributes = "";
+            $this->price->HrefValue = "";
+
+            // operator_fee
+            $this->operator_fee->LinkCustomAttributes = "";
+            $this->operator_fee->HrefValue = "";
+
+            // agency_fee
+            $this->agency_fee->LinkCustomAttributes = "";
+            $this->agency_fee->HrefValue = "";
+
+            // lamata_fee
+            $this->lamata_fee->LinkCustomAttributes = "";
+            $this->lamata_fee->HrefValue = "";
+
+            // lasaa_fee
+            $this->lasaa_fee->LinkCustomAttributes = "";
+            $this->lasaa_fee->HrefValue = "";
+
+            // printers_fee
+            $this->printers_fee->LinkCustomAttributes = "";
+            $this->printers_fee->HrefValue = "";
+        } elseif ($this->RowType == ROWTYPE_SEARCH) {
+            // id
+            $this->id->EditAttrs["class"] = "form-control";
+            $this->id->EditCustomAttributes = "";
+            $this->id->EditValue = HtmlEncode($this->id->AdvancedSearch->SearchValue);
+            $this->id->PlaceHolder = RemoveHtml($this->id->caption());
+
+            // platform_id
+            $this->platform_id->EditAttrs["class"] = "form-control";
+            $this->platform_id->EditCustomAttributes = "";
+            $curVal = trim(strval($this->platform_id->AdvancedSearch->SearchValue));
+            if ($curVal != "") {
+                $this->platform_id->AdvancedSearch->ViewValue = $this->platform_id->lookupCacheOption($curVal);
+            } else {
+                $this->platform_id->AdvancedSearch->ViewValue = $this->platform_id->Lookup !== null && is_array($this->platform_id->Lookup->Options) ? $curVal : null;
+            }
+            if ($this->platform_id->AdvancedSearch->ViewValue !== null) { // Load from cache
+                $this->platform_id->EditValue = array_values($this->platform_id->Lookup->Options);
+            } else { // Lookup from database
+                if ($curVal == "") {
+                    $filterWrk = "0=1";
+                } else {
+                    $filterWrk = "\"id\"" . SearchString("=", $this->platform_id->AdvancedSearch->SearchValue, DATATYPE_NUMBER, "");
+                }
+                $sqlWrk = $this->platform_id->Lookup->getSql(true, $filterWrk, '', $this);
+                $rswrk = Conn()->executeQuery($sqlWrk)->fetchAll(\PDO::FETCH_BOTH);
+                $ari = count($rswrk);
+                $arwrk = $rswrk;
+                $this->platform_id->EditValue = $arwrk;
+            }
+            $this->platform_id->PlaceHolder = RemoveHtml($this->platform_id->caption());
+
+            // inventory_id
+            $this->inventory_id->EditAttrs["class"] = "form-control";
+            $this->inventory_id->EditCustomAttributes = "";
+            $curVal = trim(strval($this->inventory_id->AdvancedSearch->SearchValue));
+            if ($curVal != "") {
+                $this->inventory_id->AdvancedSearch->ViewValue = $this->inventory_id->lookupCacheOption($curVal);
+            } else {
+                $this->inventory_id->AdvancedSearch->ViewValue = $this->inventory_id->Lookup !== null && is_array($this->inventory_id->Lookup->Options) ? $curVal : null;
+            }
+            if ($this->inventory_id->AdvancedSearch->ViewValue !== null) { // Load from cache
+                $this->inventory_id->EditValue = array_values($this->inventory_id->Lookup->Options);
+            } else { // Lookup from database
+                if ($curVal == "") {
+                    $filterWrk = "0=1";
+                } else {
+                    $filterWrk = "\"id\"" . SearchString("=", $this->inventory_id->AdvancedSearch->SearchValue, DATATYPE_NUMBER, "");
+                }
+                $sqlWrk = $this->inventory_id->Lookup->getSql(true, $filterWrk, '', $this);
+                $rswrk = Conn()->executeQuery($sqlWrk)->fetchAll(\PDO::FETCH_BOTH);
+                $ari = count($rswrk);
+                $arwrk = $rswrk;
+                $this->inventory_id->EditValue = $arwrk;
+            }
+            $this->inventory_id->PlaceHolder = RemoveHtml($this->inventory_id->caption());
+
+            // print_stage_id
+            $this->print_stage_id->EditAttrs["class"] = "form-control";
+            $this->print_stage_id->EditCustomAttributes = "";
+            $curVal = trim(strval($this->print_stage_id->AdvancedSearch->SearchValue));
+            if ($curVal != "") {
+                $this->print_stage_id->AdvancedSearch->ViewValue = $this->print_stage_id->lookupCacheOption($curVal);
+            } else {
+                $this->print_stage_id->AdvancedSearch->ViewValue = $this->print_stage_id->Lookup !== null && is_array($this->print_stage_id->Lookup->Options) ? $curVal : null;
+            }
+            if ($this->print_stage_id->AdvancedSearch->ViewValue !== null) { // Load from cache
+                $this->print_stage_id->EditValue = array_values($this->print_stage_id->Lookup->Options);
+            } else { // Lookup from database
+                if ($curVal == "") {
+                    $filterWrk = "0=1";
+                } else {
+                    $filterWrk = "\"id\"" . SearchString("=", $this->print_stage_id->AdvancedSearch->SearchValue, DATATYPE_NUMBER, "");
+                }
+                $sqlWrk = $this->print_stage_id->Lookup->getSql(true, $filterWrk, '', $this);
+                $rswrk = Conn()->executeQuery($sqlWrk)->fetchAll(\PDO::FETCH_BOTH);
+                $ari = count($rswrk);
+                $arwrk = $rswrk;
+                $this->print_stage_id->EditValue = $arwrk;
+            }
+            $this->print_stage_id->PlaceHolder = RemoveHtml($this->print_stage_id->caption());
+
+            // bus_size_id
+            $this->bus_size_id->EditAttrs["class"] = "form-control";
+            $this->bus_size_id->EditCustomAttributes = "";
+            $curVal = trim(strval($this->bus_size_id->AdvancedSearch->SearchValue));
+            if ($curVal != "") {
+                $this->bus_size_id->AdvancedSearch->ViewValue = $this->bus_size_id->lookupCacheOption($curVal);
+            } else {
+                $this->bus_size_id->AdvancedSearch->ViewValue = $this->bus_size_id->Lookup !== null && is_array($this->bus_size_id->Lookup->Options) ? $curVal : null;
+            }
+            if ($this->bus_size_id->AdvancedSearch->ViewValue !== null) { // Load from cache
+                $this->bus_size_id->EditValue = array_values($this->bus_size_id->Lookup->Options);
+            } else { // Lookup from database
+                if ($curVal == "") {
+                    $filterWrk = "0=1";
+                } else {
+                    $filterWrk = "\"id\"" . SearchString("=", $this->bus_size_id->AdvancedSearch->SearchValue, DATATYPE_NUMBER, "");
+                }
+                $sqlWrk = $this->bus_size_id->Lookup->getSql(true, $filterWrk, '', $this);
+                $rswrk = Conn()->executeQuery($sqlWrk)->fetchAll(\PDO::FETCH_BOTH);
+                $ari = count($rswrk);
+                $arwrk = $rswrk;
+                $this->bus_size_id->EditValue = $arwrk;
+            }
+            $this->bus_size_id->PlaceHolder = RemoveHtml($this->bus_size_id->caption());
+
+            // max_limit
+            $this->max_limit->EditAttrs["class"] = "form-control";
+            $this->max_limit->EditCustomAttributes = "";
+            $this->max_limit->EditValue = HtmlEncode($this->max_limit->AdvancedSearch->SearchValue);
+            $this->max_limit->PlaceHolder = RemoveHtml($this->max_limit->caption());
+
+            // min_limit
+            $this->min_limit->EditAttrs["class"] = "form-control";
+            $this->min_limit->EditCustomAttributes = "";
+            $this->min_limit->EditValue = HtmlEncode($this->min_limit->AdvancedSearch->SearchValue);
+            $this->min_limit->PlaceHolder = RemoveHtml($this->min_limit->caption());
+
+            // price
+            $this->price->EditAttrs["class"] = "form-control";
+            $this->price->EditCustomAttributes = "";
+            $this->price->EditValue = HtmlEncode($this->price->AdvancedSearch->SearchValue);
+            $this->price->PlaceHolder = RemoveHtml($this->price->caption());
+
+            // operator_fee
+            $this->operator_fee->EditAttrs["class"] = "form-control";
+            $this->operator_fee->EditCustomAttributes = "";
+            $this->operator_fee->EditValue = HtmlEncode($this->operator_fee->AdvancedSearch->SearchValue);
+            $this->operator_fee->PlaceHolder = RemoveHtml($this->operator_fee->caption());
+
+            // agency_fee
+            $this->agency_fee->EditAttrs["class"] = "form-control";
+            $this->agency_fee->EditCustomAttributes = "";
+            $this->agency_fee->EditValue = HtmlEncode($this->agency_fee->AdvancedSearch->SearchValue);
+            $this->agency_fee->PlaceHolder = RemoveHtml($this->agency_fee->caption());
+
+            // lamata_fee
+            $this->lamata_fee->EditAttrs["class"] = "form-control";
+            $this->lamata_fee->EditCustomAttributes = "";
+            $this->lamata_fee->EditValue = HtmlEncode($this->lamata_fee->AdvancedSearch->SearchValue);
+            $this->lamata_fee->PlaceHolder = RemoveHtml($this->lamata_fee->caption());
+
+            // lasaa_fee
+            $this->lasaa_fee->EditAttrs["class"] = "form-control";
+            $this->lasaa_fee->EditCustomAttributes = "";
+            $this->lasaa_fee->EditValue = HtmlEncode($this->lasaa_fee->AdvancedSearch->SearchValue);
+            $this->lasaa_fee->PlaceHolder = RemoveHtml($this->lasaa_fee->caption());
+
+            // printers_fee
+            $this->printers_fee->EditAttrs["class"] = "form-control";
+            $this->printers_fee->EditCustomAttributes = "";
+            $this->printers_fee->EditValue = HtmlEncode($this->printers_fee->AdvancedSearch->SearchValue);
+            $this->printers_fee->PlaceHolder = RemoveHtml($this->printers_fee->caption());
+        }
+        if ($this->RowType == ROWTYPE_ADD || $this->RowType == ROWTYPE_EDIT || $this->RowType == ROWTYPE_SEARCH) { // Add/Edit/Search row
+            $this->setupFieldTitles();
         }
 
         // Call Row Rendered event
         if ($this->RowType != ROWTYPE_AGGREGATEINIT) {
             $this->rowRendered();
         }
+    }
+
+    // Validate search
+    protected function validateSearch()
+    {
+        // Check if validation required
+        if (!Config("SERVER_VALIDATE")) {
+            return true;
+        }
+
+        // Return validate result
+        $validateSearch = !$this->hasInvalidFields();
+
+        // Call Form_CustomValidate event
+        $formCustomError = "";
+        $validateSearch = $validateSearch && $this->formCustomValidate($formCustomError);
+        if ($formCustomError != "") {
+            $this->setFailureMessage($formCustomError);
+        }
+        return $validateSearch;
+    }
+
+    // Validate form
+    protected function validateForm()
+    {
+        global $Language;
+
+        // Check if validation required
+        if (!Config("SERVER_VALIDATE")) {
+            return true;
+        }
+        if ($this->id->Required) {
+            if (!$this->id->IsDetailKey && EmptyValue($this->id->FormValue)) {
+                $this->id->addErrorMessage(str_replace("%s", $this->id->caption(), $this->id->RequiredErrorMessage));
+            }
+        }
+        if ($this->platform_id->Required) {
+            if (!$this->platform_id->IsDetailKey && EmptyValue($this->platform_id->FormValue)) {
+                $this->platform_id->addErrorMessage(str_replace("%s", $this->platform_id->caption(), $this->platform_id->RequiredErrorMessage));
+            }
+        }
+        if ($this->inventory_id->Required) {
+            if (!$this->inventory_id->IsDetailKey && EmptyValue($this->inventory_id->FormValue)) {
+                $this->inventory_id->addErrorMessage(str_replace("%s", $this->inventory_id->caption(), $this->inventory_id->RequiredErrorMessage));
+            }
+        }
+        if ($this->print_stage_id->Required) {
+            if (!$this->print_stage_id->IsDetailKey && EmptyValue($this->print_stage_id->FormValue)) {
+                $this->print_stage_id->addErrorMessage(str_replace("%s", $this->print_stage_id->caption(), $this->print_stage_id->RequiredErrorMessage));
+            }
+        }
+        if ($this->bus_size_id->Required) {
+            if (!$this->bus_size_id->IsDetailKey && EmptyValue($this->bus_size_id->FormValue)) {
+                $this->bus_size_id->addErrorMessage(str_replace("%s", $this->bus_size_id->caption(), $this->bus_size_id->RequiredErrorMessage));
+            }
+        }
+        if ($this->max_limit->Required) {
+            if (!$this->max_limit->IsDetailKey && EmptyValue($this->max_limit->FormValue)) {
+                $this->max_limit->addErrorMessage(str_replace("%s", $this->max_limit->caption(), $this->max_limit->RequiredErrorMessage));
+            }
+        }
+        if (!CheckInteger($this->max_limit->FormValue)) {
+            $this->max_limit->addErrorMessage($this->max_limit->getErrorMessage(false));
+        }
+        if ($this->min_limit->Required) {
+            if (!$this->min_limit->IsDetailKey && EmptyValue($this->min_limit->FormValue)) {
+                $this->min_limit->addErrorMessage(str_replace("%s", $this->min_limit->caption(), $this->min_limit->RequiredErrorMessage));
+            }
+        }
+        if (!CheckInteger($this->min_limit->FormValue)) {
+            $this->min_limit->addErrorMessage($this->min_limit->getErrorMessage(false));
+        }
+        if ($this->price->Required) {
+            if (!$this->price->IsDetailKey && EmptyValue($this->price->FormValue)) {
+                $this->price->addErrorMessage(str_replace("%s", $this->price->caption(), $this->price->RequiredErrorMessage));
+            }
+        }
+        if (!CheckInteger($this->price->FormValue)) {
+            $this->price->addErrorMessage($this->price->getErrorMessage(false));
+        }
+        if ($this->operator_fee->Required) {
+            if (!$this->operator_fee->IsDetailKey && EmptyValue($this->operator_fee->FormValue)) {
+                $this->operator_fee->addErrorMessage(str_replace("%s", $this->operator_fee->caption(), $this->operator_fee->RequiredErrorMessage));
+            }
+        }
+        if (!CheckInteger($this->operator_fee->FormValue)) {
+            $this->operator_fee->addErrorMessage($this->operator_fee->getErrorMessage(false));
+        }
+        if ($this->agency_fee->Required) {
+            if (!$this->agency_fee->IsDetailKey && EmptyValue($this->agency_fee->FormValue)) {
+                $this->agency_fee->addErrorMessage(str_replace("%s", $this->agency_fee->caption(), $this->agency_fee->RequiredErrorMessage));
+            }
+        }
+        if (!CheckInteger($this->agency_fee->FormValue)) {
+            $this->agency_fee->addErrorMessage($this->agency_fee->getErrorMessage(false));
+        }
+        if ($this->lamata_fee->Required) {
+            if (!$this->lamata_fee->IsDetailKey && EmptyValue($this->lamata_fee->FormValue)) {
+                $this->lamata_fee->addErrorMessage(str_replace("%s", $this->lamata_fee->caption(), $this->lamata_fee->RequiredErrorMessage));
+            }
+        }
+        if (!CheckInteger($this->lamata_fee->FormValue)) {
+            $this->lamata_fee->addErrorMessage($this->lamata_fee->getErrorMessage(false));
+        }
+        if ($this->lasaa_fee->Required) {
+            if (!$this->lasaa_fee->IsDetailKey && EmptyValue($this->lasaa_fee->FormValue)) {
+                $this->lasaa_fee->addErrorMessage(str_replace("%s", $this->lasaa_fee->caption(), $this->lasaa_fee->RequiredErrorMessage));
+            }
+        }
+        if (!CheckInteger($this->lasaa_fee->FormValue)) {
+            $this->lasaa_fee->addErrorMessage($this->lasaa_fee->getErrorMessage(false));
+        }
+        if ($this->printers_fee->Required) {
+            if (!$this->printers_fee->IsDetailKey && EmptyValue($this->printers_fee->FormValue)) {
+                $this->printers_fee->addErrorMessage(str_replace("%s", $this->printers_fee->caption(), $this->printers_fee->RequiredErrorMessage));
+            }
+        }
+        if (!CheckInteger($this->printers_fee->FormValue)) {
+            $this->printers_fee->addErrorMessage($this->printers_fee->getErrorMessage(false));
+        }
+
+        // Return validate result
+        $validateForm = !$this->hasInvalidFields();
+
+        // Call Form_CustomValidate event
+        $formCustomError = "";
+        $validateForm = $validateForm && $this->formCustomValidate($formCustomError);
+        if ($formCustomError != "") {
+            $this->setFailureMessage($formCustomError);
+        }
+        return $validateForm;
+    }
+
+    // Delete records based on current filter
+    protected function deleteRows()
+    {
+        global $Language, $Security;
+        if (!$Security->canDelete()) {
+            $this->setFailureMessage($Language->phrase("NoDeletePermission")); // No delete permission
+            return false;
+        }
+        $deleteRows = true;
+        $sql = $this->getCurrentSql();
+        $conn = $this->getConnection();
+        $rows = $conn->fetchAll($sql);
+        if (count($rows) == 0) {
+            $this->setFailureMessage($Language->phrase("NoRecord")); // No record found
+            return false;
+        }
+
+        // Clone old rows
+        $rsold = $rows;
+
+        // Call row deleting event
+        if ($deleteRows) {
+            foreach ($rsold as $row) {
+                $deleteRows = $this->rowDeleting($row);
+                if (!$deleteRows) {
+                    break;
+                }
+            }
+        }
+        if ($deleteRows) {
+            $key = "";
+            foreach ($rsold as $row) {
+                $thisKey = "";
+                if ($thisKey != "") {
+                    $thisKey .= Config("COMPOSITE_KEY_SEPARATOR");
+                }
+                $thisKey .= $row['id'];
+                if (Config("DELETE_UPLOADED_FILES")) { // Delete old files
+                    $this->deleteUploadedFiles($row);
+                }
+                $deleteRows = $this->delete($row); // Delete
+                if ($deleteRows === false) {
+                    break;
+                }
+                if ($key != "") {
+                    $key .= ", ";
+                }
+                $key .= $thisKey;
+            }
+        }
+        if (!$deleteRows) {
+            // Set up error message
+            if ($this->getSuccessMessage() != "" || $this->getFailureMessage() != "") {
+                // Use the message, do nothing
+            } elseif ($this->CancelMessage != "") {
+                $this->setFailureMessage($this->CancelMessage);
+                $this->CancelMessage = "";
+            } else {
+                $this->setFailureMessage($Language->phrase("DeleteCancelled"));
+            }
+        }
+
+        // Call Row Deleted event
+        if ($deleteRows) {
+            foreach ($rsold as $row) {
+                $this->rowDeleted($row);
+            }
+        }
+
+        // Write JSON for API request
+        if (IsApi() && $deleteRows) {
+            $row = $this->getRecordsFromRecordset($rsold);
+            WriteJson(["success" => true, $this->TableVar => $row]);
+        }
+        return $deleteRows;
+    }
+
+    // Update record based on key values
+    protected function editRow()
+    {
+        global $Security, $Language;
+        $oldKeyFilter = $this->getRecordFilter();
+        $filter = $this->applyUserIDFilters($oldKeyFilter);
+        $conn = $this->getConnection();
+        $this->CurrentFilter = $filter;
+        $sql = $this->getCurrentSql();
+        $rsold = $conn->fetchAssoc($sql);
+        if (!$rsold) {
+            $this->setFailureMessage($Language->phrase("NoRecord")); // Set no record message
+            $editRow = false; // Update Failed
+        } else {
+            // Save old values
+            $this->loadDbValues($rsold);
+            $rsnew = [];
+
+            // platform_id
+            $this->platform_id->setDbValueDef($rsnew, $this->platform_id->CurrentValue, 0, $this->platform_id->ReadOnly);
+
+            // inventory_id
+            $this->inventory_id->setDbValueDef($rsnew, $this->inventory_id->CurrentValue, 0, $this->inventory_id->ReadOnly);
+
+            // print_stage_id
+            $this->print_stage_id->setDbValueDef($rsnew, $this->print_stage_id->CurrentValue, null, $this->print_stage_id->ReadOnly);
+
+            // bus_size_id
+            $this->bus_size_id->setDbValueDef($rsnew, $this->bus_size_id->CurrentValue, null, $this->bus_size_id->ReadOnly);
+
+            // max_limit
+            $this->max_limit->setDbValueDef($rsnew, $this->max_limit->CurrentValue, null, $this->max_limit->ReadOnly);
+
+            // min_limit
+            $this->min_limit->setDbValueDef($rsnew, $this->min_limit->CurrentValue, null, $this->min_limit->ReadOnly);
+
+            // price
+            $this->price->setDbValueDef($rsnew, $this->price->CurrentValue, null, $this->price->ReadOnly);
+
+            // operator_fee
+            $this->operator_fee->setDbValueDef($rsnew, $this->operator_fee->CurrentValue, null, $this->operator_fee->ReadOnly);
+
+            // agency_fee
+            $this->agency_fee->setDbValueDef($rsnew, $this->agency_fee->CurrentValue, null, $this->agency_fee->ReadOnly);
+
+            // lamata_fee
+            $this->lamata_fee->setDbValueDef($rsnew, $this->lamata_fee->CurrentValue, null, $this->lamata_fee->ReadOnly);
+
+            // lasaa_fee
+            $this->lasaa_fee->setDbValueDef($rsnew, $this->lasaa_fee->CurrentValue, null, $this->lasaa_fee->ReadOnly);
+
+            // printers_fee
+            $this->printers_fee->setDbValueDef($rsnew, $this->printers_fee->CurrentValue, null, $this->printers_fee->ReadOnly);
+
+            // Call Row Updating event
+            $updateRow = $this->rowUpdating($rsold, $rsnew);
+            if ($updateRow) {
+                if (count($rsnew) > 0) {
+                    $editRow = $this->update($rsnew, "", $rsold);
+                } else {
+                    $editRow = true; // No field to update
+                }
+                if ($editRow) {
+                }
+            } else {
+                if ($this->getSuccessMessage() != "" || $this->getFailureMessage() != "") {
+                    // Use the message, do nothing
+                } elseif ($this->CancelMessage != "") {
+                    $this->setFailureMessage($this->CancelMessage);
+                    $this->CancelMessage = "";
+                } else {
+                    $this->setFailureMessage($Language->phrase("UpdateCancelled"));
+                }
+                $editRow = false;
+            }
+        }
+
+        // Call Row_Updated event
+        if ($editRow) {
+            $this->rowUpdated($rsold, $rsnew);
+        }
+
+        // Clean upload path if any
+        if ($editRow) {
+        }
+
+        // Write JSON for API request
+        if (IsApi() && $editRow) {
+            $row = $this->getRecordsFromRecordset([$rsnew], true);
+            WriteJson(["success" => true, $this->TableVar => $row]);
+        }
+        return $editRow;
+    }
+
+    // Load row hash
+    protected function loadRowHash()
+    {
+        $filter = $this->getRecordFilter();
+
+        // Load SQL based on filter
+        $this->CurrentFilter = $filter;
+        $sql = $this->getCurrentSql();
+        $conn = $this->getConnection();
+        $row = $conn->fetchAssoc($sql);
+        $this->HashValue = $row ? $this->getRowHash($row) : ""; // Get hash value for record
+    }
+
+    // Get Row Hash
+    public function getRowHash(&$rs)
+    {
+        if (!$rs) {
+            return "";
+        }
+        $row = ($rs instanceof Recordset) ? $rs->fields : $rs;
+        $hash = "";
+        $hash .= GetFieldHash($row['platform_id']); // platform_id
+        $hash .= GetFieldHash($row['inventory_id']); // inventory_id
+        $hash .= GetFieldHash($row['print_stage_id']); // print_stage_id
+        $hash .= GetFieldHash($row['bus_size_id']); // bus_size_id
+        $hash .= GetFieldHash($row['max_limit']); // max_limit
+        $hash .= GetFieldHash($row['min_limit']); // min_limit
+        $hash .= GetFieldHash($row['price']); // price
+        $hash .= GetFieldHash($row['operator_fee']); // operator_fee
+        $hash .= GetFieldHash($row['agency_fee']); // agency_fee
+        $hash .= GetFieldHash($row['lamata_fee']); // lamata_fee
+        $hash .= GetFieldHash($row['lasaa_fee']); // lasaa_fee
+        $hash .= GetFieldHash($row['printers_fee']); // printers_fee
+        return md5($hash);
+    }
+
+    // Add record
+    protected function addRow($rsold = null)
+    {
+        global $Language, $Security;
+        $conn = $this->getConnection();
+
+        // Load db values from rsold
+        $this->loadDbValues($rsold);
+        if ($rsold) {
+        }
+        $rsnew = [];
+
+        // platform_id
+        $this->platform_id->setDbValueDef($rsnew, $this->platform_id->CurrentValue, 0, false);
+
+        // inventory_id
+        $this->inventory_id->setDbValueDef($rsnew, $this->inventory_id->CurrentValue, 0, false);
+
+        // print_stage_id
+        $this->print_stage_id->setDbValueDef($rsnew, $this->print_stage_id->CurrentValue, null, false);
+
+        // bus_size_id
+        $this->bus_size_id->setDbValueDef($rsnew, $this->bus_size_id->CurrentValue, null, false);
+
+        // max_limit
+        $this->max_limit->setDbValueDef($rsnew, $this->max_limit->CurrentValue, null, false);
+
+        // min_limit
+        $this->min_limit->setDbValueDef($rsnew, $this->min_limit->CurrentValue, null, false);
+
+        // price
+        $this->price->setDbValueDef($rsnew, $this->price->CurrentValue, null, false);
+
+        // operator_fee
+        $this->operator_fee->setDbValueDef($rsnew, $this->operator_fee->CurrentValue, null, false);
+
+        // agency_fee
+        $this->agency_fee->setDbValueDef($rsnew, $this->agency_fee->CurrentValue, null, false);
+
+        // lamata_fee
+        $this->lamata_fee->setDbValueDef($rsnew, $this->lamata_fee->CurrentValue, null, false);
+
+        // lasaa_fee
+        $this->lasaa_fee->setDbValueDef($rsnew, $this->lasaa_fee->CurrentValue, null, false);
+
+        // printers_fee
+        $this->printers_fee->setDbValueDef($rsnew, $this->printers_fee->CurrentValue, null, false);
+
+        // Call Row Inserting event
+        $insertRow = $this->rowInserting($rsold, $rsnew);
+        if ($insertRow) {
+            $addRow = $this->insert($rsnew);
+            if ($addRow) {
+            }
+        } else {
+            if ($this->getSuccessMessage() != "" || $this->getFailureMessage() != "") {
+                // Use the message, do nothing
+            } elseif ($this->CancelMessage != "") {
+                $this->setFailureMessage($this->CancelMessage);
+                $this->CancelMessage = "";
+            } else {
+                $this->setFailureMessage($Language->phrase("InsertCancelled"));
+            }
+            $addRow = false;
+        }
+        if ($addRow) {
+            // Call Row Inserted event
+            $this->rowInserted($rsold, $rsnew);
+        }
+
+        // Clean upload path if any
+        if ($addRow) {
+        }
+
+        // Write JSON for API request
+        if (IsApi() && $addRow) {
+            $row = $this->getRecordsFromRecordset([$rsnew], true);
+            WriteJson(["success" => true, $this->TableVar => $row]);
+        }
+        return $addRow;
+    }
+
+    // Load advanced search
+    public function loadAdvancedSearch()
+    {
+        $this->id->AdvancedSearch->load();
+        $this->platform_id->AdvancedSearch->load();
+        $this->inventory_id->AdvancedSearch->load();
+        $this->print_stage_id->AdvancedSearch->load();
+        $this->bus_size_id->AdvancedSearch->load();
+        $this->details->AdvancedSearch->load();
+        $this->max_limit->AdvancedSearch->load();
+        $this->min_limit->AdvancedSearch->load();
+        $this->price->AdvancedSearch->load();
+        $this->operator_fee->AdvancedSearch->load();
+        $this->agency_fee->AdvancedSearch->load();
+        $this->lamata_fee->AdvancedSearch->load();
+        $this->lasaa_fee->AdvancedSearch->load();
+        $this->printers_fee->AdvancedSearch->load();
+    }
+
+    // Get export HTML tag
+    protected function getExportTag($type, $custom = false)
+    {
+        global $Language;
+        $pageUrl = $this->pageUrl();
+        if (SameText($type, "excel")) {
+            if ($custom) {
+                return "<a href=\"#\" class=\"ew-export-link ew-excel\" title=\"" . HtmlEncode($Language->phrase("ExportToExcelText")) . "\" data-caption=\"" . HtmlEncode($Language->phrase("ExportToExcelText")) . "\" onclick=\"return ew.export(document.fz_price_settingslist, '" . $this->ExportExcelUrl . "', 'excel', true);\">" . $Language->phrase("ExportToExcel") . "</a>";
+            } else {
+                return "<a href=\"" . $this->ExportExcelUrl . "\" class=\"ew-export-link ew-excel\" title=\"" . HtmlEncode($Language->phrase("ExportToExcelText")) . "\" data-caption=\"" . HtmlEncode($Language->phrase("ExportToExcelText")) . "\">" . $Language->phrase("ExportToExcel") . "</a>";
+            }
+        } elseif (SameText($type, "word")) {
+            if ($custom) {
+                return "<a href=\"#\" class=\"ew-export-link ew-word\" title=\"" . HtmlEncode($Language->phrase("ExportToWordText")) . "\" data-caption=\"" . HtmlEncode($Language->phrase("ExportToWordText")) . "\" onclick=\"return ew.export(document.fz_price_settingslist, '" . $this->ExportWordUrl . "', 'word', true);\">" . $Language->phrase("ExportToWord") . "</a>";
+            } else {
+                return "<a href=\"" . $this->ExportWordUrl . "\" class=\"ew-export-link ew-word\" title=\"" . HtmlEncode($Language->phrase("ExportToWordText")) . "\" data-caption=\"" . HtmlEncode($Language->phrase("ExportToWordText")) . "\">" . $Language->phrase("ExportToWord") . "</a>";
+            }
+        } elseif (SameText($type, "pdf")) {
+            if ($custom) {
+                return "<a href=\"#\" class=\"ew-export-link ew-pdf\" title=\"" . HtmlEncode($Language->phrase("ExportToPDFText")) . "\" data-caption=\"" . HtmlEncode($Language->phrase("ExportToPDFText")) . "\" onclick=\"return ew.export(document.fz_price_settingslist, '" . $this->ExportPdfUrl . "', 'pdf', true);\">" . $Language->phrase("ExportToPDF") . "</a>";
+            } else {
+                return "<a href=\"" . $this->ExportPdfUrl . "\" class=\"ew-export-link ew-pdf\" title=\"" . HtmlEncode($Language->phrase("ExportToPDFText")) . "\" data-caption=\"" . HtmlEncode($Language->phrase("ExportToPDFText")) . "\">" . $Language->phrase("ExportToPDF") . "</a>";
+            }
+        } elseif (SameText($type, "html")) {
+            return "<a href=\"" . $this->ExportHtmlUrl . "\" class=\"ew-export-link ew-html\" title=\"" . HtmlEncode($Language->phrase("ExportToHtmlText")) . "\" data-caption=\"" . HtmlEncode($Language->phrase("ExportToHtmlText")) . "\">" . $Language->phrase("ExportToHtml") . "</a>";
+        } elseif (SameText($type, "xml")) {
+            return "<a href=\"" . $this->ExportXmlUrl . "\" class=\"ew-export-link ew-xml\" title=\"" . HtmlEncode($Language->phrase("ExportToXmlText")) . "\" data-caption=\"" . HtmlEncode($Language->phrase("ExportToXmlText")) . "\">" . $Language->phrase("ExportToXml") . "</a>";
+        } elseif (SameText($type, "csv")) {
+            return "<a href=\"" . $this->ExportCsvUrl . "\" class=\"ew-export-link ew-csv\" title=\"" . HtmlEncode($Language->phrase("ExportToCsvText")) . "\" data-caption=\"" . HtmlEncode($Language->phrase("ExportToCsvText")) . "\">" . $Language->phrase("ExportToCsv") . "</a>";
+        } elseif (SameText($type, "email")) {
+            $url = $custom ? ",url:'" . $pageUrl . "export=email&amp;custom=1'" : "";
+            return '<button id="emf_z_price_settings" class="ew-export-link ew-email" title="' . $Language->phrase("ExportToEmailText") . '" data-caption="' . $Language->phrase("ExportToEmailText") . '" onclick="ew.emailDialogShow({lnk:\'emf_z_price_settings\', hdr:ew.language.phrase(\'ExportToEmailText\'), f:document.fz_price_settingslist, sel:false' . $url . '});">' . $Language->phrase("ExportToEmail") . '</button>';
+        } elseif (SameText($type, "print")) {
+            return "<a href=\"" . $this->ExportPrintUrl . "\" class=\"ew-export-link ew-print\" title=\"" . HtmlEncode($Language->phrase("PrinterFriendlyText")) . "\" data-caption=\"" . HtmlEncode($Language->phrase("PrinterFriendlyText")) . "\">" . $Language->phrase("PrinterFriendly") . "</a>";
+        }
+    }
+
+    // Set up export options
+    protected function setupExportOptions()
+    {
+        global $Language;
+
+        // Printer friendly
+        $item = &$this->ExportOptions->add("print");
+        $item->Body = $this->getExportTag("print");
+        $item->Visible = true;
+
+        // Export to Excel
+        $item = &$this->ExportOptions->add("excel");
+        $item->Body = $this->getExportTag("excel");
+        $item->Visible = true;
+
+        // Export to Word
+        $item = &$this->ExportOptions->add("word");
+        $item->Body = $this->getExportTag("word");
+        $item->Visible = true;
+
+        // Export to Html
+        $item = &$this->ExportOptions->add("html");
+        $item->Body = $this->getExportTag("html");
+        $item->Visible = true;
+
+        // Export to Xml
+        $item = &$this->ExportOptions->add("xml");
+        $item->Body = $this->getExportTag("xml");
+        $item->Visible = false;
+
+        // Export to Csv
+        $item = &$this->ExportOptions->add("csv");
+        $item->Body = $this->getExportTag("csv");
+        $item->Visible = true;
+
+        // Export to Pdf
+        $item = &$this->ExportOptions->add("pdf");
+        $item->Body = $this->getExportTag("pdf");
+        $item->Visible = false;
+
+        // Export to Email
+        $item = &$this->ExportOptions->add("email");
+        $item->Body = $this->getExportTag("email");
+        $item->Visible = false;
+
+        // Drop down button for export
+        $this->ExportOptions->UseButtonGroup = true;
+        $this->ExportOptions->UseDropDownButton = true;
+        if ($this->ExportOptions->UseButtonGroup && IsMobile()) {
+            $this->ExportOptions->UseDropDownButton = true;
+        }
+        $this->ExportOptions->DropDownButtonPhrase = $Language->phrase("ButtonExport");
+
+        // Add group option item
+        $item = &$this->ExportOptions->add($this->ExportOptions->GroupOptionName);
+        $item->Body = "";
+        $item->Visible = false;
     }
 
     // Set up search/sort options
@@ -1507,6 +3913,17 @@ class ZPriceSettingsList extends ZPriceSettings
         $pageUrl = $this->pageUrl();
         $this->SearchOptions = new ListOptions("div");
         $this->SearchOptions->TagClassName = "ew-search-option";
+
+        // Search button
+        $item = &$this->SearchOptions->add("searchtoggle");
+        $searchToggleClass = ($this->SearchWhere != "") ? " active" : " active";
+        $item->Body = "<a class=\"btn btn-default ew-search-toggle" . $searchToggleClass . "\" href=\"#\" role=\"button\" title=\"" . $Language->phrase("SearchPanel") . "\" data-caption=\"" . $Language->phrase("SearchPanel") . "\" data-toggle=\"button\" data-form=\"fz_price_settingslistsrch\" aria-pressed=\"" . ($searchToggleClass == " active" ? "true" : "false") . "\">" . $Language->phrase("SearchLink") . "</a>";
+        $item->Visible = true;
+
+        // Show all button
+        $item = &$this->SearchOptions->add("showall");
+        $item->Body = "<a class=\"btn btn-default ew-show-all\" title=\"" . $Language->phrase("ShowAll") . "\" data-caption=\"" . $Language->phrase("ShowAll") . "\" href=\"" . $pageUrl . "cmd=reset\">" . $Language->phrase("ShowAllBtn") . "</a>";
+        $item->Visible = ($this->SearchWhere != $this->DefaultSearchWhere && $this->SearchWhere != "0=101");
 
         // Button group for search
         $this->SearchOptions->UseDropDownButton = false;
@@ -1525,6 +3942,100 @@ class ZPriceSettingsList extends ZPriceSettings
         if (!$Security->canSearch()) {
             $this->SearchOptions->hideAllOptions();
             $this->FilterOptions->hideAllOptions();
+        }
+    }
+
+    /**
+    * Export data in HTML/CSV/Word/Excel/XML/Email/PDF format
+    *
+    * @param boolean $return Return the data rather than output it
+    * @return mixed
+    */
+    public function exportData($return = false)
+    {
+        global $Language;
+        $utf8 = SameText(Config("PROJECT_CHARSET"), "utf-8");
+
+        // Load recordset
+        $this->TotalRecords = $this->listRecordCount();
+        $this->StartRecord = 1;
+
+        // Export all
+        if ($this->ExportAll) {
+            set_time_limit(Config("EXPORT_ALL_TIME_LIMIT"));
+            $this->DisplayRecords = $this->TotalRecords;
+            $this->StopRecord = $this->TotalRecords;
+        } else { // Export one page only
+            $this->setupStartRecord(); // Set up start record position
+            // Set the last record to display
+            if ($this->DisplayRecords <= 0) {
+                $this->StopRecord = $this->TotalRecords;
+            } else {
+                $this->StopRecord = $this->StartRecord + $this->DisplayRecords - 1;
+            }
+        }
+        $rs = $this->loadRecordset($this->StartRecord - 1, $this->DisplayRecords <= 0 ? $this->TotalRecords : $this->DisplayRecords);
+        $this->ExportDoc = GetExportDocument($this, "h");
+        $doc = &$this->ExportDoc;
+        if (!$doc) {
+            $this->setFailureMessage($Language->phrase("ExportClassNotFound")); // Export class not found
+        }
+        if (!$rs || !$doc) {
+            RemoveHeader("Content-Type"); // Remove header
+            RemoveHeader("Content-Disposition");
+            $this->showMessage();
+            return;
+        }
+        $this->StartRecord = 1;
+        $this->StopRecord = $this->DisplayRecords <= 0 ? $this->TotalRecords : $this->DisplayRecords;
+
+        // Call Page Exporting server event
+        $this->ExportDoc->ExportCustom = !$this->pageExporting();
+        $header = $this->PageHeader;
+        $this->pageDataRendering($header);
+        $doc->Text .= $header;
+        $this->exportDocument($doc, $rs, $this->StartRecord, $this->StopRecord, "");
+        $footer = $this->PageFooter;
+        $this->pageDataRendered($footer);
+        $doc->Text .= $footer;
+
+        // Close recordset
+        $rs->close();
+
+        // Call Page Exported server event
+        $this->pageExported();
+
+        // Export header and footer
+        $doc->exportHeaderAndFooter();
+
+        // Clean output buffer (without destroying output buffer)
+        $buffer = ob_get_contents(); // Save the output buffer
+        if (!Config("DEBUG") && $buffer) {
+            ob_clean();
+        }
+
+        // Write debug message if enabled
+        if (Config("DEBUG") && !$this->isExport("pdf")) {
+            echo GetDebugMessage();
+        }
+
+        // Output data
+        if ($this->isExport("email")) {
+            // Export-to-email disabled
+        } else {
+            $doc->export();
+            if ($return) {
+                RemoveHeader("Content-Type"); // Remove header
+                RemoveHeader("Content-Disposition");
+                $content = ob_get_contents();
+                if ($content) {
+                    ob_clean();
+                }
+                if ($buffer) {
+                    echo $buffer; // Resume the output buffer
+                }
+                return $content;
+            }
         }
     }
 

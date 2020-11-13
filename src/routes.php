@@ -377,11 +377,15 @@ return function (App $app) {
     // z_price_settings
     $app->any('/zpricesettingslist[/{id}]', ZPriceSettingsController::class . ':list')->add(PermissionMiddleware::class)->setName('zpricesettingslist-z_price_settings-list'); // list
     $app->any('/zpricesettingsview[/{id}]', ZPriceSettingsController::class . ':view')->add(PermissionMiddleware::class)->setName('zpricesettingsview-z_price_settings-view'); // view
+    $app->any('/zpricesettingsedit[/{id}]', ZPriceSettingsController::class . ':edit')->add(PermissionMiddleware::class)->setName('zpricesettingsedit-z_price_settings-edit'); // edit
+    $app->any('/zpricesettingsupdate', ZPriceSettingsController::class . ':update')->add(PermissionMiddleware::class)->setName('zpricesettingsupdate-z_price_settings-update'); // update
     $app->group(
         '/z_price_settings',
         function (RouteCollectorProxy $group) {
             $group->any('/' . Config("LIST_ACTION") . '[/{id}]', ZPriceSettingsController::class . ':list')->add(PermissionMiddleware::class)->setName('z_price_settings/list-z_price_settings-list-2'); // list
             $group->any('/' . Config("VIEW_ACTION") . '[/{id}]', ZPriceSettingsController::class . ':view')->add(PermissionMiddleware::class)->setName('z_price_settings/view-z_price_settings-view-2'); // view
+            $group->any('/' . Config("EDIT_ACTION") . '[/{id}]', ZPriceSettingsController::class . ':edit')->add(PermissionMiddleware::class)->setName('z_price_settings/edit-z_price_settings-edit-2'); // edit
+            $group->any('/' . Config("UPDATE_ACTION") . '', ZPriceSettingsController::class . ':update')->add(PermissionMiddleware::class)->setName('z_price_settings/update-z_price_settings-update-2'); // update
         }
     );
 

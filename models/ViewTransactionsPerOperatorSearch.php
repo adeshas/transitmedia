@@ -801,6 +801,7 @@ class ViewTransactionsPerOperatorSearch extends ViewTransactionsPerOperator
 
             // transaction_status
             $this->transaction_status->ViewValue = $this->transaction_status->CurrentValue;
+            $this->transaction_status->CellCssStyle .= "text-align: center;";
             $this->transaction_status->ViewCustomAttributes = 'class="badge bg-success"';
 
             // quantity

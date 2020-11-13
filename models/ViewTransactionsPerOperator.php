@@ -1067,6 +1067,7 @@ SORTHTML;
 
         // transaction_status
         $this->transaction_status->ViewValue = $this->transaction_status->CurrentValue;
+        $this->transaction_status->CellCssStyle .= "text-align: center;";
         $this->transaction_status->ViewCustomAttributes = 'class="badge bg-success"';
 
         // quantity
@@ -1517,8 +1518,6 @@ SORTHTML;
                     $doc->exportCaption($this->quantity);
                     $doc->exportCaption($this->operator_fee);
                     $doc->exportCaption($this->total);
-                    $doc->exportCaption($this->start_date);
-                    $doc->exportCaption($this->end_date);
                 }
                 $doc->endExportRow();
             }
@@ -1577,8 +1576,6 @@ SORTHTML;
                         $doc->exportField($this->quantity);
                         $doc->exportField($this->operator_fee);
                         $doc->exportField($this->total);
-                        $doc->exportField($this->start_date);
-                        $doc->exportField($this->end_date);
                     }
                     $doc->endExportRow($rowCnt);
                 }
@@ -1610,8 +1607,6 @@ SORTHTML;
                 $doc->exportAggregate($this->quantity, 'TOTAL');
                 $doc->exportAggregate($this->operator_fee, 'TOTAL');
                 $doc->exportAggregate($this->total, 'TOTAL');
-                $doc->exportAggregate($this->start_date, '');
-                $doc->exportAggregate($this->end_date, '');
                 $doc->endExportRow();
             }
         }
