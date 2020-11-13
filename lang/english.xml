@@ -962,6 +962,9 @@
     <menu id="10">
       <phrase id="menutext" value="Manage Campaigns" />
     </menu>
+    <menu id="198">
+      <phrase id="menutext" value="Pending Campaigns " />
+    </menu>
     <menu id="133">
       <phrase id="menutext" value="Campaigns/Platform" />
     </menu>
@@ -997,6 +1000,12 @@
     </menu>
     <menu id="201">
       <phrase id="menutext" value="Print Orders" />
+    </menu>
+    <menu id="197">
+      <phrase id="menutext" value="Payments (Platform)" />
+    </menu>
+    <menu id="195">
+      <phrase id="menutext" value="Payments (Operator)" />
     </menu>
     <menu id="34">
       <phrase id="menutext" value="Reports" />
@@ -1093,15 +1102,6 @@
     </menu>
     <menu id="11">
       <phrase id="menutext" value="Pricing View Initial" />
-    </menu>
-    <menu id="195">
-      <phrase id="menutext" value="Payments (Operator)" />
-    </menu>
-    <menu id="197">
-      <phrase id="menutext" value="Payments (Platform)" />
-    </menu>
-    <menu id="198">
-      <phrase id="menutext" value="Pending Campaigns " />
     </menu>
     <menu id="130">
       <phrase id="menutext" value="Pricing View" />
@@ -2237,7 +2237,7 @@
         <phrase id="fldcaption" value="Bus size" />
       </field>
       <field id="print_stage">
-        <phrase id="fldcaption" value="print stage" />
+        <phrase id="fldcaption" value="Stage" />
       </field>
       <field id="vendor">
         <phrase id="fldcaption" value="Vendor" />

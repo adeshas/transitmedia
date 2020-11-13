@@ -2337,6 +2337,10 @@ class ViewTransactionsPerOperatorList extends ViewTransactionsPerOperator
             $this->bus_size->ViewValue = $this->bus_size->CurrentValue;
             $this->bus_size->ViewCustomAttributes = "";
 
+            // print_stage
+            $this->print_stage->ViewValue = $this->print_stage->CurrentValue;
+            $this->print_stage->ViewCustomAttributes = "";
+
             // vendor
             $this->vendor->ViewValue = $this->vendor->CurrentValue;
             $this->vendor->ViewCustomAttributes = "";
@@ -2450,6 +2454,90 @@ class ViewTransactionsPerOperatorList extends ViewTransactionsPerOperator
             $this->total->LinkCustomAttributes = "";
             $this->total->HrefValue = "";
             $this->total->TooltipValue = "";
+        } elseif ($this->RowType == ROWTYPE_SEARCH) {
+            // transaction_id
+            $this->transaction_id->EditAttrs["class"] = "form-control";
+            $this->transaction_id->EditCustomAttributes = "";
+            $this->transaction_id->EditValue = HtmlEncode($this->transaction_id->AdvancedSearch->SearchValue);
+            $this->transaction_id->PlaceHolder = RemoveHtml($this->transaction_id->caption());
+
+            // campaign
+            $this->campaign->EditAttrs["class"] = "form-control";
+            $this->campaign->EditCustomAttributes = "";
+            $this->campaign->EditValue = HtmlEncode($this->campaign->AdvancedSearch->SearchValue);
+            $this->campaign->PlaceHolder = RemoveHtml($this->campaign->caption());
+
+            // payment_date
+            $this->payment_date->EditAttrs["class"] = "form-control";
+            $this->payment_date->EditCustomAttributes = "";
+            $this->payment_date->EditValue = HtmlEncode(FormatDateTime(UnFormatDateTime($this->payment_date->AdvancedSearch->SearchValue, 0), 8));
+            $this->payment_date->PlaceHolder = RemoveHtml($this->payment_date->caption());
+
+            // inventory
+            $this->inventory->EditAttrs["class"] = "form-control";
+            $this->inventory->EditCustomAttributes = "";
+            $this->inventory->EditValue = HtmlEncode($this->inventory->AdvancedSearch->SearchValue);
+            $this->inventory->PlaceHolder = RemoveHtml($this->inventory->caption());
+
+            // bus_size
+            $this->bus_size->EditAttrs["class"] = "form-control";
+            $this->bus_size->EditCustomAttributes = "";
+            $this->bus_size->EditValue = HtmlEncode($this->bus_size->AdvancedSearch->SearchValue);
+            $this->bus_size->PlaceHolder = RemoveHtml($this->bus_size->caption());
+
+            // vendor
+            $this->vendor->EditAttrs["class"] = "form-control";
+            $this->vendor->EditCustomAttributes = "";
+            if (!$this->vendor->Raw) {
+                $this->vendor->AdvancedSearch->SearchValue = HtmlDecode($this->vendor->AdvancedSearch->SearchValue);
+            }
+            $this->vendor->EditValue = HtmlEncode($this->vendor->AdvancedSearch->SearchValue);
+            $this->vendor->PlaceHolder = RemoveHtml($this->vendor->caption());
+
+            // operator
+            $this->operator->EditAttrs["class"] = "form-control";
+            $this->operator->EditCustomAttributes = "";
+            if (!$this->operator->Raw) {
+                $this->operator->AdvancedSearch->SearchValue = HtmlDecode($this->operator->AdvancedSearch->SearchValue);
+            }
+            $this->operator->EditValue = HtmlEncode($this->operator->AdvancedSearch->SearchValue);
+            $this->operator->PlaceHolder = RemoveHtml($this->operator->caption());
+
+            // platform
+            $this->platform->EditAttrs["class"] = "form-control";
+            $this->platform->EditCustomAttributes = "";
+            if (!$this->platform->Raw) {
+                $this->platform->AdvancedSearch->SearchValue = HtmlDecode($this->platform->AdvancedSearch->SearchValue);
+            }
+            $this->platform->EditValue = HtmlEncode($this->platform->AdvancedSearch->SearchValue);
+            $this->platform->PlaceHolder = RemoveHtml($this->platform->caption());
+
+            // transaction_status
+            $this->transaction_status->EditAttrs["class"] = "form-control";
+            $this->transaction_status->EditCustomAttributes = "";
+            if (!$this->transaction_status->Raw) {
+                $this->transaction_status->AdvancedSearch->SearchValue = HtmlDecode($this->transaction_status->AdvancedSearch->SearchValue);
+            }
+            $this->transaction_status->EditValue = HtmlEncode($this->transaction_status->AdvancedSearch->SearchValue);
+            $this->transaction_status->PlaceHolder = RemoveHtml($this->transaction_status->caption());
+
+            // quantity
+            $this->quantity->EditAttrs["class"] = "form-control";
+            $this->quantity->EditCustomAttributes = "";
+            $this->quantity->EditValue = HtmlEncode($this->quantity->AdvancedSearch->SearchValue);
+            $this->quantity->PlaceHolder = RemoveHtml($this->quantity->caption());
+
+            // operator_fee
+            $this->operator_fee->EditAttrs["class"] = "form-control";
+            $this->operator_fee->EditCustomAttributes = "";
+            $this->operator_fee->EditValue = HtmlEncode($this->operator_fee->AdvancedSearch->SearchValue);
+            $this->operator_fee->PlaceHolder = RemoveHtml($this->operator_fee->caption());
+
+            // total
+            $this->total->EditAttrs["class"] = "form-control";
+            $this->total->EditCustomAttributes = "";
+            $this->total->EditValue = HtmlEncode($this->total->AdvancedSearch->SearchValue);
+            $this->total->PlaceHolder = RemoveHtml($this->total->caption());
         } elseif ($this->RowType == ROWTYPE_AGGREGATEINIT) { // Initialize aggregate row
                     $this->quantity->Total = 0; // Initialize total
                     $this->operator_fee->Total = 0; // Initialize total
@@ -2475,6 +2563,9 @@ class ViewTransactionsPerOperatorList extends ViewTransactionsPerOperator
             $this->total->ViewCustomAttributes = "";
             $this->total->HrefValue = ""; // Clear href value
         }
+        if ($this->RowType == ROWTYPE_ADD || $this->RowType == ROWTYPE_EDIT || $this->RowType == ROWTYPE_SEARCH) { // Add/Edit/Search row
+            $this->setupFieldTitles();
+        }
 
         // Call Row Rendered event
         if ($this->RowType != ROWTYPE_AGGREGATEINIT) {
@@ -2488,6 +2579,12 @@ class ViewTransactionsPerOperatorList extends ViewTransactionsPerOperator
         // Check if validation required
         if (!Config("SERVER_VALIDATE")) {
             return true;
+        }
+        if (!CheckDate($this->payment_date->AdvancedSearch->SearchValue)) {
+            $this->payment_date->addErrorMessage($this->payment_date->getErrorMessage(false));
+        }
+        if (!CheckInteger($this->quantity->AdvancedSearch->SearchValue)) {
+            $this->quantity->addErrorMessage($this->quantity->getErrorMessage(false));
         }
 
         // Return validate result
