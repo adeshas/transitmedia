@@ -1691,10 +1691,26 @@ class ZPriceSettingsList extends ZPriceSettings
     {
         $orderBy = $this->getSessionOrderBy(); // Get ORDER BY from Session
         if ($orderBy == "") {
-            $this->DefaultSort = "";
+            $this->DefaultSort = "\"platform_id\" ASC,\"inventory_id\" ASC,\"bus_size_id\" ASC,\"print_stage_id\" ASC";
             if ($this->getSqlOrderBy() != "") {
                 $useDefaultSort = true;
+                if ($this->platform_id->getSort() != "") {
+                    $useDefaultSort = false;
+                }
+                if ($this->inventory_id->getSort() != "") {
+                    $useDefaultSort = false;
+                }
+                if ($this->bus_size_id->getSort() != "") {
+                    $useDefaultSort = false;
+                }
+                if ($this->print_stage_id->getSort() != "") {
+                    $useDefaultSort = false;
+                }
                 if ($useDefaultSort) {
+                    $this->platform_id->setSort("ASC");
+                    $this->inventory_id->setSort("ASC");
+                    $this->bus_size_id->setSort("ASC");
+                    $this->print_stage_id->setSort("ASC");
                     $orderBy = $this->getSqlOrderBy();
                     $this->setSessionOrderBy($orderBy);
                 } else {

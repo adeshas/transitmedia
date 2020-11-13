@@ -154,7 +154,7 @@ include_once $RELATIVE_PATH . "src/userlevelsettings.php";
 $CONFIG = [
 
     // Debug
-    "DEBUG" => false, // true to debug
+    "DEBUG" => true, // true to debug
     "DEBUG_MESSAGE_TEMPLATE" => '<div class="card card-danger ew-debug"><div class="card-header">' .
         '<h3 class="card-title">%t</h3>' .
         '<div class="card-tools"><button type="button" class="btn btn-tool" data-card-widget="collapse"><i class="fas fa-minus"></i></button></div>' .
@@ -165,7 +165,7 @@ $CONFIG = [
 
     // General
     "UNFORMAT_YEAR" => 50, // Unformat year
-    "RANDOM_KEY" => 'gKqbb1BRv6Zxbh02', // Random key for encryption
+    "RANDOM_KEY" => 'l944XzKjJl5m97Br', // Random key for encryption
     "ENCRYPTION_KEY" => '', // Encryption key for data protection
     "PROJECT_STYLESHEET_FILENAME" => "css/test.css", // Project stylesheet file name
     "PROJECT_CHARSET" => "utf-8", // Project charset
