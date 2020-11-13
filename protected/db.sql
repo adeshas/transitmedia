@@ -5,7 +5,7 @@
 -- Dumped from database version 11.2
 -- Dumped by pg_dump version 11.2
 
--- Started on 2020-11-12 18:15:44
+-- Started on 2020-11-13 06:07:16
 
 SET statement_timeout = 0;
 SET lock_timeout = 0;
@@ -17,7 +17,7 @@ SET check_function_bodies = false;
 SET client_min_messages = warning;
 SET row_security = off;
 
-DROP DATABASE test;
+DROP DATABASE IF EXISTS test;
 --
 -- TOC entry 3281 (class 1262 OID 33867)
 -- Name: test; Type: DATABASE; Schema: -; Owner: postgres
@@ -3475,7 +3475,7 @@ ALTER TABLE ONLY public.main_campaigns
     ADD CONSTRAINT pricing_id_fk FOREIGN KEY (price_id) REFERENCES public.z_price_settings(id);
 
 
--- Completed on 2020-11-12 18:15:45
+-- Completed on 2020-11-13 06:07:21
 
 --
 -- PostgreSQL database dump complete
