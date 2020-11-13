@@ -22,12 +22,12 @@ return [
     },
     "audit" => function (ContainerInterface $c) {
         $logger = new Logger("audit"); // For audit trail
-        $logger->pushHandler(new AuditTrailHandler("log/audit.log"));
+        $logger->pushHandler(new AuditTrailHandler("audit.log"));
         return $logger;
     },
     "log" => function (ContainerInterface $c) {
         $logger = new Logger("log");
-        $logger->pushHandler(new RotatingFileHandler("log/log.log"));
+        $logger->pushHandler(new RotatingFileHandler("log.log"));
         return $logger;
     },
     "sqllogger" => function (ContainerInterface $c) {
