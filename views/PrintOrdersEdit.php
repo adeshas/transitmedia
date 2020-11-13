@@ -157,8 +157,8 @@ $Page->showMessage();
         <div class="<?= $Page->RightColumnClass ?>"><div <?= $Page->approved->cellAttributes() ?>>
 <span id="el_print_orders_approved">
 <div class="custom-control custom-checkbox d-inline-block">
-    <input type="checkbox" class="custom-control-input<?= $Page->approved->isInvalidClass() ?>" data-table="print_orders" data-field="x_approved" name="x_approved[]" id="x_approved_296705" value="1"<?= ConvertToBool($Page->approved->CurrentValue) ? " checked" : "" ?><?= $Page->approved->editAttributes() ?> aria-describedby="x_approved_help">
-    <label class="custom-control-label" for="x_approved_296705"></label>
+    <input type="checkbox" class="custom-control-input<?= $Page->approved->isInvalidClass() ?>" data-table="print_orders" data-field="x_approved" name="x_approved[]" id="x_approved_430288" value="1"<?= ConvertToBool($Page->approved->CurrentValue) ? " checked" : "" ?><?= $Page->approved->editAttributes() ?> aria-describedby="x_approved_help">
+    <label class="custom-control-label" for="x_approved_430288"></label>
 </div>
 <?= $Page->approved->getCustomMessage() ?>
 <div class="invalid-feedback"><?= $Page->approved->getErrorMessage() ?></div>

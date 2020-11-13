@@ -626,6 +626,9 @@ return function (App $app) {
     // error
     $app->any('/error', OthersController::class . ':error')->add(PermissionMiddleware::class)->setName('error');
 
+    // privacy
+    $app->any('/privacy', OthersController::class . ':privacy')->add(PermissionMiddleware::class)->setName('privacy');
+
     // personal_data
     $app->any('/personaldata', OthersController::class . ':personaldata')->add(PermissionMiddleware::class)->setName('personaldata');
 
