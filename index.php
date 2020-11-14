@@ -50,8 +50,8 @@ $callableResolver = $app->getCallableResolver();
 
 // Display error details
 $displayErrorDetails = $isDebug;
-$logErrors = $isDebug;
-$logErrorDetails = $isDebug;
+$logErrors = true;
+$logErrorDetails = true;
 
 // Create request object from globals
 $serverRequestCreator = ServerRequestCreatorFactory::create();

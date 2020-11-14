@@ -17,6 +17,12 @@ use Throwable;
 
 class HttpErrorHandler extends ErrorHandler
 {
+    // Log error
+    protected function logError(string $error): void
+    {
+        Log($error);
+    }
+
     // Respond
     protected function respond(): ResponseInterface
     {

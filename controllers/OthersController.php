@@ -19,12 +19,6 @@ class OthersController extends ControllerBase
         return $this->runPage($request, $response, $args, "Error");
     }
 
-    // privacy
-    public function privacy(Request $request, Response $response, array $args): Response
-    {
-        return $this->runPage($request, $response, $args, "Privacy");
-    }
-
     // personaldata
     public function personaldata(Request $request, Response $response, array $args): Response
     {

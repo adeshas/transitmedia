@@ -292,7 +292,6 @@ ew.ready("head", [ew.PATH_BASE + "ckeditor/ckeditor.js", ew.PATH_BASE + "js/ewed
 <body class="<?= Config("BODY_CLASS") ?>" dir="<?= IsRTL() ? "rtl" : "ltr" ?>">
 <?php if (@!$SkipHeaderFooter) { ?>
 <?php if (!IsExport()) { ?>
-<?php include_once $RELATIVE_PATH . "views/cookieconsent.php"; ?>
 <div class="wrapper ew-layout">
     <!-- Main Header -->
     <!-- Navbar -->
