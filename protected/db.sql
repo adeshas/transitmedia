@@ -5,7 +5,7 @@
 -- Dumped from database version 11.2
 -- Dumped by pg_dump version 11.2
 
--- Started on 2020-11-16 10:06:31
+-- Started on 2020-11-16 16:05:06
 
 SET statement_timeout = 0;
 SET lock_timeout = 0;
@@ -17,6 +17,169 @@ SET check_function_bodies = false;
 SET client_min_messages = warning;
 SET row_security = off;
 
+ALTER TABLE IF EXISTS ONLY public.main_campaigns DROP CONSTRAINT IF EXISTS pricing_id_fk;
+ALTER TABLE IF EXISTS ONLY public.main_campaigns DROP CONSTRAINT IF EXISTS platform_id_fk;
+ALTER TABLE IF EXISTS ONLY public.y_operators DROP CONSTRAINT IF EXISTS operator_platorm_id_fk;
+ALTER TABLE IF EXISTS ONLY public.main_campaigns DROP CONSTRAINT IF EXISTS inventory_id_fk;
+ALTER TABLE IF EXISTS ONLY public.main_reports DROP CONSTRAINT IF EXISTS exterior_reports_fk2;
+ALTER TABLE IF EXISTS ONLY public.main_reports DROP CONSTRAINT IF EXISTS exterior_reports_fk1;
+ALTER TABLE IF EXISTS ONLY public.main_buses DROP CONSTRAINT IF EXISTS buses_fk4;
+ALTER TABLE IF EXISTS ONLY public.main_buses DROP CONSTRAINT IF EXISTS buses_fk3;
+ALTER TABLE IF EXISTS ONLY public.main_buses DROP CONSTRAINT IF EXISTS buses_fk2;
+ALTER TABLE IF EXISTS ONLY public.main_buses DROP CONSTRAINT IF EXISTS buses_fk1;
+ALTER TABLE IF EXISTS ONLY public.main_buses DROP CONSTRAINT IF EXISTS buses_fk0;
+ALTER TABLE IF EXISTS ONLY public.main_buses DROP CONSTRAINT IF EXISTS buses_depot_fk;
+ALTER TABLE IF EXISTS ONLY public.main_campaigns DROP CONSTRAINT IF EXISTS bus_size_id_fk;
+ALTER TABLE IF EXISTS ONLY public.sub_media_allocation DROP CONSTRAINT IF EXISTS allocation_campaign_id_fk;
+ALTER TABLE IF EXISTS ONLY public.sub_media_allocation DROP CONSTRAINT IF EXISTS allocation_bus_id_fk;
+CREATE OR REPLACE VIEW public.view_campaign_status AS
+SELECT
+    NULL::integer AS id,
+    NULL::text AS name,
+    NULL::bigint AS pending,
+    NULL::bigint AS approved,
+    NULL::bigint AS denied,
+    NULL::text AS status,
+    NULL::text AS status_matrix,
+    NULL::text AS status_json;
+DROP INDEX IF EXISTS public.fki_buses_depot_fk;
+ALTER TABLE IF EXISTS ONLY public.z_core_settings DROP CONSTRAINT IF EXISTS z_core_settings_pkey;
+ALTER TABLE IF EXISTS ONLY public.y_vendors DROP CONSTRAINT IF EXISTS y_vendors_pkey;
+ALTER TABLE IF EXISTS ONLY public.x_user_types DROP CONSTRAINT IF EXISTS x_user_types_pkey;
+ALTER TABLE IF EXISTS ONLY public.x_report_types DROP CONSTRAINT IF EXISTS x_report_types_pkey;
+ALTER TABLE IF EXISTS ONLY public.x_renewal_stage DROP CONSTRAINT IF EXISTS x_renewal_stage_pkey;
+ALTER TABLE IF EXISTS ONLY public.w_vendors_operators DROP CONSTRAINT IF EXISTS w_vendors_operators_id_pk;
+ALTER TABLE IF EXISTS ONLY public.main_users DROP CONSTRAINT IF EXISTS test_id_pk;
+ALTER TABLE IF EXISTS ONLY public.sub_transaction_details DROP CONSTRAINT IF EXISTS sub_tran_details_id_pk;
+ALTER TABLE IF EXISTS ONLY public.sub_renewal_requests DROP CONSTRAINT IF EXISTS renewal_requests_id_pk;
+ALTER TABLE IF EXISTS ONLY public.y_printers DROP CONSTRAINT IF EXISTS printers_pkey;
+ALTER TABLE IF EXISTS ONLY public.x_print_status DROP CONSTRAINT IF EXISTS print_status_pk;
+ALTER TABLE IF EXISTS ONLY public.x_print_status DROP CONSTRAINT IF EXISTS print_status_name_key;
+ALTER TABLE IF EXISTS ONLY public.x_print_stage DROP CONSTRAINT IF EXISTS print_stage_id_pk;
+ALTER TABLE IF EXISTS ONLY public.main_print_orders DROP CONSTRAINT IF EXISTS print_orders_pk0;
+ALTER TABLE IF EXISTS ONLY public.z_price_settings DROP CONSTRAINT IF EXISTS pricing_id_pk;
+ALTER TABLE IF EXISTS ONLY public.y_platforms DROP CONSTRAINT IF EXISTS platform_id_pk;
+ALTER TABLE IF EXISTS ONLY public.x_payment_status DROP CONSTRAINT IF EXISTS payment_status_pk;
+ALTER TABLE IF EXISTS ONLY public.x_payment_status DROP CONSTRAINT IF EXISTS payment_status_name_key;
+ALTER TABLE IF EXISTS ONLY public.y_operators DROP CONSTRAINT IF EXISTS operator_id_pk;
+ALTER TABLE IF EXISTS ONLY public.main_campaigns DROP CONSTRAINT IF EXISTS new_campaign_id_pk;
+ALTER TABLE IF EXISTS ONLY public.main_transactions DROP CONSTRAINT IF EXISTS main_transactions_pkey;
+ALTER TABLE IF EXISTS ONLY public.y_inventory DROP CONSTRAINT IF EXISTS inventory_id_pk;
+ALTER TABLE IF EXISTS ONLY public.main_reports DROP CONSTRAINT IF EXISTS exterior_reports_pk;
+ALTER TABLE IF EXISTS ONLY public.z_email_settings DROP CONSTRAINT IF EXISTS email_settings_pk;
+ALTER TABLE IF EXISTS ONLY public.z_email_settings DROP CONSTRAINT IF EXISTS email_settings_name_uk;
+ALTER TABLE IF EXISTS ONLY public.x_transaction_status DROP CONSTRAINT IF EXISTS campaign_status_pk;
+ALTER TABLE IF EXISTS ONLY public.main_buses DROP CONSTRAINT IF EXISTS buses_pk;
+ALTER TABLE IF EXISTS ONLY public.main_buses DROP CONSTRAINT IF EXISTS buses_number_key;
+ALTER TABLE IF EXISTS ONLY public.x_bus_status DROP CONSTRAINT IF EXISTS bus_status_pk;
+ALTER TABLE IF EXISTS ONLY public.x_bus_status DROP CONSTRAINT IF EXISTS bus_status_name_key;
+ALTER TABLE IF EXISTS ONLY public.x_bus_sizes DROP CONSTRAINT IF EXISTS bus_sizes_id_pk;
+ALTER TABLE IF EXISTS ONLY public.x_bus_depot DROP CONSTRAINT IF EXISTS bus_depot_unique;
+ALTER TABLE IF EXISTS ONLY public.x_bus_depot DROP CONSTRAINT IF EXISTS bus_depot_pk;
+ALTER TABLE IF EXISTS ONLY public.sub_media_allocation DROP CONSTRAINT IF EXISTS allocation_id_pk;
+ALTER TABLE IF EXISTS ONLY public.sub_media_allocation DROP CONSTRAINT IF EXISTS allocation_bus_campaign_uk;
+ALTER TABLE IF EXISTS public.z_price_settings ALTER COLUMN id DROP DEFAULT;
+ALTER TABLE IF EXISTS public.z_email_settings ALTER COLUMN id DROP DEFAULT;
+ALTER TABLE IF EXISTS public.z_core_settings ALTER COLUMN id DROP DEFAULT;
+ALTER TABLE IF EXISTS public.y_vendors ALTER COLUMN id DROP DEFAULT;
+ALTER TABLE IF EXISTS public.y_printers ALTER COLUMN id DROP DEFAULT;
+ALTER TABLE IF EXISTS public.y_platforms ALTER COLUMN id DROP DEFAULT;
+ALTER TABLE IF EXISTS public.y_operators ALTER COLUMN id DROP DEFAULT;
+ALTER TABLE IF EXISTS public.y_inventory ALTER COLUMN id DROP DEFAULT;
+ALTER TABLE IF EXISTS public.x_user_types ALTER COLUMN id DROP DEFAULT;
+ALTER TABLE IF EXISTS public.x_transaction_status ALTER COLUMN id DROP DEFAULT;
+ALTER TABLE IF EXISTS public.x_renewal_stage ALTER COLUMN id DROP DEFAULT;
+ALTER TABLE IF EXISTS public.x_print_status ALTER COLUMN id DROP DEFAULT;
+ALTER TABLE IF EXISTS public.x_print_stage ALTER COLUMN id DROP DEFAULT;
+ALTER TABLE IF EXISTS public.x_payment_status ALTER COLUMN id DROP DEFAULT;
+ALTER TABLE IF EXISTS public.x_bus_status ALTER COLUMN id DROP DEFAULT;
+ALTER TABLE IF EXISTS public.x_bus_sizes ALTER COLUMN id DROP DEFAULT;
+ALTER TABLE IF EXISTS public.x_bus_depot ALTER COLUMN id DROP DEFAULT;
+ALTER TABLE IF EXISTS public.w_vendors_operators ALTER COLUMN id DROP DEFAULT;
+ALTER TABLE IF EXISTS public.sub_transaction_details ALTER COLUMN id DROP DEFAULT;
+ALTER TABLE IF EXISTS public.sub_renewal_requests ALTER COLUMN id DROP DEFAULT;
+ALTER TABLE IF EXISTS public.sub_media_allocation ALTER COLUMN id DROP DEFAULT;
+ALTER TABLE IF EXISTS public.main_users ALTER COLUMN id DROP DEFAULT;
+ALTER TABLE IF EXISTS public.main_transactions ALTER COLUMN id DROP DEFAULT;
+ALTER TABLE IF EXISTS public.main_reports ALTER COLUMN id DROP DEFAULT;
+ALTER TABLE IF EXISTS public.main_print_orders ALTER COLUMN id DROP DEFAULT;
+ALTER TABLE IF EXISTS public.main_campaigns ALTER COLUMN id DROP DEFAULT;
+ALTER TABLE IF EXISTS public.main_buses ALTER COLUMN id DROP DEFAULT;
+DROP TABLE IF EXISTS public.x_report_types;
+DROP SEQUENCE IF EXISTS public.w_vendors_operators_id_seq;
+DROP VIEW IF EXISTS public.view_transactions_per_platform;
+DROP VIEW IF EXISTS public.view_transactions_per_operator;
+DROP VIEW IF EXISTS public.view_vendors_operators;
+DROP TABLE IF EXISTS public.w_vendors_operators;
+DROP VIEW IF EXISTS public.view_transactions_all;
+DROP VIEW IF EXISTS public.view_pricing_options;
+DROP VIEW IF EXISTS public.view_pricing_initial;
+DROP VIEW IF EXISTS public.view_pricing_all;
+DROP VIEW IF EXISTS public.view_payments_pending;
+DROP VIEW IF EXISTS public.view_operators_platforms;
+DROP VIEW IF EXISTS public.view_operators;
+DROP VIEW IF EXISTS public.view_campaigns_pending;
+DROP VIEW IF EXISTS public.view_campaign_status;
+DROP VIEW IF EXISTS public.view_buses_interior;
+DROP VIEW IF EXISTS public.view_buses_exterior;
+DROP VIEW IF EXISTS public.view_buses_assigned;
+DROP VIEW IF EXISTS public.view_bus_trans_options;
+DROP VIEW IF EXISTS public.view_bus_summary;
+DROP VIEW IF EXISTS public.view_bus_int_summary_at_a_glance;
+DROP VIEW IF EXISTS public.view_bus_ext_summary_at_a_glance;
+DROP VIEW IF EXISTS public.view_bus_depot_summary;
+DROP SEQUENCE IF EXISTS public.vendors_id_seq;
+DROP TABLE IF EXISTS public.y_vendors;
+DROP SEQUENCE IF EXISTS public.users_id_seq;
+DROP SEQUENCE IF EXISTS public.user_types_id_seq;
+DROP TABLE IF EXISTS public.x_user_types;
+DROP SEQUENCE IF EXISTS public.transactions_id_seq;
+DROP SEQUENCE IF EXISTS public.transaction_details_id_seq;
+DROP TABLE IF EXISTS public.sub_transaction_details;
+DROP SEQUENCE IF EXISTS public.renewal_stage_id_seq;
+DROP TABLE IF EXISTS public.x_renewal_stage;
+DROP SEQUENCE IF EXISTS public.renewal_requests_id_seq;
+DROP TABLE IF EXISTS public.sub_renewal_requests;
+DROP SEQUENCE IF EXISTS public.printers_id_seq;
+DROP TABLE IF EXISTS public.y_printers;
+DROP SEQUENCE IF EXISTS public.print_status_id_seq;
+DROP TABLE IF EXISTS public.x_print_status;
+DROP SEQUENCE IF EXISTS public.print_stage_id_seq;
+DROP TABLE IF EXISTS public.x_print_stage;
+DROP SEQUENCE IF EXISTS public.print_orders_id_seq;
+DROP SEQUENCE IF EXISTS public.pricing_id_seq;
+DROP TABLE IF EXISTS public.z_price_settings;
+DROP SEQUENCE IF EXISTS public.platforms_id_seq;
+DROP TABLE IF EXISTS public.y_platforms;
+DROP SEQUENCE IF EXISTS public.payment_status_id_seq;
+DROP TABLE IF EXISTS public.x_payment_status;
+DROP SEQUENCE IF EXISTS public.operators_id_seq;
+DROP TABLE IF EXISTS public.y_operators;
+DROP SEQUENCE IF EXISTS public.new_campaign_id_seq;
+DROP TABLE IF EXISTS public.main_users;
+DROP TABLE IF EXISTS public.main_transactions;
+DROP TABLE IF EXISTS public.main_print_orders;
+DROP TABLE IF EXISTS public.main_campaigns;
+DROP SEQUENCE IF EXISTS public.inventory_id_seq;
+DROP TABLE IF EXISTS public.y_inventory;
+DROP SEQUENCE IF EXISTS public.exterior_reports_id_seq;
+DROP TABLE IF EXISTS public.main_reports;
+DROP SEQUENCE IF EXISTS public.email_settings_id_seq;
+DROP TABLE IF EXISTS public.z_email_settings;
+DROP SEQUENCE IF EXISTS public.core_settings_id_seq;
+DROP TABLE IF EXISTS public.z_core_settings;
+DROP SEQUENCE IF EXISTS public.campaign_status_id_seq;
+DROP TABLE IF EXISTS public.x_transaction_status;
+DROP SEQUENCE IF EXISTS public.buses_id_seq;
+DROP TABLE IF EXISTS public.main_buses;
+DROP SEQUENCE IF EXISTS public.bus_status_id_seq;
+DROP TABLE IF EXISTS public.x_bus_status;
+DROP SEQUENCE IF EXISTS public.bus_sizes_id_seq;
+DROP TABLE IF EXISTS public.x_bus_sizes;
+DROP SEQUENCE IF EXISTS public.bus_depot_id_seq;
+DROP TABLE IF EXISTS public.x_bus_depot;
+DROP SEQUENCE IF EXISTS public.allocation_id_seq;
+DROP TABLE IF EXISTS public.sub_media_allocation;
 SET default_tablespace = '';
 
 SET default_with_oids = false;
@@ -2114,6 +2277,7 @@ INSERT INTO public.main_campaigns VALUES (40, 2, 1, 1, 11, 20, '2020-11-20', '20
 INSERT INTO public.main_campaigns VALUES (41, 1, 1, 1, 9, 15, '2020-11-18', '2020-12-18', 0, 3, '2020-11-04 05:50:23.729373+00', '2020-11-04 05:50:23.729373+00', 'Intel Promo', 1);
 INSERT INTO public.main_campaigns VALUES (198, 1, 1, 1, 9, 7, '2020-11-18', '2020-12-18', 0, 1, '2020-11-11 11:15:51.047272+00', '2020-11-11 11:15:51.047272+00', 'Test Campaign', 1);
 INSERT INTO public.main_campaigns VALUES (202, 1, 2, 1, 1, 3, '2020-11-18', '2020-12-18', 0, 1, '2020-11-11 11:28:52.964703+00', '2020-11-11 11:28:52.964703+00', 'Max Limited (Large)', 1);
+INSERT INTO public.main_campaigns VALUES (205, 1, 2, 1, 22, 15, '2020-11-26', '2020-12-26', 0, 1, '2020-11-16 14:21:58.233947+00', '2020-11-16 14:21:58.233947+00', 'Yoyo', 1);
 INSERT INTO public.main_campaigns VALUES (199, 1, 1, 1, 9, 7, '2020-11-18', '2020-12-18', 0, 1, '2020-11-11 11:16:46.149271+00', '2020-11-11 11:16:46.149271+00', 'Test Campaign', 1);
 INSERT INTO public.main_campaigns VALUES (121, 1, 1, 1, 9, 10, '2020-11-20', '2020-12-20', 0, 1, '2020-11-04 08:31:41.244053+00', '2020-11-04 08:31:41.244053+00', 'TP3 Campaign', 1);
 INSERT INTO public.main_campaigns VALUES (122, 1, 1, 1, 9, 10, '2020-11-20', '2020-12-20', 0, 1, '2020-11-04 08:32:08.598825+00', '2020-11-04 08:32:08.598825+00', 'TP3 Campaign', 1);
@@ -2811,7 +2975,7 @@ SELECT pg_catalog.setval('public.inventory_id_seq', 3, true);
 -- Name: new_campaign_id_seq; Type: SEQUENCE SET; Schema: public; Owner: postgres
 --
 
-SELECT pg_catalog.setval('public.new_campaign_id_seq', 204, true);
+SELECT pg_catalog.setval('public.new_campaign_id_seq', 205, true);
 
 
 --
@@ -3461,7 +3625,7 @@ ALTER TABLE ONLY public.main_campaigns
     ADD CONSTRAINT pricing_id_fk FOREIGN KEY (price_id) REFERENCES public.z_price_settings(id);
 
 
--- Completed on 2020-11-16 10:06:32
+-- Completed on 2020-11-16 16:05:34
 
 --
 -- PostgreSQL database dump complete

@@ -1419,7 +1419,7 @@ SORTHTML;
     public function rowUpdated($rsold, &$rsnew)
     {
     	//echo "Row Updated";
-    	require_once 'views\PrivateFunctions.php';
+    	require_once 'views/PrivateFunctions.php';
 
     	//if (strpos($_SERVER['SERVER_NAME'], 'localhost') === false) {
     	//	require_once 'emailrun.php';

@@ -1939,7 +1939,7 @@ SORTHTML;
     	//echo "Row Inserted";
         $test = false;
         // GET SPECIAL FUNCTIONS
-        require_once 'views\PrivateFunctions.php';
+        require_once 'views/PrivateFunctions.php';
 
         // CHECK IF LINUX (PROD) OR WINDOWS (DEV) SERVER
     	if (strpos($_SERVER['SERVER_NAME'], 'localhost') === false) {

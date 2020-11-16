@@ -368,7 +368,6 @@ class Login extends MainUsers
             } else {
                 WriteCookie("AutoLogin", ""); // Clear auto login cookie
             }
-            $this->writeAuditTrailOnLogin($this->Username->CurrentValue);
 
             // Call loggedin event
             $this->userLoggedIn($this->Username->CurrentValue);
@@ -434,13 +433,6 @@ class Login extends MainUsers
             $this->setFailureMessage($formCustomError);
         }
         return $validateForm;
-    }
-
-    // Write audit trail on login
-    protected function writeAuditTrailOnLogin($usr)
-    {
-        global $Language;
-        WriteAuditLog($usr, $Language->phrase("AuditTrailLogin"), CurrentUserIP(), "", "", "", "");
     }
 
     // Page Load event
