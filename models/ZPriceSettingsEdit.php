@@ -446,6 +446,8 @@ class ZPriceSettingsEdit extends ZPriceSettings
         $this->lamata_fee->setVisibility();
         $this->lasaa_fee->setVisibility();
         $this->printers_fee->setVisibility();
+        $this->active->setVisibility();
+        $this->ts_created->Visible = false;
         $this->hideFieldsForAddEdit();
 
         // Do not use lookup cache
@@ -765,6 +767,16 @@ class ZPriceSettingsEdit extends ZPriceSettings
                 $this->printers_fee->setFormValue($val);
             }
         }
+
+        // Check field name 'active' first before field var 'x_active'
+        $val = $CurrentForm->hasValue("active") ? $CurrentForm->getValue("active") : $CurrentForm->getValue("x_active");
+        if (!$this->active->IsDetailKey) {
+            if (IsApi() && $val === null) {
+                $this->active->Visible = false; // Disable update for API request
+            } else {
+                $this->active->setFormValue($val);
+            }
+        }
     }
 
     // Restore form values
@@ -785,6 +797,7 @@ class ZPriceSettingsEdit extends ZPriceSettings
         $this->lamata_fee->CurrentValue = $this->lamata_fee->FormValue;
         $this->lasaa_fee->CurrentValue = $this->lasaa_fee->FormValue;
         $this->printers_fee->CurrentValue = $this->printers_fee->FormValue;
+        $this->active->CurrentValue = $this->active->FormValue;
     }
 
     /**
@@ -848,6 +861,8 @@ class ZPriceSettingsEdit extends ZPriceSettings
         $this->lamata_fee->setDbValue($row['lamata_fee']);
         $this->lasaa_fee->setDbValue($row['lasaa_fee']);
         $this->printers_fee->setDbValue($row['printers_fee']);
+        $this->active->setDbValue((ConvertToBool($row['active']) ? "1" : "0"));
+        $this->ts_created->setDbValue($row['ts_created']);
     }
 
     // Return a row with default values
@@ -868,6 +883,8 @@ class ZPriceSettingsEdit extends ZPriceSettings
         $row['lamata_fee'] = null;
         $row['lasaa_fee'] = null;
         $row['printers_fee'] = null;
+        $row['active'] = null;
+        $row['ts_created'] = null;
         return $row;
     }
 
@@ -926,6 +943,10 @@ class ZPriceSettingsEdit extends ZPriceSettings
         // lasaa_fee
 
         // printers_fee
+
+        // active
+
+        // ts_created
         if ($this->RowType == ROWTYPE_VIEW) {
             // id
             $this->id->ViewValue = $this->id->CurrentValue;
@@ -1059,6 +1080,19 @@ class ZPriceSettingsEdit extends ZPriceSettings
             $this->printers_fee->ViewValue = FormatNumber($this->printers_fee->ViewValue, 0, -2, -2, -2);
             $this->printers_fee->ViewCustomAttributes = "";
 
+            // active
+            if (ConvertToBool($this->active->CurrentValue)) {
+                $this->active->ViewValue = $this->active->tagCaption(1) != "" ? $this->active->tagCaption(1) : "Yes";
+            } else {
+                $this->active->ViewValue = $this->active->tagCaption(2) != "" ? $this->active->tagCaption(2) : "No";
+            }
+            $this->active->ViewCustomAttributes = "";
+
+            // ts_created
+            $this->ts_created->ViewValue = $this->ts_created->CurrentValue;
+            $this->ts_created->ViewValue = FormatDateTime($this->ts_created->ViewValue, 0);
+            $this->ts_created->ViewCustomAttributes = "";
+
             // id
             $this->id->LinkCustomAttributes = "";
             $this->id->HrefValue = "";
@@ -1128,6 +1162,11 @@ class ZPriceSettingsEdit extends ZPriceSettings
             $this->printers_fee->LinkCustomAttributes = "";
             $this->printers_fee->HrefValue = "";
             $this->printers_fee->TooltipValue = "";
+
+            // active
+            $this->active->LinkCustomAttributes = "";
+            $this->active->HrefValue = "";
+            $this->active->TooltipValue = "";
         } elseif ($this->RowType == ROWTYPE_EDIT) {
             // id
             $this->id->EditAttrs["class"] = "form-control";
@@ -1289,6 +1328,11 @@ class ZPriceSettingsEdit extends ZPriceSettings
             $this->printers_fee->EditValue = HtmlEncode($this->printers_fee->CurrentValue);
             $this->printers_fee->PlaceHolder = RemoveHtml($this->printers_fee->caption());
 
+            // active
+            $this->active->EditCustomAttributes = "";
+            $this->active->EditValue = $this->active->options(false);
+            $this->active->PlaceHolder = RemoveHtml($this->active->caption());
+
             // Edit refer script
 
             // id
@@ -1346,6 +1390,10 @@ class ZPriceSettingsEdit extends ZPriceSettings
             // printers_fee
             $this->printers_fee->LinkCustomAttributes = "";
             $this->printers_fee->HrefValue = "";
+
+            // active
+            $this->active->LinkCustomAttributes = "";
+            $this->active->HrefValue = "";
         }
         if ($this->RowType == ROWTYPE_ADD || $this->RowType == ROWTYPE_EDIT || $this->RowType == ROWTYPE_SEARCH) { // Add/Edit/Search row
             $this->setupFieldTitles();
@@ -1460,6 +1508,11 @@ class ZPriceSettingsEdit extends ZPriceSettings
         if (!CheckInteger($this->printers_fee->FormValue)) {
             $this->printers_fee->addErrorMessage($this->printers_fee->getErrorMessage(false));
         }
+        if ($this->active->Required) {
+            if ($this->active->FormValue == "") {
+                $this->active->addErrorMessage(str_replace("%s", $this->active->caption(), $this->active->RequiredErrorMessage));
+            }
+        }
 
         // Return validate result
         $validateForm = !$this->hasInvalidFields();
@@ -1529,6 +1582,13 @@ class ZPriceSettingsEdit extends ZPriceSettings
 
             // printers_fee
             $this->printers_fee->setDbValueDef($rsnew, $this->printers_fee->CurrentValue, null, $this->printers_fee->ReadOnly);
+
+            // active
+            $tmpBool = $this->active->CurrentValue;
+            if ($tmpBool != "1" && $tmpBool != "0") {
+                $tmpBool = !empty($tmpBool) ? "1" : "0";
+            }
+            $this->active->setDbValueDef($rsnew, $tmpBool, 0, $this->active->ReadOnly);
 
             // Call Row Updating event
             $updateRow = $this->rowUpdating($rsold, $rsnew);
@@ -1601,6 +1661,8 @@ class ZPriceSettingsEdit extends ZPriceSettings
                 case "x_print_stage_id":
                     break;
                 case "x_bus_size_id":
+                    break;
+                case "x_active":
                     break;
                 default:
                     $lookupFilter = "";

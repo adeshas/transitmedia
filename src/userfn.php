@@ -68,13 +68,20 @@ function MenuItem_Adding($item)
 
     // MANAGER
     if(CurrentUserLevel() >= 1 && CurrentUserLevel() <= 4){
-        if( in_array($item->id, [195,197,198,133])){
+        if( in_array($item->id, [195,197,198,133,201])){
             return false;
         }
     }
 
     // 32, -> 35 133
     //98 -> 174
+
+    // MAIN USER
+    if(CurrentUserLevel() == 0){
+        if( in_array($item->id, [174,95])){
+            return false;
+        }
+    }
     return true;
 }
 

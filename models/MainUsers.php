@@ -118,7 +118,7 @@ class MainUsers extends DbTable
         $this->user_type->UsePleaseSelect = true; // Use PleaseSelect by default
         $this->user_type->PleaseSelectText = $Language->phrase("PleaseSelect"); // "PleaseSelect" text
         $this->user_type->Lookup = new Lookup('user_type', 'main_users', false, '', ["","","",""], [], [], [], [], [], [], '', '');
-        $this->user_type->OptionCount = 9;
+        $this->user_type->OptionCount = 10;
         $this->user_type->DefaultErrorMessage = $Language->phrase("IncorrectInteger");
         $this->Fields['user_type'] = &$this->user_type;
 

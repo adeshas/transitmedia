@@ -31,7 +31,8 @@ loadjs.ready("head", function () {
         ["agency_fee", [fields.agency_fee.required ? ew.Validators.required(fields.agency_fee.caption) : null, ew.Validators.integer], fields.agency_fee.isInvalid],
         ["lamata_fee", [fields.lamata_fee.required ? ew.Validators.required(fields.lamata_fee.caption) : null, ew.Validators.integer], fields.lamata_fee.isInvalid],
         ["lasaa_fee", [fields.lasaa_fee.required ? ew.Validators.required(fields.lasaa_fee.caption) : null, ew.Validators.integer], fields.lasaa_fee.isInvalid],
-        ["printers_fee", [fields.printers_fee.required ? ew.Validators.required(fields.printers_fee.caption) : null, ew.Validators.integer], fields.printers_fee.isInvalid]
+        ["printers_fee", [fields.printers_fee.required ? ew.Validators.required(fields.printers_fee.caption) : null, ew.Validators.integer], fields.printers_fee.isInvalid],
+        ["active", [fields.active.required ? ew.Validators.required(fields.active.caption) : null], fields.active.isInvalid]
     ]);
 
     // Set invalid fields
@@ -102,6 +103,7 @@ loadjs.ready("head", function () {
     fz_price_settingsedit.lists.inventory_id = <?= $Page->inventory_id->toClientList($Page) ?>;
     fz_price_settingsedit.lists.print_stage_id = <?= $Page->print_stage_id->toClientList($Page) ?>;
     fz_price_settingsedit.lists.bus_size_id = <?= $Page->bus_size_id->toClientList($Page) ?>;
+    fz_price_settingsedit.lists.active = <?= $Page->active->toClientList($Page) ?>;
     loadjs.done("fz_price_settingsedit");
 });
 </script>
@@ -372,6 +374,21 @@ loadjs.ready("head", function() {
 <input type="<?= $Page->printers_fee->getInputTextType() ?>" data-table="z_price_settings" data-field="x_printers_fee" name="x_printers_fee" id="x_printers_fee" size="30" placeholder="<?= HtmlEncode($Page->printers_fee->getPlaceHolder()) ?>" value="<?= $Page->printers_fee->EditValue ?>"<?= $Page->printers_fee->editAttributes() ?> aria-describedby="x_printers_fee_help">
 <?= $Page->printers_fee->getCustomMessage() ?>
 <div class="invalid-feedback"><?= $Page->printers_fee->getErrorMessage() ?></div>
+</span>
+</div></div>
+    </div>
+<?php } ?>
+<?php if ($Page->active->Visible) { // active ?>
+    <div id="r_active" class="form-group row">
+        <label id="elh_z_price_settings_active" class="<?= $Page->LeftColumnClass ?>"><?= $Page->active->caption() ?><?= $Page->active->Required ? $Language->phrase("FieldRequiredIndicator") : "" ?></label>
+        <div class="<?= $Page->RightColumnClass ?>"><div <?= $Page->active->cellAttributes() ?>>
+<span id="el_z_price_settings_active">
+<div class="custom-control custom-checkbox d-inline-block">
+    <input type="checkbox" class="custom-control-input<?= $Page->active->isInvalidClass() ?>" data-table="z_price_settings" data-field="x_active" name="x_active[]" id="x_active_502905" value="1"<?= ConvertToBool($Page->active->CurrentValue) ? " checked" : "" ?><?= $Page->active->editAttributes() ?> aria-describedby="x_active_help">
+    <label class="custom-control-label" for="x_active_502905"></label>
+</div>
+<?= $Page->active->getCustomMessage() ?>
+<div class="invalid-feedback"><?= $Page->active->getErrorMessage() ?></div>
 </span>
 </div></div>
     </div>

@@ -470,6 +470,30 @@ class Login extends MainUsers
                     //PLATFORM
                     $url = "viewtransactionsperplatformlist";
                 }
+                if(CurrentUserLevel() == 0){
+                    //PLATFORM
+                    $url = "welcome";
+                }
+                if(CurrentUserLevel() == 1){
+                    //CAMPAIGN MANAGER
+                    $url = "maincampaignslist";
+                }
+                if(CurrentUserLevel() == 2){
+                    //ACCOUNTS MANAGER
+                    $url = "maintransactionslist";
+                }
+                if(CurrentUserLevel() == 3){
+                    //FLEET MANAGER
+                    $url = "mainbuseslist";
+                }
+                if(CurrentUserLevel() == 4){
+                    //REPORTS MANAGER
+                    $url = "mainreportslist";
+                }
+                if(CurrentUserLevel() == 7){
+                    //PRINT MANAGER
+                    $url = "mainprintorderslist";
+                }
             }
     }
 

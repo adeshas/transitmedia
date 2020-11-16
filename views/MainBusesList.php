@@ -248,10 +248,10 @@ $Page->ListOptions->render("header", "left");
         <th data-name="number" class="<?= $Page->number->headerCellClass() ?>"><div id="elh_main_buses_number" class="main_buses_number"><?= $Page->renderSort($Page->number) ?></div></th>
 <?php } ?>
 <?php if ($Page->platform_id->Visible) { // platform_id ?>
-        <th data-name="platform_id" class="<?= $Page->platform_id->headerCellClass() ?>"><div id="elh_main_buses_platform_id" class="main_buses_platform_id"><?= $Page->renderSort($Page->platform_id) ?></div></th>
+        <th data-name="platform_id" class="<?= $Page->platform_id->headerCellClass() ?>" style="white-space: nowrap;"><div id="elh_main_buses_platform_id" class="main_buses_platform_id"><?= $Page->renderSort($Page->platform_id) ?></div></th>
 <?php } ?>
 <?php if ($Page->operator_id->Visible) { // operator_id ?>
-        <th data-name="operator_id" class="<?= $Page->operator_id->headerCellClass() ?>"><div id="elh_main_buses_operator_id" class="main_buses_operator_id"><?= $Page->renderSort($Page->operator_id) ?></div></th>
+        <th data-name="operator_id" class="<?= $Page->operator_id->headerCellClass() ?>" style="white-space: nowrap;"><div id="elh_main_buses_operator_id" class="main_buses_operator_id"><?= $Page->renderSort($Page->operator_id) ?></div></th>
 <?php } ?>
 <?php if ($Page->exterior_campaign_id->Visible) { // exterior_campaign_id ?>
         <th data-name="exterior_campaign_id" class="<?= $Page->exterior_campaign_id->headerCellClass() ?>"><div id="elh_main_buses_exterior_campaign_id" class="main_buses_exterior_campaign_id"><?= $Page->renderSort($Page->exterior_campaign_id) ?></div></th>

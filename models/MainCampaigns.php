@@ -112,7 +112,7 @@ class MainCampaigns extends DbTable
         $this->platform_id->Sortable = true; // Allow sort
         $this->platform_id->UsePleaseSelect = true; // Use PleaseSelect by default
         $this->platform_id->PleaseSelectText = $Language->phrase("PleaseSelect"); // "PleaseSelect" text
-        $this->platform_id->Lookup = new Lookup('platform_id', 'view_pricing_initial', true, 'platform_id', ["platform","","",""], ["x_inventory_id"], ["x_bus_size_id","x_price_id"], ["inventory_id"], ["x_inventory_id"], [], [], '', '');
+        $this->platform_id->Lookup = new Lookup('platform_id', 'view_pricing_initial', true, 'platform_id', ["platform","","",""], ["x_inventory_id"], ["x_bus_size_id","x_price_id"], ["inventory_id"], ["x_inventory_id"], [], [], '"platform" ASC', '');
         $this->platform_id->DefaultErrorMessage = $Language->phrase("IncorrectInteger");
         $this->Fields['platform_id'] = &$this->platform_id;
 
@@ -1178,6 +1178,7 @@ SORTHTML;
         // id
 
         // name
+        $this->name->CellCssStyle = "white-space: nowrap;";
 
         // inventory_id
 
@@ -1290,7 +1291,11 @@ SORTHTML;
             $this->price_id->ViewValue = $this->price_id->lookupCacheOption($curVal);
             if ($this->price_id->ViewValue === null) { // Lookup from database
                 $filterWrk = "\"id\"" . SearchString("=", $curVal, DATATYPE_NUMBER, "");
-                $sqlWrk = $this->price_id->Lookup->getSql(false, $filterWrk, '', $this, true);
+                $lookupFilter = function() {
+                    return "\"active\" = true";
+                };
+                $lookupFilter = $lookupFilter->bindTo($this);
+                $sqlWrk = $this->price_id->Lookup->getSql(false, $filterWrk, $lookupFilter, $this, true);
                 $rswrk = Conn()->executeQuery($sqlWrk)->fetchAll(\PDO::FETCH_BOTH);
                 $ari = count($rswrk);
                 if ($ari > 0) { // Lookup values found
@@ -1331,11 +1336,7 @@ SORTHTML;
             $this->vendor_id->ViewValue = $this->vendor_id->lookupCacheOption($curVal);
             if ($this->vendor_id->ViewValue === null) { // Lookup from database
                 $filterWrk = "\"id\"" . SearchString("=", $curVal, DATATYPE_NUMBER, "");
-                $lookupFilter = function() {
-                    return ((!IsAdmin())? " id = ".Profile()->vendor_id:"");
-                };
-                $lookupFilter = $lookupFilter->bindTo($this);
-                $sqlWrk = $this->vendor_id->Lookup->getSql(false, $filterWrk, $lookupFilter, $this, true);
+                $sqlWrk = $this->vendor_id->Lookup->getSql(false, $filterWrk, '', $this, true);
                 $rswrk = Conn()->executeQuery($sqlWrk)->fetchAll(\PDO::FETCH_BOTH);
                 $ari = count($rswrk);
                 if ($ari > 0) { // Lookup values found
@@ -1588,11 +1589,7 @@ SORTHTML;
                 $this->vendor_id->ViewValue = $this->vendor_id->lookupCacheOption($curVal);
                 if ($this->vendor_id->ViewValue === null) { // Lookup from database
                     $filterWrk = "\"id\"" . SearchString("=", $curVal, DATATYPE_NUMBER, "");
-                    $lookupFilter = function() {
-                        return ((!IsAdmin())? " id = ".Profile()->vendor_id:"");
-                    };
-                    $lookupFilter = $lookupFilter->bindTo($this);
-                    $sqlWrk = $this->vendor_id->Lookup->getSql(false, $filterWrk, $lookupFilter, $this, true);
+                    $sqlWrk = $this->vendor_id->Lookup->getSql(false, $filterWrk, '', $this, true);
                     $rswrk = Conn()->executeQuery($sqlWrk)->fetchAll(\PDO::FETCH_BOTH);
                     $ari = count($rswrk);
                     if ($ari > 0) { // Lookup values found
@@ -2110,71 +2107,9 @@ SORTHTML;
     }
 
     // Row Updated event
-    public function rowUpdated($rsold, &$rsnew) {
-    /*
-    	//echo "Row Updated";
-    	require_once 'emailrun.php';
-    	$username = "Transit Media Vendor";
-    	$email = "";
-    	$msg = "";
-    	$msgtxt = "";
-    	$subject = "";
-    	$camp_id = $rsold["id"];
-    	$sql = "select name, quantity, start_date, end_date, (end_date::timestamp - start_date::timestamp) as duration, 
-    to_char(
-    (quantity * (select substring(value from '[0-9]+') from core_settings where name = 'exterior_campaign_price')::int ) 
-    , 'N999,999,999,990'::text) as amount,
-    (select value from core_settings where name = 'ext_account_details' ) as account_details,
-    (select name from vendors v where v.id = vendor_id) as vendor
-    from exterior_campaigns where id = {$camp_id};
-    ";
-    	$camp_details = ExecuteRow($sql);
-    	$rows = ExecuteRows("select email from users where vendor_id = (select vendor_id from exterior_campaigns where id = " . $camp_id . ");");
-    	foreach ($rows as $val) {
-    		$email = $val['email'];
-    		$vendor = $camp_details['vendor'];
-    		$username = $vendor;
-    		if ($rsold["status_id"] != 2 && $rsnew["status_id"] == 2) {
-    //Campaign Approved
-    			$msg = "Hello {$vendor},<br/><br/>Your Campaign Request has been <b>approved</b>.<br/><br/>";
-    			$msg .= "Your request for " . $camp_details['quantity'] . " Buses (Exterior Campaign / Bus Wraps) [" . $camp_details['name'] . "] has been approved for " . $camp_details['duration'] . ". <br/><br/>Kindly make payment of " . $camp_details['amount'] . " to [" . $camp_details['account_details'] . "].
-    <br/><br/>Please send payment notification once payment has been made to info@transitmedia.com.ng";
-    			$msgtxt = "Hello {$vendor},\n\nYour Campaign Request has been approved.";
-    			$msgtxt .= "Your request for " . $camp_details['quantity'] . " Buses (Exterior Campaign / Bus Wraps) [" . $camp_details['name'] . "] has been approved for " . $camp_details['duration'] . ". \n\nKindly make payment of " . $camp_details['amount'] . " to [" . $camp_details['account_details'] . "].
-    \n\nPlease send payment notification once payment has been made to info@transitmedia.com.ng";
-    			$subject = "APPROVED CAMPAIGN REQUEST ({$vendor}) - TRANSIT MEDIA ADMIN";
-    			sendTMmail('admin@transitmedia.com.ng', $email, $subject, $msg, $msgtxt);
-    		}
-    		if ($rsold["status_id"] != 3 && $rsnew["status_id"] == 3) {
-    //Campaign Denied
-    			$msg = "Hello {$vendor},<br/>Unfortunately, Your Campaign Request has been <b>Denied</b>.";
-    			$msgtxt = "Hello {$vendor},\nUnfortunately, Your Campaign Request has been Denied.";
-    			$subject = "DENIED CAMPAIGN REQUEST ({$vendor}) - TRANSIT MEDIA ADMIN";
-    			sendTMmail('admin@transitmedia.com.ng', $email, $subject, $msg, $msgtxt);
-    		}
-    		if ($rsold["print_status_id"] != 2 && $rsnew["print_status_id"] == 2) {
-    //Print Approved
-    			$msg = "Hello {$vendor},<br/>Your Print Request has been <b>Approved</b>.";
-    			$msgtxt = "Hello {$vendor},\nYour Print Request has been Approved.";
-    			$subject = "PRINT APPROVAL ({$vendor}) - TRANSIT MEDIA ADMIN";
-    			sendTMmail('admin@transitmedia.com.ng', $email, $subject, $msg, $msgtxt);
-    		}
-    		if ($rsold["print_status_id"] != 3 && $rsnew["print_status_id"] == 3) {
-    //Print Denied
-    			$msg = "Hello {$vendor},<br/>Unfortunately, Your Print Request has been <b>Denied</b>.";
-    			$msgtxt = "Hello {$vendor},\nUnfortunately, Your Print Request has been Denied.";
-    			$subject = "PRINT REFUSAL ({$vendor}) - TRANSIT MEDIA ADMIN";
-    			sendTMmail('admin@transitmedia.com.ng', $email, $subject, $msg, $msgtxt);
-    		}
-    		if ($rsold["payment_status_id"] != 2 && $rsnew["payment_status_id"] == 2) {
-    //Payment Approved
-    			$msg = "Hello {$vendor},<br/> Payment for your Campaign has been <b>Confirmed</b>. <br /><br />Your campaign is scheduled to start within 48hrs of your payment confirmation and print approval. <br /><br /><b>Note: Proof of posting would be sent to you once the buses have been branded</b>.";
-    			$msgtxt = "Hello {$vendor},\nPayment for your Campaign has been Confirmed. \n\nYour campaign is scheduled to start within 48hrs of your payment confirmation and print approval. \n\n<b>Note: Proof of posting would be sent to you once the buses have been branded</b>.";
-    			$subject = "PAYMENT CONFIRMATION ({$vendor}) - TRANSIT MEDIA ADMIN";
-    			sendTMmail('admin@transitmedia.com.ng', $email, $subject, $msg, $msgtxt);
-    		}
-    	}
-    	*/
+    public function rowUpdated($rsold, &$rsnew)
+    {
+        //Log("Row Updated");
     }
 
     // Row Update Conflict event

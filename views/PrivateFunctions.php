@@ -139,34 +139,34 @@ function determine_price($price,$qty,$html=FALSE){
 <div class="col-sm-10" style="margin-top: 10px;">
 <table class="table-bordered table-sm ew-db-table" style="min-width: 60%">
   <tr>
-    <th colspan="2">Cost Breakdown (estimated)</th>
+    <th colspan="2" style=" text-transform: uppercase; background-color: #0074b3; color: #FFF;">Cost Breakdown (estimated)</th>
   </tr>
   <tr>
-    <th>Platform</th>
+    <th style="text-align:right">Platform</th>
     <td>{$final_price["platform"]}</td>
   </tr>
   <tr>
-    <th>Inventory</th>
+    <th style="text-align:right">Inventory</th>
     <td>{$final_price["inventory"]}</td>
   </tr>
   <tr>
-    <th>Bus Size</th>
+    <th style="text-align:right">Bus Size</th>
     <td>{$final_price["bus_size"]}</td>
   </tr>
   <tr>
-    <th>Rate Details</th>
+    <th style="text-align:right">Rate Details</th>
     <td>{$final_price["details"]}</td>
   </tr>
   <tr>
-    <th>Number of Buses</th>
+    <th style="text-align:right">Number of Buses</th>
     <td>{$final_price["display_quantity"]}</td>
   </tr>
   <tr>
-    <th>Rate</th>
+    <th style="text-align:right">Rate</th>
     <td>{$final_price["display_rate"]}</td>
   </tr>
   <tr>
-    <th>Est. Cost:</th>
+    <th style="text-align:right">Est. Cost:</th>
     <td><b>{$final_price["display_price"]}</b></td>
   </tr>
 </table>
@@ -366,6 +366,23 @@ REPLACE WITH THIS
 
 </p:txBody>
 </p:sp>
+
+ */
+
+
+ /*
+SAVE
+-----------------
+filter for Vendor ID on campaign table
+((!IsAdmin())? " id = ".Profile()->vendor_id:"   ")
+
+
+
+
+
+
+
+
 
  */
 

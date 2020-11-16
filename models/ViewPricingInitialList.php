@@ -598,6 +598,7 @@ class ViewPricingInitialList extends ViewPricingInitial
         $this->lamata_fee->setVisibility();
         $this->lasaa_fee->setVisibility();
         $this->printers_fee->setVisibility();
+        $this->active->setVisibility();
         $this->hideFieldsForAddEdit();
 
         // Global Page Loading event (in userfn*.php)
@@ -913,6 +914,7 @@ class ViewPricingInitialList extends ViewPricingInitial
         $filterList = Concat($filterList, $this->lamata_fee->AdvancedSearch->toJson(), ","); // Field lamata_fee
         $filterList = Concat($filterList, $this->lasaa_fee->AdvancedSearch->toJson(), ","); // Field lasaa_fee
         $filterList = Concat($filterList, $this->printers_fee->AdvancedSearch->toJson(), ","); // Field printers_fee
+        $filterList = Concat($filterList, $this->active->AdvancedSearch->toJson(), ","); // Field active
         if ($this->BasicSearch->Keyword != "") {
             $wrk = "\"" . Config("TABLE_BASIC_SEARCH") . "\":\"" . JsEncode($this->BasicSearch->Keyword) . "\",\"" . Config("TABLE_BASIC_SEARCH_TYPE") . "\":\"" . JsEncode($this->BasicSearch->Type) . "\"";
             $filterList = Concat($filterList, $wrk, ",");
@@ -1096,6 +1098,14 @@ class ViewPricingInitialList extends ViewPricingInitial
         $this->printers_fee->AdvancedSearch->SearchValue2 = @$filter["y_printers_fee"];
         $this->printers_fee->AdvancedSearch->SearchOperator2 = @$filter["w_printers_fee"];
         $this->printers_fee->AdvancedSearch->save();
+
+        // Field active
+        $this->active->AdvancedSearch->SearchValue = @$filter["x_active"];
+        $this->active->AdvancedSearch->SearchOperator = @$filter["z_active"];
+        $this->active->AdvancedSearch->SearchCondition = @$filter["v_active"];
+        $this->active->AdvancedSearch->SearchValue2 = @$filter["y_active"];
+        $this->active->AdvancedSearch->SearchOperator2 = @$filter["w_active"];
+        $this->active->AdvancedSearch->save();
         $this->BasicSearch->setKeyword(@$filter[Config("TABLE_BASIC_SEARCH")]);
         $this->BasicSearch->setType(@$filter[Config("TABLE_BASIC_SEARCH_TYPE")]);
     }
@@ -1284,6 +1294,7 @@ class ViewPricingInitialList extends ViewPricingInitial
             $this->updateSort($this->lamata_fee); // lamata_fee
             $this->updateSort($this->lasaa_fee); // lasaa_fee
             $this->updateSort($this->printers_fee); // printers_fee
+            $this->updateSort($this->active); // active
             $this->setStartRecordNumber(1); // Reset start position
         }
     }
@@ -1341,6 +1352,7 @@ class ViewPricingInitialList extends ViewPricingInitial
                 $this->lamata_fee->setSort("");
                 $this->lasaa_fee->setSort("");
                 $this->printers_fee->setSort("");
+                $this->active->setSort("");
             }
 
             // Reset start position
@@ -1698,6 +1710,7 @@ class ViewPricingInitialList extends ViewPricingInitial
         $this->lamata_fee->setDbValue($row['lamata_fee']);
         $this->lasaa_fee->setDbValue($row['lasaa_fee']);
         $this->printers_fee->setDbValue($row['printers_fee']);
+        $this->active->setDbValue((ConvertToBool($row['active']) ? "1" : "0"));
     }
 
     // Return a row with default values
@@ -1722,6 +1735,7 @@ class ViewPricingInitialList extends ViewPricingInitial
         $row['lamata_fee'] = null;
         $row['lasaa_fee'] = null;
         $row['printers_fee'] = null;
+        $row['active'] = null;
         return $row;
     }
 
@@ -1784,6 +1798,8 @@ class ViewPricingInitialList extends ViewPricingInitial
         // lasaa_fee
 
         // printers_fee
+
+        // active
         if ($this->RowType == ROWTYPE_VIEW) {
             // id
             $this->id->ViewValue = $this->id->CurrentValue;
@@ -1866,6 +1882,14 @@ class ViewPricingInitialList extends ViewPricingInitial
             $this->printers_fee->ViewValue = FormatNumber($this->printers_fee->ViewValue, 0, -2, -2, -2);
             $this->printers_fee->ViewCustomAttributes = "";
 
+            // active
+            if (ConvertToBool($this->active->CurrentValue)) {
+                $this->active->ViewValue = $this->active->tagCaption(1) != "" ? $this->active->tagCaption(1) : "Yes";
+            } else {
+                $this->active->ViewValue = $this->active->tagCaption(2) != "" ? $this->active->tagCaption(2) : "No";
+            }
+            $this->active->ViewCustomAttributes = "";
+
             // id
             $this->id->LinkCustomAttributes = "";
             $this->id->HrefValue = "";
@@ -1930,6 +1954,11 @@ class ViewPricingInitialList extends ViewPricingInitial
             $this->printers_fee->LinkCustomAttributes = "";
             $this->printers_fee->HrefValue = "";
             $this->printers_fee->TooltipValue = "";
+
+            // active
+            $this->active->LinkCustomAttributes = "";
+            $this->active->HrefValue = "";
+            $this->active->TooltipValue = "";
         }
 
         // Call Row Rendered event
@@ -2190,6 +2219,8 @@ class ViewPricingInitialList extends ViewPricingInitial
 
             // Set up lookup SQL and connection
             switch ($fld->FieldVar) {
+                case "x_active":
+                    break;
                 default:
                     $lookupFilter = "";
                     break;

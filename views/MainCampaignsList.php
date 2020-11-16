@@ -163,7 +163,7 @@ $Page->ListOptions->render("header", "left");
         <th data-name="id" class="<?= $Page->id->headerCellClass() ?>"><div id="elh_main_campaigns_id" class="main_campaigns_id"><?= $Page->renderSort($Page->id) ?></div></th>
 <?php } ?>
 <?php if ($Page->name->Visible) { // name ?>
-        <th data-name="name" class="<?= $Page->name->headerCellClass() ?>"><div id="elh_main_campaigns_name" class="main_campaigns_name"><?= $Page->renderSort($Page->name) ?></div></th>
+        <th data-name="name" class="<?= $Page->name->headerCellClass() ?>" style="white-space: nowrap;"><div id="elh_main_campaigns_name" class="main_campaigns_name"><?= $Page->renderSort($Page->name) ?></div></th>
 <?php } ?>
 <?php if ($Page->inventory_id->Visible) { // inventory_id ?>
         <th data-name="inventory_id" class="<?= $Page->inventory_id->headerCellClass() ?>"><div id="elh_main_campaigns_inventory_id" class="main_campaigns_inventory_id"><?= $Page->renderSort($Page->inventory_id) ?></div></th>

@@ -1047,7 +1047,11 @@ class MainCampaignsView extends MainCampaigns
                 $this->price_id->ViewValue = $this->price_id->lookupCacheOption($curVal);
                 if ($this->price_id->ViewValue === null) { // Lookup from database
                     $filterWrk = "\"id\"" . SearchString("=", $curVal, DATATYPE_NUMBER, "");
-                    $sqlWrk = $this->price_id->Lookup->getSql(false, $filterWrk, '', $this, true);
+                    $lookupFilter = function() {
+                        return "\"active\" = true";
+                    };
+                    $lookupFilter = $lookupFilter->bindTo($this);
+                    $sqlWrk = $this->price_id->Lookup->getSql(false, $filterWrk, $lookupFilter, $this, true);
                     $rswrk = Conn()->executeQuery($sqlWrk)->fetchAll(\PDO::FETCH_BOTH);
                     $ari = count($rswrk);
                     if ($ari > 0) { // Lookup values found
@@ -1088,11 +1092,7 @@ class MainCampaignsView extends MainCampaigns
                 $this->vendor_id->ViewValue = $this->vendor_id->lookupCacheOption($curVal);
                 if ($this->vendor_id->ViewValue === null) { // Lookup from database
                     $filterWrk = "\"id\"" . SearchString("=", $curVal, DATATYPE_NUMBER, "");
-                    $lookupFilter = function() {
-                        return ((!IsAdmin())? " id = ".Profile()->vendor_id:"");
-                    };
-                    $lookupFilter = $lookupFilter->bindTo($this);
-                    $sqlWrk = $this->vendor_id->Lookup->getSql(false, $filterWrk, $lookupFilter, $this, true);
+                    $sqlWrk = $this->vendor_id->Lookup->getSql(false, $filterWrk, '', $this, true);
                     $rswrk = Conn()->executeQuery($sqlWrk)->fetchAll(\PDO::FETCH_BOTH);
                     $ari = count($rswrk);
                     if ($ari > 0) { // Lookup values found
@@ -1477,12 +1477,12 @@ class MainCampaignsView extends MainCampaigns
                 case "x_bus_size_id":
                     break;
                 case "x_price_id":
-                    break;
-                case "x_vendor_id":
                     $lookupFilter = function () {
-                        return ((!IsAdmin())? " id = ".Profile()->vendor_id:"");
+                        return "\"active\" = true";
                     };
                     $lookupFilter = $lookupFilter->bindTo($this);
+                    break;
+                case "x_vendor_id":
                     break;
                 case "x_renewal_stage_id":
                     break;

@@ -46,6 +46,7 @@ class ViewPricingAll extends DbTable
     public $lamata_fee;
     public $lasaa_fee;
     public $printers_fee;
+    public $active;
 
     // Page ID
     public $PageID = ""; // To be overridden by subclass
@@ -184,6 +185,14 @@ class ViewPricingAll extends DbTable
         $this->printers_fee->Sortable = true; // Allow sort
         $this->printers_fee->DefaultErrorMessage = $Language->phrase("IncorrectInteger");
         $this->Fields['printers_fee'] = &$this->printers_fee;
+
+        // active
+        $this->active = new DbField('view_pricing_all', 'view_pricing_all', 'x_active', 'active', '"active"', 'CAST("active" AS varchar(255))', 11, 1, -1, false, '"active"', false, false, false, 'FORMATTED TEXT', 'CHECKBOX');
+        $this->active->Sortable = true; // Allow sort
+        $this->active->DataType = DATATYPE_BOOLEAN;
+        $this->active->Lookup = new Lookup('active', 'view_pricing_all', false, '', ["","","",""], [], [], [], [], [], [], '', '');
+        $this->active->OptionCount = 2;
+        $this->Fields['active'] = &$this->active;
     }
 
     // Field Visibility
@@ -606,6 +615,7 @@ class ViewPricingAll extends DbTable
         $this->lamata_fee->DbValue = $row['lamata_fee'];
         $this->lasaa_fee->DbValue = $row['lasaa_fee'];
         $this->printers_fee->DbValue = $row['printers_fee'];
+        $this->active->DbValue = (ConvertToBool($row['active']) ? "1" : "0");
     }
 
     // Delete uploaded files
@@ -899,6 +909,7 @@ SORTHTML;
         $this->lamata_fee->setDbValue($row['lamata_fee']);
         $this->lasaa_fee->setDbValue($row['lasaa_fee']);
         $this->printers_fee->setDbValue($row['printers_fee']);
+        $this->active->setDbValue(ConvertToBool($row['active']) ? "1" : "0");
     }
 
     // Render list row values
@@ -946,6 +957,8 @@ SORTHTML;
         // lasaa_fee
 
         // printers_fee
+
+        // active
 
         // id
         $this->id->ViewValue = $this->id->CurrentValue;
@@ -1031,6 +1044,14 @@ SORTHTML;
         $this->printers_fee->ViewValue = $this->printers_fee->CurrentValue;
         $this->printers_fee->ViewValue = FormatNumber($this->printers_fee->ViewValue, 0, -2, -2, -2);
         $this->printers_fee->ViewCustomAttributes = "";
+
+        // active
+        if (ConvertToBool($this->active->CurrentValue)) {
+            $this->active->ViewValue = $this->active->tagCaption(1) != "" ? $this->active->tagCaption(1) : "Yes";
+        } else {
+            $this->active->ViewValue = $this->active->tagCaption(2) != "" ? $this->active->tagCaption(2) : "No";
+        }
+        $this->active->ViewCustomAttributes = "";
 
         // id
         $this->id->LinkCustomAttributes = "";
@@ -1121,6 +1142,11 @@ SORTHTML;
         $this->printers_fee->LinkCustomAttributes = "";
         $this->printers_fee->HrefValue = "";
         $this->printers_fee->TooltipValue = "";
+
+        // active
+        $this->active->LinkCustomAttributes = "";
+        $this->active->HrefValue = "";
+        $this->active->TooltipValue = "";
 
         // Call Row Rendered event
         $this->rowRendered();
@@ -1248,6 +1274,11 @@ SORTHTML;
         $this->printers_fee->EditValue = $this->printers_fee->CurrentValue;
         $this->printers_fee->PlaceHolder = RemoveHtml($this->printers_fee->caption());
 
+        // active
+        $this->active->EditCustomAttributes = "";
+        $this->active->EditValue = $this->active->options(false);
+        $this->active->PlaceHolder = RemoveHtml($this->active->caption());
+
         // Call Row Rendered event
         $this->rowRendered();
     }
@@ -1294,6 +1325,7 @@ SORTHTML;
                     $doc->exportCaption($this->lamata_fee);
                     $doc->exportCaption($this->lasaa_fee);
                     $doc->exportCaption($this->printers_fee);
+                    $doc->exportCaption($this->active);
                 } else {
                     $doc->exportCaption($this->id);
                     $doc->exportCaption($this->platform_id);
@@ -1309,6 +1341,7 @@ SORTHTML;
                     $doc->exportCaption($this->lamata_fee);
                     $doc->exportCaption($this->lasaa_fee);
                     $doc->exportCaption($this->printers_fee);
+                    $doc->exportCaption($this->active);
                 }
                 $doc->endExportRow();
             }
@@ -1356,6 +1389,7 @@ SORTHTML;
                         $doc->exportField($this->lamata_fee);
                         $doc->exportField($this->lasaa_fee);
                         $doc->exportField($this->printers_fee);
+                        $doc->exportField($this->active);
                     } else {
                         $doc->exportField($this->id);
                         $doc->exportField($this->platform_id);
@@ -1371,6 +1405,7 @@ SORTHTML;
                         $doc->exportField($this->lamata_fee);
                         $doc->exportField($this->lasaa_fee);
                         $doc->exportField($this->printers_fee);
+                        $doc->exportField($this->active);
                     }
                     $doc->endExportRow($rowCnt);
                 }

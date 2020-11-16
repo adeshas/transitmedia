@@ -1569,8 +1569,10 @@ class MainBusesGrid extends MainBuses
         // number
 
         // platform_id
+        $this->platform_id->CellCssStyle = "white-space: nowrap;";
 
         // operator_id
+        $this->operator_id->CellCssStyle = "white-space: nowrap;";
 
         // exterior_campaign_id
 

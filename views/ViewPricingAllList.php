@@ -163,6 +163,9 @@ $Page->ListOptions->render("header", "left");
 <?php if ($Page->printers_fee->Visible) { // printers_fee ?>
         <th data-name="printers_fee" class="<?= $Page->printers_fee->headerCellClass() ?>"><div id="elh_view_pricing_all_printers_fee" class="view_pricing_all_printers_fee"><?= $Page->renderSort($Page->printers_fee) ?></div></th>
 <?php } ?>
+<?php if ($Page->active->Visible) { // active ?>
+        <th data-name="active" class="<?= $Page->active->headerCellClass() ?>"><div id="elh_view_pricing_all_active" class="view_pricing_all_active"><?= $Page->renderSort($Page->active) ?></div></th>
+<?php } ?>
 <?php
 // Render list options (header, right)
 $Page->ListOptions->render("header", "right");
@@ -331,6 +334,17 @@ $Page->ListOptions->render("body", "left", $Page->RowCount);
 <span id="el<?= $Page->RowCount ?>_view_pricing_all_printers_fee">
 <span<?= $Page->printers_fee->viewAttributes() ?>>
 <?= $Page->printers_fee->getViewValue() ?></span>
+</span>
+</td>
+    <?php } ?>
+    <?php if ($Page->active->Visible) { // active ?>
+        <td data-name="active" <?= $Page->active->cellAttributes() ?>>
+<span id="el<?= $Page->RowCount ?>_view_pricing_all_active">
+<span<?= $Page->active->viewAttributes() ?>>
+<div class="custom-control custom-checkbox d-inline-block">
+    <input type="checkbox" id="x_active_<?= $Page->RowCount ?>" class="custom-control-input" value="<?= $Page->active->getViewValue() ?>" disabled<?php if (ConvertToBool($Page->active->CurrentValue)) { ?> checked<?php } ?>>
+    <label class="custom-control-label" for="x_active_<?= $Page->RowCount ?>"></label>
+</div></span>
 </span>
 </td>
     <?php } ?>

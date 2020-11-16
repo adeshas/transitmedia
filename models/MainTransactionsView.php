@@ -1478,6 +1478,9 @@ class MainTransactionsView extends MainTransactions
     			if($levelid > 0 ){
     				// MANAGER
     				$this->visible_status_id->Visible = FALSE;
+    				if($levelid == 1){
+    					$this->total->Visible = FALSE;
+    				}
     			}else{
     				// DEFAULT
     				$this->status_id->Visible = FALSE;

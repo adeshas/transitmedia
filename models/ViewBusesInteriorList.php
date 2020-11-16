@@ -2235,6 +2235,12 @@ class ViewBusesInteriorList extends ViewBusesInterior
     public function pageLoad()
     {
         //Log("Page Load");
+        if(CurrentUserLevel() == 0){
+        	$this->operator_id->Visible = FALSE;
+        	$this->bus_status_id->Visible = FALSE;
+        	$this->bus_depot_id->Visible = FALSE;
+        	$this->campaign_id->Visible = FALSE;
+        }
     }
 
     // Page Unload event

@@ -25,6 +25,7 @@ loadjs.ready("head", function () {
         ["inventory_id", [fields.inventory_id.required ? ew.Validators.required(fields.inventory_id.caption) : null], fields.inventory_id.isInvalid],
         ["print_stage_id", [fields.print_stage_id.required ? ew.Validators.required(fields.print_stage_id.caption) : null], fields.print_stage_id.isInvalid],
         ["bus_size_id", [fields.bus_size_id.required ? ew.Validators.required(fields.bus_size_id.caption) : null], fields.bus_size_id.isInvalid],
+        ["details", [fields.details.required ? ew.Validators.required(fields.details.caption) : null], fields.details.isInvalid],
         ["max_limit", [fields.max_limit.required ? ew.Validators.required(fields.max_limit.caption) : null, ew.Validators.integer], fields.max_limit.isInvalid],
         ["min_limit", [fields.min_limit.required ? ew.Validators.required(fields.min_limit.caption) : null, ew.Validators.integer], fields.min_limit.isInvalid],
         ["price", [fields.price.required ? ew.Validators.required(fields.price.caption) : null, ew.Validators.integer], fields.price.isInvalid],
@@ -32,7 +33,9 @@ loadjs.ready("head", function () {
         ["agency_fee", [fields.agency_fee.required ? ew.Validators.required(fields.agency_fee.caption) : null, ew.Validators.integer], fields.agency_fee.isInvalid],
         ["lamata_fee", [fields.lamata_fee.required ? ew.Validators.required(fields.lamata_fee.caption) : null, ew.Validators.integer], fields.lamata_fee.isInvalid],
         ["lasaa_fee", [fields.lasaa_fee.required ? ew.Validators.required(fields.lasaa_fee.caption) : null, ew.Validators.integer], fields.lasaa_fee.isInvalid],
-        ["printers_fee", [fields.printers_fee.required ? ew.Validators.required(fields.printers_fee.caption) : null, ew.Validators.integer], fields.printers_fee.isInvalid]
+        ["printers_fee", [fields.printers_fee.required ? ew.Validators.required(fields.printers_fee.caption) : null, ew.Validators.integer], fields.printers_fee.isInvalid],
+        ["active", [fields.active.required ? ew.Validators.required(fields.active.caption) : null], fields.active.isInvalid],
+        ["ts_created", [fields.ts_created.required ? ew.Validators.required(fields.ts_created.caption) : null, ew.Validators.datetime(0)], fields.ts_created.isInvalid]
     ]);
 
     // Set invalid fields
@@ -65,6 +68,9 @@ loadjs.ready("head", function () {
         for (var i = startcnt; i <= rowcnt; i++) {
             var rowIndex = ($k[0]) ? String(i) : "";
             $fobj.data("rowindex", rowIndex);
+            var checkrow = (gridinsert) ? !this.emptyRow(rowIndex) : true;
+            if (checkrow) {
+                addcnt++;
 
             // Validate fields
             if (!this.validateFields(rowIndex))
@@ -75,7 +81,48 @@ loadjs.ready("head", function () {
                 this.focus();
                 return false;
             }
+            } // End Grid Add checking
         }
+        if (gridinsert && addcnt == 0) { // No row added
+            ew.alert(ew.language.phrase("NoAddRecord"));
+            return false;
+        }
+        return true;
+    }
+
+    // Check empty row
+    fz_price_settingslist.emptyRow = function (rowIndex) {
+        var fobj = this.getForm();
+        if (ew.valueChanged(fobj, rowIndex, "platform_id", false))
+            return false;
+        if (ew.valueChanged(fobj, rowIndex, "inventory_id", false))
+            return false;
+        if (ew.valueChanged(fobj, rowIndex, "print_stage_id", false))
+            return false;
+        if (ew.valueChanged(fobj, rowIndex, "bus_size_id", false))
+            return false;
+        if (ew.valueChanged(fobj, rowIndex, "details", false))
+            return false;
+        if (ew.valueChanged(fobj, rowIndex, "max_limit", false))
+            return false;
+        if (ew.valueChanged(fobj, rowIndex, "min_limit", false))
+            return false;
+        if (ew.valueChanged(fobj, rowIndex, "price", false))
+            return false;
+        if (ew.valueChanged(fobj, rowIndex, "operator_fee", false))
+            return false;
+        if (ew.valueChanged(fobj, rowIndex, "agency_fee", false))
+            return false;
+        if (ew.valueChanged(fobj, rowIndex, "lamata_fee", false))
+            return false;
+        if (ew.valueChanged(fobj, rowIndex, "lasaa_fee", false))
+            return false;
+        if (ew.valueChanged(fobj, rowIndex, "printers_fee", false))
+            return false;
+        if (ew.valueChanged(fobj, rowIndex, "active[]", true))
+            return false;
+        if (ew.valueChanged(fobj, rowIndex, "ts_created", false))
+            return false;
         return true;
     }
 
@@ -93,6 +140,7 @@ loadjs.ready("head", function () {
     fz_price_settingslist.lists.inventory_id = <?= $Page->inventory_id->toClientList($Page) ?>;
     fz_price_settingslist.lists.print_stage_id = <?= $Page->print_stage_id->toClientList($Page) ?>;
     fz_price_settingslist.lists.bus_size_id = <?= $Page->bus_size_id->toClientList($Page) ?>;
+    fz_price_settingslist.lists.active = <?= $Page->active->toClientList($Page) ?>;
     loadjs.done("fz_price_settingslist");
 });
 var fz_price_settingslistsrch, currentSearchForm, currentAdvancedSearchForm;
@@ -109,6 +157,7 @@ loadjs.ready("head", function () {
         ["inventory_id", [], fields.inventory_id.isInvalid],
         ["print_stage_id", [], fields.print_stage_id.isInvalid],
         ["bus_size_id", [], fields.bus_size_id.isInvalid],
+        ["details", [], fields.details.isInvalid],
         ["max_limit", [], fields.max_limit.isInvalid],
         ["min_limit", [], fields.min_limit.isInvalid],
         ["price", [], fields.price.isInvalid],
@@ -116,7 +165,9 @@ loadjs.ready("head", function () {
         ["agency_fee", [], fields.agency_fee.isInvalid],
         ["lamata_fee", [], fields.lamata_fee.isInvalid],
         ["lasaa_fee", [], fields.lasaa_fee.isInvalid],
-        ["printers_fee", [], fields.printers_fee.isInvalid]
+        ["printers_fee", [], fields.printers_fee.isInvalid],
+        ["active", [], fields.active.isInvalid],
+        ["ts_created", [ew.Validators.datetime(0)], fields.ts_created.isInvalid]
     ]);
 
     // Set invalid fields
@@ -159,6 +210,7 @@ loadjs.ready("head", function () {
     fz_price_settingslistsrch.lists.inventory_id = <?= $Page->inventory_id->toClientList($Page) ?>;
     fz_price_settingslistsrch.lists.print_stage_id = <?= $Page->print_stage_id->toClientList($Page) ?>;
     fz_price_settingslistsrch.lists.bus_size_id = <?= $Page->bus_size_id->toClientList($Page) ?>;
+    fz_price_settingslistsrch.lists.active = <?= $Page->active->toClientList($Page) ?>;
 
     // Filters
     fz_price_settingslistsrch.filterList = <?= $Page->getFilterList() ?>;
@@ -388,11 +440,84 @@ loadjs.ready("head", function() {
 </div>
     <?php } ?>
 <?php } ?>
+<?php if ($Page->active->Visible) { // active ?>
+    <?php
+        $Page->SearchColumnCount++;
+        if (($Page->SearchColumnCount - 1) % $Page->SearchFieldsPerRow == 0) {
+            $Page->SearchRowCount++;
+    ?>
+<div id="xsr_<?= $Page->SearchRowCount ?>" class="ew-row d-sm-flex">
+    <?php
+        }
+     ?>
+    <div id="xsc_active" class="ew-cell form-group">
+        <label class="ew-search-caption ew-label"><?= $Page->active->caption() ?></label>
+        <span class="ew-search-operator">
+<?= $Language->phrase("=") ?>
+<input type="hidden" name="z_active" id="z_active" value="=">
+</span>
+        <span id="el_z_price_settings_active" class="ew-search-field">
+<div class="custom-control custom-checkbox d-inline-block">
+    <input type="checkbox" class="custom-control-input<?= $Page->active->isInvalidClass() ?>" data-table="z_price_settings" data-field="x_active" name="x_active[]" id="x_active_965658" value="1"<?= ConvertToBool($Page->active->AdvancedSearch->SearchValue) ? " checked" : "" ?><?= $Page->active->editAttributes() ?>>
+    <label class="custom-control-label" for="x_active_965658"></label>
+</div>
+<div class="invalid-feedback"><?= $Page->active->getErrorMessage(false) ?></div>
+</span>
+    </div>
+    <?php if ($Page->SearchColumnCount % $Page->SearchFieldsPerRow == 0) { ?>
+</div>
+    <?php } ?>
+<?php } ?>
+<?php if ($Page->ts_created->Visible) { // ts_created ?>
+    <?php
+        $Page->SearchColumnCount++;
+        if (($Page->SearchColumnCount - 1) % $Page->SearchFieldsPerRow == 0) {
+            $Page->SearchRowCount++;
+    ?>
+<div id="xsr_<?= $Page->SearchRowCount ?>" class="ew-row d-sm-flex">
+    <?php
+        }
+     ?>
+    <div id="xsc_ts_created" class="ew-cell form-group">
+        <label for="x_ts_created" class="ew-search-caption ew-label"><?= $Page->ts_created->caption() ?></label>
+        <span class="ew-search-operator">
+<?= $Language->phrase("=") ?>
+<input type="hidden" name="z_ts_created" id="z_ts_created" value="=">
+</span>
+        <span id="el_z_price_settings_ts_created" class="ew-search-field">
+<input type="<?= $Page->ts_created->getInputTextType() ?>" data-table="z_price_settings" data-field="x_ts_created" name="x_ts_created" id="x_ts_created" placeholder="<?= HtmlEncode($Page->ts_created->getPlaceHolder()) ?>" value="<?= $Page->ts_created->EditValue ?>"<?= $Page->ts_created->editAttributes() ?>>
+<div class="invalid-feedback"><?= $Page->ts_created->getErrorMessage(false) ?></div>
+<?php if (!$Page->ts_created->ReadOnly && !$Page->ts_created->Disabled && !isset($Page->ts_created->EditAttrs["readonly"]) && !isset($Page->ts_created->EditAttrs["disabled"])) { ?>
+<script>
+loadjs.ready(["fz_price_settingslistsrch", "datetimepicker"], function() {
+    ew.createDateTimePicker("fz_price_settingslistsrch", "x_ts_created", {"ignoreReadonly":true,"useCurrent":false,"format":0});
+});
+</script>
+<?php } ?>
+</span>
+    </div>
+    <?php if ($Page->SearchColumnCount % $Page->SearchFieldsPerRow == 0) { ?>
+</div>
+    <?php } ?>
+<?php } ?>
     <?php if ($Page->SearchColumnCount % $Page->SearchFieldsPerRow > 0) { ?>
 </div>
     <?php } ?>
 <div id="xsr_<?= $Page->SearchRowCount + 1 ?>" class="ew-row d-sm-flex">
-    <button class="btn btn-primary" name="btn-submit" id="btn-submit" type="submit"><?= $Language->phrase("SearchBtn") ?></button>
+    <div class="ew-quick-search input-group">
+        <input type="text" name="<?= Config("TABLE_BASIC_SEARCH") ?>" id="<?= Config("TABLE_BASIC_SEARCH") ?>" class="form-control" value="<?= HtmlEncode($Page->BasicSearch->getKeyword()) ?>" placeholder="<?= HtmlEncode($Language->phrase("Search")) ?>">
+        <input type="hidden" name="<?= Config("TABLE_BASIC_SEARCH_TYPE") ?>" id="<?= Config("TABLE_BASIC_SEARCH_TYPE") ?>" value="<?= HtmlEncode($Page->BasicSearch->getType()) ?>">
+        <div class="input-group-append">
+            <button class="btn btn-primary" name="btn-submit" id="btn-submit" type="submit"><?= $Language->phrase("SearchBtn") ?></button>
+            <button type="button" data-toggle="dropdown" class="btn btn-primary dropdown-toggle dropdown-toggle-split" aria-haspopup="true" aria-expanded="false"><span id="searchtype"><?= $Page->BasicSearch->getTypeNameShort() ?></span></button>
+            <div class="dropdown-menu dropdown-menu-right">
+                <a class="dropdown-item<?php if ($Page->BasicSearch->getType() == "") { ?> active<?php } ?>" href="#" onclick="return ew.setSearchType(this);"><?= $Language->phrase("QuickSearchAuto") ?></a>
+                <a class="dropdown-item<?php if ($Page->BasicSearch->getType() == "=") { ?> active<?php } ?>" href="#" onclick="return ew.setSearchType(this, '=');"><?= $Language->phrase("QuickSearchExact") ?></a>
+                <a class="dropdown-item<?php if ($Page->BasicSearch->getType() == "AND") { ?> active<?php } ?>" href="#" onclick="return ew.setSearchType(this, 'AND');"><?= $Language->phrase("QuickSearchAll") ?></a>
+                <a class="dropdown-item<?php if ($Page->BasicSearch->getType() == "OR") { ?> active<?php } ?>" href="#" onclick="return ew.setSearchType(this, 'OR');"><?= $Language->phrase("QuickSearchAny") ?></a>
+            </div>
+        </div>
+    </div>
 </div>
     </div><!-- /.ew-extended-search -->
 </div><!-- /.ew-search-panel -->
@@ -454,6 +579,9 @@ $Page->ListOptions->render("header", "left");
 <?php if ($Page->bus_size_id->Visible) { // bus_size_id ?>
         <th data-name="bus_size_id" class="<?= $Page->bus_size_id->headerCellClass() ?>"><div id="elh_z_price_settings_bus_size_id" class="z_price_settings_bus_size_id"><?= $Page->renderSort($Page->bus_size_id) ?></div></th>
 <?php } ?>
+<?php if ($Page->details->Visible) { // details ?>
+        <th data-name="details" class="<?= $Page->details->headerCellClass() ?>"><div id="elh_z_price_settings_details" class="z_price_settings_details"><?= $Page->renderSort($Page->details) ?></div></th>
+<?php } ?>
 <?php if ($Page->max_limit->Visible) { // max_limit ?>
         <th data-name="max_limit" class="<?= $Page->max_limit->headerCellClass() ?>"><div id="elh_z_price_settings_max_limit" class="z_price_settings_max_limit"><?= $Page->renderSort($Page->max_limit) ?></div></th>
 <?php } ?>
@@ -477,6 +605,12 @@ $Page->ListOptions->render("header", "left");
 <?php } ?>
 <?php if ($Page->printers_fee->Visible) { // printers_fee ?>
         <th data-name="printers_fee" class="<?= $Page->printers_fee->headerCellClass() ?>"><div id="elh_z_price_settings_printers_fee" class="z_price_settings_printers_fee"><?= $Page->renderSort($Page->printers_fee) ?></div></th>
+<?php } ?>
+<?php if ($Page->active->Visible) { // active ?>
+        <th data-name="active" class="<?= $Page->active->headerCellClass() ?>"><div id="elh_z_price_settings_active" class="z_price_settings_active"><?= $Page->renderSort($Page->active) ?></div></th>
+<?php } ?>
+<?php if ($Page->ts_created->Visible) { // ts_created ?>
+        <th data-name="ts_created" class="<?= $Page->ts_created->headerCellClass() ?>"><div id="elh_z_price_settings_ts_created" class="z_price_settings_ts_created"><?= $Page->renderSort($Page->ts_created) ?></div></th>
 <?php } ?>
 <?php
 // Render list options (header, right)
@@ -519,6 +653,8 @@ $Page->renderRow();
 $Page->EditRowCount = 0;
 if ($Page->isEdit())
     $Page->RowIndex = 1;
+if ($Page->isGridAdd())
+    $Page->RowIndex = 0;
 if ($Page->isGridEdit())
     $Page->RowIndex = 0;
 while ($Page->RecordCount < $Page->StopRecord) {
@@ -555,6 +691,12 @@ while ($Page->RecordCount < $Page->StopRecord) {
             }
         }
         $Page->RowType = ROWTYPE_VIEW; // Render view
+        if ($Page->isGridAdd()) { // Grid add
+            $Page->RowType = ROWTYPE_ADD; // Render add
+        }
+        if ($Page->isGridAdd() && $Page->EventCancelled && !$CurrentForm->hasValue("k_blankrow")) { // Insert failed
+            $Page->restoreCurrentRowFormValues($Page->RowIndex); // Restore form values
+        }
         if ($Page->isEdit()) {
             if ($Page->checkInlineEditKey() && $Page->EditRowCount == 0) { // Inline edit
                 $Page->RowType = ROWTYPE_EDIT; // Render edit
@@ -879,6 +1021,29 @@ loadjs.ready("head", function() {
 <?php } ?>
 </td>
     <?php } ?>
+    <?php if ($Page->details->Visible) { // details ?>
+        <td data-name="details" <?= $Page->details->cellAttributes() ?>>
+<?php if ($Page->RowType == ROWTYPE_ADD) { // Add record ?>
+<span id="el<?= $Page->RowCount ?>_z_price_settings_details" class="form-group">
+<textarea data-table="z_price_settings" data-field="x_details" name="x<?= $Page->RowIndex ?>_details" id="x<?= $Page->RowIndex ?>_details" cols="35" rows="4" placeholder="<?= HtmlEncode($Page->details->getPlaceHolder()) ?>"<?= $Page->details->editAttributes() ?>><?= $Page->details->EditValue ?></textarea>
+<div class="invalid-feedback"><?= $Page->details->getErrorMessage() ?></div>
+</span>
+<input type="hidden" data-table="z_price_settings" data-field="x_details" data-hidden="1" name="o<?= $Page->RowIndex ?>_details" id="o<?= $Page->RowIndex ?>_details" value="<?= HtmlEncode($Page->details->OldValue) ?>">
+<?php } ?>
+<?php if ($Page->RowType == ROWTYPE_EDIT) { // Edit record ?>
+<span id="el<?= $Page->RowCount ?>_z_price_settings_details" class="form-group">
+<textarea data-table="z_price_settings" data-field="x_details" name="x<?= $Page->RowIndex ?>_details" id="x<?= $Page->RowIndex ?>_details" cols="35" rows="4" placeholder="<?= HtmlEncode($Page->details->getPlaceHolder()) ?>"<?= $Page->details->editAttributes() ?>><?= $Page->details->EditValue ?></textarea>
+<div class="invalid-feedback"><?= $Page->details->getErrorMessage() ?></div>
+</span>
+<?php } ?>
+<?php if ($Page->RowType == ROWTYPE_VIEW) { // View record ?>
+<span id="el<?= $Page->RowCount ?>_z_price_settings_details">
+<span<?= $Page->details->viewAttributes() ?>>
+<?= $Page->details->getViewValue() ?></span>
+</span>
+<?php } ?>
+</td>
+    <?php } ?>
     <?php if ($Page->max_limit->Visible) { // max_limit ?>
         <td data-name="max_limit" <?= $Page->max_limit->cellAttributes() ?>>
 <?php if ($Page->RowType == ROWTYPE_ADD) { // Add record ?>
@@ -1063,6 +1228,75 @@ loadjs.ready("head", function() {
 <?php } ?>
 </td>
     <?php } ?>
+    <?php if ($Page->active->Visible) { // active ?>
+        <td data-name="active" <?= $Page->active->cellAttributes() ?>>
+<?php if ($Page->RowType == ROWTYPE_ADD) { // Add record ?>
+<span id="el<?= $Page->RowCount ?>_z_price_settings_active" class="form-group">
+<div class="custom-control custom-checkbox d-inline-block">
+    <input type="checkbox" class="custom-control-input<?= $Page->active->isInvalidClass() ?>" data-table="z_price_settings" data-field="x_active" name="x<?= $Page->RowIndex ?>_active[]" id="x<?= $Page->RowIndex ?>_active_968370" value="1"<?= ConvertToBool($Page->active->CurrentValue) ? " checked" : "" ?><?= $Page->active->editAttributes() ?>>
+    <label class="custom-control-label" for="x<?= $Page->RowIndex ?>_active_968370"></label>
+</div>
+<div class="invalid-feedback"><?= $Page->active->getErrorMessage() ?></div>
+</span>
+<input type="hidden" data-table="z_price_settings" data-field="x_active" data-hidden="1" name="o<?= $Page->RowIndex ?>_active[]" id="o<?= $Page->RowIndex ?>_active[]" value="<?= HtmlEncode($Page->active->OldValue) ?>">
+<?php } ?>
+<?php if ($Page->RowType == ROWTYPE_EDIT) { // Edit record ?>
+<span id="el<?= $Page->RowCount ?>_z_price_settings_active" class="form-group">
+<div class="custom-control custom-checkbox d-inline-block">
+    <input type="checkbox" class="custom-control-input<?= $Page->active->isInvalidClass() ?>" data-table="z_price_settings" data-field="x_active" name="x<?= $Page->RowIndex ?>_active[]" id="x<?= $Page->RowIndex ?>_active_646694" value="1"<?= ConvertToBool($Page->active->CurrentValue) ? " checked" : "" ?><?= $Page->active->editAttributes() ?>>
+    <label class="custom-control-label" for="x<?= $Page->RowIndex ?>_active_646694"></label>
+</div>
+<div class="invalid-feedback"><?= $Page->active->getErrorMessage() ?></div>
+</span>
+<?php } ?>
+<?php if ($Page->RowType == ROWTYPE_VIEW) { // View record ?>
+<span id="el<?= $Page->RowCount ?>_z_price_settings_active">
+<span<?= $Page->active->viewAttributes() ?>>
+<div class="custom-control custom-checkbox d-inline-block">
+    <input type="checkbox" id="x_active_<?= $Page->RowCount ?>" class="custom-control-input" value="<?= $Page->active->getViewValue() ?>" disabled<?php if (ConvertToBool($Page->active->CurrentValue)) { ?> checked<?php } ?>>
+    <label class="custom-control-label" for="x_active_<?= $Page->RowCount ?>"></label>
+</div></span>
+</span>
+<?php } ?>
+</td>
+    <?php } ?>
+    <?php if ($Page->ts_created->Visible) { // ts_created ?>
+        <td data-name="ts_created" <?= $Page->ts_created->cellAttributes() ?>>
+<?php if ($Page->RowType == ROWTYPE_ADD) { // Add record ?>
+<span id="el<?= $Page->RowCount ?>_z_price_settings_ts_created" class="form-group">
+<input type="<?= $Page->ts_created->getInputTextType() ?>" data-table="z_price_settings" data-field="x_ts_created" name="x<?= $Page->RowIndex ?>_ts_created" id="x<?= $Page->RowIndex ?>_ts_created" placeholder="<?= HtmlEncode($Page->ts_created->getPlaceHolder()) ?>" value="<?= $Page->ts_created->EditValue ?>"<?= $Page->ts_created->editAttributes() ?>>
+<div class="invalid-feedback"><?= $Page->ts_created->getErrorMessage() ?></div>
+<?php if (!$Page->ts_created->ReadOnly && !$Page->ts_created->Disabled && !isset($Page->ts_created->EditAttrs["readonly"]) && !isset($Page->ts_created->EditAttrs["disabled"])) { ?>
+<script>
+loadjs.ready(["fz_price_settingslist", "datetimepicker"], function() {
+    ew.createDateTimePicker("fz_price_settingslist", "x<?= $Page->RowIndex ?>_ts_created", {"ignoreReadonly":true,"useCurrent":false,"format":0});
+});
+</script>
+<?php } ?>
+</span>
+<input type="hidden" data-table="z_price_settings" data-field="x_ts_created" data-hidden="1" name="o<?= $Page->RowIndex ?>_ts_created" id="o<?= $Page->RowIndex ?>_ts_created" value="<?= HtmlEncode($Page->ts_created->OldValue) ?>">
+<?php } ?>
+<?php if ($Page->RowType == ROWTYPE_EDIT) { // Edit record ?>
+<span id="el<?= $Page->RowCount ?>_z_price_settings_ts_created" class="form-group">
+<input type="<?= $Page->ts_created->getInputTextType() ?>" data-table="z_price_settings" data-field="x_ts_created" name="x<?= $Page->RowIndex ?>_ts_created" id="x<?= $Page->RowIndex ?>_ts_created" placeholder="<?= HtmlEncode($Page->ts_created->getPlaceHolder()) ?>" value="<?= $Page->ts_created->EditValue ?>"<?= $Page->ts_created->editAttributes() ?>>
+<div class="invalid-feedback"><?= $Page->ts_created->getErrorMessage() ?></div>
+<?php if (!$Page->ts_created->ReadOnly && !$Page->ts_created->Disabled && !isset($Page->ts_created->EditAttrs["readonly"]) && !isset($Page->ts_created->EditAttrs["disabled"])) { ?>
+<script>
+loadjs.ready(["fz_price_settingslist", "datetimepicker"], function() {
+    ew.createDateTimePicker("fz_price_settingslist", "x<?= $Page->RowIndex ?>_ts_created", {"ignoreReadonly":true,"useCurrent":false,"format":0});
+});
+</script>
+<?php } ?>
+</span>
+<?php } ?>
+<?php if ($Page->RowType == ROWTYPE_VIEW) { // View record ?>
+<span id="el<?= $Page->RowCount ?>_z_price_settings_ts_created">
+<span<?= $Page->ts_created->viewAttributes() ?>>
+<?= $Page->ts_created->getViewValue() ?></span>
+</span>
+<?php } ?>
+</td>
+    <?php } ?>
 <?php
 // Render list options (body, right)
 $Page->ListOptions->render("body", "right", $Page->RowCount);
@@ -1233,6 +1467,15 @@ loadjs.ready("head", function() {
 <input type="hidden" data-table="z_price_settings" data-field="x_bus_size_id" data-hidden="1" name="o<?= $Page->RowIndex ?>_bus_size_id" id="o<?= $Page->RowIndex ?>_bus_size_id" value="<?= HtmlEncode($Page->bus_size_id->OldValue) ?>">
 </td>
     <?php } ?>
+    <?php if ($Page->details->Visible) { // details ?>
+        <td data-name="details">
+<span id="el$rowindex$_z_price_settings_details" class="form-group z_price_settings_details">
+<textarea data-table="z_price_settings" data-field="x_details" name="x<?= $Page->RowIndex ?>_details" id="x<?= $Page->RowIndex ?>_details" cols="35" rows="4" placeholder="<?= HtmlEncode($Page->details->getPlaceHolder()) ?>"<?= $Page->details->editAttributes() ?>><?= $Page->details->EditValue ?></textarea>
+<div class="invalid-feedback"><?= $Page->details->getErrorMessage() ?></div>
+</span>
+<input type="hidden" data-table="z_price_settings" data-field="x_details" data-hidden="1" name="o<?= $Page->RowIndex ?>_details" id="o<?= $Page->RowIndex ?>_details" value="<?= HtmlEncode($Page->details->OldValue) ?>">
+</td>
+    <?php } ?>
     <?php if ($Page->max_limit->Visible) { // max_limit ?>
         <td data-name="max_limit">
 <span id="el$rowindex$_z_price_settings_max_limit" class="form-group z_price_settings_max_limit">
@@ -1305,6 +1548,34 @@ loadjs.ready("head", function() {
 <input type="hidden" data-table="z_price_settings" data-field="x_printers_fee" data-hidden="1" name="o<?= $Page->RowIndex ?>_printers_fee" id="o<?= $Page->RowIndex ?>_printers_fee" value="<?= HtmlEncode($Page->printers_fee->OldValue) ?>">
 </td>
     <?php } ?>
+    <?php if ($Page->active->Visible) { // active ?>
+        <td data-name="active">
+<span id="el$rowindex$_z_price_settings_active" class="form-group z_price_settings_active">
+<div class="custom-control custom-checkbox d-inline-block">
+    <input type="checkbox" class="custom-control-input<?= $Page->active->isInvalidClass() ?>" data-table="z_price_settings" data-field="x_active" name="x<?= $Page->RowIndex ?>_active[]" id="x<?= $Page->RowIndex ?>_active_575568" value="1"<?= ConvertToBool($Page->active->CurrentValue) ? " checked" : "" ?><?= $Page->active->editAttributes() ?>>
+    <label class="custom-control-label" for="x<?= $Page->RowIndex ?>_active_575568"></label>
+</div>
+<div class="invalid-feedback"><?= $Page->active->getErrorMessage() ?></div>
+</span>
+<input type="hidden" data-table="z_price_settings" data-field="x_active" data-hidden="1" name="o<?= $Page->RowIndex ?>_active[]" id="o<?= $Page->RowIndex ?>_active[]" value="<?= HtmlEncode($Page->active->OldValue) ?>">
+</td>
+    <?php } ?>
+    <?php if ($Page->ts_created->Visible) { // ts_created ?>
+        <td data-name="ts_created">
+<span id="el$rowindex$_z_price_settings_ts_created" class="form-group z_price_settings_ts_created">
+<input type="<?= $Page->ts_created->getInputTextType() ?>" data-table="z_price_settings" data-field="x_ts_created" name="x<?= $Page->RowIndex ?>_ts_created" id="x<?= $Page->RowIndex ?>_ts_created" placeholder="<?= HtmlEncode($Page->ts_created->getPlaceHolder()) ?>" value="<?= $Page->ts_created->EditValue ?>"<?= $Page->ts_created->editAttributes() ?>>
+<div class="invalid-feedback"><?= $Page->ts_created->getErrorMessage() ?></div>
+<?php if (!$Page->ts_created->ReadOnly && !$Page->ts_created->Disabled && !isset($Page->ts_created->EditAttrs["readonly"]) && !isset($Page->ts_created->EditAttrs["disabled"])) { ?>
+<script>
+loadjs.ready(["fz_price_settingslist", "datetimepicker"], function() {
+    ew.createDateTimePicker("fz_price_settingslist", "x<?= $Page->RowIndex ?>_ts_created", {"ignoreReadonly":true,"useCurrent":false,"format":0});
+});
+</script>
+<?php } ?>
+</span>
+<input type="hidden" data-table="z_price_settings" data-field="x_ts_created" data-hidden="1" name="o<?= $Page->RowIndex ?>_ts_created" id="o<?= $Page->RowIndex ?>_ts_created" value="<?= HtmlEncode($Page->ts_created->OldValue) ?>">
+</td>
+    <?php } ?>
 <?php
 // Render list options (body, right)
 $Page->ListOptions->render("body", "right", $Page->RowIndex);
@@ -1322,6 +1593,11 @@ loadjs.ready(["fz_price_settingslist","load"], function() {
 </table><!-- /.ew-table -->
 <?php } ?>
 </div><!-- /.ew-grid-middle-panel -->
+<?php if ($Page->isGridAdd()) { ?>
+<input type="hidden" name="action" id="action" value="gridinsert">
+<input type="hidden" name="<?= $Page->FormKeyCountName ?>" id="<?= $Page->FormKeyCountName ?>" value="<?= $Page->KeyCount ?>">
+<?= $Page->MultiSelectKey ?>
+<?php } ?>
 <?php if ($Page->isEdit()) { ?>
 <input type="hidden" name="<?= $Page->FormKeyCountName ?>" id="<?= $Page->FormKeyCountName ?>" value="<?= $Page->KeyCount ?>">
 <input type="hidden" name="<?= $Page->OldKeyName ?>" value="<?= $Page->OldKey ?>">

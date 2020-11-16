@@ -1419,13 +1419,13 @@ class MainTransactionsAdd extends MainTransactions
 
             // start_date
             $this->start_date->EditAttrs["class"] = "form-control";
-            $this->start_date->EditCustomAttributes = "";
+            $this->start_date->EditCustomAttributes = 'readonly="readonly"';
             $this->start_date->EditValue = HtmlEncode(FormatDateTime($this->start_date->CurrentValue, 5));
             $this->start_date->PlaceHolder = RemoveHtml($this->start_date->caption());
 
             // end_date
             $this->end_date->EditAttrs["class"] = "form-control";
-            $this->end_date->EditCustomAttributes = "";
+            $this->end_date->EditCustomAttributes = 'readonly="readonly"';
             $this->end_date->EditValue = HtmlEncode(FormatDateTime($this->end_date->CurrentValue, 5));
             $this->end_date->PlaceHolder = RemoveHtml($this->end_date->caption());
 
@@ -2075,6 +2075,9 @@ class MainTransactionsAdd extends MainTransactions
     			if($levelid > 0 ){
     				// MANAGER
     				$this->visible_status_id->Visible = FALSE;
+    				if($levelid == 1){
+    					$this->total->Visible = FALSE;
+    				}
     			}else{
     				// DEFAULT
     				$this->status_id->Visible = FALSE;

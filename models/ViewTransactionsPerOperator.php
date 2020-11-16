@@ -72,7 +72,7 @@ class ViewTransactionsPerOperator extends DbTable
         $this->Dbid = 'DB';
         $this->ExportAll = true;
         $this->ExportPageBreakCount = 0; // Page break per every n record (PDF only)
-        $this->ExportPageOrientation = "portrait"; // Page orientation (PDF only)
+        $this->ExportPageOrientation = "landscape"; // Page orientation (PDF only)
         $this->ExportPageSize = "a4"; // Page size (PDF only)
         $this->ExportExcelPageOrientation = ""; // Page orientation (PhpSpreadsheet only)
         $this->ExportExcelPageSize = ""; // Page size (PhpSpreadsheet only)

@@ -30,7 +30,9 @@ loadjs.ready("head", function () {
         ["agency_fee", [fields.agency_fee.required ? ew.Validators.required(fields.agency_fee.caption) : null, ew.Validators.integer, ew.Validators.selected], fields.agency_fee.isInvalid],
         ["lamata_fee", [fields.lamata_fee.required ? ew.Validators.required(fields.lamata_fee.caption) : null, ew.Validators.integer, ew.Validators.selected], fields.lamata_fee.isInvalid],
         ["lasaa_fee", [fields.lasaa_fee.required ? ew.Validators.required(fields.lasaa_fee.caption) : null, ew.Validators.integer, ew.Validators.selected], fields.lasaa_fee.isInvalid],
-        ["printers_fee", [fields.printers_fee.required ? ew.Validators.required(fields.printers_fee.caption) : null, ew.Validators.integer, ew.Validators.selected], fields.printers_fee.isInvalid]
+        ["printers_fee", [fields.printers_fee.required ? ew.Validators.required(fields.printers_fee.caption) : null, ew.Validators.integer, ew.Validators.selected], fields.printers_fee.isInvalid],
+        ["active", [fields.active.required ? ew.Validators.required(fields.active.caption) : null], fields.active.isInvalid],
+        ["ts_created", [fields.ts_created.required ? ew.Validators.required(fields.ts_created.caption) : null, ew.Validators.datetime(0), ew.Validators.selected], fields.ts_created.isInvalid]
     ]);
 
     // Set invalid fields
@@ -95,6 +97,7 @@ loadjs.ready("head", function () {
     fz_price_settingsupdate.lists.inventory_id = <?= $Page->inventory_id->toClientList($Page) ?>;
     fz_price_settingsupdate.lists.print_stage_id = <?= $Page->print_stage_id->toClientList($Page) ?>;
     fz_price_settingsupdate.lists.bus_size_id = <?= $Page->bus_size_id->toClientList($Page) ?>;
+    fz_price_settingsupdate.lists.active = <?= $Page->active->toClientList($Page) ?>;
     loadjs.done("fz_price_settingsupdate");
 });
 </script>
@@ -625,6 +628,83 @@ $Page->showMessage();
                 <input type="text" readonly class="form-control-plaintext" value="<?= HtmlEncode(RemoveHtml($Page->printers_fee->getDisplayValue($Page->printers_fee->ViewValue))) ?>"></span>
                 </span>
                 <input type="hidden" data-table="z_price_settings" data-field="x_printers_fee" data-hidden="1" name="x_printers_fee" id="x_printers_fee" value="<?= HtmlEncode($Page->printers_fee->FormValue) ?>">
+                <?php } ?>
+            </div>
+        </div>
+    </div>
+<?php } ?>
+<?php if ($Page->active->Visible && (!$Page->isConfirm() || $Page->active->multiUpdateSelected())) { // active ?>
+    <div id="r_active" class="form-group row">
+        <label class="<?= $Page->LeftColumnClass ?>">
+            <?php if (!$Page->isConfirm()) { ?>
+            <div class="custom-control custom-checkbox">
+                <input type="checkbox" name="u_active" id="u_active" class="custom-control-input ew-multi-select" value="1"<?= $Page->active->multiUpdateSelected() ? " checked" : "" ?>>
+                <label class="custom-control-label" for="u_active"><?= $Page->active->caption() ?></label>
+            </div>
+            <?php } else { ?>
+            <input type="hidden" name="u_active" id="u_active" value="<?= $Page->active->MultiUpdate ?>">
+            <?= $Page->active->caption() ?>
+            <?php } ?>
+        </label>
+        <div class="<?= $Page->RightColumnClass ?>">
+            <div <?= $Page->active->cellAttributes() ?>>
+                <?php if (!$Page->isConfirm()) { ?>
+                <span id="el_z_price_settings_active">
+                <div class="custom-control custom-checkbox d-inline-block">
+                    <input type="checkbox" class="custom-control-input<?= $Page->active->isInvalidClass() ?>" data-table="z_price_settings" data-field="x_active" name="x_active[]" id="x_active_206495" value="1"<?= ConvertToBool($Page->active->CurrentValue) ? " checked" : "" ?><?= $Page->active->editAttributes() ?> aria-describedby="x_active_help">
+                    <label class="custom-control-label" for="x_active_206495"></label>
+                </div>
+                <?= $Page->active->getCustomMessage() ?>
+                <div class="invalid-feedback"><?= $Page->active->getErrorMessage() ?></div>
+                </span>
+                <?php } else { ?>
+                <span id="el_z_price_settings_active">
+                <span<?= $Page->active->viewAttributes() ?>>
+                <div class="custom-control custom-checkbox d-inline-block">
+                    <input type="checkbox" id="x_active_<?= $Page->RowCount ?>" class="custom-control-input" value="<?= $Page->active->ViewValue ?>" disabled<?php if (ConvertToBool($Page->active->CurrentValue)) { ?> checked<?php } ?>>
+                    <label class="custom-control-label" for="x_active_<?= $Page->RowCount ?>"></label>
+                </div></span>
+                </span>
+                <input type="hidden" data-table="z_price_settings" data-field="x_active" data-hidden="1" name="x_active" id="x_active" value="<?= HtmlEncode($Page->active->FormValue) ?>">
+                <?php } ?>
+            </div>
+        </div>
+    </div>
+<?php } ?>
+<?php if ($Page->ts_created->Visible && (!$Page->isConfirm() || $Page->ts_created->multiUpdateSelected())) { // ts_created ?>
+    <div id="r_ts_created" class="form-group row">
+        <label for="x_ts_created" class="<?= $Page->LeftColumnClass ?>">
+            <?php if (!$Page->isConfirm()) { ?>
+            <div class="custom-control custom-checkbox">
+                <input type="checkbox" name="u_ts_created" id="u_ts_created" class="custom-control-input ew-multi-select" value="1"<?= $Page->ts_created->multiUpdateSelected() ? " checked" : "" ?>>
+                <label class="custom-control-label" for="u_ts_created"><?= $Page->ts_created->caption() ?></label>
+            </div>
+            <?php } else { ?>
+            <input type="hidden" name="u_ts_created" id="u_ts_created" value="<?= $Page->ts_created->MultiUpdate ?>">
+            <?= $Page->ts_created->caption() ?>
+            <?php } ?>
+        </label>
+        <div class="<?= $Page->RightColumnClass ?>">
+            <div <?= $Page->ts_created->cellAttributes() ?>>
+                <?php if (!$Page->isConfirm()) { ?>
+                <span id="el_z_price_settings_ts_created">
+                <input type="<?= $Page->ts_created->getInputTextType() ?>" data-table="z_price_settings" data-field="x_ts_created" name="x_ts_created" id="x_ts_created" placeholder="<?= HtmlEncode($Page->ts_created->getPlaceHolder()) ?>" value="<?= $Page->ts_created->EditValue ?>"<?= $Page->ts_created->editAttributes() ?> aria-describedby="x_ts_created_help">
+                <?= $Page->ts_created->getCustomMessage() ?>
+                <div class="invalid-feedback"><?= $Page->ts_created->getErrorMessage() ?></div>
+                <?php if (!$Page->ts_created->ReadOnly && !$Page->ts_created->Disabled && !isset($Page->ts_created->EditAttrs["readonly"]) && !isset($Page->ts_created->EditAttrs["disabled"])) { ?>
+                <script>
+                loadjs.ready(["fz_price_settingsupdate", "datetimepicker"], function() {
+                    ew.createDateTimePicker("fz_price_settingsupdate", "x_ts_created", {"ignoreReadonly":true,"useCurrent":false,"format":0});
+                });
+                </script>
+                <?php } ?>
+                </span>
+                <?php } else { ?>
+                <span id="el_z_price_settings_ts_created">
+                <span<?= $Page->ts_created->viewAttributes() ?>>
+                <input type="text" readonly class="form-control-plaintext" value="<?= HtmlEncode(RemoveHtml($Page->ts_created->getDisplayValue($Page->ts_created->ViewValue))) ?>"></span>
+                </span>
+                <input type="hidden" data-table="z_price_settings" data-field="x_ts_created" data-hidden="1" name="x_ts_created" id="x_ts_created" value="<?= HtmlEncode($Page->ts_created->FormValue) ?>">
                 <?php } ?>
             </div>
         </div>

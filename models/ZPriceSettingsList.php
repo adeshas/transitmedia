@@ -592,7 +592,7 @@ class ZPriceSettingsList extends ZPriceSettings
         $this->inventory_id->setVisibility();
         $this->print_stage_id->setVisibility();
         $this->bus_size_id->setVisibility();
-        $this->details->Visible = false;
+        $this->details->setVisibility();
         $this->max_limit->setVisibility();
         $this->min_limit->setVisibility();
         $this->price->setVisibility();
@@ -601,6 +601,8 @@ class ZPriceSettingsList extends ZPriceSettings
         $this->lamata_fee->setVisibility();
         $this->lasaa_fee->setVisibility();
         $this->printers_fee->setVisibility();
+        $this->active->setVisibility();
+        $this->ts_created->setVisibility();
         $this->hideFieldsForAddEdit();
 
         // Global Page Loading event (in userfn*.php)
@@ -676,6 +678,11 @@ class ZPriceSettingsList extends ZPriceSettings
                 if ($this->isEdit()) {
                     $this->inlineEditMode();
                 }
+
+                // Switch to grid add mode
+                if ($this->isGridAdd()) {
+                    $this->gridAddMode();
+                }
             } else {
                 if (Post("action") !== null) {
                     $this->CurrentAction = Post("action"); // Get action
@@ -698,6 +705,20 @@ class ZPriceSettingsList extends ZPriceSettings
                     if (($this->isUpdate() || $this->isOverwrite()) && @$_SESSION[SESSION_INLINE_MODE] == "edit") {
                         $this->setKey(Post($this->OldKeyName));
                         $this->inlineUpdate();
+                    }
+
+                    // Grid Insert
+                    if ($this->isGridInsert() && @$_SESSION[SESSION_INLINE_MODE] == "gridadd") {
+                        if ($this->validateGridForm()) {
+                            $gridInsert = $this->gridInsert();
+                        } else {
+                            $gridInsert = false;
+                        }
+                        if ($gridInsert) {
+                        } else {
+                            $this->EventCancelled = true;
+                            $this->gridAddMode(); // Stay in Grid add mode
+                        }
                     }
                 } elseif (@$_SESSION[SESSION_INLINE_MODE] == "gridedit") { // Previously in grid edit mode
                     if (Get(Config("TABLE_START_REC")) !== null || Get(Config("TABLE_PAGE_NO")) !== null) { // Stay in grid edit mode if paging
@@ -742,7 +763,11 @@ class ZPriceSettingsList extends ZPriceSettings
             }
 
             // Get default search criteria
+            AddFilter($this->DefaultSearchWhere, $this->basicSearchWhere(true));
             AddFilter($this->DefaultSearchWhere, $this->advancedSearchWhere(true));
+
+            // Get basic search values
+            $this->loadBasicSearchValues();
 
             // Get and validate search values for advanced search
             $this->loadSearchValues(); // Get search values
@@ -767,6 +792,11 @@ class ZPriceSettingsList extends ZPriceSettings
             // Set up sorting order
             $this->setupSortOrder();
 
+            // Get basic search criteria
+            if (!$this->hasInvalidFields()) {
+                $srchBasic = $this->basicSearchWhere();
+            }
+
             // Get search criteria for advanced search
             if (!$this->hasInvalidFields()) {
                 $srchAdvanced = $this->advancedSearchWhere();
@@ -788,6 +818,12 @@ class ZPriceSettingsList extends ZPriceSettings
 
         // Load search default if no existing search criteria
         if (!$this->checkSearchParms()) {
+            // Load basic search from default
+            $this->BasicSearch->loadDefault();
+            if ($this->BasicSearch->Keyword != "") {
+                $srchBasic = $this->basicSearchWhere();
+            }
+
             // Load advanced search from default
             if ($this->loadAdvancedSearchDefault()) {
                 $srchAdvanced = $this->advancedSearchWhere();
@@ -936,6 +972,14 @@ class ZPriceSettingsList extends ZPriceSettings
         $this->LastAction = $this->CurrentAction; // Save last action
         $this->CurrentAction = ""; // Clear action
         $_SESSION[SESSION_INLINE_MODE] = ""; // Clear inline mode
+    }
+
+    // Switch to Grid Add mode
+    protected function gridAddMode()
+    {
+        $this->CurrentAction = "gridadd";
+        $_SESSION[SESSION_INLINE_MODE] = "gridadd";
+        $this->hideFieldsForAddEdit();
     }
 
     // Switch to Grid Edit mode
@@ -1142,6 +1186,104 @@ class ZPriceSettingsList extends ZPriceSettings
         return $wrkFilter;
     }
 
+    // Perform Grid Add
+    public function gridInsert()
+    {
+        global $Language, $CurrentForm;
+        $rowindex = 1;
+        $gridInsert = false;
+        $conn = $this->getConnection();
+
+        // Call Grid Inserting event
+        if (!$this->gridInserting()) {
+            if ($this->getFailureMessage() == "") {
+                $this->setFailureMessage($Language->phrase("GridAddCancelled")); // Set grid add cancelled message
+            }
+            return false;
+        }
+
+        // Begin transaction
+        $conn->beginTransaction();
+
+        // Init key filter
+        $wrkfilter = "";
+        $addcnt = 0;
+        $key = "";
+
+        // Get row count
+        $CurrentForm->Index = -1;
+        $rowcnt = strval($CurrentForm->getValue($this->FormKeyCountName));
+        if ($rowcnt == "" || !is_numeric($rowcnt)) {
+            $rowcnt = 0;
+        }
+
+        // Insert all rows
+        for ($rowindex = 1; $rowindex <= $rowcnt; $rowindex++) {
+            // Load current row values
+            $CurrentForm->Index = $rowindex;
+            $rowaction = strval($CurrentForm->getValue($this->FormActionName));
+            if ($rowaction != "" && $rowaction != "insert") {
+                continue; // Skip
+            }
+            if ($rowaction == "insert") {
+                $this->OldKey = strval($CurrentForm->getValue($this->OldKeyName));
+                $this->loadOldRecord(); // Load old record
+            }
+            $this->loadFormValues(); // Get form values
+            if (!$this->emptyRow()) {
+                $addcnt++;
+                $this->SendEmail = false; // Do not send email on insert success
+
+                // Validate form // Already done in validateGridForm
+                //if (!$this->validateForm()) {
+                //    $gridInsert = false; // Form error, reset action
+                //} else {
+                    $gridInsert = $this->addRow($this->OldRecordset); // Insert this row
+                //}
+                if ($gridInsert) {
+                    if ($key != "") {
+                        $key .= Config("COMPOSITE_KEY_SEPARATOR");
+                    }
+                    $key .= $this->id->CurrentValue;
+
+                    // Add filter for this record
+                    $filter = $this->getRecordFilter();
+                    if ($wrkfilter != "") {
+                        $wrkfilter .= " OR ";
+                    }
+                    $wrkfilter .= $filter;
+                } else {
+                    break;
+                }
+            }
+        }
+        if ($addcnt == 0) { // No record inserted
+            $this->setFailureMessage($Language->phrase("NoAddRecord"));
+            $gridInsert = false;
+        }
+        if ($gridInsert) {
+            $conn->commit(); // Commit transaction
+
+            // Get new records
+            $this->CurrentFilter = $wrkfilter;
+            $sql = $this->getCurrentSql();
+            $rsnew = $conn->fetchAll($sql);
+
+            // Call Grid_Inserted event
+            $this->gridInserted($rsnew);
+            if ($this->getSuccessMessage() == "") {
+                $this->setSuccessMessage($Language->phrase("InsertSuccess")); // Set up insert success message
+            }
+            $this->clearInlineMode(); // Clear grid add mode
+        } else {
+            $conn->rollback(); // Rollback transaction
+            if ($this->getFailureMessage() == "") {
+                $this->setFailureMessage($Language->phrase("InsertFailed")); // Set insert failed message
+            }
+        }
+        return $gridInsert;
+    }
+
     // Check if empty row
     public function emptyRow()
     {
@@ -1156,6 +1298,9 @@ class ZPriceSettingsList extends ZPriceSettings
             return false;
         }
         if ($CurrentForm->hasValue("x_bus_size_id") && $CurrentForm->hasValue("o_bus_size_id") && $this->bus_size_id->CurrentValue != $this->bus_size_id->OldValue) {
+            return false;
+        }
+        if ($CurrentForm->hasValue("x_details") && $CurrentForm->hasValue("o_details") && $this->details->CurrentValue != $this->details->OldValue) {
             return false;
         }
         if ($CurrentForm->hasValue("x_max_limit") && $CurrentForm->hasValue("o_max_limit") && $this->max_limit->CurrentValue != $this->max_limit->OldValue) {
@@ -1180,6 +1325,12 @@ class ZPriceSettingsList extends ZPriceSettings
             return false;
         }
         if ($CurrentForm->hasValue("x_printers_fee") && $CurrentForm->hasValue("o_printers_fee") && $this->printers_fee->CurrentValue != $this->printers_fee->OldValue) {
+            return false;
+        }
+        if ($CurrentForm->hasValue("x_active") && $CurrentForm->hasValue("o_active") && ConvertToBool($this->active->CurrentValue) != ConvertToBool($this->active->OldValue)) {
+            return false;
+        }
+        if ($CurrentForm->hasValue("x_ts_created") && $CurrentForm->hasValue("o_ts_created") && $this->ts_created->CurrentValue != $this->ts_created->OldValue) {
             return false;
         }
         return true;
@@ -1268,6 +1419,7 @@ class ZPriceSettingsList extends ZPriceSettings
         $this->inventory_id->clearErrorMessage();
         $this->print_stage_id->clearErrorMessage();
         $this->bus_size_id->clearErrorMessage();
+        $this->details->clearErrorMessage();
         $this->max_limit->clearErrorMessage();
         $this->min_limit->clearErrorMessage();
         $this->price->clearErrorMessage();
@@ -1276,6 +1428,8 @@ class ZPriceSettingsList extends ZPriceSettings
         $this->lamata_fee->clearErrorMessage();
         $this->lasaa_fee->clearErrorMessage();
         $this->printers_fee->clearErrorMessage();
+        $this->active->clearErrorMessage();
+        $this->ts_created->clearErrorMessage();
     }
 
     // Get list of filters
@@ -1300,6 +1454,12 @@ class ZPriceSettingsList extends ZPriceSettings
         $filterList = Concat($filterList, $this->lamata_fee->AdvancedSearch->toJson(), ","); // Field lamata_fee
         $filterList = Concat($filterList, $this->lasaa_fee->AdvancedSearch->toJson(), ","); // Field lasaa_fee
         $filterList = Concat($filterList, $this->printers_fee->AdvancedSearch->toJson(), ","); // Field printers_fee
+        $filterList = Concat($filterList, $this->active->AdvancedSearch->toJson(), ","); // Field active
+        $filterList = Concat($filterList, $this->ts_created->AdvancedSearch->toJson(), ","); // Field ts_created
+        if ($this->BasicSearch->Keyword != "") {
+            $wrk = "\"" . Config("TABLE_BASIC_SEARCH") . "\":\"" . JsEncode($this->BasicSearch->Keyword) . "\",\"" . Config("TABLE_BASIC_SEARCH_TYPE") . "\":\"" . JsEncode($this->BasicSearch->Type) . "\"";
+            $filterList = Concat($filterList, $wrk, ",");
+        }
 
         // Return filter list in JSON
         if ($filterList != "") {
@@ -1447,6 +1607,24 @@ class ZPriceSettingsList extends ZPriceSettings
         $this->printers_fee->AdvancedSearch->SearchValue2 = @$filter["y_printers_fee"];
         $this->printers_fee->AdvancedSearch->SearchOperator2 = @$filter["w_printers_fee"];
         $this->printers_fee->AdvancedSearch->save();
+
+        // Field active
+        $this->active->AdvancedSearch->SearchValue = @$filter["x_active"];
+        $this->active->AdvancedSearch->SearchOperator = @$filter["z_active"];
+        $this->active->AdvancedSearch->SearchCondition = @$filter["v_active"];
+        $this->active->AdvancedSearch->SearchValue2 = @$filter["y_active"];
+        $this->active->AdvancedSearch->SearchOperator2 = @$filter["w_active"];
+        $this->active->AdvancedSearch->save();
+
+        // Field ts_created
+        $this->ts_created->AdvancedSearch->SearchValue = @$filter["x_ts_created"];
+        $this->ts_created->AdvancedSearch->SearchOperator = @$filter["z_ts_created"];
+        $this->ts_created->AdvancedSearch->SearchCondition = @$filter["v_ts_created"];
+        $this->ts_created->AdvancedSearch->SearchValue2 = @$filter["y_ts_created"];
+        $this->ts_created->AdvancedSearch->SearchOperator2 = @$filter["w_ts_created"];
+        $this->ts_created->AdvancedSearch->save();
+        $this->BasicSearch->setKeyword(@$filter[Config("TABLE_BASIC_SEARCH")]);
+        $this->BasicSearch->setType(@$filter[Config("TABLE_BASIC_SEARCH_TYPE")]);
     }
 
     // Advanced search WHERE clause based on QueryString
@@ -1471,6 +1649,8 @@ class ZPriceSettingsList extends ZPriceSettings
         $this->buildSearchSql($where, $this->lamata_fee, $default, false); // lamata_fee
         $this->buildSearchSql($where, $this->lasaa_fee, $default, false); // lasaa_fee
         $this->buildSearchSql($where, $this->printers_fee, $default, false); // printers_fee
+        $this->buildSearchSql($where, $this->active, $default, false); // active
+        $this->buildSearchSql($where, $this->ts_created, $default, false); // ts_created
 
         // Set up search parm
         if (!$default && $where != "" && in_array($this->Command, ["", "reset", "resetall"])) {
@@ -1491,6 +1671,8 @@ class ZPriceSettingsList extends ZPriceSettings
             $this->lamata_fee->AdvancedSearch->save(); // lamata_fee
             $this->lasaa_fee->AdvancedSearch->save(); // lasaa_fee
             $this->printers_fee->AdvancedSearch->save(); // printers_fee
+            $this->active->AdvancedSearch->save(); // active
+            $this->ts_created->AdvancedSearch->save(); // ts_created
         }
         return $where;
     }
@@ -1556,9 +1738,131 @@ class ZPriceSettingsList extends ZPriceSettings
         return $value;
     }
 
+    // Return basic search SQL
+    protected function basicSearchSql($arKeywords, $type)
+    {
+        $where = "";
+        $this->buildBasicSearchSql($where, $this->details, $arKeywords, $type);
+        return $where;
+    }
+
+    // Build basic search SQL
+    protected function buildBasicSearchSql(&$where, &$fld, $arKeywords, $type)
+    {
+        $defCond = ($type == "OR") ? "OR" : "AND";
+        $arSql = []; // Array for SQL parts
+        $arCond = []; // Array for search conditions
+        $cnt = count($arKeywords);
+        $j = 0; // Number of SQL parts
+        for ($i = 0; $i < $cnt; $i++) {
+            $keyword = $arKeywords[$i];
+            $keyword = trim($keyword);
+            if (Config("BASIC_SEARCH_IGNORE_PATTERN") != "") {
+                $keyword = preg_replace(Config("BASIC_SEARCH_IGNORE_PATTERN"), "\\", $keyword);
+                $ar = explode("\\", $keyword);
+            } else {
+                $ar = [$keyword];
+            }
+            foreach ($ar as $keyword) {
+                if ($keyword != "") {
+                    $wrk = "";
+                    if ($keyword == "OR" && $type == "") {
+                        if ($j > 0) {
+                            $arCond[$j - 1] = "OR";
+                        }
+                    } elseif ($keyword == Config("NULL_VALUE")) {
+                        $wrk = $fld->Expression . " IS NULL";
+                    } elseif ($keyword == Config("NOT_NULL_VALUE")) {
+                        $wrk = $fld->Expression . " IS NOT NULL";
+                    } elseif ($fld->IsVirtual && $fld->Visible) {
+                        $wrk = $fld->VirtualExpression . Like(QuotedValue("%" . $keyword . "%", DATATYPE_STRING, $this->Dbid), $this->Dbid);
+                    } elseif ($fld->DataType != DATATYPE_NUMBER || is_numeric($keyword)) {
+                        $wrk = $fld->BasicSearchExpression . Like(QuotedValue("%" . $keyword . "%", DATATYPE_STRING, $this->Dbid), $this->Dbid);
+                    }
+                    if ($wrk != "") {
+                        $arSql[$j] = $wrk;
+                        $arCond[$j] = $defCond;
+                        $j += 1;
+                    }
+                }
+            }
+        }
+        $cnt = count($arSql);
+        $quoted = false;
+        $sql = "";
+        if ($cnt > 0) {
+            for ($i = 0; $i < $cnt - 1; $i++) {
+                if ($arCond[$i] == "OR") {
+                    if (!$quoted) {
+                        $sql .= "(";
+                    }
+                    $quoted = true;
+                }
+                $sql .= $arSql[$i];
+                if ($quoted && $arCond[$i] != "OR") {
+                    $sql .= ")";
+                    $quoted = false;
+                }
+                $sql .= " " . $arCond[$i] . " ";
+            }
+            $sql .= $arSql[$cnt - 1];
+            if ($quoted) {
+                $sql .= ")";
+            }
+        }
+        if ($sql != "") {
+            if ($where != "") {
+                $where .= " OR ";
+            }
+            $where .= "(" . $sql . ")";
+        }
+    }
+
+    // Return basic search WHERE clause based on search keyword and type
+    protected function basicSearchWhere($default = false)
+    {
+        global $Security;
+        $searchStr = "";
+        if (!$Security->canSearch()) {
+            return "";
+        }
+        $searchKeyword = ($default) ? $this->BasicSearch->KeywordDefault : $this->BasicSearch->Keyword;
+        $searchType = ($default) ? $this->BasicSearch->TypeDefault : $this->BasicSearch->Type;
+
+        // Get search SQL
+        if ($searchKeyword != "") {
+            $ar = $this->BasicSearch->keywordList($default);
+            // Search keyword in any fields
+            if (($searchType == "OR" || $searchType == "AND") && $this->BasicSearch->BasicSearchAnyFields) {
+                foreach ($ar as $keyword) {
+                    if ($keyword != "") {
+                        if ($searchStr != "") {
+                            $searchStr .= " " . $searchType . " ";
+                        }
+                        $searchStr .= "(" . $this->basicSearchSql([$keyword], $searchType) . ")";
+                    }
+                }
+            } else {
+                $searchStr = $this->basicSearchSql($ar, $searchType);
+            }
+            if (!$default && in_array($this->Command, ["", "reset", "resetall"])) {
+                $this->Command = "search";
+            }
+        }
+        if (!$default && $this->Command == "search") {
+            $this->BasicSearch->setKeyword($searchKeyword);
+            $this->BasicSearch->setType($searchType);
+        }
+        return $searchStr;
+    }
+
     // Check if search parm exists
     protected function checkSearchParms()
     {
+        // Check basic search
+        if ($this->BasicSearch->issetSession()) {
+            return true;
+        }
         if ($this->id->AdvancedSearch->issetSession()) {
             return true;
         }
@@ -1601,6 +1905,12 @@ class ZPriceSettingsList extends ZPriceSettings
         if ($this->printers_fee->AdvancedSearch->issetSession()) {
             return true;
         }
+        if ($this->active->AdvancedSearch->issetSession()) {
+            return true;
+        }
+        if ($this->ts_created->AdvancedSearch->issetSession()) {
+            return true;
+        }
         return false;
     }
 
@@ -1611,6 +1921,9 @@ class ZPriceSettingsList extends ZPriceSettings
         $this->SearchWhere = "";
         $this->setSearchWhere($this->SearchWhere);
 
+        // Clear basic search parameters
+        $this->resetBasicSearchParms();
+
         // Clear advanced search parameters
         $this->resetAdvancedSearchParms();
     }
@@ -1619,6 +1932,12 @@ class ZPriceSettingsList extends ZPriceSettings
     protected function loadAdvancedSearchDefault()
     {
         return false;
+    }
+
+    // Clear all basic search parameters
+    protected function resetBasicSearchParms()
+    {
+        $this->BasicSearch->unsetSession();
     }
 
     // Clear all advanced search parameters
@@ -1638,12 +1957,17 @@ class ZPriceSettingsList extends ZPriceSettings
                 $this->lamata_fee->AdvancedSearch->unsetSession();
                 $this->lasaa_fee->AdvancedSearch->unsetSession();
                 $this->printers_fee->AdvancedSearch->unsetSession();
+                $this->active->AdvancedSearch->unsetSession();
+                $this->ts_created->AdvancedSearch->unsetSession();
     }
 
     // Restore all search parameters
     protected function restoreSearchParms()
     {
         $this->RestoreSearch = true;
+
+        // Restore basic search values
+        $this->BasicSearch->load();
 
         // Restore advanced search values
                 $this->id->AdvancedSearch->load();
@@ -1660,6 +1984,8 @@ class ZPriceSettingsList extends ZPriceSettings
                 $this->lamata_fee->AdvancedSearch->load();
                 $this->lasaa_fee->AdvancedSearch->load();
                 $this->printers_fee->AdvancedSearch->load();
+                $this->active->AdvancedSearch->load();
+                $this->ts_created->AdvancedSearch->load();
     }
 
     // Set up sort parameters
@@ -1674,6 +2000,7 @@ class ZPriceSettingsList extends ZPriceSettings
             $this->updateSort($this->inventory_id); // inventory_id
             $this->updateSort($this->print_stage_id); // print_stage_id
             $this->updateSort($this->bus_size_id); // bus_size_id
+            $this->updateSort($this->details); // details
             $this->updateSort($this->max_limit); // max_limit
             $this->updateSort($this->min_limit); // min_limit
             $this->updateSort($this->price); // price
@@ -1682,6 +2009,8 @@ class ZPriceSettingsList extends ZPriceSettings
             $this->updateSort($this->lamata_fee); // lamata_fee
             $this->updateSort($this->lasaa_fee); // lasaa_fee
             $this->updateSort($this->printers_fee); // printers_fee
+            $this->updateSort($this->active); // active
+            $this->updateSort($this->ts_created); // ts_created
             $this->setStartRecordNumber(1); // Reset start position
         }
     }
@@ -1751,6 +2080,8 @@ class ZPriceSettingsList extends ZPriceSettings
                 $this->lamata_fee->setSort("");
                 $this->lasaa_fee->setSort("");
                 $this->printers_fee->setSort("");
+                $this->active->setSort("");
+                $this->ts_created->setSort("");
             }
 
             // Reset start position
@@ -1949,6 +2280,10 @@ class ZPriceSettingsList extends ZPriceSettings
     {
         global $Language, $Security;
         $options = &$this->OtherOptions;
+        $option = $options["addedit"];
+        $item = &$option->add("gridadd");
+        $item->Body = "<a class=\"ew-add-edit ew-grid-add\" title=\"" . HtmlTitle($Language->phrase("GridAddLink")) . "\" data-caption=\"" . HtmlTitle($Language->phrase("GridAddLink")) . "\" href=\"" . HtmlEncode(GetUrl($this->GridAddUrl)) . "\">" . $Language->phrase("GridAddLink") . "</a>";
+        $item->Visible = $this->GridAddUrl != "" && $Security->canAdd();
 
         // Add grid edit
         $option = $options["addedit"];
@@ -2026,6 +2361,27 @@ class ZPriceSettingsList extends ZPriceSettings
                 $option->hideAllOptions();
             }
             $pageUrl = $this->pageUrl();
+
+            // Grid-Add
+            if ($this->isGridAdd()) {
+                if ($this->AllowAddDeleteRow) {
+                    // Add add blank row
+                    $option = $options["addedit"];
+                    $option->UseDropDownButton = false;
+                    $item = &$option->add("addblankrow");
+                    $item->Body = "<a class=\"ew-add-edit ew-add-blank-row\" title=\"" . HtmlTitle($Language->phrase("AddBlankRow")) . "\" data-caption=\"" . HtmlTitle($Language->phrase("AddBlankRow")) . "\" href=\"#\" onclick=\"return ew.addGridRow(this);\">" . $Language->phrase("AddBlankRow") . "</a>";
+                    $item->Visible = false;
+                }
+                $option = $options["action"];
+                $option->UseDropDownButton = false;
+                // Add grid insert
+                $item = &$option->add("gridinsert");
+                $item->Body = "<a class=\"ew-action ew-grid-insert\" title=\"" . HtmlTitle($Language->phrase("GridInsertLink")) . "\" data-caption=\"" . HtmlTitle($Language->phrase("GridInsertLink")) . "\" href=\"#\" onclick=\"return ew.forms.get(this).submit('" . $this->pageName() . "');\">" . $Language->phrase("GridInsertLink") . "</a>";
+                // Add grid cancel
+                $item = &$option->add("gridcancel");
+                $cancelurl = $this->addMasterUrl($pageUrl . "action=cancel");
+                $item->Body = "<a class=\"ew-action ew-grid-cancel\" title=\"" . HtmlTitle($Language->phrase("GridCancelLink")) . "\" data-caption=\"" . HtmlTitle($Language->phrase("GridCancelLink")) . "\" href=\"" . $cancelurl . "\">" . $Language->phrase("GridCancelLink") . "</a>";
+            }
 
             // Grid-Edit
             if ($this->isGridEdit()) {
@@ -2171,6 +2527,20 @@ class ZPriceSettingsList extends ZPriceSettings
         $this->lasaa_fee->OldValue = $this->lasaa_fee->CurrentValue;
         $this->printers_fee->CurrentValue = null;
         $this->printers_fee->OldValue = $this->printers_fee->CurrentValue;
+        $this->active->CurrentValue = false;
+        $this->active->OldValue = $this->active->CurrentValue;
+        $this->ts_created->CurrentValue = null;
+        $this->ts_created->OldValue = $this->ts_created->CurrentValue;
+    }
+
+    // Load basic search values
+    protected function loadBasicSearchValues()
+    {
+        $this->BasicSearch->setKeyword(Get(Config("TABLE_BASIC_SEARCH"), ""), false);
+        if ($this->BasicSearch->Keyword != "" && $this->Command == "") {
+            $this->Command = "search";
+        }
+        $this->BasicSearch->setType(Get(Config("TABLE_BASIC_SEARCH_TYPE"), ""), false);
     }
 
     // Load search values for validation
@@ -2290,6 +2660,28 @@ class ZPriceSettingsList extends ZPriceSettings
                 $this->Command = "search";
             }
         }
+
+        // active
+        if (!$this->isAddOrEdit() && $this->active->AdvancedSearch->get()) {
+            $hasValue = true;
+            if (($this->active->AdvancedSearch->SearchValue != "" || $this->active->AdvancedSearch->SearchValue2 != "") && $this->Command == "") {
+                $this->Command = "search";
+            }
+        }
+        if (is_array($this->active->AdvancedSearch->SearchValue)) {
+            $this->active->AdvancedSearch->SearchValue = implode(Config("MULTIPLE_OPTION_SEPARATOR"), $this->active->AdvancedSearch->SearchValue);
+        }
+        if (is_array($this->active->AdvancedSearch->SearchValue2)) {
+            $this->active->AdvancedSearch->SearchValue2 = implode(Config("MULTIPLE_OPTION_SEPARATOR"), $this->active->AdvancedSearch->SearchValue2);
+        }
+
+        // ts_created
+        if (!$this->isAddOrEdit() && $this->ts_created->AdvancedSearch->get()) {
+            $hasValue = true;
+            if (($this->ts_created->AdvancedSearch->SearchValue != "" || $this->ts_created->AdvancedSearch->SearchValue2 != "") && $this->Command == "") {
+                $this->Command = "search";
+            }
+        }
         return $hasValue;
     }
 
@@ -2314,6 +2706,9 @@ class ZPriceSettingsList extends ZPriceSettings
                 $this->platform_id->setFormValue($val);
             }
         }
+        if ($CurrentForm->hasValue("o_platform_id")) {
+            $this->platform_id->setOldValue($CurrentForm->getValue("o_platform_id"));
+        }
 
         // Check field name 'inventory_id' first before field var 'x_inventory_id'
         $val = $CurrentForm->hasValue("inventory_id") ? $CurrentForm->getValue("inventory_id") : $CurrentForm->getValue("x_inventory_id");
@@ -2323,6 +2718,9 @@ class ZPriceSettingsList extends ZPriceSettings
             } else {
                 $this->inventory_id->setFormValue($val);
             }
+        }
+        if ($CurrentForm->hasValue("o_inventory_id")) {
+            $this->inventory_id->setOldValue($CurrentForm->getValue("o_inventory_id"));
         }
 
         // Check field name 'print_stage_id' first before field var 'x_print_stage_id'
@@ -2334,6 +2732,9 @@ class ZPriceSettingsList extends ZPriceSettings
                 $this->print_stage_id->setFormValue($val);
             }
         }
+        if ($CurrentForm->hasValue("o_print_stage_id")) {
+            $this->print_stage_id->setOldValue($CurrentForm->getValue("o_print_stage_id"));
+        }
 
         // Check field name 'bus_size_id' first before field var 'x_bus_size_id'
         $val = $CurrentForm->hasValue("bus_size_id") ? $CurrentForm->getValue("bus_size_id") : $CurrentForm->getValue("x_bus_size_id");
@@ -2343,6 +2744,22 @@ class ZPriceSettingsList extends ZPriceSettings
             } else {
                 $this->bus_size_id->setFormValue($val);
             }
+        }
+        if ($CurrentForm->hasValue("o_bus_size_id")) {
+            $this->bus_size_id->setOldValue($CurrentForm->getValue("o_bus_size_id"));
+        }
+
+        // Check field name 'details' first before field var 'x_details'
+        $val = $CurrentForm->hasValue("details") ? $CurrentForm->getValue("details") : $CurrentForm->getValue("x_details");
+        if (!$this->details->IsDetailKey) {
+            if (IsApi() && $val === null) {
+                $this->details->Visible = false; // Disable update for API request
+            } else {
+                $this->details->setFormValue($val);
+            }
+        }
+        if ($CurrentForm->hasValue("o_details")) {
+            $this->details->setOldValue($CurrentForm->getValue("o_details"));
         }
 
         // Check field name 'max_limit' first before field var 'x_max_limit'
@@ -2354,6 +2771,9 @@ class ZPriceSettingsList extends ZPriceSettings
                 $this->max_limit->setFormValue($val);
             }
         }
+        if ($CurrentForm->hasValue("o_max_limit")) {
+            $this->max_limit->setOldValue($CurrentForm->getValue("o_max_limit"));
+        }
 
         // Check field name 'min_limit' first before field var 'x_min_limit'
         $val = $CurrentForm->hasValue("min_limit") ? $CurrentForm->getValue("min_limit") : $CurrentForm->getValue("x_min_limit");
@@ -2363,6 +2783,9 @@ class ZPriceSettingsList extends ZPriceSettings
             } else {
                 $this->min_limit->setFormValue($val);
             }
+        }
+        if ($CurrentForm->hasValue("o_min_limit")) {
+            $this->min_limit->setOldValue($CurrentForm->getValue("o_min_limit"));
         }
 
         // Check field name 'price' first before field var 'x_price'
@@ -2374,6 +2797,9 @@ class ZPriceSettingsList extends ZPriceSettings
                 $this->price->setFormValue($val);
             }
         }
+        if ($CurrentForm->hasValue("o_price")) {
+            $this->price->setOldValue($CurrentForm->getValue("o_price"));
+        }
 
         // Check field name 'operator_fee' first before field var 'x_operator_fee'
         $val = $CurrentForm->hasValue("operator_fee") ? $CurrentForm->getValue("operator_fee") : $CurrentForm->getValue("x_operator_fee");
@@ -2383,6 +2809,9 @@ class ZPriceSettingsList extends ZPriceSettings
             } else {
                 $this->operator_fee->setFormValue($val);
             }
+        }
+        if ($CurrentForm->hasValue("o_operator_fee")) {
+            $this->operator_fee->setOldValue($CurrentForm->getValue("o_operator_fee"));
         }
 
         // Check field name 'agency_fee' first before field var 'x_agency_fee'
@@ -2394,6 +2823,9 @@ class ZPriceSettingsList extends ZPriceSettings
                 $this->agency_fee->setFormValue($val);
             }
         }
+        if ($CurrentForm->hasValue("o_agency_fee")) {
+            $this->agency_fee->setOldValue($CurrentForm->getValue("o_agency_fee"));
+        }
 
         // Check field name 'lamata_fee' first before field var 'x_lamata_fee'
         $val = $CurrentForm->hasValue("lamata_fee") ? $CurrentForm->getValue("lamata_fee") : $CurrentForm->getValue("x_lamata_fee");
@@ -2403,6 +2835,9 @@ class ZPriceSettingsList extends ZPriceSettings
             } else {
                 $this->lamata_fee->setFormValue($val);
             }
+        }
+        if ($CurrentForm->hasValue("o_lamata_fee")) {
+            $this->lamata_fee->setOldValue($CurrentForm->getValue("o_lamata_fee"));
         }
 
         // Check field name 'lasaa_fee' first before field var 'x_lasaa_fee'
@@ -2414,6 +2849,9 @@ class ZPriceSettingsList extends ZPriceSettings
                 $this->lasaa_fee->setFormValue($val);
             }
         }
+        if ($CurrentForm->hasValue("o_lasaa_fee")) {
+            $this->lasaa_fee->setOldValue($CurrentForm->getValue("o_lasaa_fee"));
+        }
 
         // Check field name 'printers_fee' first before field var 'x_printers_fee'
         $val = $CurrentForm->hasValue("printers_fee") ? $CurrentForm->getValue("printers_fee") : $CurrentForm->getValue("x_printers_fee");
@@ -2423,6 +2861,36 @@ class ZPriceSettingsList extends ZPriceSettings
             } else {
                 $this->printers_fee->setFormValue($val);
             }
+        }
+        if ($CurrentForm->hasValue("o_printers_fee")) {
+            $this->printers_fee->setOldValue($CurrentForm->getValue("o_printers_fee"));
+        }
+
+        // Check field name 'active' first before field var 'x_active'
+        $val = $CurrentForm->hasValue("active") ? $CurrentForm->getValue("active") : $CurrentForm->getValue("x_active");
+        if (!$this->active->IsDetailKey) {
+            if (IsApi() && $val === null) {
+                $this->active->Visible = false; // Disable update for API request
+            } else {
+                $this->active->setFormValue($val);
+            }
+        }
+        if ($CurrentForm->hasValue("o_active")) {
+            $this->active->setOldValue($CurrentForm->getValue("o_active"));
+        }
+
+        // Check field name 'ts_created' first before field var 'x_ts_created'
+        $val = $CurrentForm->hasValue("ts_created") ? $CurrentForm->getValue("ts_created") : $CurrentForm->getValue("x_ts_created");
+        if (!$this->ts_created->IsDetailKey) {
+            if (IsApi() && $val === null) {
+                $this->ts_created->Visible = false; // Disable update for API request
+            } else {
+                $this->ts_created->setFormValue($val);
+            }
+            $this->ts_created->CurrentValue = UnFormatDateTime($this->ts_created->CurrentValue, 0);
+        }
+        if ($CurrentForm->hasValue("o_ts_created")) {
+            $this->ts_created->setOldValue($CurrentForm->getValue("o_ts_created"));
         }
     }
 
@@ -2437,6 +2905,7 @@ class ZPriceSettingsList extends ZPriceSettings
         $this->inventory_id->CurrentValue = $this->inventory_id->FormValue;
         $this->print_stage_id->CurrentValue = $this->print_stage_id->FormValue;
         $this->bus_size_id->CurrentValue = $this->bus_size_id->FormValue;
+        $this->details->CurrentValue = $this->details->FormValue;
         $this->max_limit->CurrentValue = $this->max_limit->FormValue;
         $this->min_limit->CurrentValue = $this->min_limit->FormValue;
         $this->price->CurrentValue = $this->price->FormValue;
@@ -2445,6 +2914,9 @@ class ZPriceSettingsList extends ZPriceSettings
         $this->lamata_fee->CurrentValue = $this->lamata_fee->FormValue;
         $this->lasaa_fee->CurrentValue = $this->lasaa_fee->FormValue;
         $this->printers_fee->CurrentValue = $this->printers_fee->FormValue;
+        $this->active->CurrentValue = $this->active->FormValue;
+        $this->ts_created->CurrentValue = $this->ts_created->FormValue;
+        $this->ts_created->CurrentValue = UnFormatDateTime($this->ts_created->CurrentValue, 0);
     }
 
     // Load recordset
@@ -2532,6 +3004,8 @@ class ZPriceSettingsList extends ZPriceSettings
         $this->lamata_fee->setDbValue($row['lamata_fee']);
         $this->lasaa_fee->setDbValue($row['lasaa_fee']);
         $this->printers_fee->setDbValue($row['printers_fee']);
+        $this->active->setDbValue((ConvertToBool($row['active']) ? "1" : "0"));
+        $this->ts_created->setDbValue($row['ts_created']);
     }
 
     // Return a row with default values
@@ -2553,6 +3027,8 @@ class ZPriceSettingsList extends ZPriceSettings
         $row['lamata_fee'] = $this->lamata_fee->CurrentValue;
         $row['lasaa_fee'] = $this->lasaa_fee->CurrentValue;
         $row['printers_fee'] = $this->printers_fee->CurrentValue;
+        $row['active'] = $this->active->CurrentValue;
+        $row['ts_created'] = $this->ts_created->CurrentValue;
         return $row;
     }
 
@@ -2617,6 +3093,10 @@ class ZPriceSettingsList extends ZPriceSettings
         // lasaa_fee
 
         // printers_fee
+
+        // active
+
+        // ts_created
         if ($this->RowType == ROWTYPE_VIEW) {
             // id
             $this->id->ViewValue = $this->id->CurrentValue;
@@ -2706,6 +3186,10 @@ class ZPriceSettingsList extends ZPriceSettings
             }
             $this->bus_size_id->ViewCustomAttributes = "";
 
+            // details
+            $this->details->ViewValue = $this->details->CurrentValue;
+            $this->details->ViewCustomAttributes = "";
+
             // max_limit
             $this->max_limit->ViewValue = $this->max_limit->CurrentValue;
             $this->max_limit->ViewValue = FormatNumber($this->max_limit->ViewValue, 0, -2, -2, -2);
@@ -2746,6 +3230,19 @@ class ZPriceSettingsList extends ZPriceSettings
             $this->printers_fee->ViewValue = FormatNumber($this->printers_fee->ViewValue, 0, -2, -2, -2);
             $this->printers_fee->ViewCustomAttributes = "";
 
+            // active
+            if (ConvertToBool($this->active->CurrentValue)) {
+                $this->active->ViewValue = $this->active->tagCaption(1) != "" ? $this->active->tagCaption(1) : "Yes";
+            } else {
+                $this->active->ViewValue = $this->active->tagCaption(2) != "" ? $this->active->tagCaption(2) : "No";
+            }
+            $this->active->ViewCustomAttributes = "";
+
+            // ts_created
+            $this->ts_created->ViewValue = $this->ts_created->CurrentValue;
+            $this->ts_created->ViewValue = FormatDateTime($this->ts_created->ViewValue, 0);
+            $this->ts_created->ViewCustomAttributes = "";
+
             // id
             $this->id->LinkCustomAttributes = "";
             $this->id->HrefValue = "";
@@ -2770,6 +3267,11 @@ class ZPriceSettingsList extends ZPriceSettings
             $this->bus_size_id->LinkCustomAttributes = "";
             $this->bus_size_id->HrefValue = "";
             $this->bus_size_id->TooltipValue = "";
+
+            // details
+            $this->details->LinkCustomAttributes = "";
+            $this->details->HrefValue = "";
+            $this->details->TooltipValue = "";
 
             // max_limit
             $this->max_limit->LinkCustomAttributes = "";
@@ -2810,6 +3312,16 @@ class ZPriceSettingsList extends ZPriceSettings
             $this->printers_fee->LinkCustomAttributes = "";
             $this->printers_fee->HrefValue = "";
             $this->printers_fee->TooltipValue = "";
+
+            // active
+            $this->active->LinkCustomAttributes = "";
+            $this->active->HrefValue = "";
+            $this->active->TooltipValue = "";
+
+            // ts_created
+            $this->ts_created->LinkCustomAttributes = "";
+            $this->ts_created->HrefValue = "";
+            $this->ts_created->TooltipValue = "";
         } elseif ($this->RowType == ROWTYPE_ADD) {
             // id
 
@@ -2913,6 +3425,12 @@ class ZPriceSettingsList extends ZPriceSettings
             }
             $this->bus_size_id->PlaceHolder = RemoveHtml($this->bus_size_id->caption());
 
+            // details
+            $this->details->EditAttrs["class"] = "form-control";
+            $this->details->EditCustomAttributes = "";
+            $this->details->EditValue = HtmlEncode($this->details->CurrentValue);
+            $this->details->PlaceHolder = RemoveHtml($this->details->caption());
+
             // max_limit
             $this->max_limit->EditAttrs["class"] = "form-control";
             $this->max_limit->EditCustomAttributes = "";
@@ -2961,6 +3479,17 @@ class ZPriceSettingsList extends ZPriceSettings
             $this->printers_fee->EditValue = HtmlEncode($this->printers_fee->CurrentValue);
             $this->printers_fee->PlaceHolder = RemoveHtml($this->printers_fee->caption());
 
+            // active
+            $this->active->EditCustomAttributes = "";
+            $this->active->EditValue = $this->active->options(false);
+            $this->active->PlaceHolder = RemoveHtml($this->active->caption());
+
+            // ts_created
+            $this->ts_created->EditAttrs["class"] = "form-control";
+            $this->ts_created->EditCustomAttributes = "";
+            $this->ts_created->EditValue = HtmlEncode(FormatDateTime($this->ts_created->CurrentValue, 8));
+            $this->ts_created->PlaceHolder = RemoveHtml($this->ts_created->caption());
+
             // Add refer script
 
             // id
@@ -2982,6 +3511,10 @@ class ZPriceSettingsList extends ZPriceSettings
             // bus_size_id
             $this->bus_size_id->LinkCustomAttributes = "";
             $this->bus_size_id->HrefValue = "";
+
+            // details
+            $this->details->LinkCustomAttributes = "";
+            $this->details->HrefValue = "";
 
             // max_limit
             $this->max_limit->LinkCustomAttributes = "";
@@ -3014,6 +3547,14 @@ class ZPriceSettingsList extends ZPriceSettings
             // printers_fee
             $this->printers_fee->LinkCustomAttributes = "";
             $this->printers_fee->HrefValue = "";
+
+            // active
+            $this->active->LinkCustomAttributes = "";
+            $this->active->HrefValue = "";
+
+            // ts_created
+            $this->ts_created->LinkCustomAttributes = "";
+            $this->ts_created->HrefValue = "";
         } elseif ($this->RowType == ROWTYPE_EDIT) {
             // id
             $this->id->EditAttrs["class"] = "form-control";
@@ -3121,6 +3662,12 @@ class ZPriceSettingsList extends ZPriceSettings
             }
             $this->bus_size_id->PlaceHolder = RemoveHtml($this->bus_size_id->caption());
 
+            // details
+            $this->details->EditAttrs["class"] = "form-control";
+            $this->details->EditCustomAttributes = "";
+            $this->details->EditValue = HtmlEncode($this->details->CurrentValue);
+            $this->details->PlaceHolder = RemoveHtml($this->details->caption());
+
             // max_limit
             $this->max_limit->EditAttrs["class"] = "form-control";
             $this->max_limit->EditCustomAttributes = "";
@@ -3169,6 +3716,17 @@ class ZPriceSettingsList extends ZPriceSettings
             $this->printers_fee->EditValue = HtmlEncode($this->printers_fee->CurrentValue);
             $this->printers_fee->PlaceHolder = RemoveHtml($this->printers_fee->caption());
 
+            // active
+            $this->active->EditCustomAttributes = "";
+            $this->active->EditValue = $this->active->options(false);
+            $this->active->PlaceHolder = RemoveHtml($this->active->caption());
+
+            // ts_created
+            $this->ts_created->EditAttrs["class"] = "form-control";
+            $this->ts_created->EditCustomAttributes = "";
+            $this->ts_created->EditValue = HtmlEncode(FormatDateTime($this->ts_created->CurrentValue, 8));
+            $this->ts_created->PlaceHolder = RemoveHtml($this->ts_created->caption());
+
             // Edit refer script
 
             // id
@@ -3190,6 +3748,10 @@ class ZPriceSettingsList extends ZPriceSettings
             // bus_size_id
             $this->bus_size_id->LinkCustomAttributes = "";
             $this->bus_size_id->HrefValue = "";
+
+            // details
+            $this->details->LinkCustomAttributes = "";
+            $this->details->HrefValue = "";
 
             // max_limit
             $this->max_limit->LinkCustomAttributes = "";
@@ -3222,6 +3784,14 @@ class ZPriceSettingsList extends ZPriceSettings
             // printers_fee
             $this->printers_fee->LinkCustomAttributes = "";
             $this->printers_fee->HrefValue = "";
+
+            // active
+            $this->active->LinkCustomAttributes = "";
+            $this->active->HrefValue = "";
+
+            // ts_created
+            $this->ts_created->LinkCustomAttributes = "";
+            $this->ts_created->HrefValue = "";
         } elseif ($this->RowType == ROWTYPE_SEARCH) {
             // id
             $this->id->EditAttrs["class"] = "form-control";
@@ -3329,6 +3899,12 @@ class ZPriceSettingsList extends ZPriceSettings
             }
             $this->bus_size_id->PlaceHolder = RemoveHtml($this->bus_size_id->caption());
 
+            // details
+            $this->details->EditAttrs["class"] = "form-control";
+            $this->details->EditCustomAttributes = "";
+            $this->details->EditValue = HtmlEncode($this->details->AdvancedSearch->SearchValue);
+            $this->details->PlaceHolder = RemoveHtml($this->details->caption());
+
             // max_limit
             $this->max_limit->EditAttrs["class"] = "form-control";
             $this->max_limit->EditCustomAttributes = "";
@@ -3376,6 +3952,17 @@ class ZPriceSettingsList extends ZPriceSettings
             $this->printers_fee->EditCustomAttributes = "";
             $this->printers_fee->EditValue = HtmlEncode($this->printers_fee->AdvancedSearch->SearchValue);
             $this->printers_fee->PlaceHolder = RemoveHtml($this->printers_fee->caption());
+
+            // active
+            $this->active->EditCustomAttributes = "";
+            $this->active->EditValue = $this->active->options(false);
+            $this->active->PlaceHolder = RemoveHtml($this->active->caption());
+
+            // ts_created
+            $this->ts_created->EditAttrs["class"] = "form-control";
+            $this->ts_created->EditCustomAttributes = "";
+            $this->ts_created->EditValue = HtmlEncode(FormatDateTime(UnFormatDateTime($this->ts_created->AdvancedSearch->SearchValue, 0), 8));
+            $this->ts_created->PlaceHolder = RemoveHtml($this->ts_created->caption());
         }
         if ($this->RowType == ROWTYPE_ADD || $this->RowType == ROWTYPE_EDIT || $this->RowType == ROWTYPE_SEARCH) { // Add/Edit/Search row
             $this->setupFieldTitles();
@@ -3393,6 +3980,9 @@ class ZPriceSettingsList extends ZPriceSettings
         // Check if validation required
         if (!Config("SERVER_VALIDATE")) {
             return true;
+        }
+        if (!CheckDate($this->ts_created->AdvancedSearch->SearchValue)) {
+            $this->ts_created->addErrorMessage($this->ts_created->getErrorMessage(false));
         }
 
         // Return validate result
@@ -3439,6 +4029,11 @@ class ZPriceSettingsList extends ZPriceSettings
         if ($this->bus_size_id->Required) {
             if (!$this->bus_size_id->IsDetailKey && EmptyValue($this->bus_size_id->FormValue)) {
                 $this->bus_size_id->addErrorMessage(str_replace("%s", $this->bus_size_id->caption(), $this->bus_size_id->RequiredErrorMessage));
+            }
+        }
+        if ($this->details->Required) {
+            if (!$this->details->IsDetailKey && EmptyValue($this->details->FormValue)) {
+                $this->details->addErrorMessage(str_replace("%s", $this->details->caption(), $this->details->RequiredErrorMessage));
             }
         }
         if ($this->max_limit->Required) {
@@ -3504,6 +4099,19 @@ class ZPriceSettingsList extends ZPriceSettings
         }
         if (!CheckInteger($this->printers_fee->FormValue)) {
             $this->printers_fee->addErrorMessage($this->printers_fee->getErrorMessage(false));
+        }
+        if ($this->active->Required) {
+            if ($this->active->FormValue == "") {
+                $this->active->addErrorMessage(str_replace("%s", $this->active->caption(), $this->active->RequiredErrorMessage));
+            }
+        }
+        if ($this->ts_created->Required) {
+            if (!$this->ts_created->IsDetailKey && EmptyValue($this->ts_created->FormValue)) {
+                $this->ts_created->addErrorMessage(str_replace("%s", $this->ts_created->caption(), $this->ts_created->RequiredErrorMessage));
+            }
+        }
+        if (!CheckDate($this->ts_created->FormValue)) {
+            $this->ts_created->addErrorMessage($this->ts_created->getErrorMessage(false));
         }
 
         // Return validate result
@@ -3625,6 +4233,9 @@ class ZPriceSettingsList extends ZPriceSettings
             // bus_size_id
             $this->bus_size_id->setDbValueDef($rsnew, $this->bus_size_id->CurrentValue, null, $this->bus_size_id->ReadOnly);
 
+            // details
+            $this->details->setDbValueDef($rsnew, $this->details->CurrentValue, null, $this->details->ReadOnly);
+
             // max_limit
             $this->max_limit->setDbValueDef($rsnew, $this->max_limit->CurrentValue, null, $this->max_limit->ReadOnly);
 
@@ -3648,6 +4259,16 @@ class ZPriceSettingsList extends ZPriceSettings
 
             // printers_fee
             $this->printers_fee->setDbValueDef($rsnew, $this->printers_fee->CurrentValue, null, $this->printers_fee->ReadOnly);
+
+            // active
+            $tmpBool = $this->active->CurrentValue;
+            if ($tmpBool != "1" && $tmpBool != "0") {
+                $tmpBool = !empty($tmpBool) ? "1" : "0";
+            }
+            $this->active->setDbValueDef($rsnew, $tmpBool, 0, $this->active->ReadOnly);
+
+            // ts_created
+            $this->ts_created->setDbValueDef($rsnew, UnFormatDateTime($this->ts_created->CurrentValue, 0), CurrentDate(), $this->ts_created->ReadOnly);
 
             // Call Row Updating event
             $updateRow = $this->rowUpdating($rsold, $rsnew);
@@ -3714,6 +4335,7 @@ class ZPriceSettingsList extends ZPriceSettings
         $hash .= GetFieldHash($row['inventory_id']); // inventory_id
         $hash .= GetFieldHash($row['print_stage_id']); // print_stage_id
         $hash .= GetFieldHash($row['bus_size_id']); // bus_size_id
+        $hash .= GetFieldHash($row['details']); // details
         $hash .= GetFieldHash($row['max_limit']); // max_limit
         $hash .= GetFieldHash($row['min_limit']); // min_limit
         $hash .= GetFieldHash($row['price']); // price
@@ -3722,6 +4344,8 @@ class ZPriceSettingsList extends ZPriceSettings
         $hash .= GetFieldHash($row['lamata_fee']); // lamata_fee
         $hash .= GetFieldHash($row['lasaa_fee']); // lasaa_fee
         $hash .= GetFieldHash($row['printers_fee']); // printers_fee
+        $hash .= GetFieldHash($row['active']); // active
+        $hash .= GetFieldHash($row['ts_created']); // ts_created
         return md5($hash);
     }
 
@@ -3749,6 +4373,9 @@ class ZPriceSettingsList extends ZPriceSettings
         // bus_size_id
         $this->bus_size_id->setDbValueDef($rsnew, $this->bus_size_id->CurrentValue, null, false);
 
+        // details
+        $this->details->setDbValueDef($rsnew, $this->details->CurrentValue, null, false);
+
         // max_limit
         $this->max_limit->setDbValueDef($rsnew, $this->max_limit->CurrentValue, null, false);
 
@@ -3772,6 +4399,16 @@ class ZPriceSettingsList extends ZPriceSettings
 
         // printers_fee
         $this->printers_fee->setDbValueDef($rsnew, $this->printers_fee->CurrentValue, null, false);
+
+        // active
+        $tmpBool = $this->active->CurrentValue;
+        if ($tmpBool != "1" && $tmpBool != "0") {
+            $tmpBool = !empty($tmpBool) ? "1" : "0";
+        }
+        $this->active->setDbValueDef($rsnew, $tmpBool, 0, strval($this->active->CurrentValue) == "");
+
+        // ts_created
+        $this->ts_created->setDbValueDef($rsnew, UnFormatDateTime($this->ts_created->CurrentValue, 0), CurrentDate(), false);
 
         // Call Row Inserting event
         $insertRow = $this->rowInserting($rsold, $rsnew);
@@ -3824,6 +4461,8 @@ class ZPriceSettingsList extends ZPriceSettings
         $this->lamata_fee->AdvancedSearch->load();
         $this->lasaa_fee->AdvancedSearch->load();
         $this->printers_fee->AdvancedSearch->load();
+        $this->active->AdvancedSearch->load();
+        $this->ts_created->AdvancedSearch->load();
     }
 
     // Get export HTML tag
@@ -4085,6 +4724,8 @@ class ZPriceSettingsList extends ZPriceSettings
                 case "x_print_stage_id":
                     break;
                 case "x_bus_size_id":
+                    break;
+                case "x_active":
                     break;
                 default:
                     $lookupFilter = "";

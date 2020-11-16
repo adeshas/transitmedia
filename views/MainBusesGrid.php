@@ -151,10 +151,10 @@ $Grid->ListOptions->render("header", "left");
         <th data-name="number" class="<?= $Grid->number->headerCellClass() ?>"><div id="elh_main_buses_number" class="main_buses_number"><?= $Grid->renderSort($Grid->number) ?></div></th>
 <?php } ?>
 <?php if ($Grid->platform_id->Visible) { // platform_id ?>
-        <th data-name="platform_id" class="<?= $Grid->platform_id->headerCellClass() ?>"><div id="elh_main_buses_platform_id" class="main_buses_platform_id"><?= $Grid->renderSort($Grid->platform_id) ?></div></th>
+        <th data-name="platform_id" class="<?= $Grid->platform_id->headerCellClass() ?>" style="white-space: nowrap;"><div id="elh_main_buses_platform_id" class="main_buses_platform_id"><?= $Grid->renderSort($Grid->platform_id) ?></div></th>
 <?php } ?>
 <?php if ($Grid->operator_id->Visible) { // operator_id ?>
-        <th data-name="operator_id" class="<?= $Grid->operator_id->headerCellClass() ?>"><div id="elh_main_buses_operator_id" class="main_buses_operator_id"><?= $Grid->renderSort($Grid->operator_id) ?></div></th>
+        <th data-name="operator_id" class="<?= $Grid->operator_id->headerCellClass() ?>" style="white-space: nowrap;"><div id="elh_main_buses_operator_id" class="main_buses_operator_id"><?= $Grid->renderSort($Grid->operator_id) ?></div></th>
 <?php } ?>
 <?php if ($Grid->exterior_campaign_id->Visible) { // exterior_campaign_id ?>
         <th data-name="exterior_campaign_id" class="<?= $Grid->exterior_campaign_id->headerCellClass() ?>"><div id="elh_main_buses_exterior_campaign_id" class="main_buses_exterior_campaign_id"><?= $Grid->renderSort($Grid->exterior_campaign_id) ?></div></th>
