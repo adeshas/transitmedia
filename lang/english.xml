@@ -923,6 +923,9 @@
   <project>
     <phrase id="bodytitle" value="Transit Media Vendor Portal" />
     <phrase id="footertext" value="&amp;copy;2020 Transit Media Ltd. All rights reserved." />
+    <menu id="202">
+      <phrase id="menutext" value="Safety" />
+    </menu>
     <menu id="199">
       <phrase id="menutext" value="view buses assigned" />
     </menu>
@@ -2558,6 +2561,9 @@
       <field id="operator_id">
         <phrase id="fldcaption" value="Action" />
       </field>
+    </table>
+    <table id="safetysql">
+      <phrase id="tblcaption" value="Safety" />
     </table>
   </project>
 </ew-language>

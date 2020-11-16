@@ -104,6 +104,7 @@ return [
     "view_buses_assigned" => \DI\create(ViewBusesAssigned::class),
     "z_price_settings" => \DI\create(ZPriceSettings::class),
     "w_vendors_operators" => \DI\create(WVendorsOperators::class),
+    "safetysql" => \DI\create(Safetysql::class),
 
     // User table
     "usertable" => \DI\get("main_users"),
