@@ -5,29 +5,7 @@
 -- Dumped from database version 11.2
 -- Dumped by pg_dump version 11.2
 
--- Started on 2020-11-16 10:01:12
-
-SET statement_timeout = 0;
-SET lock_timeout = 0;
-SET idle_in_transaction_session_timeout = 0;
-SET client_encoding = 'UTF8';
-SET standard_conforming_strings = on;
-SELECT pg_catalog.set_config('search_path', '', false);
-SET check_function_bodies = false;
-SET client_min_messages = warning;
-SET row_security = off;
-
---
--- TOC entry 3283 (class 1262 OID 33867)
--- Name: test; Type: DATABASE; Schema: -; Owner: postgres
---
-
-CREATE DATABASE test WITH TEMPLATE = template0 ENCODING = 'UTF8' LC_COLLATE = 'English_United States.1252' LC_CTYPE = 'English_United States.1252';
-
-
-ALTER DATABASE test OWNER TO postgres;
-
-\connect test
+-- Started on 2020-11-16 10:06:31
 
 SET statement_timeout = 0;
 SET lock_timeout = 0;
@@ -78,7 +56,7 @@ CREATE SEQUENCE public.allocation_id_seq
 ALTER TABLE public.allocation_id_seq OWNER TO postgres;
 
 --
--- TOC entry 3284 (class 0 OID 0)
+-- TOC entry 3283 (class 0 OID 0)
 -- Dependencies: 219
 -- Name: allocation_id_seq; Type: SEQUENCE OWNED BY; Schema: public; Owner: postgres
 --
@@ -116,7 +94,7 @@ CREATE SEQUENCE public.bus_depot_id_seq
 ALTER TABLE public.bus_depot_id_seq OWNER TO postgres;
 
 --
--- TOC entry 3285 (class 0 OID 0)
+-- TOC entry 3284 (class 0 OID 0)
 -- Dependencies: 213
 -- Name: bus_depot_id_seq; Type: SEQUENCE OWNED BY; Schema: public; Owner: postgres
 --
@@ -154,7 +132,7 @@ CREATE SEQUENCE public.bus_sizes_id_seq
 ALTER TABLE public.bus_sizes_id_seq OWNER TO postgres;
 
 --
--- TOC entry 3286 (class 0 OID 0)
+-- TOC entry 3285 (class 0 OID 0)
 -- Dependencies: 208
 -- Name: bus_sizes_id_seq; Type: SEQUENCE OWNED BY; Schema: public; Owner: postgres
 --
@@ -193,7 +171,7 @@ CREATE SEQUENCE public.bus_status_id_seq
 ALTER TABLE public.bus_status_id_seq OWNER TO postgres;
 
 --
--- TOC entry 3287 (class 0 OID 0)
+-- TOC entry 3286 (class 0 OID 0)
 -- Dependencies: 215
 -- Name: bus_status_id_seq; Type: SEQUENCE OWNED BY; Schema: public; Owner: postgres
 --
@@ -239,7 +217,7 @@ CREATE SEQUENCE public.buses_id_seq
 ALTER TABLE public.buses_id_seq OWNER TO postgres;
 
 --
--- TOC entry 3288 (class 0 OID 0)
+-- TOC entry 3287 (class 0 OID 0)
 -- Dependencies: 217
 -- Name: buses_id_seq; Type: SEQUENCE OWNED BY; Schema: public; Owner: postgres
 --
@@ -279,7 +257,7 @@ CREATE SEQUENCE public.campaign_status_id_seq
 ALTER TABLE public.campaign_status_id_seq OWNER TO postgres;
 
 --
--- TOC entry 3289 (class 0 OID 0)
+-- TOC entry 3288 (class 0 OID 0)
 -- Dependencies: 225
 -- Name: campaign_status_id_seq; Type: SEQUENCE OWNED BY; Schema: public; Owner: postgres
 --
@@ -318,7 +296,7 @@ CREATE SEQUENCE public.core_settings_id_seq
 ALTER TABLE public.core_settings_id_seq OWNER TO postgres;
 
 --
--- TOC entry 3290 (class 0 OID 0)
+-- TOC entry 3289 (class 0 OID 0)
 -- Dependencies: 236
 -- Name: core_settings_id_seq; Type: SEQUENCE OWNED BY; Schema: public; Owner: postgres
 --
@@ -360,7 +338,7 @@ CREATE SEQUENCE public.email_settings_id_seq
 ALTER TABLE public.email_settings_id_seq OWNER TO postgres;
 
 --
--- TOC entry 3291 (class 0 OID 0)
+-- TOC entry 3290 (class 0 OID 0)
 -- Dependencies: 234
 -- Name: email_settings_id_seq; Type: SEQUENCE OWNED BY; Schema: public; Owner: postgres
 --
@@ -406,7 +384,7 @@ CREATE SEQUENCE public.exterior_reports_id_seq
 ALTER TABLE public.exterior_reports_id_seq OWNER TO postgres;
 
 --
--- TOC entry 3292 (class 0 OID 0)
+-- TOC entry 3291 (class 0 OID 0)
 -- Dependencies: 232
 -- Name: exterior_reports_id_seq; Type: SEQUENCE OWNED BY; Schema: public; Owner: postgres
 --
@@ -444,7 +422,7 @@ CREATE SEQUENCE public.inventory_id_seq
 ALTER TABLE public.inventory_id_seq OWNER TO postgres;
 
 --
--- TOC entry 3293 (class 0 OID 0)
+-- TOC entry 3292 (class 0 OID 0)
 -- Dependencies: 204
 -- Name: inventory_id_seq; Type: SEQUENCE OWNED BY; Schema: public; Owner: postgres
 --
@@ -558,7 +536,7 @@ CREATE SEQUENCE public.new_campaign_id_seq
 ALTER TABLE public.new_campaign_id_seq OWNER TO postgres;
 
 --
--- TOC entry 3294 (class 0 OID 0)
+-- TOC entry 3293 (class 0 OID 0)
 -- Dependencies: 210
 -- Name: new_campaign_id_seq; Type: SEQUENCE OWNED BY; Schema: public; Owner: postgres
 --
@@ -600,7 +578,7 @@ CREATE SEQUENCE public.operators_id_seq
 ALTER TABLE public.operators_id_seq OWNER TO postgres;
 
 --
--- TOC entry 3295 (class 0 OID 0)
+-- TOC entry 3294 (class 0 OID 0)
 -- Dependencies: 200
 -- Name: operators_id_seq; Type: SEQUENCE OWNED BY; Schema: public; Owner: postgres
 --
@@ -638,7 +616,7 @@ CREATE SEQUENCE public.payment_status_id_seq
 ALTER TABLE public.payment_status_id_seq OWNER TO postgres;
 
 --
--- TOC entry 3296 (class 0 OID 0)
+-- TOC entry 3295 (class 0 OID 0)
 -- Dependencies: 223
 -- Name: payment_status_id_seq; Type: SEQUENCE OWNED BY; Schema: public; Owner: postgres
 --
@@ -678,7 +656,7 @@ CREATE SEQUENCE public.platforms_id_seq
 ALTER TABLE public.platforms_id_seq OWNER TO postgres;
 
 --
--- TOC entry 3297 (class 0 OID 0)
+-- TOC entry 3296 (class 0 OID 0)
 -- Dependencies: 198
 -- Name: platforms_id_seq; Type: SEQUENCE OWNED BY; Schema: public; Owner: postgres
 --
@@ -730,7 +708,7 @@ CREATE SEQUENCE public.pricing_id_seq
 ALTER TABLE public.pricing_id_seq OWNER TO postgres;
 
 --
--- TOC entry 3298 (class 0 OID 0)
+-- TOC entry 3297 (class 0 OID 0)
 -- Dependencies: 202
 -- Name: pricing_id_seq; Type: SEQUENCE OWNED BY; Schema: public; Owner: postgres
 --
@@ -755,7 +733,7 @@ CREATE SEQUENCE public.print_orders_id_seq
 ALTER TABLE public.print_orders_id_seq OWNER TO postgres;
 
 --
--- TOC entry 3299 (class 0 OID 0)
+-- TOC entry 3298 (class 0 OID 0)
 -- Dependencies: 269
 -- Name: print_orders_id_seq; Type: SEQUENCE OWNED BY; Schema: public; Owner: postgres
 --
@@ -793,7 +771,7 @@ CREATE SEQUENCE public.print_stage_id_seq
 ALTER TABLE public.print_stage_id_seq OWNER TO postgres;
 
 --
--- TOC entry 3300 (class 0 OID 0)
+-- TOC entry 3299 (class 0 OID 0)
 -- Dependencies: 206
 -- Name: print_stage_id_seq; Type: SEQUENCE OWNED BY; Schema: public; Owner: postgres
 --
@@ -831,7 +809,7 @@ CREATE SEQUENCE public.print_status_id_seq
 ALTER TABLE public.print_status_id_seq OWNER TO postgres;
 
 --
--- TOC entry 3301 (class 0 OID 0)
+-- TOC entry 3300 (class 0 OID 0)
 -- Dependencies: 221
 -- Name: print_status_id_seq; Type: SEQUENCE OWNED BY; Schema: public; Owner: postgres
 --
@@ -871,7 +849,7 @@ CREATE SEQUENCE public.printers_id_seq
 ALTER TABLE public.printers_id_seq OWNER TO postgres;
 
 --
--- TOC entry 3302 (class 0 OID 0)
+-- TOC entry 3301 (class 0 OID 0)
 -- Dependencies: 267
 -- Name: printers_id_seq; Type: SEQUENCE OWNED BY; Schema: public; Owner: postgres
 --
@@ -912,7 +890,7 @@ CREATE SEQUENCE public.renewal_requests_id_seq
 ALTER TABLE public.renewal_requests_id_seq OWNER TO postgres;
 
 --
--- TOC entry 3303 (class 0 OID 0)
+-- TOC entry 3302 (class 0 OID 0)
 -- Dependencies: 240
 -- Name: renewal_requests_id_seq; Type: SEQUENCE OWNED BY; Schema: public; Owner: postgres
 --
@@ -950,7 +928,7 @@ CREATE SEQUENCE public.renewal_stage_id_seq
 ALTER TABLE public.renewal_stage_id_seq OWNER TO postgres;
 
 --
--- TOC entry 3304 (class 0 OID 0)
+-- TOC entry 3303 (class 0 OID 0)
 -- Dependencies: 244
 -- Name: renewal_stage_id_seq; Type: SEQUENCE OWNED BY; Schema: public; Owner: postgres
 --
@@ -992,7 +970,7 @@ CREATE SEQUENCE public.transaction_details_id_seq
 ALTER TABLE public.transaction_details_id_seq OWNER TO postgres;
 
 --
--- TOC entry 3305 (class 0 OID 0)
+-- TOC entry 3304 (class 0 OID 0)
 -- Dependencies: 242
 -- Name: transaction_details_id_seq; Type: SEQUENCE OWNED BY; Schema: public; Owner: postgres
 --
@@ -1017,7 +995,7 @@ CREATE SEQUENCE public.transactions_id_seq
 ALTER TABLE public.transactions_id_seq OWNER TO postgres;
 
 --
--- TOC entry 3306 (class 0 OID 0)
+-- TOC entry 3305 (class 0 OID 0)
 -- Dependencies: 238
 -- Name: transactions_id_seq; Type: SEQUENCE OWNED BY; Schema: public; Owner: postgres
 --
@@ -1055,7 +1033,7 @@ CREATE SEQUENCE public.user_types_id_seq
 ALTER TABLE public.user_types_id_seq OWNER TO postgres;
 
 --
--- TOC entry 3307 (class 0 OID 0)
+-- TOC entry 3306 (class 0 OID 0)
 -- Dependencies: 229
 -- Name: user_types_id_seq; Type: SEQUENCE OWNED BY; Schema: public; Owner: postgres
 --
@@ -1080,7 +1058,7 @@ CREATE SEQUENCE public.users_id_seq
 ALTER TABLE public.users_id_seq OWNER TO postgres;
 
 --
--- TOC entry 3308 (class 0 OID 0)
+-- TOC entry 3307 (class 0 OID 0)
 -- Dependencies: 196
 -- Name: users_id_seq; Type: SEQUENCE OWNED BY; Schema: public; Owner: postgres
 --
@@ -1118,7 +1096,7 @@ CREATE SEQUENCE public.vendors_id_seq
 ALTER TABLE public.vendors_id_seq OWNER TO postgres;
 
 --
--- TOC entry 3309 (class 0 OID 0)
+-- TOC entry 3308 (class 0 OID 0)
 -- Dependencies: 227
 -- Name: vendors_id_seq; Type: SEQUENCE OWNED BY; Schema: public; Owner: postgres
 --
@@ -1786,7 +1764,7 @@ CREATE SEQUENCE public.w_vendors_operators_id_seq
 ALTER TABLE public.w_vendors_operators_id_seq OWNER TO postgres;
 
 --
--- TOC entry 3310 (class 0 OID 0)
+-- TOC entry 3309 (class 0 OID 0)
 -- Dependencies: 260
 -- Name: w_vendors_operators_id_seq; Type: SEQUENCE OWNED BY; Schema: public; Owner: postgres
 --
@@ -2738,7 +2716,7 @@ INSERT INTO public.z_price_settings VALUES (3, 2, 1, 1, 2, 'per month per bus', 
 
 
 --
--- TOC entry 3311 (class 0 OID 0)
+-- TOC entry 3310 (class 0 OID 0)
 -- Dependencies: 219
 -- Name: allocation_id_seq; Type: SEQUENCE SET; Schema: public; Owner: postgres
 --
@@ -2747,7 +2725,7 @@ SELECT pg_catalog.setval('public.allocation_id_seq', 4, true);
 
 
 --
--- TOC entry 3312 (class 0 OID 0)
+-- TOC entry 3311 (class 0 OID 0)
 -- Dependencies: 213
 -- Name: bus_depot_id_seq; Type: SEQUENCE SET; Schema: public; Owner: postgres
 --
@@ -2756,7 +2734,7 @@ SELECT pg_catalog.setval('public.bus_depot_id_seq', 2, true);
 
 
 --
--- TOC entry 3313 (class 0 OID 0)
+-- TOC entry 3312 (class 0 OID 0)
 -- Dependencies: 208
 -- Name: bus_sizes_id_seq; Type: SEQUENCE SET; Schema: public; Owner: postgres
 --
@@ -2765,7 +2743,7 @@ SELECT pg_catalog.setval('public.bus_sizes_id_seq', 2, true);
 
 
 --
--- TOC entry 3314 (class 0 OID 0)
+-- TOC entry 3313 (class 0 OID 0)
 -- Dependencies: 215
 -- Name: bus_status_id_seq; Type: SEQUENCE SET; Schema: public; Owner: postgres
 --
@@ -2774,7 +2752,7 @@ SELECT pg_catalog.setval('public.bus_status_id_seq', 1, true);
 
 
 --
--- TOC entry 3315 (class 0 OID 0)
+-- TOC entry 3314 (class 0 OID 0)
 -- Dependencies: 217
 -- Name: buses_id_seq; Type: SEQUENCE SET; Schema: public; Owner: postgres
 --
@@ -2783,7 +2761,7 @@ SELECT pg_catalog.setval('public.buses_id_seq', 61, true);
 
 
 --
--- TOC entry 3316 (class 0 OID 0)
+-- TOC entry 3315 (class 0 OID 0)
 -- Dependencies: 225
 -- Name: campaign_status_id_seq; Type: SEQUENCE SET; Schema: public; Owner: postgres
 --
@@ -2792,7 +2770,7 @@ SELECT pg_catalog.setval('public.campaign_status_id_seq', 5, true);
 
 
 --
--- TOC entry 3317 (class 0 OID 0)
+-- TOC entry 3316 (class 0 OID 0)
 -- Dependencies: 236
 -- Name: core_settings_id_seq; Type: SEQUENCE SET; Schema: public; Owner: postgres
 --
@@ -2801,7 +2779,7 @@ SELECT pg_catalog.setval('public.core_settings_id_seq', 18, true);
 
 
 --
--- TOC entry 3318 (class 0 OID 0)
+-- TOC entry 3317 (class 0 OID 0)
 -- Dependencies: 234
 -- Name: email_settings_id_seq; Type: SEQUENCE SET; Schema: public; Owner: postgres
 --
@@ -2810,7 +2788,7 @@ SELECT pg_catalog.setval('public.email_settings_id_seq', 1, false);
 
 
 --
--- TOC entry 3319 (class 0 OID 0)
+-- TOC entry 3318 (class 0 OID 0)
 -- Dependencies: 232
 -- Name: exterior_reports_id_seq; Type: SEQUENCE SET; Schema: public; Owner: postgres
 --
@@ -2819,7 +2797,7 @@ SELECT pg_catalog.setval('public.exterior_reports_id_seq', 3, true);
 
 
 --
--- TOC entry 3320 (class 0 OID 0)
+-- TOC entry 3319 (class 0 OID 0)
 -- Dependencies: 204
 -- Name: inventory_id_seq; Type: SEQUENCE SET; Schema: public; Owner: postgres
 --
@@ -2828,7 +2806,7 @@ SELECT pg_catalog.setval('public.inventory_id_seq', 3, true);
 
 
 --
--- TOC entry 3321 (class 0 OID 0)
+-- TOC entry 3320 (class 0 OID 0)
 -- Dependencies: 210
 -- Name: new_campaign_id_seq; Type: SEQUENCE SET; Schema: public; Owner: postgres
 --
@@ -2837,7 +2815,7 @@ SELECT pg_catalog.setval('public.new_campaign_id_seq', 204, true);
 
 
 --
--- TOC entry 3322 (class 0 OID 0)
+-- TOC entry 3321 (class 0 OID 0)
 -- Dependencies: 200
 -- Name: operators_id_seq; Type: SEQUENCE SET; Schema: public; Owner: postgres
 --
@@ -2846,7 +2824,7 @@ SELECT pg_catalog.setval('public.operators_id_seq', 4, true);
 
 
 --
--- TOC entry 3323 (class 0 OID 0)
+-- TOC entry 3322 (class 0 OID 0)
 -- Dependencies: 223
 -- Name: payment_status_id_seq; Type: SEQUENCE SET; Schema: public; Owner: postgres
 --
@@ -2855,7 +2833,7 @@ SELECT pg_catalog.setval('public.payment_status_id_seq', 1, false);
 
 
 --
--- TOC entry 3324 (class 0 OID 0)
+-- TOC entry 3323 (class 0 OID 0)
 -- Dependencies: 198
 -- Name: platforms_id_seq; Type: SEQUENCE SET; Schema: public; Owner: postgres
 --
@@ -2864,7 +2842,7 @@ SELECT pg_catalog.setval('public.platforms_id_seq', 2, true);
 
 
 --
--- TOC entry 3325 (class 0 OID 0)
+-- TOC entry 3324 (class 0 OID 0)
 -- Dependencies: 202
 -- Name: pricing_id_seq; Type: SEQUENCE SET; Schema: public; Owner: postgres
 --
@@ -2873,7 +2851,7 @@ SELECT pg_catalog.setval('public.pricing_id_seq', 29, true);
 
 
 --
--- TOC entry 3326 (class 0 OID 0)
+-- TOC entry 3325 (class 0 OID 0)
 -- Dependencies: 269
 -- Name: print_orders_id_seq; Type: SEQUENCE SET; Schema: public; Owner: postgres
 --
@@ -2882,7 +2860,7 @@ SELECT pg_catalog.setval('public.print_orders_id_seq', 1, true);
 
 
 --
--- TOC entry 3327 (class 0 OID 0)
+-- TOC entry 3326 (class 0 OID 0)
 -- Dependencies: 206
 -- Name: print_stage_id_seq; Type: SEQUENCE SET; Schema: public; Owner: postgres
 --
@@ -2891,7 +2869,7 @@ SELECT pg_catalog.setval('public.print_stage_id_seq', 2, true);
 
 
 --
--- TOC entry 3328 (class 0 OID 0)
+-- TOC entry 3327 (class 0 OID 0)
 -- Dependencies: 221
 -- Name: print_status_id_seq; Type: SEQUENCE SET; Schema: public; Owner: postgres
 --
@@ -2900,7 +2878,7 @@ SELECT pg_catalog.setval('public.print_status_id_seq', 1, false);
 
 
 --
--- TOC entry 3329 (class 0 OID 0)
+-- TOC entry 3328 (class 0 OID 0)
 -- Dependencies: 267
 -- Name: printers_id_seq; Type: SEQUENCE SET; Schema: public; Owner: postgres
 --
@@ -2909,7 +2887,7 @@ SELECT pg_catalog.setval('public.printers_id_seq', 1, false);
 
 
 --
--- TOC entry 3330 (class 0 OID 0)
+-- TOC entry 3329 (class 0 OID 0)
 -- Dependencies: 240
 -- Name: renewal_requests_id_seq; Type: SEQUENCE SET; Schema: public; Owner: postgres
 --
@@ -2918,7 +2896,7 @@ SELECT pg_catalog.setval('public.renewal_requests_id_seq', 1, false);
 
 
 --
--- TOC entry 3331 (class 0 OID 0)
+-- TOC entry 3330 (class 0 OID 0)
 -- Dependencies: 244
 -- Name: renewal_stage_id_seq; Type: SEQUENCE SET; Schema: public; Owner: postgres
 --
@@ -2927,7 +2905,7 @@ SELECT pg_catalog.setval('public.renewal_stage_id_seq', 6, true);
 
 
 --
--- TOC entry 3332 (class 0 OID 0)
+-- TOC entry 3331 (class 0 OID 0)
 -- Dependencies: 242
 -- Name: transaction_details_id_seq; Type: SEQUENCE SET; Schema: public; Owner: postgres
 --
@@ -2936,7 +2914,7 @@ SELECT pg_catalog.setval('public.transaction_details_id_seq', 27, true);
 
 
 --
--- TOC entry 3333 (class 0 OID 0)
+-- TOC entry 3332 (class 0 OID 0)
 -- Dependencies: 238
 -- Name: transactions_id_seq; Type: SEQUENCE SET; Schema: public; Owner: postgres
 --
@@ -2945,7 +2923,7 @@ SELECT pg_catalog.setval('public.transactions_id_seq', 26, true);
 
 
 --
--- TOC entry 3334 (class 0 OID 0)
+-- TOC entry 3333 (class 0 OID 0)
 -- Dependencies: 229
 -- Name: user_types_id_seq; Type: SEQUENCE SET; Schema: public; Owner: postgres
 --
@@ -2954,7 +2932,7 @@ SELECT pg_catalog.setval('public.user_types_id_seq', 6, true);
 
 
 --
--- TOC entry 3335 (class 0 OID 0)
+-- TOC entry 3334 (class 0 OID 0)
 -- Dependencies: 196
 -- Name: users_id_seq; Type: SEQUENCE SET; Schema: public; Owner: postgres
 --
@@ -2963,7 +2941,7 @@ SELECT pg_catalog.setval('public.users_id_seq', 19, true);
 
 
 --
--- TOC entry 3336 (class 0 OID 0)
+-- TOC entry 3335 (class 0 OID 0)
 -- Dependencies: 227
 -- Name: vendors_id_seq; Type: SEQUENCE SET; Schema: public; Owner: postgres
 --
@@ -2972,7 +2950,7 @@ SELECT pg_catalog.setval('public.vendors_id_seq', 19, true);
 
 
 --
--- TOC entry 3337 (class 0 OID 0)
+-- TOC entry 3336 (class 0 OID 0)
 -- Dependencies: 260
 -- Name: w_vendors_operators_id_seq; Type: SEQUENCE SET; Schema: public; Owner: postgres
 --
@@ -3483,7 +3461,7 @@ ALTER TABLE ONLY public.main_campaigns
     ADD CONSTRAINT pricing_id_fk FOREIGN KEY (price_id) REFERENCES public.z_price_settings(id);
 
 
--- Completed on 2020-11-16 10:01:13
+-- Completed on 2020-11-16 10:06:32
 
 --
 -- PostgreSQL database dump complete
