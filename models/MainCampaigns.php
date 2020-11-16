@@ -1942,9 +1942,9 @@ SORTHTML;
         require_once 'views/PrivateFunctions.php';
 
         // CHECK IF LINUX (PROD) OR WINDOWS (DEV) SERVER
-    	if (strpos($_SERVER['SERVER_NAME'], 'localhost') === false) {
-    		require_once 'emailrun.php';
-        }
+    	//if (strpos($_SERVER['SERVER_NAME'], 'localhost') === false) {
+    	//	require_once 'emailrun.php';
+        //}
 
         // LOG FILE
     	$file = 'emailpeople.txt';
