@@ -202,79 +202,29 @@ $Page->showMessage();
     </tr>
 <?php } ?>
 </table>
+<?php
+    if (in_array("sub_media_allocation", explode(",", $Page->getCurrentDetailTable())) && $sub_media_allocation->DetailView) {
+?>
 <?php if ($Page->getCurrentDetailTable() != "") { ?>
-<?php
-    $Page->DetailPages->ValidKeys = explode(",", $Page->getCurrentDetailTable());
-    $firstActiveDetailTable = $Page->DetailPages->activePageIndex();
-?>
-<div class="ew-detail-pages"><!-- detail-pages -->
-<div class="ew-nav-tabs" id="Page_details"><!-- tabs -->
-    <ul class="<?= $Page->DetailPages->navStyle() ?>"><!-- .nav -->
-<?php
-    if (in_array("sub_media_allocation", explode(",", $Page->getCurrentDetailTable())) && $sub_media_allocation->DetailView) {
-        if ($firstActiveDetailTable == "" || $firstActiveDetailTable == "sub_media_allocation") {
-            $firstActiveDetailTable = "sub_media_allocation";
-        }
-?>
-        <li class="nav-item"><a class="nav-link <?= $Page->DetailPages->pageStyle("sub_media_allocation") ?>" href="#tab_sub_media_allocation" data-toggle="tab"><?= $Language->tablePhrase("sub_media_allocation", "TblCaption") ?></a></li>
-<?php
-    }
-?>
-<?php
-    if (in_array("main_buses", explode(",", $Page->getCurrentDetailTable())) && $main_buses->DetailView) {
-        if ($firstActiveDetailTable == "" || $firstActiveDetailTable == "main_buses") {
-            $firstActiveDetailTable = "main_buses";
-        }
-?>
-        <li class="nav-item"><a class="nav-link <?= $Page->DetailPages->pageStyle("main_buses") ?>" href="#tab_main_buses" data-toggle="tab"><?= $Language->tablePhrase("main_buses", "TblCaption") ?></a></li>
-<?php
-    }
-?>
-<?php
-    if (in_array("main_transactions", explode(",", $Page->getCurrentDetailTable())) && $main_transactions->DetailView) {
-        if ($firstActiveDetailTable == "" || $firstActiveDetailTable == "main_transactions") {
-            $firstActiveDetailTable = "main_transactions";
-        }
-?>
-        <li class="nav-item"><a class="nav-link <?= $Page->DetailPages->pageStyle("main_transactions") ?>" href="#tab_main_transactions" data-toggle="tab"><?= $Language->tablePhrase("main_transactions", "TblCaption") ?></a></li>
-<?php
-    }
-?>
-    </ul><!-- /.nav -->
-    <div class="tab-content"><!-- .tab-content -->
-<?php
-    if (in_array("sub_media_allocation", explode(",", $Page->getCurrentDetailTable())) && $sub_media_allocation->DetailView) {
-        if ($firstActiveDetailTable == "" || $firstActiveDetailTable == "sub_media_allocation") {
-            $firstActiveDetailTable = "sub_media_allocation";
-        }
-?>
-        <div class="tab-pane <?= $Page->DetailPages->pageStyle("sub_media_allocation") ?>" id="tab_sub_media_allocation"><!-- page* -->
+<h4 class="ew-detail-caption"><?= $Language->tablePhrase("sub_media_allocation", "TblCaption") ?></h4>
+<?php } ?>
 <?php include_once "SubMediaAllocationGrid.php" ?>
-        </div><!-- /page* -->
 <?php } ?>
 <?php
     if (in_array("main_buses", explode(",", $Page->getCurrentDetailTable())) && $main_buses->DetailView) {
-        if ($firstActiveDetailTable == "" || $firstActiveDetailTable == "main_buses") {
-            $firstActiveDetailTable = "main_buses";
-        }
 ?>
-        <div class="tab-pane <?= $Page->DetailPages->pageStyle("main_buses") ?>" id="tab_main_buses"><!-- page* -->
+<?php if ($Page->getCurrentDetailTable() != "") { ?>
+<h4 class="ew-detail-caption"><?= $Language->tablePhrase("main_buses", "TblCaption") ?></h4>
+<?php } ?>
 <?php include_once "MainBusesGrid.php" ?>
-        </div><!-- /page* -->
 <?php } ?>
 <?php
     if (in_array("main_transactions", explode(",", $Page->getCurrentDetailTable())) && $main_transactions->DetailView) {
-        if ($firstActiveDetailTable == "" || $firstActiveDetailTable == "main_transactions") {
-            $firstActiveDetailTable = "main_transactions";
-        }
 ?>
-        <div class="tab-pane <?= $Page->DetailPages->pageStyle("main_transactions") ?>" id="tab_main_transactions"><!-- page* -->
-<?php include_once "MainTransactionsGrid.php" ?>
-        </div><!-- /page* -->
+<?php if ($Page->getCurrentDetailTable() != "") { ?>
+<h4 class="ew-detail-caption"><?= $Language->tablePhrase("main_transactions", "TblCaption") ?></h4>
 <?php } ?>
-    </div><!-- /.tab-content -->
-</div><!-- /tabs -->
-</div><!-- /detail-pages -->
+<?php include_once "MainTransactionsGrid.php" ?>
 <?php } ?>
 </form>
 <?php

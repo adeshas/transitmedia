@@ -476,7 +476,6 @@ class MainCampaignsView extends MainCampaigns
     public $RecordRange = 10;
     public $RecKey = [];
     public $IsModal = false;
-    public $DetailPages; // Detail pages object
 
     /**
      * Page run
@@ -510,9 +509,6 @@ class MainCampaignsView extends MainCampaigns
 
         // Do not use lookup cache
         $this->setUseLookupCache(false);
-
-        // Set up detail page object
-        $this->setupDetailPages();
 
         // Global Page Loading event (in userfn*.php)
         Page_Loading();
@@ -1438,17 +1434,6 @@ class MainCampaignsView extends MainCampaigns
         $Breadcrumb->add("list", $this->TableVar, $this->addMasterUrl("maincampaignslist"), "", $this->TableVar, true);
         $pageId = "view";
         $Breadcrumb->add("view", $pageId, $url);
-    }
-
-    // Set up detail pages
-    protected function setupDetailPages()
-    {
-        $pages = new SubPages();
-        $pages->Style = "tabs";
-        $pages->add('sub_media_allocation');
-        $pages->add('main_buses');
-        $pages->add('main_transactions');
-        $this->DetailPages = $pages;
     }
 
     // Setup lookup options

@@ -788,7 +788,12 @@ loadjs.ready("head", function() {
 <?php if ($Grid->RowType == ROWTYPE_VIEW) { // View record ?>
 <span id="el<?= $Grid->RowCount ?>_main_transactions_visible_status_id">
 <span<?= $Grid->visible_status_id->viewAttributes() ?>>
-<?= $Grid->visible_status_id->getViewValue() ?></span>
+<?php if (!EmptyString($Grid->visible_status_id->getViewValue()) && $Grid->visible_status_id->linkAttributes() != "") { ?>
+<a<?= $Grid->visible_status_id->linkAttributes() ?>><?= $Grid->visible_status_id->getViewValue() ?></a>
+<?php } else { ?>
+<?= $Grid->visible_status_id->getViewValue() ?>
+<?php } ?>
+</span>
 </span>
 <?php if ($Grid->isConfirm()) { ?>
 <input type="hidden" data-table="main_transactions" data-field="x_visible_status_id" data-hidden="1" name="fmain_transactionsgrid$x<?= $Grid->RowIndex ?>_visible_status_id" id="fmain_transactionsgrid$x<?= $Grid->RowIndex ?>_visible_status_id" value="<?= HtmlEncode($Grid->visible_status_id->FormValue) ?>">
@@ -857,7 +862,12 @@ loadjs.ready("head", function() {
 <?php if ($Grid->RowType == ROWTYPE_VIEW) { // View record ?>
 <span id="el<?= $Grid->RowCount ?>_main_transactions_status_id">
 <span<?= $Grid->status_id->viewAttributes() ?>>
-<?= $Grid->status_id->getViewValue() ?></span>
+<?php if (!EmptyString($Grid->status_id->getViewValue()) && $Grid->status_id->linkAttributes() != "") { ?>
+<a<?= $Grid->status_id->linkAttributes() ?>><?= $Grid->status_id->getViewValue() ?></a>
+<?php } else { ?>
+<?= $Grid->status_id->getViewValue() ?>
+<?php } ?>
+</span>
 </span>
 <?php if ($Grid->isConfirm()) { ?>
 <input type="hidden" data-table="main_transactions" data-field="x_status_id" data-hidden="1" name="fmain_transactionsgrid$x<?= $Grid->RowIndex ?>_status_id" id="fmain_transactionsgrid$x<?= $Grid->RowIndex ?>_status_id" value="<?= HtmlEncode($Grid->status_id->FormValue) ?>">
@@ -926,7 +936,12 @@ loadjs.ready("head", function() {
 <?php if ($Grid->RowType == ROWTYPE_VIEW) { // View record ?>
 <span id="el<?= $Grid->RowCount ?>_main_transactions_print_status_id">
 <span<?= $Grid->print_status_id->viewAttributes() ?>>
-<?= $Grid->print_status_id->getViewValue() ?></span>
+<?php if (!EmptyString($Grid->print_status_id->getViewValue()) && $Grid->print_status_id->linkAttributes() != "") { ?>
+<a<?= $Grid->print_status_id->linkAttributes() ?>><?= $Grid->print_status_id->getViewValue() ?></a>
+<?php } else { ?>
+<?= $Grid->print_status_id->getViewValue() ?>
+<?php } ?>
+</span>
 </span>
 <?php if ($Grid->isConfirm()) { ?>
 <input type="hidden" data-table="main_transactions" data-field="x_print_status_id" data-hidden="1" name="fmain_transactionsgrid$x<?= $Grid->RowIndex ?>_print_status_id" id="fmain_transactionsgrid$x<?= $Grid->RowIndex ?>_print_status_id" value="<?= HtmlEncode($Grid->print_status_id->FormValue) ?>">
@@ -995,7 +1010,12 @@ loadjs.ready("head", function() {
 <?php if ($Grid->RowType == ROWTYPE_VIEW) { // View record ?>
 <span id="el<?= $Grid->RowCount ?>_main_transactions_payment_status_id">
 <span<?= $Grid->payment_status_id->viewAttributes() ?>>
-<?= $Grid->payment_status_id->getViewValue() ?></span>
+<?php if (!EmptyString($Grid->payment_status_id->getViewValue()) && $Grid->payment_status_id->linkAttributes() != "") { ?>
+<a<?= $Grid->payment_status_id->linkAttributes() ?>><?= $Grid->payment_status_id->getViewValue() ?></a>
+<?php } else { ?>
+<?= $Grid->payment_status_id->getViewValue() ?>
+<?php } ?>
+</span>
 </span>
 <?php if ($Grid->isConfirm()) { ?>
 <input type="hidden" data-table="main_transactions" data-field="x_payment_status_id" data-hidden="1" name="fmain_transactionsgrid$x<?= $Grid->RowIndex ?>_payment_status_id" id="fmain_transactionsgrid$x<?= $Grid->RowIndex ?>_payment_status_id" value="<?= HtmlEncode($Grid->payment_status_id->FormValue) ?>">
@@ -1340,7 +1360,12 @@ loadjs.ready("head", function() {
 <?php } else { ?>
 <span id="el$rowindex$_main_transactions_visible_status_id" class="form-group main_transactions_visible_status_id">
 <span<?= $Grid->visible_status_id->viewAttributes() ?>>
-<input type="text" readonly class="form-control-plaintext" value="<?= HtmlEncode(RemoveHtml($Grid->visible_status_id->getDisplayValue($Grid->visible_status_id->ViewValue))) ?>"></span>
+<?php if (!EmptyString($Grid->visible_status_id->ViewValue) && $Grid->visible_status_id->linkAttributes() != "") { ?>
+<a<?= $Grid->visible_status_id->linkAttributes() ?>><input type="text" readonly class="form-control-plaintext" value="<?= HtmlEncode(RemoveHtml($Grid->visible_status_id->getDisplayValue($Grid->visible_status_id->ViewValue))) ?>"></a>
+<?php } else { ?>
+<input type="text" readonly class="form-control-plaintext" value="<?= HtmlEncode(RemoveHtml($Grid->visible_status_id->getDisplayValue($Grid->visible_status_id->ViewValue))) ?>">
+<?php } ?>
+</span>
 </span>
 <input type="hidden" data-table="main_transactions" data-field="x_visible_status_id" data-hidden="1" name="x<?= $Grid->RowIndex ?>_visible_status_id" id="x<?= $Grid->RowIndex ?>_visible_status_id" value="<?= HtmlEncode($Grid->visible_status_id->FormValue) ?>">
 <?php } ?>
@@ -1378,7 +1403,12 @@ loadjs.ready("head", function() {
 <?php } else { ?>
 <span id="el$rowindex$_main_transactions_status_id" class="form-group main_transactions_status_id">
 <span<?= $Grid->status_id->viewAttributes() ?>>
-<input type="text" readonly class="form-control-plaintext" value="<?= HtmlEncode(RemoveHtml($Grid->status_id->getDisplayValue($Grid->status_id->ViewValue))) ?>"></span>
+<?php if (!EmptyString($Grid->status_id->ViewValue) && $Grid->status_id->linkAttributes() != "") { ?>
+<a<?= $Grid->status_id->linkAttributes() ?>><input type="text" readonly class="form-control-plaintext" value="<?= HtmlEncode(RemoveHtml($Grid->status_id->getDisplayValue($Grid->status_id->ViewValue))) ?>"></a>
+<?php } else { ?>
+<input type="text" readonly class="form-control-plaintext" value="<?= HtmlEncode(RemoveHtml($Grid->status_id->getDisplayValue($Grid->status_id->ViewValue))) ?>">
+<?php } ?>
+</span>
 </span>
 <input type="hidden" data-table="main_transactions" data-field="x_status_id" data-hidden="1" name="x<?= $Grid->RowIndex ?>_status_id" id="x<?= $Grid->RowIndex ?>_status_id" value="<?= HtmlEncode($Grid->status_id->FormValue) ?>">
 <?php } ?>
@@ -1416,7 +1446,12 @@ loadjs.ready("head", function() {
 <?php } else { ?>
 <span id="el$rowindex$_main_transactions_print_status_id" class="form-group main_transactions_print_status_id">
 <span<?= $Grid->print_status_id->viewAttributes() ?>>
-<input type="text" readonly class="form-control-plaintext" value="<?= HtmlEncode(RemoveHtml($Grid->print_status_id->getDisplayValue($Grid->print_status_id->ViewValue))) ?>"></span>
+<?php if (!EmptyString($Grid->print_status_id->ViewValue) && $Grid->print_status_id->linkAttributes() != "") { ?>
+<a<?= $Grid->print_status_id->linkAttributes() ?>><input type="text" readonly class="form-control-plaintext" value="<?= HtmlEncode(RemoveHtml($Grid->print_status_id->getDisplayValue($Grid->print_status_id->ViewValue))) ?>"></a>
+<?php } else { ?>
+<input type="text" readonly class="form-control-plaintext" value="<?= HtmlEncode(RemoveHtml($Grid->print_status_id->getDisplayValue($Grid->print_status_id->ViewValue))) ?>">
+<?php } ?>
+</span>
 </span>
 <input type="hidden" data-table="main_transactions" data-field="x_print_status_id" data-hidden="1" name="x<?= $Grid->RowIndex ?>_print_status_id" id="x<?= $Grid->RowIndex ?>_print_status_id" value="<?= HtmlEncode($Grid->print_status_id->FormValue) ?>">
 <?php } ?>
@@ -1454,7 +1489,12 @@ loadjs.ready("head", function() {
 <?php } else { ?>
 <span id="el$rowindex$_main_transactions_payment_status_id" class="form-group main_transactions_payment_status_id">
 <span<?= $Grid->payment_status_id->viewAttributes() ?>>
-<input type="text" readonly class="form-control-plaintext" value="<?= HtmlEncode(RemoveHtml($Grid->payment_status_id->getDisplayValue($Grid->payment_status_id->ViewValue))) ?>"></span>
+<?php if (!EmptyString($Grid->payment_status_id->ViewValue) && $Grid->payment_status_id->linkAttributes() != "") { ?>
+<a<?= $Grid->payment_status_id->linkAttributes() ?>><input type="text" readonly class="form-control-plaintext" value="<?= HtmlEncode(RemoveHtml($Grid->payment_status_id->getDisplayValue($Grid->payment_status_id->ViewValue))) ?>"></a>
+<?php } else { ?>
+<input type="text" readonly class="form-control-plaintext" value="<?= HtmlEncode(RemoveHtml($Grid->payment_status_id->getDisplayValue($Grid->payment_status_id->ViewValue))) ?>">
+<?php } ?>
+</span>
 </span>
 <input type="hidden" data-table="main_transactions" data-field="x_payment_status_id" data-hidden="1" name="x<?= $Grid->RowIndex ?>_payment_status_id" id="x<?= $Grid->RowIndex ?>_payment_status_id" value="<?= HtmlEncode($Grid->payment_status_id->FormValue) ?>">
 <?php } ?>

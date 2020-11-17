@@ -1803,7 +1803,7 @@ class MainBusesList extends MainBuses
 
         // "checkbox"
         $item = &$this->ListOptions->add("checkbox");
-        $item->Visible = false;
+        $item->Visible = $Security->canEdit();
         $item->OnLeft = false;
         $item->Header = "<div class=\"custom-control custom-checkbox d-inline-block\"><input type=\"checkbox\" name=\"key\" id=\"key\" class=\"custom-control-input\" onclick=\"ew.selectAllKey(this);\"><label class=\"custom-control-label\" for=\"key\"></label></div>";
         $item->ShowInDropDown = false;
@@ -2102,6 +2102,11 @@ class MainBusesList extends MainBuses
         $item->Body = "<a class=\"ew-add-edit ew-grid-edit\" title=\"" . HtmlTitle($Language->phrase("GridEditLink")) . "\" data-caption=\"" . HtmlTitle($Language->phrase("GridEditLink")) . "\" href=\"" . HtmlEncode(GetUrl($this->GridEditUrl)) . "\">" . $Language->phrase("GridEditLink") . "</a>";
         $item->Visible = $this->GridEditUrl != "" && $Security->canEdit();
         $option = $options["action"];
+
+        // Add multi update
+        $item = &$option->add("multiupdate");
+        $item->Body = "<a class=\"ew-action ew-multi-update\" title=\"" . HtmlTitle($Language->phrase("UpdateSelectedLink")) . "\" data-table=\"main_buses\" data-caption=\"" . HtmlTitle($Language->phrase("UpdateSelectedLink")) . "\" href=\"#\" onclick=\"return ew.modalDialogShow({lnk:this,btn:'UpdateBtn',f:document.fmain_buseslist,url:'" . GetUrl($this->MultiUpdateUrl) . "'});return false;\">" . $Language->phrase("UpdateSelectedLink") . "</a>";
+        $item->Visible = $Security->canEdit();
 
         // Set up options default
         foreach ($options as $option) {

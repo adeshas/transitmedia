@@ -12,6 +12,7 @@ return function (App $app) {
     $app->any('/mainbusesadd[/{id}]', MainBusesController::class . ':add')->add(PermissionMiddleware::class)->setName('mainbusesadd-main_buses-add'); // add
     $app->any('/mainbusesview[/{id}]', MainBusesController::class . ':view')->add(PermissionMiddleware::class)->setName('mainbusesview-main_buses-view'); // view
     $app->any('/mainbusesedit[/{id}]', MainBusesController::class . ':edit')->add(PermissionMiddleware::class)->setName('mainbusesedit-main_buses-edit'); // edit
+    $app->any('/mainbusesupdate', MainBusesController::class . ':update')->add(PermissionMiddleware::class)->setName('mainbusesupdate-main_buses-update'); // update
     $app->any('/mainbusesdelete[/{id}]', MainBusesController::class . ':delete')->add(PermissionMiddleware::class)->setName('mainbusesdelete-main_buses-delete'); // delete
     $app->group(
         '/main_buses',
@@ -20,6 +21,7 @@ return function (App $app) {
             $group->any('/' . Config("ADD_ACTION") . '[/{id}]', MainBusesController::class . ':add')->add(PermissionMiddleware::class)->setName('main_buses/add-main_buses-add-2'); // add
             $group->any('/' . Config("VIEW_ACTION") . '[/{id}]', MainBusesController::class . ':view')->add(PermissionMiddleware::class)->setName('main_buses/view-main_buses-view-2'); // view
             $group->any('/' . Config("EDIT_ACTION") . '[/{id}]', MainBusesController::class . ':edit')->add(PermissionMiddleware::class)->setName('main_buses/edit-main_buses-edit-2'); // edit
+            $group->any('/' . Config("UPDATE_ACTION") . '', MainBusesController::class . ':update')->add(PermissionMiddleware::class)->setName('main_buses/update-main_buses-update-2'); // update
             $group->any('/' . Config("DELETE_ACTION") . '[/{id}]', MainBusesController::class . ':delete')->add(PermissionMiddleware::class)->setName('main_buses/delete-main_buses-delete-2'); // delete
         }
     );
@@ -65,6 +67,7 @@ return function (App $app) {
     $app->any('/maintransactionsedit[/{id}]', MainTransactionsController::class . ':edit')->add(PermissionMiddleware::class)->setName('maintransactionsedit-main_transactions-edit'); // edit
     $app->any('/maintransactionsupdate', MainTransactionsController::class . ':update')->add(PermissionMiddleware::class)->setName('maintransactionsupdate-main_transactions-update'); // update
     $app->any('/maintransactionsdelete[/{id}]', MainTransactionsController::class . ':delete')->add(PermissionMiddleware::class)->setName('maintransactionsdelete-main_transactions-delete'); // delete
+    $app->any('/maintransactionssearch', MainTransactionsController::class . ':search')->add(PermissionMiddleware::class)->setName('maintransactionssearch-main_transactions-search'); // search
     $app->group(
         '/main_transactions',
         function (RouteCollectorProxy $group) {
@@ -74,6 +77,7 @@ return function (App $app) {
             $group->any('/' . Config("EDIT_ACTION") . '[/{id}]', MainTransactionsController::class . ':edit')->add(PermissionMiddleware::class)->setName('main_transactions/edit-main_transactions-edit-2'); // edit
             $group->any('/' . Config("UPDATE_ACTION") . '', MainTransactionsController::class . ':update')->add(PermissionMiddleware::class)->setName('main_transactions/update-main_transactions-update-2'); // update
             $group->any('/' . Config("DELETE_ACTION") . '[/{id}]', MainTransactionsController::class . ':delete')->add(PermissionMiddleware::class)->setName('main_transactions/delete-main_transactions-delete-2'); // delete
+            $group->any('/' . Config("SEARCH_ACTION") . '', MainTransactionsController::class . ':search')->add(PermissionMiddleware::class)->setName('main_transactions/search-main_transactions-search-2'); // search
         }
     );
 

@@ -3981,6 +3981,9 @@ class ZPriceSettingsList extends ZPriceSettings
         if (!Config("SERVER_VALIDATE")) {
             return true;
         }
+        if (!CheckInteger($this->id->AdvancedSearch->SearchValue)) {
+            $this->id->addErrorMessage($this->id->getErrorMessage(false));
+        }
         if (!CheckDate($this->ts_created->AdvancedSearch->SearchValue)) {
             $this->ts_created->addErrorMessage($this->ts_created->getErrorMessage(false));
         }

@@ -136,7 +136,12 @@ $Page->showMessage();
         <td data-name="visible_status_id" <?= $Page->visible_status_id->cellAttributes() ?>>
 <span id="el_main_transactions_visible_status_id">
 <span<?= $Page->visible_status_id->viewAttributes() ?>>
-<?= $Page->visible_status_id->getViewValue() ?></span>
+<?php if (!EmptyString($Page->visible_status_id->getViewValue()) && $Page->visible_status_id->linkAttributes() != "") { ?>
+<a<?= $Page->visible_status_id->linkAttributes() ?>><?= $Page->visible_status_id->getViewValue() ?></a>
+<?php } else { ?>
+<?= $Page->visible_status_id->getViewValue() ?>
+<?php } ?>
+</span>
 </span>
 </td>
     </tr>
@@ -147,7 +152,12 @@ $Page->showMessage();
         <td data-name="status_id" <?= $Page->status_id->cellAttributes() ?>>
 <span id="el_main_transactions_status_id">
 <span<?= $Page->status_id->viewAttributes() ?>>
-<?= $Page->status_id->getViewValue() ?></span>
+<?php if (!EmptyString($Page->status_id->getViewValue()) && $Page->status_id->linkAttributes() != "") { ?>
+<a<?= $Page->status_id->linkAttributes() ?>><?= $Page->status_id->getViewValue() ?></a>
+<?php } else { ?>
+<?= $Page->status_id->getViewValue() ?>
+<?php } ?>
+</span>
 </span>
 </td>
     </tr>
@@ -158,7 +168,12 @@ $Page->showMessage();
         <td data-name="print_status_id" <?= $Page->print_status_id->cellAttributes() ?>>
 <span id="el_main_transactions_print_status_id">
 <span<?= $Page->print_status_id->viewAttributes() ?>>
-<?= $Page->print_status_id->getViewValue() ?></span>
+<?php if (!EmptyString($Page->print_status_id->getViewValue()) && $Page->print_status_id->linkAttributes() != "") { ?>
+<a<?= $Page->print_status_id->linkAttributes() ?>><?= $Page->print_status_id->getViewValue() ?></a>
+<?php } else { ?>
+<?= $Page->print_status_id->getViewValue() ?>
+<?php } ?>
+</span>
 </span>
 </td>
     </tr>
@@ -169,7 +184,12 @@ $Page->showMessage();
         <td data-name="payment_status_id" <?= $Page->payment_status_id->cellAttributes() ?>>
 <span id="el_main_transactions_payment_status_id">
 <span<?= $Page->payment_status_id->viewAttributes() ?>>
-<?= $Page->payment_status_id->getViewValue() ?></span>
+<?php if (!EmptyString($Page->payment_status_id->getViewValue()) && $Page->payment_status_id->linkAttributes() != "") { ?>
+<a<?= $Page->payment_status_id->linkAttributes() ?>><?= $Page->payment_status_id->getViewValue() ?></a>
+<?php } else { ?>
+<?= $Page->payment_status_id->getViewValue() ?>
+<?php } ?>
+</span>
 </span>
 </td>
     </tr>

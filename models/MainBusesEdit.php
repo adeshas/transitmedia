@@ -607,7 +607,11 @@ class MainBusesEdit extends MainBuses
         $this->setupBreadcrumb();
 
         // Render the record
-        $this->RowType = ROWTYPE_EDIT; // Render as Edit
+        if ($this->isConfirm()) { // Confirm page
+            $this->RowType = ROWTYPE_VIEW; // Render as View
+        } else {
+            $this->RowType = ROWTYPE_EDIT; // Render as Edit
+        }
         $this->resetAttributes();
         $this->renderRow();
 
@@ -733,6 +737,7 @@ class MainBusesEdit extends MainBuses
         $this->interior_campaign_id->CurrentValue = $this->interior_campaign_id->FormValue;
         $this->bus_status_id->CurrentValue = $this->bus_status_id->FormValue;
         $this->bus_depot_id->CurrentValue = $this->bus_depot_id->FormValue;
+        $this->resetDetailParms();
     }
 
     /**
@@ -1639,7 +1644,14 @@ class MainBusesEdit extends MainBuses
                 $detailPageObj = Container("SubMediaAllocationGrid");
                 if ($detailPageObj->DetailEdit) {
                     $detailPageObj->CurrentMode = "edit";
-                    $detailPageObj->CurrentAction = "gridedit";
+                    if ($this->isConfirm()) {
+                        $detailPageObj->CurrentAction = "confirm";
+                    } else {
+                        $detailPageObj->CurrentAction = "gridedit";
+                    }
+                    if ($this->isCancel()) {
+                        $detailPageObj->EventCancelled = true;
+                    }
 
                     // Save current master table to detail table
                     $detailPageObj->setCurrentMasterTable($this->TableVar);
@@ -1654,7 +1666,14 @@ class MainBusesEdit extends MainBuses
                 $detailPageObj = Container("SubTransactionDetailsGrid");
                 if ($detailPageObj->DetailEdit) {
                     $detailPageObj->CurrentMode = "edit";
-                    $detailPageObj->CurrentAction = "gridedit";
+                    if ($this->isConfirm()) {
+                        $detailPageObj->CurrentAction = "confirm";
+                    } else {
+                        $detailPageObj->CurrentAction = "gridedit";
+                    }
+                    if ($this->isCancel()) {
+                        $detailPageObj->EventCancelled = true;
+                    }
 
                     // Save current master table to detail table
                     $detailPageObj->setCurrentMasterTable($this->TableVar);
@@ -1663,6 +1682,33 @@ class MainBusesEdit extends MainBuses
                     $detailPageObj->bus_id->CurrentValue = $this->id->CurrentValue;
                     $detailPageObj->bus_id->setSessionValue($detailPageObj->bus_id->CurrentValue);
                     $detailPageObj->transaction_id->setSessionValue(""); // Clear session key
+                }
+            }
+        }
+    }
+
+        // Reset detail parms
+    protected function resetDetailParms()
+    {
+        // Get the keys for master table
+        $detailTblVar = Get(Config("TABLE_SHOW_DETAIL"));
+        if ($detailTblVar !== null) {
+            $this->setCurrentDetailTable($detailTblVar);
+        } else {
+            $detailTblVar = $this->getCurrentDetailTable();
+        }
+        if ($detailTblVar != "") {
+            $detailTblVar = explode(",", $detailTblVar);
+            if (in_array("sub_media_allocation", $detailTblVar)) {
+                $detailPageObj = Container("SubMediaAllocationGrid");
+                if ($detailPageObj->DetailEdit) {
+                    $detailPageObj->CurrentAction = "gridedit";
+                }
+            }
+            if (in_array("sub_transaction_details", $detailTblVar)) {
+                $detailPageObj = Container("SubTransactionDetailsGrid");
+                if ($detailPageObj->DetailEdit) {
+                    $detailPageObj->CurrentAction = "gridedit";
                 }
             }
         }

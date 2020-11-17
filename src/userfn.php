@@ -67,9 +67,29 @@ function MenuItem_Adding($item)
     }
 
     // MANAGER
-    if(CurrentUserLevel() >= 1 && CurrentUserLevel() <= 4){
-        if( in_array($item->id, [195,197,198,133,201])){
-            return false;
+    if(CurrentUserLevel() >= 1 && CurrentUserLevel() <= 4 || CurrentUserLevel() == 7){
+        if(CurrentUserLevel() >= 1 && CurrentUserLevel() <= 4){
+            if( in_array($item->id, [195,197,198,133,201])){
+                //return false;
+            }
+        }
+        if(CurrentUserLevel() == 3){
+        	//FLEET MAN
+        	if( in_array($item->id, [177,178,35,98,34,95,56])){
+            	return false;
+            }
+        }
+        if(CurrentUserLevel() == 4){
+        	//REPORT MAN
+        	if( in_array($item->id, [35,33,98])){
+            	return false;
+            }
+        }
+        if(CurrentUserLevel() == 7){
+        	//PRINT MAN
+        	if( in_array($item->id, [20,35,33,174,35,133])){
+            	return false;
+            }
         }
     }
 

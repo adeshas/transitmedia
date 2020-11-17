@@ -327,6 +327,29 @@ function beautify_email($new_content){
 }
 
 
+function buttonStyle($ps){
+
+        switch ($ps) {
+        case "1":
+            $ps_output = "btn btn-block btn-default disabled";
+            break;
+        case "2":
+            $ps_output = "btn btn-block btn-success disabled";
+            break;
+        case "3":
+            $ps_output = "btn btn-block btn-danger disabled";
+            break;
+        case "4":
+            $ps_output = "btn btn-block btn-secondary disabled";
+            break;
+        case "5":
+            $ps_output = "btn btn-block btn-info disabled";
+            break;
+        default:
+            $ps_output = "btn btn-block btn-default disabled";
+        }
+        return $ps_output;
+}
 
 /*
 TEXT IN XML TO REPLACE

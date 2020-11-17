@@ -116,7 +116,12 @@ $Page->showMessage();
 <input type="hidden" name="<?= $TokenValueKey ?>" value="<?= $TokenValue ?>"><!-- CSRF token value -->
 <?php } ?>
 <input type="hidden" name="t" value="main_buses">
+<?php if ($Page->isConfirm()) { // Confirm page ?>
 <input type="hidden" name="action" id="action" value="update">
+<input type="hidden" name="confirm" id="confirm" value="confirm">
+<?php } else { ?>
+<input type="hidden" name="action" id="action" value="confirm">
+<?php } ?>
 <input type="hidden" name="modal" value="<?= (int)$Page->IsModal ?>">
 <input type="hidden" name="<?= $Page->OldKeyName ?>" value="<?= $Page->OldKey ?>">
 <?php if ($Page->getCurrentMasterTable() == "main_campaigns") { ?>
@@ -129,11 +134,19 @@ $Page->showMessage();
     <div id="r_id" class="form-group row">
         <label id="elh_main_buses_id" class="<?= $Page->LeftColumnClass ?>"><?= $Page->id->caption() ?><?= $Page->id->Required ? $Language->phrase("FieldRequiredIndicator") : "" ?></label>
         <div class="<?= $Page->RightColumnClass ?>"><div <?= $Page->id->cellAttributes() ?>>
+<?php if (!$Page->isConfirm()) { ?>
 <span id="el_main_buses_id">
 <span<?= $Page->id->viewAttributes() ?>>
 <input type="text" readonly class="form-control-plaintext" value="<?= HtmlEncode(RemoveHtml($Page->id->getDisplayValue($Page->id->EditValue))) ?>"></span>
 </span>
 <input type="hidden" data-table="main_buses" data-field="x_id" data-hidden="1" name="x_id" id="x_id" value="<?= HtmlEncode($Page->id->CurrentValue) ?>">
+<?php } else { ?>
+<span id="el_main_buses_id">
+<span<?= $Page->id->viewAttributes() ?>>
+<input type="text" readonly class="form-control-plaintext" value="<?= HtmlEncode(RemoveHtml($Page->id->getDisplayValue($Page->id->ViewValue))) ?>"></span>
+</span>
+<input type="hidden" data-table="main_buses" data-field="x_id" data-hidden="1" name="x_id" id="x_id" value="<?= HtmlEncode($Page->id->FormValue) ?>">
+<?php } ?>
 </div></div>
     </div>
 <?php } ?>
@@ -141,11 +154,19 @@ $Page->showMessage();
     <div id="r_number" class="form-group row">
         <label id="elh_main_buses_number" for="x_number" class="<?= $Page->LeftColumnClass ?>"><?= $Page->number->caption() ?><?= $Page->number->Required ? $Language->phrase("FieldRequiredIndicator") : "" ?></label>
         <div class="<?= $Page->RightColumnClass ?>"><div <?= $Page->number->cellAttributes() ?>>
+<?php if (!$Page->isConfirm()) { ?>
 <span id="el_main_buses_number">
 <input type="<?= $Page->number->getInputTextType() ?>" data-table="main_buses" data-field="x_number" name="x_number" id="x_number" size="30" placeholder="<?= HtmlEncode($Page->number->getPlaceHolder()) ?>" value="<?= $Page->number->EditValue ?>"<?= $Page->number->editAttributes() ?> aria-describedby="x_number_help">
 <?= $Page->number->getCustomMessage() ?>
 <div class="invalid-feedback"><?= $Page->number->getErrorMessage() ?></div>
 </span>
+<?php } else { ?>
+<span id="el_main_buses_number">
+<span<?= $Page->number->viewAttributes() ?>>
+<input type="text" readonly class="form-control-plaintext" value="<?= HtmlEncode(RemoveHtml($Page->number->getDisplayValue($Page->number->ViewValue))) ?>"></span>
+</span>
+<input type="hidden" data-table="main_buses" data-field="x_number" data-hidden="1" name="x_number" id="x_number" value="<?= HtmlEncode($Page->number->FormValue) ?>">
+<?php } ?>
 </div></div>
     </div>
 <?php } ?>
@@ -153,6 +174,7 @@ $Page->showMessage();
     <div id="r_platform_id" class="form-group row">
         <label id="elh_main_buses_platform_id" for="x_platform_id" class="<?= $Page->LeftColumnClass ?>"><?= $Page->platform_id->caption() ?><?= $Page->platform_id->Required ? $Language->phrase("FieldRequiredIndicator") : "" ?></label>
         <div class="<?= $Page->RightColumnClass ?>"><div <?= $Page->platform_id->cellAttributes() ?>>
+<?php if (!$Page->isConfirm()) { ?>
 <span id="el_main_buses_platform_id">
 <?php $Page->platform_id->EditAttrs->prepend("onchange", "ew.updateOptions.call(this);"); ?>
     <select
@@ -180,6 +202,13 @@ loadjs.ready("head", function() {
 });
 </script>
 </span>
+<?php } else { ?>
+<span id="el_main_buses_platform_id">
+<span<?= $Page->platform_id->viewAttributes() ?>>
+<input type="text" readonly class="form-control-plaintext" value="<?= HtmlEncode(RemoveHtml($Page->platform_id->getDisplayValue($Page->platform_id->ViewValue))) ?>"></span>
+</span>
+<input type="hidden" data-table="main_buses" data-field="x_platform_id" data-hidden="1" name="x_platform_id" id="x_platform_id" value="<?= HtmlEncode($Page->platform_id->FormValue) ?>">
+<?php } ?>
 </div></div>
     </div>
 <?php } ?>
@@ -187,6 +216,7 @@ loadjs.ready("head", function() {
     <div id="r_operator_id" class="form-group row">
         <label id="elh_main_buses_operator_id" for="x_operator_id" class="<?= $Page->LeftColumnClass ?>"><?= $Page->operator_id->caption() ?><?= $Page->operator_id->Required ? $Language->phrase("FieldRequiredIndicator") : "" ?></label>
         <div class="<?= $Page->RightColumnClass ?>"><div <?= $Page->operator_id->cellAttributes() ?>>
+<?php if (!$Page->isConfirm()) { ?>
 <span id="el_main_buses_operator_id">
     <select
         id="x_operator_id"
@@ -213,6 +243,13 @@ loadjs.ready("head", function() {
 });
 </script>
 </span>
+<?php } else { ?>
+<span id="el_main_buses_operator_id">
+<span<?= $Page->operator_id->viewAttributes() ?>>
+<input type="text" readonly class="form-control-plaintext" value="<?= HtmlEncode(RemoveHtml($Page->operator_id->getDisplayValue($Page->operator_id->ViewValue))) ?>"></span>
+</span>
+<input type="hidden" data-table="main_buses" data-field="x_operator_id" data-hidden="1" name="x_operator_id" id="x_operator_id" value="<?= HtmlEncode($Page->operator_id->FormValue) ?>">
+<?php } ?>
 </div></div>
     </div>
 <?php } ?>
@@ -220,6 +257,7 @@ loadjs.ready("head", function() {
     <div id="r_exterior_campaign_id" class="form-group row">
         <label id="elh_main_buses_exterior_campaign_id" for="x_exterior_campaign_id" class="<?= $Page->LeftColumnClass ?>"><?= $Page->exterior_campaign_id->caption() ?><?= $Page->exterior_campaign_id->Required ? $Language->phrase("FieldRequiredIndicator") : "" ?></label>
         <div class="<?= $Page->RightColumnClass ?>"><div <?= $Page->exterior_campaign_id->cellAttributes() ?>>
+<?php if (!$Page->isConfirm()) { ?>
 <?php if ($Page->exterior_campaign_id->getSessionValue() != "") { ?>
 <span id="el_main_buses_exterior_campaign_id">
 <span<?= $Page->exterior_campaign_id->viewAttributes() ?>>
@@ -254,6 +292,13 @@ loadjs.ready("head", function() {
 </script>
 </span>
 <?php } ?>
+<?php } else { ?>
+<span id="el_main_buses_exterior_campaign_id">
+<span<?= $Page->exterior_campaign_id->viewAttributes() ?>>
+<input type="text" readonly class="form-control-plaintext" value="<?= HtmlEncode(RemoveHtml($Page->exterior_campaign_id->getDisplayValue($Page->exterior_campaign_id->ViewValue))) ?>"></span>
+</span>
+<input type="hidden" data-table="main_buses" data-field="x_exterior_campaign_id" data-hidden="1" name="x_exterior_campaign_id" id="x_exterior_campaign_id" value="<?= HtmlEncode($Page->exterior_campaign_id->FormValue) ?>">
+<?php } ?>
 </div></div>
     </div>
 <?php } ?>
@@ -261,6 +306,7 @@ loadjs.ready("head", function() {
     <div id="r_interior_campaign_id" class="form-group row">
         <label id="elh_main_buses_interior_campaign_id" for="x_interior_campaign_id" class="<?= $Page->LeftColumnClass ?>"><?= $Page->interior_campaign_id->caption() ?><?= $Page->interior_campaign_id->Required ? $Language->phrase("FieldRequiredIndicator") : "" ?></label>
         <div class="<?= $Page->RightColumnClass ?>"><div <?= $Page->interior_campaign_id->cellAttributes() ?>>
+<?php if (!$Page->isConfirm()) { ?>
 <?php if ($Page->interior_campaign_id->getSessionValue() != "") { ?>
 <span id="el_main_buses_interior_campaign_id">
 <span<?= $Page->interior_campaign_id->viewAttributes() ?>>
@@ -295,6 +341,13 @@ loadjs.ready("head", function() {
 </script>
 </span>
 <?php } ?>
+<?php } else { ?>
+<span id="el_main_buses_interior_campaign_id">
+<span<?= $Page->interior_campaign_id->viewAttributes() ?>>
+<input type="text" readonly class="form-control-plaintext" value="<?= HtmlEncode(RemoveHtml($Page->interior_campaign_id->getDisplayValue($Page->interior_campaign_id->ViewValue))) ?>"></span>
+</span>
+<input type="hidden" data-table="main_buses" data-field="x_interior_campaign_id" data-hidden="1" name="x_interior_campaign_id" id="x_interior_campaign_id" value="<?= HtmlEncode($Page->interior_campaign_id->FormValue) ?>">
+<?php } ?>
 </div></div>
     </div>
 <?php } ?>
@@ -302,6 +355,7 @@ loadjs.ready("head", function() {
     <div id="r_bus_status_id" class="form-group row">
         <label id="elh_main_buses_bus_status_id" for="x_bus_status_id" class="<?= $Page->LeftColumnClass ?>"><?= $Page->bus_status_id->caption() ?><?= $Page->bus_status_id->Required ? $Language->phrase("FieldRequiredIndicator") : "" ?></label>
         <div class="<?= $Page->RightColumnClass ?>"><div <?= $Page->bus_status_id->cellAttributes() ?>>
+<?php if (!$Page->isConfirm()) { ?>
 <span id="el_main_buses_bus_status_id">
     <select
         id="x_bus_status_id"
@@ -328,6 +382,13 @@ loadjs.ready("head", function() {
 });
 </script>
 </span>
+<?php } else { ?>
+<span id="el_main_buses_bus_status_id">
+<span<?= $Page->bus_status_id->viewAttributes() ?>>
+<input type="text" readonly class="form-control-plaintext" value="<?= HtmlEncode(RemoveHtml($Page->bus_status_id->getDisplayValue($Page->bus_status_id->ViewValue))) ?>"></span>
+</span>
+<input type="hidden" data-table="main_buses" data-field="x_bus_status_id" data-hidden="1" name="x_bus_status_id" id="x_bus_status_id" value="<?= HtmlEncode($Page->bus_status_id->FormValue) ?>">
+<?php } ?>
 </div></div>
     </div>
 <?php } ?>
@@ -335,6 +396,7 @@ loadjs.ready("head", function() {
     <div id="r_bus_depot_id" class="form-group row">
         <label id="elh_main_buses_bus_depot_id" for="x_bus_depot_id" class="<?= $Page->LeftColumnClass ?>"><?= $Page->bus_depot_id->caption() ?><?= $Page->bus_depot_id->Required ? $Language->phrase("FieldRequiredIndicator") : "" ?></label>
         <div class="<?= $Page->RightColumnClass ?>"><div <?= $Page->bus_depot_id->cellAttributes() ?>>
+<?php if (!$Page->isConfirm()) { ?>
 <span id="el_main_buses_bus_depot_id">
     <select
         id="x_bus_depot_id"
@@ -361,6 +423,13 @@ loadjs.ready("head", function() {
 });
 </script>
 </span>
+<?php } else { ?>
+<span id="el_main_buses_bus_depot_id">
+<span<?= $Page->bus_depot_id->viewAttributes() ?>>
+<input type="text" readonly class="form-control-plaintext" value="<?= HtmlEncode(RemoveHtml($Page->bus_depot_id->getDisplayValue($Page->bus_depot_id->ViewValue))) ?>"></span>
+</span>
+<input type="hidden" data-table="main_buses" data-field="x_bus_depot_id" data-hidden="1" name="x_bus_depot_id" id="x_bus_depot_id" value="<?= HtmlEncode($Page->bus_depot_id->FormValue) ?>">
+<?php } ?>
 </div></div>
     </div>
 <?php } ?>
@@ -384,8 +453,13 @@ loadjs.ready("head", function() {
 <?php if (!$Page->IsModal) { ?>
 <div class="form-group row"><!-- buttons .form-group -->
     <div class="<?= $Page->OffsetColumnClass ?>"><!-- buttons offset -->
-<button class="btn btn-primary ew-btn" name="btn-action" id="btn-action" type="submit"><?= $Language->phrase("SaveBtn") ?></button>
+<?php if (!$Page->isConfirm()) { // Confirm page ?>
+<button class="btn btn-primary ew-btn" name="btn-action" id="btn-action" type="submit" onclick="this.form.action.value='confirm';"><?= $Language->phrase("SaveBtn") ?></button>
 <button class="btn btn-default ew-btn" name="btn-cancel" id="btn-cancel" type="button" data-href="<?= GetUrl($Page->getReturnUrl()) ?>"><?= $Language->phrase("CancelBtn") ?></button>
+<?php } else { ?>
+<button class="btn btn-primary ew-btn" name="btn-action" id="btn-action" type="submit"><?= $Language->phrase("ConfirmBtn") ?></button>
+<button class="btn btn-default ew-btn" name="btn-cancel" id="btn-cancel" type="submit" onclick="this.form.action.value='cancel';"><?= $Language->phrase("CancelBtn") ?></button>
+<?php } ?>
     </div><!-- /buttons offset -->
 </div><!-- /buttons .form-group -->
 <?php } ?>

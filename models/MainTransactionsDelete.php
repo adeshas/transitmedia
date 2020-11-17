@@ -729,6 +729,8 @@ class MainTransactionsDelete extends MainTransactions
             // quantity
             $this->quantity->ViewValue = $this->quantity->CurrentValue;
             $this->quantity->ViewValue = FormatNumber($this->quantity->ViewValue, 0, -2, -2, -2);
+            $this->quantity->CssClass = "font-weight-bold";
+            $this->quantity->CellCssStyle .= "text-align: right;";
             $this->quantity->ViewCustomAttributes = "";
 
             // start_date
@@ -785,6 +787,7 @@ class MainTransactionsDelete extends MainTransactions
                     $this->status_id->ViewValue = null;
                 }
             }
+            $this->status_id->CellCssStyle .= "text-align: center;";
             $this->status_id->ViewCustomAttributes = "";
 
             // print_status_id
@@ -810,6 +813,7 @@ class MainTransactionsDelete extends MainTransactions
                     $this->print_status_id->ViewValue = null;
                 }
             }
+            $this->print_status_id->CellCssStyle .= "text-align: center;";
             $this->print_status_id->ViewCustomAttributes = "";
 
             // payment_status_id
@@ -835,6 +839,7 @@ class MainTransactionsDelete extends MainTransactions
                     $this->payment_status_id->ViewValue = null;
                 }
             }
+            $this->payment_status_id->CellCssStyle .= "text-align: center;";
             $this->payment_status_id->ViewCustomAttributes = "";
 
             // created_by
@@ -871,6 +876,8 @@ class MainTransactionsDelete extends MainTransactions
             // total
             $this->total->ViewValue = $this->total->CurrentValue;
             $this->total->ViewValue = FormatNumber($this->total->ViewValue, 0, -2, -2, -2);
+            $this->total->CssClass = "font-weight-bold";
+            $this->total->CellCssStyle .= "text-align: right;";
             $this->total->ViewCustomAttributes = "";
 
             // id
@@ -915,22 +922,54 @@ class MainTransactionsDelete extends MainTransactions
 
             // visible_status_id
             $this->visible_status_id->LinkCustomAttributes = "";
-            $this->visible_status_id->HrefValue = "";
+            if (!EmptyValue($this->visible_status_id->CurrentValue)) {
+                $this->visible_status_id->HrefValue = "#" . (!empty($this->visible_status_id->ViewValue) && !is_array($this->visible_status_id->ViewValue) ? RemoveHtml($this->visible_status_id->ViewValue) : $this->visible_status_id->CurrentValue); // Add prefix/suffix
+                $this->visible_status_id->LinkAttrs["target"] = ""; // Add target
+                if ($this->isExport()) {
+                    $this->visible_status_id->HrefValue = FullUrl($this->visible_status_id->HrefValue, "href");
+                }
+            } else {
+                $this->visible_status_id->HrefValue = "";
+            }
             $this->visible_status_id->TooltipValue = "";
 
             // status_id
             $this->status_id->LinkCustomAttributes = "";
-            $this->status_id->HrefValue = "";
+            if (!EmptyValue($this->status_id->CurrentValue)) {
+                $this->status_id->HrefValue = "#" . (!empty($this->status_id->ViewValue) && !is_array($this->status_id->ViewValue) ? RemoveHtml($this->status_id->ViewValue) : $this->status_id->CurrentValue); // Add prefix/suffix
+                $this->status_id->LinkAttrs["target"] = ""; // Add target
+                if ($this->isExport()) {
+                    $this->status_id->HrefValue = FullUrl($this->status_id->HrefValue, "href");
+                }
+            } else {
+                $this->status_id->HrefValue = "";
+            }
             $this->status_id->TooltipValue = "";
 
             // print_status_id
             $this->print_status_id->LinkCustomAttributes = "";
-            $this->print_status_id->HrefValue = "";
+            if (!EmptyValue($this->print_status_id->CurrentValue)) {
+                $this->print_status_id->HrefValue = "#" . (!empty($this->print_status_id->ViewValue) && !is_array($this->print_status_id->ViewValue) ? RemoveHtml($this->print_status_id->ViewValue) : $this->print_status_id->CurrentValue); // Add prefix/suffix
+                $this->print_status_id->LinkAttrs["target"] = ""; // Add target
+                if ($this->isExport()) {
+                    $this->print_status_id->HrefValue = FullUrl($this->print_status_id->HrefValue, "href");
+                }
+            } else {
+                $this->print_status_id->HrefValue = "";
+            }
             $this->print_status_id->TooltipValue = "";
 
             // payment_status_id
             $this->payment_status_id->LinkCustomAttributes = "";
-            $this->payment_status_id->HrefValue = "";
+            if (!EmptyValue($this->payment_status_id->CurrentValue)) {
+                $this->payment_status_id->HrefValue = "#" . (!empty($this->payment_status_id->ViewValue) && !is_array($this->payment_status_id->ViewValue) ? RemoveHtml($this->payment_status_id->ViewValue) : $this->payment_status_id->CurrentValue); // Add prefix/suffix
+                $this->payment_status_id->LinkAttrs["target"] = ""; // Add target
+                if ($this->isExport()) {
+                    $this->payment_status_id->HrefValue = FullUrl($this->payment_status_id->HrefValue, "href");
+                }
+            } else {
+                $this->payment_status_id->HrefValue = "";
+            }
             $this->payment_status_id->TooltipValue = "";
 
             // total

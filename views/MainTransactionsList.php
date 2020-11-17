@@ -136,6 +136,18 @@ loadjs.ready("head", function () {
     fmain_transactionslist.lists.payment_status_id = <?= $Page->payment_status_id->toClientList($Page) ?>;
     loadjs.done("fmain_transactionslist");
 });
+var fmain_transactionslistsrch, currentSearchForm, currentAdvancedSearchForm;
+loadjs.ready("head", function () {
+    var $ = jQuery;
+    // Form object for search
+    fmain_transactionslistsrch = currentSearchForm = new ew.Form("fmain_transactionslistsrch");
+
+    // Dynamic selection lists
+
+    // Filters
+    fmain_transactionslistsrch.filterList = <?= $Page->getFilterList() ?>;
+    loadjs.done("fmain_transactionslistsrch");
+});
 </script>
 <script>
 loadjs.ready("head", function () {
@@ -150,6 +162,12 @@ loadjs.ready("head", function () {
 <?php } ?>
 <?php if ($Page->ImportOptions->visible()) { ?>
 <?php $Page->ImportOptions->render("body") ?>
+<?php } ?>
+<?php if ($Page->SearchOptions->visible()) { ?>
+<?php $Page->SearchOptions->render("body") ?>
+<?php } ?>
+<?php if ($Page->FilterOptions->visible()) { ?>
+<?php $Page->FilterOptions->render("body") ?>
 <?php } ?>
 <div class="clearfix"></div>
 </div>
@@ -173,6 +191,34 @@ if ($Page->DbMasterFilter != "" && $Page->getCurrentMasterTable() == "y_operator
 <?php
 $Page->renderOtherOptions();
 ?>
+<?php if ($Security->canSearch()) { ?>
+<?php if (!$Page->isExport() && !$Page->CurrentAction) { ?>
+<form name="fmain_transactionslistsrch" id="fmain_transactionslistsrch" class="form-inline ew-form ew-ext-search-form" action="<?= CurrentPageUrl() ?>">
+<div id="fmain_transactionslistsrch-search-panel" class="<?= $Page->SearchPanelClass ?>">
+<input type="hidden" name="cmd" value="search">
+<input type="hidden" name="t" value="main_transactions">
+    <div class="ew-extended-search">
+<div id="xsr_<?= $Page->SearchRowCount + 1 ?>" class="ew-row d-sm-flex">
+    <div class="ew-quick-search input-group">
+        <input type="text" name="<?= Config("TABLE_BASIC_SEARCH") ?>" id="<?= Config("TABLE_BASIC_SEARCH") ?>" class="form-control" value="<?= HtmlEncode($Page->BasicSearch->getKeyword()) ?>" placeholder="<?= HtmlEncode($Language->phrase("Search")) ?>">
+        <input type="hidden" name="<?= Config("TABLE_BASIC_SEARCH_TYPE") ?>" id="<?= Config("TABLE_BASIC_SEARCH_TYPE") ?>" value="<?= HtmlEncode($Page->BasicSearch->getType()) ?>">
+        <div class="input-group-append">
+            <button class="btn btn-primary" name="btn-submit" id="btn-submit" type="submit"><?= $Language->phrase("SearchBtn") ?></button>
+            <button type="button" data-toggle="dropdown" class="btn btn-primary dropdown-toggle dropdown-toggle-split" aria-haspopup="true" aria-expanded="false"><span id="searchtype"><?= $Page->BasicSearch->getTypeNameShort() ?></span></button>
+            <div class="dropdown-menu dropdown-menu-right">
+                <a class="dropdown-item<?php if ($Page->BasicSearch->getType() == "") { ?> active<?php } ?>" href="#" onclick="return ew.setSearchType(this);"><?= $Language->phrase("QuickSearchAuto") ?></a>
+                <a class="dropdown-item<?php if ($Page->BasicSearch->getType() == "=") { ?> active<?php } ?>" href="#" onclick="return ew.setSearchType(this, '=');"><?= $Language->phrase("QuickSearchExact") ?></a>
+                <a class="dropdown-item<?php if ($Page->BasicSearch->getType() == "AND") { ?> active<?php } ?>" href="#" onclick="return ew.setSearchType(this, 'AND');"><?= $Language->phrase("QuickSearchAll") ?></a>
+                <a class="dropdown-item<?php if ($Page->BasicSearch->getType() == "OR") { ?> active<?php } ?>" href="#" onclick="return ew.setSearchType(this, 'OR');"><?= $Language->phrase("QuickSearchAny") ?></a>
+            </div>
+        </div>
+    </div>
+</div>
+    </div><!-- /.ew-extended-search -->
+</div><!-- /.ew-search-panel -->
+</form>
+<?php } ?>
+<?php } ?>
 <?php $Page->showPageHeader(); ?>
 <?php
 $Page->showMessage();
@@ -832,7 +878,12 @@ loadjs.ready("head", function() {
 <?php if ($Page->RowType == ROWTYPE_VIEW) { // View record ?>
 <span id="el<?= $Page->RowCount ?>_main_transactions_visible_status_id">
 <span<?= $Page->visible_status_id->viewAttributes() ?>>
-<?= $Page->visible_status_id->getViewValue() ?></span>
+<?php if (!EmptyString($Page->visible_status_id->getViewValue()) && $Page->visible_status_id->linkAttributes() != "") { ?>
+<a<?= $Page->visible_status_id->linkAttributes() ?>><?= $Page->visible_status_id->getViewValue() ?></a>
+<?php } else { ?>
+<?= $Page->visible_status_id->getViewValue() ?>
+<?php } ?>
+</span>
 </span>
 <?php } ?>
 </td>
@@ -897,7 +948,12 @@ loadjs.ready("head", function() {
 <?php if ($Page->RowType == ROWTYPE_VIEW) { // View record ?>
 <span id="el<?= $Page->RowCount ?>_main_transactions_status_id">
 <span<?= $Page->status_id->viewAttributes() ?>>
-<?= $Page->status_id->getViewValue() ?></span>
+<?php if (!EmptyString($Page->status_id->getViewValue()) && $Page->status_id->linkAttributes() != "") { ?>
+<a<?= $Page->status_id->linkAttributes() ?>><?= $Page->status_id->getViewValue() ?></a>
+<?php } else { ?>
+<?= $Page->status_id->getViewValue() ?>
+<?php } ?>
+</span>
 </span>
 <?php } ?>
 </td>
@@ -962,7 +1018,12 @@ loadjs.ready("head", function() {
 <?php if ($Page->RowType == ROWTYPE_VIEW) { // View record ?>
 <span id="el<?= $Page->RowCount ?>_main_transactions_print_status_id">
 <span<?= $Page->print_status_id->viewAttributes() ?>>
-<?= $Page->print_status_id->getViewValue() ?></span>
+<?php if (!EmptyString($Page->print_status_id->getViewValue()) && $Page->print_status_id->linkAttributes() != "") { ?>
+<a<?= $Page->print_status_id->linkAttributes() ?>><?= $Page->print_status_id->getViewValue() ?></a>
+<?php } else { ?>
+<?= $Page->print_status_id->getViewValue() ?>
+<?php } ?>
+</span>
 </span>
 <?php } ?>
 </td>
@@ -1027,7 +1088,12 @@ loadjs.ready("head", function() {
 <?php if ($Page->RowType == ROWTYPE_VIEW) { // View record ?>
 <span id="el<?= $Page->RowCount ?>_main_transactions_payment_status_id">
 <span<?= $Page->payment_status_id->viewAttributes() ?>>
-<?= $Page->payment_status_id->getViewValue() ?></span>
+<?php if (!EmptyString($Page->payment_status_id->getViewValue()) && $Page->payment_status_id->linkAttributes() != "") { ?>
+<a<?= $Page->payment_status_id->linkAttributes() ?>><?= $Page->payment_status_id->getViewValue() ?></a>
+<?php } else { ?>
+<?= $Page->payment_status_id->getViewValue() ?>
+<?php } ?>
+</span>
 </span>
 <?php } ?>
 </td>

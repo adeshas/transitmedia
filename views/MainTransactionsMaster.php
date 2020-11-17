@@ -103,7 +103,12 @@ $main_transactions = Container("main_transactions");
             <td <?= $main_transactions->visible_status_id->cellAttributes() ?>>
 <span id="el_main_transactions_visible_status_id">
 <span<?= $main_transactions->visible_status_id->viewAttributes() ?>>
-<?= $main_transactions->visible_status_id->getViewValue() ?></span>
+<?php if (!EmptyString($main_transactions->visible_status_id->getViewValue()) && $main_transactions->visible_status_id->linkAttributes() != "") { ?>
+<a<?= $main_transactions->visible_status_id->linkAttributes() ?>><?= $main_transactions->visible_status_id->getViewValue() ?></a>
+<?php } else { ?>
+<?= $main_transactions->visible_status_id->getViewValue() ?>
+<?php } ?>
+</span>
 </span>
 </td>
         </tr>
@@ -114,7 +119,12 @@ $main_transactions = Container("main_transactions");
             <td <?= $main_transactions->status_id->cellAttributes() ?>>
 <span id="el_main_transactions_status_id">
 <span<?= $main_transactions->status_id->viewAttributes() ?>>
-<?= $main_transactions->status_id->getViewValue() ?></span>
+<?php if (!EmptyString($main_transactions->status_id->getViewValue()) && $main_transactions->status_id->linkAttributes() != "") { ?>
+<a<?= $main_transactions->status_id->linkAttributes() ?>><?= $main_transactions->status_id->getViewValue() ?></a>
+<?php } else { ?>
+<?= $main_transactions->status_id->getViewValue() ?>
+<?php } ?>
+</span>
 </span>
 </td>
         </tr>
@@ -125,7 +135,12 @@ $main_transactions = Container("main_transactions");
             <td <?= $main_transactions->print_status_id->cellAttributes() ?>>
 <span id="el_main_transactions_print_status_id">
 <span<?= $main_transactions->print_status_id->viewAttributes() ?>>
-<?= $main_transactions->print_status_id->getViewValue() ?></span>
+<?php if (!EmptyString($main_transactions->print_status_id->getViewValue()) && $main_transactions->print_status_id->linkAttributes() != "") { ?>
+<a<?= $main_transactions->print_status_id->linkAttributes() ?>><?= $main_transactions->print_status_id->getViewValue() ?></a>
+<?php } else { ?>
+<?= $main_transactions->print_status_id->getViewValue() ?>
+<?php } ?>
+</span>
 </span>
 </td>
         </tr>
@@ -136,7 +151,12 @@ $main_transactions = Container("main_transactions");
             <td <?= $main_transactions->payment_status_id->cellAttributes() ?>>
 <span id="el_main_transactions_payment_status_id">
 <span<?= $main_transactions->payment_status_id->viewAttributes() ?>>
-<?= $main_transactions->payment_status_id->getViewValue() ?></span>
+<?php if (!EmptyString($main_transactions->payment_status_id->getViewValue()) && $main_transactions->payment_status_id->linkAttributes() != "") { ?>
+<a<?= $main_transactions->payment_status_id->linkAttributes() ?>><?= $main_transactions->payment_status_id->getViewValue() ?></a>
+<?php } else { ?>
+<?= $main_transactions->payment_status_id->getViewValue() ?>
+<?php } ?>
+</span>
 </span>
 </td>
         </tr>

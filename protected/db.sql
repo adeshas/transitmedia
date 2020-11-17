@@ -5,7 +5,7 @@
 -- Dumped from database version 11.2
 -- Dumped by pg_dump version 11.2
 
--- Started on 2020-11-16 16:05:06
+-- Started on 2020-11-17 14:04:30
 
 SET statement_timeout = 0;
 SET lock_timeout = 0;
@@ -357,7 +357,8 @@ CREATE TABLE public.main_buses (
     bus_status_id integer DEFAULT 1 NOT NULL,
     ts_created timestamp with time zone DEFAULT now() NOT NULL,
     ts_last_update timestamp with time zone DEFAULT now() NOT NULL,
-    bus_depot_id integer
+    bus_depot_id integer,
+    bus_size_id integer
 );
 
 
@@ -2170,65 +2171,47 @@ ALTER TABLE ONLY public.z_price_settings ALTER COLUMN id SET DEFAULT nextval('pu
 -- Data for Name: main_buses; Type: TABLE DATA; Schema: public; Owner: postgres
 --
 
-INSERT INTO public.main_buses VALUES (5, '002', 1, 1, NULL, NULL, 1, '2020-11-02 13:16:18.516647+00', '2020-11-02 13:16:18.516647+00', 1);
-INSERT INTO public.main_buses VALUES (7, '003', 1, 1, NULL, NULL, 1, '2020-11-02 13:19:16.681323+00', '2020-11-02 13:19:16.681323+00', 1);
-INSERT INTO public.main_buses VALUES (9, '005', 3, 2, NULL, NULL, 1, '2020-11-02 13:19:16.681323+00', '2020-11-02 13:19:16.681323+00', 1);
-INSERT INTO public.main_buses VALUES (10, '006', 4, 2, NULL, NULL, 1, '2020-11-02 13:19:16.681323+00', '2020-11-02 13:19:16.681323+00', 1);
-INSERT INTO public.main_buses VALUES (11, '100', 1, 1, NULL, NULL, 1, '2020-11-02 13:23:51.753958+00', '2020-11-02 13:23:51.753958+00', 1);
-INSERT INTO public.main_buses VALUES (12, '101', 1, 1, NULL, NULL, 1, '2020-11-02 13:23:51.753958+00', '2020-11-02 13:23:51.753958+00', 1);
-INSERT INTO public.main_buses VALUES (13, '102', 1, 1, NULL, NULL, 1, '2020-11-02 13:23:51.753958+00', '2020-11-02 13:23:51.753958+00', 1);
-INSERT INTO public.main_buses VALUES (14, '103', 1, 1, NULL, NULL, 1, '2020-11-02 13:23:51.753958+00', '2020-11-02 13:23:51.753958+00', 1);
-INSERT INTO public.main_buses VALUES (15, '104', 1, 1, NULL, NULL, 1, '2020-11-02 13:23:51.753958+00', '2020-11-02 13:23:51.753958+00', 1);
-INSERT INTO public.main_buses VALUES (16, '105', 1, 1, NULL, NULL, 1, '2020-11-02 13:23:51.753958+00', '2020-11-02 13:23:51.753958+00', 1);
-INSERT INTO public.main_buses VALUES (17, '106', 1, 1, NULL, NULL, 1, '2020-11-02 13:23:51.753958+00', '2020-11-02 13:23:51.753958+00', 1);
-INSERT INTO public.main_buses VALUES (18, '107', 1, 1, NULL, NULL, 1, '2020-11-02 13:23:51.753958+00', '2020-11-02 13:23:51.753958+00', 1);
-INSERT INTO public.main_buses VALUES (19, '108', 1, 1, NULL, NULL, 1, '2020-11-02 13:23:51.753958+00', '2020-11-02 13:23:51.753958+00', 1);
-INSERT INTO public.main_buses VALUES (20, '109', 1, 1, NULL, NULL, 1, '2020-11-02 13:23:51.753958+00', '2020-11-02 13:23:51.753958+00', 1);
-INSERT INTO public.main_buses VALUES (21, '110', 1, 1, NULL, NULL, 1, '2020-11-02 13:23:51.753958+00', '2020-11-02 13:23:51.753958+00', 1);
-INSERT INTO public.main_buses VALUES (22, '111', 1, 1, NULL, NULL, 1, '2020-11-02 13:23:51.753958+00', '2020-11-02 13:23:51.753958+00', 1);
-INSERT INTO public.main_buses VALUES (24, '113', 2, 2, NULL, NULL, 1, '2020-11-02 13:23:51.753958+00', '2020-11-02 13:23:51.753958+00', 1);
-INSERT INTO public.main_buses VALUES (26, '115', 2, 2, NULL, NULL, 1, '2020-11-02 13:23:51.753958+00', '2020-11-02 13:23:51.753958+00', 1);
-INSERT INTO public.main_buses VALUES (27, '116', 2, 2, NULL, NULL, 1, '2020-11-02 13:23:51.753958+00', '2020-11-02 13:23:51.753958+00', 1);
-INSERT INTO public.main_buses VALUES (28, '117', 2, 2, NULL, NULL, 1, '2020-11-02 13:23:51.753958+00', '2020-11-02 13:23:51.753958+00', 1);
-INSERT INTO public.main_buses VALUES (29, '118', 2, 2, NULL, NULL, 1, '2020-11-02 13:23:51.753958+00', '2020-11-02 13:23:51.753958+00', 1);
-INSERT INTO public.main_buses VALUES (30, '119', 2, 2, NULL, NULL, 1, '2020-11-02 13:23:51.753958+00', '2020-11-02 13:23:51.753958+00', 1);
-INSERT INTO public.main_buses VALUES (32, '121', 2, 2, NULL, NULL, 1, '2020-11-02 13:23:51.753958+00', '2020-11-02 13:23:51.753958+00', 1);
-INSERT INTO public.main_buses VALUES (33, '122', 2, 2, NULL, NULL, 1, '2020-11-02 13:23:51.753958+00', '2020-11-02 13:23:51.753958+00', 1);
-INSERT INTO public.main_buses VALUES (34, '123', 2, 2, NULL, NULL, 1, '2020-11-02 13:23:51.753958+00', '2020-11-02 13:23:51.753958+00', 1);
-INSERT INTO public.main_buses VALUES (35, '124', 2, 2, NULL, NULL, 1, '2020-11-02 13:23:51.753958+00', '2020-11-02 13:23:51.753958+00', 1);
-INSERT INTO public.main_buses VALUES (36, '125', 3, 2, NULL, NULL, 1, '2020-11-02 13:23:51.753958+00', '2020-11-02 13:23:51.753958+00', 1);
-INSERT INTO public.main_buses VALUES (37, '126', 3, 2, NULL, NULL, 1, '2020-11-02 13:23:51.753958+00', '2020-11-02 13:23:51.753958+00', 1);
-INSERT INTO public.main_buses VALUES (38, '127', 3, 2, NULL, NULL, 1, '2020-11-02 13:23:51.753958+00', '2020-11-02 13:23:51.753958+00', 1);
-INSERT INTO public.main_buses VALUES (39, '128', 3, 2, NULL, NULL, 1, '2020-11-02 13:23:51.753958+00', '2020-11-02 13:23:51.753958+00', 1);
-INSERT INTO public.main_buses VALUES (40, '129', 3, 2, NULL, NULL, 1, '2020-11-02 13:23:51.753958+00', '2020-11-02 13:23:51.753958+00', 1);
-INSERT INTO public.main_buses VALUES (41, '130', 3, 2, NULL, NULL, 1, '2020-11-02 13:23:51.753958+00', '2020-11-02 13:23:51.753958+00', 1);
-INSERT INTO public.main_buses VALUES (42, '131', 3, 2, NULL, NULL, 1, '2020-11-02 13:23:51.753958+00', '2020-11-02 13:23:51.753958+00', 1);
-INSERT INTO public.main_buses VALUES (43, '132', 3, 2, NULL, NULL, 1, '2020-11-02 13:23:51.753958+00', '2020-11-02 13:23:51.753958+00', 1);
-INSERT INTO public.main_buses VALUES (45, '134', 3, 2, NULL, NULL, 1, '2020-11-02 13:23:51.753958+00', '2020-11-02 13:23:51.753958+00', 1);
-INSERT INTO public.main_buses VALUES (46, '135', 3, 2, NULL, NULL, 1, '2020-11-02 13:23:51.753958+00', '2020-11-02 13:23:51.753958+00', 1);
-INSERT INTO public.main_buses VALUES (47, '136', 3, 2, NULL, NULL, 1, '2020-11-02 13:23:51.753958+00', '2020-11-02 13:23:51.753958+00', 1);
-INSERT INTO public.main_buses VALUES (48, '137', 3, 2, NULL, NULL, 1, '2020-11-02 13:23:51.753958+00', '2020-11-02 13:23:51.753958+00', 1);
-INSERT INTO public.main_buses VALUES (49, '138', 3, 2, NULL, NULL, 1, '2020-11-02 13:23:51.753958+00', '2020-11-02 13:23:51.753958+00', 1);
-INSERT INTO public.main_buses VALUES (50, '139', 4, 2, NULL, NULL, 1, '2020-11-02 13:23:51.753958+00', '2020-11-02 13:23:51.753958+00', 1);
-INSERT INTO public.main_buses VALUES (51, '140', 4, 2, NULL, NULL, 1, '2020-11-02 13:23:51.753958+00', '2020-11-02 13:23:51.753958+00', 1);
-INSERT INTO public.main_buses VALUES (52, '141', 4, 2, NULL, NULL, 1, '2020-11-02 13:23:51.753958+00', '2020-11-02 13:23:51.753958+00', 1);
-INSERT INTO public.main_buses VALUES (53, '142', 4, 2, NULL, NULL, 1, '2020-11-02 13:23:51.753958+00', '2020-11-02 13:23:51.753958+00', 1);
-INSERT INTO public.main_buses VALUES (54, '143', 4, 2, NULL, NULL, 1, '2020-11-02 13:23:51.753958+00', '2020-11-02 13:23:51.753958+00', 1);
-INSERT INTO public.main_buses VALUES (55, '144', 4, 2, NULL, NULL, 1, '2020-11-02 13:23:51.753958+00', '2020-11-02 13:23:51.753958+00', 1);
-INSERT INTO public.main_buses VALUES (56, '145', 4, 2, NULL, NULL, 1, '2020-11-02 13:23:51.753958+00', '2020-11-02 13:23:51.753958+00', 1);
-INSERT INTO public.main_buses VALUES (57, '146', 4, 2, NULL, NULL, 1, '2020-11-02 13:23:51.753958+00', '2020-11-02 13:23:51.753958+00', 1);
-INSERT INTO public.main_buses VALUES (58, '147', 4, 2, NULL, NULL, 1, '2020-11-02 13:23:51.753958+00', '2020-11-02 13:23:51.753958+00', 1);
-INSERT INTO public.main_buses VALUES (59, '148', 4, 2, NULL, NULL, 1, '2020-11-02 13:23:51.753958+00', '2020-11-02 13:23:51.753958+00', 1);
-INSERT INTO public.main_buses VALUES (60, '149', 4, 2, NULL, NULL, 1, '2020-11-02 13:23:51.753958+00', '2020-11-02 13:23:51.753958+00', 1);
-INSERT INTO public.main_buses VALUES (61, '150', 4, 2, NULL, 20, 1, '2020-11-02 00:00:00+00', '2020-11-02 00:00:00+00', 1);
-INSERT INTO public.main_buses VALUES (3, '444', 2, 2, 16, 21, 1, '2020-10-24 00:00:00+00', '2020-10-24 00:00:00+00', 1);
-INSERT INTO public.main_buses VALUES (4, '001', 1, 1, NULL, NULL, 1, '2020-10-31 05:37:53.31003+00', '2020-10-31 05:37:53.31003+00', 1);
-INSERT INTO public.main_buses VALUES (2, '333', NULL, 1, NULL, NULL, 1, '2020-10-23 00:00:00+00', '2020-10-29 00:00:00+00', 1);
-INSERT INTO public.main_buses VALUES (44, '133', 3, 2, 128, NULL, 1, '2020-11-02 13:23:51.753958+00', '2020-11-02 13:23:51.753958+00', 1);
-INSERT INTO public.main_buses VALUES (8, '004', 2, 2, 129, NULL, 1, '2020-11-02 13:19:16.681323+00', '2020-11-02 13:19:16.681323+00', 1);
-INSERT INTO public.main_buses VALUES (23, '112', 2, 2, 202, NULL, 1, '2020-11-02 13:23:51.753958+00', '2020-11-02 13:23:51.753958+00', 1);
-INSERT INTO public.main_buses VALUES (31, '120', 2, 2, 202, NULL, 1, '2020-11-02 13:23:51.753958+00', '2020-11-02 13:23:51.753958+00', 1);
-INSERT INTO public.main_buses VALUES (25, '114', 2, 2, 202, NULL, 1, '2020-11-02 13:23:51.753958+00', '2020-11-02 13:23:51.753958+00', 1);
+INSERT INTO public.main_buses VALUES (62, '101260', 2, 2, NULL, NULL, 1, '2020-11-17 12:54:12.861584+00', '2020-11-17 12:54:12.861584+00', 5, NULL);
+INSERT INTO public.main_buses VALUES (63, '101266', 2, 2, NULL, NULL, 1, '2020-11-17 12:54:12.861584+00', '2020-11-17 12:54:12.861584+00', 5, NULL);
+INSERT INTO public.main_buses VALUES (64, '101268', 2, 2, NULL, NULL, 1, '2020-11-17 12:54:12.861584+00', '2020-11-17 12:54:12.861584+00', 5, NULL);
+INSERT INTO public.main_buses VALUES (65, '101280', 2, 2, NULL, NULL, 1, '2020-11-17 12:54:12.861584+00', '2020-11-17 12:54:12.861584+00', 5, NULL);
+INSERT INTO public.main_buses VALUES (66, '101291', 2, 2, NULL, NULL, 1, '2020-11-17 12:54:12.861584+00', '2020-11-17 12:54:12.861584+00', 5, NULL);
+INSERT INTO public.main_buses VALUES (67, '101296', 2, 2, NULL, NULL, 1, '2020-11-17 12:54:12.861584+00', '2020-11-17 12:54:12.861584+00', 5, NULL);
+INSERT INTO public.main_buses VALUES (68, '102025', 2, 2, NULL, NULL, 1, '2020-11-17 12:54:12.861584+00', '2020-11-17 12:54:12.861584+00', 4, NULL);
+INSERT INTO public.main_buses VALUES (69, '102030', 2, 2, NULL, NULL, 1, '2020-11-17 12:54:12.861584+00', '2020-11-17 12:54:12.861584+00', 4, NULL);
+INSERT INTO public.main_buses VALUES (70, '102031', 2, 2, NULL, NULL, 1, '2020-11-17 12:54:12.861584+00', '2020-11-17 12:54:12.861584+00', 4, NULL);
+INSERT INTO public.main_buses VALUES (71, '102034', 2, 2, NULL, NULL, 1, '2020-11-17 12:54:12.861584+00', '2020-11-17 12:54:12.861584+00', 4, NULL);
+INSERT INTO public.main_buses VALUES (72, '102040', 2, 2, NULL, NULL, 1, '2020-11-17 12:54:12.861584+00', '2020-11-17 12:54:12.861584+00', 4, NULL);
+INSERT INTO public.main_buses VALUES (73, '102042', 2, 2, NULL, NULL, 1, '2020-11-17 12:54:12.861584+00', '2020-11-17 12:54:12.861584+00', 4, NULL);
+INSERT INTO public.main_buses VALUES (74, '102055', 2, 2, NULL, NULL, 1, '2020-11-17 12:54:12.861584+00', '2020-11-17 12:54:12.861584+00', 4, NULL);
+INSERT INTO public.main_buses VALUES (75, '102065', 2, 2, NULL, NULL, 1, '2020-11-17 12:54:12.861584+00', '2020-11-17 12:54:12.861584+00', 4, NULL);
+INSERT INTO public.main_buses VALUES (76, '102077', 2, 2, NULL, NULL, 1, '2020-11-17 12:54:12.861584+00', '2020-11-17 12:54:12.861584+00', 4, NULL);
+INSERT INTO public.main_buses VALUES (77, '102092', 2, 2, NULL, NULL, 1, '2020-11-17 12:54:12.861584+00', '2020-11-17 12:54:12.861584+00', 3, NULL);
+INSERT INTO public.main_buses VALUES (78, '102095', 2, 2, NULL, NULL, 1, '2020-11-17 12:54:12.861584+00', '2020-11-17 12:54:12.861584+00', 4, NULL);
+INSERT INTO public.main_buses VALUES (79, '102102', 2, 2, NULL, NULL, 1, '2020-11-17 12:54:12.861584+00', '2020-11-17 12:54:12.861584+00', 4, NULL);
+INSERT INTO public.main_buses VALUES (80, '102108', 2, 2, NULL, NULL, 1, '2020-11-17 12:54:12.861584+00', '2020-11-17 12:54:12.861584+00', 4, NULL);
+INSERT INTO public.main_buses VALUES (81, '102112', 2, 2, NULL, NULL, 1, '2020-11-17 12:54:12.861584+00', '2020-11-17 12:54:12.861584+00', 4, NULL);
+INSERT INTO public.main_buses VALUES (82, '102127', 2, 2, NULL, NULL, 1, '2020-11-17 12:54:12.861584+00', '2020-11-17 12:54:12.861584+00', 4, NULL);
+INSERT INTO public.main_buses VALUES (83, '102157', 2, 2, NULL, NULL, 1, '2020-11-17 12:54:12.861584+00', '2020-11-17 12:54:12.861584+00', 4, NULL);
+INSERT INTO public.main_buses VALUES (84, '102163', 2, 2, NULL, NULL, 1, '2020-11-17 12:54:12.861584+00', '2020-11-17 12:54:12.861584+00', 4, NULL);
+INSERT INTO public.main_buses VALUES (85, '102168', 2, 2, NULL, NULL, 1, '2020-11-17 12:54:12.861584+00', '2020-11-17 12:54:12.861584+00', 4, NULL);
+INSERT INTO public.main_buses VALUES (86, '102194', 2, 2, NULL, NULL, 1, '2020-11-17 12:54:12.861584+00', '2020-11-17 12:54:12.861584+00', 4, NULL);
+INSERT INTO public.main_buses VALUES (87, '102210', 2, 2, NULL, NULL, 1, '2020-11-17 12:54:12.861584+00', '2020-11-17 12:54:12.861584+00', 3, NULL);
+INSERT INTO public.main_buses VALUES (88, '102212', 2, 2, NULL, NULL, 1, '2020-11-17 12:54:12.861584+00', '2020-11-17 12:54:12.861584+00', 3, NULL);
+INSERT INTO public.main_buses VALUES (89, '102213', 2, 2, NULL, NULL, 1, '2020-11-17 12:54:12.861584+00', '2020-11-17 12:54:12.861584+00', 3, NULL);
+INSERT INTO public.main_buses VALUES (90, '102215', 2, 2, NULL, NULL, 1, '2020-11-17 12:54:12.861584+00', '2020-11-17 12:54:12.861584+00', 4, NULL);
+INSERT INTO public.main_buses VALUES (91, '102216', 2, 2, NULL, NULL, 1, '2020-11-17 12:54:12.861584+00', '2020-11-17 12:54:12.861584+00', 4, NULL);
+INSERT INTO public.main_buses VALUES (92, '102217', 2, 2, NULL, NULL, 1, '2020-11-17 12:54:12.861584+00', '2020-11-17 12:54:12.861584+00', 3, NULL);
+INSERT INTO public.main_buses VALUES (93, '102220', 2, 2, NULL, NULL, 1, '2020-11-17 12:54:12.861584+00', '2020-11-17 12:54:12.861584+00', 3, NULL);
+INSERT INTO public.main_buses VALUES (94, '102221', 2, 2, NULL, NULL, 1, '2020-11-17 12:54:12.861584+00', '2020-11-17 12:54:12.861584+00', 4, NULL);
+INSERT INTO public.main_buses VALUES (95, '102222', 2, 2, NULL, NULL, 1, '2020-11-17 12:54:12.861584+00', '2020-11-17 12:54:12.861584+00', 4, NULL);
+INSERT INTO public.main_buses VALUES (96, '102225', 2, 2, NULL, NULL, 1, '2020-11-17 12:54:12.861584+00', '2020-11-17 12:54:12.861584+00', 4, NULL);
+INSERT INTO public.main_buses VALUES (97, '102226', 2, 2, NULL, NULL, 1, '2020-11-17 12:54:12.861584+00', '2020-11-17 12:54:12.861584+00', 3, NULL);
+INSERT INTO public.main_buses VALUES (98, '102228', 2, 2, NULL, NULL, 1, '2020-11-17 12:54:12.861584+00', '2020-11-17 12:54:12.861584+00', 4, NULL);
+INSERT INTO public.main_buses VALUES (99, '102231', 2, 2, NULL, NULL, 1, '2020-11-17 12:54:12.861584+00', '2020-11-17 12:54:12.861584+00', 4, NULL);
+INSERT INTO public.main_buses VALUES (100, '102241', 2, 2, NULL, NULL, 1, '2020-11-17 12:54:12.861584+00', '2020-11-17 12:54:12.861584+00', 4, NULL);
+INSERT INTO public.main_buses VALUES (101, '102244', 2, 2, NULL, NULL, 1, '2020-11-17 12:54:12.861584+00', '2020-11-17 12:54:12.861584+00', 4, NULL);
+INSERT INTO public.main_buses VALUES (102, '102246', 2, 2, NULL, NULL, 1, '2020-11-17 12:54:12.861584+00', '2020-11-17 12:54:12.861584+00', 4, NULL);
 
 
 --
@@ -2279,6 +2262,7 @@ INSERT INTO public.main_campaigns VALUES (198, 1, 1, 1, 9, 7, '2020-11-18', '202
 INSERT INTO public.main_campaigns VALUES (202, 1, 2, 1, 1, 3, '2020-11-18', '2020-12-18', 0, 1, '2020-11-11 11:28:52.964703+00', '2020-11-11 11:28:52.964703+00', 'Max Limited (Large)', 1);
 INSERT INTO public.main_campaigns VALUES (205, 1, 2, 1, 22, 15, '2020-11-26', '2020-12-26', 0, 1, '2020-11-16 14:21:58.233947+00', '2020-11-16 14:21:58.233947+00', 'Yoyo', 1);
 INSERT INTO public.main_campaigns VALUES (199, 1, 1, 1, 9, 7, '2020-11-18', '2020-12-18', 0, 1, '2020-11-11 11:16:46.149271+00', '2020-11-11 11:16:46.149271+00', 'Test Campaign', 1);
+INSERT INTO public.main_campaigns VALUES (206, 1, 1, 1, 9, 10, '2020-11-18', '2020-12-18', 0, 1, '2020-11-16 16:39:16.214133+00', '2020-11-16 16:39:16.214133+00', 'Yore', 1);
 INSERT INTO public.main_campaigns VALUES (121, 1, 1, 1, 9, 10, '2020-11-20', '2020-12-20', 0, 1, '2020-11-04 08:31:41.244053+00', '2020-11-04 08:31:41.244053+00', 'TP3 Campaign', 1);
 INSERT INTO public.main_campaigns VALUES (122, 1, 1, 1, 9, 10, '2020-11-20', '2020-12-20', 0, 1, '2020-11-04 08:32:08.598825+00', '2020-11-04 08:32:08.598825+00', 'TP3 Campaign', 1);
 INSERT INTO public.main_campaigns VALUES (123, 1, 1, 1, 9, 10, '2020-11-20', '2020-12-20', 0, 1, '2020-11-04 08:37:17.976895+00', '2020-11-04 08:37:17.976895+00', 'TP3 Campaign', 1);
@@ -2306,7 +2290,6 @@ INSERT INTO public.main_print_orders VALUES (1, 196, 4, '2020-11-11 03:22:29.760
 -- Data for Name: main_reports; Type: TABLE DATA; Schema: public; Owner: postgres
 --
 
-INSERT INTO public.main_reports VALUES (3, '2020-11-04', '<a href="https://www.flickr.com/photos/137526969@N06/albums/72157716721755923" title="TM REPORT 2020-11-02 POWER OIL"><img src="https://live.staticflickr.com/65535/50560248677_3625e73aca_z.jpg" width="640" height="480" alt="TM REPORT 2020-11-02 POWER OIL" /></a>', NULL, 'First Report', 4, 14, 37, '2020-11-03 11:45:18.860802+00', 1);
 
 
 --
@@ -2364,6 +2347,12 @@ INSERT INTO public.main_users VALUES (-1, 'Admin', NULL, 'admin', 'oehjowruh8weh
 INSERT INTO public.main_users VALUES (3, 'Test Primero LBR', NULL, 'primerolbr', '1234', 'lamata@abc.com', 5, 19);
 INSERT INTO public.main_users VALUES (2, 'Test Primero', NULL, 'primero', '1234', 'primero@abc.com', 5, 14);
 INSERT INTO public.main_users VALUES (19, 'Test Print Manager', NULL, 'printman', '1234', 'ademola.shasanya@valuemedia.com.ng', 7, 15);
+INSERT INTO public.main_users VALUES (20, 'Dokun Balogun', 15, 'provisions', '1234', 'dbalogun@provisionads.com', 0, 2);
+INSERT INTO public.main_users VALUES (21, 'Jeleel Atunwa', 15, 'ninthdayglobal', '1234', 'ninthdayglobal@gmail.com', 0, 12);
+INSERT INTO public.main_users VALUES (23, 'Rocklane', 15, 'adedeji', '1234', 'adedeji@rocklaneassociates.com', 0, 6);
+INSERT INTO public.main_users VALUES (25, 'UlotMedia', 15, 'leye.morafa', '1234', 'leye.morafa@ulotmedia.com', 0, 20);
+INSERT INTO public.main_users VALUES (22, 'UlotMedia', 15, 'ulotmediamail', '1234', 'ulotmediamail@gmail.com', 0, 20);
+INSERT INTO public.main_users VALUES (24, 'Wale Makinde', 15, 'wale.makinde', '1234', 'wale.makinde@n-guagegroup.com', 0, 21);
 
 
 --
@@ -2372,10 +2361,6 @@ INSERT INTO public.main_users VALUES (19, 'Test Print Manager', NULL, 'printman'
 -- Data for Name: sub_media_allocation; Type: TABLE DATA; Schema: public; Owner: postgres
 --
 
-INSERT INTO public.sub_media_allocation VALUES (1, 2, 13, false, NULL, NULL, NULL);
-INSERT INTO public.sub_media_allocation VALUES (2, 3, 12, true, NULL, NULL, NULL);
-INSERT INTO public.sub_media_allocation VALUES (3, 2, 14, true, NULL, NULL, NULL);
-INSERT INTO public.sub_media_allocation VALUES (4, 2, 12, true, NULL, NULL, NULL);
 
 
 --
@@ -2439,6 +2424,9 @@ INSERT INTO public.w_vendors_operators VALUES (6, 14, 1);
 
 INSERT INTO public.x_bus_depot VALUES (1, 'OJOTA / MILE 12');
 INSERT INTO public.x_bus_depot VALUES (2, 'MAJIDUN');
+INSERT INTO public.x_bus_depot VALUES (3, 'OSHODI - AYOBO');
+INSERT INTO public.x_bus_depot VALUES (4, 'OSHODI - ABULE - EGBA');
+INSERT INTO public.x_bus_depot VALUES (5, 'IKOTUN - IKEJA');
 
 
 --
@@ -2555,6 +2543,7 @@ INSERT INTO public.x_user_types VALUES (3, 'Fleet Manager');
 INSERT INTO public.x_user_types VALUES (4, 'Reports Manager');
 INSERT INTO public.x_user_types VALUES (5, 'Operator');
 INSERT INTO public.x_user_types VALUES (6, 'Super Operator (Platform)');
+INSERT INTO public.x_user_types VALUES (7, 'Print Manager');
 
 
 --
@@ -2629,6 +2618,8 @@ INSERT INTO public.y_vendors VALUES (17, 'LBSL');
 INSERT INTO public.y_vendors VALUES (18, 'LAMATA');
 INSERT INTO public.y_vendors VALUES (19, 'PRIMERO LBR');
 INSERT INTO public.y_vendors VALUES (14, 'Primero TSL');
+INSERT INTO public.y_vendors VALUES (20, 'U-Lot Media');
+INSERT INTO public.y_vendors VALUES (21, 'N-Gauge');
 
 
 --
@@ -2894,7 +2885,7 @@ SELECT pg_catalog.setval('public.allocation_id_seq', 4, true);
 -- Name: bus_depot_id_seq; Type: SEQUENCE SET; Schema: public; Owner: postgres
 --
 
-SELECT pg_catalog.setval('public.bus_depot_id_seq', 2, true);
+SELECT pg_catalog.setval('public.bus_depot_id_seq', 5, true);
 
 
 --
@@ -2921,7 +2912,7 @@ SELECT pg_catalog.setval('public.bus_status_id_seq', 1, true);
 -- Name: buses_id_seq; Type: SEQUENCE SET; Schema: public; Owner: postgres
 --
 
-SELECT pg_catalog.setval('public.buses_id_seq', 61, true);
+SELECT pg_catalog.setval('public.buses_id_seq', 102, true);
 
 
 --
@@ -2975,7 +2966,7 @@ SELECT pg_catalog.setval('public.inventory_id_seq', 3, true);
 -- Name: new_campaign_id_seq; Type: SEQUENCE SET; Schema: public; Owner: postgres
 --
 
-SELECT pg_catalog.setval('public.new_campaign_id_seq', 205, true);
+SELECT pg_catalog.setval('public.new_campaign_id_seq', 206, true);
 
 
 --
@@ -3092,7 +3083,7 @@ SELECT pg_catalog.setval('public.transactions_id_seq', 26, true);
 -- Name: user_types_id_seq; Type: SEQUENCE SET; Schema: public; Owner: postgres
 --
 
-SELECT pg_catalog.setval('public.user_types_id_seq', 6, true);
+SELECT pg_catalog.setval('public.user_types_id_seq', 7, true);
 
 
 --
@@ -3101,7 +3092,7 @@ SELECT pg_catalog.setval('public.user_types_id_seq', 6, true);
 -- Name: users_id_seq; Type: SEQUENCE SET; Schema: public; Owner: postgres
 --
 
-SELECT pg_catalog.setval('public.users_id_seq', 19, true);
+SELECT pg_catalog.setval('public.users_id_seq', 25, true);
 
 
 --
@@ -3110,7 +3101,7 @@ SELECT pg_catalog.setval('public.users_id_seq', 19, true);
 -- Name: vendors_id_seq; Type: SEQUENCE SET; Schema: public; Owner: postgres
 --
 
-SELECT pg_catalog.setval('public.vendors_id_seq', 19, true);
+SELECT pg_catalog.setval('public.vendors_id_seq', 21, true);
 
 
 --
@@ -3625,7 +3616,7 @@ ALTER TABLE ONLY public.main_campaigns
     ADD CONSTRAINT pricing_id_fk FOREIGN KEY (price_id) REFERENCES public.z_price_settings(id);
 
 
--- Completed on 2020-11-16 16:05:34
+-- Completed on 2020-11-17 14:04:36
 
 --
 -- PostgreSQL database dump complete

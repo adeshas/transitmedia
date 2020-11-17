@@ -7,6 +7,7 @@ $ViewBusesInteriorList = &$Page;
 ?>
 <?php if (!$Page->isExport()) { ?>
 <script>
+if (!ew.vars.tables.view_buses_interior) ew.vars.tables.view_buses_interior = <?= JsonEncode(GetClientVar("tables", "view_buses_interior")) ?>;
 var currentForm, currentPageID;
 var fview_buses_interiorlist;
 loadjs.ready("head", function () {
@@ -23,7 +24,58 @@ loadjs.ready("head", function () {
     // Form object for search
     fview_buses_interiorlistsrch = currentSearchForm = new ew.Form("fview_buses_interiorlistsrch");
 
+    // Add fields
+    var fields = ew.vars.tables.view_buses_interior.fields;
+    fview_buses_interiorlistsrch.addFields([
+        ["id", [], fields.id.isInvalid],
+        ["number", [], fields.number.isInvalid],
+        ["platform_id", [], fields.platform_id.isInvalid],
+        ["operator_id", [], fields.operator_id.isInvalid],
+        ["interior_campaign_id", [], fields.interior_campaign_id.isInvalid],
+        ["bus_status_id", [], fields.bus_status_id.isInvalid],
+        ["bus_depot_id", [], fields.bus_depot_id.isInvalid],
+        ["vendor_id", [], fields.vendor_id.isInvalid],
+        ["campaign_id", [], fields.campaign_id.isInvalid]
+    ]);
+
+    // Set invalid fields
+    $(function() {
+        fview_buses_interiorlistsrch.setInvalid();
+    });
+
+    // Validate form
+    fview_buses_interiorlistsrch.validate = function () {
+        if (!this.validateRequired)
+            return true; // Ignore validation
+        var fobj = this.getForm(),
+            $fobj = $(fobj),
+            rowIndex = "";
+        $fobj.data("rowindex", rowIndex);
+
+        // Validate fields
+        if (!this.validateFields(rowIndex))
+            return false;
+
+        // Call Form_CustomValidate event
+        if (!this.customValidate(fobj)) {
+            this.focus();
+            return false;
+        }
+        return true;
+    }
+
+    // Form_CustomValidate
+    fview_buses_interiorlistsrch.customValidate = function(fobj) { // DO NOT CHANGE THIS LINE!
+        // Your custom validation code here, return false if invalid.
+        return true;
+    }
+
+    // Use JavaScript validation or not
+    fview_buses_interiorlistsrch.validateRequired = <?= Config("CLIENT_VALIDATE") ? "true" : "false" ?>;
+
     // Dynamic selection lists
+    fview_buses_interiorlistsrch.lists.platform_id = <?= $Page->platform_id->toClientList($Page) ?>;
+    fview_buses_interiorlistsrch.lists.vendor_id = <?= $Page->vendor_id->toClientList($Page) ?>;
 
     // Filters
     fview_buses_interiorlistsrch.filterList = <?= $Page->getFilterList() ?>;
@@ -63,6 +115,158 @@ $Page->renderOtherOptions();
 <input type="hidden" name="cmd" value="search">
 <input type="hidden" name="t" value="view_buses_interior">
     <div class="ew-extended-search">
+<?php
+// Render search row
+$Page->RowType = ROWTYPE_SEARCH;
+$Page->resetAttributes();
+$Page->renderRow();
+?>
+<?php if ($Page->number->Visible) { // number ?>
+    <?php
+        $Page->SearchColumnCount++;
+        if (($Page->SearchColumnCount - 1) % $Page->SearchFieldsPerRow == 0) {
+            $Page->SearchRowCount++;
+    ?>
+<div id="xsr_<?= $Page->SearchRowCount ?>" class="ew-row d-sm-flex">
+    <?php
+        }
+     ?>
+    <div id="xsc_number" class="ew-cell form-group">
+        <label for="x_number" class="ew-search-caption ew-label"><?= $Page->number->caption() ?></label>
+        <span class="ew-search-operator">
+<?= $Language->phrase("LIKE") ?>
+<input type="hidden" name="z_number" id="z_number" value="LIKE">
+</span>
+        <span id="el_view_buses_interior_number" class="ew-search-field">
+<input type="<?= $Page->number->getInputTextType() ?>" data-table="view_buses_interior" data-field="x_number" name="x_number" id="x_number" size="30" placeholder="<?= HtmlEncode($Page->number->getPlaceHolder()) ?>" value="<?= $Page->number->EditValue ?>"<?= $Page->number->editAttributes() ?>>
+<div class="invalid-feedback"><?= $Page->number->getErrorMessage(false) ?></div>
+</span>
+    </div>
+    <?php if ($Page->SearchColumnCount % $Page->SearchFieldsPerRow == 0) { ?>
+</div>
+    <?php } ?>
+<?php } ?>
+<?php if ($Page->platform_id->Visible) { // platform_id ?>
+    <?php
+        $Page->SearchColumnCount++;
+        if (($Page->SearchColumnCount - 1) % $Page->SearchFieldsPerRow == 0) {
+            $Page->SearchRowCount++;
+    ?>
+<div id="xsr_<?= $Page->SearchRowCount ?>" class="ew-row d-sm-flex">
+    <?php
+        }
+     ?>
+    <div id="xsc_platform_id" class="ew-cell form-group">
+        <label for="x_platform_id" class="ew-search-caption ew-label"><?= $Page->platform_id->caption() ?></label>
+        <span class="ew-search-operator">
+<?= $Language->phrase("=") ?>
+<input type="hidden" name="z_platform_id" id="z_platform_id" value="=">
+</span>
+        <span id="el_view_buses_interior_platform_id" class="ew-search-field">
+    <select
+        id="x_platform_id"
+        name="x_platform_id"
+        class="form-control ew-select<?= $Page->platform_id->isInvalidClass() ?>"
+        data-select2-id="view_buses_interior_x_platform_id"
+        data-table="view_buses_interior"
+        data-field="x_platform_id"
+        data-value-separator="<?= $Page->platform_id->displayValueSeparatorAttribute() ?>"
+        data-placeholder="<?= HtmlEncode($Page->platform_id->getPlaceHolder()) ?>"
+        <?= $Page->platform_id->editAttributes() ?>>
+        <?= $Page->platform_id->selectOptionListHtml("x_platform_id") ?>
+    </select>
+    <div class="invalid-feedback"><?= $Page->platform_id->getErrorMessage(false) ?></div>
+<?= $Page->platform_id->Lookup->getParamTag($Page, "p_x_platform_id") ?>
+<script>
+loadjs.ready("head", function() {
+    var el = document.querySelector("select[data-select2-id='view_buses_interior_x_platform_id']"),
+        options = { name: "x_platform_id", selectId: "view_buses_interior_x_platform_id", language: ew.LANGUAGE_ID, dir: ew.IS_RTL ? "rtl" : "ltr" };
+    options.dropdownParent = $(el).closest("#ew-modal-dialog, #ew-add-opt-dialog")[0];
+    Object.assign(options, ew.vars.tables.view_buses_interior.fields.platform_id.selectOptions);
+    ew.createSelect(options);
+});
+</script>
+</span>
+    </div>
+    <?php if ($Page->SearchColumnCount % $Page->SearchFieldsPerRow == 0) { ?>
+</div>
+    <?php } ?>
+<?php } ?>
+<?php if ($Page->vendor_id->Visible) { // vendor_id ?>
+    <?php
+        $Page->SearchColumnCount++;
+        if (($Page->SearchColumnCount - 1) % $Page->SearchFieldsPerRow == 0) {
+            $Page->SearchRowCount++;
+    ?>
+<div id="xsr_<?= $Page->SearchRowCount ?>" class="ew-row d-sm-flex">
+    <?php
+        }
+     ?>
+    <div id="xsc_vendor_id" class="ew-cell form-group">
+        <label for="x_vendor_id" class="ew-search-caption ew-label"><?= $Page->vendor_id->caption() ?></label>
+        <span class="ew-search-operator">
+<?= $Language->phrase("=") ?>
+<input type="hidden" name="z_vendor_id" id="z_vendor_id" value="=">
+</span>
+        <span id="el_view_buses_interior_vendor_id" class="ew-search-field">
+<?php if (!$Security->isAdmin() && $Security->isLoggedIn() && !$Page->userIDAllow($Page->CurrentAction)) { // Non system admin ?>
+    <select
+        id="x_vendor_id"
+        name="x_vendor_id"
+        class="form-control ew-select<?= $Page->vendor_id->isInvalidClass() ?>"
+        data-select2-id="view_buses_interior_x_vendor_id"
+        data-table="view_buses_interior"
+        data-field="x_vendor_id"
+        data-value-separator="<?= $Page->vendor_id->displayValueSeparatorAttribute() ?>"
+        data-placeholder="<?= HtmlEncode($Page->vendor_id->getPlaceHolder()) ?>"
+        <?= $Page->vendor_id->editAttributes() ?>>
+        <?= $Page->vendor_id->selectOptionListHtml("x_vendor_id") ?>
+    </select>
+    <div class="invalid-feedback"><?= $Page->vendor_id->getErrorMessage(false) ?></div>
+<?= $Page->vendor_id->Lookup->getParamTag($Page, "p_x_vendor_id") ?>
+<script>
+loadjs.ready("head", function() {
+    var el = document.querySelector("select[data-select2-id='view_buses_interior_x_vendor_id']"),
+        options = { name: "x_vendor_id", selectId: "view_buses_interior_x_vendor_id", language: ew.LANGUAGE_ID, dir: ew.IS_RTL ? "rtl" : "ltr" };
+    options.dropdownParent = $(el).closest("#ew-modal-dialog, #ew-add-opt-dialog")[0];
+    Object.assign(options, ew.vars.tables.view_buses_interior.fields.vendor_id.selectOptions);
+    ew.createSelect(options);
+});
+</script>
+<?php } else { ?>
+    <select
+        id="x_vendor_id"
+        name="x_vendor_id"
+        class="form-control ew-select<?= $Page->vendor_id->isInvalidClass() ?>"
+        data-select2-id="view_buses_interior_x_vendor_id"
+        data-table="view_buses_interior"
+        data-field="x_vendor_id"
+        data-value-separator="<?= $Page->vendor_id->displayValueSeparatorAttribute() ?>"
+        data-placeholder="<?= HtmlEncode($Page->vendor_id->getPlaceHolder()) ?>"
+        <?= $Page->vendor_id->editAttributes() ?>>
+        <?= $Page->vendor_id->selectOptionListHtml("x_vendor_id") ?>
+    </select>
+    <div class="invalid-feedback"><?= $Page->vendor_id->getErrorMessage(false) ?></div>
+<?= $Page->vendor_id->Lookup->getParamTag($Page, "p_x_vendor_id") ?>
+<script>
+loadjs.ready("head", function() {
+    var el = document.querySelector("select[data-select2-id='view_buses_interior_x_vendor_id']"),
+        options = { name: "x_vendor_id", selectId: "view_buses_interior_x_vendor_id", language: ew.LANGUAGE_ID, dir: ew.IS_RTL ? "rtl" : "ltr" };
+    options.dropdownParent = $(el).closest("#ew-modal-dialog, #ew-add-opt-dialog")[0];
+    Object.assign(options, ew.vars.tables.view_buses_interior.fields.vendor_id.selectOptions);
+    ew.createSelect(options);
+});
+</script>
+<?php } ?>
+</span>
+    </div>
+    <?php if ($Page->SearchColumnCount % $Page->SearchFieldsPerRow == 0) { ?>
+</div>
+    <?php } ?>
+<?php } ?>
+    <?php if ($Page->SearchColumnCount % $Page->SearchFieldsPerRow > 0) { ?>
+</div>
+    <?php } ?>
 <div id="xsr_<?= $Page->SearchRowCount + 1 ?>" class="ew-row d-sm-flex">
     <div class="ew-quick-search input-group">
         <input type="text" name="<?= Config("TABLE_BASIC_SEARCH") ?>" id="<?= Config("TABLE_BASIC_SEARCH") ?>" class="form-control" value="<?= HtmlEncode($Page->BasicSearch->getKeyword()) ?>" placeholder="<?= HtmlEncode($Language->phrase("Search")) ?>">

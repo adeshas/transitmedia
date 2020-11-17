@@ -1835,6 +1835,9 @@ class YPlatformsList extends YPlatforms
     public function pageLoad()
     {
         //Log("Page Load");
+        if(CurrentUserLevel() == 0){
+        	$this->email->Visible = FALSE;
+        }
     }
 
     // Page Unload event
