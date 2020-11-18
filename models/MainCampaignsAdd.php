@@ -1533,10 +1533,6 @@ class MainCampaignsAdd extends MainCampaigns
         if (in_array("sub_media_allocation", $detailTblVar) && $detailPage->DetailAdd) {
             $detailPage->validateGridForm();
         }
-        $detailPage = Container("MainBusesGrid");
-        if (in_array("main_buses", $detailTblVar) && $detailPage->DetailAdd) {
-            $detailPage->validateGridForm();
-        }
         $detailPage = Container("MainTransactionsGrid");
         if (in_array("main_transactions", $detailTblVar) && $detailPage->DetailAdd) {
             $detailPage->validateGridForm();
@@ -1690,18 +1686,6 @@ class MainCampaignsAdd extends MainCampaigns
                 $Security->loadCurrentUserLevel($this->ProjectID . $this->TableName); // Restore user level of master table
                 if (!$addRow) {
                 $detailPage->campaign_id->setSessionValue(""); // Clear master key if insert failed
-                }
-            }
-            $detailPage = Container("MainBusesGrid");
-            if (in_array("main_buses", $detailTblVar) && $detailPage->DetailAdd) {
-                $detailPage->exterior_campaign_id->setSessionValue($this->id->CurrentValue); // Set master key
-                $detailPage->interior_campaign_id->setSessionValue($this->id->CurrentValue); // Set master key
-                $Security->loadCurrentUserLevel($this->ProjectID . "main_buses"); // Load user level of detail table
-                $addRow = $detailPage->gridInsert();
-                $Security->loadCurrentUserLevel($this->ProjectID . $this->TableName); // Restore user level of master table
-                if (!$addRow) {
-                $detailPage->exterior_campaign_id->setSessionValue(""); // Clear master key if insert failed
-                $detailPage->interior_campaign_id->setSessionValue(""); // Clear master key if insert failed
                 }
             }
             $detailPage = Container("MainTransactionsGrid");
@@ -1924,34 +1908,6 @@ class MainCampaignsAdd extends MainCampaigns
                     $detailPageObj->bus_id->setSessionValue(""); // Clear session key
                 }
             }
-            if (in_array("main_buses", $detailTblVar)) {
-                $detailPageObj = Container("MainBusesGrid");
-                if ($detailPageObj->DetailAdd) {
-                    if ($this->CopyRecord) {
-                        $detailPageObj->CurrentMode = "copy";
-                    } else {
-                        $detailPageObj->CurrentMode = "add";
-                    }
-                    if ($this->isConfirm()) {
-                        $detailPageObj->CurrentAction = "confirm";
-                    } else {
-                        $detailPageObj->CurrentAction = "gridadd";
-                    }
-                    if ($this->isCancel()) {
-                        $detailPageObj->EventCancelled = true;
-                    }
-
-                    // Save current master table to detail table
-                    $detailPageObj->setCurrentMasterTable($this->TableVar);
-                    $detailPageObj->setStartRecordNumber(1);
-                    $detailPageObj->exterior_campaign_id->IsDetailKey = true;
-                    $detailPageObj->exterior_campaign_id->CurrentValue = $this->id->CurrentValue;
-                    $detailPageObj->exterior_campaign_id->setSessionValue($detailPageObj->exterior_campaign_id->CurrentValue);
-                    $detailPageObj->interior_campaign_id->IsDetailKey = true;
-                    $detailPageObj->interior_campaign_id->CurrentValue = $this->id->CurrentValue;
-                    $detailPageObj->interior_campaign_id->setSessionValue($detailPageObj->interior_campaign_id->CurrentValue);
-                }
-            }
             if (in_array("main_transactions", $detailTblVar)) {
                 $detailPageObj = Container("MainTransactionsGrid");
                 if ($detailPageObj->DetailAdd) {
@@ -1995,12 +1951,6 @@ class MainCampaignsAdd extends MainCampaigns
             $detailTblVar = explode(",", $detailTblVar);
             if (in_array("sub_media_allocation", $detailTblVar)) {
                 $detailPageObj = Container("SubMediaAllocationGrid");
-                if ($detailPageObj->DetailAdd) {
-                    $detailPageObj->CurrentAction = "gridadd";
-                }
-            }
-            if (in_array("main_buses", $detailTblVar)) {
-                $detailPageObj = Container("MainBusesGrid");
                 if ($detailPageObj->DetailAdd) {
                     $detailPageObj->CurrentAction = "gridadd";
                 }

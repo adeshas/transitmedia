@@ -367,7 +367,7 @@ if (isset($DebugTimer)) {
     </footer>
     <aside class="control-sidebar control-sidebar-light">
          <div class="p-3">
-         <?php echo "CurrentUserLevel = ".CurrentUserLevel(); ?>
+         <?php #echo "CurrentUserLevel = ".CurrentUserLevel(); ?>
          </div>
      </aside>
     <script type="text/html" class="ew-js-template" data-name="myControlSidebar" data-method="prependTo" data-target="#ew-navbar-right" data-seq="10">

@@ -880,6 +880,10 @@ class MainPrintOrdersView extends MainPrintOrders
             $this->available_codes_to_be_assigned->ViewValue = $this->available_codes_to_be_assigned->CurrentValue;
             $this->available_codes_to_be_assigned->ViewCustomAttributes = "";
 
+            // tags
+            $this->tags->ViewValue = $this->tags->CurrentValue;
+            $this->tags->ViewCustomAttributes = "";
+
             // id
             $this->id->LinkCustomAttributes = "";
             $this->id->HrefValue = "";
@@ -942,6 +946,11 @@ class MainPrintOrdersView extends MainPrintOrders
             $this->available_codes_to_be_assigned->LinkCustomAttributes = "";
             $this->available_codes_to_be_assigned->HrefValue = "";
             $this->available_codes_to_be_assigned->TooltipValue = "";
+
+            // tags
+            $this->tags->LinkCustomAttributes = "";
+            $this->tags->HrefValue = "";
+            $this->tags->TooltipValue = "";
         }
 
         // Call Row Rendered event

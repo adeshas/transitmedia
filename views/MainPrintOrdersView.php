@@ -171,6 +171,17 @@ $Page->showMessage();
 </td>
     </tr>
 <?php } ?>
+<?php if ($Page->tags->Visible) { // tags ?>
+    <tr id="r_tags">
+        <td class="<?= $Page->TableLeftColumnClass ?>"><span id="elh_main_print_orders_tags"><?= $Page->tags->caption() ?></span></td>
+        <td data-name="tags" <?= $Page->tags->cellAttributes() ?>>
+<span id="el_main_print_orders_tags">
+<span<?= $Page->tags->viewAttributes() ?>>
+<?= $Page->tags->getViewValue() ?></span>
+</span>
+</td>
+    </tr>
+<?php } ?>
 </table>
 </form>
 <?php

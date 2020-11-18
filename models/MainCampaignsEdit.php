@@ -1668,10 +1668,6 @@ class MainCampaignsEdit extends MainCampaigns
         if (in_array("sub_media_allocation", $detailTblVar) && $detailPage->DetailEdit) {
             $detailPage->validateGridForm();
         }
-        $detailPage = Container("MainBusesGrid");
-        if (in_array("main_buses", $detailTblVar) && $detailPage->DetailEdit) {
-            $detailPage->validateGridForm();
-        }
         $detailPage = Container("MainTransactionsGrid");
         if (in_array("main_transactions", $detailTblVar) && $detailPage->DetailEdit) {
             $detailPage->validateGridForm();
@@ -1768,14 +1764,6 @@ class MainCampaignsEdit extends MainCampaigns
                     $detailPage = Container("SubMediaAllocationGrid");
                     if (in_array("sub_media_allocation", $detailTblVar) && $detailPage->DetailEdit) {
                         $Security->loadCurrentUserLevel($this->ProjectID . "sub_media_allocation"); // Load user level of detail table
-                        $editRow = $detailPage->gridUpdate();
-                        $Security->loadCurrentUserLevel($this->ProjectID . $this->TableName); // Restore user level of master table
-                    }
-                }
-                if ($editRow) {
-                    $detailPage = Container("MainBusesGrid");
-                    if (in_array("main_buses", $detailTblVar) && $detailPage->DetailEdit) {
-                        $Security->loadCurrentUserLevel($this->ProjectID . "main_buses"); // Load user level of detail table
                         $editRow = $detailPage->gridUpdate();
                         $Security->loadCurrentUserLevel($this->ProjectID . $this->TableName); // Restore user level of master table
                     }
@@ -1998,23 +1986,6 @@ class MainCampaignsEdit extends MainCampaigns
                     $detailPageObj->campaign_id->CurrentValue = $this->id->CurrentValue;
                     $detailPageObj->campaign_id->setSessionValue($detailPageObj->campaign_id->CurrentValue);
                     $detailPageObj->bus_id->setSessionValue(""); // Clear session key
-                }
-            }
-            if (in_array("main_buses", $detailTblVar)) {
-                $detailPageObj = Container("MainBusesGrid");
-                if ($detailPageObj->DetailEdit) {
-                    $detailPageObj->CurrentMode = "edit";
-                    $detailPageObj->CurrentAction = "gridedit";
-
-                    // Save current master table to detail table
-                    $detailPageObj->setCurrentMasterTable($this->TableVar);
-                    $detailPageObj->setStartRecordNumber(1);
-                    $detailPageObj->exterior_campaign_id->IsDetailKey = true;
-                    $detailPageObj->exterior_campaign_id->CurrentValue = $this->id->CurrentValue;
-                    $detailPageObj->exterior_campaign_id->setSessionValue($detailPageObj->exterior_campaign_id->CurrentValue);
-                    $detailPageObj->interior_campaign_id->IsDetailKey = true;
-                    $detailPageObj->interior_campaign_id->CurrentValue = $this->id->CurrentValue;
-                    $detailPageObj->interior_campaign_id->setSessionValue($detailPageObj->interior_campaign_id->CurrentValue);
                 }
             }
             if (in_array("main_transactions", $detailTblVar)) {

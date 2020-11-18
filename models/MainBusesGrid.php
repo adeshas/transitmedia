@@ -486,6 +486,7 @@ class MainBusesGrid extends MainBuses
         $this->bus_depot_id->setVisibility();
         $this->ts_created->Visible = false;
         $this->ts_last_update->Visible = false;
+        $this->bus_size_id->setVisibility();
         $this->hideFieldsForAddEdit();
 
         // Global Page Loading event (in userfn*.php)
@@ -509,6 +510,7 @@ class MainBusesGrid extends MainBuses
         $this->setupLookupOptions($this->interior_campaign_id);
         $this->setupLookupOptions($this->bus_status_id);
         $this->setupLookupOptions($this->bus_depot_id);
+        $this->setupLookupOptions($this->bus_size_id);
 
         // Search filters
         $srchAdvanced = ""; // Advanced search filter
@@ -942,6 +944,9 @@ class MainBusesGrid extends MainBuses
         if ($CurrentForm->hasValue("x_bus_depot_id") && $CurrentForm->hasValue("o_bus_depot_id") && $this->bus_depot_id->CurrentValue != $this->bus_depot_id->OldValue) {
             return false;
         }
+        if ($CurrentForm->hasValue("x_bus_size_id") && $CurrentForm->hasValue("o_bus_size_id") && $this->bus_size_id->CurrentValue != $this->bus_size_id->OldValue) {
+            return false;
+        }
         return true;
     }
 
@@ -1031,6 +1036,7 @@ class MainBusesGrid extends MainBuses
         $this->interior_campaign_id->clearErrorMessage();
         $this->bus_status_id->clearErrorMessage();
         $this->bus_depot_id->clearErrorMessage();
+        $this->bus_size_id->clearErrorMessage();
     }
 
     // Set up sort parameters
@@ -1311,6 +1317,8 @@ class MainBusesGrid extends MainBuses
         $this->ts_created->OldValue = $this->ts_created->CurrentValue;
         $this->ts_last_update->CurrentValue = null;
         $this->ts_last_update->OldValue = $this->ts_last_update->CurrentValue;
+        $this->bus_size_id->CurrentValue = null;
+        $this->bus_size_id->OldValue = $this->bus_size_id->CurrentValue;
     }
 
     // Load form values
@@ -1416,6 +1424,19 @@ class MainBusesGrid extends MainBuses
         if ($CurrentForm->hasValue("o_bus_depot_id")) {
             $this->bus_depot_id->setOldValue($CurrentForm->getValue("o_bus_depot_id"));
         }
+
+        // Check field name 'bus_size_id' first before field var 'x_bus_size_id'
+        $val = $CurrentForm->hasValue("bus_size_id") ? $CurrentForm->getValue("bus_size_id") : $CurrentForm->getValue("x_bus_size_id");
+        if (!$this->bus_size_id->IsDetailKey) {
+            if (IsApi() && $val === null) {
+                $this->bus_size_id->Visible = false; // Disable update for API request
+            } else {
+                $this->bus_size_id->setFormValue($val);
+            }
+        }
+        if ($CurrentForm->hasValue("o_bus_size_id")) {
+            $this->bus_size_id->setOldValue($CurrentForm->getValue("o_bus_size_id"));
+        }
     }
 
     // Restore form values
@@ -1432,6 +1453,7 @@ class MainBusesGrid extends MainBuses
         $this->interior_campaign_id->CurrentValue = $this->interior_campaign_id->FormValue;
         $this->bus_status_id->CurrentValue = $this->bus_status_id->FormValue;
         $this->bus_depot_id->CurrentValue = $this->bus_depot_id->FormValue;
+        $this->bus_size_id->CurrentValue = $this->bus_size_id->FormValue;
     }
 
     // Load recordset
@@ -1512,6 +1534,7 @@ class MainBusesGrid extends MainBuses
         $this->bus_depot_id->setDbValue($row['bus_depot_id']);
         $this->ts_created->setDbValue($row['ts_created']);
         $this->ts_last_update->setDbValue($row['ts_last_update']);
+        $this->bus_size_id->setDbValue($row['bus_size_id']);
     }
 
     // Return a row with default values
@@ -1529,6 +1552,7 @@ class MainBusesGrid extends MainBuses
         $row['bus_depot_id'] = $this->bus_depot_id->CurrentValue;
         $row['ts_created'] = $this->ts_created->CurrentValue;
         $row['ts_last_update'] = $this->ts_last_update->CurrentValue;
+        $row['bus_size_id'] = $this->bus_size_id->CurrentValue;
         return $row;
     }
 
@@ -1585,6 +1609,8 @@ class MainBusesGrid extends MainBuses
         // ts_created
 
         // ts_last_update
+
+        // bus_size_id
         if ($this->RowType == ROWTYPE_VIEW) {
             // id
             $this->id->ViewValue = $this->id->CurrentValue;
@@ -1738,6 +1764,27 @@ class MainBusesGrid extends MainBuses
             $this->ts_last_update->ViewValue = FormatDateTime($this->ts_last_update->ViewValue, 0);
             $this->ts_last_update->ViewCustomAttributes = "";
 
+            // bus_size_id
+            $curVal = strval($this->bus_size_id->CurrentValue);
+            if ($curVal != "") {
+                $this->bus_size_id->ViewValue = $this->bus_size_id->lookupCacheOption($curVal);
+                if ($this->bus_size_id->ViewValue === null) { // Lookup from database
+                    $filterWrk = "\"id\"" . SearchString("=", $curVal, DATATYPE_NUMBER, "");
+                    $sqlWrk = $this->bus_size_id->Lookup->getSql(false, $filterWrk, '', $this, true);
+                    $rswrk = Conn()->executeQuery($sqlWrk)->fetchAll(\PDO::FETCH_BOTH);
+                    $ari = count($rswrk);
+                    if ($ari > 0) { // Lookup values found
+                        $arwrk = $this->bus_size_id->Lookup->renderViewRow($rswrk[0]);
+                        $this->bus_size_id->ViewValue = $this->bus_size_id->displayValue($arwrk);
+                    } else {
+                        $this->bus_size_id->ViewValue = $this->bus_size_id->CurrentValue;
+                    }
+                }
+            } else {
+                $this->bus_size_id->ViewValue = null;
+            }
+            $this->bus_size_id->ViewCustomAttributes = "";
+
             // id
             $this->id->LinkCustomAttributes = "";
             $this->id->HrefValue = "";
@@ -1777,6 +1824,11 @@ class MainBusesGrid extends MainBuses
             $this->bus_depot_id->LinkCustomAttributes = "";
             $this->bus_depot_id->HrefValue = "";
             $this->bus_depot_id->TooltipValue = "";
+
+            // bus_size_id
+            $this->bus_size_id->LinkCustomAttributes = "";
+            $this->bus_size_id->HrefValue = "";
+            $this->bus_size_id->TooltipValue = "";
         } elseif ($this->RowType == ROWTYPE_ADD) {
             // id
 
@@ -2009,6 +2061,31 @@ class MainBusesGrid extends MainBuses
             }
             $this->bus_depot_id->PlaceHolder = RemoveHtml($this->bus_depot_id->caption());
 
+            // bus_size_id
+            $this->bus_size_id->EditAttrs["class"] = "form-control";
+            $this->bus_size_id->EditCustomAttributes = "";
+            $curVal = trim(strval($this->bus_size_id->CurrentValue));
+            if ($curVal != "") {
+                $this->bus_size_id->ViewValue = $this->bus_size_id->lookupCacheOption($curVal);
+            } else {
+                $this->bus_size_id->ViewValue = $this->bus_size_id->Lookup !== null && is_array($this->bus_size_id->Lookup->Options) ? $curVal : null;
+            }
+            if ($this->bus_size_id->ViewValue !== null) { // Load from cache
+                $this->bus_size_id->EditValue = array_values($this->bus_size_id->Lookup->Options);
+            } else { // Lookup from database
+                if ($curVal == "") {
+                    $filterWrk = "0=1";
+                } else {
+                    $filterWrk = "\"id\"" . SearchString("=", $this->bus_size_id->CurrentValue, DATATYPE_NUMBER, "");
+                }
+                $sqlWrk = $this->bus_size_id->Lookup->getSql(true, $filterWrk, '', $this);
+                $rswrk = Conn()->executeQuery($sqlWrk)->fetchAll(\PDO::FETCH_BOTH);
+                $ari = count($rswrk);
+                $arwrk = $rswrk;
+                $this->bus_size_id->EditValue = $arwrk;
+            }
+            $this->bus_size_id->PlaceHolder = RemoveHtml($this->bus_size_id->caption());
+
             // Add refer script
 
             // id
@@ -2042,6 +2119,10 @@ class MainBusesGrid extends MainBuses
             // bus_depot_id
             $this->bus_depot_id->LinkCustomAttributes = "";
             $this->bus_depot_id->HrefValue = "";
+
+            // bus_size_id
+            $this->bus_size_id->LinkCustomAttributes = "";
+            $this->bus_size_id->HrefValue = "";
         } elseif ($this->RowType == ROWTYPE_EDIT) {
             // id
             $this->id->EditAttrs["class"] = "form-control";
@@ -2278,6 +2359,31 @@ class MainBusesGrid extends MainBuses
             }
             $this->bus_depot_id->PlaceHolder = RemoveHtml($this->bus_depot_id->caption());
 
+            // bus_size_id
+            $this->bus_size_id->EditAttrs["class"] = "form-control";
+            $this->bus_size_id->EditCustomAttributes = "";
+            $curVal = trim(strval($this->bus_size_id->CurrentValue));
+            if ($curVal != "") {
+                $this->bus_size_id->ViewValue = $this->bus_size_id->lookupCacheOption($curVal);
+            } else {
+                $this->bus_size_id->ViewValue = $this->bus_size_id->Lookup !== null && is_array($this->bus_size_id->Lookup->Options) ? $curVal : null;
+            }
+            if ($this->bus_size_id->ViewValue !== null) { // Load from cache
+                $this->bus_size_id->EditValue = array_values($this->bus_size_id->Lookup->Options);
+            } else { // Lookup from database
+                if ($curVal == "") {
+                    $filterWrk = "0=1";
+                } else {
+                    $filterWrk = "\"id\"" . SearchString("=", $this->bus_size_id->CurrentValue, DATATYPE_NUMBER, "");
+                }
+                $sqlWrk = $this->bus_size_id->Lookup->getSql(true, $filterWrk, '', $this);
+                $rswrk = Conn()->executeQuery($sqlWrk)->fetchAll(\PDO::FETCH_BOTH);
+                $ari = count($rswrk);
+                $arwrk = $rswrk;
+                $this->bus_size_id->EditValue = $arwrk;
+            }
+            $this->bus_size_id->PlaceHolder = RemoveHtml($this->bus_size_id->caption());
+
             // Edit refer script
 
             // id
@@ -2311,6 +2417,10 @@ class MainBusesGrid extends MainBuses
             // bus_depot_id
             $this->bus_depot_id->LinkCustomAttributes = "";
             $this->bus_depot_id->HrefValue = "";
+
+            // bus_size_id
+            $this->bus_size_id->LinkCustomAttributes = "";
+            $this->bus_size_id->HrefValue = "";
         }
         if ($this->RowType == ROWTYPE_ADD || $this->RowType == ROWTYPE_EDIT || $this->RowType == ROWTYPE_SEARCH) { // Add/Edit/Search row
             $this->setupFieldTitles();
@@ -2369,6 +2479,11 @@ class MainBusesGrid extends MainBuses
         if ($this->bus_depot_id->Required) {
             if (!$this->bus_depot_id->IsDetailKey && EmptyValue($this->bus_depot_id->FormValue)) {
                 $this->bus_depot_id->addErrorMessage(str_replace("%s", $this->bus_depot_id->caption(), $this->bus_depot_id->RequiredErrorMessage));
+            }
+        }
+        if ($this->bus_size_id->Required) {
+            if (!$this->bus_size_id->IsDetailKey && EmptyValue($this->bus_size_id->FormValue)) {
+                $this->bus_size_id->addErrorMessage(str_replace("%s", $this->bus_size_id->caption(), $this->bus_size_id->RequiredErrorMessage));
             }
         }
 
@@ -2517,6 +2632,9 @@ class MainBusesGrid extends MainBuses
             // bus_depot_id
             $this->bus_depot_id->setDbValueDef($rsnew, $this->bus_depot_id->CurrentValue, null, $this->bus_depot_id->ReadOnly);
 
+            // bus_size_id
+            $this->bus_size_id->setDbValueDef($rsnew, $this->bus_size_id->CurrentValue, null, $this->bus_size_id->ReadOnly);
+
             // Call Row Updating event
             $updateRow = $this->rowUpdating($rsold, $rsnew);
             if ($updateRow) {
@@ -2637,6 +2755,9 @@ class MainBusesGrid extends MainBuses
         // bus_depot_id
         $this->bus_depot_id->setDbValueDef($rsnew, $this->bus_depot_id->CurrentValue, null, false);
 
+        // bus_size_id
+        $this->bus_size_id->setDbValueDef($rsnew, $this->bus_size_id->CurrentValue, null, false);
+
         // Call Row Inserting event
         $insertRow = $this->rowInserting($rsold, $rsnew);
         if ($insertRow) {
@@ -2723,6 +2844,8 @@ class MainBusesGrid extends MainBuses
                 case "x_bus_status_id":
                     break;
                 case "x_bus_depot_id":
+                    break;
+                case "x_bus_size_id":
                     break;
                 default:
                     $lookupFilter = "";

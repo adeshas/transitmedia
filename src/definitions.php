@@ -110,12 +110,11 @@ return [
     "usertable" => \DI\get("main_users"),
 
     // Detail table pages
-    "SubMediaAllocationGrid" => \DI\create(SubMediaAllocationGrid::class),
     "MainUsersGrid" => \DI\create(MainUsersGrid::class),
-    "MainBusesGrid" => \DI\create(MainBusesGrid::class),
+    "SubMediaAllocationGrid" => \DI\create(SubMediaAllocationGrid::class),
     "MainCampaignsGrid" => \DI\create(MainCampaignsGrid::class),
-    "SubTransactionDetailsGrid" => \DI\create(SubTransactionDetailsGrid::class),
     "YOperatorsGrid" => \DI\create(YOperatorsGrid::class),
     "MainTransactionsGrid" => \DI\create(MainTransactionsGrid::class),
     "ViewBusesAssignedGrid" => \DI\create(ViewBusesAssignedGrid::class),
+    "SubTransactionDetailsGrid" => \DI\create(SubTransactionDetailsGrid::class),
 ];

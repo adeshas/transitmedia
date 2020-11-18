@@ -183,16 +183,16 @@ class SubMediaAllocation extends DbTable
     {
         // Master filter
         $masterFilter = "";
-        if ($this->getCurrentMasterTable() == "main_buses") {
-            if ($this->bus_id->getSessionValue() != "") {
-                $masterFilter .= "" . GetForeignKeySql("\"id\"", $this->bus_id->getSessionValue(), DATATYPE_NUMBER, "DB");
+        if ($this->getCurrentMasterTable() == "main_campaigns") {
+            if ($this->campaign_id->getSessionValue() != "") {
+                $masterFilter .= "" . GetForeignKeySql("\"id\"", $this->campaign_id->getSessionValue(), DATATYPE_NUMBER, "DB");
             } else {
                 return "";
             }
         }
-        if ($this->getCurrentMasterTable() == "main_campaigns") {
-            if ($this->campaign_id->getSessionValue() != "") {
-                $masterFilter .= "" . GetForeignKeySql("\"id\"", $this->campaign_id->getSessionValue(), DATATYPE_NUMBER, "DB");
+        if ($this->getCurrentMasterTable() == "main_buses") {
+            if ($this->bus_id->getSessionValue() != "") {
+                $masterFilter .= "" . GetForeignKeySql("\"id\"", $this->bus_id->getSessionValue(), DATATYPE_NUMBER, "DB");
             } else {
                 return "";
             }
@@ -205,13 +205,6 @@ class SubMediaAllocation extends DbTable
     {
         // Detail filter
         $detailFilter = "";
-        if ($this->getCurrentMasterTable() == "main_buses") {
-            if ($this->bus_id->getSessionValue() != "") {
-                $detailFilter .= "" . GetForeignKeySql("\"bus_id\"", $this->bus_id->getSessionValue(), DATATYPE_NUMBER, "DB");
-            } else {
-                return "";
-            }
-        }
         if ($this->getCurrentMasterTable() == "main_campaigns") {
             if ($this->campaign_id->getSessionValue() != "") {
                 $detailFilter .= "" . GetForeignKeySql("\"campaign_id\"", $this->campaign_id->getSessionValue(), DATATYPE_NUMBER, "DB");
@@ -219,18 +212,14 @@ class SubMediaAllocation extends DbTable
                 return "";
             }
         }
+        if ($this->getCurrentMasterTable() == "main_buses") {
+            if ($this->bus_id->getSessionValue() != "") {
+                $detailFilter .= "" . GetForeignKeySql("\"bus_id\"", $this->bus_id->getSessionValue(), DATATYPE_NUMBER, "DB");
+            } else {
+                return "";
+            }
+        }
         return $detailFilter;
-    }
-
-    // Master filter
-    public function sqlMasterFilter_main_buses()
-    {
-        return "\"id\"=@id@";
-    }
-    // Detail filter
-    public function sqlDetailFilter_main_buses()
-    {
-        return "\"bus_id\"=@bus_id@";
     }
 
     // Master filter
@@ -242,6 +231,17 @@ class SubMediaAllocation extends DbTable
     public function sqlDetailFilter_main_campaigns()
     {
         return "\"campaign_id\"=@campaign_id@";
+    }
+
+    // Master filter
+    public function sqlMasterFilter_main_buses()
+    {
+        return "\"id\"=@id@";
+    }
+    // Detail filter
+    public function sqlDetailFilter_main_buses()
+    {
+        return "\"bus_id\"=@bus_id@";
     }
 
     // Table level SQL
@@ -344,11 +344,11 @@ class SubMediaAllocation extends DbTable
         global $Security;
         // Add User ID filter
         if ($Security->currentUserID() != "" && !$Security->isAdmin()) { // Non system admin
-            if ($this->getCurrentMasterTable() == "main_buses" || $this->getCurrentMasterTable() == "") {
-                $filter = $this->addDetailUserIDFilter($filter, "main_buses"); // Add detail User ID filter
-            }
             if ($this->getCurrentMasterTable() == "main_campaigns" || $this->getCurrentMasterTable() == "") {
                 $filter = $this->addDetailUserIDFilter($filter, "main_campaigns"); // Add detail User ID filter
+            }
+            if ($this->getCurrentMasterTable() == "main_buses" || $this->getCurrentMasterTable() == "") {
+                $filter = $this->addDetailUserIDFilter($filter, "main_buses"); // Add detail User ID filter
             }
         }
         return $filter;
@@ -812,13 +812,13 @@ class SubMediaAllocation extends DbTable
     // Add master url
     public function addMasterUrl($url)
     {
-        if ($this->getCurrentMasterTable() == "main_buses" && !ContainsString($url, Config("TABLE_SHOW_MASTER") . "=")) {
-            $url .= (ContainsString($url, "?") ? "&" : "?") . Config("TABLE_SHOW_MASTER") . "=" . $this->getCurrentMasterTable();
-            $url .= "&" . GetForeignKeyUrl("fk_id", $this->bus_id->CurrentValue);
-        }
         if ($this->getCurrentMasterTable() == "main_campaigns" && !ContainsString($url, Config("TABLE_SHOW_MASTER") . "=")) {
             $url .= (ContainsString($url, "?") ? "&" : "?") . Config("TABLE_SHOW_MASTER") . "=" . $this->getCurrentMasterTable();
             $url .= "&" . GetForeignKeyUrl("fk_id", $this->campaign_id->CurrentValue);
+        }
+        if ($this->getCurrentMasterTable() == "main_buses" && !ContainsString($url, Config("TABLE_SHOW_MASTER") . "=")) {
+            $url .= (ContainsString($url, "?") ? "&" : "?") . Config("TABLE_SHOW_MASTER") . "=" . $this->getCurrentMasterTable();
+            $url .= "&" . GetForeignKeyUrl("fk_id", $this->bus_id->CurrentValue);
         }
         return $url;
     }

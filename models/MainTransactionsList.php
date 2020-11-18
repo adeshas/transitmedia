@@ -1783,7 +1783,11 @@ class MainTransactionsList extends MainTransactions
     protected function basicSearchSql($arKeywords, $type)
     {
         $where = "";
-        $this->buildBasicSearchSql($where, $this->payment_status_id, $arKeywords, $type);
+        $this->buildBasicSearchSql($where, $this->campaign_id, $arKeywords, $type);
+        $this->buildBasicSearchSql($where, $this->operator_id, $arKeywords, $type);
+        $this->buildBasicSearchSql($where, $this->payment_date, $arKeywords, $type);
+        $this->buildBasicSearchSql($where, $this->price_id, $arKeywords, $type);
+        $this->buildBasicSearchSql($where, $this->quantity, $arKeywords, $type);
         return $where;
     }
 

@@ -706,43 +706,6 @@ class MainCampaignsView extends MainCampaigns
             $item->Visible = false;
         }
 
-        // "detail_main_buses"
-        $item = &$option->add("detail_main_buses");
-        $body = $Language->phrase("ViewPageDetailLink") . $Language->TablePhrase("main_buses", "TblCaption");
-        $body = "<a class=\"btn btn-default ew-row-link ew-detail\" data-action=\"list\" href=\"" . HtmlEncode(GetUrl("mainbuseslist?" . Config("TABLE_SHOW_MASTER") . "=main_campaigns&" . GetForeignKeyUrl("fk_id", $this->id->CurrentValue) . "&" . GetForeignKeyUrl("fk_id", $this->id->CurrentValue) . "")) . "\">" . $body . "</a>";
-        $links = "";
-        $detailPageObj = Container("MainBusesGrid");
-        if ($detailPageObj->DetailView && $Security->canView() && $Security->allowView(CurrentProjectID() . 'main_campaigns')) {
-            $links .= "<li><a class=\"dropdown-item ew-row-link ew-detail-view\" data-action=\"view\" data-caption=\"" . HtmlTitle($Language->phrase("MasterDetailViewLink")) . "\" href=\"" . HtmlEncode(GetUrl($this->getViewUrl(Config("TABLE_SHOW_DETAIL") . "=main_buses"))) . "\">" . HtmlImageAndText($Language->phrase("MasterDetailViewLink")) . "</a></li>";
-            if ($detailViewTblVar != "") {
-                $detailViewTblVar .= ",";
-            }
-            $detailViewTblVar .= "main_buses";
-        }
-        if ($detailPageObj->DetailEdit && $Security->canEdit() && $Security->allowEdit(CurrentProjectID() . 'main_campaigns')) {
-            $links .= "<li><a class=\"dropdown-item ew-row-link ew-detail-edit\" data-action=\"edit\" data-caption=\"" . HtmlTitle($Language->phrase("MasterDetailEditLink")) . "\" href=\"" . HtmlEncode(GetUrl($this->getEditUrl(Config("TABLE_SHOW_DETAIL") . "=main_buses"))) . "\">" . HtmlImageAndText($Language->phrase("MasterDetailEditLink")) . "</a></li>";
-            if ($detailEditTblVar != "") {
-                $detailEditTblVar .= ",";
-            }
-            $detailEditTblVar .= "main_buses";
-        }
-        if ($links != "") {
-            $body .= "<button class=\"dropdown-toggle btn btn-default ew-detail\" data-toggle=\"dropdown\"></button>";
-            $body .= "<ul class=\"dropdown-menu\">" . $links . "</ul>";
-        }
-        $body = "<div class=\"btn-group btn-group-sm ew-btn-group\">" . $body . "</div>";
-        $item->Body = $body;
-        $item->Visible = $Security->allowList(CurrentProjectID() . 'main_buses');
-        if ($item->Visible) {
-            if ($detailTableLink != "") {
-                $detailTableLink .= ",";
-            }
-            $detailTableLink .= "main_buses";
-        }
-        if ($this->ShowMultipleDetails) {
-            $item->Visible = false;
-        }
-
         // "detail_main_transactions"
         $item = &$option->add("detail_main_transactions");
         $body = $Language->phrase("ViewPageDetailLink") . $Language->TablePhrase("main_transactions", "TblCaption");
@@ -1390,22 +1353,6 @@ class MainCampaignsView extends MainCampaigns
                     $detailPageObj->campaign_id->CurrentValue = $this->id->CurrentValue;
                     $detailPageObj->campaign_id->setSessionValue($detailPageObj->campaign_id->CurrentValue);
                     $detailPageObj->bus_id->setSessionValue(""); // Clear session key
-                }
-            }
-            if (in_array("main_buses", $detailTblVar)) {
-                $detailPageObj = Container("MainBusesGrid");
-                if ($detailPageObj->DetailView) {
-                    $detailPageObj->CurrentMode = "view";
-
-                    // Save current master table to detail table
-                    $detailPageObj->setCurrentMasterTable($this->TableVar);
-                    $detailPageObj->setStartRecordNumber(1);
-                    $detailPageObj->exterior_campaign_id->IsDetailKey = true;
-                    $detailPageObj->exterior_campaign_id->CurrentValue = $this->id->CurrentValue;
-                    $detailPageObj->exterior_campaign_id->setSessionValue($detailPageObj->exterior_campaign_id->CurrentValue);
-                    $detailPageObj->interior_campaign_id->IsDetailKey = true;
-                    $detailPageObj->interior_campaign_id->CurrentValue = $this->id->CurrentValue;
-                    $detailPageObj->interior_campaign_id->setSessionValue($detailPageObj->interior_campaign_id->CurrentValue);
                 }
             }
             if (in_array("main_transactions", $detailTblVar)) {

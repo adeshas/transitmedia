@@ -114,13 +114,13 @@ $Page->showMessage();
 <input type="hidden" name="action" id="action" value="insert">
 <input type="hidden" name="modal" value="<?= (int)$Page->IsModal ?>">
 <input type="hidden" name="<?= $Page->OldKeyName ?>" value="<?= $Page->OldKey ?>">
-<?php if ($Page->getCurrentMasterTable() == "main_buses") { ?>
-<input type="hidden" name="<?= Config("TABLE_SHOW_MASTER") ?>" value="main_buses">
-<input type="hidden" name="fk_id" value="<?= HtmlEncode($Page->bus_id->getSessionValue()) ?>">
-<?php } ?>
 <?php if ($Page->getCurrentMasterTable() == "main_campaigns") { ?>
 <input type="hidden" name="<?= Config("TABLE_SHOW_MASTER") ?>" value="main_campaigns">
 <input type="hidden" name="fk_id" value="<?= HtmlEncode($Page->campaign_id->getSessionValue()) ?>">
+<?php } ?>
+<?php if ($Page->getCurrentMasterTable() == "main_buses") { ?>
+<input type="hidden" name="<?= Config("TABLE_SHOW_MASTER") ?>" value="main_buses">
+<input type="hidden" name="fk_id" value="<?= HtmlEncode($Page->bus_id->getSessionValue()) ?>">
 <?php } ?>
 <div class="ew-add-div"><!-- page* -->
 <?php if ($Page->bus_id->Visible) { // bus_id ?>

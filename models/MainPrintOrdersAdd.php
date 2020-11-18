@@ -446,8 +446,8 @@ class MainPrintOrdersAdd extends MainPrintOrders
         $this->comments->setVisibility();
         $this->all_codes_assigned_in_campaign->Visible = false;
         $this->bus_codes->Visible = false;
-        $this->available_codes_to_be_assigned->Visible = false;
-        $this->tags->Visible = false;
+        $this->available_codes_to_be_assigned->setVisibility();
+        $this->tags->setVisibility();
         $this->hideFieldsForAddEdit();
 
         // Do not use lookup cache
@@ -666,6 +666,26 @@ class MainPrintOrdersAdd extends MainPrintOrders
             }
         }
 
+        // Check field name 'available_codes_to_be_assigned' first before field var 'x_available_codes_to_be_assigned'
+        $val = $CurrentForm->hasValue("available_codes_to_be_assigned") ? $CurrentForm->getValue("available_codes_to_be_assigned") : $CurrentForm->getValue("x_available_codes_to_be_assigned");
+        if (!$this->available_codes_to_be_assigned->IsDetailKey) {
+            if (IsApi() && $val === null) {
+                $this->available_codes_to_be_assigned->Visible = false; // Disable update for API request
+            } else {
+                $this->available_codes_to_be_assigned->setFormValue($val);
+            }
+        }
+
+        // Check field name 'tags' first before field var 'x_tags'
+        $val = $CurrentForm->hasValue("tags") ? $CurrentForm->getValue("tags") : $CurrentForm->getValue("x_tags");
+        if (!$this->tags->IsDetailKey) {
+            if (IsApi() && $val === null) {
+                $this->tags->Visible = false; // Disable update for API request
+            } else {
+                $this->tags->setFormValue($val);
+            }
+        }
+
         // Check field name 'id' first before field var 'x_id'
         $val = $CurrentForm->hasValue("id") ? $CurrentForm->getValue("id") : $CurrentForm->getValue("x_id");
     }
@@ -678,6 +698,8 @@ class MainPrintOrdersAdd extends MainPrintOrders
         $this->printer_id->CurrentValue = $this->printer_id->FormValue;
         $this->quantity->CurrentValue = $this->quantity->FormValue;
         $this->comments->CurrentValue = $this->comments->FormValue;
+        $this->available_codes_to_be_assigned->CurrentValue = $this->available_codes_to_be_assigned->FormValue;
+        $this->tags->CurrentValue = $this->tags->FormValue;
     }
 
     /**
@@ -885,6 +907,14 @@ class MainPrintOrdersAdd extends MainPrintOrders
             $this->comments->ViewValue = $this->comments->CurrentValue;
             $this->comments->ViewCustomAttributes = "";
 
+            // available_codes_to_be_assigned
+            $this->available_codes_to_be_assigned->ViewValue = $this->available_codes_to_be_assigned->CurrentValue;
+            $this->available_codes_to_be_assigned->ViewCustomAttributes = "";
+
+            // tags
+            $this->tags->ViewValue = $this->tags->CurrentValue;
+            $this->tags->ViewCustomAttributes = "";
+
             // campaign_id
             $this->campaign_id->LinkCustomAttributes = "";
             $this->campaign_id->HrefValue = "";
@@ -904,6 +934,16 @@ class MainPrintOrdersAdd extends MainPrintOrders
             $this->comments->LinkCustomAttributes = "";
             $this->comments->HrefValue = "";
             $this->comments->TooltipValue = "";
+
+            // available_codes_to_be_assigned
+            $this->available_codes_to_be_assigned->LinkCustomAttributes = "";
+            $this->available_codes_to_be_assigned->HrefValue = "";
+            $this->available_codes_to_be_assigned->TooltipValue = "";
+
+            // tags
+            $this->tags->LinkCustomAttributes = "";
+            $this->tags->HrefValue = "";
+            $this->tags->TooltipValue = "";
         } elseif ($this->RowType == ROWTYPE_ADD) {
             // campaign_id
             $this->campaign_id->EditAttrs["class"] = "form-control";
@@ -973,6 +1013,18 @@ class MainPrintOrdersAdd extends MainPrintOrders
             $this->comments->EditValue = HtmlEncode($this->comments->CurrentValue);
             $this->comments->PlaceHolder = RemoveHtml($this->comments->caption());
 
+            // available_codes_to_be_assigned
+            $this->available_codes_to_be_assigned->EditAttrs["class"] = "form-control";
+            $this->available_codes_to_be_assigned->EditCustomAttributes = "";
+            $this->available_codes_to_be_assigned->EditValue = HtmlEncode($this->available_codes_to_be_assigned->CurrentValue);
+            $this->available_codes_to_be_assigned->PlaceHolder = RemoveHtml($this->available_codes_to_be_assigned->caption());
+
+            // tags
+            $this->tags->EditAttrs["class"] = "form-control";
+            $this->tags->EditCustomAttributes = "";
+            $this->tags->EditValue = HtmlEncode($this->tags->CurrentValue);
+            $this->tags->PlaceHolder = RemoveHtml($this->tags->caption());
+
             // Add refer script
 
             // campaign_id
@@ -990,6 +1042,14 @@ class MainPrintOrdersAdd extends MainPrintOrders
             // comments
             $this->comments->LinkCustomAttributes = "";
             $this->comments->HrefValue = "";
+
+            // available_codes_to_be_assigned
+            $this->available_codes_to_be_assigned->LinkCustomAttributes = "";
+            $this->available_codes_to_be_assigned->HrefValue = "";
+
+            // tags
+            $this->tags->LinkCustomAttributes = "";
+            $this->tags->HrefValue = "";
         }
         if ($this->RowType == ROWTYPE_ADD || $this->RowType == ROWTYPE_EDIT || $this->RowType == ROWTYPE_SEARCH) { // Add/Edit/Search row
             $this->setupFieldTitles();
@@ -1033,6 +1093,16 @@ class MainPrintOrdersAdd extends MainPrintOrders
                 $this->comments->addErrorMessage(str_replace("%s", $this->comments->caption(), $this->comments->RequiredErrorMessage));
             }
         }
+        if ($this->available_codes_to_be_assigned->Required) {
+            if (!$this->available_codes_to_be_assigned->IsDetailKey && EmptyValue($this->available_codes_to_be_assigned->FormValue)) {
+                $this->available_codes_to_be_assigned->addErrorMessage(str_replace("%s", $this->available_codes_to_be_assigned->caption(), $this->available_codes_to_be_assigned->RequiredErrorMessage));
+            }
+        }
+        if ($this->tags->Required) {
+            if (!$this->tags->IsDetailKey && EmptyValue($this->tags->FormValue)) {
+                $this->tags->addErrorMessage(str_replace("%s", $this->tags->caption(), $this->tags->RequiredErrorMessage));
+            }
+        }
 
         // Return validate result
         $validateForm = !$this->hasInvalidFields();
@@ -1069,6 +1139,12 @@ class MainPrintOrdersAdd extends MainPrintOrders
 
         // comments
         $this->comments->setDbValueDef($rsnew, $this->comments->CurrentValue, null, false);
+
+        // available_codes_to_be_assigned
+        $this->available_codes_to_be_assigned->setDbValueDef($rsnew, $this->available_codes_to_be_assigned->CurrentValue, null, false);
+
+        // tags
+        $this->tags->setDbValueDef($rsnew, $this->tags->CurrentValue, null, false);
 
         // Call Row Inserting event
         $insertRow = $this->rowInserting($rsold, $rsnew);

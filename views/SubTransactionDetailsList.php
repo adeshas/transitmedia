@@ -120,13 +120,6 @@ loadjs.ready("head", function () {
 <?php } ?>
 <?php if (!$Page->isExport() || Config("EXPORT_MASTER_RECORD") && $Page->isExport("print")) { ?>
 <?php
-if ($Page->DbMasterFilter != "" && $Page->getCurrentMasterTable() == "main_buses") {
-    if ($Page->MasterRecordExists) {
-        include_once "views/MainBusesMaster.php";
-    }
-}
-?>
-<?php
 if ($Page->DbMasterFilter != "" && $Page->getCurrentMasterTable() == "main_transactions") {
     if ($Page->MasterRecordExists) {
         include_once "views/MainTransactionsMaster.php";
@@ -162,10 +155,6 @@ $Page->showMessage();
 <input type="hidden" name="<?= $TokenValueKey ?>" value="<?= $TokenValue ?>"><!-- CSRF token value -->
 <?php } ?>
 <input type="hidden" name="t" value="sub_transaction_details">
-<?php if ($Page->getCurrentMasterTable() == "main_buses" && $Page->CurrentAction) { ?>
-<input type="hidden" name="<?= Config("TABLE_SHOW_MASTER") ?>" value="main_buses">
-<input type="hidden" name="fk_id" value="<?= HtmlEncode($Page->bus_id->getSessionValue()) ?>">
-<?php } ?>
 <?php if ($Page->getCurrentMasterTable() == "main_transactions" && $Page->CurrentAction) { ?>
 <input type="hidden" name="<?= Config("TABLE_SHOW_MASTER") ?>" value="main_transactions">
 <input type="hidden" name="fk_id" value="<?= HtmlEncode($Page->transaction_id->getSessionValue()) ?>">
@@ -265,13 +254,6 @@ loadjs.ready("head", function() {
     <?php } ?>
     <?php if ($Page->bus_id->Visible) { // bus_id ?>
         <td data-name="bus_id">
-<?php if ($Page->bus_id->getSessionValue() != "") { ?>
-<span id="el<?= $Page->RowCount ?>_sub_transaction_details_bus_id" class="form-group sub_transaction_details_bus_id">
-<span<?= $Page->bus_id->viewAttributes() ?>>
-<input type="text" readonly class="form-control-plaintext" value="<?= HtmlEncode(RemoveHtml($Page->bus_id->getDisplayValue($Page->bus_id->ViewValue))) ?>"></span>
-</span>
-<input type="hidden" id="x<?= $Page->RowIndex ?>_bus_id" name="x<?= $Page->RowIndex ?>_bus_id" value="<?= HtmlEncode($Page->bus_id->CurrentValue) ?>" data-hidden="1">
-<?php } else { ?>
 <span id="el<?= $Page->RowCount ?>_sub_transaction_details_bus_id" class="form-group sub_transaction_details_bus_id">
     <select
         id="x<?= $Page->RowIndex ?>_bus_id"
@@ -297,7 +279,6 @@ loadjs.ready("head", function() {
 });
 </script>
 </span>
-<?php } ?>
 <input type="hidden" data-table="sub_transaction_details" data-field="x_bus_id" data-hidden="1" name="o<?= $Page->RowIndex ?>_bus_id" id="o<?= $Page->RowIndex ?>_bus_id" value="<?= HtmlEncode($Page->bus_id->OldValue) ?>">
 </td>
     <?php } ?>
@@ -528,13 +509,6 @@ loadjs.ready("head", function() {
     <?php if ($Page->bus_id->Visible) { // bus_id ?>
         <td data-name="bus_id" <?= $Page->bus_id->cellAttributes() ?>>
 <?php if ($Page->RowType == ROWTYPE_ADD) { // Add record ?>
-<?php if ($Page->bus_id->getSessionValue() != "") { ?>
-<span id="el<?= $Page->RowCount ?>_sub_transaction_details_bus_id" class="form-group">
-<span<?= $Page->bus_id->viewAttributes() ?>>
-<input type="text" readonly class="form-control-plaintext" value="<?= HtmlEncode(RemoveHtml($Page->bus_id->getDisplayValue($Page->bus_id->ViewValue))) ?>"></span>
-</span>
-<input type="hidden" id="x<?= $Page->RowIndex ?>_bus_id" name="x<?= $Page->RowIndex ?>_bus_id" value="<?= HtmlEncode($Page->bus_id->CurrentValue) ?>" data-hidden="1">
-<?php } else { ?>
 <span id="el<?= $Page->RowCount ?>_sub_transaction_details_bus_id" class="form-group">
     <select
         id="x<?= $Page->RowIndex ?>_bus_id"
@@ -560,17 +534,9 @@ loadjs.ready("head", function() {
 });
 </script>
 </span>
-<?php } ?>
 <input type="hidden" data-table="sub_transaction_details" data-field="x_bus_id" data-hidden="1" name="o<?= $Page->RowIndex ?>_bus_id" id="o<?= $Page->RowIndex ?>_bus_id" value="<?= HtmlEncode($Page->bus_id->OldValue) ?>">
 <?php } ?>
 <?php if ($Page->RowType == ROWTYPE_EDIT) { // Edit record ?>
-<?php if ($Page->bus_id->getSessionValue() != "") { ?>
-<span id="el<?= $Page->RowCount ?>_sub_transaction_details_bus_id" class="form-group">
-<span<?= $Page->bus_id->viewAttributes() ?>>
-<input type="text" readonly class="form-control-plaintext" value="<?= HtmlEncode(RemoveHtml($Page->bus_id->getDisplayValue($Page->bus_id->ViewValue))) ?>"></span>
-</span>
-<input type="hidden" id="x<?= $Page->RowIndex ?>_bus_id" name="x<?= $Page->RowIndex ?>_bus_id" value="<?= HtmlEncode($Page->bus_id->CurrentValue) ?>" data-hidden="1">
-<?php } else { ?>
 <span id="el<?= $Page->RowCount ?>_sub_transaction_details_bus_id" class="form-group">
     <select
         id="x<?= $Page->RowIndex ?>_bus_id"
@@ -596,7 +562,6 @@ loadjs.ready("head", function() {
 });
 </script>
 </span>
-<?php } ?>
 <?php } ?>
 <?php if ($Page->RowType == ROWTYPE_VIEW) { // View record ?>
 <span id="el<?= $Page->RowCount ?>_sub_transaction_details_bus_id">
@@ -691,13 +656,6 @@ loadjs.ready("head", function() {
     <?php } ?>
     <?php if ($Page->bus_id->Visible) { // bus_id ?>
         <td data-name="bus_id">
-<?php if ($Page->bus_id->getSessionValue() != "") { ?>
-<span id="el$rowindex$_sub_transaction_details_bus_id" class="form-group sub_transaction_details_bus_id">
-<span<?= $Page->bus_id->viewAttributes() ?>>
-<input type="text" readonly class="form-control-plaintext" value="<?= HtmlEncode(RemoveHtml($Page->bus_id->getDisplayValue($Page->bus_id->ViewValue))) ?>"></span>
-</span>
-<input type="hidden" id="x<?= $Page->RowIndex ?>_bus_id" name="x<?= $Page->RowIndex ?>_bus_id" value="<?= HtmlEncode($Page->bus_id->CurrentValue) ?>" data-hidden="1">
-<?php } else { ?>
 <span id="el$rowindex$_sub_transaction_details_bus_id" class="form-group sub_transaction_details_bus_id">
     <select
         id="x<?= $Page->RowIndex ?>_bus_id"
@@ -723,7 +681,6 @@ loadjs.ready("head", function() {
 });
 </script>
 </span>
-<?php } ?>
 <input type="hidden" data-table="sub_transaction_details" data-field="x_bus_id" data-hidden="1" name="o<?= $Page->RowIndex ?>_bus_id" id="o<?= $Page->RowIndex ?>_bus_id" value="<?= HtmlEncode($Page->bus_id->OldValue) ?>">
 </td>
     <?php } ?>

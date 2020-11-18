@@ -567,22 +567,6 @@ class SubTransactionDetailsGrid extends SubTransactionDetails
         AddFilter($filter, $this->SearchWhere);
 
         // Load master record
-        if ($this->CurrentMode != "add" && $this->getMasterFilter() != "" && $this->getCurrentMasterTable() == "main_buses") {
-            $masterTbl = Container("main_buses");
-            $rsmaster = $masterTbl->loadRs($this->DbMasterFilter)->fetch(\PDO::FETCH_ASSOC);
-            $this->MasterRecordExists = $rsmaster !== false;
-            if (!$this->MasterRecordExists) {
-                $this->setFailureMessage($Language->phrase("NoRecord")); // Set no record found
-                $this->terminate("mainbuseslist"); // Return to master page
-                return;
-            } else {
-                $masterTbl->loadListRowValues($rsmaster);
-                $masterTbl->RowType = ROWTYPE_MASTER; // Master row
-                $masterTbl->renderListRow();
-            }
-        }
-
-        // Load master record
         if ($this->CurrentMode != "add" && $this->getMasterFilter() != "" && $this->getCurrentMasterTable() == "main_transactions") {
             $masterTbl = Container("main_transactions");
             $rsmaster = $masterTbl->loadRs($this->DbMasterFilter)->fetch(\PDO::FETCH_ASSOC);
@@ -1059,7 +1043,6 @@ class SubTransactionDetailsGrid extends SubTransactionDetails
                 $this->setCurrentMasterTable(""); // Clear master table
                 $this->DbMasterFilter = "";
                 $this->DbDetailFilter = "";
-                        $this->bus_id->setSessionValue("");
                         $this->transaction_id->setSessionValue("");
             }
 
@@ -1606,55 +1589,27 @@ class SubTransactionDetailsGrid extends SubTransactionDetails
             // bus_id
             $this->bus_id->EditAttrs["class"] = "form-control";
             $this->bus_id->EditCustomAttributes = "";
-            if ($this->bus_id->getSessionValue() != "") {
-                $this->bus_id->CurrentValue = GetForeignKeyValue($this->bus_id->getSessionValue());
-                $this->bus_id->OldValue = $this->bus_id->CurrentValue;
-                if ($this->bus_id->VirtualValue != "") {
-                    $this->bus_id->ViewValue = $this->bus_id->VirtualValue;
-                } else {
-                    $curVal = strval($this->bus_id->CurrentValue);
-                    if ($curVal != "") {
-                        $this->bus_id->ViewValue = $this->bus_id->lookupCacheOption($curVal);
-                        if ($this->bus_id->ViewValue === null) { // Lookup from database
-                            $filterWrk = "\"bus_id\"" . SearchString("=", $curVal, DATATYPE_NUMBER, "");
-                            $sqlWrk = $this->bus_id->Lookup->getSql(false, $filterWrk, '', $this, true);
-                            $rswrk = Conn()->executeQuery($sqlWrk)->fetchAll(\PDO::FETCH_BOTH);
-                            $ari = count($rswrk);
-                            if ($ari > 0) { // Lookup values found
-                                $arwrk = $this->bus_id->Lookup->renderViewRow($rswrk[0]);
-                                $this->bus_id->ViewValue = $this->bus_id->displayValue($arwrk);
-                            } else {
-                                $this->bus_id->ViewValue = $this->bus_id->CurrentValue;
-                            }
-                        }
-                    } else {
-                        $this->bus_id->ViewValue = null;
-                    }
-                }
-                $this->bus_id->ViewCustomAttributes = "";
+            $curVal = trim(strval($this->bus_id->CurrentValue));
+            if ($curVal != "") {
+                $this->bus_id->ViewValue = $this->bus_id->lookupCacheOption($curVal);
             } else {
-                $curVal = trim(strval($this->bus_id->CurrentValue));
-                if ($curVal != "") {
-                    $this->bus_id->ViewValue = $this->bus_id->lookupCacheOption($curVal);
-                } else {
-                    $this->bus_id->ViewValue = $this->bus_id->Lookup !== null && is_array($this->bus_id->Lookup->Options) ? $curVal : null;
-                }
-                if ($this->bus_id->ViewValue !== null) { // Load from cache
-                    $this->bus_id->EditValue = array_values($this->bus_id->Lookup->Options);
-                } else { // Lookup from database
-                    if ($curVal == "") {
-                        $filterWrk = "0=1";
-                    } else {
-                        $filterWrk = "\"bus_id\"" . SearchString("=", $this->bus_id->CurrentValue, DATATYPE_NUMBER, "");
-                    }
-                    $sqlWrk = $this->bus_id->Lookup->getSql(true, $filterWrk, '', $this);
-                    $rswrk = Conn()->executeQuery($sqlWrk)->fetchAll(\PDO::FETCH_BOTH);
-                    $ari = count($rswrk);
-                    $arwrk = $rswrk;
-                    $this->bus_id->EditValue = $arwrk;
-                }
-                $this->bus_id->PlaceHolder = RemoveHtml($this->bus_id->caption());
+                $this->bus_id->ViewValue = $this->bus_id->Lookup !== null && is_array($this->bus_id->Lookup->Options) ? $curVal : null;
             }
+            if ($this->bus_id->ViewValue !== null) { // Load from cache
+                $this->bus_id->EditValue = array_values($this->bus_id->Lookup->Options);
+            } else { // Lookup from database
+                if ($curVal == "") {
+                    $filterWrk = "0=1";
+                } else {
+                    $filterWrk = "\"bus_id\"" . SearchString("=", $this->bus_id->CurrentValue, DATATYPE_NUMBER, "");
+                }
+                $sqlWrk = $this->bus_id->Lookup->getSql(true, $filterWrk, '', $this);
+                $rswrk = Conn()->executeQuery($sqlWrk)->fetchAll(\PDO::FETCH_BOTH);
+                $ari = count($rswrk);
+                $arwrk = $rswrk;
+                $this->bus_id->EditValue = $arwrk;
+            }
+            $this->bus_id->PlaceHolder = RemoveHtml($this->bus_id->caption());
 
             // Add refer script
 
@@ -1720,55 +1675,27 @@ class SubTransactionDetailsGrid extends SubTransactionDetails
             // bus_id
             $this->bus_id->EditAttrs["class"] = "form-control";
             $this->bus_id->EditCustomAttributes = "";
-            if ($this->bus_id->getSessionValue() != "") {
-                $this->bus_id->CurrentValue = GetForeignKeyValue($this->bus_id->getSessionValue());
-                $this->bus_id->OldValue = $this->bus_id->CurrentValue;
-                if ($this->bus_id->VirtualValue != "") {
-                    $this->bus_id->ViewValue = $this->bus_id->VirtualValue;
-                } else {
-                    $curVal = strval($this->bus_id->CurrentValue);
-                    if ($curVal != "") {
-                        $this->bus_id->ViewValue = $this->bus_id->lookupCacheOption($curVal);
-                        if ($this->bus_id->ViewValue === null) { // Lookup from database
-                            $filterWrk = "\"bus_id\"" . SearchString("=", $curVal, DATATYPE_NUMBER, "");
-                            $sqlWrk = $this->bus_id->Lookup->getSql(false, $filterWrk, '', $this, true);
-                            $rswrk = Conn()->executeQuery($sqlWrk)->fetchAll(\PDO::FETCH_BOTH);
-                            $ari = count($rswrk);
-                            if ($ari > 0) { // Lookup values found
-                                $arwrk = $this->bus_id->Lookup->renderViewRow($rswrk[0]);
-                                $this->bus_id->ViewValue = $this->bus_id->displayValue($arwrk);
-                            } else {
-                                $this->bus_id->ViewValue = $this->bus_id->CurrentValue;
-                            }
-                        }
-                    } else {
-                        $this->bus_id->ViewValue = null;
-                    }
-                }
-                $this->bus_id->ViewCustomAttributes = "";
+            $curVal = trim(strval($this->bus_id->CurrentValue));
+            if ($curVal != "") {
+                $this->bus_id->ViewValue = $this->bus_id->lookupCacheOption($curVal);
             } else {
-                $curVal = trim(strval($this->bus_id->CurrentValue));
-                if ($curVal != "") {
-                    $this->bus_id->ViewValue = $this->bus_id->lookupCacheOption($curVal);
-                } else {
-                    $this->bus_id->ViewValue = $this->bus_id->Lookup !== null && is_array($this->bus_id->Lookup->Options) ? $curVal : null;
-                }
-                if ($this->bus_id->ViewValue !== null) { // Load from cache
-                    $this->bus_id->EditValue = array_values($this->bus_id->Lookup->Options);
-                } else { // Lookup from database
-                    if ($curVal == "") {
-                        $filterWrk = "0=1";
-                    } else {
-                        $filterWrk = "\"bus_id\"" . SearchString("=", $this->bus_id->CurrentValue, DATATYPE_NUMBER, "");
-                    }
-                    $sqlWrk = $this->bus_id->Lookup->getSql(true, $filterWrk, '', $this);
-                    $rswrk = Conn()->executeQuery($sqlWrk)->fetchAll(\PDO::FETCH_BOTH);
-                    $ari = count($rswrk);
-                    $arwrk = $rswrk;
-                    $this->bus_id->EditValue = $arwrk;
-                }
-                $this->bus_id->PlaceHolder = RemoveHtml($this->bus_id->caption());
+                $this->bus_id->ViewValue = $this->bus_id->Lookup !== null && is_array($this->bus_id->Lookup->Options) ? $curVal : null;
             }
+            if ($this->bus_id->ViewValue !== null) { // Load from cache
+                $this->bus_id->EditValue = array_values($this->bus_id->Lookup->Options);
+            } else { // Lookup from database
+                if ($curVal == "") {
+                    $filterWrk = "0=1";
+                } else {
+                    $filterWrk = "\"bus_id\"" . SearchString("=", $this->bus_id->CurrentValue, DATATYPE_NUMBER, "");
+                }
+                $sqlWrk = $this->bus_id->Lookup->getSql(true, $filterWrk, '', $this);
+                $rswrk = Conn()->executeQuery($sqlWrk)->fetchAll(\PDO::FETCH_BOTH);
+                $ari = count($rswrk);
+                $arwrk = $rswrk;
+                $this->bus_id->EditValue = $arwrk;
+            }
+            $this->bus_id->PlaceHolder = RemoveHtml($this->bus_id->caption());
 
             // Edit refer script
 
@@ -1923,6 +1850,25 @@ class SubTransactionDetailsGrid extends SubTransactionDetails
             // bus_id
             $this->bus_id->setDbValueDef($rsnew, $this->bus_id->CurrentValue, 0, $this->bus_id->ReadOnly);
 
+            // Check referential integrity for master table 'main_transactions'
+            $validMasterRecord = true;
+            $masterFilter = $this->sqlMasterFilter_main_transactions();
+            $keyValue = $rsnew['transaction_id'] ?? $rsold['transaction_id'];
+            if (strval($keyValue) != "") {
+                $masterFilter = str_replace("@id@", AdjustSql($keyValue), $masterFilter);
+            } else {
+                $validMasterRecord = false;
+            }
+            if ($validMasterRecord) {
+                $rsmaster = Container("main_transactions")->loadRs($masterFilter)->fetch();
+                $validMasterRecord = $rsmaster !== false;
+            }
+            if (!$validMasterRecord) {
+                $relatedRecordMsg = str_replace("%t", "main_transactions", $Language->phrase("RelatedRecordRequired"));
+                $this->setFailureMessage($relatedRecordMsg);
+                return false;
+            }
+
             // Call Row Updating event
             $updateRow = $this->rowUpdating($rsold, $rsnew);
             if ($updateRow) {
@@ -1969,11 +1915,26 @@ class SubTransactionDetailsGrid extends SubTransactionDetails
         global $Language, $Security;
 
         // Set up foreign key field value from Session
-        if ($this->getCurrentMasterTable() == "main_buses") {
-            $this->bus_id->CurrentValue = $this->bus_id->getSessionValue();
-        }
         if ($this->getCurrentMasterTable() == "main_transactions") {
             $this->transaction_id->CurrentValue = $this->transaction_id->getSessionValue();
+        }
+
+        // Check referential integrity for master table 'sub_transaction_details'
+        $validMasterRecord = true;
+        $masterFilter = $this->sqlMasterFilter_main_transactions();
+        if (strval($this->transaction_id->CurrentValue) != "") {
+            $masterFilter = str_replace("@id@", AdjustSql($this->transaction_id->CurrentValue, "DB"), $masterFilter);
+        } else {
+            $validMasterRecord = false;
+        }
+        if ($validMasterRecord) {
+            $rsmaster = Container("main_transactions")->loadRs($masterFilter)->fetch();
+            $validMasterRecord = $rsmaster !== false;
+        }
+        if (!$validMasterRecord) {
+            $relatedRecordMsg = str_replace("%t", "main_transactions", $Language->phrase("RelatedRecordRequired"));
+            $this->setFailureMessage($relatedRecordMsg);
+            return false;
         }
         $conn = $this->getConnection();
 
@@ -2028,13 +1989,6 @@ class SubTransactionDetailsGrid extends SubTransactionDetails
     {
         // Hide foreign keys
         $masterTblVar = $this->getCurrentMasterTable();
-        if ($masterTblVar == "main_buses") {
-            $masterTbl = Container("main_buses");
-            $this->bus_id->Visible = false;
-            if ($masterTbl->EventCancelled) {
-                $this->EventCancelled = true;
-            }
-        }
         if ($masterTblVar == "main_transactions") {
             $masterTbl = Container("main_transactions");
             $this->transaction_id->Visible = false;

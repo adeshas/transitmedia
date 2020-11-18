@@ -27,7 +27,8 @@ loadjs.ready("head", function () {
         ["exterior_campaign_id", [fields.exterior_campaign_id.required ? ew.Validators.required(fields.exterior_campaign_id.caption) : null], fields.exterior_campaign_id.isInvalid],
         ["interior_campaign_id", [fields.interior_campaign_id.required ? ew.Validators.required(fields.interior_campaign_id.caption) : null], fields.interior_campaign_id.isInvalid],
         ["bus_status_id", [fields.bus_status_id.required ? ew.Validators.required(fields.bus_status_id.caption) : null], fields.bus_status_id.isInvalid],
-        ["bus_depot_id", [fields.bus_depot_id.required ? ew.Validators.required(fields.bus_depot_id.caption) : null], fields.bus_depot_id.isInvalid]
+        ["bus_depot_id", [fields.bus_depot_id.required ? ew.Validators.required(fields.bus_depot_id.caption) : null], fields.bus_depot_id.isInvalid],
+        ["bus_size_id", [fields.bus_size_id.required ? ew.Validators.required(fields.bus_size_id.caption) : null], fields.bus_size_id.isInvalid]
     ]);
 
     // Set invalid fields
@@ -95,6 +96,8 @@ loadjs.ready("head", function () {
             return false;
         if (ew.valueChanged(fobj, rowIndex, "bus_depot_id", false))
             return false;
+        if (ew.valueChanged(fobj, rowIndex, "bus_size_id", false))
+            return false;
         return true;
     }
 
@@ -114,6 +117,7 @@ loadjs.ready("head", function () {
     fmain_busesgrid.lists.interior_campaign_id = <?= $Grid->interior_campaign_id->toClientList($Grid) ?>;
     fmain_busesgrid.lists.bus_status_id = <?= $Grid->bus_status_id->toClientList($Grid) ?>;
     fmain_busesgrid.lists.bus_depot_id = <?= $Grid->bus_depot_id->toClientList($Grid) ?>;
+    fmain_busesgrid.lists.bus_size_id = <?= $Grid->bus_size_id->toClientList($Grid) ?>;
     loadjs.done("fmain_busesgrid");
 });
 </script>
@@ -167,6 +171,9 @@ $Grid->ListOptions->render("header", "left");
 <?php } ?>
 <?php if ($Grid->bus_depot_id->Visible) { // bus_depot_id ?>
         <th data-name="bus_depot_id" class="<?= $Grid->bus_depot_id->headerCellClass() ?>"><div id="elh_main_buses_bus_depot_id" class="main_buses_bus_depot_id"><?= $Grid->renderSort($Grid->bus_depot_id) ?></div></th>
+<?php } ?>
+<?php if ($Grid->bus_size_id->Visible) { // bus_size_id ?>
+        <th data-name="bus_size_id" class="<?= $Grid->bus_size_id->headerCellClass() ?>"><div id="elh_main_buses_bus_size_id" class="main_buses_bus_size_id"><?= $Grid->renderSort($Grid->bus_size_id) ?></div></th>
 <?php } ?>
 <?php
 // Render list options (header, right)
@@ -781,6 +788,75 @@ loadjs.ready("head", function() {
 <?php } ?>
 </td>
     <?php } ?>
+    <?php if ($Grid->bus_size_id->Visible) { // bus_size_id ?>
+        <td data-name="bus_size_id" <?= $Grid->bus_size_id->cellAttributes() ?>>
+<?php if ($Grid->RowType == ROWTYPE_ADD) { // Add record ?>
+<span id="el<?= $Grid->RowCount ?>_main_buses_bus_size_id" class="form-group">
+    <select
+        id="x<?= $Grid->RowIndex ?>_bus_size_id"
+        name="x<?= $Grid->RowIndex ?>_bus_size_id"
+        class="form-control ew-select<?= $Grid->bus_size_id->isInvalidClass() ?>"
+        data-select2-id="main_buses_x<?= $Grid->RowIndex ?>_bus_size_id"
+        data-table="main_buses"
+        data-field="x_bus_size_id"
+        data-value-separator="<?= $Grid->bus_size_id->displayValueSeparatorAttribute() ?>"
+        data-placeholder="<?= HtmlEncode($Grid->bus_size_id->getPlaceHolder()) ?>"
+        <?= $Grid->bus_size_id->editAttributes() ?>>
+        <?= $Grid->bus_size_id->selectOptionListHtml("x{$Grid->RowIndex}_bus_size_id") ?>
+    </select>
+    <div class="invalid-feedback"><?= $Grid->bus_size_id->getErrorMessage() ?></div>
+<?= $Grid->bus_size_id->Lookup->getParamTag($Grid, "p_x" . $Grid->RowIndex . "_bus_size_id") ?>
+<script>
+loadjs.ready("head", function() {
+    var el = document.querySelector("select[data-select2-id='main_buses_x<?= $Grid->RowIndex ?>_bus_size_id']"),
+        options = { name: "x<?= $Grid->RowIndex ?>_bus_size_id", selectId: "main_buses_x<?= $Grid->RowIndex ?>_bus_size_id", language: ew.LANGUAGE_ID, dir: ew.IS_RTL ? "rtl" : "ltr" };
+    options.dropdownParent = $(el).closest("#ew-modal-dialog, #ew-add-opt-dialog")[0];
+    Object.assign(options, ew.vars.tables.main_buses.fields.bus_size_id.selectOptions);
+    ew.createSelect(options);
+});
+</script>
+</span>
+<input type="hidden" data-table="main_buses" data-field="x_bus_size_id" data-hidden="1" name="o<?= $Grid->RowIndex ?>_bus_size_id" id="o<?= $Grid->RowIndex ?>_bus_size_id" value="<?= HtmlEncode($Grid->bus_size_id->OldValue) ?>">
+<?php } ?>
+<?php if ($Grid->RowType == ROWTYPE_EDIT) { // Edit record ?>
+<span id="el<?= $Grid->RowCount ?>_main_buses_bus_size_id" class="form-group">
+    <select
+        id="x<?= $Grid->RowIndex ?>_bus_size_id"
+        name="x<?= $Grid->RowIndex ?>_bus_size_id"
+        class="form-control ew-select<?= $Grid->bus_size_id->isInvalidClass() ?>"
+        data-select2-id="main_buses_x<?= $Grid->RowIndex ?>_bus_size_id"
+        data-table="main_buses"
+        data-field="x_bus_size_id"
+        data-value-separator="<?= $Grid->bus_size_id->displayValueSeparatorAttribute() ?>"
+        data-placeholder="<?= HtmlEncode($Grid->bus_size_id->getPlaceHolder()) ?>"
+        <?= $Grid->bus_size_id->editAttributes() ?>>
+        <?= $Grid->bus_size_id->selectOptionListHtml("x{$Grid->RowIndex}_bus_size_id") ?>
+    </select>
+    <div class="invalid-feedback"><?= $Grid->bus_size_id->getErrorMessage() ?></div>
+<?= $Grid->bus_size_id->Lookup->getParamTag($Grid, "p_x" . $Grid->RowIndex . "_bus_size_id") ?>
+<script>
+loadjs.ready("head", function() {
+    var el = document.querySelector("select[data-select2-id='main_buses_x<?= $Grid->RowIndex ?>_bus_size_id']"),
+        options = { name: "x<?= $Grid->RowIndex ?>_bus_size_id", selectId: "main_buses_x<?= $Grid->RowIndex ?>_bus_size_id", language: ew.LANGUAGE_ID, dir: ew.IS_RTL ? "rtl" : "ltr" };
+    options.dropdownParent = $(el).closest("#ew-modal-dialog, #ew-add-opt-dialog")[0];
+    Object.assign(options, ew.vars.tables.main_buses.fields.bus_size_id.selectOptions);
+    ew.createSelect(options);
+});
+</script>
+</span>
+<?php } ?>
+<?php if ($Grid->RowType == ROWTYPE_VIEW) { // View record ?>
+<span id="el<?= $Grid->RowCount ?>_main_buses_bus_size_id">
+<span<?= $Grid->bus_size_id->viewAttributes() ?>>
+<?= $Grid->bus_size_id->getViewValue() ?></span>
+</span>
+<?php if ($Grid->isConfirm()) { ?>
+<input type="hidden" data-table="main_buses" data-field="x_bus_size_id" data-hidden="1" name="fmain_busesgrid$x<?= $Grid->RowIndex ?>_bus_size_id" id="fmain_busesgrid$x<?= $Grid->RowIndex ?>_bus_size_id" value="<?= HtmlEncode($Grid->bus_size_id->FormValue) ?>">
+<input type="hidden" data-table="main_buses" data-field="x_bus_size_id" data-hidden="1" name="fmain_busesgrid$o<?= $Grid->RowIndex ?>_bus_size_id" id="fmain_busesgrid$o<?= $Grid->RowIndex ?>_bus_size_id" value="<?= HtmlEncode($Grid->bus_size_id->OldValue) ?>">
+<?php } ?>
+<?php } ?>
+</td>
+    <?php } ?>
 <?php
 // Render list options (body, right)
 $Grid->ListOptions->render("body", "right", $Grid->RowCount);
@@ -1099,6 +1175,44 @@ loadjs.ready("head", function() {
 <input type="hidden" data-table="main_buses" data-field="x_bus_depot_id" data-hidden="1" name="x<?= $Grid->RowIndex ?>_bus_depot_id" id="x<?= $Grid->RowIndex ?>_bus_depot_id" value="<?= HtmlEncode($Grid->bus_depot_id->FormValue) ?>">
 <?php } ?>
 <input type="hidden" data-table="main_buses" data-field="x_bus_depot_id" data-hidden="1" name="o<?= $Grid->RowIndex ?>_bus_depot_id" id="o<?= $Grid->RowIndex ?>_bus_depot_id" value="<?= HtmlEncode($Grid->bus_depot_id->OldValue) ?>">
+</td>
+    <?php } ?>
+    <?php if ($Grid->bus_size_id->Visible) { // bus_size_id ?>
+        <td data-name="bus_size_id">
+<?php if (!$Grid->isConfirm()) { ?>
+<span id="el$rowindex$_main_buses_bus_size_id" class="form-group main_buses_bus_size_id">
+    <select
+        id="x<?= $Grid->RowIndex ?>_bus_size_id"
+        name="x<?= $Grid->RowIndex ?>_bus_size_id"
+        class="form-control ew-select<?= $Grid->bus_size_id->isInvalidClass() ?>"
+        data-select2-id="main_buses_x<?= $Grid->RowIndex ?>_bus_size_id"
+        data-table="main_buses"
+        data-field="x_bus_size_id"
+        data-value-separator="<?= $Grid->bus_size_id->displayValueSeparatorAttribute() ?>"
+        data-placeholder="<?= HtmlEncode($Grid->bus_size_id->getPlaceHolder()) ?>"
+        <?= $Grid->bus_size_id->editAttributes() ?>>
+        <?= $Grid->bus_size_id->selectOptionListHtml("x{$Grid->RowIndex}_bus_size_id") ?>
+    </select>
+    <div class="invalid-feedback"><?= $Grid->bus_size_id->getErrorMessage() ?></div>
+<?= $Grid->bus_size_id->Lookup->getParamTag($Grid, "p_x" . $Grid->RowIndex . "_bus_size_id") ?>
+<script>
+loadjs.ready("head", function() {
+    var el = document.querySelector("select[data-select2-id='main_buses_x<?= $Grid->RowIndex ?>_bus_size_id']"),
+        options = { name: "x<?= $Grid->RowIndex ?>_bus_size_id", selectId: "main_buses_x<?= $Grid->RowIndex ?>_bus_size_id", language: ew.LANGUAGE_ID, dir: ew.IS_RTL ? "rtl" : "ltr" };
+    options.dropdownParent = $(el).closest("#ew-modal-dialog, #ew-add-opt-dialog")[0];
+    Object.assign(options, ew.vars.tables.main_buses.fields.bus_size_id.selectOptions);
+    ew.createSelect(options);
+});
+</script>
+</span>
+<?php } else { ?>
+<span id="el$rowindex$_main_buses_bus_size_id" class="form-group main_buses_bus_size_id">
+<span<?= $Grid->bus_size_id->viewAttributes() ?>>
+<input type="text" readonly class="form-control-plaintext" value="<?= HtmlEncode(RemoveHtml($Grid->bus_size_id->getDisplayValue($Grid->bus_size_id->ViewValue))) ?>"></span>
+</span>
+<input type="hidden" data-table="main_buses" data-field="x_bus_size_id" data-hidden="1" name="x<?= $Grid->RowIndex ?>_bus_size_id" id="x<?= $Grid->RowIndex ?>_bus_size_id" value="<?= HtmlEncode($Grid->bus_size_id->FormValue) ?>">
+<?php } ?>
+<input type="hidden" data-table="main_buses" data-field="x_bus_size_id" data-hidden="1" name="o<?= $Grid->RowIndex ?>_bus_size_id" id="o<?= $Grid->RowIndex ?>_bus_size_id" value="<?= HtmlEncode($Grid->bus_size_id->OldValue) ?>">
 </td>
     <?php } ?>
 <?php

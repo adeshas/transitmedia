@@ -119,6 +119,17 @@ $Page->showMessage();
 </td>
     </tr>
 <?php } ?>
+<?php if ($Page->bus_size_id->Visible) { // bus_size_id ?>
+    <tr id="r_bus_size_id">
+        <td class="<?= $Page->TableLeftColumnClass ?>"><span id="elh_main_buses_bus_size_id"><?= $Page->bus_size_id->caption() ?></span></td>
+        <td data-name="bus_size_id" <?= $Page->bus_size_id->cellAttributes() ?>>
+<span id="el_main_buses_bus_size_id">
+<span<?= $Page->bus_size_id->viewAttributes() ?>>
+<?= $Page->bus_size_id->getViewValue() ?></span>
+</span>
+</td>
+    </tr>
+<?php } ?>
 <?php if ($Page->bus_depot_id->Visible) { // bus_depot_id ?>
     <tr id="r_bus_depot_id">
         <td class="<?= $Page->TableLeftColumnClass ?>"><span id="elh_main_buses_bus_depot_id"><?= $Page->bus_depot_id->caption() ?></span></td>
@@ -160,14 +171,6 @@ $Page->showMessage();
 <h4 class="ew-detail-caption"><?= $Language->tablePhrase("sub_media_allocation", "TblCaption") ?></h4>
 <?php } ?>
 <?php include_once "SubMediaAllocationGrid.php" ?>
-<?php } ?>
-<?php
-    if (in_array("sub_transaction_details", explode(",", $Page->getCurrentDetailTable())) && $sub_transaction_details->DetailView) {
-?>
-<?php if ($Page->getCurrentDetailTable() != "") { ?>
-<h4 class="ew-detail-caption"><?= $Language->tablePhrase("sub_transaction_details", "TblCaption") ?></h4>
-<?php } ?>
-<?php include_once "SubTransactionDetailsGrid.php" ?>
 <?php } ?>
 </form>
 <?php

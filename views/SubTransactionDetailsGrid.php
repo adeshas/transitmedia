@@ -340,13 +340,6 @@ loadjs.ready("head", function() {
     <?php if ($Grid->bus_id->Visible) { // bus_id ?>
         <td data-name="bus_id" <?= $Grid->bus_id->cellAttributes() ?>>
 <?php if ($Grid->RowType == ROWTYPE_ADD) { // Add record ?>
-<?php if ($Grid->bus_id->getSessionValue() != "") { ?>
-<span id="el<?= $Grid->RowCount ?>_sub_transaction_details_bus_id" class="form-group">
-<span<?= $Grid->bus_id->viewAttributes() ?>>
-<input type="text" readonly class="form-control-plaintext" value="<?= HtmlEncode(RemoveHtml($Grid->bus_id->getDisplayValue($Grid->bus_id->ViewValue))) ?>"></span>
-</span>
-<input type="hidden" id="x<?= $Grid->RowIndex ?>_bus_id" name="x<?= $Grid->RowIndex ?>_bus_id" value="<?= HtmlEncode($Grid->bus_id->CurrentValue) ?>" data-hidden="1">
-<?php } else { ?>
 <span id="el<?= $Grid->RowCount ?>_sub_transaction_details_bus_id" class="form-group">
     <select
         id="x<?= $Grid->RowIndex ?>_bus_id"
@@ -372,17 +365,9 @@ loadjs.ready("head", function() {
 });
 </script>
 </span>
-<?php } ?>
 <input type="hidden" data-table="sub_transaction_details" data-field="x_bus_id" data-hidden="1" name="o<?= $Grid->RowIndex ?>_bus_id" id="o<?= $Grid->RowIndex ?>_bus_id" value="<?= HtmlEncode($Grid->bus_id->OldValue) ?>">
 <?php } ?>
 <?php if ($Grid->RowType == ROWTYPE_EDIT) { // Edit record ?>
-<?php if ($Grid->bus_id->getSessionValue() != "") { ?>
-<span id="el<?= $Grid->RowCount ?>_sub_transaction_details_bus_id" class="form-group">
-<span<?= $Grid->bus_id->viewAttributes() ?>>
-<input type="text" readonly class="form-control-plaintext" value="<?= HtmlEncode(RemoveHtml($Grid->bus_id->getDisplayValue($Grid->bus_id->ViewValue))) ?>"></span>
-</span>
-<input type="hidden" id="x<?= $Grid->RowIndex ?>_bus_id" name="x<?= $Grid->RowIndex ?>_bus_id" value="<?= HtmlEncode($Grid->bus_id->CurrentValue) ?>" data-hidden="1">
-<?php } else { ?>
 <span id="el<?= $Grid->RowCount ?>_sub_transaction_details_bus_id" class="form-group">
     <select
         id="x<?= $Grid->RowIndex ?>_bus_id"
@@ -408,7 +393,6 @@ loadjs.ready("head", function() {
 });
 </script>
 </span>
-<?php } ?>
 <?php } ?>
 <?php if ($Grid->RowType == ROWTYPE_VIEW) { // View record ?>
 <span id="el<?= $Grid->RowCount ?>_sub_transaction_details_bus_id">
@@ -516,13 +500,6 @@ loadjs.ready("head", function() {
     <?php if ($Grid->bus_id->Visible) { // bus_id ?>
         <td data-name="bus_id">
 <?php if (!$Grid->isConfirm()) { ?>
-<?php if ($Grid->bus_id->getSessionValue() != "") { ?>
-<span id="el$rowindex$_sub_transaction_details_bus_id" class="form-group sub_transaction_details_bus_id">
-<span<?= $Grid->bus_id->viewAttributes() ?>>
-<input type="text" readonly class="form-control-plaintext" value="<?= HtmlEncode(RemoveHtml($Grid->bus_id->getDisplayValue($Grid->bus_id->ViewValue))) ?>"></span>
-</span>
-<input type="hidden" id="x<?= $Grid->RowIndex ?>_bus_id" name="x<?= $Grid->RowIndex ?>_bus_id" value="<?= HtmlEncode($Grid->bus_id->CurrentValue) ?>" data-hidden="1">
-<?php } else { ?>
 <span id="el$rowindex$_sub_transaction_details_bus_id" class="form-group sub_transaction_details_bus_id">
     <select
         id="x<?= $Grid->RowIndex ?>_bus_id"
@@ -548,7 +525,6 @@ loadjs.ready("head", function() {
 });
 </script>
 </span>
-<?php } ?>
 <?php } else { ?>
 <span id="el$rowindex$_sub_transaction_details_bus_id" class="form-group sub_transaction_details_bus_id">
 <span<?= $Grid->bus_id->viewAttributes() ?>>

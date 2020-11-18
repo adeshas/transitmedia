@@ -62,6 +62,9 @@ $Page->showMessage();
 <?php if ($Page->bus_status_id->Visible) { // bus_status_id ?>
         <th class="<?= $Page->bus_status_id->headerCellClass() ?>"><span id="elh_main_buses_bus_status_id" class="main_buses_bus_status_id"><?= $Page->bus_status_id->caption() ?></span></th>
 <?php } ?>
+<?php if ($Page->bus_size_id->Visible) { // bus_size_id ?>
+        <th class="<?= $Page->bus_size_id->headerCellClass() ?>"><span id="elh_main_buses_bus_size_id" class="main_buses_bus_size_id"><?= $Page->bus_size_id->caption() ?></span></th>
+<?php } ?>
 <?php if ($Page->bus_depot_id->Visible) { // bus_depot_id ?>
         <th class="<?= $Page->bus_depot_id->headerCellClass() ?>"><span id="elh_main_buses_bus_depot_id" class="main_buses_bus_depot_id"><?= $Page->bus_depot_id->caption() ?></span></th>
 <?php } ?>
@@ -139,6 +142,14 @@ while (!$Page->Recordset->EOF) {
 <span id="el<?= $Page->RowCount ?>_main_buses_bus_status_id" class="main_buses_bus_status_id">
 <span<?= $Page->bus_status_id->viewAttributes() ?>>
 <?= $Page->bus_status_id->getViewValue() ?></span>
+</span>
+</td>
+<?php } ?>
+<?php if ($Page->bus_size_id->Visible) { // bus_size_id ?>
+        <td <?= $Page->bus_size_id->cellAttributes() ?>>
+<span id="el<?= $Page->RowCount ?>_main_buses_bus_size_id" class="main_buses_bus_size_id">
+<span<?= $Page->bus_size_id->viewAttributes() ?>>
+<?= $Page->bus_size_id->getViewValue() ?></span>
 </span>
 </td>
 <?php } ?>

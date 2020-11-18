@@ -45,7 +45,7 @@ function purify_list($comma_sep_list1, $comma_sep_list2)
 function getEmailPayload($name)
 {
 	$sql = "select * from z_email_settings where name = '" . $name . "';";
-	$report_details = ExecuteRow($sql);
+	$report_details = 2ExecuteRow($sql);
 	return $report_details;
 }
 

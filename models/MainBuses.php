@@ -35,6 +35,7 @@ class MainBuses extends DbTable
     public $exterior_campaign_id;
     public $interior_campaign_id;
     public $bus_status_id;
+    public $bus_size_id;
     public $bus_depot_id;
     public $ts_created;
     public $ts_last_update;
@@ -111,7 +112,6 @@ class MainBuses extends DbTable
 
         // exterior_campaign_id
         $this->exterior_campaign_id = new DbField('main_buses', 'main_buses', 'x_exterior_campaign_id', 'exterior_campaign_id', '"exterior_campaign_id"', 'CAST("exterior_campaign_id" AS varchar(255))', 3, 4, -1, false, '"exterior_campaign_id"', false, false, false, 'FORMATTED TEXT', 'SELECT');
-        $this->exterior_campaign_id->IsForeignKey = true; // Foreign key field
         $this->exterior_campaign_id->Sortable = true; // Allow sort
         $this->exterior_campaign_id->UsePleaseSelect = true; // Use PleaseSelect by default
         $this->exterior_campaign_id->PleaseSelectText = $Language->phrase("PleaseSelect"); // "PleaseSelect" text
@@ -121,7 +121,6 @@ class MainBuses extends DbTable
 
         // interior_campaign_id
         $this->interior_campaign_id = new DbField('main_buses', 'main_buses', 'x_interior_campaign_id', 'interior_campaign_id', '"interior_campaign_id"', 'CAST("interior_campaign_id" AS varchar(255))', 3, 4, -1, false, '"interior_campaign_id"', false, false, false, 'FORMATTED TEXT', 'SELECT');
-        $this->interior_campaign_id->IsForeignKey = true; // Foreign key field
         $this->interior_campaign_id->Sortable = true; // Allow sort
         $this->interior_campaign_id->UsePleaseSelect = true; // Use PleaseSelect by default
         $this->interior_campaign_id->PleaseSelectText = $Language->phrase("PleaseSelect"); // "PleaseSelect" text
@@ -138,6 +137,15 @@ class MainBuses extends DbTable
         $this->bus_status_id->Lookup = new Lookup('bus_status_id', 'x_bus_status', false, 'id', ["name","availability","",""], [], [], [], [], [], [], '', '');
         $this->bus_status_id->DefaultErrorMessage = $Language->phrase("IncorrectInteger");
         $this->Fields['bus_status_id'] = &$this->bus_status_id;
+
+        // bus_size_id
+        $this->bus_size_id = new DbField('main_buses', 'main_buses', 'x_bus_size_id', 'bus_size_id', '"bus_size_id"', 'CAST("bus_size_id" AS varchar(255))', 3, 4, -1, false, '"bus_size_id"', false, false, false, 'FORMATTED TEXT', 'SELECT');
+        $this->bus_size_id->Sortable = true; // Allow sort
+        $this->bus_size_id->UsePleaseSelect = true; // Use PleaseSelect by default
+        $this->bus_size_id->PleaseSelectText = $Language->phrase("PleaseSelect"); // "PleaseSelect" text
+        $this->bus_size_id->Lookup = new Lookup('bus_size_id', 'x_bus_sizes', false, 'id', ["name","","",""], [], [], [], [], [], [], '', '');
+        $this->bus_size_id->DefaultErrorMessage = $Language->phrase("IncorrectInteger");
+        $this->Fields['bus_size_id'] = &$this->bus_size_id;
 
         // bus_depot_id
         $this->bus_depot_id = new DbField('main_buses', 'main_buses', 'x_bus_depot_id', 'bus_depot_id', '"bus_depot_id"', 'CAST("bus_depot_id" AS varchar(255))', 3, 4, -1, false, '"bus_depot_id"', false, false, false, 'FORMATTED TEXT', 'SELECT');
@@ -202,68 +210,6 @@ class MainBuses extends DbTable
         }
     }
 
-    // Current master table name
-    public function getCurrentMasterTable()
-    {
-        return @$_SESSION[PROJECT_NAME . "_" . $this->TableVar . "_" . Config("TABLE_MASTER_TABLE")];
-    }
-
-    public function setCurrentMasterTable($v)
-    {
-        $_SESSION[PROJECT_NAME . "_" . $this->TableVar . "_" . Config("TABLE_MASTER_TABLE")] = $v;
-    }
-
-    // Session master WHERE clause
-    public function getMasterFilter()
-    {
-        // Master filter
-        $masterFilter = "";
-        if ($this->getCurrentMasterTable() == "main_campaigns") {
-            if ($this->exterior_campaign_id->getSessionValue() != "") {
-                $masterFilter .= "" . GetForeignKeySql("\"id\"", $this->exterior_campaign_id->getSessionValue(), DATATYPE_NUMBER, "DB");
-            } else {
-                return "";
-            }
-            if ($this->interior_campaign_id->getSessionValue() != "") {
-                $masterFilter .= " AND " . GetForeignKeySql("\"id\"", $this->interior_campaign_id->getSessionValue(), DATATYPE_NUMBER, "DB");
-            } else {
-                return "";
-            }
-        }
-        return $masterFilter;
-    }
-
-    // Session detail WHERE clause
-    public function getDetailFilter()
-    {
-        // Detail filter
-        $detailFilter = "";
-        if ($this->getCurrentMasterTable() == "main_campaigns") {
-            if ($this->exterior_campaign_id->getSessionValue() != "") {
-                $detailFilter .= "" . GetForeignKeySql("\"exterior_campaign_id\"", $this->exterior_campaign_id->getSessionValue(), DATATYPE_NUMBER, "DB");
-            } else {
-                return "";
-            }
-            if ($this->interior_campaign_id->getSessionValue() != "") {
-                $detailFilter .= " AND " . GetForeignKeySql("\"interior_campaign_id\"", $this->interior_campaign_id->getSessionValue(), DATATYPE_NUMBER, "DB");
-            } else {
-                return "";
-            }
-        }
-        return $detailFilter;
-    }
-
-    // Master filter
-    public function sqlMasterFilter_main_campaigns()
-    {
-        return "\"id\"=@id@ AND \"id\"=@id@";
-    }
-    // Detail filter
-    public function sqlDetailFilter_main_campaigns()
-    {
-        return "\"exterior_campaign_id\"=@exterior_campaign_id@ AND \"interior_campaign_id\"=@interior_campaign_id@";
-    }
-
     // Current detail table name
     public function getCurrentDetailTable()
     {
@@ -282,10 +228,6 @@ class MainBuses extends DbTable
         $detailUrl = "";
         if ($this->getCurrentDetailTable() == "sub_media_allocation") {
             $detailUrl = Container("sub_media_allocation")->getListUrl() . "?" . Config("TABLE_SHOW_MASTER") . "=" . $this->TableVar;
-            $detailUrl .= "&" . GetForeignKeyUrl("fk_id", $this->id->CurrentValue);
-        }
-        if ($this->getCurrentDetailTable() == "sub_transaction_details") {
-            $detailUrl = Container("sub_transaction_details")->getListUrl() . "?" . Config("TABLE_SHOW_MASTER") . "=" . $this->TableVar;
             $detailUrl .= "&" . GetForeignKeyUrl("fk_id", $this->id->CurrentValue);
         }
         if ($detailUrl == "") {
@@ -391,13 +333,6 @@ class MainBuses extends DbTable
     // Apply User ID filters
     public function applyUserIDFilters($filter)
     {
-        global $Security;
-        // Add User ID filter
-        if ($Security->currentUserID() != "" && !$Security->isAdmin()) { // Non system admin
-            if ($this->getCurrentMasterTable() == "main_campaigns" || $this->getCurrentMasterTable() == "") {
-                $filter = $this->addDetailUserIDFilter($filter, "main_campaigns"); // Add detail User ID filter
-            }
-        }
         return $filter;
     }
 
@@ -679,6 +614,7 @@ class MainBuses extends DbTable
         $this->exterior_campaign_id->DbValue = $row['exterior_campaign_id'];
         $this->interior_campaign_id->DbValue = $row['interior_campaign_id'];
         $this->bus_status_id->DbValue = $row['bus_status_id'];
+        $this->bus_size_id->DbValue = $row['bus_size_id'];
         $this->bus_depot_id->DbValue = $row['bus_depot_id'];
         $this->ts_created->DbValue = $row['ts_created'];
         $this->ts_last_update->DbValue = $row['ts_last_update'];
@@ -870,11 +806,6 @@ class MainBuses extends DbTable
     // Add master url
     public function addMasterUrl($url)
     {
-        if ($this->getCurrentMasterTable() == "main_campaigns" && !ContainsString($url, Config("TABLE_SHOW_MASTER") . "=")) {
-            $url .= (ContainsString($url, "?") ? "&" : "?") . Config("TABLE_SHOW_MASTER") . "=" . $this->getCurrentMasterTable();
-            $url .= "&" . GetForeignKeyUrl("fk_id", $this->exterior_campaign_id->CurrentValue);
-            $url .= "&" . GetForeignKeyUrl("fk_id", $this->interior_campaign_id->CurrentValue);
-        }
         return $url;
     }
 
@@ -1023,6 +954,7 @@ SORTHTML;
         $this->exterior_campaign_id->setDbValue($row['exterior_campaign_id']);
         $this->interior_campaign_id->setDbValue($row['interior_campaign_id']);
         $this->bus_status_id->setDbValue($row['bus_status_id']);
+        $this->bus_size_id->setDbValue($row['bus_size_id']);
         $this->bus_depot_id->setDbValue($row['bus_depot_id']);
         $this->ts_created->setDbValue($row['ts_created']);
         $this->ts_last_update->setDbValue($row['ts_last_update']);
@@ -1053,6 +985,8 @@ SORTHTML;
         // interior_campaign_id
 
         // bus_status_id
+
+        // bus_size_id
 
         // bus_depot_id
 
@@ -1181,6 +1115,27 @@ SORTHTML;
         }
         $this->bus_status_id->ViewCustomAttributes = "";
 
+        // bus_size_id
+        $curVal = strval($this->bus_size_id->CurrentValue);
+        if ($curVal != "") {
+            $this->bus_size_id->ViewValue = $this->bus_size_id->lookupCacheOption($curVal);
+            if ($this->bus_size_id->ViewValue === null) { // Lookup from database
+                $filterWrk = "\"id\"" . SearchString("=", $curVal, DATATYPE_NUMBER, "");
+                $sqlWrk = $this->bus_size_id->Lookup->getSql(false, $filterWrk, '', $this, true);
+                $rswrk = Conn()->executeQuery($sqlWrk)->fetchAll(\PDO::FETCH_BOTH);
+                $ari = count($rswrk);
+                if ($ari > 0) { // Lookup values found
+                    $arwrk = $this->bus_size_id->Lookup->renderViewRow($rswrk[0]);
+                    $this->bus_size_id->ViewValue = $this->bus_size_id->displayValue($arwrk);
+                } else {
+                    $this->bus_size_id->ViewValue = $this->bus_size_id->CurrentValue;
+                }
+            }
+        } else {
+            $this->bus_size_id->ViewValue = null;
+        }
+        $this->bus_size_id->ViewCustomAttributes = "";
+
         // bus_depot_id
         $curVal = strval($this->bus_depot_id->CurrentValue);
         if ($curVal != "") {
@@ -1247,6 +1202,11 @@ SORTHTML;
         $this->bus_status_id->HrefValue = "";
         $this->bus_status_id->TooltipValue = "";
 
+        // bus_size_id
+        $this->bus_size_id->LinkCustomAttributes = "";
+        $this->bus_size_id->HrefValue = "";
+        $this->bus_size_id->TooltipValue = "";
+
         // bus_depot_id
         $this->bus_depot_id->LinkCustomAttributes = "";
         $this->bus_depot_id->HrefValue = "";
@@ -1305,71 +1265,22 @@ SORTHTML;
         // exterior_campaign_id
         $this->exterior_campaign_id->EditAttrs["class"] = "form-control";
         $this->exterior_campaign_id->EditCustomAttributes = "";
-        if ($this->exterior_campaign_id->getSessionValue() != "") {
-            $this->exterior_campaign_id->CurrentValue = GetForeignKeyValue($this->exterior_campaign_id->getSessionValue());
-            $curVal = strval($this->exterior_campaign_id->CurrentValue);
-            if ($curVal != "") {
-                $this->exterior_campaign_id->ViewValue = $this->exterior_campaign_id->lookupCacheOption($curVal);
-                if ($this->exterior_campaign_id->ViewValue === null) { // Lookup from database
-                    $filterWrk = "\"id\"" . SearchString("=", $curVal, DATATYPE_NUMBER, "");
-                    $lookupFilter = function() {
-                        return "\"inventory_id\" = (SELECT ID FROM y_inventory WHERE name = 'Exterior Branding')";
-                    };
-                    $lookupFilter = $lookupFilter->bindTo($this);
-                    $sqlWrk = $this->exterior_campaign_id->Lookup->getSql(false, $filterWrk, $lookupFilter, $this, true);
-                    $rswrk = Conn()->executeQuery($sqlWrk)->fetchAll(\PDO::FETCH_BOTH);
-                    $ari = count($rswrk);
-                    if ($ari > 0) { // Lookup values found
-                        $arwrk = $this->exterior_campaign_id->Lookup->renderViewRow($rswrk[0]);
-                        $this->exterior_campaign_id->ViewValue = $this->exterior_campaign_id->displayValue($arwrk);
-                    } else {
-                        $this->exterior_campaign_id->ViewValue = $this->exterior_campaign_id->CurrentValue;
-                    }
-                }
-            } else {
-                $this->exterior_campaign_id->ViewValue = null;
-            }
-            $this->exterior_campaign_id->ViewCustomAttributes = "";
-        } else {
-            $this->exterior_campaign_id->PlaceHolder = RemoveHtml($this->exterior_campaign_id->caption());
-        }
+        $this->exterior_campaign_id->PlaceHolder = RemoveHtml($this->exterior_campaign_id->caption());
 
         // interior_campaign_id
         $this->interior_campaign_id->EditAttrs["class"] = "form-control";
         $this->interior_campaign_id->EditCustomAttributes = "";
-        if ($this->interior_campaign_id->getSessionValue() != "") {
-            $this->interior_campaign_id->CurrentValue = GetForeignKeyValue($this->interior_campaign_id->getSessionValue());
-            $curVal = strval($this->interior_campaign_id->CurrentValue);
-            if ($curVal != "") {
-                $this->interior_campaign_id->ViewValue = $this->interior_campaign_id->lookupCacheOption($curVal);
-                if ($this->interior_campaign_id->ViewValue === null) { // Lookup from database
-                    $filterWrk = "\"id\"" . SearchString("=", $curVal, DATATYPE_NUMBER, "");
-                    $lookupFilter = function() {
-                        return "\"inventory_id\" = (SELECT ID FROM y_inventory WHERE name = 'Interior Branding')";
-                    };
-                    $lookupFilter = $lookupFilter->bindTo($this);
-                    $sqlWrk = $this->interior_campaign_id->Lookup->getSql(false, $filterWrk, $lookupFilter, $this, true);
-                    $rswrk = Conn()->executeQuery($sqlWrk)->fetchAll(\PDO::FETCH_BOTH);
-                    $ari = count($rswrk);
-                    if ($ari > 0) { // Lookup values found
-                        $arwrk = $this->interior_campaign_id->Lookup->renderViewRow($rswrk[0]);
-                        $this->interior_campaign_id->ViewValue = $this->interior_campaign_id->displayValue($arwrk);
-                    } else {
-                        $this->interior_campaign_id->ViewValue = $this->interior_campaign_id->CurrentValue;
-                    }
-                }
-            } else {
-                $this->interior_campaign_id->ViewValue = null;
-            }
-            $this->interior_campaign_id->ViewCustomAttributes = "";
-        } else {
-            $this->interior_campaign_id->PlaceHolder = RemoveHtml($this->interior_campaign_id->caption());
-        }
+        $this->interior_campaign_id->PlaceHolder = RemoveHtml($this->interior_campaign_id->caption());
 
         // bus_status_id
         $this->bus_status_id->EditAttrs["class"] = "form-control";
         $this->bus_status_id->EditCustomAttributes = "";
         $this->bus_status_id->PlaceHolder = RemoveHtml($this->bus_status_id->caption());
+
+        // bus_size_id
+        $this->bus_size_id->EditAttrs["class"] = "form-control";
+        $this->bus_size_id->EditCustomAttributes = "";
+        $this->bus_size_id->PlaceHolder = RemoveHtml($this->bus_size_id->caption());
 
         // bus_depot_id
         $this->bus_depot_id->EditAttrs["class"] = "form-control";
@@ -1423,6 +1334,7 @@ SORTHTML;
                     $doc->exportCaption($this->exterior_campaign_id);
                     $doc->exportCaption($this->interior_campaign_id);
                     $doc->exportCaption($this->bus_status_id);
+                    $doc->exportCaption($this->bus_size_id);
                     $doc->exportCaption($this->bus_depot_id);
                     $doc->exportCaption($this->ts_created);
                     $doc->exportCaption($this->ts_last_update);
@@ -1434,6 +1346,7 @@ SORTHTML;
                     $doc->exportCaption($this->exterior_campaign_id);
                     $doc->exportCaption($this->interior_campaign_id);
                     $doc->exportCaption($this->bus_status_id);
+                    $doc->exportCaption($this->bus_size_id);
                     $doc->exportCaption($this->bus_depot_id);
                     $doc->exportCaption($this->ts_created);
                     $doc->exportCaption($this->ts_last_update);
@@ -1473,6 +1386,7 @@ SORTHTML;
                         $doc->exportField($this->exterior_campaign_id);
                         $doc->exportField($this->interior_campaign_id);
                         $doc->exportField($this->bus_status_id);
+                        $doc->exportField($this->bus_size_id);
                         $doc->exportField($this->bus_depot_id);
                         $doc->exportField($this->ts_created);
                         $doc->exportField($this->ts_last_update);
@@ -1484,6 +1398,7 @@ SORTHTML;
                         $doc->exportField($this->exterior_campaign_id);
                         $doc->exportField($this->interior_campaign_id);
                         $doc->exportField($this->bus_status_id);
+                        $doc->exportField($this->bus_size_id);
                         $doc->exportField($this->bus_depot_id);
                         $doc->exportField($this->ts_created);
                         $doc->exportField($this->ts_last_update);
@@ -1501,35 +1416,6 @@ SORTHTML;
         if (!$doc->ExportCustom) {
             $doc->exportTableFooter();
         }
-    }
-
-    // Add master User ID filter
-    public function addMasterUserIDFilter($filter, $currentMasterTable)
-    {
-        $filterWrk = $filter;
-        if ($currentMasterTable == "main_campaigns") {
-            $filterWrk = Container("main_campaigns")->addUserIDFilter($filterWrk);
-        }
-        return $filterWrk;
-    }
-
-    // Add detail User ID filter
-    public function addDetailUserIDFilter($filter, $currentMasterTable)
-    {
-        $filterWrk = $filter;
-        if ($currentMasterTable == "main_campaigns") {
-            $mastertable = Container("main_campaigns");
-            if (!$mastertable->userIdAllow()) {
-                $subqueryWrk = $mastertable->getUserIDSubquery($this->exterior_campaign_id, $mastertable->id);
-                AddFilter($filterWrk, $subqueryWrk);
-            }
-            $mastertable = Container("main_campaigns");
-            if (!$mastertable->userIdAllow()) {
-                $subqueryWrk = $mastertable->getUserIDSubquery($this->interior_campaign_id, $mastertable->id);
-                AddFilter($filterWrk, $subqueryWrk);
-            }
-        }
-        return $filterWrk;
     }
 
     // Get file data

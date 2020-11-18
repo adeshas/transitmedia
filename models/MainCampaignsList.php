@@ -1440,13 +1440,6 @@ class MainCampaignsList extends MainCampaigns
         $item->OnLeft = false;
         $item->ShowInButtonGroup = false;
 
-        // "detail_main_buses"
-        $item = &$this->ListOptions->add("detail_main_buses");
-        $item->CssClass = "text-nowrap";
-        $item->Visible = $Security->allowList(CurrentProjectID() . 'main_buses') && !$this->ShowMultipleDetails;
-        $item->OnLeft = false;
-        $item->ShowInButtonGroup = false;
-
         // "detail_main_transactions"
         $item = &$this->ListOptions->add("detail_main_transactions");
         $item->CssClass = "text-nowrap";
@@ -1466,7 +1459,6 @@ class MainCampaignsList extends MainCampaigns
         // Set up detail pages
         $pages = new SubPages();
         $pages->add("sub_media_allocation");
-        $pages->add("main_buses");
         $pages->add("main_transactions");
         $this->DetailPages = $pages;
 
@@ -1610,42 +1602,6 @@ class MainCampaignsList extends MainCampaigns
             }
         }
 
-        // "detail_main_buses"
-        $opt = $this->ListOptions["detail_main_buses"];
-        if ($Security->allowList(CurrentProjectID() . 'main_buses') && $this->showOptionLink()) {
-            $body = $Language->phrase("DetailLink") . $Language->TablePhrase("main_buses", "TblCaption");
-            $body = "<a class=\"btn btn-default ew-row-link ew-detail\" data-action=\"list\" href=\"" . HtmlEncode("mainbuseslist?" . Config("TABLE_SHOW_MASTER") . "=main_campaigns&" . GetForeignKeyUrl("fk_id", $this->id->CurrentValue) . "&" . GetForeignKeyUrl("fk_id", $this->id->CurrentValue) . "") . "\">" . $body . "</a>";
-            $links = "";
-            $detailPage = Container("MainBusesGrid");
-            if ($detailPage->DetailView && $Security->canView() && $this->showOptionLink("view") && $Security->allowView(CurrentProjectID() . 'main_campaigns')) {
-                $caption = $Language->phrase("MasterDetailViewLink");
-                $url = $this->getViewUrl(Config("TABLE_SHOW_DETAIL") . "=main_buses");
-                $links .= "<li><a class=\"dropdown-item ew-row-link ew-detail-view\" data-action=\"view\" data-caption=\"" . HtmlTitle($caption) . "\" href=\"" . HtmlEncode($url) . "\">" . HtmlImageAndText($caption) . "</a></li>";
-                if ($detailViewTblVar != "") {
-                    $detailViewTblVar .= ",";
-                }
-                $detailViewTblVar .= "main_buses";
-            }
-            if ($detailPage->DetailEdit && $Security->canEdit() && $this->showOptionLink("edit") && $Security->allowEdit(CurrentProjectID() . 'main_campaigns')) {
-                $caption = $Language->phrase("MasterDetailEditLink");
-                $url = $this->getEditUrl(Config("TABLE_SHOW_DETAIL") . "=main_buses");
-                $links .= "<li><a class=\"dropdown-item ew-row-link ew-detail-edit\" data-action=\"edit\" data-caption=\"" . HtmlTitle($caption) . "\" href=\"" . HtmlEncode($url) . "\">" . HtmlImageAndText($caption) . "</a></li>";
-                if ($detailEditTblVar != "") {
-                    $detailEditTblVar .= ",";
-                }
-                $detailEditTblVar .= "main_buses";
-            }
-            if ($links != "") {
-                $body .= "<button class=\"dropdown-toggle btn btn-default ew-detail\" data-toggle=\"dropdown\"></button>";
-                $body .= "<ul class=\"dropdown-menu\">" . $links . "</ul>";
-            }
-            $body = "<div class=\"btn-group btn-group-sm ew-btn-group\">" . $body . "</div>";
-            $opt->Body = $body;
-            if ($this->ShowMultipleDetails) {
-                $opt->Visible = false;
-            }
-        }
-
         // "detail_main_transactions"
         $opt = $this->ListOptions["detail_main_transactions"];
         if ($Security->allowList(CurrentProjectID() . 'main_transactions') && $this->showOptionLink()) {
@@ -1737,18 +1693,6 @@ class MainCampaignsList extends MainCampaigns
                         $detailTableLink .= ",";
                     }
                     $detailTableLink .= "sub_media_allocation";
-                }
-                $item = &$option->add("detailadd_main_buses");
-                $url = $this->getAddUrl(Config("TABLE_SHOW_DETAIL") . "=main_buses");
-                $detailPage = Container("MainBusesGrid");
-                $caption = $Language->phrase("Add") . "&nbsp;" . $this->tableCaption() . "/" . $detailPage->tableCaption();
-                $item->Body = "<a class=\"ew-detail-add-group ew-detail-add\" title=\"" . HtmlTitle($caption) . "\" data-caption=\"" . HtmlTitle($caption) . "\" href=\"" . HtmlEncode(GetUrl($url)) . "\">" . $caption . "</a>";
-                $item->Visible = ($detailPage->DetailAdd && $Security->allowAdd(CurrentProjectID() . 'main_campaigns') && $Security->canAdd());
-                if ($item->Visible) {
-                    if ($detailTableLink != "") {
-                        $detailTableLink .= ",";
-                    }
-                    $detailTableLink .= "main_buses";
                 }
                 $item = &$option->add("detailadd_main_transactions");
                 $url = $this->getAddUrl(Config("TABLE_SHOW_DETAIL") . "=main_transactions");

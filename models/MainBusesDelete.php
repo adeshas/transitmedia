@@ -353,6 +353,7 @@ class MainBusesDelete extends MainBuses
         $this->exterior_campaign_id->setVisibility();
         $this->interior_campaign_id->setVisibility();
         $this->bus_status_id->setVisibility();
+        $this->bus_size_id->setVisibility();
         $this->bus_depot_id->setVisibility();
         $this->ts_created->Visible = false;
         $this->ts_last_update->Visible = false;
@@ -375,10 +376,8 @@ class MainBusesDelete extends MainBuses
         $this->setupLookupOptions($this->exterior_campaign_id);
         $this->setupLookupOptions($this->interior_campaign_id);
         $this->setupLookupOptions($this->bus_status_id);
+        $this->setupLookupOptions($this->bus_size_id);
         $this->setupLookupOptions($this->bus_depot_id);
-
-        // Set up master/detail parameters
-        $this->setupMasterParms();
 
         // Set up Breadcrumb
         $this->setupBreadcrumb();
@@ -534,6 +533,7 @@ class MainBusesDelete extends MainBuses
         $this->exterior_campaign_id->setDbValue($row['exterior_campaign_id']);
         $this->interior_campaign_id->setDbValue($row['interior_campaign_id']);
         $this->bus_status_id->setDbValue($row['bus_status_id']);
+        $this->bus_size_id->setDbValue($row['bus_size_id']);
         $this->bus_depot_id->setDbValue($row['bus_depot_id']);
         $this->ts_created->setDbValue($row['ts_created']);
         $this->ts_last_update->setDbValue($row['ts_last_update']);
@@ -550,6 +550,7 @@ class MainBusesDelete extends MainBuses
         $row['exterior_campaign_id'] = null;
         $row['interior_campaign_id'] = null;
         $row['bus_status_id'] = null;
+        $row['bus_size_id'] = null;
         $row['bus_depot_id'] = null;
         $row['ts_created'] = null;
         $row['ts_last_update'] = null;
@@ -583,6 +584,8 @@ class MainBusesDelete extends MainBuses
         // interior_campaign_id
 
         // bus_status_id
+
+        // bus_size_id
 
         // bus_depot_id
 
@@ -711,6 +714,27 @@ class MainBusesDelete extends MainBuses
             }
             $this->bus_status_id->ViewCustomAttributes = "";
 
+            // bus_size_id
+            $curVal = strval($this->bus_size_id->CurrentValue);
+            if ($curVal != "") {
+                $this->bus_size_id->ViewValue = $this->bus_size_id->lookupCacheOption($curVal);
+                if ($this->bus_size_id->ViewValue === null) { // Lookup from database
+                    $filterWrk = "\"id\"" . SearchString("=", $curVal, DATATYPE_NUMBER, "");
+                    $sqlWrk = $this->bus_size_id->Lookup->getSql(false, $filterWrk, '', $this, true);
+                    $rswrk = Conn()->executeQuery($sqlWrk)->fetchAll(\PDO::FETCH_BOTH);
+                    $ari = count($rswrk);
+                    if ($ari > 0) { // Lookup values found
+                        $arwrk = $this->bus_size_id->Lookup->renderViewRow($rswrk[0]);
+                        $this->bus_size_id->ViewValue = $this->bus_size_id->displayValue($arwrk);
+                    } else {
+                        $this->bus_size_id->ViewValue = $this->bus_size_id->CurrentValue;
+                    }
+                }
+            } else {
+                $this->bus_size_id->ViewValue = null;
+            }
+            $this->bus_size_id->ViewCustomAttributes = "";
+
             // bus_depot_id
             $curVal = strval($this->bus_depot_id->CurrentValue);
             if ($curVal != "") {
@@ -776,6 +800,11 @@ class MainBusesDelete extends MainBuses
             $this->bus_status_id->LinkCustomAttributes = "";
             $this->bus_status_id->HrefValue = "";
             $this->bus_status_id->TooltipValue = "";
+
+            // bus_size_id
+            $this->bus_size_id->LinkCustomAttributes = "";
+            $this->bus_size_id->HrefValue = "";
+            $this->bus_size_id->TooltipValue = "";
 
             // bus_depot_id
             $this->bus_depot_id->LinkCustomAttributes = "";
@@ -872,98 +901,6 @@ class MainBusesDelete extends MainBuses
         return $deleteRows;
     }
 
-    // Set up master/detail based on QueryString
-    protected function setupMasterParms()
-    {
-        $validMaster = false;
-        // Get the keys for master table
-        if (($master = Get(Config("TABLE_SHOW_MASTER"), Get(Config("TABLE_MASTER")))) !== null) {
-            $masterTblVar = $master;
-            if ($masterTblVar == "") {
-                $validMaster = true;
-                $this->DbMasterFilter = "";
-                $this->DbDetailFilter = "";
-            }
-            if ($masterTblVar == "main_campaigns") {
-                $validMaster = true;
-                $masterTbl = Container("main_campaigns");
-                if (($parm = Get("fk_id", Get("exterior_campaign_id"))) !== null) {
-                    $masterTbl->id->setQueryStringValue($parm);
-                    $this->exterior_campaign_id->setQueryStringValue($masterTbl->id->QueryStringValue);
-                    $this->exterior_campaign_id->setSessionValue($this->exterior_campaign_id->QueryStringValue);
-                    if (!is_numeric($masterTbl->id->QueryStringValue)) {
-                        $validMaster = false;
-                    }
-                } else {
-                    $validMaster = false;
-                }
-                if (($parm = Get("fk_id", Get("interior_campaign_id"))) !== null) {
-                    $masterTbl->id->setQueryStringValue($parm);
-                    $this->interior_campaign_id->setQueryStringValue($masterTbl->id->QueryStringValue);
-                    $this->interior_campaign_id->setSessionValue($this->interior_campaign_id->QueryStringValue);
-                    if (!is_numeric($masterTbl->id->QueryStringValue)) {
-                        $validMaster = false;
-                    }
-                } else {
-                    $validMaster = false;
-                }
-            }
-        } elseif (($master = Post(Config("TABLE_SHOW_MASTER"), Post(Config("TABLE_MASTER")))) !== null) {
-            $masterTblVar = $master;
-            if ($masterTblVar == "") {
-                    $validMaster = true;
-                    $this->DbMasterFilter = "";
-                    $this->DbDetailFilter = "";
-            }
-            if ($masterTblVar == "main_campaigns") {
-                $validMaster = true;
-                $masterTbl = Container("main_campaigns");
-                if (($parm = Post("fk_id", Post("exterior_campaign_id"))) !== null) {
-                    $masterTbl->id->setFormValue($parm);
-                    $this->exterior_campaign_id->setFormValue($masterTbl->id->FormValue);
-                    $this->exterior_campaign_id->setSessionValue($this->exterior_campaign_id->FormValue);
-                    if (!is_numeric($masterTbl->id->FormValue)) {
-                        $validMaster = false;
-                    }
-                } else {
-                    $validMaster = false;
-                }
-                if (($parm = Post("fk_id", Post("interior_campaign_id"))) !== null) {
-                    $masterTbl->id->setFormValue($parm);
-                    $this->interior_campaign_id->setFormValue($masterTbl->id->FormValue);
-                    $this->interior_campaign_id->setSessionValue($this->interior_campaign_id->FormValue);
-                    if (!is_numeric($masterTbl->id->FormValue)) {
-                        $validMaster = false;
-                    }
-                } else {
-                    $validMaster = false;
-                }
-            }
-        }
-        if ($validMaster) {
-            // Save current master table
-            $this->setCurrentMasterTable($masterTblVar);
-
-            // Reset start record counter (new master key)
-            if (!$this->isAddOrEdit()) {
-                $this->StartRecord = 1;
-                $this->setStartRecordNumber($this->StartRecord);
-            }
-
-            // Clear previous master key from Session
-            if ($masterTblVar != "main_campaigns") {
-                if ($this->exterior_campaign_id->CurrentValue == "") {
-                    $this->exterior_campaign_id->setSessionValue("");
-                }
-                if ($this->interior_campaign_id->CurrentValue == "") {
-                    $this->interior_campaign_id->setSessionValue("");
-                }
-            }
-        }
-        $this->DbMasterFilter = $this->getMasterFilter(); // Get master filter
-        $this->DbDetailFilter = $this->getDetailFilter(); // Get detail filter
-    }
-
     // Set up Breadcrumb
     protected function setupBreadcrumb()
     {
@@ -1005,6 +942,8 @@ class MainBusesDelete extends MainBuses
                     $lookupFilter = $lookupFilter->bindTo($this);
                     break;
                 case "x_bus_status_id":
+                    break;
+                case "x_bus_size_id":
                     break;
                 case "x_bus_depot_id":
                     break;

@@ -520,14 +520,6 @@ loadjs.ready("head", function() {
 <?php include_once "SubMediaAllocationGrid.php" ?>
 <?php } ?>
 <?php
-    if (in_array("main_buses", explode(",", $Page->getCurrentDetailTable())) && $main_buses->DetailAdd) {
-?>
-<?php if ($Page->getCurrentDetailTable() != "") { ?>
-<h4 class="ew-detail-caption"><?= $Language->tablePhrase("main_buses", "TblCaption") ?></h4>
-<?php } ?>
-<?php include_once "MainBusesGrid.php" ?>
-<?php } ?>
-<?php
     if (in_array("main_transactions", explode(",", $Page->getCurrentDetailTable())) && $main_transactions->DetailAdd) {
 ?>
 <?php if ($Page->getCurrentDetailTable() != "") { ?>

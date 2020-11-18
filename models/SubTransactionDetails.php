@@ -93,7 +93,6 @@ class SubTransactionDetails extends DbTable
 
         // bus_id
         $this->bus_id = new DbField('sub_transaction_details', 'sub_transaction_details', 'x_bus_id', 'bus_id', '"bus_id"', 'CAST("bus_id" AS varchar(255))', 3, 4, -1, false, '"EV__bus_id"', true, true, true, 'FORMATTED TEXT', 'SELECT');
-        $this->bus_id->IsForeignKey = true; // Foreign key field
         $this->bus_id->Nullable = false; // NOT NULL field
         $this->bus_id->Required = true; // Required field
         $this->bus_id->Sortable = true; // Allow sort
@@ -194,13 +193,6 @@ class SubTransactionDetails extends DbTable
     {
         // Master filter
         $masterFilter = "";
-        if ($this->getCurrentMasterTable() == "main_buses") {
-            if ($this->bus_id->getSessionValue() != "") {
-                $masterFilter .= "" . GetForeignKeySql("\"id\"", $this->bus_id->getSessionValue(), DATATYPE_NUMBER, "DB");
-            } else {
-                return "";
-            }
-        }
         if ($this->getCurrentMasterTable() == "main_transactions") {
             if ($this->transaction_id->getSessionValue() != "") {
                 $masterFilter .= "" . GetForeignKeySql("\"id\"", $this->transaction_id->getSessionValue(), DATATYPE_NUMBER, "DB");
@@ -216,13 +208,6 @@ class SubTransactionDetails extends DbTable
     {
         // Detail filter
         $detailFilter = "";
-        if ($this->getCurrentMasterTable() == "main_buses") {
-            if ($this->bus_id->getSessionValue() != "") {
-                $detailFilter .= "" . GetForeignKeySql("\"bus_id\"", $this->bus_id->getSessionValue(), DATATYPE_NUMBER, "DB");
-            } else {
-                return "";
-            }
-        }
         if ($this->getCurrentMasterTable() == "main_transactions") {
             if ($this->transaction_id->getSessionValue() != "") {
                 $detailFilter .= "" . GetForeignKeySql("\"transaction_id\"", $this->transaction_id->getSessionValue(), DATATYPE_NUMBER, "DB");
@@ -231,17 +216,6 @@ class SubTransactionDetails extends DbTable
             }
         }
         return $detailFilter;
-    }
-
-    // Master filter
-    public function sqlMasterFilter_main_buses()
-    {
-        return "\"id\"=@id@";
-    }
-    // Detail filter
-    public function sqlDetailFilter_main_buses()
-    {
-        return "\"bus_id\"=@bus_id@";
     }
 
     // Master filter
@@ -865,10 +839,6 @@ class SubTransactionDetails extends DbTable
     // Add master url
     public function addMasterUrl($url)
     {
-        if ($this->getCurrentMasterTable() == "main_buses" && !ContainsString($url, Config("TABLE_SHOW_MASTER") . "=")) {
-            $url .= (ContainsString($url, "?") ? "&" : "?") . Config("TABLE_SHOW_MASTER") . "=" . $this->getCurrentMasterTable();
-            $url .= "&" . GetForeignKeyUrl("fk_id", $this->bus_id->CurrentValue);
-        }
         if ($this->getCurrentMasterTable() == "main_transactions" && !ContainsString($url, Config("TABLE_SHOW_MASTER") . "=")) {
             $url .= (ContainsString($url, "?") ? "&" : "?") . Config("TABLE_SHOW_MASTER") . "=" . $this->getCurrentMasterTable();
             $url .= "&" . GetForeignKeyUrl("fk_id", $this->transaction_id->CurrentValue);
@@ -1193,34 +1163,7 @@ SORTHTML;
         // bus_id
         $this->bus_id->EditAttrs["class"] = "form-control";
         $this->bus_id->EditCustomAttributes = "";
-        if ($this->bus_id->getSessionValue() != "") {
-            $this->bus_id->CurrentValue = GetForeignKeyValue($this->bus_id->getSessionValue());
-            if ($this->bus_id->VirtualValue != "") {
-                $this->bus_id->ViewValue = $this->bus_id->VirtualValue;
-            } else {
-                $curVal = strval($this->bus_id->CurrentValue);
-                if ($curVal != "") {
-                    $this->bus_id->ViewValue = $this->bus_id->lookupCacheOption($curVal);
-                    if ($this->bus_id->ViewValue === null) { // Lookup from database
-                        $filterWrk = "\"bus_id\"" . SearchString("=", $curVal, DATATYPE_NUMBER, "");
-                        $sqlWrk = $this->bus_id->Lookup->getSql(false, $filterWrk, '', $this, true);
-                        $rswrk = Conn()->executeQuery($sqlWrk)->fetchAll(\PDO::FETCH_BOTH);
-                        $ari = count($rswrk);
-                        if ($ari > 0) { // Lookup values found
-                            $arwrk = $this->bus_id->Lookup->renderViewRow($rswrk[0]);
-                            $this->bus_id->ViewValue = $this->bus_id->displayValue($arwrk);
-                        } else {
-                            $this->bus_id->ViewValue = $this->bus_id->CurrentValue;
-                        }
-                    }
-                } else {
-                    $this->bus_id->ViewValue = null;
-                }
-            }
-            $this->bus_id->ViewCustomAttributes = "";
-        } else {
-            $this->bus_id->PlaceHolder = RemoveHtml($this->bus_id->caption());
-        }
+        $this->bus_id->PlaceHolder = RemoveHtml($this->bus_id->caption());
 
         // created_by
         $this->created_by->EditAttrs["class"] = "form-control";

@@ -25,6 +25,7 @@ loadjs.ready("head", function () {
         ["comments", [fields.comments.required ? ew.Validators.required(fields.comments.caption) : null], fields.comments.isInvalid],
         ["all_codes_assigned_in_campaign", [fields.all_codes_assigned_in_campaign.required ? ew.Validators.required(fields.all_codes_assigned_in_campaign.caption) : null], fields.all_codes_assigned_in_campaign.isInvalid],
         ["bus_codes", [fields.bus_codes.required ? ew.Validators.required(fields.bus_codes.caption) : null], fields.bus_codes.isInvalid],
+        ["available_codes_to_be_assigned", [fields.available_codes_to_be_assigned.required ? ew.Validators.required(fields.available_codes_to_be_assigned.caption) : null], fields.available_codes_to_be_assigned.isInvalid],
         ["tags", [fields.tags.required ? ew.Validators.required(fields.tags.caption) : null], fields.tags.isInvalid]
     ]);
 
@@ -157,8 +158,8 @@ $Page->showMessage();
         <div class="<?= $Page->RightColumnClass ?>"><div <?= $Page->approved->cellAttributes() ?>>
 <span id="el_main_print_orders_approved">
 <div class="custom-control custom-checkbox d-inline-block">
-    <input type="checkbox" class="custom-control-input<?= $Page->approved->isInvalidClass() ?>" data-table="main_print_orders" data-field="x_approved" name="x_approved[]" id="x_approved_882196" value="1"<?= ConvertToBool($Page->approved->CurrentValue) ? " checked" : "" ?><?= $Page->approved->editAttributes() ?> aria-describedby="x_approved_help">
-    <label class="custom-control-label" for="x_approved_882196"></label>
+    <input type="checkbox" class="custom-control-input<?= $Page->approved->isInvalidClass() ?>" data-table="main_print_orders" data-field="x_approved" name="x_approved[]" id="x_approved_698122" value="1"<?= ConvertToBool($Page->approved->CurrentValue) ? " checked" : "" ?><?= $Page->approved->editAttributes() ?> aria-describedby="x_approved_help">
+    <label class="custom-control-label" for="x_approved_698122"></label>
 </div>
 <?= $Page->approved->getCustomMessage() ?>
 <div class="invalid-feedback"><?= $Page->approved->getErrorMessage() ?></div>
@@ -198,6 +199,18 @@ $Page->showMessage();
 <textarea data-table="main_print_orders" data-field="x_bus_codes" name="x_bus_codes" id="x_bus_codes" cols="35" rows="4" placeholder="<?= HtmlEncode($Page->bus_codes->getPlaceHolder()) ?>"<?= $Page->bus_codes->editAttributes() ?> aria-describedby="x_bus_codes_help"><?= $Page->bus_codes->EditValue ?></textarea>
 <?= $Page->bus_codes->getCustomMessage() ?>
 <div class="invalid-feedback"><?= $Page->bus_codes->getErrorMessage() ?></div>
+</span>
+</div></div>
+    </div>
+<?php } ?>
+<?php if ($Page->available_codes_to_be_assigned->Visible) { // available_codes_to_be_assigned ?>
+    <div id="r_available_codes_to_be_assigned" class="form-group row">
+        <label id="elh_main_print_orders_available_codes_to_be_assigned" for="x_available_codes_to_be_assigned" class="<?= $Page->LeftColumnClass ?>"><?= $Page->available_codes_to_be_assigned->caption() ?><?= $Page->available_codes_to_be_assigned->Required ? $Language->phrase("FieldRequiredIndicator") : "" ?></label>
+        <div class="<?= $Page->RightColumnClass ?>"><div <?= $Page->available_codes_to_be_assigned->cellAttributes() ?>>
+<span id="el_main_print_orders_available_codes_to_be_assigned">
+<textarea data-table="main_print_orders" data-field="x_available_codes_to_be_assigned" name="x_available_codes_to_be_assigned" id="x_available_codes_to_be_assigned" cols="35" rows="4" placeholder="<?= HtmlEncode($Page->available_codes_to_be_assigned->getPlaceHolder()) ?>"<?= $Page->available_codes_to_be_assigned->editAttributes() ?> aria-describedby="x_available_codes_to_be_assigned_help"><?= $Page->available_codes_to_be_assigned->EditValue ?></textarea>
+<?= $Page->available_codes_to_be_assigned->getCustomMessage() ?>
+<div class="invalid-feedback"><?= $Page->available_codes_to_be_assigned->getErrorMessage() ?></div>
 </span>
 </div></div>
     </div>

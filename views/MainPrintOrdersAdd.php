@@ -21,7 +21,9 @@ loadjs.ready("head", function () {
         ["campaign_id", [fields.campaign_id.required ? ew.Validators.required(fields.campaign_id.caption) : null], fields.campaign_id.isInvalid],
         ["printer_id", [fields.printer_id.required ? ew.Validators.required(fields.printer_id.caption) : null], fields.printer_id.isInvalid],
         ["quantity", [fields.quantity.required ? ew.Validators.required(fields.quantity.caption) : null, ew.Validators.integer], fields.quantity.isInvalid],
-        ["comments", [fields.comments.required ? ew.Validators.required(fields.comments.caption) : null], fields.comments.isInvalid]
+        ["comments", [fields.comments.required ? ew.Validators.required(fields.comments.caption) : null], fields.comments.isInvalid],
+        ["available_codes_to_be_assigned", [fields.available_codes_to_be_assigned.required ? ew.Validators.required(fields.available_codes_to_be_assigned.caption) : null], fields.available_codes_to_be_assigned.isInvalid],
+        ["tags", [fields.tags.required ? ew.Validators.required(fields.tags.caption) : null], fields.tags.isInvalid]
     ]);
 
     // Set invalid fields
@@ -198,6 +200,30 @@ loadjs.ready("head", function() {
 <textarea data-table="main_print_orders" data-field="x_comments" name="x_comments" id="x_comments" cols="35" rows="4" placeholder="<?= HtmlEncode($Page->comments->getPlaceHolder()) ?>"<?= $Page->comments->editAttributes() ?> aria-describedby="x_comments_help"><?= $Page->comments->EditValue ?></textarea>
 <?= $Page->comments->getCustomMessage() ?>
 <div class="invalid-feedback"><?= $Page->comments->getErrorMessage() ?></div>
+</span>
+</div></div>
+    </div>
+<?php } ?>
+<?php if ($Page->available_codes_to_be_assigned->Visible) { // available_codes_to_be_assigned ?>
+    <div id="r_available_codes_to_be_assigned" class="form-group row">
+        <label id="elh_main_print_orders_available_codes_to_be_assigned" for="x_available_codes_to_be_assigned" class="<?= $Page->LeftColumnClass ?>"><?= $Page->available_codes_to_be_assigned->caption() ?><?= $Page->available_codes_to_be_assigned->Required ? $Language->phrase("FieldRequiredIndicator") : "" ?></label>
+        <div class="<?= $Page->RightColumnClass ?>"><div <?= $Page->available_codes_to_be_assigned->cellAttributes() ?>>
+<span id="el_main_print_orders_available_codes_to_be_assigned">
+<textarea data-table="main_print_orders" data-field="x_available_codes_to_be_assigned" name="x_available_codes_to_be_assigned" id="x_available_codes_to_be_assigned" cols="35" rows="4" placeholder="<?= HtmlEncode($Page->available_codes_to_be_assigned->getPlaceHolder()) ?>"<?= $Page->available_codes_to_be_assigned->editAttributes() ?> aria-describedby="x_available_codes_to_be_assigned_help"><?= $Page->available_codes_to_be_assigned->EditValue ?></textarea>
+<?= $Page->available_codes_to_be_assigned->getCustomMessage() ?>
+<div class="invalid-feedback"><?= $Page->available_codes_to_be_assigned->getErrorMessage() ?></div>
+</span>
+</div></div>
+    </div>
+<?php } ?>
+<?php if ($Page->tags->Visible) { // tags ?>
+    <div id="r_tags" class="form-group row">
+        <label id="elh_main_print_orders_tags" for="x_tags" class="<?= $Page->LeftColumnClass ?>"><?= $Page->tags->caption() ?><?= $Page->tags->Required ? $Language->phrase("FieldRequiredIndicator") : "" ?></label>
+        <div class="<?= $Page->RightColumnClass ?>"><div <?= $Page->tags->cellAttributes() ?>>
+<span id="el_main_print_orders_tags">
+<textarea data-table="main_print_orders" data-field="x_tags" name="x_tags" id="x_tags" cols="35" rows="4" placeholder="<?= HtmlEncode($Page->tags->getPlaceHolder()) ?>"<?= $Page->tags->editAttributes() ?> aria-describedby="x_tags_help"><?= $Page->tags->EditValue ?></textarea>
+<?= $Page->tags->getCustomMessage() ?>
+<div class="invalid-feedback"><?= $Page->tags->getErrorMessage() ?></div>
 </span>
 </div></div>
     </div>

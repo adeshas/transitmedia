@@ -779,31 +779,15 @@ class SubMediaAllocationList extends SubMediaAllocation
 
         // Add master User ID filter
         if ($Security->currentUserID() != "" && !$Security->isAdmin()) { // Non system admin
-                if ($this->getCurrentMasterTable() == "main_buses") {
-                    $this->DbMasterFilter = $this->addMasterUserIDFilter($this->DbMasterFilter, "main_buses"); // Add master User ID filter
-                }
                 if ($this->getCurrentMasterTable() == "main_campaigns") {
                     $this->DbMasterFilter = $this->addMasterUserIDFilter($this->DbMasterFilter, "main_campaigns"); // Add master User ID filter
+                }
+                if ($this->getCurrentMasterTable() == "main_buses") {
+                    $this->DbMasterFilter = $this->addMasterUserIDFilter($this->DbMasterFilter, "main_buses"); // Add master User ID filter
                 }
         }
         AddFilter($filter, $this->DbDetailFilter);
         AddFilter($filter, $this->SearchWhere);
-
-        // Load master record
-        if ($this->CurrentMode != "add" && $this->getMasterFilter() != "" && $this->getCurrentMasterTable() == "main_buses") {
-            $masterTbl = Container("main_buses");
-            $rsmaster = $masterTbl->loadRs($this->DbMasterFilter)->fetch(\PDO::FETCH_ASSOC);
-            $this->MasterRecordExists = $rsmaster !== false;
-            if (!$this->MasterRecordExists) {
-                $this->setFailureMessage($Language->phrase("NoRecord")); // Set no record found
-                $this->terminate("mainbuseslist"); // Return to master page
-                return;
-            } else {
-                $masterTbl->loadListRowValues($rsmaster);
-                $masterTbl->RowType = ROWTYPE_MASTER; // Master row
-                $masterTbl->renderListRow();
-            }
-        }
 
         // Load master record
         if ($this->CurrentMode != "add" && $this->getMasterFilter() != "" && $this->getCurrentMasterTable() == "main_campaigns") {
@@ -813,6 +797,22 @@ class SubMediaAllocationList extends SubMediaAllocation
             if (!$this->MasterRecordExists) {
                 $this->setFailureMessage($Language->phrase("NoRecord")); // Set no record found
                 $this->terminate("maincampaignslist"); // Return to master page
+                return;
+            } else {
+                $masterTbl->loadListRowValues($rsmaster);
+                $masterTbl->RowType = ROWTYPE_MASTER; // Master row
+                $masterTbl->renderListRow();
+            }
+        }
+
+        // Load master record
+        if ($this->CurrentMode != "add" && $this->getMasterFilter() != "" && $this->getCurrentMasterTable() == "main_buses") {
+            $masterTbl = Container("main_buses");
+            $rsmaster = $masterTbl->loadRs($this->DbMasterFilter)->fetch(\PDO::FETCH_ASSOC);
+            $this->MasterRecordExists = $rsmaster !== false;
+            if (!$this->MasterRecordExists) {
+                $this->setFailureMessage($Language->phrase("NoRecord")); // Set no record found
+                $this->terminate("mainbuseslist"); // Return to master page
                 return;
             } else {
                 $masterTbl->loadListRowValues($rsmaster);
@@ -1344,8 +1344,8 @@ class SubMediaAllocationList extends SubMediaAllocation
                 $this->setCurrentMasterTable(""); // Clear master table
                 $this->DbMasterFilter = "";
                 $this->DbDetailFilter = "";
-                        $this->bus_id->setSessionValue("");
                         $this->campaign_id->setSessionValue("");
+                        $this->bus_id->setSessionValue("");
             }
 
             // Reset (clear) sorting order
@@ -3339,24 +3339,6 @@ class SubMediaAllocationList extends SubMediaAllocation
         $this->ExportDoc->ExportCustom = !$this->pageExporting();
 
         // Export master record
-        if (Config("EXPORT_MASTER_RECORD") && $this->getMasterFilter() != "" && $this->getCurrentMasterTable() == "main_buses") {
-            $main_buses = Container("main_buses");
-            $rsmaster = $main_buses->loadRs($this->DbMasterFilter); // Load master record
-            if ($rsmaster) {
-                $exportStyle = $doc->Style;
-                $doc->setStyle("v"); // Change to vertical
-                if (!$this->isExport("csv") || Config("EXPORT_MASTER_RECORD_FOR_CSV")) {
-                    $doc->Table = $main_buses;
-                    $main_buses->exportDocument($doc, new Recordset($rsmaster));
-                    $doc->exportEmptyRow();
-                    $doc->Table = &$this;
-                }
-                $doc->setStyle($exportStyle); // Restore
-                $rsmaster->closeCursor();
-            }
-        }
-
-        // Export master record
         if (Config("EXPORT_MASTER_RECORD") && $this->getMasterFilter() != "" && $this->getCurrentMasterTable() == "main_campaigns") {
             $main_campaigns = Container("main_campaigns");
             $rsmaster = $main_campaigns->loadRs($this->DbMasterFilter); // Load master record
@@ -3366,6 +3348,24 @@ class SubMediaAllocationList extends SubMediaAllocation
                 if (!$this->isExport("csv") || Config("EXPORT_MASTER_RECORD_FOR_CSV")) {
                     $doc->Table = $main_campaigns;
                     $main_campaigns->exportDocument($doc, new Recordset($rsmaster));
+                    $doc->exportEmptyRow();
+                    $doc->Table = &$this;
+                }
+                $doc->setStyle($exportStyle); // Restore
+                $rsmaster->closeCursor();
+            }
+        }
+
+        // Export master record
+        if (Config("EXPORT_MASTER_RECORD") && $this->getMasterFilter() != "" && $this->getCurrentMasterTable() == "main_buses") {
+            $main_buses = Container("main_buses");
+            $rsmaster = $main_buses->loadRs($this->DbMasterFilter); // Load master record
+            if ($rsmaster) {
+                $exportStyle = $doc->Style;
+                $doc->setStyle("v"); // Change to vertical
+                if (!$this->isExport("csv") || Config("EXPORT_MASTER_RECORD_FOR_CSV")) {
+                    $doc->Table = $main_buses;
+                    $main_buses->exportDocument($doc, new Recordset($rsmaster));
                     $doc->exportEmptyRow();
                     $doc->Table = &$this;
                 }
@@ -3433,20 +3433,6 @@ class SubMediaAllocationList extends SubMediaAllocation
                 $this->DbMasterFilter = "";
                 $this->DbDetailFilter = "";
             }
-            if ($masterTblVar == "main_buses") {
-                $validMaster = true;
-                $masterTbl = Container("main_buses");
-                if (($parm = Get("fk_id", Get("bus_id"))) !== null) {
-                    $masterTbl->id->setQueryStringValue($parm);
-                    $this->bus_id->setQueryStringValue($masterTbl->id->QueryStringValue);
-                    $this->bus_id->setSessionValue($this->bus_id->QueryStringValue);
-                    if (!is_numeric($masterTbl->id->QueryStringValue)) {
-                        $validMaster = false;
-                    }
-                } else {
-                    $validMaster = false;
-                }
-            }
             if ($masterTblVar == "main_campaigns") {
                 $validMaster = true;
                 $masterTbl = Container("main_campaigns");
@@ -3461,26 +3447,26 @@ class SubMediaAllocationList extends SubMediaAllocation
                     $validMaster = false;
                 }
             }
+            if ($masterTblVar == "main_buses") {
+                $validMaster = true;
+                $masterTbl = Container("main_buses");
+                if (($parm = Get("fk_id", Get("bus_id"))) !== null) {
+                    $masterTbl->id->setQueryStringValue($parm);
+                    $this->bus_id->setQueryStringValue($masterTbl->id->QueryStringValue);
+                    $this->bus_id->setSessionValue($this->bus_id->QueryStringValue);
+                    if (!is_numeric($masterTbl->id->QueryStringValue)) {
+                        $validMaster = false;
+                    }
+                } else {
+                    $validMaster = false;
+                }
+            }
         } elseif (($master = Post(Config("TABLE_SHOW_MASTER"), Post(Config("TABLE_MASTER")))) !== null) {
             $masterTblVar = $master;
             if ($masterTblVar == "") {
                     $validMaster = true;
                     $this->DbMasterFilter = "";
                     $this->DbDetailFilter = "";
-            }
-            if ($masterTblVar == "main_buses") {
-                $validMaster = true;
-                $masterTbl = Container("main_buses");
-                if (($parm = Post("fk_id", Post("bus_id"))) !== null) {
-                    $masterTbl->id->setFormValue($parm);
-                    $this->bus_id->setFormValue($masterTbl->id->FormValue);
-                    $this->bus_id->setSessionValue($this->bus_id->FormValue);
-                    if (!is_numeric($masterTbl->id->FormValue)) {
-                        $validMaster = false;
-                    }
-                } else {
-                    $validMaster = false;
-                }
             }
             if ($masterTblVar == "main_campaigns") {
                 $validMaster = true;
@@ -3489,6 +3475,20 @@ class SubMediaAllocationList extends SubMediaAllocation
                     $masterTbl->id->setFormValue($parm);
                     $this->campaign_id->setFormValue($masterTbl->id->FormValue);
                     $this->campaign_id->setSessionValue($this->campaign_id->FormValue);
+                    if (!is_numeric($masterTbl->id->FormValue)) {
+                        $validMaster = false;
+                    }
+                } else {
+                    $validMaster = false;
+                }
+            }
+            if ($masterTblVar == "main_buses") {
+                $validMaster = true;
+                $masterTbl = Container("main_buses");
+                if (($parm = Post("fk_id", Post("bus_id"))) !== null) {
+                    $masterTbl->id->setFormValue($parm);
+                    $this->bus_id->setFormValue($masterTbl->id->FormValue);
+                    $this->bus_id->setSessionValue($this->bus_id->FormValue);
                     if (!is_numeric($masterTbl->id->FormValue)) {
                         $validMaster = false;
                     }
@@ -3514,14 +3514,14 @@ class SubMediaAllocationList extends SubMediaAllocation
             }
 
             // Clear previous master key from Session
-            if ($masterTblVar != "main_buses") {
-                if ($this->bus_id->CurrentValue == "") {
-                    $this->bus_id->setSessionValue("");
-                }
-            }
             if ($masterTblVar != "main_campaigns") {
                 if ($this->campaign_id->CurrentValue == "") {
                     $this->campaign_id->setSessionValue("");
+                }
+            }
+            if ($masterTblVar != "main_buses") {
+                if ($this->bus_id->CurrentValue == "") {
+                    $this->bus_id->setSessionValue("");
                 }
             }
         }

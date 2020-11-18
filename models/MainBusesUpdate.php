@@ -440,6 +440,7 @@ class MainBusesUpdate extends MainBuses
         $this->exterior_campaign_id->setVisibility();
         $this->interior_campaign_id->setVisibility();
         $this->bus_status_id->setVisibility();
+        $this->bus_size_id->setVisibility();
         $this->bus_depot_id->setVisibility();
         $this->ts_created->setVisibility();
         $this->ts_last_update->setVisibility();
@@ -462,6 +463,7 @@ class MainBusesUpdate extends MainBuses
         $this->setupLookupOptions($this->exterior_campaign_id);
         $this->setupLookupOptions($this->interior_campaign_id);
         $this->setupLookupOptions($this->bus_status_id);
+        $this->setupLookupOptions($this->bus_size_id);
         $this->setupLookupOptions($this->bus_depot_id);
 
         // Check modal
@@ -555,6 +557,7 @@ class MainBusesUpdate extends MainBuses
                     $this->exterior_campaign_id->setDbValue($rs->fields['exterior_campaign_id']);
                     $this->interior_campaign_id->setDbValue($rs->fields['interior_campaign_id']);
                     $this->bus_status_id->setDbValue($rs->fields['bus_status_id']);
+                    $this->bus_size_id->setDbValue($rs->fields['bus_size_id']);
                     $this->bus_depot_id->setDbValue($rs->fields['bus_depot_id']);
                     $this->ts_created->setDbValue($rs->fields['ts_created']);
                     $this->ts_last_update->setDbValue($rs->fields['ts_last_update']);
@@ -576,6 +579,9 @@ class MainBusesUpdate extends MainBuses
                     }
                     if (!CompareValue($this->bus_status_id->DbValue, $rs->fields['bus_status_id'])) {
                         $this->bus_status_id->CurrentValue = null;
+                    }
+                    if (!CompareValue($this->bus_size_id->DbValue, $rs->fields['bus_size_id'])) {
+                        $this->bus_size_id->CurrentValue = null;
                     }
                     if (!CompareValue($this->bus_depot_id->DbValue, $rs->fields['bus_depot_id'])) {
                         $this->bus_depot_id->CurrentValue = null;
@@ -727,6 +733,17 @@ class MainBusesUpdate extends MainBuses
         }
         $this->bus_status_id->MultiUpdate = $CurrentForm->getValue("u_bus_status_id");
 
+        // Check field name 'bus_size_id' first before field var 'x_bus_size_id'
+        $val = $CurrentForm->hasValue("bus_size_id") ? $CurrentForm->getValue("bus_size_id") : $CurrentForm->getValue("x_bus_size_id");
+        if (!$this->bus_size_id->IsDetailKey) {
+            if (IsApi() && $val === null) {
+                $this->bus_size_id->Visible = false; // Disable update for API request
+            } else {
+                $this->bus_size_id->setFormValue($val);
+            }
+        }
+        $this->bus_size_id->MultiUpdate = $CurrentForm->getValue("u_bus_size_id");
+
         // Check field name 'bus_depot_id' first before field var 'x_bus_depot_id'
         $val = $CurrentForm->hasValue("bus_depot_id") ? $CurrentForm->getValue("bus_depot_id") : $CurrentForm->getValue("x_bus_depot_id");
         if (!$this->bus_depot_id->IsDetailKey) {
@@ -780,6 +797,7 @@ class MainBusesUpdate extends MainBuses
         $this->exterior_campaign_id->CurrentValue = $this->exterior_campaign_id->FormValue;
         $this->interior_campaign_id->CurrentValue = $this->interior_campaign_id->FormValue;
         $this->bus_status_id->CurrentValue = $this->bus_status_id->FormValue;
+        $this->bus_size_id->CurrentValue = $this->bus_size_id->FormValue;
         $this->bus_depot_id->CurrentValue = $this->bus_depot_id->FormValue;
         $this->ts_created->CurrentValue = $this->ts_created->FormValue;
         $this->ts_created->CurrentValue = UnFormatDateTime($this->ts_created->CurrentValue, 0);
@@ -862,6 +880,7 @@ class MainBusesUpdate extends MainBuses
         $this->exterior_campaign_id->setDbValue($row['exterior_campaign_id']);
         $this->interior_campaign_id->setDbValue($row['interior_campaign_id']);
         $this->bus_status_id->setDbValue($row['bus_status_id']);
+        $this->bus_size_id->setDbValue($row['bus_size_id']);
         $this->bus_depot_id->setDbValue($row['bus_depot_id']);
         $this->ts_created->setDbValue($row['ts_created']);
         $this->ts_last_update->setDbValue($row['ts_last_update']);
@@ -878,6 +897,7 @@ class MainBusesUpdate extends MainBuses
         $row['exterior_campaign_id'] = null;
         $row['interior_campaign_id'] = null;
         $row['bus_status_id'] = null;
+        $row['bus_size_id'] = null;
         $row['bus_depot_id'] = null;
         $row['ts_created'] = null;
         $row['ts_last_update'] = null;
@@ -909,6 +929,8 @@ class MainBusesUpdate extends MainBuses
         // interior_campaign_id
 
         // bus_status_id
+
+        // bus_size_id
 
         // bus_depot_id
 
@@ -1037,6 +1059,27 @@ class MainBusesUpdate extends MainBuses
             }
             $this->bus_status_id->ViewCustomAttributes = "";
 
+            // bus_size_id
+            $curVal = strval($this->bus_size_id->CurrentValue);
+            if ($curVal != "") {
+                $this->bus_size_id->ViewValue = $this->bus_size_id->lookupCacheOption($curVal);
+                if ($this->bus_size_id->ViewValue === null) { // Lookup from database
+                    $filterWrk = "\"id\"" . SearchString("=", $curVal, DATATYPE_NUMBER, "");
+                    $sqlWrk = $this->bus_size_id->Lookup->getSql(false, $filterWrk, '', $this, true);
+                    $rswrk = Conn()->executeQuery($sqlWrk)->fetchAll(\PDO::FETCH_BOTH);
+                    $ari = count($rswrk);
+                    if ($ari > 0) { // Lookup values found
+                        $arwrk = $this->bus_size_id->Lookup->renderViewRow($rswrk[0]);
+                        $this->bus_size_id->ViewValue = $this->bus_size_id->displayValue($arwrk);
+                    } else {
+                        $this->bus_size_id->ViewValue = $this->bus_size_id->CurrentValue;
+                    }
+                }
+            } else {
+                $this->bus_size_id->ViewValue = null;
+            }
+            $this->bus_size_id->ViewCustomAttributes = "";
+
             // bus_depot_id
             $curVal = strval($this->bus_depot_id->CurrentValue);
             if ($curVal != "") {
@@ -1097,6 +1140,11 @@ class MainBusesUpdate extends MainBuses
             $this->bus_status_id->LinkCustomAttributes = "";
             $this->bus_status_id->HrefValue = "";
             $this->bus_status_id->TooltipValue = "";
+
+            // bus_size_id
+            $this->bus_size_id->LinkCustomAttributes = "";
+            $this->bus_size_id->HrefValue = "";
+            $this->bus_size_id->TooltipValue = "";
 
             // bus_depot_id
             $this->bus_depot_id->LinkCustomAttributes = "";
@@ -1177,118 +1225,64 @@ class MainBusesUpdate extends MainBuses
             // exterior_campaign_id
             $this->exterior_campaign_id->EditAttrs["class"] = "form-control";
             $this->exterior_campaign_id->EditCustomAttributes = "";
-            if ($this->exterior_campaign_id->getSessionValue() != "") {
-                $this->exterior_campaign_id->CurrentValue = GetForeignKeyValue($this->exterior_campaign_id->getSessionValue());
-                $curVal = strval($this->exterior_campaign_id->CurrentValue);
-                if ($curVal != "") {
-                    $this->exterior_campaign_id->ViewValue = $this->exterior_campaign_id->lookupCacheOption($curVal);
-                    if ($this->exterior_campaign_id->ViewValue === null) { // Lookup from database
-                        $filterWrk = "\"id\"" . SearchString("=", $curVal, DATATYPE_NUMBER, "");
-                        $lookupFilter = function() {
-                            return "\"inventory_id\" = (SELECT ID FROM y_inventory WHERE name = 'Exterior Branding')";
-                        };
-                        $lookupFilter = $lookupFilter->bindTo($this);
-                        $sqlWrk = $this->exterior_campaign_id->Lookup->getSql(false, $filterWrk, $lookupFilter, $this, true);
-                        $rswrk = Conn()->executeQuery($sqlWrk)->fetchAll(\PDO::FETCH_BOTH);
-                        $ari = count($rswrk);
-                        if ($ari > 0) { // Lookup values found
-                            $arwrk = $this->exterior_campaign_id->Lookup->renderViewRow($rswrk[0]);
-                            $this->exterior_campaign_id->ViewValue = $this->exterior_campaign_id->displayValue($arwrk);
-                        } else {
-                            $this->exterior_campaign_id->ViewValue = $this->exterior_campaign_id->CurrentValue;
-                        }
-                    }
-                } else {
-                    $this->exterior_campaign_id->ViewValue = null;
-                }
-                $this->exterior_campaign_id->ViewCustomAttributes = "";
+            $curVal = trim(strval($this->exterior_campaign_id->CurrentValue));
+            if ($curVal != "") {
+                $this->exterior_campaign_id->ViewValue = $this->exterior_campaign_id->lookupCacheOption($curVal);
             } else {
-                $curVal = trim(strval($this->exterior_campaign_id->CurrentValue));
-                if ($curVal != "") {
-                    $this->exterior_campaign_id->ViewValue = $this->exterior_campaign_id->lookupCacheOption($curVal);
-                } else {
-                    $this->exterior_campaign_id->ViewValue = $this->exterior_campaign_id->Lookup !== null && is_array($this->exterior_campaign_id->Lookup->Options) ? $curVal : null;
-                }
-                if ($this->exterior_campaign_id->ViewValue !== null) { // Load from cache
-                    $this->exterior_campaign_id->EditValue = array_values($this->exterior_campaign_id->Lookup->Options);
-                } else { // Lookup from database
-                    if ($curVal == "") {
-                        $filterWrk = "0=1";
-                    } else {
-                        $filterWrk = "\"id\"" . SearchString("=", $this->exterior_campaign_id->CurrentValue, DATATYPE_NUMBER, "");
-                    }
-                    $lookupFilter = function() {
-                        return "\"inventory_id\" = (SELECT ID FROM y_inventory WHERE name = 'Exterior Branding')";
-                    };
-                    $lookupFilter = $lookupFilter->bindTo($this);
-                    $sqlWrk = $this->exterior_campaign_id->Lookup->getSql(true, $filterWrk, $lookupFilter, $this);
-                    $rswrk = Conn()->executeQuery($sqlWrk)->fetchAll(\PDO::FETCH_BOTH);
-                    $ari = count($rswrk);
-                    $arwrk = $rswrk;
-                    foreach ($arwrk as &$row)
-                        $row = $this->exterior_campaign_id->Lookup->renderViewRow($row);
-                    $this->exterior_campaign_id->EditValue = $arwrk;
-                }
-                $this->exterior_campaign_id->PlaceHolder = RemoveHtml($this->exterior_campaign_id->caption());
+                $this->exterior_campaign_id->ViewValue = $this->exterior_campaign_id->Lookup !== null && is_array($this->exterior_campaign_id->Lookup->Options) ? $curVal : null;
             }
+            if ($this->exterior_campaign_id->ViewValue !== null) { // Load from cache
+                $this->exterior_campaign_id->EditValue = array_values($this->exterior_campaign_id->Lookup->Options);
+            } else { // Lookup from database
+                if ($curVal == "") {
+                    $filterWrk = "0=1";
+                } else {
+                    $filterWrk = "\"id\"" . SearchString("=", $this->exterior_campaign_id->CurrentValue, DATATYPE_NUMBER, "");
+                }
+                $lookupFilter = function() {
+                    return "\"inventory_id\" = (SELECT ID FROM y_inventory WHERE name = 'Exterior Branding')";
+                };
+                $lookupFilter = $lookupFilter->bindTo($this);
+                $sqlWrk = $this->exterior_campaign_id->Lookup->getSql(true, $filterWrk, $lookupFilter, $this);
+                $rswrk = Conn()->executeQuery($sqlWrk)->fetchAll(\PDO::FETCH_BOTH);
+                $ari = count($rswrk);
+                $arwrk = $rswrk;
+                foreach ($arwrk as &$row)
+                    $row = $this->exterior_campaign_id->Lookup->renderViewRow($row);
+                $this->exterior_campaign_id->EditValue = $arwrk;
+            }
+            $this->exterior_campaign_id->PlaceHolder = RemoveHtml($this->exterior_campaign_id->caption());
 
             // interior_campaign_id
             $this->interior_campaign_id->EditAttrs["class"] = "form-control";
             $this->interior_campaign_id->EditCustomAttributes = "";
-            if ($this->interior_campaign_id->getSessionValue() != "") {
-                $this->interior_campaign_id->CurrentValue = GetForeignKeyValue($this->interior_campaign_id->getSessionValue());
-                $curVal = strval($this->interior_campaign_id->CurrentValue);
-                if ($curVal != "") {
-                    $this->interior_campaign_id->ViewValue = $this->interior_campaign_id->lookupCacheOption($curVal);
-                    if ($this->interior_campaign_id->ViewValue === null) { // Lookup from database
-                        $filterWrk = "\"id\"" . SearchString("=", $curVal, DATATYPE_NUMBER, "");
-                        $lookupFilter = function() {
-                            return "\"inventory_id\" = (SELECT ID FROM y_inventory WHERE name = 'Interior Branding')";
-                        };
-                        $lookupFilter = $lookupFilter->bindTo($this);
-                        $sqlWrk = $this->interior_campaign_id->Lookup->getSql(false, $filterWrk, $lookupFilter, $this, true);
-                        $rswrk = Conn()->executeQuery($sqlWrk)->fetchAll(\PDO::FETCH_BOTH);
-                        $ari = count($rswrk);
-                        if ($ari > 0) { // Lookup values found
-                            $arwrk = $this->interior_campaign_id->Lookup->renderViewRow($rswrk[0]);
-                            $this->interior_campaign_id->ViewValue = $this->interior_campaign_id->displayValue($arwrk);
-                        } else {
-                            $this->interior_campaign_id->ViewValue = $this->interior_campaign_id->CurrentValue;
-                        }
-                    }
-                } else {
-                    $this->interior_campaign_id->ViewValue = null;
-                }
-                $this->interior_campaign_id->ViewCustomAttributes = "";
+            $curVal = trim(strval($this->interior_campaign_id->CurrentValue));
+            if ($curVal != "") {
+                $this->interior_campaign_id->ViewValue = $this->interior_campaign_id->lookupCacheOption($curVal);
             } else {
-                $curVal = trim(strval($this->interior_campaign_id->CurrentValue));
-                if ($curVal != "") {
-                    $this->interior_campaign_id->ViewValue = $this->interior_campaign_id->lookupCacheOption($curVal);
-                } else {
-                    $this->interior_campaign_id->ViewValue = $this->interior_campaign_id->Lookup !== null && is_array($this->interior_campaign_id->Lookup->Options) ? $curVal : null;
-                }
-                if ($this->interior_campaign_id->ViewValue !== null) { // Load from cache
-                    $this->interior_campaign_id->EditValue = array_values($this->interior_campaign_id->Lookup->Options);
-                } else { // Lookup from database
-                    if ($curVal == "") {
-                        $filterWrk = "0=1";
-                    } else {
-                        $filterWrk = "\"id\"" . SearchString("=", $this->interior_campaign_id->CurrentValue, DATATYPE_NUMBER, "");
-                    }
-                    $lookupFilter = function() {
-                        return "\"inventory_id\" = (SELECT ID FROM y_inventory WHERE name = 'Interior Branding')";
-                    };
-                    $lookupFilter = $lookupFilter->bindTo($this);
-                    $sqlWrk = $this->interior_campaign_id->Lookup->getSql(true, $filterWrk, $lookupFilter, $this);
-                    $rswrk = Conn()->executeQuery($sqlWrk)->fetchAll(\PDO::FETCH_BOTH);
-                    $ari = count($rswrk);
-                    $arwrk = $rswrk;
-                    foreach ($arwrk as &$row)
-                        $row = $this->interior_campaign_id->Lookup->renderViewRow($row);
-                    $this->interior_campaign_id->EditValue = $arwrk;
-                }
-                $this->interior_campaign_id->PlaceHolder = RemoveHtml($this->interior_campaign_id->caption());
+                $this->interior_campaign_id->ViewValue = $this->interior_campaign_id->Lookup !== null && is_array($this->interior_campaign_id->Lookup->Options) ? $curVal : null;
             }
+            if ($this->interior_campaign_id->ViewValue !== null) { // Load from cache
+                $this->interior_campaign_id->EditValue = array_values($this->interior_campaign_id->Lookup->Options);
+            } else { // Lookup from database
+                if ($curVal == "") {
+                    $filterWrk = "0=1";
+                } else {
+                    $filterWrk = "\"id\"" . SearchString("=", $this->interior_campaign_id->CurrentValue, DATATYPE_NUMBER, "");
+                }
+                $lookupFilter = function() {
+                    return "\"inventory_id\" = (SELECT ID FROM y_inventory WHERE name = 'Interior Branding')";
+                };
+                $lookupFilter = $lookupFilter->bindTo($this);
+                $sqlWrk = $this->interior_campaign_id->Lookup->getSql(true, $filterWrk, $lookupFilter, $this);
+                $rswrk = Conn()->executeQuery($sqlWrk)->fetchAll(\PDO::FETCH_BOTH);
+                $ari = count($rswrk);
+                $arwrk = $rswrk;
+                foreach ($arwrk as &$row)
+                    $row = $this->interior_campaign_id->Lookup->renderViewRow($row);
+                $this->interior_campaign_id->EditValue = $arwrk;
+            }
+            $this->interior_campaign_id->PlaceHolder = RemoveHtml($this->interior_campaign_id->caption());
 
             // bus_status_id
             $this->bus_status_id->EditAttrs["class"] = "form-control";
@@ -1314,6 +1308,31 @@ class MainBusesUpdate extends MainBuses
                 $this->bus_status_id->EditValue = $arwrk;
             }
             $this->bus_status_id->PlaceHolder = RemoveHtml($this->bus_status_id->caption());
+
+            // bus_size_id
+            $this->bus_size_id->EditAttrs["class"] = "form-control";
+            $this->bus_size_id->EditCustomAttributes = "";
+            $curVal = trim(strval($this->bus_size_id->CurrentValue));
+            if ($curVal != "") {
+                $this->bus_size_id->ViewValue = $this->bus_size_id->lookupCacheOption($curVal);
+            } else {
+                $this->bus_size_id->ViewValue = $this->bus_size_id->Lookup !== null && is_array($this->bus_size_id->Lookup->Options) ? $curVal : null;
+            }
+            if ($this->bus_size_id->ViewValue !== null) { // Load from cache
+                $this->bus_size_id->EditValue = array_values($this->bus_size_id->Lookup->Options);
+            } else { // Lookup from database
+                if ($curVal == "") {
+                    $filterWrk = "0=1";
+                } else {
+                    $filterWrk = "\"id\"" . SearchString("=", $this->bus_size_id->CurrentValue, DATATYPE_NUMBER, "");
+                }
+                $sqlWrk = $this->bus_size_id->Lookup->getSql(true, $filterWrk, '', $this);
+                $rswrk = Conn()->executeQuery($sqlWrk)->fetchAll(\PDO::FETCH_BOTH);
+                $ari = count($rswrk);
+                $arwrk = $rswrk;
+                $this->bus_size_id->EditValue = $arwrk;
+            }
+            $this->bus_size_id->PlaceHolder = RemoveHtml($this->bus_size_id->caption());
 
             // bus_depot_id
             $this->bus_depot_id->EditAttrs["class"] = "form-control";
@@ -1378,6 +1397,10 @@ class MainBusesUpdate extends MainBuses
             $this->bus_status_id->LinkCustomAttributes = "";
             $this->bus_status_id->HrefValue = "";
 
+            // bus_size_id
+            $this->bus_size_id->LinkCustomAttributes = "";
+            $this->bus_size_id->HrefValue = "";
+
             // bus_depot_id
             $this->bus_depot_id->LinkCustomAttributes = "";
             $this->bus_depot_id->HrefValue = "";
@@ -1421,6 +1444,9 @@ class MainBusesUpdate extends MainBuses
             $updateCnt++;
         }
         if ($this->bus_status_id->multiUpdateSelected()) {
+            $updateCnt++;
+        }
+        if ($this->bus_size_id->multiUpdateSelected()) {
             $updateCnt++;
         }
         if ($this->bus_depot_id->multiUpdateSelected()) {
@@ -1468,6 +1494,11 @@ class MainBusesUpdate extends MainBuses
         if ($this->bus_status_id->Required) {
             if ($this->bus_status_id->MultiUpdate != "" && !$this->bus_status_id->IsDetailKey && EmptyValue($this->bus_status_id->FormValue)) {
                 $this->bus_status_id->addErrorMessage(str_replace("%s", $this->bus_status_id->caption(), $this->bus_status_id->RequiredErrorMessage));
+            }
+        }
+        if ($this->bus_size_id->Required) {
+            if ($this->bus_size_id->MultiUpdate != "" && !$this->bus_size_id->IsDetailKey && EmptyValue($this->bus_size_id->FormValue)) {
+                $this->bus_size_id->addErrorMessage(str_replace("%s", $this->bus_size_id->caption(), $this->bus_size_id->RequiredErrorMessage));
             }
         }
         if ($this->bus_depot_id->Required) {
@@ -1561,6 +1592,9 @@ class MainBusesUpdate extends MainBuses
             // bus_status_id
             $this->bus_status_id->setDbValueDef($rsnew, $this->bus_status_id->CurrentValue, 0, $this->bus_status_id->ReadOnly || $this->bus_status_id->MultiUpdate != "1");
 
+            // bus_size_id
+            $this->bus_size_id->setDbValueDef($rsnew, $this->bus_size_id->CurrentValue, null, $this->bus_size_id->ReadOnly || $this->bus_size_id->MultiUpdate != "1");
+
             // bus_depot_id
             $this->bus_depot_id->setDbValueDef($rsnew, $this->bus_depot_id->CurrentValue, null, $this->bus_depot_id->ReadOnly || $this->bus_depot_id->MultiUpdate != "1");
 
@@ -1651,6 +1685,8 @@ class MainBusesUpdate extends MainBuses
                     $lookupFilter = $lookupFilter->bindTo($this);
                     break;
                 case "x_bus_status_id":
+                    break;
+                case "x_bus_size_id":
                     break;
                 case "x_bus_depot_id":
                     break;

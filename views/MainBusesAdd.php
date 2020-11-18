@@ -24,6 +24,7 @@ loadjs.ready("head", function () {
         ["exterior_campaign_id", [fields.exterior_campaign_id.required ? ew.Validators.required(fields.exterior_campaign_id.caption) : null], fields.exterior_campaign_id.isInvalid],
         ["interior_campaign_id", [fields.interior_campaign_id.required ? ew.Validators.required(fields.interior_campaign_id.caption) : null], fields.interior_campaign_id.isInvalid],
         ["bus_status_id", [fields.bus_status_id.required ? ew.Validators.required(fields.bus_status_id.caption) : null], fields.bus_status_id.isInvalid],
+        ["bus_size_id", [fields.bus_size_id.required ? ew.Validators.required(fields.bus_size_id.caption) : null], fields.bus_size_id.isInvalid],
         ["bus_depot_id", [fields.bus_depot_id.required ? ew.Validators.required(fields.bus_depot_id.caption) : null], fields.bus_depot_id.isInvalid]
     ]);
 
@@ -96,6 +97,7 @@ loadjs.ready("head", function () {
     fmain_busesadd.lists.exterior_campaign_id = <?= $Page->exterior_campaign_id->toClientList($Page) ?>;
     fmain_busesadd.lists.interior_campaign_id = <?= $Page->interior_campaign_id->toClientList($Page) ?>;
     fmain_busesadd.lists.bus_status_id = <?= $Page->bus_status_id->toClientList($Page) ?>;
+    fmain_busesadd.lists.bus_size_id = <?= $Page->bus_size_id->toClientList($Page) ?>;
     fmain_busesadd.lists.bus_depot_id = <?= $Page->bus_depot_id->toClientList($Page) ?>;
     loadjs.done("fmain_busesadd");
 });
@@ -118,11 +120,6 @@ $Page->showMessage();
 <input type="hidden" name="action" id="action" value="insert">
 <input type="hidden" name="modal" value="<?= (int)$Page->IsModal ?>">
 <input type="hidden" name="<?= $Page->OldKeyName ?>" value="<?= $Page->OldKey ?>">
-<?php if ($Page->getCurrentMasterTable() == "main_campaigns") { ?>
-<input type="hidden" name="<?= Config("TABLE_SHOW_MASTER") ?>" value="main_campaigns">
-<input type="hidden" name="fk_id" value="<?= HtmlEncode($Page->exterior_campaign_id->getSessionValue()) ?>">
-<input type="hidden" name="fk_id" value="<?= HtmlEncode($Page->interior_campaign_id->getSessionValue()) ?>">
-<?php } ?>
 <div class="ew-add-div"><!-- page* -->
 <?php if ($Page->number->Visible) { // number ?>
     <div id="r_number" class="form-group row">
@@ -207,13 +204,6 @@ loadjs.ready("head", function() {
     <div id="r_exterior_campaign_id" class="form-group row">
         <label id="elh_main_buses_exterior_campaign_id" for="x_exterior_campaign_id" class="<?= $Page->LeftColumnClass ?>"><?= $Page->exterior_campaign_id->caption() ?><?= $Page->exterior_campaign_id->Required ? $Language->phrase("FieldRequiredIndicator") : "" ?></label>
         <div class="<?= $Page->RightColumnClass ?>"><div <?= $Page->exterior_campaign_id->cellAttributes() ?>>
-<?php if ($Page->exterior_campaign_id->getSessionValue() != "") { ?>
-<span id="el_main_buses_exterior_campaign_id">
-<span<?= $Page->exterior_campaign_id->viewAttributes() ?>>
-<input type="text" readonly class="form-control-plaintext" value="<?= HtmlEncode(RemoveHtml($Page->exterior_campaign_id->getDisplayValue($Page->exterior_campaign_id->ViewValue))) ?>"></span>
-</span>
-<input type="hidden" id="x_exterior_campaign_id" name="x_exterior_campaign_id" value="<?= HtmlEncode($Page->exterior_campaign_id->CurrentValue) ?>" data-hidden="1">
-<?php } else { ?>
 <span id="el_main_buses_exterior_campaign_id">
     <select
         id="x_exterior_campaign_id"
@@ -240,7 +230,6 @@ loadjs.ready("head", function() {
 });
 </script>
 </span>
-<?php } ?>
 </div></div>
     </div>
 <?php } ?>
@@ -248,13 +237,6 @@ loadjs.ready("head", function() {
     <div id="r_interior_campaign_id" class="form-group row">
         <label id="elh_main_buses_interior_campaign_id" for="x_interior_campaign_id" class="<?= $Page->LeftColumnClass ?>"><?= $Page->interior_campaign_id->caption() ?><?= $Page->interior_campaign_id->Required ? $Language->phrase("FieldRequiredIndicator") : "" ?></label>
         <div class="<?= $Page->RightColumnClass ?>"><div <?= $Page->interior_campaign_id->cellAttributes() ?>>
-<?php if ($Page->interior_campaign_id->getSessionValue() != "") { ?>
-<span id="el_main_buses_interior_campaign_id">
-<span<?= $Page->interior_campaign_id->viewAttributes() ?>>
-<input type="text" readonly class="form-control-plaintext" value="<?= HtmlEncode(RemoveHtml($Page->interior_campaign_id->getDisplayValue($Page->interior_campaign_id->ViewValue))) ?>"></span>
-</span>
-<input type="hidden" id="x_interior_campaign_id" name="x_interior_campaign_id" value="<?= HtmlEncode($Page->interior_campaign_id->CurrentValue) ?>" data-hidden="1">
-<?php } else { ?>
 <span id="el_main_buses_interior_campaign_id">
     <select
         id="x_interior_campaign_id"
@@ -281,7 +263,6 @@ loadjs.ready("head", function() {
 });
 </script>
 </span>
-<?php } ?>
 </div></div>
     </div>
 <?php } ?>
@@ -311,6 +292,39 @@ loadjs.ready("head", function() {
         options = { name: "x_bus_status_id", selectId: "main_buses_x_bus_status_id", language: ew.LANGUAGE_ID, dir: ew.IS_RTL ? "rtl" : "ltr" };
     options.dropdownParent = $(el).closest("#ew-modal-dialog, #ew-add-opt-dialog")[0];
     Object.assign(options, ew.vars.tables.main_buses.fields.bus_status_id.selectOptions);
+    ew.createSelect(options);
+});
+</script>
+</span>
+</div></div>
+    </div>
+<?php } ?>
+<?php if ($Page->bus_size_id->Visible) { // bus_size_id ?>
+    <div id="r_bus_size_id" class="form-group row">
+        <label id="elh_main_buses_bus_size_id" for="x_bus_size_id" class="<?= $Page->LeftColumnClass ?>"><?= $Page->bus_size_id->caption() ?><?= $Page->bus_size_id->Required ? $Language->phrase("FieldRequiredIndicator") : "" ?></label>
+        <div class="<?= $Page->RightColumnClass ?>"><div <?= $Page->bus_size_id->cellAttributes() ?>>
+<span id="el_main_buses_bus_size_id">
+    <select
+        id="x_bus_size_id"
+        name="x_bus_size_id"
+        class="form-control ew-select<?= $Page->bus_size_id->isInvalidClass() ?>"
+        data-select2-id="main_buses_x_bus_size_id"
+        data-table="main_buses"
+        data-field="x_bus_size_id"
+        data-value-separator="<?= $Page->bus_size_id->displayValueSeparatorAttribute() ?>"
+        data-placeholder="<?= HtmlEncode($Page->bus_size_id->getPlaceHolder()) ?>"
+        <?= $Page->bus_size_id->editAttributes() ?>>
+        <?= $Page->bus_size_id->selectOptionListHtml("x_bus_size_id") ?>
+    </select>
+    <?= $Page->bus_size_id->getCustomMessage() ?>
+    <div class="invalid-feedback"><?= $Page->bus_size_id->getErrorMessage() ?></div>
+<?= $Page->bus_size_id->Lookup->getParamTag($Page, "p_x_bus_size_id") ?>
+<script>
+loadjs.ready("head", function() {
+    var el = document.querySelector("select[data-select2-id='main_buses_x_bus_size_id']"),
+        options = { name: "x_bus_size_id", selectId: "main_buses_x_bus_size_id", language: ew.LANGUAGE_ID, dir: ew.IS_RTL ? "rtl" : "ltr" };
+    options.dropdownParent = $(el).closest("#ew-modal-dialog, #ew-add-opt-dialog")[0];
+    Object.assign(options, ew.vars.tables.main_buses.fields.bus_size_id.selectOptions);
     ew.createSelect(options);
 });
 </script>
@@ -359,14 +373,6 @@ loadjs.ready("head", function() {
 <h4 class="ew-detail-caption"><?= $Language->tablePhrase("sub_media_allocation", "TblCaption") ?></h4>
 <?php } ?>
 <?php include_once "SubMediaAllocationGrid.php" ?>
-<?php } ?>
-<?php
-    if (in_array("sub_transaction_details", explode(",", $Page->getCurrentDetailTable())) && $sub_transaction_details->DetailAdd) {
-?>
-<?php if ($Page->getCurrentDetailTable() != "") { ?>
-<h4 class="ew-detail-caption"><?= $Language->tablePhrase("sub_transaction_details", "TblCaption") ?></h4>
-<?php } ?>
-<?php include_once "SubTransactionDetailsGrid.php" ?>
 <?php } ?>
 <?php if (!$Page->IsModal) { ?>
 <div class="form-group row"><!-- buttons .form-group -->

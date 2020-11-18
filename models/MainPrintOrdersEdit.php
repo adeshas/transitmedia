@@ -442,7 +442,7 @@ class MainPrintOrdersEdit extends MainPrintOrders
         $this->comments->setVisibility();
         $this->all_codes_assigned_in_campaign->setVisibility();
         $this->bus_codes->setVisibility();
-        $this->available_codes_to_be_assigned->Visible = false;
+        $this->available_codes_to_be_assigned->setVisibility();
         $this->tags->setVisibility();
         $this->hideFieldsForAddEdit();
         $this->quantity->Required = false;
@@ -697,6 +697,16 @@ class MainPrintOrdersEdit extends MainPrintOrders
             }
         }
 
+        // Check field name 'available_codes_to_be_assigned' first before field var 'x_available_codes_to_be_assigned'
+        $val = $CurrentForm->hasValue("available_codes_to_be_assigned") ? $CurrentForm->getValue("available_codes_to_be_assigned") : $CurrentForm->getValue("x_available_codes_to_be_assigned");
+        if (!$this->available_codes_to_be_assigned->IsDetailKey) {
+            if (IsApi() && $val === null) {
+                $this->available_codes_to_be_assigned->Visible = false; // Disable update for API request
+            } else {
+                $this->available_codes_to_be_assigned->setFormValue($val);
+            }
+        }
+
         // Check field name 'tags' first before field var 'x_tags'
         $val = $CurrentForm->hasValue("tags") ? $CurrentForm->getValue("tags") : $CurrentForm->getValue("x_tags");
         if (!$this->tags->IsDetailKey) {
@@ -726,6 +736,7 @@ class MainPrintOrdersEdit extends MainPrintOrders
         $this->comments->CurrentValue = $this->comments->FormValue;
         $this->all_codes_assigned_in_campaign->CurrentValue = $this->all_codes_assigned_in_campaign->FormValue;
         $this->bus_codes->CurrentValue = $this->bus_codes->FormValue;
+        $this->available_codes_to_be_assigned->CurrentValue = $this->available_codes_to_be_assigned->FormValue;
         $this->tags->CurrentValue = $this->tags->FormValue;
     }
 
@@ -941,6 +952,10 @@ class MainPrintOrdersEdit extends MainPrintOrders
             $this->bus_codes->ViewValue = $this->bus_codes->CurrentValue;
             $this->bus_codes->ViewCustomAttributes = "";
 
+            // available_codes_to_be_assigned
+            $this->available_codes_to_be_assigned->ViewValue = $this->available_codes_to_be_assigned->CurrentValue;
+            $this->available_codes_to_be_assigned->ViewCustomAttributes = "";
+
             // tags
             $this->tags->ViewValue = $this->tags->CurrentValue;
             $this->tags->ViewCustomAttributes = "";
@@ -979,6 +994,11 @@ class MainPrintOrdersEdit extends MainPrintOrders
             $this->bus_codes->LinkCustomAttributes = "";
             $this->bus_codes->HrefValue = "";
             $this->bus_codes->TooltipValue = "";
+
+            // available_codes_to_be_assigned
+            $this->available_codes_to_be_assigned->LinkCustomAttributes = "";
+            $this->available_codes_to_be_assigned->HrefValue = "";
+            $this->available_codes_to_be_assigned->TooltipValue = "";
 
             // tags
             $this->tags->LinkCustomAttributes = "";
@@ -1065,6 +1085,12 @@ class MainPrintOrdersEdit extends MainPrintOrders
             $this->bus_codes->EditValue = HtmlEncode($this->bus_codes->CurrentValue);
             $this->bus_codes->PlaceHolder = RemoveHtml($this->bus_codes->caption());
 
+            // available_codes_to_be_assigned
+            $this->available_codes_to_be_assigned->EditAttrs["class"] = "form-control";
+            $this->available_codes_to_be_assigned->EditCustomAttributes = "";
+            $this->available_codes_to_be_assigned->EditValue = HtmlEncode($this->available_codes_to_be_assigned->CurrentValue);
+            $this->available_codes_to_be_assigned->PlaceHolder = RemoveHtml($this->available_codes_to_be_assigned->caption());
+
             // tags
             $this->tags->EditAttrs["class"] = "form-control";
             $this->tags->EditCustomAttributes = "";
@@ -1104,6 +1130,10 @@ class MainPrintOrdersEdit extends MainPrintOrders
             // bus_codes
             $this->bus_codes->LinkCustomAttributes = "";
             $this->bus_codes->HrefValue = "";
+
+            // available_codes_to_be_assigned
+            $this->available_codes_to_be_assigned->LinkCustomAttributes = "";
+            $this->available_codes_to_be_assigned->HrefValue = "";
 
             // tags
             $this->tags->LinkCustomAttributes = "";
@@ -1163,6 +1193,11 @@ class MainPrintOrdersEdit extends MainPrintOrders
                 $this->bus_codes->addErrorMessage(str_replace("%s", $this->bus_codes->caption(), $this->bus_codes->RequiredErrorMessage));
             }
         }
+        if ($this->available_codes_to_be_assigned->Required) {
+            if (!$this->available_codes_to_be_assigned->IsDetailKey && EmptyValue($this->available_codes_to_be_assigned->FormValue)) {
+                $this->available_codes_to_be_assigned->addErrorMessage(str_replace("%s", $this->available_codes_to_be_assigned->caption(), $this->available_codes_to_be_assigned->RequiredErrorMessage));
+            }
+        }
         if ($this->tags->Required) {
             if (!$this->tags->IsDetailKey && EmptyValue($this->tags->FormValue)) {
                 $this->tags->addErrorMessage(str_replace("%s", $this->tags->caption(), $this->tags->RequiredErrorMessage));
@@ -1211,6 +1246,9 @@ class MainPrintOrdersEdit extends MainPrintOrders
 
             // bus_codes
             $this->bus_codes->setDbValueDef($rsnew, $this->bus_codes->CurrentValue, null, $this->bus_codes->ReadOnly);
+
+            // available_codes_to_be_assigned
+            $this->available_codes_to_be_assigned->setDbValueDef($rsnew, $this->available_codes_to_be_assigned->CurrentValue, null, $this->available_codes_to_be_assigned->ReadOnly);
 
             // tags
             $this->tags->setDbValueDef($rsnew, $this->tags->CurrentValue, null, $this->tags->ReadOnly);

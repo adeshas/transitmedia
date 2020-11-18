@@ -747,20 +747,6 @@ class SubTransactionDetailsDelete extends SubTransactionDetails
                 $this->DbMasterFilter = "";
                 $this->DbDetailFilter = "";
             }
-            if ($masterTblVar == "main_buses") {
-                $validMaster = true;
-                $masterTbl = Container("main_buses");
-                if (($parm = Get("fk_id", Get("bus_id"))) !== null) {
-                    $masterTbl->id->setQueryStringValue($parm);
-                    $this->bus_id->setQueryStringValue($masterTbl->id->QueryStringValue);
-                    $this->bus_id->setSessionValue($this->bus_id->QueryStringValue);
-                    if (!is_numeric($masterTbl->id->QueryStringValue)) {
-                        $validMaster = false;
-                    }
-                } else {
-                    $validMaster = false;
-                }
-            }
             if ($masterTblVar == "main_transactions") {
                 $validMaster = true;
                 $masterTbl = Container("main_transactions");
@@ -781,20 +767,6 @@ class SubTransactionDetailsDelete extends SubTransactionDetails
                     $validMaster = true;
                     $this->DbMasterFilter = "";
                     $this->DbDetailFilter = "";
-            }
-            if ($masterTblVar == "main_buses") {
-                $validMaster = true;
-                $masterTbl = Container("main_buses");
-                if (($parm = Post("fk_id", Post("bus_id"))) !== null) {
-                    $masterTbl->id->setFormValue($parm);
-                    $this->bus_id->setFormValue($masterTbl->id->FormValue);
-                    $this->bus_id->setSessionValue($this->bus_id->FormValue);
-                    if (!is_numeric($masterTbl->id->FormValue)) {
-                        $validMaster = false;
-                    }
-                } else {
-                    $validMaster = false;
-                }
             }
             if ($masterTblVar == "main_transactions") {
                 $validMaster = true;
@@ -822,11 +794,6 @@ class SubTransactionDetailsDelete extends SubTransactionDetails
             }
 
             // Clear previous master key from Session
-            if ($masterTblVar != "main_buses") {
-                if ($this->bus_id->CurrentValue == "") {
-                    $this->bus_id->setSessionValue("");
-                }
-            }
             if ($masterTblVar != "main_transactions") {
                 if ($this->transaction_id->CurrentValue == "") {
                     $this->transaction_id->setSessionValue("");

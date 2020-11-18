@@ -118,10 +118,6 @@ $Page->showMessage();
 <?php } ?>
 <input type="hidden" name="modal" value="<?= (int)$Page->IsModal ?>">
 <input type="hidden" name="<?= $Page->OldKeyName ?>" value="<?= $Page->OldKey ?>">
-<?php if ($Page->getCurrentMasterTable() == "main_buses") { ?>
-<input type="hidden" name="<?= Config("TABLE_SHOW_MASTER") ?>" value="main_buses">
-<input type="hidden" name="fk_id" value="<?= HtmlEncode($Page->bus_id->getSessionValue()) ?>">
-<?php } ?>
 <?php if ($Page->getCurrentMasterTable() == "main_transactions") { ?>
 <input type="hidden" name="<?= Config("TABLE_SHOW_MASTER") ?>" value="main_transactions">
 <input type="hidden" name="fk_id" value="<?= HtmlEncode($Page->transaction_id->getSessionValue()) ?>">
@@ -202,13 +198,6 @@ loadjs.ready("head", function() {
         <label id="elh_sub_transaction_details_bus_id" for="x_bus_id" class="<?= $Page->LeftColumnClass ?>"><?= $Page->bus_id->caption() ?><?= $Page->bus_id->Required ? $Language->phrase("FieldRequiredIndicator") : "" ?></label>
         <div class="<?= $Page->RightColumnClass ?>"><div <?= $Page->bus_id->cellAttributes() ?>>
 <?php if (!$Page->isConfirm()) { ?>
-<?php if ($Page->bus_id->getSessionValue() != "") { ?>
-<span id="el_sub_transaction_details_bus_id">
-<span<?= $Page->bus_id->viewAttributes() ?>>
-<input type="text" readonly class="form-control-plaintext" value="<?= HtmlEncode(RemoveHtml($Page->bus_id->getDisplayValue($Page->bus_id->ViewValue))) ?>"></span>
-</span>
-<input type="hidden" id="x_bus_id" name="x_bus_id" value="<?= HtmlEncode($Page->bus_id->CurrentValue) ?>" data-hidden="1">
-<?php } else { ?>
 <span id="el_sub_transaction_details_bus_id">
     <select
         id="x_bus_id"
@@ -235,7 +224,6 @@ loadjs.ready("head", function() {
 });
 </script>
 </span>
-<?php } ?>
 <?php } else { ?>
 <span id="el_sub_transaction_details_bus_id">
 <span<?= $Page->bus_id->viewAttributes() ?>>

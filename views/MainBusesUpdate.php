@@ -24,6 +24,7 @@ loadjs.ready("head", function () {
         ["exterior_campaign_id", [fields.exterior_campaign_id.required ? ew.Validators.required(fields.exterior_campaign_id.caption) : null], fields.exterior_campaign_id.isInvalid],
         ["interior_campaign_id", [fields.interior_campaign_id.required ? ew.Validators.required(fields.interior_campaign_id.caption) : null], fields.interior_campaign_id.isInvalid],
         ["bus_status_id", [fields.bus_status_id.required ? ew.Validators.required(fields.bus_status_id.caption) : null], fields.bus_status_id.isInvalid],
+        ["bus_size_id", [fields.bus_size_id.required ? ew.Validators.required(fields.bus_size_id.caption) : null], fields.bus_size_id.isInvalid],
         ["bus_depot_id", [fields.bus_depot_id.required ? ew.Validators.required(fields.bus_depot_id.caption) : null], fields.bus_depot_id.isInvalid],
         ["ts_created", [fields.ts_created.required ? ew.Validators.required(fields.ts_created.caption) : null, ew.Validators.datetime(0), ew.Validators.selected], fields.ts_created.isInvalid],
         ["ts_last_update", [fields.ts_last_update.required ? ew.Validators.required(fields.ts_last_update.caption) : null, ew.Validators.datetime(0), ew.Validators.selected], fields.ts_last_update.isInvalid]
@@ -92,6 +93,7 @@ loadjs.ready("head", function () {
     fmain_busesupdate.lists.exterior_campaign_id = <?= $Page->exterior_campaign_id->toClientList($Page) ?>;
     fmain_busesupdate.lists.interior_campaign_id = <?= $Page->interior_campaign_id->toClientList($Page) ?>;
     fmain_busesupdate.lists.bus_status_id = <?= $Page->bus_status_id->toClientList($Page) ?>;
+    fmain_busesupdate.lists.bus_size_id = <?= $Page->bus_size_id->toClientList($Page) ?>;
     fmain_busesupdate.lists.bus_depot_id = <?= $Page->bus_depot_id->toClientList($Page) ?>;
     loadjs.done("fmain_busesupdate");
 });
@@ -283,13 +285,6 @@ $Page->showMessage();
         <div class="<?= $Page->RightColumnClass ?>">
             <div <?= $Page->exterior_campaign_id->cellAttributes() ?>>
                 <?php if (!$Page->isConfirm()) { ?>
-                <?php if ($Page->exterior_campaign_id->getSessionValue() != "") { ?>
-                <span id="el_main_buses_exterior_campaign_id">
-                <span<?= $Page->exterior_campaign_id->viewAttributes() ?>>
-                <input type="text" readonly class="form-control-plaintext" value="<?= HtmlEncode(RemoveHtml($Page->exterior_campaign_id->getDisplayValue($Page->exterior_campaign_id->ViewValue))) ?>"></span>
-                </span>
-                <input type="hidden" id="x_exterior_campaign_id" name="x_exterior_campaign_id" value="<?= HtmlEncode($Page->exterior_campaign_id->CurrentValue) ?>" data-hidden="1">
-                <?php } else { ?>
                 <span id="el_main_buses_exterior_campaign_id">
                     <select
                         id="x_exterior_campaign_id"
@@ -316,7 +311,6 @@ $Page->showMessage();
                 });
                 </script>
                 </span>
-                <?php } ?>
                 <?php } else { ?>
                 <span id="el_main_buses_exterior_campaign_id">
                 <span<?= $Page->exterior_campaign_id->viewAttributes() ?>>
@@ -344,13 +338,6 @@ $Page->showMessage();
         <div class="<?= $Page->RightColumnClass ?>">
             <div <?= $Page->interior_campaign_id->cellAttributes() ?>>
                 <?php if (!$Page->isConfirm()) { ?>
-                <?php if ($Page->interior_campaign_id->getSessionValue() != "") { ?>
-                <span id="el_main_buses_interior_campaign_id">
-                <span<?= $Page->interior_campaign_id->viewAttributes() ?>>
-                <input type="text" readonly class="form-control-plaintext" value="<?= HtmlEncode(RemoveHtml($Page->interior_campaign_id->getDisplayValue($Page->interior_campaign_id->ViewValue))) ?>"></span>
-                </span>
-                <input type="hidden" id="x_interior_campaign_id" name="x_interior_campaign_id" value="<?= HtmlEncode($Page->interior_campaign_id->CurrentValue) ?>" data-hidden="1">
-                <?php } else { ?>
                 <span id="el_main_buses_interior_campaign_id">
                     <select
                         id="x_interior_campaign_id"
@@ -377,7 +364,6 @@ $Page->showMessage();
                 });
                 </script>
                 </span>
-                <?php } ?>
                 <?php } else { ?>
                 <span id="el_main_buses_interior_campaign_id">
                 <span<?= $Page->interior_campaign_id->viewAttributes() ?>>
@@ -437,6 +423,59 @@ $Page->showMessage();
                 <input type="text" readonly class="form-control-plaintext" value="<?= HtmlEncode(RemoveHtml($Page->bus_status_id->getDisplayValue($Page->bus_status_id->ViewValue))) ?>"></span>
                 </span>
                 <input type="hidden" data-table="main_buses" data-field="x_bus_status_id" data-hidden="1" name="x_bus_status_id" id="x_bus_status_id" value="<?= HtmlEncode($Page->bus_status_id->FormValue) ?>">
+                <?php } ?>
+            </div>
+        </div>
+    </div>
+<?php } ?>
+<?php if ($Page->bus_size_id->Visible && (!$Page->isConfirm() || $Page->bus_size_id->multiUpdateSelected())) { // bus_size_id ?>
+    <div id="r_bus_size_id" class="form-group row">
+        <label for="x_bus_size_id" class="<?= $Page->LeftColumnClass ?>">
+            <?php if (!$Page->isConfirm()) { ?>
+            <div class="custom-control custom-checkbox">
+                <input type="checkbox" name="u_bus_size_id" id="u_bus_size_id" class="custom-control-input ew-multi-select" value="1"<?= $Page->bus_size_id->multiUpdateSelected() ? " checked" : "" ?>>
+                <label class="custom-control-label" for="u_bus_size_id"><?= $Page->bus_size_id->caption() ?></label>
+            </div>
+            <?php } else { ?>
+            <input type="hidden" name="u_bus_size_id" id="u_bus_size_id" value="<?= $Page->bus_size_id->MultiUpdate ?>">
+            <?= $Page->bus_size_id->caption() ?>
+            <?php } ?>
+        </label>
+        <div class="<?= $Page->RightColumnClass ?>">
+            <div <?= $Page->bus_size_id->cellAttributes() ?>>
+                <?php if (!$Page->isConfirm()) { ?>
+                <span id="el_main_buses_bus_size_id">
+                    <select
+                        id="x_bus_size_id"
+                        name="x_bus_size_id"
+                        class="form-control ew-select<?= $Page->bus_size_id->isInvalidClass() ?>"
+                        data-select2-id="main_buses_x_bus_size_id"
+                        data-table="main_buses"
+                        data-field="x_bus_size_id"
+                        data-value-separator="<?= $Page->bus_size_id->displayValueSeparatorAttribute() ?>"
+                        data-placeholder="<?= HtmlEncode($Page->bus_size_id->getPlaceHolder()) ?>"
+                        <?= $Page->bus_size_id->editAttributes() ?>>
+                        <?= $Page->bus_size_id->selectOptionListHtml("x_bus_size_id") ?>
+                    </select>
+                    <?= $Page->bus_size_id->getCustomMessage() ?>
+                    <div class="invalid-feedback"><?= $Page->bus_size_id->getErrorMessage() ?></div>
+                <?= $Page->bus_size_id->Lookup->getParamTag($Page, "p_x_bus_size_id") ?>
+                <script>
+                loadjs.ready("head", function() {
+                    var el = document.querySelector("select[data-select2-id='main_buses_x_bus_size_id']"),
+                        options = { name: "x_bus_size_id", selectId: "main_buses_x_bus_size_id", language: ew.LANGUAGE_ID, dir: ew.IS_RTL ? "rtl" : "ltr" };
+                    options.dropdownParent = $(el).closest("#ew-modal-dialog, #ew-add-opt-dialog")[0];
+                    Object.assign(options, ew.vars.tables.main_buses.fields.bus_size_id.selectOptions);
+                    ew.createSelect(options);
+                });
+                </script>
+                </span>
+                <?php } else { ?>
+                <span id="el_main_buses_bus_size_id">
+                <span<?= $Page->bus_size_id->viewAttributes() ?>>
+                <input type="text" readonly class="form-control-plaintext" value="<?= HtmlEncode(RemoveHtml($Page->bus_size_id->getDisplayValue($Page->bus_size_id->ViewValue))) ?>"></span>
+                </span>
+                <input type="hidden" data-table="main_buses" data-field="x_bus_size_id" data-hidden="1" name="x_bus_size_id" id="x_bus_size_id" value="<?= HtmlEncode($Page->bus_size_id->FormValue) ?>">
                 <?php } ?>
             </div>
         </div>

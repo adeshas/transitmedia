@@ -567,31 +567,15 @@ class SubMediaAllocationGrid extends SubMediaAllocation
 
         // Add master User ID filter
         if ($Security->currentUserID() != "" && !$Security->isAdmin()) { // Non system admin
-                if ($this->getCurrentMasterTable() == "main_buses") {
-                    $this->DbMasterFilter = $this->addMasterUserIDFilter($this->DbMasterFilter, "main_buses"); // Add master User ID filter
-                }
                 if ($this->getCurrentMasterTable() == "main_campaigns") {
                     $this->DbMasterFilter = $this->addMasterUserIDFilter($this->DbMasterFilter, "main_campaigns"); // Add master User ID filter
+                }
+                if ($this->getCurrentMasterTable() == "main_buses") {
+                    $this->DbMasterFilter = $this->addMasterUserIDFilter($this->DbMasterFilter, "main_buses"); // Add master User ID filter
                 }
         }
         AddFilter($filter, $this->DbDetailFilter);
         AddFilter($filter, $this->SearchWhere);
-
-        // Load master record
-        if ($this->CurrentMode != "add" && $this->getMasterFilter() != "" && $this->getCurrentMasterTable() == "main_buses") {
-            $masterTbl = Container("main_buses");
-            $rsmaster = $masterTbl->loadRs($this->DbMasterFilter)->fetch(\PDO::FETCH_ASSOC);
-            $this->MasterRecordExists = $rsmaster !== false;
-            if (!$this->MasterRecordExists) {
-                $this->setFailureMessage($Language->phrase("NoRecord")); // Set no record found
-                $this->terminate("mainbuseslist"); // Return to master page
-                return;
-            } else {
-                $masterTbl->loadListRowValues($rsmaster);
-                $masterTbl->RowType = ROWTYPE_MASTER; // Master row
-                $masterTbl->renderListRow();
-            }
-        }
 
         // Load master record
         if ($this->CurrentMode != "add" && $this->getMasterFilter() != "" && $this->getCurrentMasterTable() == "main_campaigns") {
@@ -601,6 +585,22 @@ class SubMediaAllocationGrid extends SubMediaAllocation
             if (!$this->MasterRecordExists) {
                 $this->setFailureMessage($Language->phrase("NoRecord")); // Set no record found
                 $this->terminate("maincampaignslist"); // Return to master page
+                return;
+            } else {
+                $masterTbl->loadListRowValues($rsmaster);
+                $masterTbl->RowType = ROWTYPE_MASTER; // Master row
+                $masterTbl->renderListRow();
+            }
+        }
+
+        // Load master record
+        if ($this->CurrentMode != "add" && $this->getMasterFilter() != "" && $this->getCurrentMasterTable() == "main_buses") {
+            $masterTbl = Container("main_buses");
+            $rsmaster = $masterTbl->loadRs($this->DbMasterFilter)->fetch(\PDO::FETCH_ASSOC);
+            $this->MasterRecordExists = $rsmaster !== false;
+            if (!$this->MasterRecordExists) {
+                $this->setFailureMessage($Language->phrase("NoRecord")); // Set no record found
+                $this->terminate("mainbuseslist"); // Return to master page
                 return;
             } else {
                 $masterTbl->loadListRowValues($rsmaster);
@@ -1083,8 +1083,8 @@ class SubMediaAllocationGrid extends SubMediaAllocation
                 $this->setCurrentMasterTable(""); // Clear master table
                 $this->DbMasterFilter = "";
                 $this->DbDetailFilter = "";
-                        $this->bus_id->setSessionValue("");
                         $this->campaign_id->setSessionValue("");
+                        $this->bus_id->setSessionValue("");
             }
 
             // Reset (clear) sorting order
@@ -2243,11 +2243,11 @@ class SubMediaAllocationGrid extends SubMediaAllocation
         }
 
         // Set up foreign key field value from Session
-        if ($this->getCurrentMasterTable() == "main_buses") {
-            $this->bus_id->CurrentValue = $this->bus_id->getSessionValue();
-        }
         if ($this->getCurrentMasterTable() == "main_campaigns") {
             $this->campaign_id->CurrentValue = $this->campaign_id->getSessionValue();
+        }
+        if ($this->getCurrentMasterTable() == "main_buses") {
+            $this->bus_id->CurrentValue = $this->bus_id->getSessionValue();
         }
         $conn = $this->getConnection();
 
@@ -2314,16 +2314,16 @@ class SubMediaAllocationGrid extends SubMediaAllocation
     {
         // Hide foreign keys
         $masterTblVar = $this->getCurrentMasterTable();
-        if ($masterTblVar == "main_buses") {
-            $masterTbl = Container("main_buses");
-            $this->bus_id->Visible = false;
+        if ($masterTblVar == "main_campaigns") {
+            $masterTbl = Container("main_campaigns");
+            $this->campaign_id->Visible = false;
             if ($masterTbl->EventCancelled) {
                 $this->EventCancelled = true;
             }
         }
-        if ($masterTblVar == "main_campaigns") {
-            $masterTbl = Container("main_campaigns");
-            $this->campaign_id->Visible = false;
+        if ($masterTblVar == "main_buses") {
+            $masterTbl = Container("main_buses");
+            $this->bus_id->Visible = false;
             if ($masterTbl->EventCancelled) {
                 $this->EventCancelled = true;
             }

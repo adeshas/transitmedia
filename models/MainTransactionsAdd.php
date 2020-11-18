@@ -2041,7 +2041,6 @@ class MainTransactionsAdd extends MainTransactions
                     $detailPageObj->transaction_id->IsDetailKey = true;
                     $detailPageObj->transaction_id->CurrentValue = $this->id->CurrentValue;
                     $detailPageObj->transaction_id->setSessionValue($detailPageObj->transaction_id->CurrentValue);
-                    $detailPageObj->bus_id->setSessionValue(""); // Clear session key
                 }
             }
         }

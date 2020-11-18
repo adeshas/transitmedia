@@ -73,6 +73,18 @@ function MenuItem_Adding($item)
                 //return false;
             }
         }
+        if(CurrentUserLevel() == 1){
+        	//CAMPAIGN MAN
+        	if( in_array($item->id, [201])){
+            	//return false;
+            }
+        }
+        if(CurrentUserLevel() == 2){
+        	//ACCOUNTS MAN
+        	if( in_array($item->id, [198,133])){
+            	return false;
+            }
+        }
         if(CurrentUserLevel() == 3){
         	//FLEET MAN
         	if( in_array($item->id, [177,178,35,98,34,95,56])){
