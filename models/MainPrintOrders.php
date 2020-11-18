@@ -1471,14 +1471,14 @@ SORTHTML;
     			// print_r($rootPath);
     			// exit;
     			// Initialize archive object
-    			$zip = new ZipArchive();
-    			$zip->open($zipfile, ZipArchive::CREATE | ZipArchive::OVERWRITE);
+    			$zip = new \ZipArchive();
+    			$zip->open($zipfile, \ZipArchive::CREATE | \ZipArchive::OVERWRITE);
 
     			// Create recursive directory iterator
     			/** @var SplFileInfo[] $files */
-    			$files = new RecursiveIteratorIterator(
-    				new RecursiveDirectoryIterator($rootPath),
-    				RecursiveIteratorIterator::LEAVES_ONLY
+    			$files = new \RecursiveIteratorIterator(
+    				new \RecursiveDirectoryIterator($rootPath),
+    				\RecursiveIteratorIterator::LEAVES_ONLY
     			);
     			foreach ($files as $name => $file) {
     				// Skip directories (they would be added automatically)

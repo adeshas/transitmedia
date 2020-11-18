@@ -761,14 +761,21 @@ class MainBusesList extends MainBuses
 
             // Get default search criteria
             AddFilter($this->DefaultSearchWhere, $this->basicSearchWhere(true));
+            AddFilter($this->DefaultSearchWhere, $this->advancedSearchWhere(true));
 
             // Get basic search values
             $this->loadBasicSearchValues();
+
+            // Get and validate search values for advanced search
+            $this->loadSearchValues(); // Get search values
 
             // Process filter list
             if ($this->processFilterList()) {
                 $this->terminate();
                 return;
+            }
+            if (!$this->validateSearch()) {
+                // Nothing to do
             }
 
             // Restore search parms from Session if not searching / reset / export
@@ -785,6 +792,11 @@ class MainBusesList extends MainBuses
             // Get basic search criteria
             if (!$this->hasInvalidFields()) {
                 $srchBasic = $this->basicSearchWhere();
+            }
+
+            // Get search criteria for advanced search
+            if (!$this->hasInvalidFields()) {
+                $srchAdvanced = $this->advancedSearchWhere();
             }
         }
 
@@ -808,6 +820,16 @@ class MainBusesList extends MainBuses
             if ($this->BasicSearch->Keyword != "") {
                 $srchBasic = $this->basicSearchWhere();
             }
+
+            // Load advanced search from default
+            if ($this->loadAdvancedSearchDefault()) {
+                $srchAdvanced = $this->advancedSearchWhere();
+            }
+        }
+
+        // Restore search settings from Session
+        if (!$this->hasInvalidFields()) {
+            $this->loadAdvancedSearch();
         }
 
         // Build search criteria
@@ -1467,6 +1489,107 @@ class MainBusesList extends MainBuses
         $this->BasicSearch->setType(@$filter[Config("TABLE_BASIC_SEARCH_TYPE")]);
     }
 
+    // Advanced search WHERE clause based on QueryString
+    protected function advancedSearchWhere($default = false)
+    {
+        global $Security;
+        $where = "";
+        if (!$Security->canSearch()) {
+            return "";
+        }
+        $this->buildSearchSql($where, $this->id, $default, false); // id
+        $this->buildSearchSql($where, $this->number, $default, false); // number
+        $this->buildSearchSql($where, $this->platform_id, $default, false); // platform_id
+        $this->buildSearchSql($where, $this->operator_id, $default, false); // operator_id
+        $this->buildSearchSql($where, $this->exterior_campaign_id, $default, false); // exterior_campaign_id
+        $this->buildSearchSql($where, $this->interior_campaign_id, $default, false); // interior_campaign_id
+        $this->buildSearchSql($where, $this->bus_status_id, $default, false); // bus_status_id
+        $this->buildSearchSql($where, $this->bus_size_id, $default, false); // bus_size_id
+        $this->buildSearchSql($where, $this->bus_depot_id, $default, false); // bus_depot_id
+        $this->buildSearchSql($where, $this->ts_created, $default, false); // ts_created
+        $this->buildSearchSql($where, $this->ts_last_update, $default, false); // ts_last_update
+
+        // Set up search parm
+        if (!$default && $where != "" && in_array($this->Command, ["", "reset", "resetall"])) {
+            $this->Command = "search";
+        }
+        if (!$default && $this->Command == "search") {
+            $this->id->AdvancedSearch->save(); // id
+            $this->number->AdvancedSearch->save(); // number
+            $this->platform_id->AdvancedSearch->save(); // platform_id
+            $this->operator_id->AdvancedSearch->save(); // operator_id
+            $this->exterior_campaign_id->AdvancedSearch->save(); // exterior_campaign_id
+            $this->interior_campaign_id->AdvancedSearch->save(); // interior_campaign_id
+            $this->bus_status_id->AdvancedSearch->save(); // bus_status_id
+            $this->bus_size_id->AdvancedSearch->save(); // bus_size_id
+            $this->bus_depot_id->AdvancedSearch->save(); // bus_depot_id
+            $this->ts_created->AdvancedSearch->save(); // ts_created
+            $this->ts_last_update->AdvancedSearch->save(); // ts_last_update
+        }
+        return $where;
+    }
+
+    // Build search SQL
+    protected function buildSearchSql(&$where, &$fld, $default, $multiValue)
+    {
+        $fldParm = $fld->Param;
+        $fldVal = ($default) ? $fld->AdvancedSearch->SearchValueDefault : $fld->AdvancedSearch->SearchValue;
+        $fldOpr = ($default) ? $fld->AdvancedSearch->SearchOperatorDefault : $fld->AdvancedSearch->SearchOperator;
+        $fldCond = ($default) ? $fld->AdvancedSearch->SearchConditionDefault : $fld->AdvancedSearch->SearchCondition;
+        $fldVal2 = ($default) ? $fld->AdvancedSearch->SearchValue2Default : $fld->AdvancedSearch->SearchValue2;
+        $fldOpr2 = ($default) ? $fld->AdvancedSearch->SearchOperator2Default : $fld->AdvancedSearch->SearchOperator2;
+        $wrk = "";
+        if (is_array($fldVal)) {
+            $fldVal = implode(Config("MULTIPLE_OPTION_SEPARATOR"), $fldVal);
+        }
+        if (is_array($fldVal2)) {
+            $fldVal2 = implode(Config("MULTIPLE_OPTION_SEPARATOR"), $fldVal2);
+        }
+        $fldOpr = strtoupper(trim($fldOpr));
+        if ($fldOpr == "") {
+            $fldOpr = "=";
+        }
+        $fldOpr2 = strtoupper(trim($fldOpr2));
+        if ($fldOpr2 == "") {
+            $fldOpr2 = "=";
+        }
+        if (Config("SEARCH_MULTI_VALUE_OPTION") == 1 || !IsMultiSearchOperator($fldOpr)) {
+            $multiValue = false;
+        }
+        if ($multiValue) {
+            $wrk1 = ($fldVal != "") ? GetMultiSearchSql($fld, $fldOpr, $fldVal, $this->Dbid) : ""; // Field value 1
+            $wrk2 = ($fldVal2 != "") ? GetMultiSearchSql($fld, $fldOpr2, $fldVal2, $this->Dbid) : ""; // Field value 2
+            $wrk = $wrk1; // Build final SQL
+            if ($wrk2 != "") {
+                $wrk = ($wrk != "") ? "($wrk) $fldCond ($wrk2)" : $wrk2;
+            }
+        } else {
+            $fldVal = $this->convertSearchValue($fld, $fldVal);
+            $fldVal2 = $this->convertSearchValue($fld, $fldVal2);
+            $wrk = GetSearchSql($fld, $fldVal, $fldOpr, $fldCond, $fldVal2, $fldOpr2, $this->Dbid);
+        }
+        AddFilter($where, $wrk);
+    }
+
+    // Convert search value
+    protected function convertSearchValue(&$fld, $fldVal)
+    {
+        if ($fldVal == Config("NULL_VALUE") || $fldVal == Config("NOT_NULL_VALUE")) {
+            return $fldVal;
+        }
+        $value = $fldVal;
+        if ($fld->isBoolean()) {
+            if ($fldVal != "") {
+                $value = (SameText($fldVal, "1") || SameText($fldVal, "y") || SameText($fldVal, "t")) ? $fld->TrueValue : $fld->FalseValue;
+            }
+        } elseif ($fld->DataType == DATATYPE_DATE || $fld->DataType == DATATYPE_TIME) {
+            if ($fldVal != "") {
+                $value = UnFormatDateTime($fldVal, $fld->DateTimeFormat);
+            }
+        }
+        return $value;
+    }
+
     // Return basic search SQL
     protected function basicSearchSql($arKeywords, $type)
     {
@@ -1592,6 +1715,39 @@ class MainBusesList extends MainBuses
         if ($this->BasicSearch->issetSession()) {
             return true;
         }
+        if ($this->id->AdvancedSearch->issetSession()) {
+            return true;
+        }
+        if ($this->number->AdvancedSearch->issetSession()) {
+            return true;
+        }
+        if ($this->platform_id->AdvancedSearch->issetSession()) {
+            return true;
+        }
+        if ($this->operator_id->AdvancedSearch->issetSession()) {
+            return true;
+        }
+        if ($this->exterior_campaign_id->AdvancedSearch->issetSession()) {
+            return true;
+        }
+        if ($this->interior_campaign_id->AdvancedSearch->issetSession()) {
+            return true;
+        }
+        if ($this->bus_status_id->AdvancedSearch->issetSession()) {
+            return true;
+        }
+        if ($this->bus_size_id->AdvancedSearch->issetSession()) {
+            return true;
+        }
+        if ($this->bus_depot_id->AdvancedSearch->issetSession()) {
+            return true;
+        }
+        if ($this->ts_created->AdvancedSearch->issetSession()) {
+            return true;
+        }
+        if ($this->ts_last_update->AdvancedSearch->issetSession()) {
+            return true;
+        }
         return false;
     }
 
@@ -1604,6 +1760,9 @@ class MainBusesList extends MainBuses
 
         // Clear basic search parameters
         $this->resetBasicSearchParms();
+
+        // Clear advanced search parameters
+        $this->resetAdvancedSearchParms();
     }
 
     // Load advanced search default values
@@ -1618,6 +1777,22 @@ class MainBusesList extends MainBuses
         $this->BasicSearch->unsetSession();
     }
 
+    // Clear all advanced search parameters
+    protected function resetAdvancedSearchParms()
+    {
+                $this->id->AdvancedSearch->unsetSession();
+                $this->number->AdvancedSearch->unsetSession();
+                $this->platform_id->AdvancedSearch->unsetSession();
+                $this->operator_id->AdvancedSearch->unsetSession();
+                $this->exterior_campaign_id->AdvancedSearch->unsetSession();
+                $this->interior_campaign_id->AdvancedSearch->unsetSession();
+                $this->bus_status_id->AdvancedSearch->unsetSession();
+                $this->bus_size_id->AdvancedSearch->unsetSession();
+                $this->bus_depot_id->AdvancedSearch->unsetSession();
+                $this->ts_created->AdvancedSearch->unsetSession();
+                $this->ts_last_update->AdvancedSearch->unsetSession();
+    }
+
     // Restore all search parameters
     protected function restoreSearchParms()
     {
@@ -1625,6 +1800,19 @@ class MainBusesList extends MainBuses
 
         // Restore basic search values
         $this->BasicSearch->load();
+
+        // Restore advanced search values
+                $this->id->AdvancedSearch->load();
+                $this->number->AdvancedSearch->load();
+                $this->platform_id->AdvancedSearch->load();
+                $this->operator_id->AdvancedSearch->load();
+                $this->exterior_campaign_id->AdvancedSearch->load();
+                $this->interior_campaign_id->AdvancedSearch->load();
+                $this->bus_status_id->AdvancedSearch->load();
+                $this->bus_size_id->AdvancedSearch->load();
+                $this->bus_depot_id->AdvancedSearch->load();
+                $this->ts_created->AdvancedSearch->load();
+                $this->ts_last_update->AdvancedSearch->load();
     }
 
     // Set up sort parameters
@@ -2264,6 +2452,102 @@ class MainBusesList extends MainBuses
             $this->Command = "search";
         }
         $this->BasicSearch->setType(Get(Config("TABLE_BASIC_SEARCH_TYPE"), ""), false);
+    }
+
+    // Load search values for validation
+    protected function loadSearchValues()
+    {
+        // Load search values
+        $hasValue = false;
+
+        // id
+        if (!$this->isAddOrEdit() && $this->id->AdvancedSearch->get()) {
+            $hasValue = true;
+            if (($this->id->AdvancedSearch->SearchValue != "" || $this->id->AdvancedSearch->SearchValue2 != "") && $this->Command == "") {
+                $this->Command = "search";
+            }
+        }
+
+        // number
+        if (!$this->isAddOrEdit() && $this->number->AdvancedSearch->get()) {
+            $hasValue = true;
+            if (($this->number->AdvancedSearch->SearchValue != "" || $this->number->AdvancedSearch->SearchValue2 != "") && $this->Command == "") {
+                $this->Command = "search";
+            }
+        }
+
+        // platform_id
+        if (!$this->isAddOrEdit() && $this->platform_id->AdvancedSearch->get()) {
+            $hasValue = true;
+            if (($this->platform_id->AdvancedSearch->SearchValue != "" || $this->platform_id->AdvancedSearch->SearchValue2 != "") && $this->Command == "") {
+                $this->Command = "search";
+            }
+        }
+
+        // operator_id
+        if (!$this->isAddOrEdit() && $this->operator_id->AdvancedSearch->get()) {
+            $hasValue = true;
+            if (($this->operator_id->AdvancedSearch->SearchValue != "" || $this->operator_id->AdvancedSearch->SearchValue2 != "") && $this->Command == "") {
+                $this->Command = "search";
+            }
+        }
+
+        // exterior_campaign_id
+        if (!$this->isAddOrEdit() && $this->exterior_campaign_id->AdvancedSearch->get()) {
+            $hasValue = true;
+            if (($this->exterior_campaign_id->AdvancedSearch->SearchValue != "" || $this->exterior_campaign_id->AdvancedSearch->SearchValue2 != "") && $this->Command == "") {
+                $this->Command = "search";
+            }
+        }
+
+        // interior_campaign_id
+        if (!$this->isAddOrEdit() && $this->interior_campaign_id->AdvancedSearch->get()) {
+            $hasValue = true;
+            if (($this->interior_campaign_id->AdvancedSearch->SearchValue != "" || $this->interior_campaign_id->AdvancedSearch->SearchValue2 != "") && $this->Command == "") {
+                $this->Command = "search";
+            }
+        }
+
+        // bus_status_id
+        if (!$this->isAddOrEdit() && $this->bus_status_id->AdvancedSearch->get()) {
+            $hasValue = true;
+            if (($this->bus_status_id->AdvancedSearch->SearchValue != "" || $this->bus_status_id->AdvancedSearch->SearchValue2 != "") && $this->Command == "") {
+                $this->Command = "search";
+            }
+        }
+
+        // bus_size_id
+        if (!$this->isAddOrEdit() && $this->bus_size_id->AdvancedSearch->get()) {
+            $hasValue = true;
+            if (($this->bus_size_id->AdvancedSearch->SearchValue != "" || $this->bus_size_id->AdvancedSearch->SearchValue2 != "") && $this->Command == "") {
+                $this->Command = "search";
+            }
+        }
+
+        // bus_depot_id
+        if (!$this->isAddOrEdit() && $this->bus_depot_id->AdvancedSearch->get()) {
+            $hasValue = true;
+            if (($this->bus_depot_id->AdvancedSearch->SearchValue != "" || $this->bus_depot_id->AdvancedSearch->SearchValue2 != "") && $this->Command == "") {
+                $this->Command = "search";
+            }
+        }
+
+        // ts_created
+        if (!$this->isAddOrEdit() && $this->ts_created->AdvancedSearch->get()) {
+            $hasValue = true;
+            if (($this->ts_created->AdvancedSearch->SearchValue != "" || $this->ts_created->AdvancedSearch->SearchValue2 != "") && $this->Command == "") {
+                $this->Command = "search";
+            }
+        }
+
+        // ts_last_update
+        if (!$this->isAddOrEdit() && $this->ts_last_update->AdvancedSearch->get()) {
+            $hasValue = true;
+            if (($this->ts_last_update->AdvancedSearch->SearchValue != "" || $this->ts_last_update->AdvancedSearch->SearchValue2 != "") && $this->Command == "") {
+                $this->Command = "search";
+            }
+        }
+        return $hasValue;
     }
 
     // Load form values
@@ -3258,6 +3542,210 @@ class MainBusesList extends MainBuses
             // bus_depot_id
             $this->bus_depot_id->LinkCustomAttributes = "";
             $this->bus_depot_id->HrefValue = "";
+        } elseif ($this->RowType == ROWTYPE_SEARCH) {
+            // id
+            $this->id->EditAttrs["class"] = "form-control";
+            $this->id->EditCustomAttributes = "";
+            $this->id->EditValue = HtmlEncode($this->id->AdvancedSearch->SearchValue);
+            $this->id->PlaceHolder = RemoveHtml($this->id->caption());
+
+            // number
+            $this->number->EditAttrs["class"] = "form-control";
+            $this->number->EditCustomAttributes = "";
+            if (!$this->number->Raw) {
+                $this->number->AdvancedSearch->SearchValue = HtmlDecode($this->number->AdvancedSearch->SearchValue);
+            }
+            $this->number->EditValue = HtmlEncode($this->number->AdvancedSearch->SearchValue);
+            $this->number->PlaceHolder = RemoveHtml($this->number->caption());
+
+            // platform_id
+            $this->platform_id->EditAttrs["class"] = "form-control";
+            $this->platform_id->EditCustomAttributes = "";
+            $curVal = trim(strval($this->platform_id->AdvancedSearch->SearchValue));
+            if ($curVal != "") {
+                $this->platform_id->AdvancedSearch->ViewValue = $this->platform_id->lookupCacheOption($curVal);
+            } else {
+                $this->platform_id->AdvancedSearch->ViewValue = $this->platform_id->Lookup !== null && is_array($this->platform_id->Lookup->Options) ? $curVal : null;
+            }
+            if ($this->platform_id->AdvancedSearch->ViewValue !== null) { // Load from cache
+                $this->platform_id->EditValue = array_values($this->platform_id->Lookup->Options);
+            } else { // Lookup from database
+                if ($curVal == "") {
+                    $filterWrk = "0=1";
+                } else {
+                    $filterWrk = "\"id\"" . SearchString("=", $this->platform_id->AdvancedSearch->SearchValue, DATATYPE_NUMBER, "");
+                }
+                $sqlWrk = $this->platform_id->Lookup->getSql(true, $filterWrk, '', $this);
+                $rswrk = Conn()->executeQuery($sqlWrk)->fetchAll(\PDO::FETCH_BOTH);
+                $ari = count($rswrk);
+                $arwrk = $rswrk;
+                $this->platform_id->EditValue = $arwrk;
+            }
+            $this->platform_id->PlaceHolder = RemoveHtml($this->platform_id->caption());
+
+            // operator_id
+            $this->operator_id->EditAttrs["class"] = "form-control";
+            $this->operator_id->EditCustomAttributes = "";
+            $curVal = trim(strval($this->operator_id->AdvancedSearch->SearchValue));
+            if ($curVal != "") {
+                $this->operator_id->AdvancedSearch->ViewValue = $this->operator_id->lookupCacheOption($curVal);
+            } else {
+                $this->operator_id->AdvancedSearch->ViewValue = $this->operator_id->Lookup !== null && is_array($this->operator_id->Lookup->Options) ? $curVal : null;
+            }
+            if ($this->operator_id->AdvancedSearch->ViewValue !== null) { // Load from cache
+                $this->operator_id->EditValue = array_values($this->operator_id->Lookup->Options);
+            } else { // Lookup from database
+                if ($curVal == "") {
+                    $filterWrk = "0=1";
+                } else {
+                    $filterWrk = "\"id\"" . SearchString("=", $this->operator_id->AdvancedSearch->SearchValue, DATATYPE_NUMBER, "");
+                }
+                $sqlWrk = $this->operator_id->Lookup->getSql(true, $filterWrk, '', $this);
+                $rswrk = Conn()->executeQuery($sqlWrk)->fetchAll(\PDO::FETCH_BOTH);
+                $ari = count($rswrk);
+                $arwrk = $rswrk;
+                foreach ($arwrk as &$row)
+                    $row = $this->operator_id->Lookup->renderViewRow($row);
+                $this->operator_id->EditValue = $arwrk;
+            }
+            $this->operator_id->PlaceHolder = RemoveHtml($this->operator_id->caption());
+
+            // exterior_campaign_id
+            $this->exterior_campaign_id->EditAttrs["class"] = "form-control";
+            $this->exterior_campaign_id->EditCustomAttributes = "";
+            $curVal = trim(strval($this->exterior_campaign_id->AdvancedSearch->SearchValue));
+            if ($curVal != "") {
+                $this->exterior_campaign_id->AdvancedSearch->ViewValue = $this->exterior_campaign_id->lookupCacheOption($curVal);
+            } else {
+                $this->exterior_campaign_id->AdvancedSearch->ViewValue = $this->exterior_campaign_id->Lookup !== null && is_array($this->exterior_campaign_id->Lookup->Options) ? $curVal : null;
+            }
+            if ($this->exterior_campaign_id->AdvancedSearch->ViewValue !== null) { // Load from cache
+                $this->exterior_campaign_id->EditValue = array_values($this->exterior_campaign_id->Lookup->Options);
+            } else { // Lookup from database
+                if ($curVal == "") {
+                    $filterWrk = "0=1";
+                } else {
+                    $filterWrk = "\"id\"" . SearchString("=", $this->exterior_campaign_id->AdvancedSearch->SearchValue, DATATYPE_NUMBER, "");
+                }
+                $lookupFilter = function() {
+                    return "\"inventory_id\" = (SELECT ID FROM y_inventory WHERE name = 'Exterior Branding')";
+                };
+                $lookupFilter = $lookupFilter->bindTo($this);
+                $sqlWrk = $this->exterior_campaign_id->Lookup->getSql(true, $filterWrk, $lookupFilter, $this);
+                $rswrk = Conn()->executeQuery($sqlWrk)->fetchAll(\PDO::FETCH_BOTH);
+                $ari = count($rswrk);
+                $arwrk = $rswrk;
+                foreach ($arwrk as &$row)
+                    $row = $this->exterior_campaign_id->Lookup->renderViewRow($row);
+                $this->exterior_campaign_id->EditValue = $arwrk;
+            }
+            $this->exterior_campaign_id->PlaceHolder = RemoveHtml($this->exterior_campaign_id->caption());
+
+            // interior_campaign_id
+            $this->interior_campaign_id->EditAttrs["class"] = "form-control";
+            $this->interior_campaign_id->EditCustomAttributes = "";
+            $curVal = trim(strval($this->interior_campaign_id->AdvancedSearch->SearchValue));
+            if ($curVal != "") {
+                $this->interior_campaign_id->AdvancedSearch->ViewValue = $this->interior_campaign_id->lookupCacheOption($curVal);
+            } else {
+                $this->interior_campaign_id->AdvancedSearch->ViewValue = $this->interior_campaign_id->Lookup !== null && is_array($this->interior_campaign_id->Lookup->Options) ? $curVal : null;
+            }
+            if ($this->interior_campaign_id->AdvancedSearch->ViewValue !== null) { // Load from cache
+                $this->interior_campaign_id->EditValue = array_values($this->interior_campaign_id->Lookup->Options);
+            } else { // Lookup from database
+                if ($curVal == "") {
+                    $filterWrk = "0=1";
+                } else {
+                    $filterWrk = "\"id\"" . SearchString("=", $this->interior_campaign_id->AdvancedSearch->SearchValue, DATATYPE_NUMBER, "");
+                }
+                $lookupFilter = function() {
+                    return "\"inventory_id\" = (SELECT ID FROM y_inventory WHERE name = 'Interior Branding')";
+                };
+                $lookupFilter = $lookupFilter->bindTo($this);
+                $sqlWrk = $this->interior_campaign_id->Lookup->getSql(true, $filterWrk, $lookupFilter, $this);
+                $rswrk = Conn()->executeQuery($sqlWrk)->fetchAll(\PDO::FETCH_BOTH);
+                $ari = count($rswrk);
+                $arwrk = $rswrk;
+                foreach ($arwrk as &$row)
+                    $row = $this->interior_campaign_id->Lookup->renderViewRow($row);
+                $this->interior_campaign_id->EditValue = $arwrk;
+            }
+            $this->interior_campaign_id->PlaceHolder = RemoveHtml($this->interior_campaign_id->caption());
+
+            // bus_status_id
+            $this->bus_status_id->EditAttrs["class"] = "form-control";
+            $this->bus_status_id->EditCustomAttributes = "";
+            $curVal = trim(strval($this->bus_status_id->AdvancedSearch->SearchValue));
+            if ($curVal != "") {
+                $this->bus_status_id->AdvancedSearch->ViewValue = $this->bus_status_id->lookupCacheOption($curVal);
+            } else {
+                $this->bus_status_id->AdvancedSearch->ViewValue = $this->bus_status_id->Lookup !== null && is_array($this->bus_status_id->Lookup->Options) ? $curVal : null;
+            }
+            if ($this->bus_status_id->AdvancedSearch->ViewValue !== null) { // Load from cache
+                $this->bus_status_id->EditValue = array_values($this->bus_status_id->Lookup->Options);
+            } else { // Lookup from database
+                if ($curVal == "") {
+                    $filterWrk = "0=1";
+                } else {
+                    $filterWrk = "\"id\"" . SearchString("=", $this->bus_status_id->AdvancedSearch->SearchValue, DATATYPE_NUMBER, "");
+                }
+                $sqlWrk = $this->bus_status_id->Lookup->getSql(true, $filterWrk, '', $this);
+                $rswrk = Conn()->executeQuery($sqlWrk)->fetchAll(\PDO::FETCH_BOTH);
+                $ari = count($rswrk);
+                $arwrk = $rswrk;
+                $this->bus_status_id->EditValue = $arwrk;
+            }
+            $this->bus_status_id->PlaceHolder = RemoveHtml($this->bus_status_id->caption());
+
+            // bus_size_id
+            $this->bus_size_id->EditAttrs["class"] = "form-control";
+            $this->bus_size_id->EditCustomAttributes = "";
+            $curVal = trim(strval($this->bus_size_id->AdvancedSearch->SearchValue));
+            if ($curVal != "") {
+                $this->bus_size_id->AdvancedSearch->ViewValue = $this->bus_size_id->lookupCacheOption($curVal);
+            } else {
+                $this->bus_size_id->AdvancedSearch->ViewValue = $this->bus_size_id->Lookup !== null && is_array($this->bus_size_id->Lookup->Options) ? $curVal : null;
+            }
+            if ($this->bus_size_id->AdvancedSearch->ViewValue !== null) { // Load from cache
+                $this->bus_size_id->EditValue = array_values($this->bus_size_id->Lookup->Options);
+            } else { // Lookup from database
+                if ($curVal == "") {
+                    $filterWrk = "0=1";
+                } else {
+                    $filterWrk = "\"id\"" . SearchString("=", $this->bus_size_id->AdvancedSearch->SearchValue, DATATYPE_NUMBER, "");
+                }
+                $sqlWrk = $this->bus_size_id->Lookup->getSql(true, $filterWrk, '', $this);
+                $rswrk = Conn()->executeQuery($sqlWrk)->fetchAll(\PDO::FETCH_BOTH);
+                $ari = count($rswrk);
+                $arwrk = $rswrk;
+                $this->bus_size_id->EditValue = $arwrk;
+            }
+            $this->bus_size_id->PlaceHolder = RemoveHtml($this->bus_size_id->caption());
+
+            // bus_depot_id
+            $this->bus_depot_id->EditAttrs["class"] = "form-control";
+            $this->bus_depot_id->EditCustomAttributes = "";
+            $curVal = trim(strval($this->bus_depot_id->AdvancedSearch->SearchValue));
+            if ($curVal != "") {
+                $this->bus_depot_id->AdvancedSearch->ViewValue = $this->bus_depot_id->lookupCacheOption($curVal);
+            } else {
+                $this->bus_depot_id->AdvancedSearch->ViewValue = $this->bus_depot_id->Lookup !== null && is_array($this->bus_depot_id->Lookup->Options) ? $curVal : null;
+            }
+            if ($this->bus_depot_id->AdvancedSearch->ViewValue !== null) { // Load from cache
+                $this->bus_depot_id->EditValue = array_values($this->bus_depot_id->Lookup->Options);
+            } else { // Lookup from database
+                if ($curVal == "") {
+                    $filterWrk = "0=1";
+                } else {
+                    $filterWrk = "\"id\"" . SearchString("=", $this->bus_depot_id->AdvancedSearch->SearchValue, DATATYPE_NUMBER, "");
+                }
+                $sqlWrk = $this->bus_depot_id->Lookup->getSql(true, $filterWrk, '', $this);
+                $rswrk = Conn()->executeQuery($sqlWrk)->fetchAll(\PDO::FETCH_BOTH);
+                $ari = count($rswrk);
+                $arwrk = $rswrk;
+                $this->bus_depot_id->EditValue = $arwrk;
+            }
+            $this->bus_depot_id->PlaceHolder = RemoveHtml($this->bus_depot_id->caption());
         }
         if ($this->RowType == ROWTYPE_ADD || $this->RowType == ROWTYPE_EDIT || $this->RowType == ROWTYPE_SEARCH) { // Add/Edit/Search row
             $this->setupFieldTitles();
@@ -3267,6 +3755,26 @@ class MainBusesList extends MainBuses
         if ($this->RowType != ROWTYPE_AGGREGATEINIT) {
             $this->rowRendered();
         }
+    }
+
+    // Validate search
+    protected function validateSearch()
+    {
+        // Check if validation required
+        if (!Config("SERVER_VALIDATE")) {
+            return true;
+        }
+
+        // Return validate result
+        $validateSearch = !$this->hasInvalidFields();
+
+        // Call Form_CustomValidate event
+        $formCustomError = "";
+        $validateSearch = $validateSearch && $this->formCustomValidate($formCustomError);
+        if ($formCustomError != "") {
+            $this->setFailureMessage($formCustomError);
+        }
+        return $validateSearch;
     }
 
     // Validate form
@@ -3932,6 +4440,22 @@ class MainBusesList extends MainBuses
             WriteJson(["success" => true, $this->TableVar => $row]);
         }
         return $addRow;
+    }
+
+    // Load advanced search
+    public function loadAdvancedSearch()
+    {
+        $this->id->AdvancedSearch->load();
+        $this->number->AdvancedSearch->load();
+        $this->platform_id->AdvancedSearch->load();
+        $this->operator_id->AdvancedSearch->load();
+        $this->exterior_campaign_id->AdvancedSearch->load();
+        $this->interior_campaign_id->AdvancedSearch->load();
+        $this->bus_status_id->AdvancedSearch->load();
+        $this->bus_size_id->AdvancedSearch->load();
+        $this->bus_depot_id->AdvancedSearch->load();
+        $this->ts_created->AdvancedSearch->load();
+        $this->ts_last_update->AdvancedSearch->load();
     }
 
     // Get export HTML tag

@@ -488,9 +488,6 @@ return function (App $app) {
     // private_functions
     $app->any('/privatefunctions', PrivateFunctionsController::class)->add(PermissionMiddleware::class)->setName('privatefunctions-private_functions-custom'); // custom
 
-    // test
-    $app->any('/test', TestController::class)->add(PermissionMiddleware::class)->setName('test-test-custom'); // custom
-
     // view_campaign_status
     $app->any('/viewcampaignstatuslist', ViewCampaignStatusController::class . ':list')->add(PermissionMiddleware::class)->setName('viewcampaignstatuslist-view_campaign_status-list'); // list
     $app->group(

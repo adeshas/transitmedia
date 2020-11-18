@@ -313,6 +313,8 @@ function deubgEmail($email,$send=false){
 		$newmail->Content = beautify_email($msg); 
 		$newmail->Format = 'HTML'; 
 		$newmail->Charset = '';
+		if(isset(addAttachment))
+        $newmail->addAttachment($email->Attachments[0]['filename']);
 		$newmail->send();
 	}		
 	return $msg;
