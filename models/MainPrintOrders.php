@@ -1434,11 +1434,11 @@ SORTHTML;
     		$sql = <<<EOT
     SELECT id, campaign_id,
     (select name from main_campaigns where id = campaign_id) as campaign,
-    (select name from printers where id = printer_id) as brander,
-    (select passcode from printers where id = printer_id) as passcode,
-    (select email from printers where id = printer_id) as email,
+    (select name from y_printers where id = printer_id) as brander,
+    (select passcode from y_printers where id = printer_id) as passcode,
+    (select email from y_printers where id = printer_id) as email,
     ts_created, link, approved, quantity, bus_codes
-    	FROM print_orders where id = {$id};
+    	FROM main_print_orders where id = {$id};
     EOT;
     		$details = ExecuteRow($sql);
     		$replacements = [
