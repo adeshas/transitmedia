@@ -624,6 +624,15 @@ return function (App $app) {
         }
     );
 
+    // view_all_buses
+    $app->any('/viewallbuseslist[/{id}]', ViewAllBusesController::class . ':list')->add(PermissionMiddleware::class)->setName('viewallbuseslist-view_all_buses-list'); // list
+    $app->group(
+        '/view_all_buses',
+        function (RouteCollectorProxy $group) {
+            $group->any('/' . Config("LIST_ACTION") . '[/{id}]', ViewAllBusesController::class . ':list')->add(PermissionMiddleware::class)->setName('view_all_buses/list-view_all_buses-list-2'); // list
+        }
+    );
+
     // error
     $app->any('/error', OthersController::class . ':error')->add(PermissionMiddleware::class)->setName('error');
 

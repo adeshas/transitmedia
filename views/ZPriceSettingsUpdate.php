@@ -651,8 +651,8 @@ $Page->showMessage();
                 <?php if (!$Page->isConfirm()) { ?>
                 <span id="el_z_price_settings_active">
                 <div class="custom-control custom-checkbox d-inline-block">
-                    <input type="checkbox" class="custom-control-input<?= $Page->active->isInvalidClass() ?>" data-table="z_price_settings" data-field="x_active" name="x_active[]" id="x_active_175501" value="1"<?= ConvertToBool($Page->active->CurrentValue) ? " checked" : "" ?><?= $Page->active->editAttributes() ?> aria-describedby="x_active_help">
-                    <label class="custom-control-label" for="x_active_175501"></label>
+                    <input type="checkbox" class="custom-control-input<?= $Page->active->isInvalidClass() ?>" data-table="z_price_settings" data-field="x_active" name="x_active[]" id="x_active_332911" value="1"<?= ConvertToBool($Page->active->CurrentValue) ? " checked" : "" ?><?= $Page->active->editAttributes() ?> aria-describedby="x_active_help">
+                    <label class="custom-control-label" for="x_active_332911"></label>
                 </div>
                 <?= $Page->active->getCustomMessage() ?>
                 <div class="invalid-feedback"><?= $Page->active->getErrorMessage() ?></div>

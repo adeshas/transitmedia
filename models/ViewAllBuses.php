@@ -5,9 +5,9 @@ namespace PHPMaker2021\test;
 use Doctrine\DBAL\ParameterType;
 
 /**
- * Table class for main_buses
+ * Table class for view_all_buses
  */
-class MainBuses extends DbTable
+class ViewAllBuses extends DbTable
 {
     protected $SqlFrom = "";
     protected $SqlSelect = null;
@@ -30,15 +30,24 @@ class MainBuses extends DbTable
     // Fields
     public $id;
     public $number;
+    public $platform;
+    public $operator;
+    public $exterior_campaign;
+    public $exterior_campaign_vendor;
+    public $interior_campaign;
+    public $interior_campaign_vendor;
+    public $bus_status;
+    public $bus_size;
+    public $bus_depot;
+    public $ts_created;
+    public $ts_last_update;
+    public $bus_status_id;
+    public $bus_size_id;
+    public $bus_depot_id;
     public $platform_id;
     public $operator_id;
     public $exterior_campaign_id;
     public $interior_campaign_id;
-    public $bus_status_id;
-    public $bus_size_id;
-    public $bus_depot_id;
-    public $ts_created;
-    public $ts_last_update;
 
     // Page ID
     public $PageID = ""; // To be overridden by subclass
@@ -51,12 +60,12 @@ class MainBuses extends DbTable
 
         // Language object
         $Language = Container("language");
-        $this->TableVar = 'main_buses';
-        $this->TableName = 'main_buses';
-        $this->TableType = 'TABLE';
+        $this->TableVar = 'view_all_buses';
+        $this->TableName = 'view_all_buses';
+        $this->TableType = 'VIEW';
 
         // Update Table
-        $this->UpdateTable = "\"main_buses\"";
+        $this->UpdateTable = "\"view_all_buses\"";
         $this->Dbid = 'DB';
         $this->ExportAll = true;
         $this->ExportPageBreakCount = 0; // Page break per every n record (PDF only)
@@ -76,61 +85,76 @@ class MainBuses extends DbTable
         $this->BasicSearch = new BasicSearch($this->TableVar);
 
         // id
-        $this->id = new DbField('main_buses', 'main_buses', 'x_id', 'id', '"id"', 'CAST("id" AS varchar(255))', 3, 4, -1, false, '"id"', false, false, false, 'FORMATTED TEXT', 'NO');
-        $this->id->IsAutoIncrement = true; // Autoincrement field
+        $this->id = new DbField('view_all_buses', 'view_all_buses', 'x_id', 'id', '"id"', 'CAST("id" AS varchar(255))', 3, 4, -1, false, '"id"', false, false, false, 'FORMATTED TEXT', 'NO');
         $this->id->IsPrimaryKey = true; // Primary key field
-        $this->id->IsForeignKey = true; // Foreign key field
-        $this->id->Nullable = false; // NOT NULL field
         $this->id->Sortable = true; // Allow sort
         $this->id->DefaultErrorMessage = $Language->phrase("IncorrectInteger");
         $this->Fields['id'] = &$this->id;
 
         // number
-        $this->number = new DbField('main_buses', 'main_buses', 'x_number', 'number', '"number"', '"number"', 200, 0, -1, false, '"number"', false, false, false, 'FORMATTED TEXT', 'TEXT');
-        $this->number->Nullable = false; // NOT NULL field
-        $this->number->Required = true; // Required field
+        $this->number = new DbField('view_all_buses', 'view_all_buses', 'x_number', 'number', '"number"', '"number"', 200, 0, -1, false, '"number"', false, false, false, 'FORMATTED TEXT', 'TEXT');
         $this->number->Sortable = true; // Allow sort
         $this->Fields['number'] = &$this->number;
 
-        // platform_id
-        $this->platform_id = new DbField('main_buses', 'main_buses', 'x_platform_id', 'platform_id', '"platform_id"', 'CAST("platform_id" AS varchar(255))', 3, 4, -1, false, '"platform_id"', false, false, false, 'FORMATTED TEXT', 'SELECT');
-        $this->platform_id->Sortable = true; // Allow sort
-        $this->platform_id->UsePleaseSelect = true; // Use PleaseSelect by default
-        $this->platform_id->PleaseSelectText = $Language->phrase("PleaseSelect"); // "PleaseSelect" text
-        $this->platform_id->Lookup = new Lookup('platform_id', 'y_platforms', false, 'id', ["name","","",""], [], ["x_operator_id","main_buses x_exterior_campaign_id","main_buses x_interior_campaign_id","view_buses_interior x_interior_campaign_id","view_buses_exterior x_exterior_campaign_id","view_all_buses x_exterior_campaign_id","view_all_buses x_interior_campaign_id"], [], [], [], [], '', '');
-        $this->platform_id->DefaultErrorMessage = $Language->phrase("IncorrectInteger");
-        $this->Fields['platform_id'] = &$this->platform_id;
+        // platform
+        $this->platform = new DbField('view_all_buses', 'view_all_buses', 'x_platform', 'platform', '"platform"', '"platform"', 200, 50, -1, false, '"platform"', false, false, false, 'FORMATTED TEXT', 'TEXT');
+        $this->platform->Sortable = true; // Allow sort
+        $this->Fields['platform'] = &$this->platform;
 
-        // operator_id
-        $this->operator_id = new DbField('main_buses', 'main_buses', 'x_operator_id', 'operator_id', '"operator_id"', 'CAST("operator_id" AS varchar(255))', 3, 4, -1, false, '"operator_id"', false, false, false, 'FORMATTED TEXT', 'SELECT');
-        $this->operator_id->Sortable = true; // Allow sort
-        $this->operator_id->UsePleaseSelect = true; // Use PleaseSelect by default
-        $this->operator_id->PleaseSelectText = $Language->phrase("PleaseSelect"); // "PleaseSelect" text
-        $this->operator_id->Lookup = new Lookup('operator_id', 'y_operators', false, 'id', ["name","platform_id","",""], ["x_platform_id"], [], ["platform_id"], ["x_platform_id"], [], [], '', '');
-        $this->operator_id->DefaultErrorMessage = $Language->phrase("IncorrectInteger");
-        $this->Fields['operator_id'] = &$this->operator_id;
+        // operator
+        $this->operator = new DbField('view_all_buses', 'view_all_buses', 'x_operator', 'operator', '"operator"', '"operator"', 200, 50, -1, false, '"operator"', false, false, false, 'FORMATTED TEXT', 'TEXT');
+        $this->operator->Sortable = true; // Allow sort
+        $this->Fields['operator'] = &$this->operator;
 
-        // exterior_campaign_id
-        $this->exterior_campaign_id = new DbField('main_buses', 'main_buses', 'x_exterior_campaign_id', 'exterior_campaign_id', '"exterior_campaign_id"', 'CAST("exterior_campaign_id" AS varchar(255))', 3, 4, -1, false, '"exterior_campaign_id"', false, false, false, 'FORMATTED TEXT', 'SELECT');
-        $this->exterior_campaign_id->Sortable = true; // Allow sort
-        $this->exterior_campaign_id->UsePleaseSelect = true; // Use PleaseSelect by default
-        $this->exterior_campaign_id->PleaseSelectText = $Language->phrase("PleaseSelect"); // "PleaseSelect" text
-        $this->exterior_campaign_id->Lookup = new Lookup('exterior_campaign_id', 'main_campaigns', false, 'id', ["name","quantity","vendor_id",""], ["main_buses x_platform_id"], [], ["platform_id"], ["x_platform_id"], [], [], '"id" DESC', '');
-        $this->exterior_campaign_id->DefaultErrorMessage = $Language->phrase("IncorrectInteger");
-        $this->Fields['exterior_campaign_id'] = &$this->exterior_campaign_id;
+        // exterior_campaign
+        $this->exterior_campaign = new DbField('view_all_buses', 'view_all_buses', 'x_exterior_campaign', 'exterior_campaign', '"exterior_campaign"', '"exterior_campaign"', 201, 0, -1, false, '"exterior_campaign"', false, false, false, 'FORMATTED TEXT', 'TEXTAREA');
+        $this->exterior_campaign->Sortable = true; // Allow sort
+        $this->Fields['exterior_campaign'] = &$this->exterior_campaign;
 
-        // interior_campaign_id
-        $this->interior_campaign_id = new DbField('main_buses', 'main_buses', 'x_interior_campaign_id', 'interior_campaign_id', '"interior_campaign_id"', 'CAST("interior_campaign_id" AS varchar(255))', 3, 4, -1, false, '"interior_campaign_id"', false, false, false, 'FORMATTED TEXT', 'SELECT');
-        $this->interior_campaign_id->Sortable = true; // Allow sort
-        $this->interior_campaign_id->UsePleaseSelect = true; // Use PleaseSelect by default
-        $this->interior_campaign_id->PleaseSelectText = $Language->phrase("PleaseSelect"); // "PleaseSelect" text
-        $this->interior_campaign_id->Lookup = new Lookup('interior_campaign_id', 'main_campaigns', false, 'id', ["name","inventory_id","vendor_id",""], ["main_buses x_platform_id"], [], ["platform_id"], ["x_platform_id"], [], [], '', '');
-        $this->interior_campaign_id->DefaultErrorMessage = $Language->phrase("IncorrectInteger");
-        $this->Fields['interior_campaign_id'] = &$this->interior_campaign_id;
+        // exterior_campaign_vendor
+        $this->exterior_campaign_vendor = new DbField('view_all_buses', 'view_all_buses', 'x_exterior_campaign_vendor', 'exterior_campaign_vendor', '"exterior_campaign_vendor"', '"exterior_campaign_vendor"', 200, 0, -1, false, '"exterior_campaign_vendor"', false, false, false, 'FORMATTED TEXT', 'TEXT');
+        $this->exterior_campaign_vendor->Sortable = true; // Allow sort
+        $this->Fields['exterior_campaign_vendor'] = &$this->exterior_campaign_vendor;
+
+        // interior_campaign
+        $this->interior_campaign = new DbField('view_all_buses', 'view_all_buses', 'x_interior_campaign', 'interior_campaign', '"interior_campaign"', '"interior_campaign"', 201, 0, -1, false, '"interior_campaign"', false, false, false, 'FORMATTED TEXT', 'TEXTAREA');
+        $this->interior_campaign->Sortable = true; // Allow sort
+        $this->Fields['interior_campaign'] = &$this->interior_campaign;
+
+        // interior_campaign_vendor
+        $this->interior_campaign_vendor = new DbField('view_all_buses', 'view_all_buses', 'x_interior_campaign_vendor', 'interior_campaign_vendor', '"interior_campaign_vendor"', '"interior_campaign_vendor"', 200, 0, -1, false, '"interior_campaign_vendor"', false, false, false, 'FORMATTED TEXT', 'TEXT');
+        $this->interior_campaign_vendor->Sortable = true; // Allow sort
+        $this->Fields['interior_campaign_vendor'] = &$this->interior_campaign_vendor;
+
+        // bus_status
+        $this->bus_status = new DbField('view_all_buses', 'view_all_buses', 'x_bus_status', 'bus_status', '"bus_status"', '"bus_status"', 200, 0, -1, false, '"bus_status"', false, false, false, 'FORMATTED TEXT', 'TEXT');
+        $this->bus_status->Sortable = true; // Allow sort
+        $this->Fields['bus_status'] = &$this->bus_status;
+
+        // bus_size
+        $this->bus_size = new DbField('view_all_buses', 'view_all_buses', 'x_bus_size', 'bus_size', '"bus_size"', '"bus_size"', 201, 0, -1, false, '"bus_size"', false, false, false, 'FORMATTED TEXT', 'TEXTAREA');
+        $this->bus_size->Sortable = true; // Allow sort
+        $this->Fields['bus_size'] = &$this->bus_size;
+
+        // bus_depot
+        $this->bus_depot = new DbField('view_all_buses', 'view_all_buses', 'x_bus_depot', 'bus_depot', '"bus_depot"', '"bus_depot"', 201, 0, -1, false, '"bus_depot"', false, false, false, 'FORMATTED TEXT', 'TEXTAREA');
+        $this->bus_depot->Sortable = true; // Allow sort
+        $this->Fields['bus_depot'] = &$this->bus_depot;
+
+        // ts_created
+        $this->ts_created = new DbField('view_all_buses', 'view_all_buses', 'x_ts_created', 'ts_created', '"ts_created"', CastDateFieldForLike("\"ts_created\"", 0, "DB"), 135, 8, 0, false, '"ts_created"', false, false, false, 'FORMATTED TEXT', 'TEXT');
+        $this->ts_created->Sortable = true; // Allow sort
+        $this->ts_created->DefaultErrorMessage = str_replace("%s", $GLOBALS["DATE_FORMAT"], $Language->phrase("IncorrectDate"));
+        $this->Fields['ts_created'] = &$this->ts_created;
+
+        // ts_last_update
+        $this->ts_last_update = new DbField('view_all_buses', 'view_all_buses', 'x_ts_last_update', 'ts_last_update', '"ts_last_update"', CastDateFieldForLike("\"ts_last_update\"", 0, "DB"), 135, 8, 0, false, '"ts_last_update"', false, false, false, 'FORMATTED TEXT', 'TEXT');
+        $this->ts_last_update->Sortable = true; // Allow sort
+        $this->ts_last_update->DefaultErrorMessage = str_replace("%s", $GLOBALS["DATE_FORMAT"], $Language->phrase("IncorrectDate"));
+        $this->Fields['ts_last_update'] = &$this->ts_last_update;
 
         // bus_status_id
-        $this->bus_status_id = new DbField('main_buses', 'main_buses', 'x_bus_status_id', 'bus_status_id', '"bus_status_id"', 'CAST("bus_status_id" AS varchar(255))', 3, 4, -1, false, '"bus_status_id"', false, false, false, 'FORMATTED TEXT', 'SELECT');
-        $this->bus_status_id->Nullable = false; // NOT NULL field
+        $this->bus_status_id = new DbField('view_all_buses', 'view_all_buses', 'x_bus_status_id', 'bus_status_id', '"bus_status_id"', 'CAST("bus_status_id" AS varchar(255))', 3, 4, -1, false, '"bus_status_id"', false, false, false, 'FORMATTED TEXT', 'SELECT');
         $this->bus_status_id->Sortable = true; // Allow sort
         $this->bus_status_id->UsePleaseSelect = true; // Use PleaseSelect by default
         $this->bus_status_id->PleaseSelectText = $Language->phrase("PleaseSelect"); // "PleaseSelect" text
@@ -139,7 +163,7 @@ class MainBuses extends DbTable
         $this->Fields['bus_status_id'] = &$this->bus_status_id;
 
         // bus_size_id
-        $this->bus_size_id = new DbField('main_buses', 'main_buses', 'x_bus_size_id', 'bus_size_id', '"bus_size_id"', 'CAST("bus_size_id" AS varchar(255))', 3, 4, -1, false, '"bus_size_id"', false, false, false, 'FORMATTED TEXT', 'SELECT');
+        $this->bus_size_id = new DbField('view_all_buses', 'view_all_buses', 'x_bus_size_id', 'bus_size_id', '"bus_size_id"', 'CAST("bus_size_id" AS varchar(255))', 3, 4, -1, false, '"bus_size_id"', false, false, false, 'FORMATTED TEXT', 'SELECT');
         $this->bus_size_id->Sortable = true; // Allow sort
         $this->bus_size_id->UsePleaseSelect = true; // Use PleaseSelect by default
         $this->bus_size_id->PleaseSelectText = $Language->phrase("PleaseSelect"); // "PleaseSelect" text
@@ -148,7 +172,7 @@ class MainBuses extends DbTable
         $this->Fields['bus_size_id'] = &$this->bus_size_id;
 
         // bus_depot_id
-        $this->bus_depot_id = new DbField('main_buses', 'main_buses', 'x_bus_depot_id', 'bus_depot_id', '"bus_depot_id"', 'CAST("bus_depot_id" AS varchar(255))', 3, 4, -1, false, '"bus_depot_id"', false, false, false, 'FORMATTED TEXT', 'SELECT');
+        $this->bus_depot_id = new DbField('view_all_buses', 'view_all_buses', 'x_bus_depot_id', 'bus_depot_id', '"bus_depot_id"', 'CAST("bus_depot_id" AS varchar(255))', 3, 4, -1, false, '"bus_depot_id"', false, false, false, 'FORMATTED TEXT', 'SELECT');
         $this->bus_depot_id->Sortable = true; // Allow sort
         $this->bus_depot_id->UsePleaseSelect = true; // Use PleaseSelect by default
         $this->bus_depot_id->PleaseSelectText = $Language->phrase("PleaseSelect"); // "PleaseSelect" text
@@ -156,21 +180,41 @@ class MainBuses extends DbTable
         $this->bus_depot_id->DefaultErrorMessage = $Language->phrase("IncorrectInteger");
         $this->Fields['bus_depot_id'] = &$this->bus_depot_id;
 
-        // ts_created
-        $this->ts_created = new DbField('main_buses', 'main_buses', 'x_ts_created', 'ts_created', '"ts_created"', CastDateFieldForLike("\"ts_created\"", 0, "DB"), 135, 8, 0, false, '"ts_created"', false, false, false, 'FORMATTED TEXT', 'TEXT');
-        $this->ts_created->Nullable = false; // NOT NULL field
-        $this->ts_created->Required = true; // Required field
-        $this->ts_created->Sortable = true; // Allow sort
-        $this->ts_created->DefaultErrorMessage = str_replace("%s", $GLOBALS["DATE_FORMAT"], $Language->phrase("IncorrectDate"));
-        $this->Fields['ts_created'] = &$this->ts_created;
+        // platform_id
+        $this->platform_id = new DbField('view_all_buses', 'view_all_buses', 'x_platform_id', 'platform_id', '"platform_id"', 'CAST("platform_id" AS varchar(255))', 3, 4, -1, false, '"platform_id"', false, false, false, 'FORMATTED TEXT', 'SELECT');
+        $this->platform_id->Sortable = true; // Allow sort
+        $this->platform_id->UsePleaseSelect = true; // Use PleaseSelect by default
+        $this->platform_id->PleaseSelectText = $Language->phrase("PleaseSelect"); // "PleaseSelect" text
+        $this->platform_id->Lookup = new Lookup('platform_id', 'y_platforms', false, 'id', ["name","","",""], [], ["x_operator_id"], [], [], [], [], '', '');
+        $this->platform_id->DefaultErrorMessage = $Language->phrase("IncorrectInteger");
+        $this->Fields['platform_id'] = &$this->platform_id;
 
-        // ts_last_update
-        $this->ts_last_update = new DbField('main_buses', 'main_buses', 'x_ts_last_update', 'ts_last_update', '"ts_last_update"', CastDateFieldForLike("\"ts_last_update\"", 0, "DB"), 135, 8, 0, false, '"ts_last_update"', false, false, false, 'FORMATTED TEXT', 'TEXT');
-        $this->ts_last_update->Nullable = false; // NOT NULL field
-        $this->ts_last_update->Required = true; // Required field
-        $this->ts_last_update->Sortable = true; // Allow sort
-        $this->ts_last_update->DefaultErrorMessage = str_replace("%s", $GLOBALS["DATE_FORMAT"], $Language->phrase("IncorrectDate"));
-        $this->Fields['ts_last_update'] = &$this->ts_last_update;
+        // operator_id
+        $this->operator_id = new DbField('view_all_buses', 'view_all_buses', 'x_operator_id', 'operator_id', '"operator_id"', 'CAST("operator_id" AS varchar(255))', 3, 4, -1, false, '"operator_id"', false, false, false, 'FORMATTED TEXT', 'SELECT');
+        $this->operator_id->Sortable = true; // Allow sort
+        $this->operator_id->UsePleaseSelect = true; // Use PleaseSelect by default
+        $this->operator_id->PleaseSelectText = $Language->phrase("PleaseSelect"); // "PleaseSelect" text
+        $this->operator_id->Lookup = new Lookup('operator_id', 'y_operators', false, 'id', ["name","platform_id","",""], ["x_platform_id"], [], ["platform_id"], ["x_platform_id"], [], [], '', '');
+        $this->operator_id->DefaultErrorMessage = $Language->phrase("IncorrectInteger");
+        $this->Fields['operator_id'] = &$this->operator_id;
+
+        // exterior_campaign_id
+        $this->exterior_campaign_id = new DbField('view_all_buses', 'view_all_buses', 'x_exterior_campaign_id', 'exterior_campaign_id', '"exterior_campaign_id"', 'CAST("exterior_campaign_id" AS varchar(255))', 3, 4, -1, false, '"exterior_campaign_id"', false, false, false, 'FORMATTED TEXT', 'SELECT');
+        $this->exterior_campaign_id->Sortable = true; // Allow sort
+        $this->exterior_campaign_id->UsePleaseSelect = true; // Use PleaseSelect by default
+        $this->exterior_campaign_id->PleaseSelectText = $Language->phrase("PleaseSelect"); // "PleaseSelect" text
+        $this->exterior_campaign_id->Lookup = new Lookup('exterior_campaign_id', 'main_campaigns', false, 'id', ["name","quantity","vendor_id",""], ["main_buses x_platform_id"], [], ["platform_id"], ["x_platform_id"], [], [], '"id" DESC', '');
+        $this->exterior_campaign_id->DefaultErrorMessage = $Language->phrase("IncorrectInteger");
+        $this->Fields['exterior_campaign_id'] = &$this->exterior_campaign_id;
+
+        // interior_campaign_id
+        $this->interior_campaign_id = new DbField('view_all_buses', 'view_all_buses', 'x_interior_campaign_id', 'interior_campaign_id', '"interior_campaign_id"', 'CAST("interior_campaign_id" AS varchar(255))', 3, 4, -1, false, '"interior_campaign_id"', false, false, false, 'FORMATTED TEXT', 'SELECT');
+        $this->interior_campaign_id->Sortable = true; // Allow sort
+        $this->interior_campaign_id->UsePleaseSelect = true; // Use PleaseSelect by default
+        $this->interior_campaign_id->PleaseSelectText = $Language->phrase("PleaseSelect"); // "PleaseSelect" text
+        $this->interior_campaign_id->Lookup = new Lookup('interior_campaign_id', 'main_campaigns', false, 'id', ["name","inventory_id","vendor_id",""], ["main_buses x_platform_id"], [], ["platform_id"], ["x_platform_id"], [], [], '', '');
+        $this->interior_campaign_id->DefaultErrorMessage = $Language->phrase("IncorrectInteger");
+        $this->Fields['interior_campaign_id'] = &$this->interior_campaign_id;
     }
 
     // Field Visibility
@@ -210,36 +254,10 @@ class MainBuses extends DbTable
         }
     }
 
-    // Current detail table name
-    public function getCurrentDetailTable()
-    {
-        return @$_SESSION[PROJECT_NAME . "_" . $this->TableVar . "_" . Config("TABLE_DETAIL_TABLE")];
-    }
-
-    public function setCurrentDetailTable($v)
-    {
-        $_SESSION[PROJECT_NAME . "_" . $this->TableVar . "_" . Config("TABLE_DETAIL_TABLE")] = $v;
-    }
-
-    // Get detail url
-    public function getDetailUrl()
-    {
-        // Detail url
-        $detailUrl = "";
-        if ($this->getCurrentDetailTable() == "sub_media_allocation") {
-            $detailUrl = Container("sub_media_allocation")->getListUrl() . "?" . Config("TABLE_SHOW_MASTER") . "=" . $this->TableVar;
-            $detailUrl .= "&" . GetForeignKeyUrl("fk_id", $this->id->CurrentValue);
-        }
-        if ($detailUrl == "") {
-            $detailUrl = "mainbuseslist";
-        }
-        return $detailUrl;
-    }
-
     // Table level SQL
     public function getSqlFrom() // From
     {
-        return ($this->SqlFrom != "") ? $this->SqlFrom : "\"main_buses\"";
+        return ($this->SqlFrom != "") ? $this->SqlFrom : "\"view_all_buses\"";
     }
 
     public function sqlFrom() // For backward compatibility
@@ -270,7 +288,7 @@ class MainBuses extends DbTable
     public function getSqlWhere() // Where
     {
         $where = ($this->SqlWhere != "") ? $this->SqlWhere : "";
-        $this->DefaultFilter = "";
+        $this->DefaultFilter = ((CurrentUserLevel() == 5) ? "\"operator_id\" = (select o.id from y_vendors v, y_operators o where v.name = o.shortname and v.id = ".Profile()->vendor_id.")":"");
         AddFilter($where, $this->DefaultFilter);
         return $where;
     }
@@ -520,9 +538,6 @@ class MainBuses extends DbTable
         $conn = $this->getConnection();
         $success = $this->insertSql($rs)->execute();
         if ($success) {
-            // Get insert id if necessary
-            $this->id->setDbValue($conn->fetchColumn("SELECT currval('buses_id_seq'::regclass)"));
-            $rs['id'] = $this->id->DbValue;
         }
         return $success;
     }
@@ -609,15 +624,24 @@ class MainBuses extends DbTable
         }
         $this->id->DbValue = $row['id'];
         $this->number->DbValue = $row['number'];
+        $this->platform->DbValue = $row['platform'];
+        $this->operator->DbValue = $row['operator'];
+        $this->exterior_campaign->DbValue = $row['exterior_campaign'];
+        $this->exterior_campaign_vendor->DbValue = $row['exterior_campaign_vendor'];
+        $this->interior_campaign->DbValue = $row['interior_campaign'];
+        $this->interior_campaign_vendor->DbValue = $row['interior_campaign_vendor'];
+        $this->bus_status->DbValue = $row['bus_status'];
+        $this->bus_size->DbValue = $row['bus_size'];
+        $this->bus_depot->DbValue = $row['bus_depot'];
+        $this->ts_created->DbValue = $row['ts_created'];
+        $this->ts_last_update->DbValue = $row['ts_last_update'];
+        $this->bus_status_id->DbValue = $row['bus_status_id'];
+        $this->bus_size_id->DbValue = $row['bus_size_id'];
+        $this->bus_depot_id->DbValue = $row['bus_depot_id'];
         $this->platform_id->DbValue = $row['platform_id'];
         $this->operator_id->DbValue = $row['operator_id'];
         $this->exterior_campaign_id->DbValue = $row['exterior_campaign_id'];
         $this->interior_campaign_id->DbValue = $row['interior_campaign_id'];
-        $this->bus_status_id->DbValue = $row['bus_status_id'];
-        $this->bus_size_id->DbValue = $row['bus_size_id'];
-        $this->bus_depot_id->DbValue = $row['bus_depot_id'];
-        $this->ts_created->DbValue = $row['ts_created'];
-        $this->ts_last_update->DbValue = $row['ts_last_update'];
     }
 
     // Delete uploaded files
@@ -690,7 +714,7 @@ class MainBuses extends DbTable
         if (@$_SESSION[$name] != "") {
             return $_SESSION[$name];
         } else {
-            return GetUrl("mainbuseslist");
+            return GetUrl("viewallbuseslist");
         }
     }
 
@@ -703,11 +727,11 @@ class MainBuses extends DbTable
     public function getModalCaption($pageName)
     {
         global $Language;
-        if ($pageName == "mainbusesview") {
+        if ($pageName == "viewallbusesview") {
             return $Language->phrase("View");
-        } elseif ($pageName == "mainbusesedit") {
+        } elseif ($pageName == "viewallbusesedit") {
             return $Language->phrase("Edit");
-        } elseif ($pageName == "mainbusesadd") {
+        } elseif ($pageName == "viewallbusesadd") {
             return $Language->phrase("Add");
         } else {
             return "";
@@ -719,15 +743,15 @@ class MainBuses extends DbTable
     {
         switch (strtolower($action)) {
             case Config("API_VIEW_ACTION"):
-                return "MainBusesView";
+                return "ViewAllBusesView";
             case Config("API_ADD_ACTION"):
-                return "MainBusesAdd";
+                return "ViewAllBusesAdd";
             case Config("API_EDIT_ACTION"):
-                return "MainBusesEdit";
+                return "ViewAllBusesEdit";
             case Config("API_DELETE_ACTION"):
-                return "MainBusesDelete";
+                return "ViewAllBusesDelete";
             case Config("API_LIST_ACTION"):
-                return "MainBusesList";
+                return "ViewAllBusesList";
             default:
                 return "";
         }
@@ -736,16 +760,16 @@ class MainBuses extends DbTable
     // List URL
     public function getListUrl()
     {
-        return "mainbuseslist";
+        return "viewallbuseslist";
     }
 
     // View URL
     public function getViewUrl($parm = "")
     {
         if ($parm != "") {
-            $url = $this->keyUrl("mainbusesview", $this->getUrlParm($parm));
+            $url = $this->keyUrl("viewallbusesview", $this->getUrlParm($parm));
         } else {
-            $url = $this->keyUrl("mainbusesview", $this->getUrlParm(Config("TABLE_SHOW_DETAIL") . "="));
+            $url = $this->keyUrl("viewallbusesview", $this->getUrlParm(Config("TABLE_SHOW_DETAIL") . "="));
         }
         return $this->addMasterUrl($url);
     }
@@ -754,9 +778,9 @@ class MainBuses extends DbTable
     public function getAddUrl($parm = "")
     {
         if ($parm != "") {
-            $url = "mainbusesadd?" . $this->getUrlParm($parm);
+            $url = "viewallbusesadd?" . $this->getUrlParm($parm);
         } else {
-            $url = "mainbusesadd";
+            $url = "viewallbusesadd";
         }
         return $this->addMasterUrl($url);
     }
@@ -764,11 +788,7 @@ class MainBuses extends DbTable
     // Edit URL
     public function getEditUrl($parm = "")
     {
-        if ($parm != "") {
-            $url = $this->keyUrl("mainbusesedit", $this->getUrlParm($parm));
-        } else {
-            $url = $this->keyUrl("mainbusesedit", $this->getUrlParm(Config("TABLE_SHOW_DETAIL") . "="));
-        }
+        $url = $this->keyUrl("viewallbusesedit", $this->getUrlParm($parm));
         return $this->addMasterUrl($url);
     }
 
@@ -782,11 +802,7 @@ class MainBuses extends DbTable
     // Copy URL
     public function getCopyUrl($parm = "")
     {
-        if ($parm != "") {
-            $url = $this->keyUrl("mainbusesadd", $this->getUrlParm($parm));
-        } else {
-            $url = $this->keyUrl("mainbusesadd", $this->getUrlParm(Config("TABLE_SHOW_DETAIL") . "="));
-        }
+        $url = $this->keyUrl("viewallbusesadd", $this->getUrlParm($parm));
         return $this->addMasterUrl($url);
     }
 
@@ -800,7 +816,7 @@ class MainBuses extends DbTable
     // Delete URL
     public function getDeleteUrl()
     {
-        return $this->keyUrl("mainbusesdelete", $this->getUrlParm());
+        return $this->keyUrl("viewallbusesdelete", $this->getUrlParm());
     }
 
     // Add master url
@@ -949,15 +965,24 @@ SORTHTML;
         }
         $this->id->setDbValue($row['id']);
         $this->number->setDbValue($row['number']);
+        $this->platform->setDbValue($row['platform']);
+        $this->operator->setDbValue($row['operator']);
+        $this->exterior_campaign->setDbValue($row['exterior_campaign']);
+        $this->exterior_campaign_vendor->setDbValue($row['exterior_campaign_vendor']);
+        $this->interior_campaign->setDbValue($row['interior_campaign']);
+        $this->interior_campaign_vendor->setDbValue($row['interior_campaign_vendor']);
+        $this->bus_status->setDbValue($row['bus_status']);
+        $this->bus_size->setDbValue($row['bus_size']);
+        $this->bus_depot->setDbValue($row['bus_depot']);
+        $this->ts_created->setDbValue($row['ts_created']);
+        $this->ts_last_update->setDbValue($row['ts_last_update']);
+        $this->bus_status_id->setDbValue($row['bus_status_id']);
+        $this->bus_size_id->setDbValue($row['bus_size_id']);
+        $this->bus_depot_id->setDbValue($row['bus_depot_id']);
         $this->platform_id->setDbValue($row['platform_id']);
         $this->operator_id->setDbValue($row['operator_id']);
         $this->exterior_campaign_id->setDbValue($row['exterior_campaign_id']);
         $this->interior_campaign_id->setDbValue($row['interior_campaign_id']);
-        $this->bus_status_id->setDbValue($row['bus_status_id']);
-        $this->bus_size_id->setDbValue($row['bus_size_id']);
-        $this->bus_depot_id->setDbValue($row['bus_depot_id']);
-        $this->ts_created->setDbValue($row['ts_created']);
-        $this->ts_last_update->setDbValue($row['ts_last_update']);
     }
 
     // Render list row values
@@ -973,6 +998,49 @@ SORTHTML;
         // id
 
         // number
+        $this->number->CellCssStyle = "white-space: nowrap;";
+
+        // platform
+        $this->platform->CellCssStyle = "white-space: nowrap;";
+
+        // operator
+        $this->operator->CellCssStyle = "white-space: nowrap;";
+
+        // exterior_campaign
+        $this->exterior_campaign->CellCssStyle = "white-space: nowrap;";
+
+        // exterior_campaign_vendor
+        $this->exterior_campaign_vendor->CellCssStyle = "white-space: nowrap;";
+
+        // interior_campaign
+        $this->interior_campaign->CellCssStyle = "white-space: nowrap;";
+
+        // interior_campaign_vendor
+        $this->interior_campaign_vendor->CellCssStyle = "white-space: nowrap;";
+
+        // bus_status
+        $this->bus_status->CellCssStyle = "white-space: nowrap;";
+
+        // bus_size
+        $this->bus_size->CellCssStyle = "white-space: nowrap;";
+
+        // bus_depot
+        $this->bus_depot->CellCssStyle = "white-space: nowrap;";
+
+        // ts_created
+        $this->ts_created->CellCssStyle = "white-space: nowrap;";
+
+        // ts_last_update
+        $this->ts_last_update->CellCssStyle = "white-space: nowrap;";
+
+        // bus_status_id
+        $this->bus_status_id->CellCssStyle = "white-space: nowrap;";
+
+        // bus_size_id
+        $this->bus_size_id->CellCssStyle = "white-space: nowrap;";
+
+        // bus_depot_id
+        $this->bus_depot_id->CellCssStyle = "white-space: nowrap;";
 
         // platform_id
         $this->platform_id->CellCssStyle = "white-space: nowrap;";
@@ -981,18 +1049,10 @@ SORTHTML;
         $this->operator_id->CellCssStyle = "white-space: nowrap;";
 
         // exterior_campaign_id
+        $this->exterior_campaign_id->CellCssStyle = "white-space: nowrap;";
 
         // interior_campaign_id
-
-        // bus_status_id
-
-        // bus_size_id
-
-        // bus_depot_id
-
-        // ts_created
-
-        // ts_last_update
+        $this->interior_campaign_id->CellCssStyle = "white-space: nowrap;";
 
         // id
         $this->id->ViewValue = $this->id->CurrentValue;
@@ -1001,6 +1061,115 @@ SORTHTML;
         // number
         $this->number->ViewValue = $this->number->CurrentValue;
         $this->number->ViewCustomAttributes = "";
+
+        // platform
+        $this->platform->ViewValue = $this->platform->CurrentValue;
+        $this->platform->ViewCustomAttributes = "";
+
+        // operator
+        $this->operator->ViewValue = $this->operator->CurrentValue;
+        $this->operator->ViewCustomAttributes = "";
+
+        // exterior_campaign
+        $this->exterior_campaign->ViewValue = $this->exterior_campaign->CurrentValue;
+        $this->exterior_campaign->ViewCustomAttributes = "";
+
+        // exterior_campaign_vendor
+        $this->exterior_campaign_vendor->ViewValue = $this->exterior_campaign_vendor->CurrentValue;
+        $this->exterior_campaign_vendor->ViewCustomAttributes = "";
+
+        // interior_campaign
+        $this->interior_campaign->ViewValue = $this->interior_campaign->CurrentValue;
+        $this->interior_campaign->ViewCustomAttributes = "";
+
+        // interior_campaign_vendor
+        $this->interior_campaign_vendor->ViewValue = $this->interior_campaign_vendor->CurrentValue;
+        $this->interior_campaign_vendor->ViewCustomAttributes = "";
+
+        // bus_status
+        $this->bus_status->ViewValue = $this->bus_status->CurrentValue;
+        $this->bus_status->ViewCustomAttributes = "";
+
+        // bus_size
+        $this->bus_size->ViewValue = $this->bus_size->CurrentValue;
+        $this->bus_size->ViewCustomAttributes = "";
+
+        // bus_depot
+        $this->bus_depot->ViewValue = $this->bus_depot->CurrentValue;
+        $this->bus_depot->ViewCustomAttributes = "";
+
+        // ts_created
+        $this->ts_created->ViewValue = $this->ts_created->CurrentValue;
+        $this->ts_created->ViewValue = FormatDateTime($this->ts_created->ViewValue, 0);
+        $this->ts_created->ViewCustomAttributes = "";
+
+        // ts_last_update
+        $this->ts_last_update->ViewValue = $this->ts_last_update->CurrentValue;
+        $this->ts_last_update->ViewValue = FormatDateTime($this->ts_last_update->ViewValue, 0);
+        $this->ts_last_update->ViewCustomAttributes = "";
+
+        // bus_status_id
+        $curVal = strval($this->bus_status_id->CurrentValue);
+        if ($curVal != "") {
+            $this->bus_status_id->ViewValue = $this->bus_status_id->lookupCacheOption($curVal);
+            if ($this->bus_status_id->ViewValue === null) { // Lookup from database
+                $filterWrk = "\"id\"" . SearchString("=", $curVal, DATATYPE_NUMBER, "");
+                $sqlWrk = $this->bus_status_id->Lookup->getSql(false, $filterWrk, '', $this, true);
+                $rswrk = Conn()->executeQuery($sqlWrk)->fetchAll(\PDO::FETCH_BOTH);
+                $ari = count($rswrk);
+                if ($ari > 0) { // Lookup values found
+                    $arwrk = $this->bus_status_id->Lookup->renderViewRow($rswrk[0]);
+                    $this->bus_status_id->ViewValue = $this->bus_status_id->displayValue($arwrk);
+                } else {
+                    $this->bus_status_id->ViewValue = $this->bus_status_id->CurrentValue;
+                }
+            }
+        } else {
+            $this->bus_status_id->ViewValue = null;
+        }
+        $this->bus_status_id->ViewCustomAttributes = "";
+
+        // bus_size_id
+        $curVal = strval($this->bus_size_id->CurrentValue);
+        if ($curVal != "") {
+            $this->bus_size_id->ViewValue = $this->bus_size_id->lookupCacheOption($curVal);
+            if ($this->bus_size_id->ViewValue === null) { // Lookup from database
+                $filterWrk = "\"id\"" . SearchString("=", $curVal, DATATYPE_NUMBER, "");
+                $sqlWrk = $this->bus_size_id->Lookup->getSql(false, $filterWrk, '', $this, true);
+                $rswrk = Conn()->executeQuery($sqlWrk)->fetchAll(\PDO::FETCH_BOTH);
+                $ari = count($rswrk);
+                if ($ari > 0) { // Lookup values found
+                    $arwrk = $this->bus_size_id->Lookup->renderViewRow($rswrk[0]);
+                    $this->bus_size_id->ViewValue = $this->bus_size_id->displayValue($arwrk);
+                } else {
+                    $this->bus_size_id->ViewValue = $this->bus_size_id->CurrentValue;
+                }
+            }
+        } else {
+            $this->bus_size_id->ViewValue = null;
+        }
+        $this->bus_size_id->ViewCustomAttributes = "";
+
+        // bus_depot_id
+        $curVal = strval($this->bus_depot_id->CurrentValue);
+        if ($curVal != "") {
+            $this->bus_depot_id->ViewValue = $this->bus_depot_id->lookupCacheOption($curVal);
+            if ($this->bus_depot_id->ViewValue === null) { // Lookup from database
+                $filterWrk = "\"id\"" . SearchString("=", $curVal, DATATYPE_NUMBER, "");
+                $sqlWrk = $this->bus_depot_id->Lookup->getSql(false, $filterWrk, '', $this, true);
+                $rswrk = Conn()->executeQuery($sqlWrk)->fetchAll(\PDO::FETCH_BOTH);
+                $ari = count($rswrk);
+                if ($ari > 0) { // Lookup values found
+                    $arwrk = $this->bus_depot_id->Lookup->renderViewRow($rswrk[0]);
+                    $this->bus_depot_id->ViewValue = $this->bus_depot_id->displayValue($arwrk);
+                } else {
+                    $this->bus_depot_id->ViewValue = $this->bus_depot_id->CurrentValue;
+                }
+            }
+        } else {
+            $this->bus_depot_id->ViewValue = null;
+        }
+        $this->bus_depot_id->ViewCustomAttributes = "";
 
         // platform_id
         $curVal = strval($this->platform_id->CurrentValue);
@@ -1094,79 +1263,6 @@ SORTHTML;
         }
         $this->interior_campaign_id->ViewCustomAttributes = "";
 
-        // bus_status_id
-        $curVal = strval($this->bus_status_id->CurrentValue);
-        if ($curVal != "") {
-            $this->bus_status_id->ViewValue = $this->bus_status_id->lookupCacheOption($curVal);
-            if ($this->bus_status_id->ViewValue === null) { // Lookup from database
-                $filterWrk = "\"id\"" . SearchString("=", $curVal, DATATYPE_NUMBER, "");
-                $sqlWrk = $this->bus_status_id->Lookup->getSql(false, $filterWrk, '', $this, true);
-                $rswrk = Conn()->executeQuery($sqlWrk)->fetchAll(\PDO::FETCH_BOTH);
-                $ari = count($rswrk);
-                if ($ari > 0) { // Lookup values found
-                    $arwrk = $this->bus_status_id->Lookup->renderViewRow($rswrk[0]);
-                    $this->bus_status_id->ViewValue = $this->bus_status_id->displayValue($arwrk);
-                } else {
-                    $this->bus_status_id->ViewValue = $this->bus_status_id->CurrentValue;
-                }
-            }
-        } else {
-            $this->bus_status_id->ViewValue = null;
-        }
-        $this->bus_status_id->ViewCustomAttributes = "";
-
-        // bus_size_id
-        $curVal = strval($this->bus_size_id->CurrentValue);
-        if ($curVal != "") {
-            $this->bus_size_id->ViewValue = $this->bus_size_id->lookupCacheOption($curVal);
-            if ($this->bus_size_id->ViewValue === null) { // Lookup from database
-                $filterWrk = "\"id\"" . SearchString("=", $curVal, DATATYPE_NUMBER, "");
-                $sqlWrk = $this->bus_size_id->Lookup->getSql(false, $filterWrk, '', $this, true);
-                $rswrk = Conn()->executeQuery($sqlWrk)->fetchAll(\PDO::FETCH_BOTH);
-                $ari = count($rswrk);
-                if ($ari > 0) { // Lookup values found
-                    $arwrk = $this->bus_size_id->Lookup->renderViewRow($rswrk[0]);
-                    $this->bus_size_id->ViewValue = $this->bus_size_id->displayValue($arwrk);
-                } else {
-                    $this->bus_size_id->ViewValue = $this->bus_size_id->CurrentValue;
-                }
-            }
-        } else {
-            $this->bus_size_id->ViewValue = null;
-        }
-        $this->bus_size_id->ViewCustomAttributes = "";
-
-        // bus_depot_id
-        $curVal = strval($this->bus_depot_id->CurrentValue);
-        if ($curVal != "") {
-            $this->bus_depot_id->ViewValue = $this->bus_depot_id->lookupCacheOption($curVal);
-            if ($this->bus_depot_id->ViewValue === null) { // Lookup from database
-                $filterWrk = "\"id\"" . SearchString("=", $curVal, DATATYPE_NUMBER, "");
-                $sqlWrk = $this->bus_depot_id->Lookup->getSql(false, $filterWrk, '', $this, true);
-                $rswrk = Conn()->executeQuery($sqlWrk)->fetchAll(\PDO::FETCH_BOTH);
-                $ari = count($rswrk);
-                if ($ari > 0) { // Lookup values found
-                    $arwrk = $this->bus_depot_id->Lookup->renderViewRow($rswrk[0]);
-                    $this->bus_depot_id->ViewValue = $this->bus_depot_id->displayValue($arwrk);
-                } else {
-                    $this->bus_depot_id->ViewValue = $this->bus_depot_id->CurrentValue;
-                }
-            }
-        } else {
-            $this->bus_depot_id->ViewValue = null;
-        }
-        $this->bus_depot_id->ViewCustomAttributes = "";
-
-        // ts_created
-        $this->ts_created->ViewValue = $this->ts_created->CurrentValue;
-        $this->ts_created->ViewValue = FormatDateTime($this->ts_created->ViewValue, 0);
-        $this->ts_created->ViewCustomAttributes = "";
-
-        // ts_last_update
-        $this->ts_last_update->ViewValue = $this->ts_last_update->CurrentValue;
-        $this->ts_last_update->ViewValue = FormatDateTime($this->ts_last_update->ViewValue, 0);
-        $this->ts_last_update->ViewCustomAttributes = "";
-
         // id
         $this->id->LinkCustomAttributes = "";
         $this->id->HrefValue = "";
@@ -1176,6 +1272,76 @@ SORTHTML;
         $this->number->LinkCustomAttributes = "";
         $this->number->HrefValue = "";
         $this->number->TooltipValue = "";
+
+        // platform
+        $this->platform->LinkCustomAttributes = "";
+        $this->platform->HrefValue = "";
+        $this->platform->TooltipValue = "";
+
+        // operator
+        $this->operator->LinkCustomAttributes = "";
+        $this->operator->HrefValue = "";
+        $this->operator->TooltipValue = "";
+
+        // exterior_campaign
+        $this->exterior_campaign->LinkCustomAttributes = "";
+        $this->exterior_campaign->HrefValue = "";
+        $this->exterior_campaign->TooltipValue = "";
+
+        // exterior_campaign_vendor
+        $this->exterior_campaign_vendor->LinkCustomAttributes = "";
+        $this->exterior_campaign_vendor->HrefValue = "";
+        $this->exterior_campaign_vendor->TooltipValue = "";
+
+        // interior_campaign
+        $this->interior_campaign->LinkCustomAttributes = "";
+        $this->interior_campaign->HrefValue = "";
+        $this->interior_campaign->TooltipValue = "";
+
+        // interior_campaign_vendor
+        $this->interior_campaign_vendor->LinkCustomAttributes = "";
+        $this->interior_campaign_vendor->HrefValue = "";
+        $this->interior_campaign_vendor->TooltipValue = "";
+
+        // bus_status
+        $this->bus_status->LinkCustomAttributes = "";
+        $this->bus_status->HrefValue = "";
+        $this->bus_status->TooltipValue = "";
+
+        // bus_size
+        $this->bus_size->LinkCustomAttributes = "";
+        $this->bus_size->HrefValue = "";
+        $this->bus_size->TooltipValue = "";
+
+        // bus_depot
+        $this->bus_depot->LinkCustomAttributes = "";
+        $this->bus_depot->HrefValue = "";
+        $this->bus_depot->TooltipValue = "";
+
+        // ts_created
+        $this->ts_created->LinkCustomAttributes = "";
+        $this->ts_created->HrefValue = "";
+        $this->ts_created->TooltipValue = "";
+
+        // ts_last_update
+        $this->ts_last_update->LinkCustomAttributes = "";
+        $this->ts_last_update->HrefValue = "";
+        $this->ts_last_update->TooltipValue = "";
+
+        // bus_status_id
+        $this->bus_status_id->LinkCustomAttributes = "";
+        $this->bus_status_id->HrefValue = "";
+        $this->bus_status_id->TooltipValue = "";
+
+        // bus_size_id
+        $this->bus_size_id->LinkCustomAttributes = "";
+        $this->bus_size_id->HrefValue = "";
+        $this->bus_size_id->TooltipValue = "";
+
+        // bus_depot_id
+        $this->bus_depot_id->LinkCustomAttributes = "";
+        $this->bus_depot_id->HrefValue = "";
+        $this->bus_depot_id->TooltipValue = "";
 
         // platform_id
         $this->platform_id->LinkCustomAttributes = "";
@@ -1197,31 +1363,6 @@ SORTHTML;
         $this->interior_campaign_id->HrefValue = "";
         $this->interior_campaign_id->TooltipValue = "";
 
-        // bus_status_id
-        $this->bus_status_id->LinkCustomAttributes = "";
-        $this->bus_status_id->HrefValue = "";
-        $this->bus_status_id->TooltipValue = "";
-
-        // bus_size_id
-        $this->bus_size_id->LinkCustomAttributes = "";
-        $this->bus_size_id->HrefValue = "";
-        $this->bus_size_id->TooltipValue = "";
-
-        // bus_depot_id
-        $this->bus_depot_id->LinkCustomAttributes = "";
-        $this->bus_depot_id->HrefValue = "";
-        $this->bus_depot_id->TooltipValue = "";
-
-        // ts_created
-        $this->ts_created->LinkCustomAttributes = "";
-        $this->ts_created->HrefValue = "";
-        $this->ts_created->TooltipValue = "";
-
-        // ts_last_update
-        $this->ts_last_update->LinkCustomAttributes = "";
-        $this->ts_last_update->HrefValue = "";
-        $this->ts_last_update->TooltipValue = "";
-
         // Call Row Rendered event
         $this->rowRendered();
 
@@ -1241,7 +1382,7 @@ SORTHTML;
         $this->id->EditAttrs["class"] = "form-control";
         $this->id->EditCustomAttributes = "";
         $this->id->EditValue = $this->id->CurrentValue;
-        $this->id->ViewCustomAttributes = "";
+        $this->id->PlaceHolder = RemoveHtml($this->id->caption());
 
         // number
         $this->number->EditAttrs["class"] = "form-control";
@@ -1251,6 +1392,102 @@ SORTHTML;
         }
         $this->number->EditValue = $this->number->CurrentValue;
         $this->number->PlaceHolder = RemoveHtml($this->number->caption());
+
+        // platform
+        $this->platform->EditAttrs["class"] = "form-control";
+        $this->platform->EditCustomAttributes = "";
+        if (!$this->platform->Raw) {
+            $this->platform->CurrentValue = HtmlDecode($this->platform->CurrentValue);
+        }
+        $this->platform->EditValue = $this->platform->CurrentValue;
+        $this->platform->PlaceHolder = RemoveHtml($this->platform->caption());
+
+        // operator
+        $this->operator->EditAttrs["class"] = "form-control";
+        $this->operator->EditCustomAttributes = "";
+        if (!$this->operator->Raw) {
+            $this->operator->CurrentValue = HtmlDecode($this->operator->CurrentValue);
+        }
+        $this->operator->EditValue = $this->operator->CurrentValue;
+        $this->operator->PlaceHolder = RemoveHtml($this->operator->caption());
+
+        // exterior_campaign
+        $this->exterior_campaign->EditAttrs["class"] = "form-control";
+        $this->exterior_campaign->EditCustomAttributes = "";
+        $this->exterior_campaign->EditValue = $this->exterior_campaign->CurrentValue;
+        $this->exterior_campaign->PlaceHolder = RemoveHtml($this->exterior_campaign->caption());
+
+        // exterior_campaign_vendor
+        $this->exterior_campaign_vendor->EditAttrs["class"] = "form-control";
+        $this->exterior_campaign_vendor->EditCustomAttributes = "";
+        if (!$this->exterior_campaign_vendor->Raw) {
+            $this->exterior_campaign_vendor->CurrentValue = HtmlDecode($this->exterior_campaign_vendor->CurrentValue);
+        }
+        $this->exterior_campaign_vendor->EditValue = $this->exterior_campaign_vendor->CurrentValue;
+        $this->exterior_campaign_vendor->PlaceHolder = RemoveHtml($this->exterior_campaign_vendor->caption());
+
+        // interior_campaign
+        $this->interior_campaign->EditAttrs["class"] = "form-control";
+        $this->interior_campaign->EditCustomAttributes = "";
+        $this->interior_campaign->EditValue = $this->interior_campaign->CurrentValue;
+        $this->interior_campaign->PlaceHolder = RemoveHtml($this->interior_campaign->caption());
+
+        // interior_campaign_vendor
+        $this->interior_campaign_vendor->EditAttrs["class"] = "form-control";
+        $this->interior_campaign_vendor->EditCustomAttributes = "";
+        if (!$this->interior_campaign_vendor->Raw) {
+            $this->interior_campaign_vendor->CurrentValue = HtmlDecode($this->interior_campaign_vendor->CurrentValue);
+        }
+        $this->interior_campaign_vendor->EditValue = $this->interior_campaign_vendor->CurrentValue;
+        $this->interior_campaign_vendor->PlaceHolder = RemoveHtml($this->interior_campaign_vendor->caption());
+
+        // bus_status
+        $this->bus_status->EditAttrs["class"] = "form-control";
+        $this->bus_status->EditCustomAttributes = "";
+        if (!$this->bus_status->Raw) {
+            $this->bus_status->CurrentValue = HtmlDecode($this->bus_status->CurrentValue);
+        }
+        $this->bus_status->EditValue = $this->bus_status->CurrentValue;
+        $this->bus_status->PlaceHolder = RemoveHtml($this->bus_status->caption());
+
+        // bus_size
+        $this->bus_size->EditAttrs["class"] = "form-control";
+        $this->bus_size->EditCustomAttributes = "";
+        $this->bus_size->EditValue = $this->bus_size->CurrentValue;
+        $this->bus_size->PlaceHolder = RemoveHtml($this->bus_size->caption());
+
+        // bus_depot
+        $this->bus_depot->EditAttrs["class"] = "form-control";
+        $this->bus_depot->EditCustomAttributes = "";
+        $this->bus_depot->EditValue = $this->bus_depot->CurrentValue;
+        $this->bus_depot->PlaceHolder = RemoveHtml($this->bus_depot->caption());
+
+        // ts_created
+        $this->ts_created->EditAttrs["class"] = "form-control";
+        $this->ts_created->EditCustomAttributes = "";
+        $this->ts_created->EditValue = FormatDateTime($this->ts_created->CurrentValue, 8);
+        $this->ts_created->PlaceHolder = RemoveHtml($this->ts_created->caption());
+
+        // ts_last_update
+        $this->ts_last_update->EditAttrs["class"] = "form-control";
+        $this->ts_last_update->EditCustomAttributes = "";
+        $this->ts_last_update->EditValue = FormatDateTime($this->ts_last_update->CurrentValue, 8);
+        $this->ts_last_update->PlaceHolder = RemoveHtml($this->ts_last_update->caption());
+
+        // bus_status_id
+        $this->bus_status_id->EditAttrs["class"] = "form-control";
+        $this->bus_status_id->EditCustomAttributes = "";
+        $this->bus_status_id->PlaceHolder = RemoveHtml($this->bus_status_id->caption());
+
+        // bus_size_id
+        $this->bus_size_id->EditAttrs["class"] = "form-control";
+        $this->bus_size_id->EditCustomAttributes = "";
+        $this->bus_size_id->PlaceHolder = RemoveHtml($this->bus_size_id->caption());
+
+        // bus_depot_id
+        $this->bus_depot_id->EditAttrs["class"] = "form-control";
+        $this->bus_depot_id->EditCustomAttributes = "";
+        $this->bus_depot_id->PlaceHolder = RemoveHtml($this->bus_depot_id->caption());
 
         // platform_id
         $this->platform_id->EditAttrs["class"] = "form-control";
@@ -1272,33 +1509,6 @@ SORTHTML;
         $this->interior_campaign_id->EditCustomAttributes = "";
         $this->interior_campaign_id->PlaceHolder = RemoveHtml($this->interior_campaign_id->caption());
 
-        // bus_status_id
-        $this->bus_status_id->EditAttrs["class"] = "form-control";
-        $this->bus_status_id->EditCustomAttributes = "";
-        $this->bus_status_id->PlaceHolder = RemoveHtml($this->bus_status_id->caption());
-
-        // bus_size_id
-        $this->bus_size_id->EditAttrs["class"] = "form-control";
-        $this->bus_size_id->EditCustomAttributes = "";
-        $this->bus_size_id->PlaceHolder = RemoveHtml($this->bus_size_id->caption());
-
-        // bus_depot_id
-        $this->bus_depot_id->EditAttrs["class"] = "form-control";
-        $this->bus_depot_id->EditCustomAttributes = "";
-        $this->bus_depot_id->PlaceHolder = RemoveHtml($this->bus_depot_id->caption());
-
-        // ts_created
-        $this->ts_created->EditAttrs["class"] = "form-control";
-        $this->ts_created->EditCustomAttributes = "";
-        $this->ts_created->EditValue = FormatDateTime($this->ts_created->CurrentValue, 8);
-        $this->ts_created->PlaceHolder = RemoveHtml($this->ts_created->caption());
-
-        // ts_last_update
-        $this->ts_last_update->EditAttrs["class"] = "form-control";
-        $this->ts_last_update->EditCustomAttributes = "";
-        $this->ts_last_update->EditValue = FormatDateTime($this->ts_last_update->CurrentValue, 8);
-        $this->ts_last_update->PlaceHolder = RemoveHtml($this->ts_last_update->caption());
-
         // Call Row Rendered event
         $this->rowRendered();
     }
@@ -1306,11 +1516,17 @@ SORTHTML;
     // Aggregate list row values
     public function aggregateListRowValues()
     {
+            $this->id->Count++; // Increment count
     }
 
     // Aggregate list row (for rendering)
     public function aggregateListRow()
     {
+            $this->id->CurrentValue = $this->id->Count;
+            $this->id->ViewValue = $this->id->CurrentValue;
+            $this->id->ViewCustomAttributes = "";
+            $this->id->HrefValue = ""; // Clear href value
+
         // Call Row Rendered event
         $this->rowRendered();
     }
@@ -1329,27 +1545,33 @@ SORTHTML;
                 if ($exportPageType == "view") {
                     $doc->exportCaption($this->id);
                     $doc->exportCaption($this->number);
-                    $doc->exportCaption($this->platform_id);
-                    $doc->exportCaption($this->operator_id);
-                    $doc->exportCaption($this->exterior_campaign_id);
-                    $doc->exportCaption($this->interior_campaign_id);
-                    $doc->exportCaption($this->bus_status_id);
-                    $doc->exportCaption($this->bus_size_id);
-                    $doc->exportCaption($this->bus_depot_id);
+                    $doc->exportCaption($this->platform);
+                    $doc->exportCaption($this->operator);
+                    $doc->exportCaption($this->exterior_campaign);
+                    $doc->exportCaption($this->exterior_campaign_vendor);
+                    $doc->exportCaption($this->interior_campaign);
+                    $doc->exportCaption($this->interior_campaign_vendor);
+                    $doc->exportCaption($this->bus_status);
+                    $doc->exportCaption($this->bus_size);
+                    $doc->exportCaption($this->bus_depot);
                     $doc->exportCaption($this->ts_created);
-                    $doc->exportCaption($this->ts_last_update);
                 } else {
                     $doc->exportCaption($this->id);
                     $doc->exportCaption($this->number);
+                    $doc->exportCaption($this->platform);
+                    $doc->exportCaption($this->operator);
+                    $doc->exportCaption($this->exterior_campaign_vendor);
+                    $doc->exportCaption($this->interior_campaign_vendor);
+                    $doc->exportCaption($this->bus_status);
+                    $doc->exportCaption($this->ts_created);
+                    $doc->exportCaption($this->ts_last_update);
+                    $doc->exportCaption($this->bus_status_id);
+                    $doc->exportCaption($this->bus_size_id);
+                    $doc->exportCaption($this->bus_depot_id);
                     $doc->exportCaption($this->platform_id);
                     $doc->exportCaption($this->operator_id);
                     $doc->exportCaption($this->exterior_campaign_id);
                     $doc->exportCaption($this->interior_campaign_id);
-                    $doc->exportCaption($this->bus_status_id);
-                    $doc->exportCaption($this->bus_size_id);
-                    $doc->exportCaption($this->bus_depot_id);
-                    $doc->exportCaption($this->ts_created);
-                    $doc->exportCaption($this->ts_last_update);
                 }
                 $doc->endExportRow();
             }
@@ -1371,6 +1593,7 @@ SORTHTML;
                     }
                 }
                 $this->loadListRowValues($row);
+                $this->aggregateListRowValues(); // Aggregate row values
 
                 // Render row
                 $this->RowType = ROWTYPE_VIEW; // Render view
@@ -1381,27 +1604,33 @@ SORTHTML;
                     if ($exportPageType == "view") {
                         $doc->exportField($this->id);
                         $doc->exportField($this->number);
-                        $doc->exportField($this->platform_id);
-                        $doc->exportField($this->operator_id);
-                        $doc->exportField($this->exterior_campaign_id);
-                        $doc->exportField($this->interior_campaign_id);
-                        $doc->exportField($this->bus_status_id);
-                        $doc->exportField($this->bus_size_id);
-                        $doc->exportField($this->bus_depot_id);
+                        $doc->exportField($this->platform);
+                        $doc->exportField($this->operator);
+                        $doc->exportField($this->exterior_campaign);
+                        $doc->exportField($this->exterior_campaign_vendor);
+                        $doc->exportField($this->interior_campaign);
+                        $doc->exportField($this->interior_campaign_vendor);
+                        $doc->exportField($this->bus_status);
+                        $doc->exportField($this->bus_size);
+                        $doc->exportField($this->bus_depot);
                         $doc->exportField($this->ts_created);
-                        $doc->exportField($this->ts_last_update);
                     } else {
                         $doc->exportField($this->id);
                         $doc->exportField($this->number);
+                        $doc->exportField($this->platform);
+                        $doc->exportField($this->operator);
+                        $doc->exportField($this->exterior_campaign_vendor);
+                        $doc->exportField($this->interior_campaign_vendor);
+                        $doc->exportField($this->bus_status);
+                        $doc->exportField($this->ts_created);
+                        $doc->exportField($this->ts_last_update);
+                        $doc->exportField($this->bus_status_id);
+                        $doc->exportField($this->bus_size_id);
+                        $doc->exportField($this->bus_depot_id);
                         $doc->exportField($this->platform_id);
                         $doc->exportField($this->operator_id);
                         $doc->exportField($this->exterior_campaign_id);
                         $doc->exportField($this->interior_campaign_id);
-                        $doc->exportField($this->bus_status_id);
-                        $doc->exportField($this->bus_size_id);
-                        $doc->exportField($this->bus_depot_id);
-                        $doc->exportField($this->ts_created);
-                        $doc->exportField($this->ts_last_update);
                     }
                     $doc->endExportRow($rowCnt);
                 }
@@ -1412,6 +1641,33 @@ SORTHTML;
                 $this->rowExport($row);
             }
             $recordset->moveNext();
+        }
+
+        // Export aggregates (horizontal format only)
+        if ($doc->Horizontal) {
+            $this->RowType = ROWTYPE_AGGREGATE;
+            $this->resetAttributes();
+            $this->aggregateListRow();
+            if (!$doc->ExportCustom) {
+                $doc->beginExportRow(-1);
+                $doc->exportAggregate($this->id, 'COUNT');
+                $doc->exportAggregate($this->number, '');
+                $doc->exportAggregate($this->platform, '');
+                $doc->exportAggregate($this->operator, '');
+                $doc->exportAggregate($this->exterior_campaign_vendor, '');
+                $doc->exportAggregate($this->interior_campaign_vendor, '');
+                $doc->exportAggregate($this->bus_status, '');
+                $doc->exportAggregate($this->ts_created, '');
+                $doc->exportAggregate($this->ts_last_update, '');
+                $doc->exportAggregate($this->bus_status_id, '');
+                $doc->exportAggregate($this->bus_size_id, '');
+                $doc->exportAggregate($this->bus_depot_id, '');
+                $doc->exportAggregate($this->platform_id, '');
+                $doc->exportAggregate($this->operator_id, '');
+                $doc->exportAggregate($this->exterior_campaign_id, '');
+                $doc->exportAggregate($this->interior_campaign_id, '');
+                $doc->endExportRow();
+            }
         }
         if (!$doc->ExportCustom) {
             $doc->exportTableFooter();

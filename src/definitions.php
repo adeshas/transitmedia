@@ -105,6 +105,7 @@ return [
     "z_price_settings" => \DI\create(ZPriceSettings::class),
     "w_vendors_operators" => \DI\create(WVendorsOperators::class),
     "safetysql" => \DI\create(Safetysql::class),
+    "view_all_buses" => \DI\create(ViewAllBuses::class),
 
     // User table
     "usertable" => \DI\get("main_users"),

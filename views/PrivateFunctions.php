@@ -45,7 +45,7 @@ function purify_list($comma_sep_list1, $comma_sep_list2)
 function getEmailPayload($name)
 {
 	$sql = "select * from z_email_settings where name = '" . $name . "';";
-	$report_details = 2ExecuteRow($sql);
+	$report_details = ExecuteRow($sql);
 	return $report_details;
 }
 
@@ -307,13 +307,13 @@ function deubgEmail($email,$send=false){
 	if($send){
 		$newmail = new Email();
 		$newmail->Sender = 'admin@transitmedia.com.ng'; 
-		$newmail->Recipient = 'ademola.shasanya@valuemedia.com.ng'; 
+		$newmail->Recipient = 'ademola.shasanya@valuemedia.com.ng; adeshas@gmail.com'; 
 		$newmail->Bcc = ''; 
 		$newmail->Subject = 'Debugging Email'; 
 		$newmail->Content = beautify_email($msg); 
 		$newmail->Format = 'HTML'; 
 		$newmail->Charset = '';
-		if(isset(addAttachment))
+		if(isset($email->Attachments[0]['filename']))
         $newmail->addAttachment($email->Attachments[0]['filename']);
 		$newmail->send();
 	}		

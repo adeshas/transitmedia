@@ -509,7 +509,16 @@ $USER_LEVEL_PRIVS = [["{7CA6B0F7-61EF-4DB7-A152-ED7AD2382C98}main_buses","-2","0
     ["{7CA6B0F7-61EF-4DB7-A152-ED7AD2382C98}safety.sql","4","0"],
     ["{7CA6B0F7-61EF-4DB7-A152-ED7AD2382C98}safety.sql","5","0"],
     ["{7CA6B0F7-61EF-4DB7-A152-ED7AD2382C98}safety.sql","6","0"],
-    ["{7CA6B0F7-61EF-4DB7-A152-ED7AD2382C98}safety.sql","7","0"]];
+    ["{7CA6B0F7-61EF-4DB7-A152-ED7AD2382C98}safety.sql","7","0"],
+    ["{7CA6B0F7-61EF-4DB7-A152-ED7AD2382C98}view_all_buses","-2","0"],
+    ["{7CA6B0F7-61EF-4DB7-A152-ED7AD2382C98}view_all_buses","0","0"],
+    ["{7CA6B0F7-61EF-4DB7-A152-ED7AD2382C98}view_all_buses","1","8"],
+    ["{7CA6B0F7-61EF-4DB7-A152-ED7AD2382C98}view_all_buses","2","8"],
+    ["{7CA6B0F7-61EF-4DB7-A152-ED7AD2382C98}view_all_buses","3","40"],
+    ["{7CA6B0F7-61EF-4DB7-A152-ED7AD2382C98}view_all_buses","4","0"],
+    ["{7CA6B0F7-61EF-4DB7-A152-ED7AD2382C98}view_all_buses","5","495"],
+    ["{7CA6B0F7-61EF-4DB7-A152-ED7AD2382C98}view_all_buses","6","0"],
+    ["{7CA6B0F7-61EF-4DB7-A152-ED7AD2382C98}view_all_buses","7","0"]];
 // User level table info
 $USER_LEVEL_TABLES = [["main_buses","main_buses","Buses",true,"{7CA6B0F7-61EF-4DB7-A152-ED7AD2382C98}"],
     ["main_campaigns","main_campaigns","Campaigns",true,"{7CA6B0F7-61EF-4DB7-A152-ED7AD2382C98}"],
@@ -565,4 +574,5 @@ $USER_LEVEL_TABLES = [["main_buses","main_buses","Buses",true,"{7CA6B0F7-61EF-4D
     ["view_buses_assigned","view_buses_assigned","view buses assigned",true,"{7CA6B0F7-61EF-4DB7-A152-ED7AD2382C98}"],
     ["z_price_settings","z_price_settings","Pricing",true,"{7CA6B0F7-61EF-4DB7-A152-ED7AD2382C98}"],
     ["w_vendors_operators","w_vendors_operators","Vendors/Operators",true,"{7CA6B0F7-61EF-4DB7-A152-ED7AD2382C98}"],
-    ["safety.sql","safetysql","Safety",true,"{7CA6B0F7-61EF-4DB7-A152-ED7AD2382C98}"]];
+    ["safety.sql","safetysql","Safety",true,"{7CA6B0F7-61EF-4DB7-A152-ED7AD2382C98}"],
+    ["view_all_buses","view_all_buses","view all buses",true,"{7CA6B0F7-61EF-4DB7-A152-ED7AD2382C98}"]];

@@ -1,5 +1,5 @@
 ﻿<?xml version="1.0" encoding="utf-8" standalone="yes"?>
-<ew-language date="2020/11/18" version="17.0.3" id="en" name="English" desc="English" author="e.World Technology Limited">
+<ew-language date="2020/11/26" version="17.0.3" id="en" name="English" desc="English" author="e.World Technology Limited">
   <!--
     *** Important Notes:
     1. Language ID should follow: https://developers.google.com/recaptcha/docs/language,
@@ -982,6 +982,9 @@
     </menu>
     <menu id="177">
       <phrase id="menutext" value="Buses (Interior)" />
+    </menu>
+    <menu id="203">
+      <phrase id="menutext" value="View All Buses" />
     </menu>
     <menu id="98">
       <phrase id="menutext" value="Transactions" />
@@ -2567,6 +2570,69 @@
     </table>
     <table id="safetysql">
       <phrase id="tblcaption" value="Safety" />
+    </table>
+    <table id="view_all_buses">
+      <phrase id="tblcaption" value="view all buses" />
+      <field id="id">
+        <phrase id="fldcaption" value="ID" />
+      </field>
+      <field id="number">
+        <phrase id="fldcaption" value="Bus Code" />
+      </field>
+      <field id="platform">
+        <phrase id="fldcaption" value="Platform" />
+      </field>
+      <field id="operator">
+        <phrase id="fldcaption" value="Operator" />
+      </field>
+      <field id="exterior_campaign">
+        <phrase id="fldcaption" value="Ext. Campaign" />
+      </field>
+      <field id="exterior_campaign_vendor">
+        <phrase id="fldcaption" value="Ext. Campaign Vendor" />
+      </field>
+      <field id="interior_campaign">
+        <phrase id="fldcaption" value="Int. Campaign" />
+      </field>
+      <field id="interior_campaign_vendor">
+        <phrase id="fldcaption" value="Int. Campaign Vendor" />
+      </field>
+      <field id="bus_status">
+        <phrase id="fldcaption" value="Status" />
+      </field>
+      <field id="bus_size">
+        <phrase id="fldcaption" value="Size" />
+      </field>
+      <field id="bus_depot">
+        <phrase id="fldcaption" value="Depot" />
+      </field>
+      <field id="ts_created">
+        <phrase id="fldcaption" value="Created at" />
+      </field>
+      <field id="ts_last_update">
+        <phrase id="fldcaption" value="Last Updated" />
+      </field>
+      <field id="bus_status_id">
+        <phrase id="fldcaption" value="Bus Status" />
+      </field>
+      <field id="bus_size_id">
+        <phrase id="fldcaption" value="Bus Size id" />
+      </field>
+      <field id="bus_depot_id">
+        <phrase id="fldcaption" value="Bus Depot" />
+      </field>
+      <field id="platform_id">
+        <phrase id="fldcaption" value="Platform" />
+      </field>
+      <field id="operator_id">
+        <phrase id="fldcaption" value="Operator" />
+      </field>
+      <field id="exterior_campaign_id">
+        <phrase id="fldcaption" value="Exterior Campaign" />
+      </field>
+      <field id="interior_campaign_id">
+        <phrase id="fldcaption" value="Interior Campaign" />
+      </field>
     </table>
   </project>
 </ew-language>
