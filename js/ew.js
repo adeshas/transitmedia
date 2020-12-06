@@ -1,5 +1,5 @@
 /*!
- * JavaScript for PHPMaker v2021.0.3
+ * JavaScript for PHPMaker v2021.0.6
  * Copyright (c) e.World Technology Limited. All rights reserved.
  */
 (function ($) {
@@ -42,24 +42,6 @@
     var iteratorSymbol = $Symbol.iterator || "@@iterator";
     var asyncIteratorSymbol = $Symbol.asyncIterator || "@@asyncIterator";
     var toStringTagSymbol = $Symbol.toStringTag || "@@toStringTag";
-
-    function define(obj, key, value) {
-      Object.defineProperty(obj, key, {
-        value: value,
-        enumerable: true,
-        configurable: true,
-        writable: true
-      });
-      return obj[key];
-    }
-    try {
-      // IE 8 has a broken Object.defineProperty that only works on DOM objects.
-      define({}, "");
-    } catch (err) {
-      define = function(obj, key, value) {
-        return obj[key] = value;
-      };
-    }
 
     function wrap(innerFn, outerFn, self, tryLocsList) {
       // If outerFn provided and outerFn.prototype is a Generator, then outerFn.prototype instanceof Generator.
@@ -131,19 +113,16 @@
       Generator.prototype = Object.create(IteratorPrototype);
     GeneratorFunction.prototype = Gp.constructor = GeneratorFunctionPrototype;
     GeneratorFunctionPrototype.constructor = GeneratorFunction;
-    GeneratorFunction.displayName = define(
-      GeneratorFunctionPrototype,
-      toStringTagSymbol,
-      "GeneratorFunction"
-    );
+    GeneratorFunctionPrototype[toStringTagSymbol] =
+      GeneratorFunction.displayName = "GeneratorFunction";
 
     // Helper for defining the .next, .throw, and .return methods of the
     // Iterator interface in terms of a single ._invoke method.
     function defineIteratorMethods(prototype) {
       ["next", "throw", "return"].forEach(function(method) {
-        define(prototype, method, function(arg) {
+        prototype[method] = function(arg) {
           return this._invoke(method, arg);
-        });
+        };
       });
     }
 
@@ -162,7 +141,9 @@
         Object.setPrototypeOf(genFun, GeneratorFunctionPrototype);
       } else {
         genFun.__proto__ = GeneratorFunctionPrototype;
-        define(genFun, toStringTagSymbol, "GeneratorFunction");
+        if (!(toStringTagSymbol in genFun)) {
+          genFun[toStringTagSymbol] = "GeneratorFunction";
+        }
       }
       genFun.prototype = Object.create(Gp);
       return genFun;
@@ -432,7 +413,7 @@
     // unified ._invoke helper method.
     defineIteratorMethods(Gp);
 
-    define(Gp, toStringTagSymbol, "Generator");
+    Gp[toStringTagSymbol] = "Generator";
 
     // A Generator should always return itself as the iterator object when the
     // @@iterator function is called on it. Some browsers' implementations of the
@@ -2139,12 +2120,15 @@
       return false;
     }; // Submit
 
-    this.submit = function (action) {
+    this.submit = function (e, action) {
       var form = this.getForm();
 
       if (this.canSubmit()) {
         if (action) form.action = action;
         form.submit();
+      } else {
+        if ((e === null || e === void 0 ? void 0 : e.type) == "submit") // SubmitEvent
+          e.preventDefault();
       }
 
       return false;
@@ -2416,7 +2400,7 @@
             $__default['default']("<input type='hidden'>").attr({
               name: "filter",
               value: JSON.stringify(filters[i][1])
-            })).appendTo("body").submit();
+            })).appendTo("body").trigger("submit");
           });
         }
 
@@ -2494,9 +2478,9 @@
               $container = $tab.closest(".container-fluid");
           if ($panel.width() >= $container.width()) $panel.width($container.width() + "px");else $panel.width("auto");
         });
-        $form.submit(function (e) {
+        $form.on("submit", function (e) {
           // Bind submit event
-          return self.submit();
+          return self.submit(e);
         });
         $form.find("[data-field], .ew-priv").on("change", function () {
           if (ew.CONFIRM_CANCEL) self.modified = true;
@@ -2703,7 +2687,7 @@
         var _this$_element, _this$_element$id;
 
         this._element = el;
-        this._checkbox = ((_this$_element = this._element) === null || _this$_element === void 0 ? void 0 : (_this$_element$id = _this$_element.id) === null || _this$_element$id === void 0 ? void 0 : _this$_element$id.match(/^[xy]_/)) ? document.getElementById(this._element.id.replace(/^[xy]_/, "u_")) : null; // Find the checkbox for the field in Update page
+        this._checkbox = (_this$_element = this._element) !== null && _this$_element !== void 0 && (_this$_element$id = _this$_element.id) !== null && _this$_element$id !== void 0 && _this$_element$id.match(/^[xy]_/) ? document.getElementById(this._element.id.replace(/^[xy]_/, "u_")) : null; // Find the checkbox for the field in Update page
       }
       /**
        * Get form element
@@ -3669,29 +3653,45 @@
         });
       });
     }
-  } // Get API action URL
+  }
+  /**
+   * Get API action URL
+   * @param {string|string[]} action Route as string or array, e.g. "foo", ["foo", "1"]
+   * @param {string|string[]|object} query Search params, e.g. "foo=1&bar=2", [["foo", "1"], ["bar", "2"]], {"foo": "1", "bar": "2"}
+   */
 
   function getApiUrl(action, query) {
     var url = ew.PATH_BASE + ew.API_URL,
-        params = new URLSearchParams(query);
+        params = new URLSearchParams(query),
+        qs = params.toString();
 
-    if (ew.USE_URL_REWRITE) {
-      if ($__default['default'].isString(action)) {
-        // Route as string
-        url += action ? action : "";
-      } else if (Array.isArray(action)) {
-        // Route as array
-        var route = action.map(function (v) {
-          return encodeURIComponent(v);
-        }).join("/");
-        url += route ? route : "";
-      }
-    } else {
-      if (action) params.set(ew.API_ACTION_NAME, action);
+    if ($__default['default'].isString(action)) {
+      // Route as string
+      url += action ? action : "";
+    } else if (Array.isArray(action)) {
+      // Route as array
+      var route = action.map(function (v) {
+        return encodeURIComponent(v);
+      }).join("/");
+      url += route ? route : "";
     }
 
-    var qs = params.toString();
     return url + (qs ? "?" + qs : "");
+  } // Sanitize URL
+
+  function sanitizeUrl(url) {
+    var ar = url.split("?"),
+        search = ar[1];
+
+    if (search) {
+      var searchParams = new URLSearchParams(search);
+      searchParams.forEach(function (value, key) {
+        return searchParams.set(key, ew.sanitize(value));
+      });
+      search = searchParams.toString();
+    }
+
+    return ar[0] + (search ? "?" + search : "");
   } // Set session timer
 
   function setSessionTimer() {
@@ -3709,6 +3709,7 @@
           // PHP
           ew.TOKEN_NAME = token[ew.TOKEN_NAME_KEY];
           ew.ANTIFORGERY_TOKEN = token[ew.ANTIFORGERY_TOKEN_KEY];
+          if (token["JWT"]) ew.API_JWT_TOKEN = token["JWT"];
         }
       });
     }; // Reset timer
@@ -3774,7 +3775,7 @@
           } else if (result.dismiss === Swal.DismissReason.timer) {
             // Timeout
             resetTimer();
-            window.location = ew.TIMEOUT_URL + "?expired=1";
+            window.location = sanitizeUrl(ew.TIMEOUT_URL + "?expired=1");
           }
         });
       }
@@ -4380,9 +4381,17 @@
         });
 
         if ($__default['default'].views) {
-          var textContent = template.textContent;
+          var textContent = template.textContent,
+              hasTag = textContent.includes("{{") && textContent.includes("}}");
 
-          if (textContent.includes("{{") && textContent.includes("}}")) {
+          if (!hasTag) {
+            var selector = ew.jsRenderAttributes.map(function (attr) {
+              return "[" + attr + "*='{{'][" + attr + "*='}}']";
+            }).join(",");
+            hasTag = template.querySelector(selector);
+          }
+
+          if (hasTag) {
             // Includes JsRender template
             var scripts = Array.prototype.slice.call(template.querySelectorAll("script")); // Extract scripts
 
@@ -4520,13 +4529,8 @@
     var $el = $__default['default'](el),
         val = $el.val() || $el.data("language");
     if (!val) return;
-    var params = new URLSearchParams();
-    currentUrl.searchParams.forEach(function (value, key) {
-      params.append(key, ew.sanitize(value));
-    });
-    params.set("language", ew.sanitize(val));
-    currentUrl.search = params.toString();
-    window.location = currentUrl.toString();
+    currentUrl.searchParams.set("language", val);
+    window.location = sanitizeUrl(currentUrl.toString());
   }
   /**
    * Submit action
@@ -4603,7 +4607,7 @@
           }
         }
 
-        $f.prop("action", url).submit();
+        $f.prop("action", url).trigger("submit");
         if (action) // Action
           $f.find("input[type=hidden][name=useraction]").remove(); // Remove the "useraction" element
       } else {
@@ -4683,7 +4687,7 @@
           })).attr({
             "action": url,
             "target": "ew-export-frame"
-          }).find("input[name=exporttype]").val(type).end().submit();
+          }).find("input[name=exporttype]").val(type).end().trigger("submit");
         } finally {
           // Reset
           $f.attr({
@@ -4700,7 +4704,7 @@
     } else {
       // No Custom Template
       $f.find("input[name=exporttype]").val(type);
-      if (["xml", "print"].includes(type)) $f.submit(); // Submit the form directly
+      if (["xml", "print"].includes(type)) $f.trigger("submit"); // Submit the form directly
       else fileDownload(action, $f.serialize());
     }
 
@@ -4870,7 +4874,7 @@
 
   function sort(e, url, type) {
     if (e.shiftKey && !e.ctrlKey) url = url.split("?")[0] + "?cmd=resetsort";else if (type == 2 && e.ctrlKey) url += "&ctrl=1";
-    location = url;
+    window.location = sanitizeUrl(url);
     return true;
   } // Confirm Delete Message
 
@@ -4878,7 +4882,7 @@
     clickDelete(el);
 
     _prompt(ew.language.phrase("DeleteConfirmMsg"), function (result) {
-      result && el.href ? window.location = el.href : clearDelete(el);
+      result && el.href ? window.location = sanitizeUrl(el.href) : clearDelete(el);
     });
 
     return false;
@@ -5248,9 +5252,9 @@
     var obj;
 
     if ($__default['default'].isString(el)) {
-      var ar = el.split(" ");
+      var _ar = el.split(" ");
 
-      if (ar.length == 2) {
+      if (_ar.length == 2) {
         // Parent field in master table
         obj = getElements(el);
       } else {
@@ -5726,9 +5730,9 @@
     var matches = html.matchAll(/<script([^>]*)>([\s\S]*?)<\/script\s*>/ig);
 
     for (var _iterator5 = _createForOfIteratorHelperLoose$3(matches), _step5; !(_step5 = _iterator5()).done;) {
-      var ar = _step5.value;
-      var text = ar[0];
-      if (/(\s+type\s*=\s*['"]*text\/javascript['"]*)|^((?!\s+type\s*=).)*$/i.test(ar[1])) html = html.replace(text, "");
+      var _ar2 = _step5.value;
+      var text = _ar2[0];
+      if (/(\s+type\s*=\s*['"]*text\/javascript['"]*)|^((?!\s+type\s*=).)*$/i.test(_ar2[1])) html = html.replace(text, "");
     }
 
     return html;
@@ -5808,7 +5812,7 @@
           list = frm.getList(el);
       if ($__default['default'].isString(data)) results = parseJson(data);
 
-      if (((_results = results) === null || _results === void 0 ? void 0 : _results.success) && results[objName]) {
+      if ((_results = results) !== null && _results !== void 0 && _results.success && results[objName]) {
         // Success
         $dlg.modal("hide");
         var result = results[objName],
@@ -5938,7 +5942,7 @@
         var _results2;
 
         // Failure
-        if ((_results2 = results) === null || _results2 === void 0 ? void 0 : _results2.error) {
+        if ((_results2 = results) !== null && _results2 !== void 0 && _results2.error) {
           var _results$error;
 
           if ($__default['default'].isString(results.error)) showToast(results.error);else if ($__default['default'].isString((_results$error = results.error) === null || _results$error === void 0 ? void 0 : _results$error.description)) showToast(results.error.description);
@@ -6016,8 +6020,8 @@
 
       if (form) {
         // Set the filter field value
-        $__default['default'](form).keypress(function (e) {
-          if (e.which == 13 && e.target.nodeName != "TEXTAREA") return _submit();
+        $__default['default'](form).on("keydown", function (e) {
+          if (e.key == "Enter" && e.target.nodeName != "TEXTAREA") return _submit();
         });
         ar.forEach(function (v, i) {
           (function () {
@@ -6185,7 +6189,7 @@
             $__default['default'].ajax(url).done(success).fail(_fail).always(_always);
           } else {
             $dlg.modal("hide");
-            window.location = url;
+            window.location = sanitizeUrl(url);
           }
         }
       } else {
@@ -6299,8 +6303,8 @@
         var table = $lnk.data("table");
         if (table) $dlg.find(".modal-dialog").addClass("table-" + table);
         var $btn = $dlg.find(".modal-footer .btn-primary").addClass("ew-submit").click(_submit);
-        $dlg.find(".modal-body form").keypress(function (e) {
-          if (e.which == 13 && e.target.nodeName != "TEXTAREA") return $btn.click();
+        $dlg.find(".modal-body form").on("keydown", function (e) {
+          if (e.key == "Enter" && e.target.nodeName != "TEXTAREA") return $btn.click();
         });
         ew.modalDialog = $dlg.modal("show");
         executeScript(data, "ModalDialog");
@@ -6834,7 +6838,7 @@
         var destEl = getElements(dest_array[j].replace(/^x_/, "x" + rowindex + "_"), f);
 
         if (destEl) {
-          var val = $__default['default'].isValue(result["af" + j]) ? result["af" + j] : "";
+          var val = $__default['default'].isValue(result["af" + j]) ? String(result["af" + j]) : "";
           var args = {
             results: results,
             result: result,
@@ -6977,7 +6981,7 @@
         return this.validateFields();
       };
 
-      frm.submit = function () {
+      frm.submit = function (e) {
         if (!this.validate()) return false;
         var qs = $f.serialize(),
             data = "";
@@ -7005,7 +7009,7 @@
     $dlg.modal("hide").find(".modal-title").html(args.hdr);
     $dlg.find(".modal-footer .btn-primary").off().click(function (e) {
       e.preventDefault();
-      if (frm.submit()) $dlg.modal("hide");
+      if (frm.submit(e)) $dlg.modal("hide");
     });
     ew.emailDialog = $dlg.modal("show");
     return false;
@@ -7904,10 +7908,10 @@
           $menu = $this.find("> .dropdown-menu");
       $this.toggleClass("dropup", $menu.offset().top + $menu.height() > $window.scrollTop() + $window.height());
     });
-    $el.find("input[name=pageno]").keypress(function (e) {
-      if (e.which == 13) {
-        currentUrl.searchParams.append(this.name, parseInt(this.value));
-        window.location = currentUrl.toString();
+    $el.find("input[name=pageno]").on("keydown", function (e) {
+      if (e.key == "Enter") {
+        currentUrl.searchParams.set(this.name, parseInt(this.value));
+        window.location = sanitizeUrl(currentUrl.toString());
         return false;
       }
     });
@@ -7955,8 +7959,8 @@
   } // Redirect by HTTP GET or POST
 
   function redirect(url, f, method) {
-    var ar = url.split("?"),
-        params = new URLSearchParams(ar[1]);
+    var newUrl = new URL(url),
+        params = newUrl.searchParams;
     params.set(ew.TOKEN_NAME_KEY, ew.TOKEN_NAME); // PHP
 
     params.set(ew.ANTIFORGERY_TOKEN_KEY, ew.ANTIFORGERY_TOKEN); // PHP
@@ -7971,14 +7975,13 @@
       params.forEach(function (value, key) {
         $__default['default']('<input type="hidden">').attr({
           name: key,
-          value: sanitize(value)
+          value: ew.sanitize(value)
         }).appendTo($form);
       });
-      $form.submit();
+      $form.trigger("submit");
     } else {
       // GET
-      var search = params.toString();
-      window.location = ar[0] + (search ? "?" + search : "");
+      window.location = sanitizeUrl(newUrl.toString());
     }
   } // Show/Hide password
 
@@ -8129,6 +8132,7 @@
     initIcons: initIcons,
     initPasswordOptions: initPasswordOptions,
     getApiUrl: getApiUrl,
+    sanitizeUrl: sanitizeUrl,
     setSessionTimer: setSessionTimer,
     initExportLinks: initExportLinks,
     initMultiSelectCheckboxes: initMultiSelectCheckboxes,

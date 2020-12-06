@@ -158,8 +158,8 @@ $Page->showMessage();
         <div class="<?= $Page->RightColumnClass ?>"><div <?= $Page->approved->cellAttributes() ?>>
 <span id="el_main_print_orders_approved">
 <div class="custom-control custom-checkbox d-inline-block">
-    <input type="checkbox" class="custom-control-input<?= $Page->approved->isInvalidClass() ?>" data-table="main_print_orders" data-field="x_approved" name="x_approved[]" id="x_approved_406265" value="1"<?= ConvertToBool($Page->approved->CurrentValue) ? " checked" : "" ?><?= $Page->approved->editAttributes() ?> aria-describedby="x_approved_help">
-    <label class="custom-control-label" for="x_approved_406265"></label>
+    <input type="checkbox" class="custom-control-input<?= $Page->approved->isInvalidClass() ?>" data-table="main_print_orders" data-field="x_approved" name="x_approved[]" id="x_approved_149531" value="1"<?= ConvertToBool($Page->approved->CurrentValue) ? " checked" : "" ?><?= $Page->approved->editAttributes() ?> aria-describedby="x_approved_help">
+    <label class="custom-control-label" for="x_approved_149531"></label>
 </div>
 <?= $Page->approved->getCustomMessage() ?>
 <div class="invalid-feedback"><?= $Page->approved->getErrorMessage() ?></div>
@@ -233,7 +233,7 @@ $Page->showMessage();
 <div class="form-group row"><!-- buttons .form-group -->
     <div class="<?= $Page->OffsetColumnClass ?>"><!-- buttons offset -->
 <button class="btn btn-primary ew-btn" name="btn-action" id="btn-action" type="submit"><?= $Language->phrase("SaveBtn") ?></button>
-<button class="btn btn-default ew-btn" name="btn-cancel" id="btn-cancel" type="button" data-href="<?= GetUrl($Page->getReturnUrl()) ?>"><?= $Language->phrase("CancelBtn") ?></button>
+<button class="btn btn-default ew-btn" name="btn-cancel" id="btn-cancel" type="button" data-href="<?= HtmlEncode(GetUrl($Page->getReturnUrl())) ?>"><?= $Language->phrase("CancelBtn") ?></button>
     </div><!-- /buttons offset -->
 </div><!-- /buttons .form-group -->
 <?php } ?>

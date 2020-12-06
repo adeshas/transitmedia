@@ -144,12 +144,12 @@ class DbChart
     // Sort
     public function getSort()
     {
-        return @$_SESSION[PROJECT_NAME . "_" . $this->Table->TableVar . "_" . Config("TABLE_SORTCHART") . "_" . $this->ChartVar];
+        return Session(PROJECT_NAME . "_" . $this->Table->TableVar . "_" . Config("TABLE_SORTCHART") . "_" . $this->ChartVar);
     }
 
     public function setSort($v)
     {
-        if (@$_SESSION[PROJECT_NAME . "_" . $this->Table->TableVar . "_" . Config("TABLE_SORTCHART") . "_" . $this->ChartVar] != $v) {
+        if (Session(PROJECT_NAME . "_" . $this->Table->TableVar . "_" . Config("TABLE_SORTCHART") . "_" . $this->ChartVar) != $v) {
             $_SESSION[PROJECT_NAME . "_" . $this->Table->TableVar . "_" . Config("TABLE_SORTCHART") . "_" . $this->ChartVar] = $v;
         }
     }

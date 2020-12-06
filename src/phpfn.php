@@ -122,7 +122,20 @@ function Container()
     }
     $numargs = func_num_args();
     if ($numargs == 1) { // Get
-        return $container->get(func_get_arg(0));
+        $name = func_get_arg(0);
+        if (is_string($name)) { // $name must be string
+            if ($container->has($name)) {
+                return $container->get($name);
+            } else {
+                $class = PROJECT_NAMESPACE . $name;
+                if (class_exists($class)) {
+                    $obj = new $class();
+                    $container->set($name, $obj);
+                    return $obj;
+                }
+            }
+        }
+        return null;
     } elseif ($numargs == 2) { // Set
         $container->set(func_get_arg(0), func_get_arg(1));
     }
@@ -251,6 +264,110 @@ function Redirect($url)
 function IsApi()
 {
     return $GLOBALS["IsApi"] === true;
+}
+
+/**
+ * Create JWT token
+ *
+ * @param string $userName User name
+ * @param string $userID User ID
+ * @param string $parentUserID Parent User ID
+ * @param string $userLevelID User Level ID
+ * @param integer $minExpiry Minimum expiry time (seconds)
+ * @return string JWT token
+ */
+function CreateJwt($userName, $userID, $parentUserID, $userLevelID, $minExpiry = 0)
+{
+    //$tokenId = base64_encode(mcrypt_create_iv(32));
+    $tokenId = base64_encode(openssl_random_pseudo_bytes(32));
+    $issuedAt = time();
+    $notBefore = $issuedAt + Config("JWT.NOT_BEFORE_TIME"); // Adding not before time (seconds)
+    $expire = $notBefore + Config("JWT.EXPIRE_TIME"); // Adding expire time (seconds)
+    $serverName = ServerVar("SERVER_NAME");
+    if ($minExpiry > 0) {
+        $notBefore = 0;
+        $expire = $minExpiry;
+    }
+
+    // Create the token as an array
+    $ar = [
+        "iat" => $issuedAt, // Issued at: time when the token was generated
+        "jti" => $tokenId, // Json Token Id: a unique identifier for the token
+        "iss" => $serverName, // Issuer
+        "nbf" => $notBefore, // Not before
+        "exp" => $expire, // Expire
+        "security" => [ // Data related to the signer user
+            "username" => $userName, // User name
+            "userid" => $userID, // User ID
+            "parentuserid" => $parentUserID, // Parent user ID
+            "userlevelid" => $userLevelID // User Level ID
+        ]
+    ];
+    $jwt = \Firebase\JWT\JWT::encode(
+        $ar, // Data to be encoded in the JWT
+        Config("JWT.SECRET_KEY"), // The signing key
+        Config("JWT.ALGORITHM") // Algorithm used to sign the token, see https://tools.ietf.org/html/draft-ietf-jose-json-web-algorithms-40#section-3
+    );
+    WriteCookie("JWT", $jwt, $expire, true, true); // Write HttpOnly cookie
+    return ["JWT" => $jwt];
+}
+
+/**
+ * Decode JWT token
+ *
+ * @param string $token Bearer token
+ * @return array
+ */
+function DecodeJwt($token)
+{
+    try {
+        $ar = (array)\Firebase\JWT\JWT::decode($token, Config("JWT.SECRET_KEY"), [Config("JWT.ALGORITHM")]);
+        return (array)$ar["security"];
+    } catch (\Firebase\JWT\BeforeValidException $e) {
+        if (Config("DEBUG")) {
+            return ["failureMessage" => "BeforeValidException: " . $e->getMessage()];
+        }
+    } catch (\Firebase\JWT\ExpiredException $e) {
+        if (Config("DEBUG")) {
+            return ["failureMessage" => "ExpiredException: " . $e->getMessage()];
+        }
+    } catch (\Throwable $e) {
+        if (Config("DEBUG")) {
+            return ["failureMessage" => "Exception: " . $e->getMessage()];
+        }
+    }
+    return [];
+}
+
+/**
+ * Get JWT token
+ *
+ * @return string JWT token
+ */
+function GetJwtToken()
+{
+    global $Security;
+    $expiry = time() + max(Config("SESSION_TIMEOUT") * 60, Config("JWT.EXPIRE_TIME"), ini_get("session.gc_maxlifetime"));
+    $token = isset($Security) ? $Security->createJwt($expiry) : CreateJwt(null, null, null, "-2", $expiry);
+    return $token["JWT"] ?? "";
+}
+
+/**
+ * Use Session
+ *
+ * @param Request $request Request
+ * @return boolean
+ */
+function UseSession($request)
+{
+    if (!HasParamWithPrefix(Config("CSRF_PREFIX")))
+        return false;
+    $params = $request->getServerParams();
+    $uri = $params["REQUEST_URI"] ?? ""; // e.g. /basepath/api/file
+    $basePath = BasePath(true); // e.g. /basepath/api/
+    $uri = preg_replace("/^" . preg_quote($basePath, "/")  . "/", "", $uri);
+    $action = explode("/", $uri)[0];
+    return !in_array($action, Config("SESSIONLESS_API_ACTIONS"));
 }
 
 /**
@@ -542,7 +659,7 @@ function ReadCookie($name)
 }
 
 /**
- * Use has given consent to track cookie
+ * User has given consent to track cookie
  *
  * @return boolean
  */
@@ -569,10 +686,11 @@ function CreateConsentCookie()
  * @param string $name Cookie name
  * @param string $value Cookie value
  * @param integer $expiry optional Cookie expiry time. Default is Config("COOKIE_EXPIRY_TIME")
- * @param boolean $essential optional Essential cookie, set even without user consent. Default is true
+ * @param boolean $essential optional Essential cookie, set even without user consent. Default is true.
+ * @param boolean $httpOnly optional HTTP only. Default is false.
  * @return void
  */
-function WriteCookie($name, $value, $expiry = -1, $essential = true)
+function WriteCookie($name, $value, $expiry = -1, $essential = true, $httpOnly = false)
 {
     $expiry = ($expiry > -1) ? $expiry : Config("COOKIE_EXPIRY_TIME");
     if ($essential || CanTrackCookie()) {
@@ -580,7 +698,7 @@ function WriteCookie($name, $value, $expiry = -1, $essential = true)
         $cookie->setValue($value);
         $cookie->setExpiryTime($expiry);
         $cookie->setSameSiteRestriction(Config("COOKIE_SAMESITE"));
-        $cookie->setHttpOnly(Config("COOKIE_HTTP_ONLY"));
+        $cookie->setHttpOnly($httpOnly || Config("COOKIE_HTTP_ONLY"));
         $cookie->setSecureOnly(Config("COOKIE_SAMESITE") == "None" || Config("COOKIE_SECURE"));
         $cookie->save();
     }
@@ -916,11 +1034,7 @@ function GetFileTempImage($fld, $val)
 // Get API action URL // PHP
 function GetApiUrl($action, $query = "")
 {
-    if (Config("USE_URL_REWRITE")) {
-        return GetUrl(Config("API_URL") . $action) . ($query ? "?" : "") . $query;
-    } else {
-        return GetUrl(Config("API_URL")) . "?" . Config("API_ACTION_NAME") . "=" . $action . ($query ? "&" : "") . $query;
-    }
+    return GetUrl(Config("API_URL") . $action) . ($query ? "?" : "") . $query;
 }
 
 // Get file upload URL
@@ -3938,18 +4052,41 @@ function &Security()
     return $security;
 }
 
+/**
+ * Session helper
+ *
+ * @return mixed Session value or HttpSession
+ */
+function Session()
+{
+    global $Session;
+    $Session = $Session ?? Container("session");
+    $numargs = func_num_args();
+    if ($numargs == 1) { // Get
+        $name = func_get_arg(0);
+        return $Session->get($name);
+    } elseif ($numargs == 2) { // Set
+        list($name, $value) = func_get_args();
+        $Session->set($name, $value);
+    }
+    return $Session;
+}
+
 // Get profile value
 function Profile()
 {
-    $profile = Container("profile");
+    global $UserProfile;
+    $UserProfile = $UserProfile ?? Container("profile");
     $numargs = func_num_args();
     if ($numargs == 1) { // Get
-        return $profile->get(func_get_arg(0));
+        $name = func_get_arg(0);
+        return $UserProfile->get($name);
     } elseif ($numargs == 2) { // Set
-        $profile->set(func_get_arg(0), func_get_arg(1));
-        $profile->save();
+        list($name, $value) = func_get_args();
+        $UserProfile->set($name, $value);
+        $UserProfile->save();
     }
-    return $profile;
+    return $UserProfile;
 }
 
 // Get language object
@@ -3990,35 +4127,35 @@ function Log($msg, array $context = [])
 function CurrentUserName()
 {
     global $Security;
-    return isset($Security) ? $Security->currentUserName() : strval(@$_SESSION[SESSION_USER_NAME]);
+    return isset($Security) ? $Security->currentUserName() : strval(Session(SESSION_USER_NAME));
 }
 
 // Get current user ID
 function CurrentUserID()
 {
     global $Security;
-    return isset($Security) ? $Security->currentUserID() : strval(@$_SESSION[SESSION_USER_ID]);
+    return isset($Security) ? $Security->currentUserID() : strval(Session(SESSION_USER_ID));
 }
 
 // Get current parent user ID
 function CurrentParentUserID()
 {
     global $Security;
-    return isset($Security) ? $Security->currentParentUserID() : strval(@$_SESSION[SESSION_PARENT_USER_ID]);
+    return isset($Security) ? $Security->currentParentUserID() : strval(Session(SESSION_PARENT_USER_ID));
 }
 
 // Get current user level
 function CurrentUserLevel()
 {
     global $Security;
-    return isset($Security) ? $Security->currentUserLevelID() : @$_SESSION[SESSION_USER_LEVEL_ID];
+    return isset($Security) ? $Security->currentUserLevelID() : Session(SESSION_USER_LEVEL_ID);
 }
 
 // Get current user level list
 function CurrentUserLevelList()
 {
     global $Security;
-    return isset($Security) ? $Security->userLevelList() : strval(@$_SESSION[SESSION_USER_LEVEL_LIST]);
+    return isset($Security) ? $Security->userLevelList() : strval(Session(SESSION_USER_LEVEL_LIST));
 }
 
 // Get Current user info
@@ -4107,7 +4244,7 @@ function AllowAdd($tableName)
 function IsPasswordExpired()
 {
     global $Security;
-    return isset($Security) ? $Security->isPasswordExpired() : (@$_SESSION[SESSION_STATUS] == "passwordexpired");
+    return isset($Security) ? $Security->isPasswordExpired() : (Session(SESSION_STATUS) == "passwordexpired");
 }
 
 // Set session password expired
@@ -4125,35 +4262,35 @@ function SetSessionPasswordExpired()
 function IsPasswordReset()
 {
     global $Security;
-    return isset($Security) ? $Security->isPasswordReset() : (@$_SESSION[SESSION_STATUS] == "passwordreset");
+    return isset($Security) ? $Security->isPasswordReset() : (Session(SESSION_STATUS) == "passwordreset");
 }
 
 // Is logging in
 function IsLoggingIn()
 {
     global $Security;
-    return isset($Security) ? $Security->isLoggingIn() : (@$_SESSION[SESSION_STATUS] == "loggingin");
+    return isset($Security) ? $Security->isLoggingIn() : (Session(SESSION_STATUS) == "loggingin");
 }
 
 // Is logged in
 function IsLoggedIn()
 {
     global $Security;
-    return isset($Security) ? $Security->isLoggedIn() : (@$_SESSION[SESSION_STATUS] == "login");
+    return isset($Security) ? $Security->isLoggedIn() : (Session(SESSION_STATUS) == "login");
 }
 
 // Is admin
 function IsAdmin()
 {
     global $Security;
-    return isset($Security) ? $Security->isAdmin() : (@$_SESSION[SESSION_SYS_ADMIN] == 1);
+    return isset($Security) ? $Security->isAdmin() : (Session(SESSION_SYS_ADMIN) == 1);
 }
 
 // Is system admin
 function IsSysAdmin()
 {
     global $Security;
-    return isset($Security) ? $Security->isSysAdmin() : (@$_SESSION[SESSION_SYS_ADMIN] == 1);
+    return isset($Security) ? $Security->isSysAdmin() : (Session(SESSION_SYS_ADMIN) == 1);
 }
 
 // Is Windows authenticated
@@ -4327,13 +4464,6 @@ function SetDebugMessage($v, $level = 0)
     $DebugMessage .= "<p><samp>" . (isset($DebugTimer) ? number_format($DebugTimer->getElapsedTime(), 6) . ": " : "") . $v . "</samp></p>";
 }
 
-// Show debug message
-function ShowDebugMessage()
-{
-    global $DebugMessage;
-    return Config("DEBUG") ? $DebugMessage : "";
-}
-
 // Save global debug message
 function SaveDebugMessage()
 {
@@ -4348,7 +4478,7 @@ function LoadDebugMessage()
 {
     global $DebugMessage;
     if (Config("DEBUG")) {
-        $DebugMessage = @$_SESSION["DEBUG_MESSAGE"];
+        $DebugMessage = Session("DEBUG_MESSAGE");
         $_SESSION["DEBUG_MESSAGE"] = "";
     }
 }
@@ -5399,8 +5529,9 @@ function AllowListMenu($tableName)
         return true;
     } else {
         $priv = 0;
-        if (is_array(@$_SESSION[SESSION_AR_USER_LEVEL_PRIV])) {
-            foreach ($_SESSION[SESSION_AR_USER_LEVEL_PRIV] as $row) {
+        $rows = Session(SESSION_AR_USER_LEVEL_PRIV);
+        if (is_array($rows)) {
+            foreach ($rows as $row) {
                 if (SameString($row[0], $tableName) && in_array($row[1], $userlevels)) {
                     $thispriv = $row[2] ?? 0;
                     $thispriv = (int)$thispriv;
@@ -6238,7 +6369,7 @@ function &LoginStatus($name = "", $value = null)
 // Is auto login (login with option "Auto login until I logout explicitly")
 function IsAutoLogin()
 {
-    return (@$_SESSION[SESSION_USER_LOGIN_TYPE] == "a");
+    return (Session(SESSION_USER_LOGIN_TYPE) == "a");
 }
 
 // Get current page heading

@@ -78,8 +78,8 @@ $Page->showMessage();
                 <i class="icon fas fa-ban"></i><?= $Language->phrase("PersonalDataWarning") ?>
             </div>
             <p>
-                <a id="download" href="<?= GetUrl(CurrentPageUrl() . "?cmd=download") ?>" class="btn btn-default"><?= $Language->phrase("DownloadBtn") ?></a>
-                <a id="delete" href="<?= GetUrl(CurrentPageUrl() . "?cmd=delete") ?>" class="btn btn-default"><?= $Language->phrase("DeleteBtn") ?></a>
+                <a id="download" href="<?= HtmlEncode(GetUrl(CurrentPageUrl() . "?cmd=download")) ?>" class="btn btn-default"><?= $Language->phrase("DownloadBtn") ?></a>
+                <a id="delete" href="<?= HtmlEncode(GetUrl(CurrentPageUrl() . "?cmd=delete")) ?>" class="btn btn-default"><?= $Language->phrase("DeleteBtn") ?></a>
             </p>
         </div>
     </div>

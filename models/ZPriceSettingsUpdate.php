@@ -1048,7 +1048,7 @@ class ZPriceSettingsUpdate extends ZPriceSettings
                 $this->platform_id->ViewValue = $this->platform_id->lookupCacheOption($curVal);
                 if ($this->platform_id->ViewValue === null) { // Lookup from database
                     $filterWrk = "\"id\"" . SearchString("=", $curVal, DATATYPE_NUMBER, "");
-                    $sqlWrk = $this->platform_id->Lookup->getSql(false, $filterWrk, '', $this, true);
+                    $sqlWrk = $this->platform_id->Lookup->getSql(false, $filterWrk, '', $this, true, true);
                     $rswrk = Conn()->executeQuery($sqlWrk)->fetchAll(\PDO::FETCH_BOTH);
                     $ari = count($rswrk);
                     if ($ari > 0) { // Lookup values found
@@ -1069,7 +1069,7 @@ class ZPriceSettingsUpdate extends ZPriceSettings
                 $this->inventory_id->ViewValue = $this->inventory_id->lookupCacheOption($curVal);
                 if ($this->inventory_id->ViewValue === null) { // Lookup from database
                     $filterWrk = "\"id\"" . SearchString("=", $curVal, DATATYPE_NUMBER, "");
-                    $sqlWrk = $this->inventory_id->Lookup->getSql(false, $filterWrk, '', $this, true);
+                    $sqlWrk = $this->inventory_id->Lookup->getSql(false, $filterWrk, '', $this, true, true);
                     $rswrk = Conn()->executeQuery($sqlWrk)->fetchAll(\PDO::FETCH_BOTH);
                     $ari = count($rswrk);
                     if ($ari > 0) { // Lookup values found
@@ -1090,7 +1090,7 @@ class ZPriceSettingsUpdate extends ZPriceSettings
                 $this->print_stage_id->ViewValue = $this->print_stage_id->lookupCacheOption($curVal);
                 if ($this->print_stage_id->ViewValue === null) { // Lookup from database
                     $filterWrk = "\"id\"" . SearchString("=", $curVal, DATATYPE_NUMBER, "");
-                    $sqlWrk = $this->print_stage_id->Lookup->getSql(false, $filterWrk, '', $this, true);
+                    $sqlWrk = $this->print_stage_id->Lookup->getSql(false, $filterWrk, '', $this, true, true);
                     $rswrk = Conn()->executeQuery($sqlWrk)->fetchAll(\PDO::FETCH_BOTH);
                     $ari = count($rswrk);
                     if ($ari > 0) { // Lookup values found
@@ -1111,7 +1111,7 @@ class ZPriceSettingsUpdate extends ZPriceSettings
                 $this->bus_size_id->ViewValue = $this->bus_size_id->lookupCacheOption($curVal);
                 if ($this->bus_size_id->ViewValue === null) { // Lookup from database
                     $filterWrk = "\"id\"" . SearchString("=", $curVal, DATATYPE_NUMBER, "");
-                    $sqlWrk = $this->bus_size_id->Lookup->getSql(false, $filterWrk, '', $this, true);
+                    $sqlWrk = $this->bus_size_id->Lookup->getSql(false, $filterWrk, '', $this, true, true);
                     $rswrk = Conn()->executeQuery($sqlWrk)->fetchAll(\PDO::FETCH_BOTH);
                     $ari = count($rswrk);
                     if ($ari > 0) { // Lookup values found
@@ -1275,7 +1275,7 @@ class ZPriceSettingsUpdate extends ZPriceSettings
                 } else {
                     $filterWrk = "\"id\"" . SearchString("=", $this->platform_id->CurrentValue, DATATYPE_NUMBER, "");
                 }
-                $sqlWrk = $this->platform_id->Lookup->getSql(true, $filterWrk, '', $this);
+                $sqlWrk = $this->platform_id->Lookup->getSql(true, $filterWrk, '', $this, false, true);
                 $rswrk = Conn()->executeQuery($sqlWrk)->fetchAll(\PDO::FETCH_BOTH);
                 $ari = count($rswrk);
                 $arwrk = $rswrk;
@@ -1300,7 +1300,7 @@ class ZPriceSettingsUpdate extends ZPriceSettings
                 } else {
                     $filterWrk = "\"id\"" . SearchString("=", $this->inventory_id->CurrentValue, DATATYPE_NUMBER, "");
                 }
-                $sqlWrk = $this->inventory_id->Lookup->getSql(true, $filterWrk, '', $this);
+                $sqlWrk = $this->inventory_id->Lookup->getSql(true, $filterWrk, '', $this, false, true);
                 $rswrk = Conn()->executeQuery($sqlWrk)->fetchAll(\PDO::FETCH_BOTH);
                 $ari = count($rswrk);
                 $arwrk = $rswrk;
@@ -1325,7 +1325,7 @@ class ZPriceSettingsUpdate extends ZPriceSettings
                 } else {
                     $filterWrk = "\"id\"" . SearchString("=", $this->print_stage_id->CurrentValue, DATATYPE_NUMBER, "");
                 }
-                $sqlWrk = $this->print_stage_id->Lookup->getSql(true, $filterWrk, '', $this);
+                $sqlWrk = $this->print_stage_id->Lookup->getSql(true, $filterWrk, '', $this, false, true);
                 $rswrk = Conn()->executeQuery($sqlWrk)->fetchAll(\PDO::FETCH_BOTH);
                 $ari = count($rswrk);
                 $arwrk = $rswrk;
@@ -1350,7 +1350,7 @@ class ZPriceSettingsUpdate extends ZPriceSettings
                 } else {
                     $filterWrk = "\"id\"" . SearchString("=", $this->bus_size_id->CurrentValue, DATATYPE_NUMBER, "");
                 }
-                $sqlWrk = $this->bus_size_id->Lookup->getSql(true, $filterWrk, '', $this);
+                $sqlWrk = $this->bus_size_id->Lookup->getSql(true, $filterWrk, '', $this, false, true);
                 $rswrk = Conn()->executeQuery($sqlWrk)->fetchAll(\PDO::FETCH_BOTH);
                 $ari = count($rswrk);
                 $arwrk = $rswrk;

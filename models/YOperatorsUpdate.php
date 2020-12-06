@@ -841,7 +841,7 @@ class YOperatorsUpdate extends YOperators
                 $this->platform_id->ViewValue = $this->platform_id->lookupCacheOption($curVal);
                 if ($this->platform_id->ViewValue === null) { // Lookup from database
                     $filterWrk = "\"id\"" . SearchString("=", $curVal, DATATYPE_NUMBER, "");
-                    $sqlWrk = $this->platform_id->Lookup->getSql(false, $filterWrk, '', $this, true);
+                    $sqlWrk = $this->platform_id->Lookup->getSql(false, $filterWrk, '', $this, true, true);
                     $rswrk = Conn()->executeQuery($sqlWrk)->fetchAll(\PDO::FETCH_BOTH);
                     $ari = count($rswrk);
                     if ($ari > 0) { // Lookup values found
@@ -917,7 +917,7 @@ class YOperatorsUpdate extends YOperators
                     $this->platform_id->ViewValue = $this->platform_id->lookupCacheOption($curVal);
                     if ($this->platform_id->ViewValue === null) { // Lookup from database
                         $filterWrk = "\"id\"" . SearchString("=", $curVal, DATATYPE_NUMBER, "");
-                        $sqlWrk = $this->platform_id->Lookup->getSql(false, $filterWrk, '', $this, true);
+                        $sqlWrk = $this->platform_id->Lookup->getSql(false, $filterWrk, '', $this, true, true);
                         $rswrk = Conn()->executeQuery($sqlWrk)->fetchAll(\PDO::FETCH_BOTH);
                         $ari = count($rswrk);
                         if ($ari > 0) { // Lookup values found
@@ -946,7 +946,7 @@ class YOperatorsUpdate extends YOperators
                     } else {
                         $filterWrk = "\"id\"" . SearchString("=", $this->platform_id->CurrentValue, DATATYPE_NUMBER, "");
                     }
-                    $sqlWrk = $this->platform_id->Lookup->getSql(true, $filterWrk, '', $this);
+                    $sqlWrk = $this->platform_id->Lookup->getSql(true, $filterWrk, '', $this, false, true);
                     $rswrk = Conn()->executeQuery($sqlWrk)->fetchAll(\PDO::FETCH_BOTH);
                     $ari = count($rswrk);
                     $arwrk = $rswrk;
@@ -1096,6 +1096,9 @@ class YOperatorsUpdate extends YOperators
             $this->shortname->setDbValueDef($rsnew, $this->shortname->CurrentValue, null, $this->shortname->ReadOnly || $this->shortname->MultiUpdate != "1");
 
             // platform_id
+            if ($this->platform_id->getSessionValue() != "") {
+                $this->platform_id->ReadOnly = true;
+            }
             $this->platform_id->setDbValueDef($rsnew, $this->platform_id->CurrentValue, null, $this->platform_id->ReadOnly || $this->platform_id->MultiUpdate != "1");
 
             // email

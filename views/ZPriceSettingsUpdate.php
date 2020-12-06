@@ -651,8 +651,8 @@ $Page->showMessage();
                 <?php if (!$Page->isConfirm()) { ?>
                 <span id="el_z_price_settings_active">
                 <div class="custom-control custom-checkbox d-inline-block">
-                    <input type="checkbox" class="custom-control-input<?= $Page->active->isInvalidClass() ?>" data-table="z_price_settings" data-field="x_active" name="x_active[]" id="x_active_332911" value="1"<?= ConvertToBool($Page->active->CurrentValue) ? " checked" : "" ?><?= $Page->active->editAttributes() ?> aria-describedby="x_active_help">
-                    <label class="custom-control-label" for="x_active_332911"></label>
+                    <input type="checkbox" class="custom-control-input<?= $Page->active->isInvalidClass() ?>" data-table="z_price_settings" data-field="x_active" name="x_active[]" id="x_active_912170" value="1"<?= ConvertToBool($Page->active->CurrentValue) ? " checked" : "" ?><?= $Page->active->editAttributes() ?> aria-describedby="x_active_help">
+                    <label class="custom-control-label" for="x_active_912170"></label>
                 </div>
                 <?= $Page->active->getCustomMessage() ?>
                 <div class="invalid-feedback"><?= $Page->active->getErrorMessage() ?></div>
@@ -716,7 +716,7 @@ $Page->showMessage();
         <div class="<?= $Page->OffsetColumnClass ?>"><!-- buttons offset -->
 <?php if (!$Page->isConfirm()) { // Confirm page ?>
 <button class="btn btn-primary ew-btn" name="btn-action" id="btn-action" type="submit" onclick="this.form.action.value='confirm';"><?= $Language->phrase("UpdateBtn") ?></button>
-<button class="btn btn-default ew-btn" name="btn-cancel" id="btn-cancel" type="button" data-href="<?= GetUrl($Page->getReturnUrl()) ?>"><?= $Language->phrase("CancelBtn") ?></button>
+<button class="btn btn-default ew-btn" name="btn-cancel" id="btn-cancel" type="button" data-href="<?= HtmlEncode(GetUrl($Page->getReturnUrl())) ?>"><?= $Language->phrase("CancelBtn") ?></button>
 <?php } else { ?>
 <button class="btn btn-primary ew-btn" name="btn-action" id="btn-action" type="submit"><?= $Language->phrase("ConfirmBtn") ?></button>
 <button class="btn btn-default ew-btn" name="btn-cancel" id="btn-cancel" type="submit" onclick="this.form.action.value='cancel';"><?= $Language->phrase("CancelBtn") ?></button>

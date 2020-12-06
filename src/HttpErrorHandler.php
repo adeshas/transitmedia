@@ -65,6 +65,16 @@ class HttpErrorHandler extends ErrorHandler
         }
         if (!($exception instanceof HttpException) && ($exception instanceof Exception || $exception instanceof Throwable)) {
             if ($this->displayErrorDetails) {
+                if ($exception instanceof \ErrorException) {
+                    $severity = $exception->getSeverity();
+                    if ($severity === E_WARNING) {
+                        $error["error"]["class"] = "text-warning";
+                        $error["error"]["type"] = $Language->phrase("Warning");
+                    } elseif ($severity === E_NOTICE) {
+                        $error["error"]["class"] = "text-warning";
+                        $error["error"]["type"] = $Language->phrase("Notice");
+                    }
+                }
                 $description = $exception->getFile() . "(" . $exception->getLine() . "): " . $exception->getMessage();
                 $error["error"]["description"] = $description;
             }

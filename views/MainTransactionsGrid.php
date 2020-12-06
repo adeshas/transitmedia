@@ -336,6 +336,8 @@ $Grid->ListOptions->render("body", "left", $Grid->RowCount);
 <?php } ?>
 <?php } ?>
 </td>
+    <?php } else { ?>
+            <input type="hidden" data-table="main_transactions" data-field="x_id" data-hidden="1" name="x<?= $Grid->RowIndex ?>_id" id="x<?= $Grid->RowIndex ?>_id" value="<?= HtmlEncode($Grid->id->CurrentValue) ?>">
     <?php } ?>
     <?php if ($Grid->campaign_id->Visible) { // campaign_id ?>
         <td data-name="campaign_id" <?= $Grid->campaign_id->cellAttributes() ?>>

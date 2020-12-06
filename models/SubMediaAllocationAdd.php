@@ -819,7 +819,7 @@ class SubMediaAllocationAdd extends SubMediaAllocation
                 $this->bus_id->ViewValue = $this->bus_id->lookupCacheOption($curVal);
                 if ($this->bus_id->ViewValue === null) { // Lookup from database
                     $filterWrk = "\"id\"" . SearchString("=", $curVal, DATATYPE_NUMBER, "");
-                    $sqlWrk = $this->bus_id->Lookup->getSql(false, $filterWrk, '', $this, true);
+                    $sqlWrk = $this->bus_id->Lookup->getSql(false, $filterWrk, '', $this, true, true);
                     $rswrk = Conn()->executeQuery($sqlWrk)->fetchAll(\PDO::FETCH_BOTH);
                     $ari = count($rswrk);
                     if ($ari > 0) { // Lookup values found
@@ -844,7 +844,7 @@ class SubMediaAllocationAdd extends SubMediaAllocation
                         return "inventory_id = 3";
                     };
                     $lookupFilter = $lookupFilter->bindTo($this);
-                    $sqlWrk = $this->campaign_id->Lookup->getSql(false, $filterWrk, $lookupFilter, $this, true);
+                    $sqlWrk = $this->campaign_id->Lookup->getSql(false, $filterWrk, $lookupFilter, $this, true, true);
                     $rswrk = Conn()->executeQuery($sqlWrk)->fetchAll(\PDO::FETCH_BOTH);
                     $ari = count($rswrk);
                     if ($ari > 0) { // Lookup values found
@@ -921,7 +921,7 @@ class SubMediaAllocationAdd extends SubMediaAllocation
                     $this->bus_id->ViewValue = $this->bus_id->lookupCacheOption($curVal);
                     if ($this->bus_id->ViewValue === null) { // Lookup from database
                         $filterWrk = "\"id\"" . SearchString("=", $curVal, DATATYPE_NUMBER, "");
-                        $sqlWrk = $this->bus_id->Lookup->getSql(false, $filterWrk, '', $this, true);
+                        $sqlWrk = $this->bus_id->Lookup->getSql(false, $filterWrk, '', $this, true, true);
                         $rswrk = Conn()->executeQuery($sqlWrk)->fetchAll(\PDO::FETCH_BOTH);
                         $ari = count($rswrk);
                         if ($ari > 0) { // Lookup values found
@@ -950,7 +950,7 @@ class SubMediaAllocationAdd extends SubMediaAllocation
                     } else {
                         $filterWrk = "\"id\"" . SearchString("=", $this->bus_id->CurrentValue, DATATYPE_NUMBER, "");
                     }
-                    $sqlWrk = $this->bus_id->Lookup->getSql(true, $filterWrk, '', $this);
+                    $sqlWrk = $this->bus_id->Lookup->getSql(true, $filterWrk, '', $this, false, true);
                     $rswrk = Conn()->executeQuery($sqlWrk)->fetchAll(\PDO::FETCH_BOTH);
                     $ari = count($rswrk);
                     $arwrk = $rswrk;
@@ -975,7 +975,7 @@ class SubMediaAllocationAdd extends SubMediaAllocation
                             return "inventory_id = 3";
                         };
                         $lookupFilter = $lookupFilter->bindTo($this);
-                        $sqlWrk = $this->campaign_id->Lookup->getSql(false, $filterWrk, $lookupFilter, $this, true);
+                        $sqlWrk = $this->campaign_id->Lookup->getSql(false, $filterWrk, $lookupFilter, $this, true, true);
                         $rswrk = Conn()->executeQuery($sqlWrk)->fetchAll(\PDO::FETCH_BOTH);
                         $ari = count($rswrk);
                         if ($ari > 0) { // Lookup values found
@@ -1008,7 +1008,7 @@ class SubMediaAllocationAdd extends SubMediaAllocation
                         return "inventory_id = 3";
                     };
                     $lookupFilter = $lookupFilter->bindTo($this);
-                    $sqlWrk = $this->campaign_id->Lookup->getSql(true, $filterWrk, $lookupFilter, $this);
+                    $sqlWrk = $this->campaign_id->Lookup->getSql(true, $filterWrk, $lookupFilter, $this, false, true);
                     $rswrk = Conn()->executeQuery($sqlWrk)->fetchAll(\PDO::FETCH_BOTH);
                     $ari = count($rswrk);
                     $arwrk = $rswrk;
@@ -1159,7 +1159,7 @@ class SubMediaAllocationAdd extends SubMediaAllocation
                 }
                 if (!$validMasterKey) {
                     $masterUserIdMsg = str_replace("%c", CurrentUserID(), $Language->phrase("UnAuthorizedMasterUserID"));
-                    $masterUserIdMsg = str_replace("%f", $sMasterFilter, $masterUserIdMsg);
+                    $masterUserIdMsg = str_replace("%f", $masterFilter, $masterUserIdMsg);
                     $this->setFailureMessage($masterUserIdMsg);
                     return false;
                 }

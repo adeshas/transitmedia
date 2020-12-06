@@ -330,13 +330,6 @@ loadjs.ready("head", function() {
 <?php } ?>
 </td>
     <?php } ?>
-<?php if ($Grid->RowType == ROWTYPE_ADD) { // Add record ?>
-<input type="hidden" data-table="sub_transaction_details" data-field="x_id" data-hidden="1" name="x<?= $Grid->RowIndex ?>_id" id="x<?= $Grid->RowIndex ?>_id" value="<?= HtmlEncode($Grid->id->CurrentValue) ?>">
-<input type="hidden" data-table="sub_transaction_details" data-field="x_id" data-hidden="1" name="o<?= $Grid->RowIndex ?>_id" id="o<?= $Grid->RowIndex ?>_id" value="<?= HtmlEncode($Grid->id->OldValue) ?>">
-<?php } ?>
-<?php if ($Grid->RowType == ROWTYPE_EDIT || $Grid->CurrentMode == "edit") { ?>
-<input type="hidden" data-table="sub_transaction_details" data-field="x_id" data-hidden="1" name="x<?= $Grid->RowIndex ?>_id" id="x<?= $Grid->RowIndex ?>_id" value="<?= HtmlEncode($Grid->id->CurrentValue) ?>">
-<?php } ?>
     <?php if ($Grid->bus_id->Visible) { // bus_id ?>
         <td data-name="bus_id" <?= $Grid->bus_id->cellAttributes() ?>>
 <?php if ($Grid->RowType == ROWTYPE_ADD) { // Add record ?>

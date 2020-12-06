@@ -483,8 +483,8 @@ loadjs.ready("head", function() {
 </span>
         <span id="el_z_price_settings_active" class="ew-search-field">
 <div class="custom-control custom-checkbox d-inline-block">
-    <input type="checkbox" class="custom-control-input<?= $Page->active->isInvalidClass() ?>" data-table="z_price_settings" data-field="x_active" name="x_active[]" id="x_active_570582" value="1"<?= ConvertToBool($Page->active->AdvancedSearch->SearchValue) ? " checked" : "" ?><?= $Page->active->editAttributes() ?>>
-    <label class="custom-control-label" for="x_active_570582"></label>
+    <input type="checkbox" class="custom-control-input<?= $Page->active->isInvalidClass() ?>" data-table="z_price_settings" data-field="x_active" name="x_active[]" id="x_active_974552" value="1"<?= ConvertToBool($Page->active->AdvancedSearch->SearchValue) ? " checked" : "" ?><?= $Page->active->editAttributes() ?>>
+    <label class="custom-control-label" for="x_active_974552"></label>
 </div>
 <div class="invalid-feedback"><?= $Page->active->getErrorMessage(false) ?></div>
 </span>
@@ -785,6 +785,8 @@ $Page->ListOptions->render("body", "left", $Page->RowCount);
 </span>
 <?php } ?>
 </td>
+    <?php } else { ?>
+            <input type="hidden" data-table="z_price_settings" data-field="x_id" data-hidden="1" name="x<?= $Page->RowIndex ?>_id" id="x<?= $Page->RowIndex ?>_id" value="<?= HtmlEncode($Page->id->CurrentValue) ?>">
     <?php } ?>
     <?php if ($Page->platform_id->Visible) { // platform_id ?>
         <td data-name="platform_id" <?= $Page->platform_id->cellAttributes() ?>>
@@ -1258,8 +1260,8 @@ loadjs.ready("head", function() {
 <?php if ($Page->RowType == ROWTYPE_ADD) { // Add record ?>
 <span id="el<?= $Page->RowCount ?>_z_price_settings_active" class="form-group">
 <div class="custom-control custom-checkbox d-inline-block">
-    <input type="checkbox" class="custom-control-input<?= $Page->active->isInvalidClass() ?>" data-table="z_price_settings" data-field="x_active" name="x<?= $Page->RowIndex ?>_active[]" id="x<?= $Page->RowIndex ?>_active_411579" value="1"<?= ConvertToBool($Page->active->CurrentValue) ? " checked" : "" ?><?= $Page->active->editAttributes() ?>>
-    <label class="custom-control-label" for="x<?= $Page->RowIndex ?>_active_411579"></label>
+    <input type="checkbox" class="custom-control-input<?= $Page->active->isInvalidClass() ?>" data-table="z_price_settings" data-field="x_active" name="x<?= $Page->RowIndex ?>_active[]" id="x<?= $Page->RowIndex ?>_active_526821" value="1"<?= ConvertToBool($Page->active->CurrentValue) ? " checked" : "" ?><?= $Page->active->editAttributes() ?>>
+    <label class="custom-control-label" for="x<?= $Page->RowIndex ?>_active_526821"></label>
 </div>
 <div class="invalid-feedback"><?= $Page->active->getErrorMessage() ?></div>
 </span>
@@ -1268,8 +1270,8 @@ loadjs.ready("head", function() {
 <?php if ($Page->RowType == ROWTYPE_EDIT) { // Edit record ?>
 <span id="el<?= $Page->RowCount ?>_z_price_settings_active" class="form-group">
 <div class="custom-control custom-checkbox d-inline-block">
-    <input type="checkbox" class="custom-control-input<?= $Page->active->isInvalidClass() ?>" data-table="z_price_settings" data-field="x_active" name="x<?= $Page->RowIndex ?>_active[]" id="x<?= $Page->RowIndex ?>_active_684318" value="1"<?= ConvertToBool($Page->active->CurrentValue) ? " checked" : "" ?><?= $Page->active->editAttributes() ?>>
-    <label class="custom-control-label" for="x<?= $Page->RowIndex ?>_active_684318"></label>
+    <input type="checkbox" class="custom-control-input<?= $Page->active->isInvalidClass() ?>" data-table="z_price_settings" data-field="x_active" name="x<?= $Page->RowIndex ?>_active[]" id="x<?= $Page->RowIndex ?>_active_616194" value="1"<?= ConvertToBool($Page->active->CurrentValue) ? " checked" : "" ?><?= $Page->active->editAttributes() ?>>
+    <label class="custom-control-label" for="x<?= $Page->RowIndex ?>_active_616194"></label>
 </div>
 <div class="invalid-feedback"><?= $Page->active->getErrorMessage() ?></div>
 </span>
@@ -1577,8 +1579,8 @@ loadjs.ready("head", function() {
         <td data-name="active">
 <span id="el$rowindex$_z_price_settings_active" class="form-group z_price_settings_active">
 <div class="custom-control custom-checkbox d-inline-block">
-    <input type="checkbox" class="custom-control-input<?= $Page->active->isInvalidClass() ?>" data-table="z_price_settings" data-field="x_active" name="x<?= $Page->RowIndex ?>_active[]" id="x<?= $Page->RowIndex ?>_active_377671" value="1"<?= ConvertToBool($Page->active->CurrentValue) ? " checked" : "" ?><?= $Page->active->editAttributes() ?>>
-    <label class="custom-control-label" for="x<?= $Page->RowIndex ?>_active_377671"></label>
+    <input type="checkbox" class="custom-control-input<?= $Page->active->isInvalidClass() ?>" data-table="z_price_settings" data-field="x_active" name="x<?= $Page->RowIndex ?>_active[]" id="x<?= $Page->RowIndex ?>_active_892829" value="1"<?= ConvertToBool($Page->active->CurrentValue) ? " checked" : "" ?><?= $Page->active->editAttributes() ?>>
+    <label class="custom-control-label" for="x<?= $Page->RowIndex ?>_active_892829"></label>
 </div>
 <div class="invalid-feedback"><?= $Page->active->getErrorMessage() ?></div>
 </span>

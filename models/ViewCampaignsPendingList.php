@@ -2100,7 +2100,7 @@ class ViewCampaignsPendingList extends ViewCampaignsPending
                 $this->status_id->ViewValue = $this->status_id->lookupCacheOption($curVal);
                 if ($this->status_id->ViewValue === null) { // Lookup from database
                     $filterWrk = "\"id\"" . SearchString("=", $curVal, DATATYPE_NUMBER, "");
-                    $sqlWrk = $this->status_id->Lookup->getSql(false, $filterWrk, '', $this, true);
+                    $sqlWrk = $this->status_id->Lookup->getSql(false, $filterWrk, '', $this, true, true);
                     $rswrk = Conn()->executeQuery($sqlWrk)->fetchAll(\PDO::FETCH_BOTH);
                     $ari = count($rswrk);
                     if ($ari > 0) { // Lookup values found

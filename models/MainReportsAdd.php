@@ -893,7 +893,7 @@ class MainReportsAdd extends MainReports
                 $this->type_id->ViewValue = $this->type_id->lookupCacheOption($curVal);
                 if ($this->type_id->ViewValue === null) { // Lookup from database
                     $filterWrk = "\"id\"" . SearchString("=", $curVal, DATATYPE_NUMBER, "");
-                    $sqlWrk = $this->type_id->Lookup->getSql(false, $filterWrk, '', $this, true);
+                    $sqlWrk = $this->type_id->Lookup->getSql(false, $filterWrk, '', $this, true, true);
                     $rswrk = Conn()->executeQuery($sqlWrk)->fetchAll(\PDO::FETCH_BOTH);
                     $ari = count($rswrk);
                     if ($ari > 0) { // Lookup values found
@@ -914,7 +914,7 @@ class MainReportsAdd extends MainReports
                 $this->campaign_id->ViewValue = $this->campaign_id->lookupCacheOption($curVal);
                 if ($this->campaign_id->ViewValue === null) { // Lookup from database
                     $filterWrk = "\"id\"" . SearchString("=", $curVal, DATATYPE_NUMBER, "");
-                    $sqlWrk = $this->campaign_id->Lookup->getSql(false, $filterWrk, '', $this, true);
+                    $sqlWrk = $this->campaign_id->Lookup->getSql(false, $filterWrk, '', $this, true, true);
                     $rswrk = Conn()->executeQuery($sqlWrk)->fetchAll(\PDO::FETCH_BOTH);
                     $ari = count($rswrk);
                     if ($ari > 0) { // Lookup values found
@@ -939,7 +939,7 @@ class MainReportsAdd extends MainReports
                     $this->ref_bus_id->ViewValue = $this->ref_bus_id->lookupCacheOption($curVal);
                     if ($this->ref_bus_id->ViewValue === null) { // Lookup from database
                         $filterWrk = "\"id\"" . SearchString("=", $curVal, DATATYPE_NUMBER, "");
-                        $sqlWrk = $this->ref_bus_id->Lookup->getSql(false, $filterWrk, '', $this, true);
+                        $sqlWrk = $this->ref_bus_id->Lookup->getSql(false, $filterWrk, '', $this, true, true);
                         $rswrk = Conn()->executeQuery($sqlWrk)->fetchAll(\PDO::FETCH_BOTH);
                         $ari = count($rswrk);
                         if ($ari > 0) { // Lookup values found
@@ -966,7 +966,7 @@ class MainReportsAdd extends MainReports
                 $this->vendor_id->ViewValue = $this->vendor_id->lookupCacheOption($curVal);
                 if ($this->vendor_id->ViewValue === null) { // Lookup from database
                     $filterWrk = "\"id\"" . SearchString("=", $curVal, DATATYPE_NUMBER, "");
-                    $sqlWrk = $this->vendor_id->Lookup->getSql(false, $filterWrk, '', $this, true);
+                    $sqlWrk = $this->vendor_id->Lookup->getSql(false, $filterWrk, '', $this, true, true);
                     $rswrk = Conn()->executeQuery($sqlWrk)->fetchAll(\PDO::FETCH_BOTH);
                     $ari = count($rswrk);
                     if ($ari > 0) { // Lookup values found
@@ -1062,7 +1062,7 @@ class MainReportsAdd extends MainReports
                 } else {
                     $filterWrk = "\"id\"" . SearchString("=", $this->type_id->CurrentValue, DATATYPE_NUMBER, "");
                 }
-                $sqlWrk = $this->type_id->Lookup->getSql(true, $filterWrk, '', $this);
+                $sqlWrk = $this->type_id->Lookup->getSql(true, $filterWrk, '', $this, false, true);
                 $rswrk = Conn()->executeQuery($sqlWrk)->fetchAll(\PDO::FETCH_BOTH);
                 $ari = count($rswrk);
                 $arwrk = $rswrk;
@@ -1087,7 +1087,7 @@ class MainReportsAdd extends MainReports
                 } else {
                     $filterWrk = "\"id\"" . SearchString("=", $this->campaign_id->CurrentValue, DATATYPE_NUMBER, "");
                 }
-                $sqlWrk = $this->campaign_id->Lookup->getSql(true, $filterWrk, '', $this);
+                $sqlWrk = $this->campaign_id->Lookup->getSql(true, $filterWrk, '', $this, false, true);
                 $rswrk = Conn()->executeQuery($sqlWrk)->fetchAll(\PDO::FETCH_BOTH);
                 $ari = count($rswrk);
                 $arwrk = $rswrk;
@@ -1110,7 +1110,7 @@ class MainReportsAdd extends MainReports
                 } else {
                     $filterWrk = "\"id\"" . SearchString("=", $this->vendor_id->CurrentValue, DATATYPE_NUMBER, "");
                 }
-                $sqlWrk = $this->vendor_id->Lookup->getSql(true, $filterWrk, '', $this);
+                $sqlWrk = $this->vendor_id->Lookup->getSql(true, $filterWrk, '', $this, false, true);
                 $rswrk = Conn()->executeQuery($sqlWrk)->fetchAll(\PDO::FETCH_BOTH);
                 $arwrk = $rswrk;
                 $this->vendor_id->EditValue = $arwrk;
@@ -1129,7 +1129,7 @@ class MainReportsAdd extends MainReports
                     } else {
                         $filterWrk = "\"id\"" . SearchString("=", $this->vendor_id->CurrentValue, DATATYPE_NUMBER, "");
                     }
-                    $sqlWrk = $this->vendor_id->Lookup->getSql(true, $filterWrk, '', $this);
+                    $sqlWrk = $this->vendor_id->Lookup->getSql(true, $filterWrk, '', $this, false, true);
                     $rswrk = Conn()->executeQuery($sqlWrk)->fetchAll(\PDO::FETCH_BOTH);
                     $ari = count($rswrk);
                     $arwrk = $rswrk;

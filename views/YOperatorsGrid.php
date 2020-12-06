@@ -288,6 +288,8 @@ $Grid->ListOptions->render("body", "left", $Grid->RowCount);
 <?php } ?>
 <?php } ?>
 </td>
+    <?php } else { ?>
+            <input type="hidden" data-table="y_operators" data-field="x_id" data-hidden="1" name="x<?= $Grid->RowIndex ?>_id" id="x<?= $Grid->RowIndex ?>_id" value="<?= HtmlEncode($Grid->id->CurrentValue) ?>">
     <?php } ?>
     <?php if ($Grid->name->Visible) { // name ?>
         <td data-name="name" <?= $Grid->name->cellAttributes() ?>>

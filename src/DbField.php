@@ -728,13 +728,13 @@ class DbField
     // Get sorting order
     public function getSort()
     {
-        return @$_SESSION[PROJECT_NAME . "_" . $this->TableVar . "_" . Config("TABLE_SORT") . "_" . $this->FieldVar];
+        return Session(PROJECT_NAME . "_" . $this->TableVar . "_" . Config("TABLE_SORT") . "_" . $this->FieldVar);
     }
 
     // Set sorting order
     public function setSort($v)
     {
-        if (@$_SESSION[PROJECT_NAME . "_" . $this->TableVar . "_" . Config("TABLE_SORT") . "_" . $this->FieldVar] != $v) {
+        if (Session(PROJECT_NAME . "_" . $this->TableVar . "_" . Config("TABLE_SORT") . "_" . $this->FieldVar) != $v) {
             $_SESSION[PROJECT_NAME . "_" . $this->TableVar . "_" . Config("TABLE_SORT") . "_" . $this->FieldVar] = $v;
         }
     }
@@ -1007,7 +1007,7 @@ class DbField
     // Get session value
     public function getSessionValue()
     {
-        return @$_SESSION[PROJECT_NAME . "_" . $this->TableVar . "_" . $this->FieldVar . "_SessionValue"];
+        return Session(PROJECT_NAME . "_" . $this->TableVar . "_" . $this->FieldVar . "_SessionValue");
     }
 
     // Set session value

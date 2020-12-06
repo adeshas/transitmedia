@@ -169,7 +169,7 @@ class SubTransactionDetails extends DbTable
     // Session ORDER BY for List page
     public function getSessionOrderByList()
     {
-        return @$_SESSION[PROJECT_NAME . "_" . $this->TableVar . "_" . Config("TABLE_ORDER_BY_LIST")];
+        return Session(PROJECT_NAME . "_" . $this->TableVar . "_" . Config("TABLE_ORDER_BY_LIST"));
     }
 
     public function setSessionOrderByList($v)
@@ -180,7 +180,7 @@ class SubTransactionDetails extends DbTable
     // Current master table name
     public function getCurrentMasterTable()
     {
-        return @$_SESSION[PROJECT_NAME . "_" . $this->TableVar . "_" . Config("TABLE_MASTER_TABLE")];
+        return Session(PROJECT_NAME . "_" . $this->TableVar . "_" . Config("TABLE_MASTER_TABLE"));
     }
 
     public function setCurrentMasterTable($v)
@@ -723,18 +723,17 @@ class SubTransactionDetails extends DbTable
     // Return page URL
     public function getReturnUrl()
     {
+        $referUrl = ReferUrl();
+        $referPageName = ReferPageName();
         $name = PROJECT_NAME . "_" . $this->TableVar . "_" . Config("TABLE_RETURN_URL");
         // Get referer URL automatically
-        if (ReferUrl() != "" && ReferPageName() != CurrentPageName() && ReferPageName() != "login") { // Referer not same page or login page
-            $_SESSION[$name] = ReferUrl(); // Save to Session
+        if ($referUrl != "" && $referPageName != CurrentPageName() && $referPageName != "login") { // Referer not same page or login page
+            $_SESSION[$name] = $referUrl; // Save to Session
         }
-        if (@$_SESSION[$name] != "") {
-            return $_SESSION[$name];
-        } else {
-            return GetUrl("subtransactiondetailslist");
-        }
+        return $_SESSION[$name] ?? GetUrl("subtransactiondetailslist");
     }
 
+    // Set return page URL
     public function setReturnUrl($v)
     {
         $_SESSION[PROJECT_NAME . "_" . $this->TableVar . "_" . Config("TABLE_RETURN_URL")] = $v;
@@ -1025,7 +1024,7 @@ SORTHTML;
             $this->transaction_id->ViewValue = $this->transaction_id->lookupCacheOption($curVal);
             if ($this->transaction_id->ViewValue === null) { // Lookup from database
                 $filterWrk = "\"id\"" . SearchString("=", $curVal, DATATYPE_NUMBER, "");
-                $sqlWrk = $this->transaction_id->Lookup->getSql(false, $filterWrk, '', $this, true);
+                $sqlWrk = $this->transaction_id->Lookup->getSql(false, $filterWrk, '', $this, true, true);
                 $rswrk = Conn()->executeQuery($sqlWrk)->fetchAll(\PDO::FETCH_BOTH);
                 $ari = count($rswrk);
                 if ($ari > 0) { // Lookup values found
@@ -1049,7 +1048,7 @@ SORTHTML;
                 $this->bus_id->ViewValue = $this->bus_id->lookupCacheOption($curVal);
                 if ($this->bus_id->ViewValue === null) { // Lookup from database
                     $filterWrk = "\"bus_id\"" . SearchString("=", $curVal, DATATYPE_NUMBER, "");
-                    $sqlWrk = $this->bus_id->Lookup->getSql(false, $filterWrk, '', $this, true);
+                    $sqlWrk = $this->bus_id->Lookup->getSql(false, $filterWrk, '', $this, true, true);
                     $rswrk = Conn()->executeQuery($sqlWrk)->fetchAll(\PDO::FETCH_BOTH);
                     $ari = count($rswrk);
                     if ($ari > 0) { // Lookup values found
@@ -1142,7 +1141,7 @@ SORTHTML;
                 $this->transaction_id->ViewValue = $this->transaction_id->lookupCacheOption($curVal);
                 if ($this->transaction_id->ViewValue === null) { // Lookup from database
                     $filterWrk = "\"id\"" . SearchString("=", $curVal, DATATYPE_NUMBER, "");
-                    $sqlWrk = $this->transaction_id->Lookup->getSql(false, $filterWrk, '', $this, true);
+                    $sqlWrk = $this->transaction_id->Lookup->getSql(false, $filterWrk, '', $this, true, true);
                     $rswrk = Conn()->executeQuery($sqlWrk)->fetchAll(\PDO::FETCH_BOTH);
                     $ari = count($rswrk);
                     if ($ari > 0) { // Lookup values found

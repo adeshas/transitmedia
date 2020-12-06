@@ -268,7 +268,7 @@ class MainTransactions extends DbTable
     // Session ORDER BY for List page
     public function getSessionOrderByList()
     {
-        return @$_SESSION[PROJECT_NAME . "_" . $this->TableVar . "_" . Config("TABLE_ORDER_BY_LIST")];
+        return Session(PROJECT_NAME . "_" . $this->TableVar . "_" . Config("TABLE_ORDER_BY_LIST"));
     }
 
     public function setSessionOrderByList($v)
@@ -279,7 +279,7 @@ class MainTransactions extends DbTable
     // Current master table name
     public function getCurrentMasterTable()
     {
-        return @$_SESSION[PROJECT_NAME . "_" . $this->TableVar . "_" . Config("TABLE_MASTER_TABLE")];
+        return Session(PROJECT_NAME . "_" . $this->TableVar . "_" . Config("TABLE_MASTER_TABLE"));
     }
 
     public function setCurrentMasterTable($v)
@@ -356,7 +356,7 @@ class MainTransactions extends DbTable
     // Current detail table name
     public function getCurrentDetailTable()
     {
-        return @$_SESSION[PROJECT_NAME . "_" . $this->TableVar . "_" . Config("TABLE_DETAIL_TABLE")];
+        return Session(PROJECT_NAME . "_" . $this->TableVar . "_" . Config("TABLE_DETAIL_TABLE"));
     }
 
     public function setCurrentDetailTable($v)
@@ -987,18 +987,17 @@ class MainTransactions extends DbTable
     // Return page URL
     public function getReturnUrl()
     {
+        $referUrl = ReferUrl();
+        $referPageName = ReferPageName();
         $name = PROJECT_NAME . "_" . $this->TableVar . "_" . Config("TABLE_RETURN_URL");
         // Get referer URL automatically
-        if (ReferUrl() != "" && ReferPageName() != CurrentPageName() && ReferPageName() != "login") { // Referer not same page or login page
-            $_SESSION[$name] = ReferUrl(); // Save to Session
+        if ($referUrl != "" && $referPageName != CurrentPageName() && $referPageName != "login") { // Referer not same page or login page
+            $_SESSION[$name] = $referUrl; // Save to Session
         }
-        if (@$_SESSION[$name] != "") {
-            return $_SESSION[$name];
-        } else {
-            return GetUrl("maintransactionslist");
-        }
+        return $_SESSION[$name] ?? GetUrl("maintransactionslist");
     }
 
+    // Set return page URL
     public function setReturnUrl($v)
     {
         $_SESSION[PROJECT_NAME . "_" . $this->TableVar . "_" . Config("TABLE_RETURN_URL")] = $v;
@@ -1334,7 +1333,7 @@ SORTHTML;
                 $this->campaign_id->ViewValue = $this->campaign_id->lookupCacheOption($curVal);
                 if ($this->campaign_id->ViewValue === null) { // Lookup from database
                     $filterWrk = "\"id\"" . SearchString("=", $curVal, DATATYPE_NUMBER, "");
-                    $sqlWrk = $this->campaign_id->Lookup->getSql(false, $filterWrk, '', $this, true);
+                    $sqlWrk = $this->campaign_id->Lookup->getSql(false, $filterWrk, '', $this, true, true);
                     $rswrk = Conn()->executeQuery($sqlWrk)->fetchAll(\PDO::FETCH_BOTH);
                     $ari = count($rswrk);
                     if ($ari > 0) { // Lookup values found
@@ -1356,7 +1355,7 @@ SORTHTML;
             $this->operator_id->ViewValue = $this->operator_id->lookupCacheOption($curVal);
             if ($this->operator_id->ViewValue === null) { // Lookup from database
                 $filterWrk = "\"operator_id\"" . SearchString("=", $curVal, DATATYPE_NUMBER, "");
-                $sqlWrk = $this->operator_id->Lookup->getSql(false, $filterWrk, '', $this, true);
+                $sqlWrk = $this->operator_id->Lookup->getSql(false, $filterWrk, '', $this, true, true);
                 $rswrk = Conn()->executeQuery($sqlWrk)->fetchAll(\PDO::FETCH_BOTH);
                 $ari = count($rswrk);
                 if ($ari > 0) { // Lookup values found
@@ -1385,7 +1384,7 @@ SORTHTML;
                 $this->price_id->ViewValue = $this->price_id->lookupCacheOption($curVal);
                 if ($this->price_id->ViewValue === null) { // Lookup from database
                     $filterWrk = "\"price_id\"" . SearchString("=", $curVal, DATATYPE_NUMBER, "");
-                    $sqlWrk = $this->price_id->Lookup->getSql(false, $filterWrk, '', $this, true);
+                    $sqlWrk = $this->price_id->Lookup->getSql(false, $filterWrk, '', $this, true, true);
                     $rswrk = Conn()->executeQuery($sqlWrk)->fetchAll(\PDO::FETCH_BOTH);
                     $ari = count($rswrk);
                     if ($ari > 0) { // Lookup values found
@@ -1424,7 +1423,7 @@ SORTHTML;
             $this->visible_status_id->ViewValue = $this->visible_status_id->lookupCacheOption($curVal);
             if ($this->visible_status_id->ViewValue === null) { // Lookup from database
                 $filterWrk = "\"id\"" . SearchString("=", $curVal, DATATYPE_NUMBER, "");
-                $sqlWrk = $this->visible_status_id->Lookup->getSql(false, $filterWrk, '', $this, true);
+                $sqlWrk = $this->visible_status_id->Lookup->getSql(false, $filterWrk, '', $this, true, true);
                 $rswrk = Conn()->executeQuery($sqlWrk)->fetchAll(\PDO::FETCH_BOTH);
                 $ari = count($rswrk);
                 if ($ari > 0) { // Lookup values found
@@ -1448,7 +1447,7 @@ SORTHTML;
                 $this->status_id->ViewValue = $this->status_id->lookupCacheOption($curVal);
                 if ($this->status_id->ViewValue === null) { // Lookup from database
                     $filterWrk = "\"id\"" . SearchString("=", $curVal, DATATYPE_NUMBER, "");
-                    $sqlWrk = $this->status_id->Lookup->getSql(false, $filterWrk, '', $this, true);
+                    $sqlWrk = $this->status_id->Lookup->getSql(false, $filterWrk, '', $this, true, true);
                     $rswrk = Conn()->executeQuery($sqlWrk)->fetchAll(\PDO::FETCH_BOTH);
                     $ari = count($rswrk);
                     if ($ari > 0) { // Lookup values found
@@ -1474,7 +1473,7 @@ SORTHTML;
                 $this->print_status_id->ViewValue = $this->print_status_id->lookupCacheOption($curVal);
                 if ($this->print_status_id->ViewValue === null) { // Lookup from database
                     $filterWrk = "\"id\"" . SearchString("=", $curVal, DATATYPE_NUMBER, "");
-                    $sqlWrk = $this->print_status_id->Lookup->getSql(false, $filterWrk, '', $this, true);
+                    $sqlWrk = $this->print_status_id->Lookup->getSql(false, $filterWrk, '', $this, true, true);
                     $rswrk = Conn()->executeQuery($sqlWrk)->fetchAll(\PDO::FETCH_BOTH);
                     $ari = count($rswrk);
                     if ($ari > 0) { // Lookup values found
@@ -1500,7 +1499,7 @@ SORTHTML;
                 $this->payment_status_id->ViewValue = $this->payment_status_id->lookupCacheOption($curVal);
                 if ($this->payment_status_id->ViewValue === null) { // Lookup from database
                     $filterWrk = "\"id\"" . SearchString("=", $curVal, DATATYPE_NUMBER, "");
-                    $sqlWrk = $this->payment_status_id->Lookup->getSql(false, $filterWrk, '', $this, true);
+                    $sqlWrk = $this->payment_status_id->Lookup->getSql(false, $filterWrk, '', $this, true, true);
                     $rswrk = Conn()->executeQuery($sqlWrk)->fetchAll(\PDO::FETCH_BOTH);
                     $ari = count($rswrk);
                     if ($ari > 0) { // Lookup values found
@@ -1523,7 +1522,7 @@ SORTHTML;
             $this->created_by->ViewValue = $this->created_by->lookupCacheOption($curVal);
             if ($this->created_by->ViewValue === null) { // Lookup from database
                 $filterWrk = "\"id\"" . SearchString("=", $curVal, DATATYPE_NUMBER, "");
-                $sqlWrk = $this->created_by->Lookup->getSql(false, $filterWrk, '', $this, true);
+                $sqlWrk = $this->created_by->Lookup->getSql(false, $filterWrk, '', $this, true, true);
                 $rswrk = Conn()->executeQuery($sqlWrk)->fetchAll(\PDO::FETCH_BOTH);
                 $ari = count($rswrk);
                 if ($ari > 0) { // Lookup values found
@@ -1702,7 +1701,7 @@ SORTHTML;
                     $this->campaign_id->ViewValue = $this->campaign_id->lookupCacheOption($curVal);
                     if ($this->campaign_id->ViewValue === null) { // Lookup from database
                         $filterWrk = "\"id\"" . SearchString("=", $curVal, DATATYPE_NUMBER, "");
-                        $sqlWrk = $this->campaign_id->Lookup->getSql(false, $filterWrk, '', $this, true);
+                        $sqlWrk = $this->campaign_id->Lookup->getSql(false, $filterWrk, '', $this, true, true);
                         $rswrk = Conn()->executeQuery($sqlWrk)->fetchAll(\PDO::FETCH_BOTH);
                         $ari = count($rswrk);
                         if ($ari > 0) { // Lookup values found
@@ -1731,7 +1730,7 @@ SORTHTML;
                 $this->operator_id->ViewValue = $this->operator_id->lookupCacheOption($curVal);
                 if ($this->operator_id->ViewValue === null) { // Lookup from database
                     $filterWrk = "\"operator_id\"" . SearchString("=", $curVal, DATATYPE_NUMBER, "");
-                    $sqlWrk = $this->operator_id->Lookup->getSql(false, $filterWrk, '', $this, true);
+                    $sqlWrk = $this->operator_id->Lookup->getSql(false, $filterWrk, '', $this, true, true);
                     $rswrk = Conn()->executeQuery($sqlWrk)->fetchAll(\PDO::FETCH_BOTH);
                     $ari = count($rswrk);
                     if ($ari > 0) { // Lookup values found

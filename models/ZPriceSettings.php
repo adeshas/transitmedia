@@ -688,18 +688,17 @@ class ZPriceSettings extends DbTable
     // Return page URL
     public function getReturnUrl()
     {
+        $referUrl = ReferUrl();
+        $referPageName = ReferPageName();
         $name = PROJECT_NAME . "_" . $this->TableVar . "_" . Config("TABLE_RETURN_URL");
         // Get referer URL automatically
-        if (ReferUrl() != "" && ReferPageName() != CurrentPageName() && ReferPageName() != "login") { // Referer not same page or login page
-            $_SESSION[$name] = ReferUrl(); // Save to Session
+        if ($referUrl != "" && $referPageName != CurrentPageName() && $referPageName != "login") { // Referer not same page or login page
+            $_SESSION[$name] = $referUrl; // Save to Session
         }
-        if (@$_SESSION[$name] != "") {
-            return $_SESSION[$name];
-        } else {
-            return GetUrl("zpricesettingslist");
-        }
+        return $_SESSION[$name] ?? GetUrl("zpricesettingslist");
     }
 
+    // Set return page URL
     public function setReturnUrl($v)
     {
         $_SESSION[PROJECT_NAME . "_" . $this->TableVar . "_" . Config("TABLE_RETURN_URL")] = $v;
@@ -1015,7 +1014,7 @@ SORTHTML;
             $this->platform_id->ViewValue = $this->platform_id->lookupCacheOption($curVal);
             if ($this->platform_id->ViewValue === null) { // Lookup from database
                 $filterWrk = "\"id\"" . SearchString("=", $curVal, DATATYPE_NUMBER, "");
-                $sqlWrk = $this->platform_id->Lookup->getSql(false, $filterWrk, '', $this, true);
+                $sqlWrk = $this->platform_id->Lookup->getSql(false, $filterWrk, '', $this, true, true);
                 $rswrk = Conn()->executeQuery($sqlWrk)->fetchAll(\PDO::FETCH_BOTH);
                 $ari = count($rswrk);
                 if ($ari > 0) { // Lookup values found
@@ -1036,7 +1035,7 @@ SORTHTML;
             $this->inventory_id->ViewValue = $this->inventory_id->lookupCacheOption($curVal);
             if ($this->inventory_id->ViewValue === null) { // Lookup from database
                 $filterWrk = "\"id\"" . SearchString("=", $curVal, DATATYPE_NUMBER, "");
-                $sqlWrk = $this->inventory_id->Lookup->getSql(false, $filterWrk, '', $this, true);
+                $sqlWrk = $this->inventory_id->Lookup->getSql(false, $filterWrk, '', $this, true, true);
                 $rswrk = Conn()->executeQuery($sqlWrk)->fetchAll(\PDO::FETCH_BOTH);
                 $ari = count($rswrk);
                 if ($ari > 0) { // Lookup values found
@@ -1057,7 +1056,7 @@ SORTHTML;
             $this->print_stage_id->ViewValue = $this->print_stage_id->lookupCacheOption($curVal);
             if ($this->print_stage_id->ViewValue === null) { // Lookup from database
                 $filterWrk = "\"id\"" . SearchString("=", $curVal, DATATYPE_NUMBER, "");
-                $sqlWrk = $this->print_stage_id->Lookup->getSql(false, $filterWrk, '', $this, true);
+                $sqlWrk = $this->print_stage_id->Lookup->getSql(false, $filterWrk, '', $this, true, true);
                 $rswrk = Conn()->executeQuery($sqlWrk)->fetchAll(\PDO::FETCH_BOTH);
                 $ari = count($rswrk);
                 if ($ari > 0) { // Lookup values found
@@ -1078,7 +1077,7 @@ SORTHTML;
             $this->bus_size_id->ViewValue = $this->bus_size_id->lookupCacheOption($curVal);
             if ($this->bus_size_id->ViewValue === null) { // Lookup from database
                 $filterWrk = "\"id\"" . SearchString("=", $curVal, DATATYPE_NUMBER, "");
-                $sqlWrk = $this->bus_size_id->Lookup->getSql(false, $filterWrk, '', $this, true);
+                $sqlWrk = $this->bus_size_id->Lookup->getSql(false, $filterWrk, '', $this, true, true);
                 $rswrk = Conn()->executeQuery($sqlWrk)->fetchAll(\PDO::FETCH_BOTH);
                 $ari = count($rswrk);
                 if ($ari > 0) { // Lookup values found

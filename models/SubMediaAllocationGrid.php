@@ -1156,7 +1156,6 @@ class SubMediaAllocationGrid extends SubMediaAllocation
         $this->listOptionsRendering();
 
         // Set up row action and key
-        $keyName = "";
         if ($CurrentForm && is_numeric($this->RowIndex) && $this->RowType != "view") {
             $CurrentForm->Index = $this->RowIndex;
             $actionName = str_replace("k_", "k" . $this->RowIndex . "_", $this->FormActionName);
@@ -1206,11 +1205,6 @@ class SubMediaAllocationGrid extends SubMediaAllocation
                 $opt->Body = "";
             }
         } // End View mode
-        if ($this->CurrentMode == "edit" && is_numeric($this->RowIndex) && $this->RowAction != "delete") {
-            if ($keyName != "") {
-                $this->MultiSelectKey .= "<input type=\"hidden\" name=\"" . $keyName . "\" id=\"" . $keyName . "\" value=\"" . $this->id->CurrentValue . "\">";
-            }
-        }
         $this->renderListOptionsExt();
 
         // Call ListOptions_Rendered event
@@ -1556,7 +1550,7 @@ class SubMediaAllocationGrid extends SubMediaAllocation
                 $this->bus_id->ViewValue = $this->bus_id->lookupCacheOption($curVal);
                 if ($this->bus_id->ViewValue === null) { // Lookup from database
                     $filterWrk = "\"id\"" . SearchString("=", $curVal, DATATYPE_NUMBER, "");
-                    $sqlWrk = $this->bus_id->Lookup->getSql(false, $filterWrk, '', $this, true);
+                    $sqlWrk = $this->bus_id->Lookup->getSql(false, $filterWrk, '', $this, true, true);
                     $rswrk = Conn()->executeQuery($sqlWrk)->fetchAll(\PDO::FETCH_BOTH);
                     $ari = count($rswrk);
                     if ($ari > 0) { // Lookup values found
@@ -1581,7 +1575,7 @@ class SubMediaAllocationGrid extends SubMediaAllocation
                         return "inventory_id = 3";
                     };
                     $lookupFilter = $lookupFilter->bindTo($this);
-                    $sqlWrk = $this->campaign_id->Lookup->getSql(false, $filterWrk, $lookupFilter, $this, true);
+                    $sqlWrk = $this->campaign_id->Lookup->getSql(false, $filterWrk, $lookupFilter, $this, true, true);
                     $rswrk = Conn()->executeQuery($sqlWrk)->fetchAll(\PDO::FETCH_BOTH);
                     $ari = count($rswrk);
                     if ($ari > 0) { // Lookup values found
@@ -1666,7 +1660,7 @@ class SubMediaAllocationGrid extends SubMediaAllocation
                     $this->bus_id->ViewValue = $this->bus_id->lookupCacheOption($curVal);
                     if ($this->bus_id->ViewValue === null) { // Lookup from database
                         $filterWrk = "\"id\"" . SearchString("=", $curVal, DATATYPE_NUMBER, "");
-                        $sqlWrk = $this->bus_id->Lookup->getSql(false, $filterWrk, '', $this, true);
+                        $sqlWrk = $this->bus_id->Lookup->getSql(false, $filterWrk, '', $this, true, true);
                         $rswrk = Conn()->executeQuery($sqlWrk)->fetchAll(\PDO::FETCH_BOTH);
                         $ari = count($rswrk);
                         if ($ari > 0) { // Lookup values found
@@ -1695,7 +1689,7 @@ class SubMediaAllocationGrid extends SubMediaAllocation
                     } else {
                         $filterWrk = "\"id\"" . SearchString("=", $this->bus_id->CurrentValue, DATATYPE_NUMBER, "");
                     }
-                    $sqlWrk = $this->bus_id->Lookup->getSql(true, $filterWrk, '', $this);
+                    $sqlWrk = $this->bus_id->Lookup->getSql(true, $filterWrk, '', $this, false, true);
                     $rswrk = Conn()->executeQuery($sqlWrk)->fetchAll(\PDO::FETCH_BOTH);
                     $ari = count($rswrk);
                     $arwrk = $rswrk;
@@ -1721,7 +1715,7 @@ class SubMediaAllocationGrid extends SubMediaAllocation
                             return "inventory_id = 3";
                         };
                         $lookupFilter = $lookupFilter->bindTo($this);
-                        $sqlWrk = $this->campaign_id->Lookup->getSql(false, $filterWrk, $lookupFilter, $this, true);
+                        $sqlWrk = $this->campaign_id->Lookup->getSql(false, $filterWrk, $lookupFilter, $this, true, true);
                         $rswrk = Conn()->executeQuery($sqlWrk)->fetchAll(\PDO::FETCH_BOTH);
                         $ari = count($rswrk);
                         if ($ari > 0) { // Lookup values found
@@ -1754,7 +1748,7 @@ class SubMediaAllocationGrid extends SubMediaAllocation
                         return "inventory_id = 3";
                     };
                     $lookupFilter = $lookupFilter->bindTo($this);
-                    $sqlWrk = $this->campaign_id->Lookup->getSql(true, $filterWrk, $lookupFilter, $this);
+                    $sqlWrk = $this->campaign_id->Lookup->getSql(true, $filterWrk, $lookupFilter, $this, false, true);
                     $rswrk = Conn()->executeQuery($sqlWrk)->fetchAll(\PDO::FETCH_BOTH);
                     $ari = count($rswrk);
                     $arwrk = $rswrk;
@@ -1834,7 +1828,7 @@ class SubMediaAllocationGrid extends SubMediaAllocation
                     $this->bus_id->ViewValue = $this->bus_id->lookupCacheOption($curVal);
                     if ($this->bus_id->ViewValue === null) { // Lookup from database
                         $filterWrk = "\"id\"" . SearchString("=", $curVal, DATATYPE_NUMBER, "");
-                        $sqlWrk = $this->bus_id->Lookup->getSql(false, $filterWrk, '', $this, true);
+                        $sqlWrk = $this->bus_id->Lookup->getSql(false, $filterWrk, '', $this, true, true);
                         $rswrk = Conn()->executeQuery($sqlWrk)->fetchAll(\PDO::FETCH_BOTH);
                         $ari = count($rswrk);
                         if ($ari > 0) { // Lookup values found
@@ -1863,7 +1857,7 @@ class SubMediaAllocationGrid extends SubMediaAllocation
                     } else {
                         $filterWrk = "\"id\"" . SearchString("=", $this->bus_id->CurrentValue, DATATYPE_NUMBER, "");
                     }
-                    $sqlWrk = $this->bus_id->Lookup->getSql(true, $filterWrk, '', $this);
+                    $sqlWrk = $this->bus_id->Lookup->getSql(true, $filterWrk, '', $this, false, true);
                     $rswrk = Conn()->executeQuery($sqlWrk)->fetchAll(\PDO::FETCH_BOTH);
                     $ari = count($rswrk);
                     $arwrk = $rswrk;
@@ -1889,7 +1883,7 @@ class SubMediaAllocationGrid extends SubMediaAllocation
                             return "inventory_id = 3";
                         };
                         $lookupFilter = $lookupFilter->bindTo($this);
-                        $sqlWrk = $this->campaign_id->Lookup->getSql(false, $filterWrk, $lookupFilter, $this, true);
+                        $sqlWrk = $this->campaign_id->Lookup->getSql(false, $filterWrk, $lookupFilter, $this, true, true);
                         $rswrk = Conn()->executeQuery($sqlWrk)->fetchAll(\PDO::FETCH_BOTH);
                         $ari = count($rswrk);
                         if ($ari > 0) { // Lookup values found
@@ -1922,7 +1916,7 @@ class SubMediaAllocationGrid extends SubMediaAllocation
                         return "inventory_id = 3";
                     };
                     $lookupFilter = $lookupFilter->bindTo($this);
-                    $sqlWrk = $this->campaign_id->Lookup->getSql(true, $filterWrk, $lookupFilter, $this);
+                    $sqlWrk = $this->campaign_id->Lookup->getSql(true, $filterWrk, $lookupFilter, $this, false, true);
                     $rswrk = Conn()->executeQuery($sqlWrk)->fetchAll(\PDO::FETCH_BOTH);
                     $ari = count($rswrk);
                     $arwrk = $rswrk;
@@ -2154,9 +2148,15 @@ class SubMediaAllocationGrid extends SubMediaAllocation
             $rsnew = [];
 
             // bus_id
+            if ($this->bus_id->getSessionValue() != "") {
+                $this->bus_id->ReadOnly = true;
+            }
             $this->bus_id->setDbValueDef($rsnew, $this->bus_id->CurrentValue, null, $this->bus_id->ReadOnly);
 
             // campaign_id
+            if ($this->campaign_id->getSessionValue() != "") {
+                $this->campaign_id->ReadOnly = true;
+            }
             $this->campaign_id->setDbValueDef($rsnew, $this->campaign_id->CurrentValue, null, $this->campaign_id->ReadOnly);
 
             // active
@@ -2235,7 +2235,7 @@ class SubMediaAllocationGrid extends SubMediaAllocation
                 }
                 if (!$validMasterKey) {
                     $masterUserIdMsg = str_replace("%c", CurrentUserID(), $Language->phrase("UnAuthorizedMasterUserID"));
-                    $masterUserIdMsg = str_replace("%f", $sMasterFilter, $masterUserIdMsg);
+                    $masterUserIdMsg = str_replace("%f", $masterFilter, $masterUserIdMsg);
                     $this->setFailureMessage($masterUserIdMsg);
                     return false;
                 }

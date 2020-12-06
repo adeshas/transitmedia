@@ -508,7 +508,6 @@ class MainCampaignsGrid extends MainCampaigns
         $this->setupOtherOptions();
 
         // Set up lookup cache
-        $this->setupLookupOptions($this->name);
         $this->setupLookupOptions($this->inventory_id);
         $this->setupLookupOptions($this->platform_id);
         $this->setupLookupOptions($this->bus_size_id);
@@ -1215,7 +1214,6 @@ class MainCampaignsGrid extends MainCampaigns
         $this->listOptionsRendering();
 
         // Set up row action and key
-        $keyName = "";
         if ($CurrentForm && is_numeric($this->RowIndex) && $this->RowType != "view") {
             $CurrentForm->Index = $this->RowIndex;
             $actionName = str_replace("k_", "k" . $this->RowIndex . "_", $this->FormActionName);
@@ -1273,11 +1271,6 @@ class MainCampaignsGrid extends MainCampaigns
                 $opt->Body = "";
             }
         } // End View mode
-        if ($this->CurrentMode == "edit" && is_numeric($this->RowIndex) && $this->RowAction != "delete") {
-            if ($keyName != "") {
-                $this->MultiSelectKey .= "<input type=\"hidden\" name=\"" . $keyName . "\" id=\"" . $keyName . "\" value=\"" . $this->id->CurrentValue . "\">";
-            }
-        }
         $this->renderListOptionsExt();
 
         // Call ListOptions_Rendered event
@@ -1731,13 +1724,6 @@ class MainCampaignsGrid extends MainCampaigns
 
             // name
             $this->name->ViewValue = $this->name->CurrentValue;
-            $arwrk = [];
-            $arwrk["df"] = $this->name->CurrentValue;
-            $arwrk = $this->name->Lookup->renderViewRow($arwrk, $this);
-            $dispVal = $this->name->displayValue($arwrk);
-            if ($dispVal != "") {
-                $this->name->ViewValue = $dispVal;
-            }
             $this->name->CssClass = "font-weight-bold";
             $this->name->ViewCustomAttributes = "";
 
@@ -1747,7 +1733,7 @@ class MainCampaignsGrid extends MainCampaigns
                 $this->inventory_id->ViewValue = $this->inventory_id->lookupCacheOption($curVal);
                 if ($this->inventory_id->ViewValue === null) { // Lookup from database
                     $filterWrk = "\"inventory_id\"" . SearchString("=", $curVal, DATATYPE_NUMBER, "");
-                    $sqlWrk = $this->inventory_id->Lookup->getSql(false, $filterWrk, '', $this, true);
+                    $sqlWrk = $this->inventory_id->Lookup->getSql(false, $filterWrk, '', $this, true, true);
                     $rswrk = Conn()->executeQuery($sqlWrk)->fetchAll(\PDO::FETCH_BOTH);
                     $ari = count($rswrk);
                     if ($ari > 0) { // Lookup values found
@@ -1768,7 +1754,7 @@ class MainCampaignsGrid extends MainCampaigns
                 $this->platform_id->ViewValue = $this->platform_id->lookupCacheOption($curVal);
                 if ($this->platform_id->ViewValue === null) { // Lookup from database
                     $filterWrk = "\"platform_id\"" . SearchString("=", $curVal, DATATYPE_NUMBER, "");
-                    $sqlWrk = $this->platform_id->Lookup->getSql(false, $filterWrk, '', $this, true);
+                    $sqlWrk = $this->platform_id->Lookup->getSql(false, $filterWrk, '', $this, true, true);
                     $rswrk = Conn()->executeQuery($sqlWrk)->fetchAll(\PDO::FETCH_BOTH);
                     $ari = count($rswrk);
                     if ($ari > 0) { // Lookup values found
@@ -1789,7 +1775,7 @@ class MainCampaignsGrid extends MainCampaigns
                 $this->bus_size_id->ViewValue = $this->bus_size_id->lookupCacheOption($curVal);
                 if ($this->bus_size_id->ViewValue === null) { // Lookup from database
                     $filterWrk = "\"bus_size_id\"" . SearchString("=", $curVal, DATATYPE_NUMBER, "");
-                    $sqlWrk = $this->bus_size_id->Lookup->getSql(false, $filterWrk, '', $this, true);
+                    $sqlWrk = $this->bus_size_id->Lookup->getSql(false, $filterWrk, '', $this, true, true);
                     $rswrk = Conn()->executeQuery($sqlWrk)->fetchAll(\PDO::FETCH_BOTH);
                     $ari = count($rswrk);
                     if ($ari > 0) { // Lookup values found
@@ -1814,7 +1800,7 @@ class MainCampaignsGrid extends MainCampaigns
                         return "\"active\" = true";
                     };
                     $lookupFilter = $lookupFilter->bindTo($this);
-                    $sqlWrk = $this->price_id->Lookup->getSql(false, $filterWrk, $lookupFilter, $this, true);
+                    $sqlWrk = $this->price_id->Lookup->getSql(false, $filterWrk, $lookupFilter, $this, true, true);
                     $rswrk = Conn()->executeQuery($sqlWrk)->fetchAll(\PDO::FETCH_BOTH);
                     $ari = count($rswrk);
                     if ($ari > 0) { // Lookup values found
@@ -1855,7 +1841,7 @@ class MainCampaignsGrid extends MainCampaigns
                 $this->vendor_id->ViewValue = $this->vendor_id->lookupCacheOption($curVal);
                 if ($this->vendor_id->ViewValue === null) { // Lookup from database
                     $filterWrk = "\"id\"" . SearchString("=", $curVal, DATATYPE_NUMBER, "");
-                    $sqlWrk = $this->vendor_id->Lookup->getSql(false, $filterWrk, '', $this, true);
+                    $sqlWrk = $this->vendor_id->Lookup->getSql(false, $filterWrk, '', $this, true, true);
                     $rswrk = Conn()->executeQuery($sqlWrk)->fetchAll(\PDO::FETCH_BOTH);
                     $ari = count($rswrk);
                     if ($ari > 0) { // Lookup values found
@@ -1886,7 +1872,7 @@ class MainCampaignsGrid extends MainCampaigns
                 $this->renewal_stage_id->ViewValue = $this->renewal_stage_id->lookupCacheOption($curVal);
                 if ($this->renewal_stage_id->ViewValue === null) { // Lookup from database
                     $filterWrk = "\"id\"" . SearchString("=", $curVal, DATATYPE_NUMBER, "");
-                    $sqlWrk = $this->renewal_stage_id->Lookup->getSql(false, $filterWrk, '', $this, true);
+                    $sqlWrk = $this->renewal_stage_id->Lookup->getSql(false, $filterWrk, '', $this, true, true);
                     $rswrk = Conn()->executeQuery($sqlWrk)->fetchAll(\PDO::FETCH_BOTH);
                     $ari = count($rswrk);
                     if ($ari > 0) { // Lookup values found
@@ -2012,7 +1998,7 @@ class MainCampaignsGrid extends MainCampaigns
                 } else {
                     $filterWrk = "\"inventory_id\"" . SearchString("=", $this->inventory_id->CurrentValue, DATATYPE_NUMBER, "");
                 }
-                $sqlWrk = $this->inventory_id->Lookup->getSql(true, $filterWrk, '', $this);
+                $sqlWrk = $this->inventory_id->Lookup->getSql(true, $filterWrk, '', $this, false, true);
                 $rswrk = Conn()->executeQuery($sqlWrk)->fetchAll(\PDO::FETCH_BOTH);
                 $ari = count($rswrk);
                 $arwrk = $rswrk;
@@ -2031,7 +2017,7 @@ class MainCampaignsGrid extends MainCampaigns
                     $this->platform_id->ViewValue = $this->platform_id->lookupCacheOption($curVal);
                     if ($this->platform_id->ViewValue === null) { // Lookup from database
                         $filterWrk = "\"platform_id\"" . SearchString("=", $curVal, DATATYPE_NUMBER, "");
-                        $sqlWrk = $this->platform_id->Lookup->getSql(false, $filterWrk, '', $this, true);
+                        $sqlWrk = $this->platform_id->Lookup->getSql(false, $filterWrk, '', $this, true, true);
                         $rswrk = Conn()->executeQuery($sqlWrk)->fetchAll(\PDO::FETCH_BOTH);
                         $ari = count($rswrk);
                         if ($ari > 0) { // Lookup values found
@@ -2060,7 +2046,7 @@ class MainCampaignsGrid extends MainCampaigns
                     } else {
                         $filterWrk = "\"platform_id\"" . SearchString("=", $this->platform_id->CurrentValue, DATATYPE_NUMBER, "");
                     }
-                    $sqlWrk = $this->platform_id->Lookup->getSql(true, $filterWrk, '', $this);
+                    $sqlWrk = $this->platform_id->Lookup->getSql(true, $filterWrk, '', $this, false, true);
                     $rswrk = Conn()->executeQuery($sqlWrk)->fetchAll(\PDO::FETCH_BOTH);
                     $ari = count($rswrk);
                     $arwrk = $rswrk;
@@ -2086,7 +2072,7 @@ class MainCampaignsGrid extends MainCampaigns
                 } else {
                     $filterWrk = "\"bus_size_id\"" . SearchString("=", $this->bus_size_id->CurrentValue, DATATYPE_NUMBER, "");
                 }
-                $sqlWrk = $this->bus_size_id->Lookup->getSql(true, $filterWrk, '', $this);
+                $sqlWrk = $this->bus_size_id->Lookup->getSql(true, $filterWrk, '', $this, false, true);
                 $rswrk = Conn()->executeQuery($sqlWrk)->fetchAll(\PDO::FETCH_BOTH);
                 $ari = count($rswrk);
                 $arwrk = $rswrk;
@@ -2123,7 +2109,7 @@ class MainCampaignsGrid extends MainCampaigns
                     $this->vendor_id->ViewValue = $this->vendor_id->lookupCacheOption($curVal);
                     if ($this->vendor_id->ViewValue === null) { // Lookup from database
                         $filterWrk = "\"id\"" . SearchString("=", $curVal, DATATYPE_NUMBER, "");
-                        $sqlWrk = $this->vendor_id->Lookup->getSql(false, $filterWrk, '', $this, true);
+                        $sqlWrk = $this->vendor_id->Lookup->getSql(false, $filterWrk, '', $this, true, true);
                         $rswrk = Conn()->executeQuery($sqlWrk)->fetchAll(\PDO::FETCH_BOTH);
                         $ari = count($rswrk);
                         if ($ari > 0) { // Lookup values found
@@ -2153,7 +2139,7 @@ class MainCampaignsGrid extends MainCampaigns
                     } else {
                         $filterWrk = "\"id\"" . SearchString("=", $this->vendor_id->CurrentValue, DATATYPE_NUMBER, "");
                     }
-                    $sqlWrk = $this->vendor_id->Lookup->getSql(true, $filterWrk, '', $this);
+                    $sqlWrk = $this->vendor_id->Lookup->getSql(true, $filterWrk, '', $this, false, true);
                     $rswrk = Conn()->executeQuery($sqlWrk)->fetchAll(\PDO::FETCH_BOTH);
                     $ari = count($rswrk);
                     $arwrk = $rswrk;
@@ -2179,7 +2165,7 @@ class MainCampaignsGrid extends MainCampaigns
                 } else {
                     $filterWrk = "\"id\"" . SearchString("=", $this->renewal_stage_id->CurrentValue, DATATYPE_NUMBER, "");
                 }
-                $sqlWrk = $this->renewal_stage_id->Lookup->getSql(true, $filterWrk, '', $this);
+                $sqlWrk = $this->renewal_stage_id->Lookup->getSql(true, $filterWrk, '', $this, false, true);
                 $rswrk = Conn()->executeQuery($sqlWrk)->fetchAll(\PDO::FETCH_BOTH);
                 $ari = count($rswrk);
                 $arwrk = $rswrk;
@@ -2294,7 +2280,7 @@ class MainCampaignsGrid extends MainCampaigns
                 } else {
                     $filterWrk = "\"inventory_id\"" . SearchString("=", $this->inventory_id->CurrentValue, DATATYPE_NUMBER, "");
                 }
-                $sqlWrk = $this->inventory_id->Lookup->getSql(true, $filterWrk, '', $this);
+                $sqlWrk = $this->inventory_id->Lookup->getSql(true, $filterWrk, '', $this, false, true);
                 $rswrk = Conn()->executeQuery($sqlWrk)->fetchAll(\PDO::FETCH_BOTH);
                 $ari = count($rswrk);
                 $arwrk = $rswrk;
@@ -2313,7 +2299,7 @@ class MainCampaignsGrid extends MainCampaigns
                     $this->platform_id->ViewValue = $this->platform_id->lookupCacheOption($curVal);
                     if ($this->platform_id->ViewValue === null) { // Lookup from database
                         $filterWrk = "\"platform_id\"" . SearchString("=", $curVal, DATATYPE_NUMBER, "");
-                        $sqlWrk = $this->platform_id->Lookup->getSql(false, $filterWrk, '', $this, true);
+                        $sqlWrk = $this->platform_id->Lookup->getSql(false, $filterWrk, '', $this, true, true);
                         $rswrk = Conn()->executeQuery($sqlWrk)->fetchAll(\PDO::FETCH_BOTH);
                         $ari = count($rswrk);
                         if ($ari > 0) { // Lookup values found
@@ -2342,7 +2328,7 @@ class MainCampaignsGrid extends MainCampaigns
                     } else {
                         $filterWrk = "\"platform_id\"" . SearchString("=", $this->platform_id->CurrentValue, DATATYPE_NUMBER, "");
                     }
-                    $sqlWrk = $this->platform_id->Lookup->getSql(true, $filterWrk, '', $this);
+                    $sqlWrk = $this->platform_id->Lookup->getSql(true, $filterWrk, '', $this, false, true);
                     $rswrk = Conn()->executeQuery($sqlWrk)->fetchAll(\PDO::FETCH_BOTH);
                     $ari = count($rswrk);
                     $arwrk = $rswrk;
@@ -2368,7 +2354,7 @@ class MainCampaignsGrid extends MainCampaigns
                 } else {
                     $filterWrk = "\"bus_size_id\"" . SearchString("=", $this->bus_size_id->CurrentValue, DATATYPE_NUMBER, "");
                 }
-                $sqlWrk = $this->bus_size_id->Lookup->getSql(true, $filterWrk, '', $this);
+                $sqlWrk = $this->bus_size_id->Lookup->getSql(true, $filterWrk, '', $this, false, true);
                 $rswrk = Conn()->executeQuery($sqlWrk)->fetchAll(\PDO::FETCH_BOTH);
                 $ari = count($rswrk);
                 $arwrk = $rswrk;
@@ -2405,7 +2391,7 @@ class MainCampaignsGrid extends MainCampaigns
                     $this->vendor_id->ViewValue = $this->vendor_id->lookupCacheOption($curVal);
                     if ($this->vendor_id->ViewValue === null) { // Lookup from database
                         $filterWrk = "\"id\"" . SearchString("=", $curVal, DATATYPE_NUMBER, "");
-                        $sqlWrk = $this->vendor_id->Lookup->getSql(false, $filterWrk, '', $this, true);
+                        $sqlWrk = $this->vendor_id->Lookup->getSql(false, $filterWrk, '', $this, true, true);
                         $rswrk = Conn()->executeQuery($sqlWrk)->fetchAll(\PDO::FETCH_BOTH);
                         $ari = count($rswrk);
                         if ($ari > 0) { // Lookup values found
@@ -2435,7 +2421,7 @@ class MainCampaignsGrid extends MainCampaigns
                     } else {
                         $filterWrk = "\"id\"" . SearchString("=", $this->vendor_id->CurrentValue, DATATYPE_NUMBER, "");
                     }
-                    $sqlWrk = $this->vendor_id->Lookup->getSql(true, $filterWrk, '', $this);
+                    $sqlWrk = $this->vendor_id->Lookup->getSql(true, $filterWrk, '', $this, false, true);
                     $rswrk = Conn()->executeQuery($sqlWrk)->fetchAll(\PDO::FETCH_BOTH);
                     $ari = count($rswrk);
                     $arwrk = $rswrk;
@@ -2461,7 +2447,7 @@ class MainCampaignsGrid extends MainCampaigns
                 } else {
                     $filterWrk = "\"id\"" . SearchString("=", $this->renewal_stage_id->CurrentValue, DATATYPE_NUMBER, "");
                 }
-                $sqlWrk = $this->renewal_stage_id->Lookup->getSql(true, $filterWrk, '', $this);
+                $sqlWrk = $this->renewal_stage_id->Lookup->getSql(true, $filterWrk, '', $this, false, true);
                 $rswrk = Conn()->executeQuery($sqlWrk)->fetchAll(\PDO::FETCH_BOTH);
                 $ari = count($rswrk);
                 $arwrk = $rswrk;
@@ -2746,6 +2732,9 @@ class MainCampaignsGrid extends MainCampaigns
             $this->inventory_id->setDbValueDef($rsnew, $this->inventory_id->CurrentValue, null, $this->inventory_id->ReadOnly);
 
             // platform_id
+            if ($this->platform_id->getSessionValue() != "") {
+                $this->platform_id->ReadOnly = true;
+            }
             $this->platform_id->setDbValueDef($rsnew, $this->platform_id->CurrentValue, null, $this->platform_id->ReadOnly);
 
             // bus_size_id
@@ -2761,6 +2750,9 @@ class MainCampaignsGrid extends MainCampaigns
             $this->end_date->setDbValueDef($rsnew, UnFormatDateTime($this->end_date->CurrentValue, 0), CurrentDate(), $this->end_date->ReadOnly);
 
             // vendor_id
+            if ($this->vendor_id->getSessionValue() != "") {
+                $this->vendor_id->ReadOnly = true;
+            }
             $this->vendor_id->setDbValueDef($rsnew, $this->vendor_id->CurrentValue, null, $this->vendor_id->ReadOnly);
 
             // renewal_stage_id
@@ -2845,7 +2837,7 @@ class MainCampaignsGrid extends MainCampaigns
                 }
                 if (!$validMasterKey) {
                     $masterUserIdMsg = str_replace("%c", CurrentUserID(), $Language->phrase("UnAuthorizedMasterUserID"));
-                    $masterUserIdMsg = str_replace("%f", $sMasterFilter, $masterUserIdMsg);
+                    $masterUserIdMsg = str_replace("%f", $masterFilter, $masterUserIdMsg);
                     $this->setFailureMessage($masterUserIdMsg);
                     return false;
                 }
@@ -2867,7 +2859,7 @@ class MainCampaignsGrid extends MainCampaigns
                 }
                 if (!$validMasterKey) {
                     $masterUserIdMsg = str_replace("%c", CurrentUserID(), $Language->phrase("UnAuthorizedMasterUserID"));
-                    $masterUserIdMsg = str_replace("%f", $sMasterFilter, $masterUserIdMsg);
+                    $masterUserIdMsg = str_replace("%f", $masterFilter, $masterUserIdMsg);
                     $this->setFailureMessage($masterUserIdMsg);
                     return false;
                 }

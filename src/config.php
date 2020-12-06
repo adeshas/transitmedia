@@ -69,6 +69,7 @@ $Language = null; // Language
 $Security = null; // Security
 $UserProfile = null; // User profile
 $CurrentForm = null; // Form
+$Session = null; // Session
 
 // Current language
 $CurrentLanguage = "";
@@ -154,18 +155,23 @@ include_once $RELATIVE_PATH . "src/userlevelsettings.php";
 $CONFIG = [
 
     // Debug
-    "DEBUG" => false, // true to debug
+    "DEBUG" => false, // Enabled
+    "REPORT_ALL_ERRORS" => false, // Treat PHP warnings and notices as errors
+    "LOG_ERROR_TO_FILE" => true, // Log error to file
     "DEBUG_MESSAGE_TEMPLATE" => '<div class="card card-danger ew-debug"><div class="card-header">' .
         '<h3 class="card-title">%t</h3>' .
         '<div class="card-tools"><button type="button" class="btn btn-tool" data-card-widget="collapse"><i class="fas fa-minus"></i></button></div>' .
-        '</div><div class="card-body">%s</div></div>',
+        '</div><div class="card-body">%s</div></div>', // Debug message template
 
     // Environment
     "ENVIRONMENT" => "production",
 
+    // Container
+    "COMPILE_CONTAINER" => false,
+
     // General
     "UNFORMAT_YEAR" => 50, // Unformat year
-    "RANDOM_KEY" => '06a9c0kbBhbsKa5W', // Random key for encryption
+    "RANDOM_KEY" => 'mSMrLpqVcwXv5re2', // Random key for encryption
     "ENCRYPTION_KEY" => '', // Encryption key for data protection
     "PROJECT_STYLESHEET_FILENAME" => "css/test.css", // Project stylesheet file name
     "PROJECT_CHARSET" => "utf-8", // Project charset
@@ -376,7 +382,7 @@ $CONFIG = [
     "EMAIL_TEMPLATE_PATH" => "html", // Template path
 
     // Remote file
-    "REMOTE_FILE_PATTERN" => '/^((https?\:)?|ftps?\:|s3:)\/\//i',
+    "REMOTE_FILE_PATTERN" => '/^((https?\:)?|s3:)\/\//i',
 
     // File upload
     "UPLOAD_TEMP_PATH" => "", // Upload temp path (absolute local physical path)
@@ -452,8 +458,8 @@ $CONFIG = [
     "API_EXPORT_CHART_ACTION" => "chart", // API export chart action
     "API_PERMISSIONS_ACTION" => "permissions", // API permissions action
 
-    // URL rewrite // PHP
-    "USE_URL_REWRITE" => true, // Always use URL rewrite
+    // Session-less API actions
+    "SESSIONLESS_API_ACTIONS" => ["file"],
 
     // Image resize
     "THUMBNAIL_CLASS" => "\PHPThumb\GD",
@@ -1009,7 +1015,7 @@ $CONFIG = [
     "COOKIE_CONSENT_BUTTON_CLASS" => "btn btn-dark btn-sm", // CSS class name for cookie consent buttons
 
     // Cookies
-    "COOKIE_EXPIRY_TIME" => time() + 365 * 24 * 60 * 60, // Change cookie expiry time here
+    "COOKIE_EXPIRY_TIME" => time() + 365 * 24 * 60 * 60,
     "COOKIE_HTTP_ONLY" => true,
     "COOKIE_SECURE" => false,
     "COOKIE_SAMESITE" => "Lax",

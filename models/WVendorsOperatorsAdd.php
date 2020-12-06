@@ -744,7 +744,7 @@ class WVendorsOperatorsAdd extends WVendorsOperators
                         return "id in (select vendor_id from main_users u where u.user_type in (5,6))";
                     };
                     $lookupFilter = $lookupFilter->bindTo($this);
-                    $sqlWrk = $this->vendor_id->Lookup->getSql(false, $filterWrk, $lookupFilter, $this, true);
+                    $sqlWrk = $this->vendor_id->Lookup->getSql(false, $filterWrk, $lookupFilter, $this, true, true);
                     $rswrk = Conn()->executeQuery($sqlWrk)->fetchAll(\PDO::FETCH_BOTH);
                     $ari = count($rswrk);
                     if ($ari > 0) { // Lookup values found
@@ -765,7 +765,7 @@ class WVendorsOperatorsAdd extends WVendorsOperators
                 $this->operator_id->ViewValue = $this->operator_id->lookupCacheOption($curVal);
                 if ($this->operator_id->ViewValue === null) { // Lookup from database
                     $filterWrk = "\"id\"" . SearchString("=", $curVal, DATATYPE_NUMBER, "");
-                    $sqlWrk = $this->operator_id->Lookup->getSql(false, $filterWrk, '', $this, true);
+                    $sqlWrk = $this->operator_id->Lookup->getSql(false, $filterWrk, '', $this, true, true);
                     $rswrk = Conn()->executeQuery($sqlWrk)->fetchAll(\PDO::FETCH_BOTH);
                     $ari = count($rswrk);
                     if ($ari > 0) { // Lookup values found
@@ -811,7 +811,7 @@ class WVendorsOperatorsAdd extends WVendorsOperators
                     return "id in (select vendor_id from main_users u where u.user_type in (5,6))";
                 };
                 $lookupFilter = $lookupFilter->bindTo($this);
-                $sqlWrk = $this->vendor_id->Lookup->getSql(true, $filterWrk, $lookupFilter, $this);
+                $sqlWrk = $this->vendor_id->Lookup->getSql(true, $filterWrk, $lookupFilter, $this, false, true);
                 $rswrk = Conn()->executeQuery($sqlWrk)->fetchAll(\PDO::FETCH_BOTH);
                 $ari = count($rswrk);
                 $arwrk = $rswrk;
@@ -836,7 +836,7 @@ class WVendorsOperatorsAdd extends WVendorsOperators
                 } else {
                     $filterWrk = "\"id\"" . SearchString("=", $this->operator_id->CurrentValue, DATATYPE_NUMBER, "");
                 }
-                $sqlWrk = $this->operator_id->Lookup->getSql(true, $filterWrk, '', $this);
+                $sqlWrk = $this->operator_id->Lookup->getSql(true, $filterWrk, '', $this, false, true);
                 $rswrk = Conn()->executeQuery($sqlWrk)->fetchAll(\PDO::FETCH_BOTH);
                 $ari = count($rswrk);
                 $arwrk = $rswrk;

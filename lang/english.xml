@@ -1,5 +1,5 @@
 ﻿<?xml version="1.0" encoding="utf-8" standalone="yes"?>
-<ew-language date="2020/11/26" version="17.0.3" id="en" name="English" desc="English" author="e.World Technology Limited">
+<ew-language date="2020/12/5" version="17.0.5" id="en" name="English" desc="English" author="e.World Technology Limited">
   <!--
     *** Important Notes:
     1. Language ID should follow: https://developers.google.com/recaptcha/docs/language,
@@ -521,6 +521,8 @@
     <!-- v2020 (report) -->
     <phrase id="norecordselected" value="No records selected" client="1" />
     <phrase id="notablegenerated" value="No tables generated" />
+    <phrase id="notice" value="Notice" />
+    <!-- v2021 -->
     <phrase id="nouserlevel" value="No user level settings." />
     <phrase id="nulllabel" value="(Null)" />
     <!-- v2020 (report) -->
@@ -927,7 +929,7 @@
       <phrase id="menutext" value="Safety" />
     </menu>
     <menu id="199">
-      <phrase id="menutext" value="view buses assigned" />
+      <phrase id="menutext" value="Assigned Buses" />
     </menu>
     <menu id="196">
       <phrase id="menutext" value="view vendors operators" />
@@ -2490,7 +2492,7 @@
       </field>
     </table>
     <table id="view_buses_assigned">
-      <phrase id="tblcaption" value="view buses assigned" />
+      <phrase id="tblcaption" value="Assigned Buses" />
       <field id="id">
         <phrase id="fldcaption" value="id" />
       </field>
@@ -2572,7 +2574,7 @@
       <phrase id="tblcaption" value="Safety" />
     </table>
     <table id="view_all_buses">
-      <phrase id="tblcaption" value="view all buses" />
+      <phrase id="tblcaption" value="All Buses" />
       <field id="id">
         <phrase id="fldcaption" value="ID" />
       </field>

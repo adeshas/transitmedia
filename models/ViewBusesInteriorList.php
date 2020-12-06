@@ -1986,7 +1986,7 @@ class ViewBusesInteriorList extends ViewBusesInterior
                 $this->platform_id->ViewValue = $this->platform_id->lookupCacheOption($curVal);
                 if ($this->platform_id->ViewValue === null) { // Lookup from database
                     $filterWrk = "\"id\"" . SearchString("=", $curVal, DATATYPE_NUMBER, "");
-                    $sqlWrk = $this->platform_id->Lookup->getSql(false, $filterWrk, '', $this, true);
+                    $sqlWrk = $this->platform_id->Lookup->getSql(false, $filterWrk, '', $this, true, true);
                     $rswrk = Conn()->executeQuery($sqlWrk)->fetchAll(\PDO::FETCH_BOTH);
                     $ari = count($rswrk);
                     if ($ari > 0) { // Lookup values found
@@ -2007,7 +2007,7 @@ class ViewBusesInteriorList extends ViewBusesInterior
                 $this->operator_id->ViewValue = $this->operator_id->lookupCacheOption($curVal);
                 if ($this->operator_id->ViewValue === null) { // Lookup from database
                     $filterWrk = "\"id\"" . SearchString("=", $curVal, DATATYPE_NUMBER, "");
-                    $sqlWrk = $this->operator_id->Lookup->getSql(false, $filterWrk, '', $this, true);
+                    $sqlWrk = $this->operator_id->Lookup->getSql(false, $filterWrk, '', $this, true, true);
                     $rswrk = Conn()->executeQuery($sqlWrk)->fetchAll(\PDO::FETCH_BOTH);
                     $ari = count($rswrk);
                     if ($ari > 0) { // Lookup values found
@@ -2032,7 +2032,7 @@ class ViewBusesInteriorList extends ViewBusesInterior
                         return "\"inventory_id\" = (SELECT ID FROM y_inventory WHERE name = 'Interior Branding')";
                     };
                     $lookupFilter = $lookupFilter->bindTo($this);
-                    $sqlWrk = $this->interior_campaign_id->Lookup->getSql(false, $filterWrk, $lookupFilter, $this, true);
+                    $sqlWrk = $this->interior_campaign_id->Lookup->getSql(false, $filterWrk, $lookupFilter, $this, true, true);
                     $rswrk = Conn()->executeQuery($sqlWrk)->fetchAll(\PDO::FETCH_BOTH);
                     $ari = count($rswrk);
                     if ($ari > 0) { // Lookup values found
@@ -2054,7 +2054,7 @@ class ViewBusesInteriorList extends ViewBusesInterior
                 $this->bus_status_id->ViewValue = $this->bus_status_id->lookupCacheOption($curVal);
                 if ($this->bus_status_id->ViewValue === null) { // Lookup from database
                     $filterWrk = "\"id\"" . SearchString("=", $curVal, DATATYPE_NUMBER, "");
-                    $sqlWrk = $this->bus_status_id->Lookup->getSql(false, $filterWrk, '', $this, true);
+                    $sqlWrk = $this->bus_status_id->Lookup->getSql(false, $filterWrk, '', $this, true, true);
                     $rswrk = Conn()->executeQuery($sqlWrk)->fetchAll(\PDO::FETCH_BOTH);
                     $ari = count($rswrk);
                     if ($ari > 0) { // Lookup values found
@@ -2075,7 +2075,7 @@ class ViewBusesInteriorList extends ViewBusesInterior
                 $this->bus_depot_id->ViewValue = $this->bus_depot_id->lookupCacheOption($curVal);
                 if ($this->bus_depot_id->ViewValue === null) { // Lookup from database
                     $filterWrk = "\"id\"" . SearchString("=", $curVal, DATATYPE_NUMBER, "");
-                    $sqlWrk = $this->bus_depot_id->Lookup->getSql(false, $filterWrk, '', $this, true);
+                    $sqlWrk = $this->bus_depot_id->Lookup->getSql(false, $filterWrk, '', $this, true, true);
                     $rswrk = Conn()->executeQuery($sqlWrk)->fetchAll(\PDO::FETCH_BOTH);
                     $ari = count($rswrk);
                     if ($ari > 0) { // Lookup values found
@@ -2106,7 +2106,7 @@ class ViewBusesInteriorList extends ViewBusesInterior
                 $this->vendor_id->ViewValue = $this->vendor_id->lookupCacheOption($curVal);
                 if ($this->vendor_id->ViewValue === null) { // Lookup from database
                     $filterWrk = "\"id\"" . SearchString("=", $curVal, DATATYPE_NUMBER, "");
-                    $sqlWrk = $this->vendor_id->Lookup->getSql(false, $filterWrk, '', $this, true);
+                    $sqlWrk = $this->vendor_id->Lookup->getSql(false, $filterWrk, '', $this, true, true);
                     $rswrk = Conn()->executeQuery($sqlWrk)->fetchAll(\PDO::FETCH_BOTH);
                     $ari = count($rswrk);
                     if ($ari > 0) { // Lookup values found
@@ -2203,7 +2203,7 @@ class ViewBusesInteriorList extends ViewBusesInterior
                 } else {
                     $filterWrk = "\"id\"" . SearchString("=", $this->platform_id->AdvancedSearch->SearchValue, DATATYPE_NUMBER, "");
                 }
-                $sqlWrk = $this->platform_id->Lookup->getSql(true, $filterWrk, '', $this);
+                $sqlWrk = $this->platform_id->Lookup->getSql(true, $filterWrk, '', $this, false, true);
                 $rswrk = Conn()->executeQuery($sqlWrk)->fetchAll(\PDO::FETCH_BOTH);
                 $ari = count($rswrk);
                 $arwrk = $rswrk;
@@ -2240,7 +2240,7 @@ class ViewBusesInteriorList extends ViewBusesInterior
                 } else {
                     $filterWrk = "\"id\"" . SearchString("=", $this->vendor_id->AdvancedSearch->SearchValue, DATATYPE_NUMBER, "");
                 }
-                $sqlWrk = $this->vendor_id->Lookup->getSql(true, $filterWrk, '', $this);
+                $sqlWrk = $this->vendor_id->Lookup->getSql(true, $filterWrk, '', $this, false, true);
                 $rswrk = Conn()->executeQuery($sqlWrk)->fetchAll(\PDO::FETCH_BOTH);
                 $arwrk = $rswrk;
                 $this->vendor_id->EditValue = $arwrk;
@@ -2259,7 +2259,7 @@ class ViewBusesInteriorList extends ViewBusesInterior
                     } else {
                         $filterWrk = "\"id\"" . SearchString("=", $this->vendor_id->AdvancedSearch->SearchValue, DATATYPE_NUMBER, "");
                     }
-                    $sqlWrk = $this->vendor_id->Lookup->getSql(true, $filterWrk, '', $this);
+                    $sqlWrk = $this->vendor_id->Lookup->getSql(true, $filterWrk, '', $this, false, true);
                     $rswrk = Conn()->executeQuery($sqlWrk)->fetchAll(\PDO::FETCH_BOTH);
                     $ari = count($rswrk);
                     $arwrk = $rswrk;

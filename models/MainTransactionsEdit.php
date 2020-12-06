@@ -514,7 +514,7 @@ class MainTransactionsEdit extends MainTransactions
                 }
 
                 // Get key from Form
-                $this->setKey(Post($this->OldKeyName));
+                $this->setKey(Post($this->OldKeyName), $this->isShow());
             } else {
                 $this->CurrentAction = "show"; // Default action is display
 
@@ -996,7 +996,7 @@ class MainTransactionsEdit extends MainTransactions
                     $this->campaign_id->ViewValue = $this->campaign_id->lookupCacheOption($curVal);
                     if ($this->campaign_id->ViewValue === null) { // Lookup from database
                         $filterWrk = "\"id\"" . SearchString("=", $curVal, DATATYPE_NUMBER, "");
-                        $sqlWrk = $this->campaign_id->Lookup->getSql(false, $filterWrk, '', $this, true);
+                        $sqlWrk = $this->campaign_id->Lookup->getSql(false, $filterWrk, '', $this, true, true);
                         $rswrk = Conn()->executeQuery($sqlWrk)->fetchAll(\PDO::FETCH_BOTH);
                         $ari = count($rswrk);
                         if ($ari > 0) { // Lookup values found
@@ -1018,7 +1018,7 @@ class MainTransactionsEdit extends MainTransactions
                 $this->operator_id->ViewValue = $this->operator_id->lookupCacheOption($curVal);
                 if ($this->operator_id->ViewValue === null) { // Lookup from database
                     $filterWrk = "\"operator_id\"" . SearchString("=", $curVal, DATATYPE_NUMBER, "");
-                    $sqlWrk = $this->operator_id->Lookup->getSql(false, $filterWrk, '', $this, true);
+                    $sqlWrk = $this->operator_id->Lookup->getSql(false, $filterWrk, '', $this, true, true);
                     $rswrk = Conn()->executeQuery($sqlWrk)->fetchAll(\PDO::FETCH_BOTH);
                     $ari = count($rswrk);
                     if ($ari > 0) { // Lookup values found
@@ -1047,7 +1047,7 @@ class MainTransactionsEdit extends MainTransactions
                     $this->price_id->ViewValue = $this->price_id->lookupCacheOption($curVal);
                     if ($this->price_id->ViewValue === null) { // Lookup from database
                         $filterWrk = "\"price_id\"" . SearchString("=", $curVal, DATATYPE_NUMBER, "");
-                        $sqlWrk = $this->price_id->Lookup->getSql(false, $filterWrk, '', $this, true);
+                        $sqlWrk = $this->price_id->Lookup->getSql(false, $filterWrk, '', $this, true, true);
                         $rswrk = Conn()->executeQuery($sqlWrk)->fetchAll(\PDO::FETCH_BOTH);
                         $ari = count($rswrk);
                         if ($ari > 0) { // Lookup values found
@@ -1086,7 +1086,7 @@ class MainTransactionsEdit extends MainTransactions
                 $this->visible_status_id->ViewValue = $this->visible_status_id->lookupCacheOption($curVal);
                 if ($this->visible_status_id->ViewValue === null) { // Lookup from database
                     $filterWrk = "\"id\"" . SearchString("=", $curVal, DATATYPE_NUMBER, "");
-                    $sqlWrk = $this->visible_status_id->Lookup->getSql(false, $filterWrk, '', $this, true);
+                    $sqlWrk = $this->visible_status_id->Lookup->getSql(false, $filterWrk, '', $this, true, true);
                     $rswrk = Conn()->executeQuery($sqlWrk)->fetchAll(\PDO::FETCH_BOTH);
                     $ari = count($rswrk);
                     if ($ari > 0) { // Lookup values found
@@ -1110,7 +1110,7 @@ class MainTransactionsEdit extends MainTransactions
                     $this->status_id->ViewValue = $this->status_id->lookupCacheOption($curVal);
                     if ($this->status_id->ViewValue === null) { // Lookup from database
                         $filterWrk = "\"id\"" . SearchString("=", $curVal, DATATYPE_NUMBER, "");
-                        $sqlWrk = $this->status_id->Lookup->getSql(false, $filterWrk, '', $this, true);
+                        $sqlWrk = $this->status_id->Lookup->getSql(false, $filterWrk, '', $this, true, true);
                         $rswrk = Conn()->executeQuery($sqlWrk)->fetchAll(\PDO::FETCH_BOTH);
                         $ari = count($rswrk);
                         if ($ari > 0) { // Lookup values found
@@ -1136,7 +1136,7 @@ class MainTransactionsEdit extends MainTransactions
                     $this->print_status_id->ViewValue = $this->print_status_id->lookupCacheOption($curVal);
                     if ($this->print_status_id->ViewValue === null) { // Lookup from database
                         $filterWrk = "\"id\"" . SearchString("=", $curVal, DATATYPE_NUMBER, "");
-                        $sqlWrk = $this->print_status_id->Lookup->getSql(false, $filterWrk, '', $this, true);
+                        $sqlWrk = $this->print_status_id->Lookup->getSql(false, $filterWrk, '', $this, true, true);
                         $rswrk = Conn()->executeQuery($sqlWrk)->fetchAll(\PDO::FETCH_BOTH);
                         $ari = count($rswrk);
                         if ($ari > 0) { // Lookup values found
@@ -1162,7 +1162,7 @@ class MainTransactionsEdit extends MainTransactions
                     $this->payment_status_id->ViewValue = $this->payment_status_id->lookupCacheOption($curVal);
                     if ($this->payment_status_id->ViewValue === null) { // Lookup from database
                         $filterWrk = "\"id\"" . SearchString("=", $curVal, DATATYPE_NUMBER, "");
-                        $sqlWrk = $this->payment_status_id->Lookup->getSql(false, $filterWrk, '', $this, true);
+                        $sqlWrk = $this->payment_status_id->Lookup->getSql(false, $filterWrk, '', $this, true, true);
                         $rswrk = Conn()->executeQuery($sqlWrk)->fetchAll(\PDO::FETCH_BOTH);
                         $ari = count($rswrk);
                         if ($ari > 0) { // Lookup values found
@@ -1185,7 +1185,7 @@ class MainTransactionsEdit extends MainTransactions
                 $this->created_by->ViewValue = $this->created_by->lookupCacheOption($curVal);
                 if ($this->created_by->ViewValue === null) { // Lookup from database
                     $filterWrk = "\"id\"" . SearchString("=", $curVal, DATATYPE_NUMBER, "");
-                    $sqlWrk = $this->created_by->Lookup->getSql(false, $filterWrk, '', $this, true);
+                    $sqlWrk = $this->created_by->Lookup->getSql(false, $filterWrk, '', $this, true, true);
                     $rswrk = Conn()->executeQuery($sqlWrk)->fetchAll(\PDO::FETCH_BOTH);
                     $ari = count($rswrk);
                     if ($ari > 0) { // Lookup values found
@@ -1322,7 +1322,7 @@ class MainTransactionsEdit extends MainTransactions
                         $this->campaign_id->ViewValue = $this->campaign_id->lookupCacheOption($curVal);
                         if ($this->campaign_id->ViewValue === null) { // Lookup from database
                             $filterWrk = "\"id\"" . SearchString("=", $curVal, DATATYPE_NUMBER, "");
-                            $sqlWrk = $this->campaign_id->Lookup->getSql(false, $filterWrk, '', $this, true);
+                            $sqlWrk = $this->campaign_id->Lookup->getSql(false, $filterWrk, '', $this, true, true);
                             $rswrk = Conn()->executeQuery($sqlWrk)->fetchAll(\PDO::FETCH_BOTH);
                             $ari = count($rswrk);
                             if ($ari > 0) { // Lookup values found
@@ -1352,7 +1352,7 @@ class MainTransactionsEdit extends MainTransactions
                     } else {
                         $filterWrk = "\"id\"" . SearchString("=", $this->campaign_id->CurrentValue, DATATYPE_NUMBER, "");
                     }
-                    $sqlWrk = $this->campaign_id->Lookup->getSql(true, $filterWrk, '', $this);
+                    $sqlWrk = $this->campaign_id->Lookup->getSql(true, $filterWrk, '', $this, false, true);
                     $rswrk = Conn()->executeQuery($sqlWrk)->fetchAll(\PDO::FETCH_BOTH);
                     $ari = count($rswrk);
                     $arwrk = $rswrk;
@@ -1373,7 +1373,7 @@ class MainTransactionsEdit extends MainTransactions
                     $this->operator_id->ViewValue = $this->operator_id->lookupCacheOption($curVal);
                     if ($this->operator_id->ViewValue === null) { // Lookup from database
                         $filterWrk = "\"operator_id\"" . SearchString("=", $curVal, DATATYPE_NUMBER, "");
-                        $sqlWrk = $this->operator_id->Lookup->getSql(false, $filterWrk, '', $this, true);
+                        $sqlWrk = $this->operator_id->Lookup->getSql(false, $filterWrk, '', $this, true, true);
                         $rswrk = Conn()->executeQuery($sqlWrk)->fetchAll(\PDO::FETCH_BOTH);
                         $ari = count($rswrk);
                         if ($ari > 0) { // Lookup values found
@@ -1402,7 +1402,7 @@ class MainTransactionsEdit extends MainTransactions
                     } else {
                         $filterWrk = "\"operator_id\"" . SearchString("=", $this->operator_id->CurrentValue, DATATYPE_NUMBER, "");
                     }
-                    $sqlWrk = $this->operator_id->Lookup->getSql(true, $filterWrk, '', $this);
+                    $sqlWrk = $this->operator_id->Lookup->getSql(true, $filterWrk, '', $this, false, true);
                     $rswrk = Conn()->executeQuery($sqlWrk)->fetchAll(\PDO::FETCH_BOTH);
                     $ari = count($rswrk);
                     $arwrk = $rswrk;
@@ -1434,7 +1434,7 @@ class MainTransactionsEdit extends MainTransactions
                 } else {
                     $filterWrk = "\"price_id\"" . SearchString("=", $this->price_id->CurrentValue, DATATYPE_NUMBER, "");
                 }
-                $sqlWrk = $this->price_id->Lookup->getSql(true, $filterWrk, '', $this);
+                $sqlWrk = $this->price_id->Lookup->getSql(true, $filterWrk, '', $this, false, true);
                 $rswrk = Conn()->executeQuery($sqlWrk)->fetchAll(\PDO::FETCH_BOTH);
                 $ari = count($rswrk);
                 $arwrk = $rswrk;
@@ -1477,7 +1477,7 @@ class MainTransactionsEdit extends MainTransactions
                 } else {
                     $filterWrk = "\"id\"" . SearchString("=", $this->visible_status_id->CurrentValue, DATATYPE_NUMBER, "");
                 }
-                $sqlWrk = $this->visible_status_id->Lookup->getSql(true, $filterWrk, '', $this);
+                $sqlWrk = $this->visible_status_id->Lookup->getSql(true, $filterWrk, '', $this, false, true);
                 $rswrk = Conn()->executeQuery($sqlWrk)->fetchAll(\PDO::FETCH_BOTH);
                 $ari = count($rswrk);
                 $arwrk = $rswrk;
@@ -1502,7 +1502,7 @@ class MainTransactionsEdit extends MainTransactions
                 } else {
                     $filterWrk = "\"id\"" . SearchString("=", $this->status_id->CurrentValue, DATATYPE_NUMBER, "");
                 }
-                $sqlWrk = $this->status_id->Lookup->getSql(true, $filterWrk, '', $this);
+                $sqlWrk = $this->status_id->Lookup->getSql(true, $filterWrk, '', $this, false, true);
                 $rswrk = Conn()->executeQuery($sqlWrk)->fetchAll(\PDO::FETCH_BOTH);
                 $ari = count($rswrk);
                 $arwrk = $rswrk;
@@ -1527,7 +1527,7 @@ class MainTransactionsEdit extends MainTransactions
                 } else {
                     $filterWrk = "\"id\"" . SearchString("=", $this->print_status_id->CurrentValue, DATATYPE_NUMBER, "");
                 }
-                $sqlWrk = $this->print_status_id->Lookup->getSql(true, $filterWrk, '', $this);
+                $sqlWrk = $this->print_status_id->Lookup->getSql(true, $filterWrk, '', $this, false, true);
                 $rswrk = Conn()->executeQuery($sqlWrk)->fetchAll(\PDO::FETCH_BOTH);
                 $ari = count($rswrk);
                 $arwrk = $rswrk;
@@ -1552,7 +1552,7 @@ class MainTransactionsEdit extends MainTransactions
                 } else {
                     $filterWrk = "\"id\"" . SearchString("=", $this->payment_status_id->CurrentValue, DATATYPE_NUMBER, "");
                 }
-                $sqlWrk = $this->payment_status_id->Lookup->getSql(true, $filterWrk, '', $this);
+                $sqlWrk = $this->payment_status_id->Lookup->getSql(true, $filterWrk, '', $this, false, true);
                 $rswrk = Conn()->executeQuery($sqlWrk)->fetchAll(\PDO::FETCH_BOTH);
                 $ari = count($rswrk);
                 $arwrk = $rswrk;
@@ -1783,9 +1783,15 @@ class MainTransactionsEdit extends MainTransactions
             $rsnew = [];
 
             // campaign_id
+            if ($this->campaign_id->getSessionValue() != "") {
+                $this->campaign_id->ReadOnly = true;
+            }
             $this->campaign_id->setDbValueDef($rsnew, $this->campaign_id->CurrentValue, 0, $this->campaign_id->ReadOnly);
 
             // operator_id
+            if ($this->operator_id->getSessionValue() != "") {
+                $this->operator_id->ReadOnly = true;
+            }
             $this->operator_id->setDbValueDef($rsnew, $this->operator_id->CurrentValue, 0, $this->operator_id->ReadOnly);
 
             // payment_date

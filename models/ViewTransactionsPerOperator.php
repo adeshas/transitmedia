@@ -687,18 +687,17 @@ class ViewTransactionsPerOperator extends DbTable
     // Return page URL
     public function getReturnUrl()
     {
+        $referUrl = ReferUrl();
+        $referPageName = ReferPageName();
         $name = PROJECT_NAME . "_" . $this->TableVar . "_" . Config("TABLE_RETURN_URL");
         // Get referer URL automatically
-        if (ReferUrl() != "" && ReferPageName() != CurrentPageName() && ReferPageName() != "login") { // Referer not same page or login page
-            $_SESSION[$name] = ReferUrl(); // Save to Session
+        if ($referUrl != "" && $referPageName != CurrentPageName() && $referPageName != "login") { // Referer not same page or login page
+            $_SESSION[$name] = $referUrl; // Save to Session
         }
-        if (@$_SESSION[$name] != "") {
-            return $_SESSION[$name];
-        } else {
-            return GetUrl("viewtransactionsperoperatorlist");
-        }
+        return $_SESSION[$name] ?? GetUrl("viewtransactionsperoperatorlist");
     }
 
+    // Set return page URL
     public function setReturnUrl($v)
     {
         $_SESSION[PROJECT_NAME . "_" . $this->TableVar . "_" . Config("TABLE_RETURN_URL")] = $v;
@@ -1629,7 +1628,7 @@ SORTHTML;
         }
 
         // Call User ID Filtering event
-        $this->userIDFiltering($filterWrk);
+        $this->userIdFiltering($filterWrk);
         AddFilter($filter, $filterWrk);
         return $filter;
     }

@@ -26,8 +26,9 @@ return [
         return $logger;
     },
     "log" => function (ContainerInterface $c) {
+        global $RELATIVE_PATH;
         $logger = new Logger("log");
-        $logger->pushHandler(new RotatingFileHandler("log.log"));
+        $logger->pushHandler(new RotatingFileHandler($RELATIVE_PATH . "log.log"));
         return $logger;
     },
     "sqllogger" => function (ContainerInterface $c) {
@@ -48,6 +49,7 @@ return [
     "profile" => \DI\create(UserProfile::class),
     "language" => \DI\create(Language::class),
     "timer" => \DI\create(Timer::class),
+    "session" => \DI\create(HttpSession::class),
 
     // Tables
     "main_buses" => \DI\create(MainBuses::class),
@@ -104,18 +106,8 @@ return [
     "view_buses_assigned" => \DI\create(ViewBusesAssigned::class),
     "z_price_settings" => \DI\create(ZPriceSettings::class),
     "w_vendors_operators" => \DI\create(WVendorsOperators::class),
-    "safetysql" => \DI\create(Safetysql::class),
     "view_all_buses" => \DI\create(ViewAllBuses::class),
 
     // User table
     "usertable" => \DI\get("main_users"),
-
-    // Detail table pages
-    "MainUsersGrid" => \DI\create(MainUsersGrid::class),
-    "SubMediaAllocationGrid" => \DI\create(SubMediaAllocationGrid::class),
-    "MainCampaignsGrid" => \DI\create(MainCampaignsGrid::class),
-    "YOperatorsGrid" => \DI\create(YOperatorsGrid::class),
-    "MainTransactionsGrid" => \DI\create(MainTransactionsGrid::class),
-    "ViewBusesAssignedGrid" => \DI\create(ViewBusesAssignedGrid::class),
-    "SubTransactionDetailsGrid" => \DI\create(SubTransactionDetailsGrid::class),
 ];

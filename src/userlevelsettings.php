@@ -304,7 +304,7 @@ $USER_LEVEL_PRIVS = [["{7CA6B0F7-61EF-4DB7-A152-ED7AD2382C98}main_buses","-2","0
     ["{7CA6B0F7-61EF-4DB7-A152-ED7AD2382C98}view_bus_trans_options","6","0"],
     ["{7CA6B0F7-61EF-4DB7-A152-ED7AD2382C98}view_bus_trans_options","7","256"],
     ["{7CA6B0F7-61EF-4DB7-A152-ED7AD2382C98}view_buses_interior","-2","0"],
-    ["{7CA6B0F7-61EF-4DB7-A152-ED7AD2382C98}view_buses_interior","0","360"],
+    ["{7CA6B0F7-61EF-4DB7-A152-ED7AD2382C98}view_buses_interior","0","256"],
     ["{7CA6B0F7-61EF-4DB7-A152-ED7AD2382C98}view_buses_interior","1","256"],
     ["{7CA6B0F7-61EF-4DB7-A152-ED7AD2382C98}view_buses_interior","2","0"],
     ["{7CA6B0F7-61EF-4DB7-A152-ED7AD2382C98}view_buses_interior","3","296"],
@@ -313,7 +313,7 @@ $USER_LEVEL_PRIVS = [["{7CA6B0F7-61EF-4DB7-A152-ED7AD2382C98}main_buses","-2","0
     ["{7CA6B0F7-61EF-4DB7-A152-ED7AD2382C98}view_buses_interior","6","0"],
     ["{7CA6B0F7-61EF-4DB7-A152-ED7AD2382C98}view_buses_interior","7","256"],
     ["{7CA6B0F7-61EF-4DB7-A152-ED7AD2382C98}view_buses_exterior","-2","0"],
-    ["{7CA6B0F7-61EF-4DB7-A152-ED7AD2382C98}view_buses_exterior","0","360"],
+    ["{7CA6B0F7-61EF-4DB7-A152-ED7AD2382C98}view_buses_exterior","0","256"],
     ["{7CA6B0F7-61EF-4DB7-A152-ED7AD2382C98}view_buses_exterior","1","256"],
     ["{7CA6B0F7-61EF-4DB7-A152-ED7AD2382C98}view_buses_exterior","2","0"],
     ["{7CA6B0F7-61EF-4DB7-A152-ED7AD2382C98}view_buses_exterior","3","296"],
@@ -571,8 +571,8 @@ $USER_LEVEL_TABLES = [["main_buses","main_buses","Buses",true,"{7CA6B0F7-61EF-4D
     ["view_transactions_per_platform","view_transactions_per_platform","Payments (Platform)",true,"{7CA6B0F7-61EF-4DB7-A152-ED7AD2382C98}"],
     ["view_vendors_operators","view_vendors_operators","view vendors operators",true,"{7CA6B0F7-61EF-4DB7-A152-ED7AD2382C98}"],
     ["view_campaigns_pending","view_campaigns_pending","Pending Campaigns ",true,"{7CA6B0F7-61EF-4DB7-A152-ED7AD2382C98}"],
-    ["view_buses_assigned","view_buses_assigned","view buses assigned",true,"{7CA6B0F7-61EF-4DB7-A152-ED7AD2382C98}"],
+    ["view_buses_assigned","view_buses_assigned","Assigned Buses",true,"{7CA6B0F7-61EF-4DB7-A152-ED7AD2382C98}"],
     ["z_price_settings","z_price_settings","Pricing",true,"{7CA6B0F7-61EF-4DB7-A152-ED7AD2382C98}"],
     ["w_vendors_operators","w_vendors_operators","Vendors/Operators",true,"{7CA6B0F7-61EF-4DB7-A152-ED7AD2382C98}"],
     ["safety.sql","safetysql","Safety",true,"{7CA6B0F7-61EF-4DB7-A152-ED7AD2382C98}"],
-    ["view_all_buses","view_all_buses","view all buses",true,"{7CA6B0F7-61EF-4DB7-A152-ED7AD2382C98}"]];
+    ["view_all_buses","view_all_buses","All Buses",true,"{7CA6B0F7-61EF-4DB7-A152-ED7AD2382C98}"]];

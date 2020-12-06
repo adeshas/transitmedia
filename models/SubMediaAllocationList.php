@@ -690,19 +690,19 @@ class SubMediaAllocationList extends SubMediaAllocation
                     }
 
                     // Inline Update
-                    if (($this->isUpdate() || $this->isOverwrite()) && @$_SESSION[SESSION_INLINE_MODE] == "edit") {
+                    if (($this->isUpdate() || $this->isOverwrite()) && Session(SESSION_INLINE_MODE) == "edit") {
                         $this->setKey(Post($this->OldKeyName));
                         $this->inlineUpdate();
                     }
 
                     // Insert Inline
-                    if ($this->isInsert() && @$_SESSION[SESSION_INLINE_MODE] == "add") {
+                    if ($this->isInsert() && Session(SESSION_INLINE_MODE) == "add") {
                         $this->setKey(Post($this->OldKeyName));
                         $this->inlineInsert();
                     }
 
                     // Grid Insert
-                    if ($this->isGridInsert() && @$_SESSION[SESSION_INLINE_MODE] == "gridadd") {
+                    if ($this->isGridInsert() && Session(SESSION_INLINE_MODE) == "gridadd") {
                         if ($this->validateGridForm()) {
                             $gridInsert = $this->gridInsert();
                         } else {
@@ -1447,7 +1447,6 @@ class SubMediaAllocationList extends SubMediaAllocation
         $this->listOptionsRendering();
 
         // Set up row action and key
-        $keyName = "";
         if ($CurrentForm && is_numeric($this->RowIndex) && $this->RowType != "view") {
             $CurrentForm->Index = $this->RowIndex;
             $actionName = str_replace("k_", "k" . $this->RowIndex . "_", $this->FormActionName);
@@ -1486,7 +1485,7 @@ class SubMediaAllocationList extends SubMediaAllocation
             $this->ListOptions->CustomItem = "copy"; // Show copy column only
             $cancelurl = $this->addMasterUrl($pageUrl . "action=cancel");
             $opt->Body = "<div" . (($opt->OnLeft) ? " class=\"text-right\"" : "") . ">" .
-            "<a class=\"ew-grid-link ew-inline-insert\" title=\"" . HtmlTitle($Language->phrase("InsertLink")) . "\" data-caption=\"" . HtmlTitle($Language->phrase("InsertLink")) . "\" href=\"#\" onclick=\"return ew.forms.get(this).submit('" . $this->pageName() . "');\">" . $Language->phrase("InsertLink") . "</a>&nbsp;" .
+            "<a class=\"ew-grid-link ew-inline-insert\" title=\"" . HtmlTitle($Language->phrase("InsertLink")) . "\" data-caption=\"" . HtmlTitle($Language->phrase("InsertLink")) . "\" href=\"#\" onclick=\"return ew.forms.get(this).submit(event, '" . $this->pageName() . "');\">" . $Language->phrase("InsertLink") . "</a>&nbsp;" .
             "<a class=\"ew-grid-link ew-inline-cancel\" title=\"" . HtmlTitle($Language->phrase("CancelLink")) . "\" data-caption=\"" . HtmlTitle($Language->phrase("CancelLink")) . "\" href=\"" . $cancelurl . "\">" . $Language->phrase("CancelLink") . "</a>" .
             "<input type=\"hidden\" name=\"action\" id=\"action\" value=\"insert\"></div>";
             return;
@@ -1498,7 +1497,7 @@ class SubMediaAllocationList extends SubMediaAllocation
             $this->ListOptions->CustomItem = "edit"; // Show edit column only
             $cancelurl = $this->addMasterUrl($pageUrl . "action=cancel");
                 $opt->Body = "<div" . (($opt->OnLeft) ? " class=\"text-right\"" : "") . ">" .
-                "<a class=\"ew-grid-link ew-inline-update\" title=\"" . HtmlTitle($Language->phrase("UpdateLink")) . "\" data-caption=\"" . HtmlTitle($Language->phrase("UpdateLink")) . "\" href=\"#\" onclick=\"return ew.forms.get(this).submit('" . UrlAddHash($this->pageName(), "r" . $this->RowCount . "_" . $this->TableVar) . "');\">" . $Language->phrase("UpdateLink") . "</a>&nbsp;" .
+                "<a class=\"ew-grid-link ew-inline-update\" title=\"" . HtmlTitle($Language->phrase("UpdateLink")) . "\" data-caption=\"" . HtmlTitle($Language->phrase("UpdateLink")) . "\" href=\"#\" onclick=\"return ew.forms.get(this).submit(event, '" . UrlAddHash($this->pageName(), "r" . $this->RowCount . "_" . $this->TableVar) . "');\">" . $Language->phrase("UpdateLink") . "</a>&nbsp;" .
                 "<a class=\"ew-grid-link ew-inline-cancel\" title=\"" . HtmlTitle($Language->phrase("CancelLink")) . "\" data-caption=\"" . HtmlTitle($Language->phrase("CancelLink")) . "\" href=\"" . $cancelurl . "\">" . $Language->phrase("CancelLink") . "</a>" .
                 "<input type=\"hidden\" name=\"action\" id=\"action\" value=\"update\"></div>";
             $opt->Body .= "<input type=\"hidden\" name=\"k" . $this->RowIndex . "_key\" id=\"k" . $this->RowIndex . "_key\" value=\"" . HtmlEncode($this->id->CurrentValue) . "\">";
@@ -1680,7 +1679,7 @@ class SubMediaAllocationList extends SubMediaAllocation
                 $option->UseDropDownButton = false;
                 // Add grid insert
                 $item = &$option->add("gridinsert");
-                $item->Body = "<a class=\"ew-action ew-grid-insert\" title=\"" . HtmlTitle($Language->phrase("GridInsertLink")) . "\" data-caption=\"" . HtmlTitle($Language->phrase("GridInsertLink")) . "\" href=\"#\" onclick=\"return ew.forms.get(this).submit('" . $this->pageName() . "');\">" . $Language->phrase("GridInsertLink") . "</a>";
+                $item->Body = "<a class=\"ew-action ew-grid-insert\" title=\"" . HtmlTitle($Language->phrase("GridInsertLink")) . "\" data-caption=\"" . HtmlTitle($Language->phrase("GridInsertLink")) . "\" href=\"#\" onclick=\"return ew.forms.get(this).submit(event, '" . $this->pageName() . "');\">" . $Language->phrase("GridInsertLink") . "</a>";
                 // Add grid cancel
                 $item = &$option->add("gridcancel");
                 $cancelurl = $this->addMasterUrl($pageUrl . "action=cancel");
@@ -2063,7 +2062,7 @@ class SubMediaAllocationList extends SubMediaAllocation
                 $this->bus_id->ViewValue = $this->bus_id->lookupCacheOption($curVal);
                 if ($this->bus_id->ViewValue === null) { // Lookup from database
                     $filterWrk = "\"id\"" . SearchString("=", $curVal, DATATYPE_NUMBER, "");
-                    $sqlWrk = $this->bus_id->Lookup->getSql(false, $filterWrk, '', $this, true);
+                    $sqlWrk = $this->bus_id->Lookup->getSql(false, $filterWrk, '', $this, true, true);
                     $rswrk = Conn()->executeQuery($sqlWrk)->fetchAll(\PDO::FETCH_BOTH);
                     $ari = count($rswrk);
                     if ($ari > 0) { // Lookup values found
@@ -2088,7 +2087,7 @@ class SubMediaAllocationList extends SubMediaAllocation
                         return "inventory_id = 3";
                     };
                     $lookupFilter = $lookupFilter->bindTo($this);
-                    $sqlWrk = $this->campaign_id->Lookup->getSql(false, $filterWrk, $lookupFilter, $this, true);
+                    $sqlWrk = $this->campaign_id->Lookup->getSql(false, $filterWrk, $lookupFilter, $this, true, true);
                     $rswrk = Conn()->executeQuery($sqlWrk)->fetchAll(\PDO::FETCH_BOTH);
                     $ari = count($rswrk);
                     if ($ari > 0) { // Lookup values found
@@ -2173,7 +2172,7 @@ class SubMediaAllocationList extends SubMediaAllocation
                     $this->bus_id->ViewValue = $this->bus_id->lookupCacheOption($curVal);
                     if ($this->bus_id->ViewValue === null) { // Lookup from database
                         $filterWrk = "\"id\"" . SearchString("=", $curVal, DATATYPE_NUMBER, "");
-                        $sqlWrk = $this->bus_id->Lookup->getSql(false, $filterWrk, '', $this, true);
+                        $sqlWrk = $this->bus_id->Lookup->getSql(false, $filterWrk, '', $this, true, true);
                         $rswrk = Conn()->executeQuery($sqlWrk)->fetchAll(\PDO::FETCH_BOTH);
                         $ari = count($rswrk);
                         if ($ari > 0) { // Lookup values found
@@ -2202,7 +2201,7 @@ class SubMediaAllocationList extends SubMediaAllocation
                     } else {
                         $filterWrk = "\"id\"" . SearchString("=", $this->bus_id->CurrentValue, DATATYPE_NUMBER, "");
                     }
-                    $sqlWrk = $this->bus_id->Lookup->getSql(true, $filterWrk, '', $this);
+                    $sqlWrk = $this->bus_id->Lookup->getSql(true, $filterWrk, '', $this, false, true);
                     $rswrk = Conn()->executeQuery($sqlWrk)->fetchAll(\PDO::FETCH_BOTH);
                     $ari = count($rswrk);
                     $arwrk = $rswrk;
@@ -2228,7 +2227,7 @@ class SubMediaAllocationList extends SubMediaAllocation
                             return "inventory_id = 3";
                         };
                         $lookupFilter = $lookupFilter->bindTo($this);
-                        $sqlWrk = $this->campaign_id->Lookup->getSql(false, $filterWrk, $lookupFilter, $this, true);
+                        $sqlWrk = $this->campaign_id->Lookup->getSql(false, $filterWrk, $lookupFilter, $this, true, true);
                         $rswrk = Conn()->executeQuery($sqlWrk)->fetchAll(\PDO::FETCH_BOTH);
                         $ari = count($rswrk);
                         if ($ari > 0) { // Lookup values found
@@ -2261,7 +2260,7 @@ class SubMediaAllocationList extends SubMediaAllocation
                         return "inventory_id = 3";
                     };
                     $lookupFilter = $lookupFilter->bindTo($this);
-                    $sqlWrk = $this->campaign_id->Lookup->getSql(true, $filterWrk, $lookupFilter, $this);
+                    $sqlWrk = $this->campaign_id->Lookup->getSql(true, $filterWrk, $lookupFilter, $this, false, true);
                     $rswrk = Conn()->executeQuery($sqlWrk)->fetchAll(\PDO::FETCH_BOTH);
                     $ari = count($rswrk);
                     $arwrk = $rswrk;
@@ -2341,7 +2340,7 @@ class SubMediaAllocationList extends SubMediaAllocation
                     $this->bus_id->ViewValue = $this->bus_id->lookupCacheOption($curVal);
                     if ($this->bus_id->ViewValue === null) { // Lookup from database
                         $filterWrk = "\"id\"" . SearchString("=", $curVal, DATATYPE_NUMBER, "");
-                        $sqlWrk = $this->bus_id->Lookup->getSql(false, $filterWrk, '', $this, true);
+                        $sqlWrk = $this->bus_id->Lookup->getSql(false, $filterWrk, '', $this, true, true);
                         $rswrk = Conn()->executeQuery($sqlWrk)->fetchAll(\PDO::FETCH_BOTH);
                         $ari = count($rswrk);
                         if ($ari > 0) { // Lookup values found
@@ -2370,7 +2369,7 @@ class SubMediaAllocationList extends SubMediaAllocation
                     } else {
                         $filterWrk = "\"id\"" . SearchString("=", $this->bus_id->CurrentValue, DATATYPE_NUMBER, "");
                     }
-                    $sqlWrk = $this->bus_id->Lookup->getSql(true, $filterWrk, '', $this);
+                    $sqlWrk = $this->bus_id->Lookup->getSql(true, $filterWrk, '', $this, false, true);
                     $rswrk = Conn()->executeQuery($sqlWrk)->fetchAll(\PDO::FETCH_BOTH);
                     $ari = count($rswrk);
                     $arwrk = $rswrk;
@@ -2396,7 +2395,7 @@ class SubMediaAllocationList extends SubMediaAllocation
                             return "inventory_id = 3";
                         };
                         $lookupFilter = $lookupFilter->bindTo($this);
-                        $sqlWrk = $this->campaign_id->Lookup->getSql(false, $filterWrk, $lookupFilter, $this, true);
+                        $sqlWrk = $this->campaign_id->Lookup->getSql(false, $filterWrk, $lookupFilter, $this, true, true);
                         $rswrk = Conn()->executeQuery($sqlWrk)->fetchAll(\PDO::FETCH_BOTH);
                         $ari = count($rswrk);
                         if ($ari > 0) { // Lookup values found
@@ -2429,7 +2428,7 @@ class SubMediaAllocationList extends SubMediaAllocation
                         return "inventory_id = 3";
                     };
                     $lookupFilter = $lookupFilter->bindTo($this);
-                    $sqlWrk = $this->campaign_id->Lookup->getSql(true, $filterWrk, $lookupFilter, $this);
+                    $sqlWrk = $this->campaign_id->Lookup->getSql(true, $filterWrk, $lookupFilter, $this, false, true);
                     $rswrk = Conn()->executeQuery($sqlWrk)->fetchAll(\PDO::FETCH_BOTH);
                     $ari = count($rswrk);
                     $arwrk = $rswrk;
@@ -2661,9 +2660,15 @@ class SubMediaAllocationList extends SubMediaAllocation
             $rsnew = [];
 
             // bus_id
+            if ($this->bus_id->getSessionValue() != "") {
+                $this->bus_id->ReadOnly = true;
+            }
             $this->bus_id->setDbValueDef($rsnew, $this->bus_id->CurrentValue, null, $this->bus_id->ReadOnly);
 
             // campaign_id
+            if ($this->campaign_id->getSessionValue() != "") {
+                $this->campaign_id->ReadOnly = true;
+            }
             $this->campaign_id->setDbValueDef($rsnew, $this->campaign_id->CurrentValue, null, $this->campaign_id->ReadOnly);
 
             // active
@@ -3082,7 +3087,7 @@ class SubMediaAllocationList extends SubMediaAllocation
                 }
                 if (!$validMasterKey) {
                     $masterUserIdMsg = str_replace("%c", CurrentUserID(), $Language->phrase("UnAuthorizedMasterUserID"));
-                    $masterUserIdMsg = str_replace("%f", $sMasterFilter, $masterUserIdMsg);
+                    $masterUserIdMsg = str_replace("%f", $masterFilter, $masterUserIdMsg);
                     $this->setFailureMessage($masterUserIdMsg);
                     return false;
                 }

@@ -17,11 +17,11 @@ use Slim\Exception\HttpInternalServerErrorException;
 use Nyholm\Psr7\Factory\Psr17Factory;
 use Nyholm\Psr7Server\ServerRequestCreator;
 
-// Auto load
-require_once "../vendor/autoload.php";
+// Relative path
+$RELATIVE_PATH = "../";
 
 // Require files
-$RELATIVE_PATH = "../";
+require_once "../vendor/autoload.php";
 require_once "../src/constants.php";
 require_once "../src/config.php";
 require_once "../src/phpfn.php";
@@ -31,11 +31,28 @@ require_once "../src/userfn.php";
 $isProduction = IsProduction();
 $isDebug = IsDebug();
 
+// Warnings and notices as errors
+if ($isDebug && Config("REPORT_ALL_ERRORS")) {
+    error_reporting(E_ALL);
+    set_error_handler(function ($severity, $message, $file, $line) {
+        if (error_reporting() & $severity) {
+            throw new \ErrorException($message, 0, $severity, $file, $line);
+        }
+    });
+}
+
 // Instantiate PHP-DI ContainerBuilder
 $containerBuilder = new ContainerBuilder();
 
+// Enable compilation
+if ($isProduction && Config("COMPILE_CONTAINER") && !IsRemote(Config("UPLOAD_DEST_PATH"))) {
+    $containerBuilder->enableCompilation(UploadPath(false) . "cache");
+}
+
 // Add definitions
 $containerBuilder->addDefinitions("../src/definitions.php");
+
+// Call Container Build event
 if (function_exists(PROJECT_NAMESPACE . "Container_Build")) {
     Container_Build($containerBuilder);
 }
@@ -50,8 +67,9 @@ $callableResolver = $app->getCallableResolver();
 
 // Display error details
 $displayErrorDetails = $isDebug;
-$logErrors = true;
-$logErrorDetails = true;
+$logErrorToFile = Config("LOG_ERROR_TO_FILE");
+$logErrors = $logErrorToFile || $isDebug;
+$logErrorDetails = $logErrorToFile || $isDebug;
 
 // Create request object from globals
 $serverRequestCreator = ServerRequestCreatorFactory::create();
@@ -79,11 +97,14 @@ $app->addRoutingMiddleware();
 // Set base path
 $app->setBasePath(BasePath());
 
+// Is API
+$IsApi = true;
+
 // Register routes (Add permission middleware)
 (require_once "../src/apiroutes.php")($app);
 
-// Enable same site cookie if CSRF token exists
-if (HasParamWithPrefix(Config("CSRF_PREFIX"))) {
+// Add SameSite cookie/session middleware
+if (UseSession($Request)) {
     $cookieConfiguration = new SameSiteCookieConfiguration();
     $cookieConfiguration->sameSite = Config("COOKIE_SAMESITE");
     $cookieConfiguration->httpOnly = Config("COOKIE_HTTP_ONLY");

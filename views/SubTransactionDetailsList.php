@@ -499,13 +499,6 @@ loadjs.ready("head", function() {
 <?php } ?>
 </td>
     <?php } ?>
-<?php if ($Page->RowType == ROWTYPE_ADD) { // Add record ?>
-<input type="hidden" data-table="sub_transaction_details" data-field="x_id" data-hidden="1" name="x<?= $Page->RowIndex ?>_id" id="x<?= $Page->RowIndex ?>_id" value="<?= HtmlEncode($Page->id->CurrentValue) ?>">
-<input type="hidden" data-table="sub_transaction_details" data-field="x_id" data-hidden="1" name="o<?= $Page->RowIndex ?>_id" id="o<?= $Page->RowIndex ?>_id" value="<?= HtmlEncode($Page->id->OldValue) ?>">
-<?php } ?>
-<?php if ($Page->RowType == ROWTYPE_EDIT || $Page->CurrentMode == "edit") { ?>
-<input type="hidden" data-table="sub_transaction_details" data-field="x_id" data-hidden="1" name="x<?= $Page->RowIndex ?>_id" id="x<?= $Page->RowIndex ?>_id" value="<?= HtmlEncode($Page->id->CurrentValue) ?>">
-<?php } ?>
     <?php if ($Page->bus_id->Visible) { // bus_id ?>
         <td data-name="bus_id" <?= $Page->bus_id->cellAttributes() ?>>
 <?php if ($Page->RowType == ROWTYPE_ADD) { // Add record ?>

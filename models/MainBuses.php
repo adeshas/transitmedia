@@ -115,7 +115,7 @@ class MainBuses extends DbTable
         $this->exterior_campaign_id->Sortable = true; // Allow sort
         $this->exterior_campaign_id->UsePleaseSelect = true; // Use PleaseSelect by default
         $this->exterior_campaign_id->PleaseSelectText = $Language->phrase("PleaseSelect"); // "PleaseSelect" text
-        $this->exterior_campaign_id->Lookup = new Lookup('exterior_campaign_id', 'main_campaigns', false, 'id', ["name","quantity","vendor_id",""], ["main_buses x_platform_id"], [], ["platform_id"], ["x_platform_id"], [], [], '"id" DESC', '');
+        $this->exterior_campaign_id->Lookup = new Lookup('exterior_campaign_id', 'main_campaigns', false, 'id', ["name","quantity","vendor_id",""], ["x_platform_id"], [], ["platform_id"], ["x_platform_id"], [], [], '"id" DESC', '');
         $this->exterior_campaign_id->DefaultErrorMessage = $Language->phrase("IncorrectInteger");
         $this->Fields['exterior_campaign_id'] = &$this->exterior_campaign_id;
 
@@ -124,7 +124,7 @@ class MainBuses extends DbTable
         $this->interior_campaign_id->Sortable = true; // Allow sort
         $this->interior_campaign_id->UsePleaseSelect = true; // Use PleaseSelect by default
         $this->interior_campaign_id->PleaseSelectText = $Language->phrase("PleaseSelect"); // "PleaseSelect" text
-        $this->interior_campaign_id->Lookup = new Lookup('interior_campaign_id', 'main_campaigns', false, 'id', ["name","inventory_id","vendor_id",""], ["main_buses x_platform_id"], [], ["platform_id"], ["x_platform_id"], [], [], '', '');
+        $this->interior_campaign_id->Lookup = new Lookup('interior_campaign_id', 'main_campaigns', false, 'id', ["name","inventory_id","vendor_id",""], ["x_platform_id"], [], ["platform_id"], ["x_platform_id"], [], [], '', '');
         $this->interior_campaign_id->DefaultErrorMessage = $Language->phrase("IncorrectInteger");
         $this->Fields['interior_campaign_id'] = &$this->interior_campaign_id;
 
@@ -213,7 +213,7 @@ class MainBuses extends DbTable
     // Current detail table name
     public function getCurrentDetailTable()
     {
-        return @$_SESSION[PROJECT_NAME . "_" . $this->TableVar . "_" . Config("TABLE_DETAIL_TABLE")];
+        return Session(PROJECT_NAME . "_" . $this->TableVar . "_" . Config("TABLE_DETAIL_TABLE"));
     }
 
     public function setCurrentDetailTable($v)
@@ -682,18 +682,17 @@ class MainBuses extends DbTable
     // Return page URL
     public function getReturnUrl()
     {
+        $referUrl = ReferUrl();
+        $referPageName = ReferPageName();
         $name = PROJECT_NAME . "_" . $this->TableVar . "_" . Config("TABLE_RETURN_URL");
         // Get referer URL automatically
-        if (ReferUrl() != "" && ReferPageName() != CurrentPageName() && ReferPageName() != "login") { // Referer not same page or login page
-            $_SESSION[$name] = ReferUrl(); // Save to Session
+        if ($referUrl != "" && $referPageName != CurrentPageName() && $referPageName != "login") { // Referer not same page or login page
+            $_SESSION[$name] = $referUrl; // Save to Session
         }
-        if (@$_SESSION[$name] != "") {
-            return $_SESSION[$name];
-        } else {
-            return GetUrl("mainbuseslist");
-        }
+        return $_SESSION[$name] ?? GetUrl("mainbuseslist");
     }
 
+    // Set return page URL
     public function setReturnUrl($v)
     {
         $_SESSION[PROJECT_NAME . "_" . $this->TableVar . "_" . Config("TABLE_RETURN_URL")] = $v;
@@ -1008,7 +1007,7 @@ SORTHTML;
             $this->platform_id->ViewValue = $this->platform_id->lookupCacheOption($curVal);
             if ($this->platform_id->ViewValue === null) { // Lookup from database
                 $filterWrk = "\"id\"" . SearchString("=", $curVal, DATATYPE_NUMBER, "");
-                $sqlWrk = $this->platform_id->Lookup->getSql(false, $filterWrk, '', $this, true);
+                $sqlWrk = $this->platform_id->Lookup->getSql(false, $filterWrk, '', $this, true, true);
                 $rswrk = Conn()->executeQuery($sqlWrk)->fetchAll(\PDO::FETCH_BOTH);
                 $ari = count($rswrk);
                 if ($ari > 0) { // Lookup values found
@@ -1029,7 +1028,7 @@ SORTHTML;
             $this->operator_id->ViewValue = $this->operator_id->lookupCacheOption($curVal);
             if ($this->operator_id->ViewValue === null) { // Lookup from database
                 $filterWrk = "\"id\"" . SearchString("=", $curVal, DATATYPE_NUMBER, "");
-                $sqlWrk = $this->operator_id->Lookup->getSql(false, $filterWrk, '', $this, true);
+                $sqlWrk = $this->operator_id->Lookup->getSql(false, $filterWrk, '', $this, true, true);
                 $rswrk = Conn()->executeQuery($sqlWrk)->fetchAll(\PDO::FETCH_BOTH);
                 $ari = count($rswrk);
                 if ($ari > 0) { // Lookup values found
@@ -1054,7 +1053,7 @@ SORTHTML;
                     return "\"inventory_id\" = (SELECT ID FROM y_inventory WHERE name = 'Exterior Branding')";
                 };
                 $lookupFilter = $lookupFilter->bindTo($this);
-                $sqlWrk = $this->exterior_campaign_id->Lookup->getSql(false, $filterWrk, $lookupFilter, $this, true);
+                $sqlWrk = $this->exterior_campaign_id->Lookup->getSql(false, $filterWrk, $lookupFilter, $this, true, true);
                 $rswrk = Conn()->executeQuery($sqlWrk)->fetchAll(\PDO::FETCH_BOTH);
                 $ari = count($rswrk);
                 if ($ari > 0) { // Lookup values found
@@ -1079,7 +1078,7 @@ SORTHTML;
                     return "\"inventory_id\" = (SELECT ID FROM y_inventory WHERE name = 'Interior Branding')";
                 };
                 $lookupFilter = $lookupFilter->bindTo($this);
-                $sqlWrk = $this->interior_campaign_id->Lookup->getSql(false, $filterWrk, $lookupFilter, $this, true);
+                $sqlWrk = $this->interior_campaign_id->Lookup->getSql(false, $filterWrk, $lookupFilter, $this, true, true);
                 $rswrk = Conn()->executeQuery($sqlWrk)->fetchAll(\PDO::FETCH_BOTH);
                 $ari = count($rswrk);
                 if ($ari > 0) { // Lookup values found
@@ -1100,7 +1099,7 @@ SORTHTML;
             $this->bus_status_id->ViewValue = $this->bus_status_id->lookupCacheOption($curVal);
             if ($this->bus_status_id->ViewValue === null) { // Lookup from database
                 $filterWrk = "\"id\"" . SearchString("=", $curVal, DATATYPE_NUMBER, "");
-                $sqlWrk = $this->bus_status_id->Lookup->getSql(false, $filterWrk, '', $this, true);
+                $sqlWrk = $this->bus_status_id->Lookup->getSql(false, $filterWrk, '', $this, true, true);
                 $rswrk = Conn()->executeQuery($sqlWrk)->fetchAll(\PDO::FETCH_BOTH);
                 $ari = count($rswrk);
                 if ($ari > 0) { // Lookup values found
@@ -1121,7 +1120,7 @@ SORTHTML;
             $this->bus_size_id->ViewValue = $this->bus_size_id->lookupCacheOption($curVal);
             if ($this->bus_size_id->ViewValue === null) { // Lookup from database
                 $filterWrk = "\"id\"" . SearchString("=", $curVal, DATATYPE_NUMBER, "");
-                $sqlWrk = $this->bus_size_id->Lookup->getSql(false, $filterWrk, '', $this, true);
+                $sqlWrk = $this->bus_size_id->Lookup->getSql(false, $filterWrk, '', $this, true, true);
                 $rswrk = Conn()->executeQuery($sqlWrk)->fetchAll(\PDO::FETCH_BOTH);
                 $ari = count($rswrk);
                 if ($ari > 0) { // Lookup values found
@@ -1142,7 +1141,7 @@ SORTHTML;
             $this->bus_depot_id->ViewValue = $this->bus_depot_id->lookupCacheOption($curVal);
             if ($this->bus_depot_id->ViewValue === null) { // Lookup from database
                 $filterWrk = "\"id\"" . SearchString("=", $curVal, DATATYPE_NUMBER, "");
-                $sqlWrk = $this->bus_depot_id->Lookup->getSql(false, $filterWrk, '', $this, true);
+                $sqlWrk = $this->bus_depot_id->Lookup->getSql(false, $filterWrk, '', $this, true, true);
                 $rswrk = Conn()->executeQuery($sqlWrk)->fetchAll(\PDO::FETCH_BOTH);
                 $ari = count($rswrk);
                 if ($ari > 0) { // Lookup values found

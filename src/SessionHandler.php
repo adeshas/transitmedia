@@ -17,7 +17,8 @@ class SessionHandler
         $token = $csrf->generateToken();
         WriteJson([
             $csrf->getTokenNameKey() => $csrf->getTokenName(),
-            $csrf->getTokenValueKey() => $csrf->getTokenValue()
+            $csrf->getTokenValueKey() => $csrf->getTokenValue(),
+            "JWT" => GetJwtToken()
         ]);
         return true;
     }

@@ -494,7 +494,7 @@ class XTransactionStatusEdit extends XTransactionStatus
                 }
 
                 // Get key from Form
-                $this->setKey(Post($this->OldKeyName));
+                $this->setKey(Post($this->OldKeyName), $this->isShow());
             } else {
                 $this->CurrentAction = "show"; // Default action is display
 

@@ -775,7 +775,7 @@ class SubTransactionDetailsAdd extends SubTransactionDetails
                 $this->transaction_id->ViewValue = $this->transaction_id->lookupCacheOption($curVal);
                 if ($this->transaction_id->ViewValue === null) { // Lookup from database
                     $filterWrk = "\"id\"" . SearchString("=", $curVal, DATATYPE_NUMBER, "");
-                    $sqlWrk = $this->transaction_id->Lookup->getSql(false, $filterWrk, '', $this, true);
+                    $sqlWrk = $this->transaction_id->Lookup->getSql(false, $filterWrk, '', $this, true, true);
                     $rswrk = Conn()->executeQuery($sqlWrk)->fetchAll(\PDO::FETCH_BOTH);
                     $ari = count($rswrk);
                     if ($ari > 0) { // Lookup values found
@@ -799,7 +799,7 @@ class SubTransactionDetailsAdd extends SubTransactionDetails
                     $this->bus_id->ViewValue = $this->bus_id->lookupCacheOption($curVal);
                     if ($this->bus_id->ViewValue === null) { // Lookup from database
                         $filterWrk = "\"bus_id\"" . SearchString("=", $curVal, DATATYPE_NUMBER, "");
-                        $sqlWrk = $this->bus_id->Lookup->getSql(false, $filterWrk, '', $this, true);
+                        $sqlWrk = $this->bus_id->Lookup->getSql(false, $filterWrk, '', $this, true, true);
                         $rswrk = Conn()->executeQuery($sqlWrk)->fetchAll(\PDO::FETCH_BOTH);
                         $ari = count($rswrk);
                         if ($ari > 0) { // Lookup values found
@@ -850,7 +850,7 @@ class SubTransactionDetailsAdd extends SubTransactionDetails
                     $this->transaction_id->ViewValue = $this->transaction_id->lookupCacheOption($curVal);
                     if ($this->transaction_id->ViewValue === null) { // Lookup from database
                         $filterWrk = "\"id\"" . SearchString("=", $curVal, DATATYPE_NUMBER, "");
-                        $sqlWrk = $this->transaction_id->Lookup->getSql(false, $filterWrk, '', $this, true);
+                        $sqlWrk = $this->transaction_id->Lookup->getSql(false, $filterWrk, '', $this, true, true);
                         $rswrk = Conn()->executeQuery($sqlWrk)->fetchAll(\PDO::FETCH_BOTH);
                         $ari = count($rswrk);
                         if ($ari > 0) { // Lookup values found
@@ -879,7 +879,7 @@ class SubTransactionDetailsAdd extends SubTransactionDetails
                     } else {
                         $filterWrk = "\"id\"" . SearchString("=", $this->transaction_id->CurrentValue, DATATYPE_NUMBER, "");
                     }
-                    $sqlWrk = $this->transaction_id->Lookup->getSql(true, $filterWrk, '', $this);
+                    $sqlWrk = $this->transaction_id->Lookup->getSql(true, $filterWrk, '', $this, false, true);
                     $rswrk = Conn()->executeQuery($sqlWrk)->fetchAll(\PDO::FETCH_BOTH);
                     $ari = count($rswrk);
                     $arwrk = $rswrk;
@@ -907,7 +907,7 @@ class SubTransactionDetailsAdd extends SubTransactionDetails
                 } else {
                     $filterWrk = "\"bus_id\"" . SearchString("=", $this->bus_id->CurrentValue, DATATYPE_NUMBER, "");
                 }
-                $sqlWrk = $this->bus_id->Lookup->getSql(true, $filterWrk, '', $this);
+                $sqlWrk = $this->bus_id->Lookup->getSql(true, $filterWrk, '', $this, false, true);
                 $rswrk = Conn()->executeQuery($sqlWrk)->fetchAll(\PDO::FETCH_BOTH);
                 $ari = count($rswrk);
                 $arwrk = $rswrk;

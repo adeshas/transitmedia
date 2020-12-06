@@ -268,9 +268,9 @@ class Login extends MainUsers
 
         // Login
         if (IsLoggingIn()) { // After changing password
-            $this->Username->setFormValue(@$_SESSION[SESSION_USER_PROFILE_USER_NAME]);
-            $this->Password->setFormValue(@$_SESSION[SESSION_USER_PROFILE_PASSWORD]);
-            $this->LoginType->setFormValue(@$_SESSION[SESSION_USER_PROFILE_LOGIN_TYPE]);
+            $this->Username->setFormValue(Session(SESSION_USER_PROFILE_USER_NAME));
+            $this->Password->setFormValue(Session(SESSION_USER_PROFILE_PASSWORD));
+            $this->LoginType->setFormValue(Session(SESSION_USER_PROFILE_LOGIN_TYPE));
             $validPwd = $Security->validateUser($this->Username->CurrentValue, $this->Password->CurrentValue, false);
             if ($validPwd) {
                 $_SESSION[SESSION_USER_PROFILE_USER_NAME] = "";

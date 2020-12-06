@@ -474,7 +474,7 @@ class MainUsersUpdate extends MainUsers
         // Check if valid User ID
         $sql = $this->getSql($this->getFilterFromRecordKeys(false));
         $conn = $this->getConnection();
-        $rows = $conn->fetchAll();
+        $rows = $conn->fetchAll($sql);
         $res = true;
         foreach ($rows as $row) {
             $this->loadRowValues($row);
@@ -923,7 +923,7 @@ class MainUsersUpdate extends MainUsers
                 $this->vendor_id->ViewValue = $this->vendor_id->lookupCacheOption($curVal);
                 if ($this->vendor_id->ViewValue === null) { // Lookup from database
                     $filterWrk = "\"id\"" . SearchString("=", $curVal, DATATYPE_NUMBER, "");
-                    $sqlWrk = $this->vendor_id->Lookup->getSql(false, $filterWrk, '', $this, true);
+                    $sqlWrk = $this->vendor_id->Lookup->getSql(false, $filterWrk, '', $this, true, true);
                     $rswrk = Conn()->executeQuery($sqlWrk)->fetchAll(\PDO::FETCH_BOTH);
                     $ari = count($rswrk);
                     if ($ari > 0) { // Lookup values found
@@ -944,7 +944,7 @@ class MainUsersUpdate extends MainUsers
                 $this->reportsto->ViewValue = $this->reportsto->lookupCacheOption($curVal);
                 if ($this->reportsto->ViewValue === null) { // Lookup from database
                     $filterWrk = "\"id\"" . SearchString("=", $curVal, DATATYPE_NUMBER, "");
-                    $sqlWrk = $this->reportsto->Lookup->getSql(false, $filterWrk, '', $this, true);
+                    $sqlWrk = $this->reportsto->Lookup->getSql(false, $filterWrk, '', $this, true, true);
                     $rswrk = Conn()->executeQuery($sqlWrk)->fetchAll(\PDO::FETCH_BOTH);
                     $ari = count($rswrk);
                     if ($ari > 0) { // Lookup values found
@@ -1041,7 +1041,7 @@ class MainUsersUpdate extends MainUsers
                     $this->vendor_id->ViewValue = $this->vendor_id->lookupCacheOption($curVal);
                     if ($this->vendor_id->ViewValue === null) { // Lookup from database
                         $filterWrk = "\"id\"" . SearchString("=", $curVal, DATATYPE_NUMBER, "");
-                        $sqlWrk = $this->vendor_id->Lookup->getSql(false, $filterWrk, '', $this, true);
+                        $sqlWrk = $this->vendor_id->Lookup->getSql(false, $filterWrk, '', $this, true, true);
                         $rswrk = Conn()->executeQuery($sqlWrk)->fetchAll(\PDO::FETCH_BOTH);
                         $ari = count($rswrk);
                         if ($ari > 0) { // Lookup values found
@@ -1071,7 +1071,7 @@ class MainUsersUpdate extends MainUsers
                     } else {
                         $filterWrk = "\"id\"" . SearchString("=", $this->vendor_id->CurrentValue, DATATYPE_NUMBER, "");
                     }
-                    $sqlWrk = $this->vendor_id->Lookup->getSql(true, $filterWrk, '', $this);
+                    $sqlWrk = $this->vendor_id->Lookup->getSql(true, $filterWrk, '', $this, false, true);
                     $rswrk = Conn()->executeQuery($sqlWrk)->fetchAll(\PDO::FETCH_BOTH);
                     $ari = count($rswrk);
                     $arwrk = $rswrk;
@@ -1090,7 +1090,7 @@ class MainUsersUpdate extends MainUsers
                         $this->reportsto->EditValue = $this->reportsto->lookupCacheOption($curVal);
                         if ($this->reportsto->EditValue === null) { // Lookup from database
                             $filterWrk = "\"id\"" . SearchString("=", $curVal, DATATYPE_NUMBER, "");
-                            $sqlWrk = $this->reportsto->Lookup->getSql(false, $filterWrk, '', $this, true);
+                            $sqlWrk = $this->reportsto->Lookup->getSql(false, $filterWrk, '', $this, true, true);
                             $rswrk = Conn()->executeQuery($sqlWrk)->fetchAll(\PDO::FETCH_BOTH);
                             $ari = count($rswrk);
                             if ($ari > 0) { // Lookup values found
@@ -1110,7 +1110,7 @@ class MainUsersUpdate extends MainUsers
                 } else {
                     $filterWrk = "\"id\"" . SearchString("=", $this->reportsto->CurrentValue, DATATYPE_NUMBER, "");
                 }
-                $sqlWrk = $this->reportsto->Lookup->getSql(true, $filterWrk, '', $this);
+                $sqlWrk = $this->reportsto->Lookup->getSql(true, $filterWrk, '', $this, false, true);
                 $rswrk = Conn()->executeQuery($sqlWrk)->fetchAll(\PDO::FETCH_BOTH);
                 $arwrk = $rswrk;
                 $this->reportsto->EditValue = $arwrk;
@@ -1130,7 +1130,7 @@ class MainUsersUpdate extends MainUsers
                     } else {
                         $filterWrk = "\"id\"" . SearchString("=", $this->reportsto->CurrentValue, DATATYPE_NUMBER, "");
                     }
-                    $sqlWrk = $this->reportsto->Lookup->getSql(true, $filterWrk, '', $this);
+                    $sqlWrk = $this->reportsto->Lookup->getSql(true, $filterWrk, '', $this, false, true);
                     $rswrk = Conn()->executeQuery($sqlWrk)->fetchAll(\PDO::FETCH_BOTH);
                     $ari = count($rswrk);
                     $arwrk = $rswrk;
@@ -1307,6 +1307,9 @@ class MainUsersUpdate extends MainUsers
             }
 
             // vendor_id
+            if ($this->vendor_id->getSessionValue() != "") {
+                $this->vendor_id->ReadOnly = true;
+            }
             $this->vendor_id->setDbValueDef($rsnew, $this->vendor_id->CurrentValue, null, $this->vendor_id->ReadOnly || $this->vendor_id->MultiUpdate != "1");
 
             // reportsto

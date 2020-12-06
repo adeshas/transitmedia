@@ -98,11 +98,14 @@ class Lookup
      * @param bool $skipFilterFields
      * @return QueryBuilder
      */
-    public function getSql($useParentFilter = true, $currentFilter = "", $lookupFilter = "", $page = null, $skipFilterFields = false)
+    public function getSql($useParentFilter = true, $currentFilter = "", $lookupFilter = "", $page = null, $skipFilterFields = false, $clearUserFilter = false)
     {
         $this->UseParentFilter = $useParentFilter; // Save last call
         $this->CurrentFilter = $currentFilter;
         $this->LookupFilter = $lookupFilter; // Save last call
+        if ($clearUserFilter) {
+            $this->UserFilter = "";
+        }
         if ($page !== null) {
             $filter = $this->getUserFilter($useParentFilter);
             $newFilter = $filter;
@@ -586,13 +589,16 @@ class Lookup
             if ($select != "") {
                 $sql = $select;
                 $dbType = GetConnectionType($tbl->Dbid);
-                if ($where != "")
+                if ($where != "") {
                     $sql .= " WHERE " . $where;
-                if ($orderBy != "")
-                    if ($dbType == "MSSQL")
+                }
+                if ($orderBy != "") {
+                    if ($dbType == "MSSQL") {
                         $sql .= " /*BeginOrderBy*/ORDER BY " . $orderBy . "/*EndOrderBy*/";
-                    else
+                    } else {
                         $sql .= " ORDER BY " . $orderBy;
+                    }
+                }
                 return $sql;
             } else {
                 if ($where != "") {

@@ -691,7 +691,7 @@ class MainBusesList extends MainBuses
                     }
 
                     // Grid Update
-                    if (($this->isGridUpdate() || $this->isGridOverwrite()) && @$_SESSION[SESSION_INLINE_MODE] == "gridedit") {
+                    if (($this->isGridUpdate() || $this->isGridOverwrite()) && Session(SESSION_INLINE_MODE) == "gridedit") {
                         if ($this->validateGridForm()) {
                             $gridUpdate = $this->gridUpdate();
                         } else {
@@ -705,7 +705,7 @@ class MainBusesList extends MainBuses
                     }
 
                     // Grid Insert
-                    if ($this->isGridInsert() && @$_SESSION[SESSION_INLINE_MODE] == "gridadd") {
+                    if ($this->isGridInsert() && Session(SESSION_INLINE_MODE) == "gridadd") {
                         if ($this->validateGridForm()) {
                             $gridInsert = $this->gridInsert();
                         } else {
@@ -717,7 +717,7 @@ class MainBusesList extends MainBuses
                             $this->gridAddMode(); // Stay in Grid add mode
                         }
                     }
-                } elseif (@$_SESSION[SESSION_INLINE_MODE] == "gridedit") { // Previously in grid edit mode
+                } elseif (Session(SESSION_INLINE_MODE) == "gridedit") { // Previously in grid edit mode
                     if (Get(Config("TABLE_START_REC")) !== null || Get(Config("TABLE_PAGE_NO")) !== null) { // Stay in grid edit mode if paging
                         $this->gridEditMode();
                     } else { // Reset grid edit
@@ -1994,7 +1994,6 @@ class MainBusesList extends MainBuses
         $this->listOptionsRendering();
 
         // Set up row action and key
-        $keyName = "";
         if ($CurrentForm && is_numeric($this->RowIndex) && $this->RowType != "view") {
             $CurrentForm->Index = $this->RowIndex;
             $actionName = str_replace("k_", "k" . $this->RowIndex . "_", $this->FormActionName);
@@ -2148,11 +2147,6 @@ class MainBusesList extends MainBuses
         // "checkbox"
         $opt = $this->ListOptions["checkbox"];
         $opt->Body = "<div class=\"custom-control custom-checkbox d-inline-block\"><input type=\"checkbox\" id=\"key_m_" . $this->RowCount . "\" name=\"key_m[]\" class=\"custom-control-input ew-multi-select\" value=\"" . HtmlEncode($this->id->CurrentValue) . "\" onclick=\"ew.clickMultiCheckbox(event);\"><label class=\"custom-control-label\" for=\"key_m_" . $this->RowCount . "\"></label></div>";
-        if ($this->isGridEdit() && is_numeric($this->RowIndex)) {
-            if ($keyName != "") {
-                $this->MultiSelectKey .= "<input type=\"hidden\" name=\"" . $keyName . "\" id=\"" . $keyName . "\" value=\"" . $this->id->CurrentValue . "\">";
-            }
-        }
         $this->renderListOptionsExt();
 
         // Call ListOptions_Rendered event
@@ -2297,7 +2291,7 @@ class MainBusesList extends MainBuses
                 $option->UseDropDownButton = false;
                 // Add grid insert
                 $item = &$option->add("gridinsert");
-                $item->Body = "<a class=\"ew-action ew-grid-insert\" title=\"" . HtmlTitle($Language->phrase("GridInsertLink")) . "\" data-caption=\"" . HtmlTitle($Language->phrase("GridInsertLink")) . "\" href=\"#\" onclick=\"return ew.forms.get(this).submit('" . $this->pageName() . "');\">" . $Language->phrase("GridInsertLink") . "</a>";
+                $item->Body = "<a class=\"ew-action ew-grid-insert\" title=\"" . HtmlTitle($Language->phrase("GridInsertLink")) . "\" data-caption=\"" . HtmlTitle($Language->phrase("GridInsertLink")) . "\" href=\"#\" onclick=\"return ew.forms.get(this).submit(event, '" . $this->pageName() . "');\">" . $Language->phrase("GridInsertLink") . "</a>";
                 // Add grid cancel
                 $item = &$option->add("gridcancel");
                 $cancelurl = $this->addMasterUrl($pageUrl . "action=cancel");
@@ -2317,7 +2311,7 @@ class MainBusesList extends MainBuses
                 $option = $options["action"];
                 $option->UseDropDownButton = false;
                     $item = &$option->add("gridsave");
-                    $item->Body = "<a class=\"ew-action ew-grid-save\" title=\"" . HtmlTitle($Language->phrase("GridSaveLink")) . "\" data-caption=\"" . HtmlTitle($Language->phrase("GridSaveLink")) . "\" href=\"#\" onclick=\"return ew.forms.get(this).submit('" . $this->pageName() . "');\">" . $Language->phrase("GridSaveLink") . "</a>";
+                    $item->Body = "<a class=\"ew-action ew-grid-save\" title=\"" . HtmlTitle($Language->phrase("GridSaveLink")) . "\" data-caption=\"" . HtmlTitle($Language->phrase("GridSaveLink")) . "\" href=\"#\" onclick=\"return ew.forms.get(this).submit(event, '" . $this->pageName() . "');\">" . $Language->phrase("GridSaveLink") . "</a>";
                     $item = &$option->add("gridcancel");
                     $cancelurl = $this->addMasterUrl($pageUrl . "action=cancel");
                     $item->Body = "<a class=\"ew-action ew-grid-cancel\" title=\"" . HtmlTitle($Language->phrase("GridCancelLink")) . "\" data-caption=\"" . HtmlTitle($Language->phrase("GridCancelLink")) . "\" href=\"" . $cancelurl . "\">" . $Language->phrase("GridCancelLink") . "</a>";
@@ -2859,7 +2853,7 @@ class MainBusesList extends MainBuses
                 $this->platform_id->ViewValue = $this->platform_id->lookupCacheOption($curVal);
                 if ($this->platform_id->ViewValue === null) { // Lookup from database
                     $filterWrk = "\"id\"" . SearchString("=", $curVal, DATATYPE_NUMBER, "");
-                    $sqlWrk = $this->platform_id->Lookup->getSql(false, $filterWrk, '', $this, true);
+                    $sqlWrk = $this->platform_id->Lookup->getSql(false, $filterWrk, '', $this, true, true);
                     $rswrk = Conn()->executeQuery($sqlWrk)->fetchAll(\PDO::FETCH_BOTH);
                     $ari = count($rswrk);
                     if ($ari > 0) { // Lookup values found
@@ -2880,7 +2874,7 @@ class MainBusesList extends MainBuses
                 $this->operator_id->ViewValue = $this->operator_id->lookupCacheOption($curVal);
                 if ($this->operator_id->ViewValue === null) { // Lookup from database
                     $filterWrk = "\"id\"" . SearchString("=", $curVal, DATATYPE_NUMBER, "");
-                    $sqlWrk = $this->operator_id->Lookup->getSql(false, $filterWrk, '', $this, true);
+                    $sqlWrk = $this->operator_id->Lookup->getSql(false, $filterWrk, '', $this, true, true);
                     $rswrk = Conn()->executeQuery($sqlWrk)->fetchAll(\PDO::FETCH_BOTH);
                     $ari = count($rswrk);
                     if ($ari > 0) { // Lookup values found
@@ -2905,7 +2899,7 @@ class MainBusesList extends MainBuses
                         return "\"inventory_id\" = (SELECT ID FROM y_inventory WHERE name = 'Exterior Branding')";
                     };
                     $lookupFilter = $lookupFilter->bindTo($this);
-                    $sqlWrk = $this->exterior_campaign_id->Lookup->getSql(false, $filterWrk, $lookupFilter, $this, true);
+                    $sqlWrk = $this->exterior_campaign_id->Lookup->getSql(false, $filterWrk, $lookupFilter, $this, true, true);
                     $rswrk = Conn()->executeQuery($sqlWrk)->fetchAll(\PDO::FETCH_BOTH);
                     $ari = count($rswrk);
                     if ($ari > 0) { // Lookup values found
@@ -2930,7 +2924,7 @@ class MainBusesList extends MainBuses
                         return "\"inventory_id\" = (SELECT ID FROM y_inventory WHERE name = 'Interior Branding')";
                     };
                     $lookupFilter = $lookupFilter->bindTo($this);
-                    $sqlWrk = $this->interior_campaign_id->Lookup->getSql(false, $filterWrk, $lookupFilter, $this, true);
+                    $sqlWrk = $this->interior_campaign_id->Lookup->getSql(false, $filterWrk, $lookupFilter, $this, true, true);
                     $rswrk = Conn()->executeQuery($sqlWrk)->fetchAll(\PDO::FETCH_BOTH);
                     $ari = count($rswrk);
                     if ($ari > 0) { // Lookup values found
@@ -2951,7 +2945,7 @@ class MainBusesList extends MainBuses
                 $this->bus_status_id->ViewValue = $this->bus_status_id->lookupCacheOption($curVal);
                 if ($this->bus_status_id->ViewValue === null) { // Lookup from database
                     $filterWrk = "\"id\"" . SearchString("=", $curVal, DATATYPE_NUMBER, "");
-                    $sqlWrk = $this->bus_status_id->Lookup->getSql(false, $filterWrk, '', $this, true);
+                    $sqlWrk = $this->bus_status_id->Lookup->getSql(false, $filterWrk, '', $this, true, true);
                     $rswrk = Conn()->executeQuery($sqlWrk)->fetchAll(\PDO::FETCH_BOTH);
                     $ari = count($rswrk);
                     if ($ari > 0) { // Lookup values found
@@ -2972,7 +2966,7 @@ class MainBusesList extends MainBuses
                 $this->bus_size_id->ViewValue = $this->bus_size_id->lookupCacheOption($curVal);
                 if ($this->bus_size_id->ViewValue === null) { // Lookup from database
                     $filterWrk = "\"id\"" . SearchString("=", $curVal, DATATYPE_NUMBER, "");
-                    $sqlWrk = $this->bus_size_id->Lookup->getSql(false, $filterWrk, '', $this, true);
+                    $sqlWrk = $this->bus_size_id->Lookup->getSql(false, $filterWrk, '', $this, true, true);
                     $rswrk = Conn()->executeQuery($sqlWrk)->fetchAll(\PDO::FETCH_BOTH);
                     $ari = count($rswrk);
                     if ($ari > 0) { // Lookup values found
@@ -2993,7 +2987,7 @@ class MainBusesList extends MainBuses
                 $this->bus_depot_id->ViewValue = $this->bus_depot_id->lookupCacheOption($curVal);
                 if ($this->bus_depot_id->ViewValue === null) { // Lookup from database
                     $filterWrk = "\"id\"" . SearchString("=", $curVal, DATATYPE_NUMBER, "");
-                    $sqlWrk = $this->bus_depot_id->Lookup->getSql(false, $filterWrk, '', $this, true);
+                    $sqlWrk = $this->bus_depot_id->Lookup->getSql(false, $filterWrk, '', $this, true, true);
                     $rswrk = Conn()->executeQuery($sqlWrk)->fetchAll(\PDO::FETCH_BOTH);
                     $ari = count($rswrk);
                     if ($ari > 0) { // Lookup values found
@@ -3091,7 +3085,7 @@ class MainBusesList extends MainBuses
                 } else {
                     $filterWrk = "\"id\"" . SearchString("=", $this->platform_id->CurrentValue, DATATYPE_NUMBER, "");
                 }
-                $sqlWrk = $this->platform_id->Lookup->getSql(true, $filterWrk, '', $this);
+                $sqlWrk = $this->platform_id->Lookup->getSql(true, $filterWrk, '', $this, false, true);
                 $rswrk = Conn()->executeQuery($sqlWrk)->fetchAll(\PDO::FETCH_BOTH);
                 $ari = count($rswrk);
                 $arwrk = $rswrk;
@@ -3116,7 +3110,7 @@ class MainBusesList extends MainBuses
                 } else {
                     $filterWrk = "\"id\"" . SearchString("=", $this->operator_id->CurrentValue, DATATYPE_NUMBER, "");
                 }
-                $sqlWrk = $this->operator_id->Lookup->getSql(true, $filterWrk, '', $this);
+                $sqlWrk = $this->operator_id->Lookup->getSql(true, $filterWrk, '', $this, false, true);
                 $rswrk = Conn()->executeQuery($sqlWrk)->fetchAll(\PDO::FETCH_BOTH);
                 $ari = count($rswrk);
                 $arwrk = $rswrk;
@@ -3147,7 +3141,7 @@ class MainBusesList extends MainBuses
                     return "\"inventory_id\" = (SELECT ID FROM y_inventory WHERE name = 'Exterior Branding')";
                 };
                 $lookupFilter = $lookupFilter->bindTo($this);
-                $sqlWrk = $this->exterior_campaign_id->Lookup->getSql(true, $filterWrk, $lookupFilter, $this);
+                $sqlWrk = $this->exterior_campaign_id->Lookup->getSql(true, $filterWrk, $lookupFilter, $this, false, true);
                 $rswrk = Conn()->executeQuery($sqlWrk)->fetchAll(\PDO::FETCH_BOTH);
                 $ari = count($rswrk);
                 $arwrk = $rswrk;
@@ -3178,7 +3172,7 @@ class MainBusesList extends MainBuses
                     return "\"inventory_id\" = (SELECT ID FROM y_inventory WHERE name = 'Interior Branding')";
                 };
                 $lookupFilter = $lookupFilter->bindTo($this);
-                $sqlWrk = $this->interior_campaign_id->Lookup->getSql(true, $filterWrk, $lookupFilter, $this);
+                $sqlWrk = $this->interior_campaign_id->Lookup->getSql(true, $filterWrk, $lookupFilter, $this, false, true);
                 $rswrk = Conn()->executeQuery($sqlWrk)->fetchAll(\PDO::FETCH_BOTH);
                 $ari = count($rswrk);
                 $arwrk = $rswrk;
@@ -3205,7 +3199,7 @@ class MainBusesList extends MainBuses
                 } else {
                     $filterWrk = "\"id\"" . SearchString("=", $this->bus_status_id->CurrentValue, DATATYPE_NUMBER, "");
                 }
-                $sqlWrk = $this->bus_status_id->Lookup->getSql(true, $filterWrk, '', $this);
+                $sqlWrk = $this->bus_status_id->Lookup->getSql(true, $filterWrk, '', $this, false, true);
                 $rswrk = Conn()->executeQuery($sqlWrk)->fetchAll(\PDO::FETCH_BOTH);
                 $ari = count($rswrk);
                 $arwrk = $rswrk;
@@ -3230,7 +3224,7 @@ class MainBusesList extends MainBuses
                 } else {
                     $filterWrk = "\"id\"" . SearchString("=", $this->bus_size_id->CurrentValue, DATATYPE_NUMBER, "");
                 }
-                $sqlWrk = $this->bus_size_id->Lookup->getSql(true, $filterWrk, '', $this);
+                $sqlWrk = $this->bus_size_id->Lookup->getSql(true, $filterWrk, '', $this, false, true);
                 $rswrk = Conn()->executeQuery($sqlWrk)->fetchAll(\PDO::FETCH_BOTH);
                 $ari = count($rswrk);
                 $arwrk = $rswrk;
@@ -3255,7 +3249,7 @@ class MainBusesList extends MainBuses
                 } else {
                     $filterWrk = "\"id\"" . SearchString("=", $this->bus_depot_id->CurrentValue, DATATYPE_NUMBER, "");
                 }
-                $sqlWrk = $this->bus_depot_id->Lookup->getSql(true, $filterWrk, '', $this);
+                $sqlWrk = $this->bus_depot_id->Lookup->getSql(true, $filterWrk, '', $this, false, true);
                 $rswrk = Conn()->executeQuery($sqlWrk)->fetchAll(\PDO::FETCH_BOTH);
                 $ari = count($rswrk);
                 $arwrk = $rswrk;
@@ -3333,7 +3327,7 @@ class MainBusesList extends MainBuses
                 } else {
                     $filterWrk = "\"id\"" . SearchString("=", $this->platform_id->CurrentValue, DATATYPE_NUMBER, "");
                 }
-                $sqlWrk = $this->platform_id->Lookup->getSql(true, $filterWrk, '', $this);
+                $sqlWrk = $this->platform_id->Lookup->getSql(true, $filterWrk, '', $this, false, true);
                 $rswrk = Conn()->executeQuery($sqlWrk)->fetchAll(\PDO::FETCH_BOTH);
                 $ari = count($rswrk);
                 $arwrk = $rswrk;
@@ -3358,7 +3352,7 @@ class MainBusesList extends MainBuses
                 } else {
                     $filterWrk = "\"id\"" . SearchString("=", $this->operator_id->CurrentValue, DATATYPE_NUMBER, "");
                 }
-                $sqlWrk = $this->operator_id->Lookup->getSql(true, $filterWrk, '', $this);
+                $sqlWrk = $this->operator_id->Lookup->getSql(true, $filterWrk, '', $this, false, true);
                 $rswrk = Conn()->executeQuery($sqlWrk)->fetchAll(\PDO::FETCH_BOTH);
                 $ari = count($rswrk);
                 $arwrk = $rswrk;
@@ -3389,7 +3383,7 @@ class MainBusesList extends MainBuses
                     return "\"inventory_id\" = (SELECT ID FROM y_inventory WHERE name = 'Exterior Branding')";
                 };
                 $lookupFilter = $lookupFilter->bindTo($this);
-                $sqlWrk = $this->exterior_campaign_id->Lookup->getSql(true, $filterWrk, $lookupFilter, $this);
+                $sqlWrk = $this->exterior_campaign_id->Lookup->getSql(true, $filterWrk, $lookupFilter, $this, false, true);
                 $rswrk = Conn()->executeQuery($sqlWrk)->fetchAll(\PDO::FETCH_BOTH);
                 $ari = count($rswrk);
                 $arwrk = $rswrk;
@@ -3420,7 +3414,7 @@ class MainBusesList extends MainBuses
                     return "\"inventory_id\" = (SELECT ID FROM y_inventory WHERE name = 'Interior Branding')";
                 };
                 $lookupFilter = $lookupFilter->bindTo($this);
-                $sqlWrk = $this->interior_campaign_id->Lookup->getSql(true, $filterWrk, $lookupFilter, $this);
+                $sqlWrk = $this->interior_campaign_id->Lookup->getSql(true, $filterWrk, $lookupFilter, $this, false, true);
                 $rswrk = Conn()->executeQuery($sqlWrk)->fetchAll(\PDO::FETCH_BOTH);
                 $ari = count($rswrk);
                 $arwrk = $rswrk;
@@ -3447,7 +3441,7 @@ class MainBusesList extends MainBuses
                 } else {
                     $filterWrk = "\"id\"" . SearchString("=", $this->bus_status_id->CurrentValue, DATATYPE_NUMBER, "");
                 }
-                $sqlWrk = $this->bus_status_id->Lookup->getSql(true, $filterWrk, '', $this);
+                $sqlWrk = $this->bus_status_id->Lookup->getSql(true, $filterWrk, '', $this, false, true);
                 $rswrk = Conn()->executeQuery($sqlWrk)->fetchAll(\PDO::FETCH_BOTH);
                 $ari = count($rswrk);
                 $arwrk = $rswrk;
@@ -3472,7 +3466,7 @@ class MainBusesList extends MainBuses
                 } else {
                     $filterWrk = "\"id\"" . SearchString("=", $this->bus_size_id->CurrentValue, DATATYPE_NUMBER, "");
                 }
-                $sqlWrk = $this->bus_size_id->Lookup->getSql(true, $filterWrk, '', $this);
+                $sqlWrk = $this->bus_size_id->Lookup->getSql(true, $filterWrk, '', $this, false, true);
                 $rswrk = Conn()->executeQuery($sqlWrk)->fetchAll(\PDO::FETCH_BOTH);
                 $ari = count($rswrk);
                 $arwrk = $rswrk;
@@ -3497,7 +3491,7 @@ class MainBusesList extends MainBuses
                 } else {
                     $filterWrk = "\"id\"" . SearchString("=", $this->bus_depot_id->CurrentValue, DATATYPE_NUMBER, "");
                 }
-                $sqlWrk = $this->bus_depot_id->Lookup->getSql(true, $filterWrk, '', $this);
+                $sqlWrk = $this->bus_depot_id->Lookup->getSql(true, $filterWrk, '', $this, false, true);
                 $rswrk = Conn()->executeQuery($sqlWrk)->fetchAll(\PDO::FETCH_BOTH);
                 $ari = count($rswrk);
                 $arwrk = $rswrk;
@@ -3575,7 +3569,7 @@ class MainBusesList extends MainBuses
                 } else {
                     $filterWrk = "\"id\"" . SearchString("=", $this->platform_id->AdvancedSearch->SearchValue, DATATYPE_NUMBER, "");
                 }
-                $sqlWrk = $this->platform_id->Lookup->getSql(true, $filterWrk, '', $this);
+                $sqlWrk = $this->platform_id->Lookup->getSql(true, $filterWrk, '', $this, false, true);
                 $rswrk = Conn()->executeQuery($sqlWrk)->fetchAll(\PDO::FETCH_BOTH);
                 $ari = count($rswrk);
                 $arwrk = $rswrk;
@@ -3600,7 +3594,7 @@ class MainBusesList extends MainBuses
                 } else {
                     $filterWrk = "\"id\"" . SearchString("=", $this->operator_id->AdvancedSearch->SearchValue, DATATYPE_NUMBER, "");
                 }
-                $sqlWrk = $this->operator_id->Lookup->getSql(true, $filterWrk, '', $this);
+                $sqlWrk = $this->operator_id->Lookup->getSql(true, $filterWrk, '', $this, false, true);
                 $rswrk = Conn()->executeQuery($sqlWrk)->fetchAll(\PDO::FETCH_BOTH);
                 $ari = count($rswrk);
                 $arwrk = $rswrk;
@@ -3631,7 +3625,7 @@ class MainBusesList extends MainBuses
                     return "\"inventory_id\" = (SELECT ID FROM y_inventory WHERE name = 'Exterior Branding')";
                 };
                 $lookupFilter = $lookupFilter->bindTo($this);
-                $sqlWrk = $this->exterior_campaign_id->Lookup->getSql(true, $filterWrk, $lookupFilter, $this);
+                $sqlWrk = $this->exterior_campaign_id->Lookup->getSql(true, $filterWrk, $lookupFilter, $this, false, true);
                 $rswrk = Conn()->executeQuery($sqlWrk)->fetchAll(\PDO::FETCH_BOTH);
                 $ari = count($rswrk);
                 $arwrk = $rswrk;
@@ -3662,7 +3656,7 @@ class MainBusesList extends MainBuses
                     return "\"inventory_id\" = (SELECT ID FROM y_inventory WHERE name = 'Interior Branding')";
                 };
                 $lookupFilter = $lookupFilter->bindTo($this);
-                $sqlWrk = $this->interior_campaign_id->Lookup->getSql(true, $filterWrk, $lookupFilter, $this);
+                $sqlWrk = $this->interior_campaign_id->Lookup->getSql(true, $filterWrk, $lookupFilter, $this, false, true);
                 $rswrk = Conn()->executeQuery($sqlWrk)->fetchAll(\PDO::FETCH_BOTH);
                 $ari = count($rswrk);
                 $arwrk = $rswrk;
@@ -3689,7 +3683,7 @@ class MainBusesList extends MainBuses
                 } else {
                     $filterWrk = "\"id\"" . SearchString("=", $this->bus_status_id->AdvancedSearch->SearchValue, DATATYPE_NUMBER, "");
                 }
-                $sqlWrk = $this->bus_status_id->Lookup->getSql(true, $filterWrk, '', $this);
+                $sqlWrk = $this->bus_status_id->Lookup->getSql(true, $filterWrk, '', $this, false, true);
                 $rswrk = Conn()->executeQuery($sqlWrk)->fetchAll(\PDO::FETCH_BOTH);
                 $ari = count($rswrk);
                 $arwrk = $rswrk;
@@ -3714,7 +3708,7 @@ class MainBusesList extends MainBuses
                 } else {
                     $filterWrk = "\"id\"" . SearchString("=", $this->bus_size_id->AdvancedSearch->SearchValue, DATATYPE_NUMBER, "");
                 }
-                $sqlWrk = $this->bus_size_id->Lookup->getSql(true, $filterWrk, '', $this);
+                $sqlWrk = $this->bus_size_id->Lookup->getSql(true, $filterWrk, '', $this, false, true);
                 $rswrk = Conn()->executeQuery($sqlWrk)->fetchAll(\PDO::FETCH_BOTH);
                 $ari = count($rswrk);
                 $arwrk = $rswrk;
@@ -3739,7 +3733,7 @@ class MainBusesList extends MainBuses
                 } else {
                     $filterWrk = "\"id\"" . SearchString("=", $this->bus_depot_id->AdvancedSearch->SearchValue, DATATYPE_NUMBER, "");
                 }
-                $sqlWrk = $this->bus_depot_id->Lookup->getSql(true, $filterWrk, '', $this);
+                $sqlWrk = $this->bus_depot_id->Lookup->getSql(true, $filterWrk, '', $this, false, true);
                 $rswrk = Conn()->executeQuery($sqlWrk)->fetchAll(\PDO::FETCH_BOTH);
                 $ari = count($rswrk);
                 $arwrk = $rswrk;

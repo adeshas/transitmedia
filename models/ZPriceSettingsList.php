@@ -688,7 +688,7 @@ class ZPriceSettingsList extends ZPriceSettings
                     $this->CurrentAction = Post("action"); // Get action
 
                     // Grid Update
-                    if (($this->isGridUpdate() || $this->isGridOverwrite()) && @$_SESSION[SESSION_INLINE_MODE] == "gridedit") {
+                    if (($this->isGridUpdate() || $this->isGridOverwrite()) && Session(SESSION_INLINE_MODE) == "gridedit") {
                         if ($this->validateGridForm()) {
                             $gridUpdate = $this->gridUpdate();
                         } else {
@@ -702,13 +702,13 @@ class ZPriceSettingsList extends ZPriceSettings
                     }
 
                     // Inline Update
-                    if (($this->isUpdate() || $this->isOverwrite()) && @$_SESSION[SESSION_INLINE_MODE] == "edit") {
+                    if (($this->isUpdate() || $this->isOverwrite()) && Session(SESSION_INLINE_MODE) == "edit") {
                         $this->setKey(Post($this->OldKeyName));
                         $this->inlineUpdate();
                     }
 
                     // Grid Insert
-                    if ($this->isGridInsert() && @$_SESSION[SESSION_INLINE_MODE] == "gridadd") {
+                    if ($this->isGridInsert() && Session(SESSION_INLINE_MODE) == "gridadd") {
                         if ($this->validateGridForm()) {
                             $gridInsert = $this->gridInsert();
                         } else {
@@ -720,7 +720,7 @@ class ZPriceSettingsList extends ZPriceSettings
                             $this->gridAddMode(); // Stay in Grid add mode
                         }
                     }
-                } elseif (@$_SESSION[SESSION_INLINE_MODE] == "gridedit") { // Previously in grid edit mode
+                } elseif (Session(SESSION_INLINE_MODE) == "gridedit") { // Previously in grid edit mode
                     if (Get(Config("TABLE_START_REC")) !== null || Get(Config("TABLE_PAGE_NO")) !== null) { // Stay in grid edit mode if paging
                         $this->gridEditMode();
                     } else { // Reset grid edit
@@ -2164,7 +2164,6 @@ class ZPriceSettingsList extends ZPriceSettings
         $this->listOptionsRendering();
 
         // Set up row action and key
-        $keyName = "";
         if ($CurrentForm && is_numeric($this->RowIndex) && $this->RowType != "view") {
             $CurrentForm->Index = $this->RowIndex;
             $actionName = str_replace("k_", "k" . $this->RowIndex . "_", $this->FormActionName);
@@ -2203,7 +2202,7 @@ class ZPriceSettingsList extends ZPriceSettings
             $this->ListOptions->CustomItem = "edit"; // Show edit column only
             $cancelurl = $this->addMasterUrl($pageUrl . "action=cancel");
                 $opt->Body = "<div" . (($opt->OnLeft) ? " class=\"text-right\"" : "") . ">" .
-                "<a class=\"ew-grid-link ew-inline-update\" title=\"" . HtmlTitle($Language->phrase("UpdateLink")) . "\" data-caption=\"" . HtmlTitle($Language->phrase("UpdateLink")) . "\" href=\"#\" onclick=\"return ew.forms.get(this).submit('" . UrlAddHash($this->pageName(), "r" . $this->RowCount . "_" . $this->TableVar) . "');\">" . $Language->phrase("UpdateLink") . "</a>&nbsp;" .
+                "<a class=\"ew-grid-link ew-inline-update\" title=\"" . HtmlTitle($Language->phrase("UpdateLink")) . "\" data-caption=\"" . HtmlTitle($Language->phrase("UpdateLink")) . "\" href=\"#\" onclick=\"return ew.forms.get(this).submit(event, '" . UrlAddHash($this->pageName(), "r" . $this->RowCount . "_" . $this->TableVar) . "');\">" . $Language->phrase("UpdateLink") . "</a>&nbsp;" .
                 "<a class=\"ew-grid-link ew-inline-cancel\" title=\"" . HtmlTitle($Language->phrase("CancelLink")) . "\" data-caption=\"" . HtmlTitle($Language->phrase("CancelLink")) . "\" href=\"" . $cancelurl . "\">" . $Language->phrase("CancelLink") . "</a>" .
                 "<input type=\"hidden\" name=\"action\" id=\"action\" value=\"update\"></div>";
             $opt->Body .= "<input type=\"hidden\" name=\"k" . $this->RowIndex . "_key\" id=\"k" . $this->RowIndex . "_key\" value=\"" . HtmlEncode($this->id->CurrentValue) . "\">";
@@ -2264,11 +2263,6 @@ class ZPriceSettingsList extends ZPriceSettings
         // "checkbox"
         $opt = $this->ListOptions["checkbox"];
         $opt->Body = "<div class=\"custom-control custom-checkbox d-inline-block\"><input type=\"checkbox\" id=\"key_m_" . $this->RowCount . "\" name=\"key_m[]\" class=\"custom-control-input ew-multi-select\" value=\"" . HtmlEncode($this->id->CurrentValue) . "\" onclick=\"ew.clickMultiCheckbox(event);\"><label class=\"custom-control-label\" for=\"key_m_" . $this->RowCount . "\"></label></div>";
-        if ($this->isGridEdit() && is_numeric($this->RowIndex)) {
-            if ($keyName != "") {
-                $this->MultiSelectKey .= "<input type=\"hidden\" name=\"" . $keyName . "\" id=\"" . $keyName . "\" value=\"" . $this->id->CurrentValue . "\">";
-            }
-        }
         $this->renderListOptionsExt();
 
         // Call ListOptions_Rendered event
@@ -2376,7 +2370,7 @@ class ZPriceSettingsList extends ZPriceSettings
                 $option->UseDropDownButton = false;
                 // Add grid insert
                 $item = &$option->add("gridinsert");
-                $item->Body = "<a class=\"ew-action ew-grid-insert\" title=\"" . HtmlTitle($Language->phrase("GridInsertLink")) . "\" data-caption=\"" . HtmlTitle($Language->phrase("GridInsertLink")) . "\" href=\"#\" onclick=\"return ew.forms.get(this).submit('" . $this->pageName() . "');\">" . $Language->phrase("GridInsertLink") . "</a>";
+                $item->Body = "<a class=\"ew-action ew-grid-insert\" title=\"" . HtmlTitle($Language->phrase("GridInsertLink")) . "\" data-caption=\"" . HtmlTitle($Language->phrase("GridInsertLink")) . "\" href=\"#\" onclick=\"return ew.forms.get(this).submit(event, '" . $this->pageName() . "');\">" . $Language->phrase("GridInsertLink") . "</a>";
                 // Add grid cancel
                 $item = &$option->add("gridcancel");
                 $cancelurl = $this->addMasterUrl($pageUrl . "action=cancel");
@@ -2396,7 +2390,7 @@ class ZPriceSettingsList extends ZPriceSettings
                 $option = $options["action"];
                 $option->UseDropDownButton = false;
                     $item = &$option->add("gridsave");
-                    $item->Body = "<a class=\"ew-action ew-grid-save\" title=\"" . HtmlTitle($Language->phrase("GridSaveLink")) . "\" data-caption=\"" . HtmlTitle($Language->phrase("GridSaveLink")) . "\" href=\"#\" onclick=\"return ew.forms.get(this).submit('" . $this->pageName() . "');\">" . $Language->phrase("GridSaveLink") . "</a>";
+                    $item->Body = "<a class=\"ew-action ew-grid-save\" title=\"" . HtmlTitle($Language->phrase("GridSaveLink")) . "\" data-caption=\"" . HtmlTitle($Language->phrase("GridSaveLink")) . "\" href=\"#\" onclick=\"return ew.forms.get(this).submit(event, '" . $this->pageName() . "');\">" . $Language->phrase("GridSaveLink") . "</a>";
                     $item = &$option->add("gridcancel");
                     $cancelurl = $this->addMasterUrl($pageUrl . "action=cancel");
                     $item->Body = "<a class=\"ew-action ew-grid-cancel\" title=\"" . HtmlTitle($Language->phrase("GridCancelLink")) . "\" data-caption=\"" . HtmlTitle($Language->phrase("GridCancelLink")) . "\" href=\"" . $cancelurl . "\">" . $Language->phrase("GridCancelLink") . "</a>";
@@ -3108,7 +3102,7 @@ class ZPriceSettingsList extends ZPriceSettings
                 $this->platform_id->ViewValue = $this->platform_id->lookupCacheOption($curVal);
                 if ($this->platform_id->ViewValue === null) { // Lookup from database
                     $filterWrk = "\"id\"" . SearchString("=", $curVal, DATATYPE_NUMBER, "");
-                    $sqlWrk = $this->platform_id->Lookup->getSql(false, $filterWrk, '', $this, true);
+                    $sqlWrk = $this->platform_id->Lookup->getSql(false, $filterWrk, '', $this, true, true);
                     $rswrk = Conn()->executeQuery($sqlWrk)->fetchAll(\PDO::FETCH_BOTH);
                     $ari = count($rswrk);
                     if ($ari > 0) { // Lookup values found
@@ -3129,7 +3123,7 @@ class ZPriceSettingsList extends ZPriceSettings
                 $this->inventory_id->ViewValue = $this->inventory_id->lookupCacheOption($curVal);
                 if ($this->inventory_id->ViewValue === null) { // Lookup from database
                     $filterWrk = "\"id\"" . SearchString("=", $curVal, DATATYPE_NUMBER, "");
-                    $sqlWrk = $this->inventory_id->Lookup->getSql(false, $filterWrk, '', $this, true);
+                    $sqlWrk = $this->inventory_id->Lookup->getSql(false, $filterWrk, '', $this, true, true);
                     $rswrk = Conn()->executeQuery($sqlWrk)->fetchAll(\PDO::FETCH_BOTH);
                     $ari = count($rswrk);
                     if ($ari > 0) { // Lookup values found
@@ -3150,7 +3144,7 @@ class ZPriceSettingsList extends ZPriceSettings
                 $this->print_stage_id->ViewValue = $this->print_stage_id->lookupCacheOption($curVal);
                 if ($this->print_stage_id->ViewValue === null) { // Lookup from database
                     $filterWrk = "\"id\"" . SearchString("=", $curVal, DATATYPE_NUMBER, "");
-                    $sqlWrk = $this->print_stage_id->Lookup->getSql(false, $filterWrk, '', $this, true);
+                    $sqlWrk = $this->print_stage_id->Lookup->getSql(false, $filterWrk, '', $this, true, true);
                     $rswrk = Conn()->executeQuery($sqlWrk)->fetchAll(\PDO::FETCH_BOTH);
                     $ari = count($rswrk);
                     if ($ari > 0) { // Lookup values found
@@ -3171,7 +3165,7 @@ class ZPriceSettingsList extends ZPriceSettings
                 $this->bus_size_id->ViewValue = $this->bus_size_id->lookupCacheOption($curVal);
                 if ($this->bus_size_id->ViewValue === null) { // Lookup from database
                     $filterWrk = "\"id\"" . SearchString("=", $curVal, DATATYPE_NUMBER, "");
-                    $sqlWrk = $this->bus_size_id->Lookup->getSql(false, $filterWrk, '', $this, true);
+                    $sqlWrk = $this->bus_size_id->Lookup->getSql(false, $filterWrk, '', $this, true, true);
                     $rswrk = Conn()->executeQuery($sqlWrk)->fetchAll(\PDO::FETCH_BOTH);
                     $ari = count($rswrk);
                     if ($ari > 0) { // Lookup values found
@@ -3342,7 +3336,7 @@ class ZPriceSettingsList extends ZPriceSettings
                 } else {
                     $filterWrk = "\"id\"" . SearchString("=", $this->platform_id->CurrentValue, DATATYPE_NUMBER, "");
                 }
-                $sqlWrk = $this->platform_id->Lookup->getSql(true, $filterWrk, '', $this);
+                $sqlWrk = $this->platform_id->Lookup->getSql(true, $filterWrk, '', $this, false, true);
                 $rswrk = Conn()->executeQuery($sqlWrk)->fetchAll(\PDO::FETCH_BOTH);
                 $ari = count($rswrk);
                 $arwrk = $rswrk;
@@ -3367,7 +3361,7 @@ class ZPriceSettingsList extends ZPriceSettings
                 } else {
                     $filterWrk = "\"id\"" . SearchString("=", $this->inventory_id->CurrentValue, DATATYPE_NUMBER, "");
                 }
-                $sqlWrk = $this->inventory_id->Lookup->getSql(true, $filterWrk, '', $this);
+                $sqlWrk = $this->inventory_id->Lookup->getSql(true, $filterWrk, '', $this, false, true);
                 $rswrk = Conn()->executeQuery($sqlWrk)->fetchAll(\PDO::FETCH_BOTH);
                 $ari = count($rswrk);
                 $arwrk = $rswrk;
@@ -3392,7 +3386,7 @@ class ZPriceSettingsList extends ZPriceSettings
                 } else {
                     $filterWrk = "\"id\"" . SearchString("=", $this->print_stage_id->CurrentValue, DATATYPE_NUMBER, "");
                 }
-                $sqlWrk = $this->print_stage_id->Lookup->getSql(true, $filterWrk, '', $this);
+                $sqlWrk = $this->print_stage_id->Lookup->getSql(true, $filterWrk, '', $this, false, true);
                 $rswrk = Conn()->executeQuery($sqlWrk)->fetchAll(\PDO::FETCH_BOTH);
                 $ari = count($rswrk);
                 $arwrk = $rswrk;
@@ -3417,7 +3411,7 @@ class ZPriceSettingsList extends ZPriceSettings
                 } else {
                     $filterWrk = "\"id\"" . SearchString("=", $this->bus_size_id->CurrentValue, DATATYPE_NUMBER, "");
                 }
-                $sqlWrk = $this->bus_size_id->Lookup->getSql(true, $filterWrk, '', $this);
+                $sqlWrk = $this->bus_size_id->Lookup->getSql(true, $filterWrk, '', $this, false, true);
                 $rswrk = Conn()->executeQuery($sqlWrk)->fetchAll(\PDO::FETCH_BOTH);
                 $ari = count($rswrk);
                 $arwrk = $rswrk;
@@ -3579,7 +3573,7 @@ class ZPriceSettingsList extends ZPriceSettings
                 } else {
                     $filterWrk = "\"id\"" . SearchString("=", $this->platform_id->CurrentValue, DATATYPE_NUMBER, "");
                 }
-                $sqlWrk = $this->platform_id->Lookup->getSql(true, $filterWrk, '', $this);
+                $sqlWrk = $this->platform_id->Lookup->getSql(true, $filterWrk, '', $this, false, true);
                 $rswrk = Conn()->executeQuery($sqlWrk)->fetchAll(\PDO::FETCH_BOTH);
                 $ari = count($rswrk);
                 $arwrk = $rswrk;
@@ -3604,7 +3598,7 @@ class ZPriceSettingsList extends ZPriceSettings
                 } else {
                     $filterWrk = "\"id\"" . SearchString("=", $this->inventory_id->CurrentValue, DATATYPE_NUMBER, "");
                 }
-                $sqlWrk = $this->inventory_id->Lookup->getSql(true, $filterWrk, '', $this);
+                $sqlWrk = $this->inventory_id->Lookup->getSql(true, $filterWrk, '', $this, false, true);
                 $rswrk = Conn()->executeQuery($sqlWrk)->fetchAll(\PDO::FETCH_BOTH);
                 $ari = count($rswrk);
                 $arwrk = $rswrk;
@@ -3629,7 +3623,7 @@ class ZPriceSettingsList extends ZPriceSettings
                 } else {
                     $filterWrk = "\"id\"" . SearchString("=", $this->print_stage_id->CurrentValue, DATATYPE_NUMBER, "");
                 }
-                $sqlWrk = $this->print_stage_id->Lookup->getSql(true, $filterWrk, '', $this);
+                $sqlWrk = $this->print_stage_id->Lookup->getSql(true, $filterWrk, '', $this, false, true);
                 $rswrk = Conn()->executeQuery($sqlWrk)->fetchAll(\PDO::FETCH_BOTH);
                 $ari = count($rswrk);
                 $arwrk = $rswrk;
@@ -3654,7 +3648,7 @@ class ZPriceSettingsList extends ZPriceSettings
                 } else {
                     $filterWrk = "\"id\"" . SearchString("=", $this->bus_size_id->CurrentValue, DATATYPE_NUMBER, "");
                 }
-                $sqlWrk = $this->bus_size_id->Lookup->getSql(true, $filterWrk, '', $this);
+                $sqlWrk = $this->bus_size_id->Lookup->getSql(true, $filterWrk, '', $this, false, true);
                 $rswrk = Conn()->executeQuery($sqlWrk)->fetchAll(\PDO::FETCH_BOTH);
                 $ari = count($rswrk);
                 $arwrk = $rswrk;
@@ -3816,7 +3810,7 @@ class ZPriceSettingsList extends ZPriceSettings
                 } else {
                     $filterWrk = "\"id\"" . SearchString("=", $this->platform_id->AdvancedSearch->SearchValue, DATATYPE_NUMBER, "");
                 }
-                $sqlWrk = $this->platform_id->Lookup->getSql(true, $filterWrk, '', $this);
+                $sqlWrk = $this->platform_id->Lookup->getSql(true, $filterWrk, '', $this, false, true);
                 $rswrk = Conn()->executeQuery($sqlWrk)->fetchAll(\PDO::FETCH_BOTH);
                 $ari = count($rswrk);
                 $arwrk = $rswrk;
@@ -3841,7 +3835,7 @@ class ZPriceSettingsList extends ZPriceSettings
                 } else {
                     $filterWrk = "\"id\"" . SearchString("=", $this->inventory_id->AdvancedSearch->SearchValue, DATATYPE_NUMBER, "");
                 }
-                $sqlWrk = $this->inventory_id->Lookup->getSql(true, $filterWrk, '', $this);
+                $sqlWrk = $this->inventory_id->Lookup->getSql(true, $filterWrk, '', $this, false, true);
                 $rswrk = Conn()->executeQuery($sqlWrk)->fetchAll(\PDO::FETCH_BOTH);
                 $ari = count($rswrk);
                 $arwrk = $rswrk;
@@ -3866,7 +3860,7 @@ class ZPriceSettingsList extends ZPriceSettings
                 } else {
                     $filterWrk = "\"id\"" . SearchString("=", $this->print_stage_id->AdvancedSearch->SearchValue, DATATYPE_NUMBER, "");
                 }
-                $sqlWrk = $this->print_stage_id->Lookup->getSql(true, $filterWrk, '', $this);
+                $sqlWrk = $this->print_stage_id->Lookup->getSql(true, $filterWrk, '', $this, false, true);
                 $rswrk = Conn()->executeQuery($sqlWrk)->fetchAll(\PDO::FETCH_BOTH);
                 $ari = count($rswrk);
                 $arwrk = $rswrk;
@@ -3891,7 +3885,7 @@ class ZPriceSettingsList extends ZPriceSettings
                 } else {
                     $filterWrk = "\"id\"" . SearchString("=", $this->bus_size_id->AdvancedSearch->SearchValue, DATATYPE_NUMBER, "");
                 }
-                $sqlWrk = $this->bus_size_id->Lookup->getSql(true, $filterWrk, '', $this);
+                $sqlWrk = $this->bus_size_id->Lookup->getSql(true, $filterWrk, '', $this, false, true);
                 $rswrk = Conn()->executeQuery($sqlWrk)->fetchAll(\PDO::FETCH_BOTH);
                 $ari = count($rswrk);
                 $arwrk = $rswrk;

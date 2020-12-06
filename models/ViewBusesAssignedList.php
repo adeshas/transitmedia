@@ -1595,7 +1595,7 @@ class ViewBusesAssignedList extends ViewBusesAssigned
                 $this->transaction_id->ViewValue = $this->transaction_id->lookupCacheOption($curVal);
                 if ($this->transaction_id->ViewValue === null) { // Lookup from database
                     $filterWrk = "\"transaction_id\"" . SearchString("=", $curVal, DATATYPE_NUMBER, "");
-                    $sqlWrk = $this->transaction_id->Lookup->getSql(false, $filterWrk, '', $this, true);
+                    $sqlWrk = $this->transaction_id->Lookup->getSql(false, $filterWrk, '', $this, true, true);
                     $rswrk = Conn()->executeQuery($sqlWrk)->fetchAll(\PDO::FETCH_BOTH);
                     $ari = count($rswrk);
                     if ($ari > 0) { // Lookup values found
