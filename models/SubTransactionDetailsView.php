@@ -496,6 +496,7 @@ class SubTransactionDetailsView extends SubTransactionDetails
         $this->created_by->setVisibility();
         $this->ts_created->setVisibility();
         $this->ts_last_update->setVisibility();
+        $this->vendor_id->setVisibility();
         $this->hideFieldsForAddEdit();
 
         // Do not use lookup cache
@@ -512,6 +513,7 @@ class SubTransactionDetailsView extends SubTransactionDetails
         // Set up lookup cache
         $this->setupLookupOptions($this->transaction_id);
         $this->setupLookupOptions($this->bus_id);
+        $this->setupLookupOptions($this->vendor_id);
 
         // Check modal
         if ($this->IsModal) {
@@ -636,7 +638,7 @@ class SubTransactionDetailsView extends SubTransactionDetails
         } else {
             $item->Body = "<a class=\"ew-action ew-edit\" title=\"" . $editcaption . "\" data-caption=\"" . $editcaption . "\" href=\"" . HtmlEncode(GetUrl($this->EditUrl)) . "\">" . $Language->phrase("ViewPageEditLink") . "</a>";
         }
-        $item->Visible = ($this->EditUrl != "" && $Security->canEdit());
+        $item->Visible = ($this->EditUrl != "" && $Security->canEdit() && $this->showOptionLink("edit"));
 
         // Delete
         $item = &$option->add("delete");
@@ -645,7 +647,7 @@ class SubTransactionDetailsView extends SubTransactionDetails
         } else {
             $item->Body = "<a class=\"ew-action ew-delete\" title=\"" . HtmlTitle($Language->phrase("ViewPageDeleteLink")) . "\" data-caption=\"" . HtmlTitle($Language->phrase("ViewPageDeleteLink")) . "\" href=\"" . HtmlEncode(GetUrl($this->DeleteUrl)) . "\">" . $Language->phrase("ViewPageDeleteLink") . "</a>";
         }
-        $item->Visible = ($this->DeleteUrl != "" && $Security->canDelete());
+        $item->Visible = ($this->DeleteUrl != "" && $Security->canDelete() && $this->showOptionLink("delete"));
 
         // Set up action default
         $option = $options["action"];
@@ -715,6 +717,7 @@ class SubTransactionDetailsView extends SubTransactionDetails
         $this->created_by->setDbValue($row['created_by']);
         $this->ts_created->setDbValue($row['ts_created']);
         $this->ts_last_update->setDbValue($row['ts_last_update']);
+        $this->vendor_id->setDbValue($row['vendor_id']);
     }
 
     // Return a row with default values
@@ -727,6 +730,7 @@ class SubTransactionDetailsView extends SubTransactionDetails
         $row['created_by'] = null;
         $row['ts_created'] = null;
         $row['ts_last_update'] = null;
+        $row['vendor_id'] = null;
         return $row;
     }
 
@@ -759,6 +763,8 @@ class SubTransactionDetailsView extends SubTransactionDetails
         // ts_created
 
         // ts_last_update
+
+        // vendor_id
         if ($this->RowType == ROWTYPE_VIEW) {
             // id
             $this->id->ViewValue = $this->id->CurrentValue;
@@ -826,6 +832,28 @@ class SubTransactionDetailsView extends SubTransactionDetails
             $this->ts_last_update->ViewValue = FormatDateTime($this->ts_last_update->ViewValue, 0);
             $this->ts_last_update->ViewCustomAttributes = "";
 
+            // vendor_id
+            $this->vendor_id->ViewValue = $this->vendor_id->CurrentValue;
+            $curVal = strval($this->vendor_id->CurrentValue);
+            if ($curVal != "") {
+                $this->vendor_id->ViewValue = $this->vendor_id->lookupCacheOption($curVal);
+                if ($this->vendor_id->ViewValue === null) { // Lookup from database
+                    $filterWrk = "\"id\"" . SearchString("=", $curVal, DATATYPE_NUMBER, "");
+                    $sqlWrk = $this->vendor_id->Lookup->getSql(false, $filterWrk, '', $this, true, true);
+                    $rswrk = Conn()->executeQuery($sqlWrk)->fetchAll(\PDO::FETCH_BOTH);
+                    $ari = count($rswrk);
+                    if ($ari > 0) { // Lookup values found
+                        $arwrk = $this->vendor_id->Lookup->renderViewRow($rswrk[0]);
+                        $this->vendor_id->ViewValue = $this->vendor_id->displayValue($arwrk);
+                    } else {
+                        $this->vendor_id->ViewValue = $this->vendor_id->CurrentValue;
+                    }
+                }
+            } else {
+                $this->vendor_id->ViewValue = null;
+            }
+            $this->vendor_id->ViewCustomAttributes = "";
+
             // transaction_id
             $this->transaction_id->LinkCustomAttributes = "";
             $this->transaction_id->HrefValue = "";
@@ -835,12 +863,27 @@ class SubTransactionDetailsView extends SubTransactionDetails
             $this->bus_id->LinkCustomAttributes = "";
             $this->bus_id->HrefValue = "";
             $this->bus_id->TooltipValue = "";
+
+            // vendor_id
+            $this->vendor_id->LinkCustomAttributes = "";
+            $this->vendor_id->HrefValue = "";
+            $this->vendor_id->TooltipValue = "";
         }
 
         // Call Row Rendered event
         if ($this->RowType != ROWTYPE_AGGREGATEINIT) {
             $this->rowRendered();
         }
+    }
+
+    // Show link optionally based on User ID
+    protected function showOptionLink($id = "")
+    {
+        global $Security;
+        if ($Security->isLoggedIn() && !$Security->isAdmin() && !$this->userIDAllow($id)) {
+            return $Security->isValidUserID($this->vendor_id->CurrentValue);
+        }
+        return true;
     }
 
     // Set up master/detail based on QueryString
@@ -940,6 +983,8 @@ class SubTransactionDetailsView extends SubTransactionDetails
                 case "x_transaction_id":
                     break;
                 case "x_bus_id":
+                    break;
+                case "x_vendor_id":
                     break;
                 default:
                     $lookupFilter = "";

@@ -591,8 +591,10 @@ class MainTransactionsList extends MainTransactions
         $this->campaign_id->setVisibility();
         $this->operator_id->setVisibility();
         $this->payment_date->setVisibility();
+        $this->vendor_id->setVisibility();
         $this->price_id->setVisibility();
         $this->quantity->setVisibility();
+        $this->assigned_buses->setVisibility();
         $this->start_date->setVisibility();
         $this->end_date->setVisibility();
         $this->visible_status_id->setVisibility();
@@ -635,6 +637,7 @@ class MainTransactionsList extends MainTransactions
         // Set up lookup cache
         $this->setupLookupOptions($this->campaign_id);
         $this->setupLookupOptions($this->operator_id);
+        $this->setupLookupOptions($this->vendor_id);
         $this->setupLookupOptions($this->price_id);
         $this->setupLookupOptions($this->visible_status_id);
         $this->setupLookupOptions($this->status_id);
@@ -1058,6 +1061,13 @@ class MainTransactionsList extends MainTransactions
         }
         if ($inlineEdit) {
             if ($this->loadRow()) {
+                    // Check if valid User ID
+                    if (!$this->showOptionLink("edit")) {
+                        $userIdMsg = $Language->phrase("NoEditPermission");
+                        $this->setFailureMessage($userIdMsg);
+                        $this->clearInlineMode(); // Clear inline edit mode
+                        return false;
+                    }
                 $this->OldKey = $this->getKey(true); // Get from CurrentValue
                 $this->setKey($this->OldKey); // Set to OldValue
                 $_SESSION[SESSION_INLINE_MODE] = "edit"; // Enable inline edit
@@ -1350,10 +1360,16 @@ class MainTransactionsList extends MainTransactions
         if ($CurrentForm->hasValue("x_payment_date") && $CurrentForm->hasValue("o_payment_date") && $this->payment_date->CurrentValue != $this->payment_date->OldValue) {
             return false;
         }
+        if ($CurrentForm->hasValue("x_vendor_id") && $CurrentForm->hasValue("o_vendor_id") && $this->vendor_id->CurrentValue != $this->vendor_id->OldValue) {
+            return false;
+        }
         if ($CurrentForm->hasValue("x_price_id") && $CurrentForm->hasValue("o_price_id") && $this->price_id->CurrentValue != $this->price_id->OldValue) {
             return false;
         }
         if ($CurrentForm->hasValue("x_quantity") && $CurrentForm->hasValue("o_quantity") && $this->quantity->CurrentValue != $this->quantity->OldValue) {
+            return false;
+        }
+        if ($CurrentForm->hasValue("x_assigned_buses") && $CurrentForm->hasValue("o_assigned_buses") && $this->assigned_buses->CurrentValue != $this->assigned_buses->OldValue) {
             return false;
         }
         if ($CurrentForm->hasValue("x_start_date") && $CurrentForm->hasValue("o_start_date") && $this->start_date->CurrentValue != $this->start_date->OldValue) {
@@ -1462,8 +1478,10 @@ class MainTransactionsList extends MainTransactions
         $this->campaign_id->clearErrorMessage();
         $this->operator_id->clearErrorMessage();
         $this->payment_date->clearErrorMessage();
+        $this->vendor_id->clearErrorMessage();
         $this->price_id->clearErrorMessage();
         $this->quantity->clearErrorMessage();
+        $this->assigned_buses->clearErrorMessage();
         $this->start_date->clearErrorMessage();
         $this->end_date->clearErrorMessage();
         $this->visible_status_id->clearErrorMessage();
@@ -1485,8 +1503,10 @@ class MainTransactionsList extends MainTransactions
         $filterList = Concat($filterList, $this->campaign_id->AdvancedSearch->toJson(), ","); // Field campaign_id
         $filterList = Concat($filterList, $this->operator_id->AdvancedSearch->toJson(), ","); // Field operator_id
         $filterList = Concat($filterList, $this->payment_date->AdvancedSearch->toJson(), ","); // Field payment_date
+        $filterList = Concat($filterList, $this->vendor_id->AdvancedSearch->toJson(), ","); // Field vendor_id
         $filterList = Concat($filterList, $this->price_id->AdvancedSearch->toJson(), ","); // Field price_id
         $filterList = Concat($filterList, $this->quantity->AdvancedSearch->toJson(), ","); // Field quantity
+        $filterList = Concat($filterList, $this->assigned_buses->AdvancedSearch->toJson(), ","); // Field assigned_buses
         $filterList = Concat($filterList, $this->start_date->AdvancedSearch->toJson(), ","); // Field start_date
         $filterList = Concat($filterList, $this->end_date->AdvancedSearch->toJson(), ","); // Field end_date
         $filterList = Concat($filterList, $this->visible_status_id->AdvancedSearch->toJson(), ","); // Field visible_status_id
@@ -1569,6 +1589,14 @@ class MainTransactionsList extends MainTransactions
         $this->payment_date->AdvancedSearch->SearchOperator2 = @$filter["w_payment_date"];
         $this->payment_date->AdvancedSearch->save();
 
+        // Field vendor_id
+        $this->vendor_id->AdvancedSearch->SearchValue = @$filter["x_vendor_id"];
+        $this->vendor_id->AdvancedSearch->SearchOperator = @$filter["z_vendor_id"];
+        $this->vendor_id->AdvancedSearch->SearchCondition = @$filter["v_vendor_id"];
+        $this->vendor_id->AdvancedSearch->SearchValue2 = @$filter["y_vendor_id"];
+        $this->vendor_id->AdvancedSearch->SearchOperator2 = @$filter["w_vendor_id"];
+        $this->vendor_id->AdvancedSearch->save();
+
         // Field price_id
         $this->price_id->AdvancedSearch->SearchValue = @$filter["x_price_id"];
         $this->price_id->AdvancedSearch->SearchOperator = @$filter["z_price_id"];
@@ -1584,6 +1612,14 @@ class MainTransactionsList extends MainTransactions
         $this->quantity->AdvancedSearch->SearchValue2 = @$filter["y_quantity"];
         $this->quantity->AdvancedSearch->SearchOperator2 = @$filter["w_quantity"];
         $this->quantity->AdvancedSearch->save();
+
+        // Field assigned_buses
+        $this->assigned_buses->AdvancedSearch->SearchValue = @$filter["x_assigned_buses"];
+        $this->assigned_buses->AdvancedSearch->SearchOperator = @$filter["z_assigned_buses"];
+        $this->assigned_buses->AdvancedSearch->SearchCondition = @$filter["v_assigned_buses"];
+        $this->assigned_buses->AdvancedSearch->SearchValue2 = @$filter["y_assigned_buses"];
+        $this->assigned_buses->AdvancedSearch->SearchOperator2 = @$filter["w_assigned_buses"];
+        $this->assigned_buses->AdvancedSearch->save();
 
         // Field start_date
         $this->start_date->AdvancedSearch->SearchValue = @$filter["x_start_date"];
@@ -1680,8 +1716,10 @@ class MainTransactionsList extends MainTransactions
         $this->buildSearchSql($where, $this->campaign_id, $default, false); // campaign_id
         $this->buildSearchSql($where, $this->operator_id, $default, false); // operator_id
         $this->buildSearchSql($where, $this->payment_date, $default, false); // payment_date
+        $this->buildSearchSql($where, $this->vendor_id, $default, false); // vendor_id
         $this->buildSearchSql($where, $this->price_id, $default, false); // price_id
         $this->buildSearchSql($where, $this->quantity, $default, false); // quantity
+        $this->buildSearchSql($where, $this->assigned_buses, $default, false); // assigned_buses
         $this->buildSearchSql($where, $this->start_date, $default, false); // start_date
         $this->buildSearchSql($where, $this->end_date, $default, false); // end_date
         $this->buildSearchSql($where, $this->visible_status_id, $default, false); // visible_status_id
@@ -1702,8 +1740,10 @@ class MainTransactionsList extends MainTransactions
             $this->campaign_id->AdvancedSearch->save(); // campaign_id
             $this->operator_id->AdvancedSearch->save(); // operator_id
             $this->payment_date->AdvancedSearch->save(); // payment_date
+            $this->vendor_id->AdvancedSearch->save(); // vendor_id
             $this->price_id->AdvancedSearch->save(); // price_id
             $this->quantity->AdvancedSearch->save(); // quantity
+            $this->assigned_buses->AdvancedSearch->save(); // assigned_buses
             $this->start_date->AdvancedSearch->save(); // start_date
             $this->end_date->AdvancedSearch->save(); // end_date
             $this->visible_status_id->AdvancedSearch->save(); // visible_status_id
@@ -1783,11 +1823,8 @@ class MainTransactionsList extends MainTransactions
     protected function basicSearchSql($arKeywords, $type)
     {
         $where = "";
-        $this->buildBasicSearchSql($where, $this->campaign_id, $arKeywords, $type);
-        $this->buildBasicSearchSql($where, $this->operator_id, $arKeywords, $type);
-        $this->buildBasicSearchSql($where, $this->payment_date, $arKeywords, $type);
+        $this->buildBasicSearchSql($where, $this->vendor_id, $arKeywords, $type);
         $this->buildBasicSearchSql($where, $this->price_id, $arKeywords, $type);
-        $this->buildBasicSearchSql($where, $this->quantity, $arKeywords, $type);
         return $where;
     }
 
@@ -1920,10 +1957,16 @@ class MainTransactionsList extends MainTransactions
         if ($this->payment_date->AdvancedSearch->issetSession()) {
             return true;
         }
+        if ($this->vendor_id->AdvancedSearch->issetSession()) {
+            return true;
+        }
         if ($this->price_id->AdvancedSearch->issetSession()) {
             return true;
         }
         if ($this->quantity->AdvancedSearch->issetSession()) {
+            return true;
+        }
+        if ($this->assigned_buses->AdvancedSearch->issetSession()) {
             return true;
         }
         if ($this->start_date->AdvancedSearch->issetSession()) {
@@ -1992,8 +2035,10 @@ class MainTransactionsList extends MainTransactions
                 $this->campaign_id->AdvancedSearch->unsetSession();
                 $this->operator_id->AdvancedSearch->unsetSession();
                 $this->payment_date->AdvancedSearch->unsetSession();
+                $this->vendor_id->AdvancedSearch->unsetSession();
                 $this->price_id->AdvancedSearch->unsetSession();
                 $this->quantity->AdvancedSearch->unsetSession();
+                $this->assigned_buses->AdvancedSearch->unsetSession();
                 $this->start_date->AdvancedSearch->unsetSession();
                 $this->end_date->AdvancedSearch->unsetSession();
                 $this->visible_status_id->AdvancedSearch->unsetSession();
@@ -2019,8 +2064,10 @@ class MainTransactionsList extends MainTransactions
                 $this->campaign_id->AdvancedSearch->load();
                 $this->operator_id->AdvancedSearch->load();
                 $this->payment_date->AdvancedSearch->load();
+                $this->vendor_id->AdvancedSearch->load();
                 $this->price_id->AdvancedSearch->load();
                 $this->quantity->AdvancedSearch->load();
+                $this->assigned_buses->AdvancedSearch->load();
                 $this->start_date->AdvancedSearch->load();
                 $this->end_date->AdvancedSearch->load();
                 $this->visible_status_id->AdvancedSearch->load();
@@ -2044,8 +2091,10 @@ class MainTransactionsList extends MainTransactions
             $this->updateSort($this->campaign_id); // campaign_id
             $this->updateSort($this->operator_id); // operator_id
             $this->updateSort($this->payment_date); // payment_date
+            $this->updateSort($this->vendor_id); // vendor_id
             $this->updateSort($this->price_id); // price_id
             $this->updateSort($this->quantity); // quantity
+            $this->updateSort($this->assigned_buses); // assigned_buses
             $this->updateSort($this->start_date); // start_date
             $this->updateSort($this->end_date); // end_date
             $this->updateSort($this->visible_status_id); // visible_status_id
@@ -2110,8 +2159,10 @@ class MainTransactionsList extends MainTransactions
                 $this->campaign_id->setSort("");
                 $this->operator_id->setSort("");
                 $this->payment_date->setSort("");
+                $this->vendor_id->setSort("");
                 $this->price_id->setSort("");
                 $this->quantity->setSort("");
+                $this->assigned_buses->setSort("");
                 $this->start_date->setSort("");
                 $this->end_date->setSort("");
                 $this->visible_status_id->setSort("");
@@ -2279,7 +2330,7 @@ class MainTransactionsList extends MainTransactions
             // "view"
             $opt = $this->ListOptions["view"];
             $viewcaption = HtmlTitle($Language->phrase("ViewLink"));
-            if ($Security->canView()) {
+            if ($Security->canView() && $this->showOptionLink("view")) {
                 $opt->Body = "<a class=\"ew-row-link ew-view\" title=\"" . $viewcaption . "\" data-caption=\"" . $viewcaption . "\" href=\"" . HtmlEncode(GetUrl($this->ViewUrl)) . "\">" . $Language->phrase("ViewLink") . "</a>";
             } else {
                 $opt->Body = "";
@@ -2288,7 +2339,7 @@ class MainTransactionsList extends MainTransactions
             // "edit"
             $opt = $this->ListOptions["edit"];
             $editcaption = HtmlTitle($Language->phrase("EditLink"));
-            if ($Security->canEdit()) {
+            if ($Security->canEdit() && $this->showOptionLink("edit")) {
                 $opt->Body = "<a class=\"ew-row-link ew-edit\" title=\"" . HtmlTitle($Language->phrase("EditLink")) . "\" data-caption=\"" . HtmlTitle($Language->phrase("EditLink")) . "\" href=\"" . HtmlEncode(GetUrl($this->EditUrl)) . "\">" . $Language->phrase("EditLink") . "</a>";
                 $opt->Body .= "<a class=\"ew-row-link ew-inline-edit\" title=\"" . HtmlTitle($Language->phrase("InlineEditLink")) . "\" data-caption=\"" . HtmlTitle($Language->phrase("InlineEditLink")) . "\" href=\"" . HtmlEncode(UrlAddHash(GetUrl($this->InlineEditUrl), "r" . $this->RowCount . "_" . $this->TableVar)) . "\">" . $Language->phrase("InlineEditLink") . "</a>";
             } else {
@@ -2297,7 +2348,7 @@ class MainTransactionsList extends MainTransactions
 
             // "delete"
             $opt = $this->ListOptions["delete"];
-            if ($Security->canDelete()) {
+            if ($Security->canDelete() && $this->showOptionLink("delete")) {
             $opt->Body = "<a class=\"ew-row-link ew-delete\"" . "" . " title=\"" . HtmlTitle($Language->phrase("DeleteLink")) . "\" data-caption=\"" . HtmlTitle($Language->phrase("DeleteLink")) . "\" href=\"" . HtmlEncode(GetUrl($this->DeleteUrl)) . "\">" . $Language->phrase("DeleteLink") . "</a>";
             } else {
                 $opt->Body = "";
@@ -2340,12 +2391,12 @@ class MainTransactionsList extends MainTransactions
 
         // "detail_sub_transaction_details"
         $opt = $this->ListOptions["detail_sub_transaction_details"];
-        if ($Security->allowList(CurrentProjectID() . 'sub_transaction_details')) {
+        if ($Security->allowList(CurrentProjectID() . 'sub_transaction_details') && $this->showOptionLink()) {
             $body = $Language->phrase("DetailLink") . $Language->TablePhrase("sub_transaction_details", "TblCaption");
             $body = "<a class=\"btn btn-default ew-row-link ew-detail\" data-action=\"list\" href=\"" . HtmlEncode("subtransactiondetailslist?" . Config("TABLE_SHOW_MASTER") . "=main_transactions&" . GetForeignKeyUrl("fk_id", $this->id->CurrentValue) . "") . "\">" . $body . "</a>";
             $links = "";
             $detailPage = Container("SubTransactionDetailsGrid");
-            if ($detailPage->DetailView && $Security->canView() && $Security->allowView(CurrentProjectID() . 'main_transactions')) {
+            if ($detailPage->DetailView && $Security->canView() && $this->showOptionLink("view") && $Security->allowView(CurrentProjectID() . 'main_transactions')) {
                 $caption = $Language->phrase("MasterDetailViewLink");
                 $url = $this->getViewUrl(Config("TABLE_SHOW_DETAIL") . "=sub_transaction_details");
                 $links .= "<li><a class=\"dropdown-item ew-row-link ew-detail-view\" data-action=\"view\" data-caption=\"" . HtmlTitle($caption) . "\" href=\"" . HtmlEncode($url) . "\">" . HtmlImageAndText($caption) . "</a></li>";
@@ -2354,7 +2405,7 @@ class MainTransactionsList extends MainTransactions
                 }
                 $detailViewTblVar .= "sub_transaction_details";
             }
-            if ($detailPage->DetailEdit && $Security->canEdit() && $Security->allowEdit(CurrentProjectID() . 'main_transactions')) {
+            if ($detailPage->DetailEdit && $Security->canEdit() && $this->showOptionLink("edit") && $Security->allowEdit(CurrentProjectID() . 'main_transactions')) {
                 $caption = $Language->phrase("MasterDetailEditLink");
                 $url = $this->getEditUrl(Config("TABLE_SHOW_DETAIL") . "=sub_transaction_details");
                 $links .= "<li><a class=\"dropdown-item ew-row-link ew-detail-edit\" data-action=\"edit\" data-caption=\"" . HtmlTitle($caption) . "\" href=\"" . HtmlEncode($url) . "\">" . HtmlImageAndText($caption) . "</a></li>";
@@ -2673,10 +2724,14 @@ class MainTransactionsList extends MainTransactions
         $this->operator_id->OldValue = $this->operator_id->CurrentValue;
         $this->payment_date->CurrentValue = null;
         $this->payment_date->OldValue = $this->payment_date->CurrentValue;
+        $this->vendor_id->CurrentValue = CurrentUserID();
+        $this->vendor_id->OldValue = $this->vendor_id->CurrentValue;
         $this->price_id->CurrentValue = null;
         $this->price_id->OldValue = $this->price_id->CurrentValue;
         $this->quantity->CurrentValue = null;
         $this->quantity->OldValue = $this->quantity->CurrentValue;
+        $this->assigned_buses->CurrentValue = null;
+        $this->assigned_buses->OldValue = $this->assigned_buses->CurrentValue;
         $this->start_date->CurrentValue = null;
         $this->start_date->OldValue = $this->start_date->CurrentValue;
         $this->end_date->CurrentValue = null;
@@ -2747,6 +2802,14 @@ class MainTransactionsList extends MainTransactions
             }
         }
 
+        // vendor_id
+        if (!$this->isAddOrEdit() && $this->vendor_id->AdvancedSearch->get()) {
+            $hasValue = true;
+            if (($this->vendor_id->AdvancedSearch->SearchValue != "" || $this->vendor_id->AdvancedSearch->SearchValue2 != "") && $this->Command == "") {
+                $this->Command = "search";
+            }
+        }
+
         // price_id
         if (!$this->isAddOrEdit() && $this->price_id->AdvancedSearch->get()) {
             $hasValue = true;
@@ -2759,6 +2822,14 @@ class MainTransactionsList extends MainTransactions
         if (!$this->isAddOrEdit() && $this->quantity->AdvancedSearch->get()) {
             $hasValue = true;
             if (($this->quantity->AdvancedSearch->SearchValue != "" || $this->quantity->AdvancedSearch->SearchValue2 != "") && $this->Command == "") {
+                $this->Command = "search";
+            }
+        }
+
+        // assigned_buses
+        if (!$this->isAddOrEdit() && $this->assigned_buses->AdvancedSearch->get()) {
+            $hasValue = true;
+            if (($this->assigned_buses->AdvancedSearch->SearchValue != "" || $this->assigned_buses->AdvancedSearch->SearchValue2 != "") && $this->Command == "") {
                 $this->Command = "search";
             }
         }
@@ -2897,6 +2968,19 @@ class MainTransactionsList extends MainTransactions
             $this->payment_date->setOldValue($CurrentForm->getValue("o_payment_date"));
         }
 
+        // Check field name 'vendor_id' first before field var 'x_vendor_id'
+        $val = $CurrentForm->hasValue("vendor_id") ? $CurrentForm->getValue("vendor_id") : $CurrentForm->getValue("x_vendor_id");
+        if (!$this->vendor_id->IsDetailKey) {
+            if (IsApi() && $val === null) {
+                $this->vendor_id->Visible = false; // Disable update for API request
+            } else {
+                $this->vendor_id->setFormValue($val);
+            }
+        }
+        if ($CurrentForm->hasValue("o_vendor_id")) {
+            $this->vendor_id->setOldValue($CurrentForm->getValue("o_vendor_id"));
+        }
+
         // Check field name 'price_id' first before field var 'x_price_id'
         $val = $CurrentForm->hasValue("price_id") ? $CurrentForm->getValue("price_id") : $CurrentForm->getValue("x_price_id");
         if (!$this->price_id->IsDetailKey) {
@@ -2921,6 +3005,19 @@ class MainTransactionsList extends MainTransactions
         }
         if ($CurrentForm->hasValue("o_quantity")) {
             $this->quantity->setOldValue($CurrentForm->getValue("o_quantity"));
+        }
+
+        // Check field name 'assigned_buses' first before field var 'x_assigned_buses'
+        $val = $CurrentForm->hasValue("assigned_buses") ? $CurrentForm->getValue("assigned_buses") : $CurrentForm->getValue("x_assigned_buses");
+        if (!$this->assigned_buses->IsDetailKey) {
+            if (IsApi() && $val === null) {
+                $this->assigned_buses->Visible = false; // Disable update for API request
+            } else {
+                $this->assigned_buses->setFormValue($val);
+            }
+        }
+        if ($CurrentForm->hasValue("o_assigned_buses")) {
+            $this->assigned_buses->setOldValue($CurrentForm->getValue("o_assigned_buses"));
         }
 
         // Check field name 'start_date' first before field var 'x_start_date'
@@ -3028,8 +3125,10 @@ class MainTransactionsList extends MainTransactions
         $this->operator_id->CurrentValue = $this->operator_id->FormValue;
         $this->payment_date->CurrentValue = $this->payment_date->FormValue;
         $this->payment_date->CurrentValue = UnFormatDateTime($this->payment_date->CurrentValue, 5);
+        $this->vendor_id->CurrentValue = $this->vendor_id->FormValue;
         $this->price_id->CurrentValue = $this->price_id->FormValue;
         $this->quantity->CurrentValue = $this->quantity->FormValue;
+        $this->assigned_buses->CurrentValue = $this->assigned_buses->FormValue;
         $this->start_date->CurrentValue = $this->start_date->FormValue;
         $this->start_date->CurrentValue = UnFormatDateTime($this->start_date->CurrentValue, 5);
         $this->end_date->CurrentValue = $this->end_date->FormValue;
@@ -3121,6 +3220,7 @@ class MainTransactionsList extends MainTransactions
         }
         $this->operator_id->setDbValue($row['operator_id']);
         $this->payment_date->setDbValue($row['payment_date']);
+        $this->vendor_id->setDbValue($row['vendor_id']);
         $this->price_id->setDbValue($row['price_id']);
         if (array_key_exists('EV__price_id', $row)) {
             $this->price_id->VirtualValue = $row['EV__price_id']; // Set up virtual field value
@@ -3128,6 +3228,7 @@ class MainTransactionsList extends MainTransactions
             $this->price_id->VirtualValue = ""; // Clear value
         }
         $this->quantity->setDbValue($row['quantity']);
+        $this->assigned_buses->setDbValue($row['assigned_buses']);
         $this->start_date->setDbValue($row['start_date']);
         $this->end_date->setDbValue($row['end_date']);
         $this->visible_status_id->setDbValue($row['visible_status_id']);
@@ -3164,8 +3265,10 @@ class MainTransactionsList extends MainTransactions
         $row['campaign_id'] = $this->campaign_id->CurrentValue;
         $row['operator_id'] = $this->operator_id->CurrentValue;
         $row['payment_date'] = $this->payment_date->CurrentValue;
+        $row['vendor_id'] = $this->vendor_id->CurrentValue;
         $row['price_id'] = $this->price_id->CurrentValue;
         $row['quantity'] = $this->quantity->CurrentValue;
+        $row['assigned_buses'] = $this->assigned_buses->CurrentValue;
         $row['start_date'] = $this->start_date->CurrentValue;
         $row['end_date'] = $this->end_date->CurrentValue;
         $row['visible_status_id'] = $this->visible_status_id->CurrentValue;
@@ -3216,14 +3319,21 @@ class MainTransactionsList extends MainTransactions
         // id
 
         // campaign_id
+        $this->campaign_id->CellCssStyle = "white-space: nowrap;";
 
         // operator_id
 
         // payment_date
 
+        // vendor_id
+        $this->vendor_id->CellCssStyle = "white-space: nowrap;";
+
         // price_id
+        $this->price_id->CellCssStyle = "white-space: nowrap;";
 
         // quantity
+
+        // assigned_buses
 
         // start_date
 
@@ -3244,6 +3354,7 @@ class MainTransactionsList extends MainTransactions
         // ts_last_update
 
         // total
+        $this->total->CellCssStyle = "white-space: nowrap;";
 
         // Accumulate aggregate value
         if ($this->RowType != ROWTYPE_AGGREGATEINIT && $this->RowType != ROWTYPE_AGGREGATE) {
@@ -3311,6 +3422,28 @@ class MainTransactionsList extends MainTransactions
             $this->payment_date->ViewValue = FormatDateTime($this->payment_date->ViewValue, 5);
             $this->payment_date->ViewCustomAttributes = "";
 
+            // vendor_id
+            $this->vendor_id->ViewValue = $this->vendor_id->CurrentValue;
+            $curVal = strval($this->vendor_id->CurrentValue);
+            if ($curVal != "") {
+                $this->vendor_id->ViewValue = $this->vendor_id->lookupCacheOption($curVal);
+                if ($this->vendor_id->ViewValue === null) { // Lookup from database
+                    $filterWrk = "\"id\"" . SearchString("=", $curVal, DATATYPE_NUMBER, "");
+                    $sqlWrk = $this->vendor_id->Lookup->getSql(false, $filterWrk, '', $this, true, true);
+                    $rswrk = Conn()->executeQuery($sqlWrk)->fetchAll(\PDO::FETCH_BOTH);
+                    $ari = count($rswrk);
+                    if ($ari > 0) { // Lookup values found
+                        $arwrk = $this->vendor_id->Lookup->renderViewRow($rswrk[0]);
+                        $this->vendor_id->ViewValue = $this->vendor_id->displayValue($arwrk);
+                    } else {
+                        $this->vendor_id->ViewValue = $this->vendor_id->CurrentValue;
+                    }
+                }
+            } else {
+                $this->vendor_id->ViewValue = null;
+            }
+            $this->vendor_id->ViewCustomAttributes = "";
+
             // price_id
             if ($this->price_id->VirtualValue != "") {
                 $this->price_id->ViewValue = $this->price_id->VirtualValue;
@@ -3342,6 +3475,11 @@ class MainTransactionsList extends MainTransactions
             $this->quantity->CssClass = "font-weight-bold";
             $this->quantity->CellCssStyle .= "text-align: right;";
             $this->quantity->ViewCustomAttributes = "";
+
+            // assigned_buses
+            $this->assigned_buses->ViewValue = $this->assigned_buses->CurrentValue;
+            $this->assigned_buses->ViewValue = FormatNumber($this->assigned_buses->ViewValue, 0, -2, -2, -2);
+            $this->assigned_buses->ViewCustomAttributes = "";
 
             // start_date
             $this->start_date->ViewValue = $this->start_date->CurrentValue;
@@ -3510,6 +3648,11 @@ class MainTransactionsList extends MainTransactions
             $this->payment_date->HrefValue = "";
             $this->payment_date->TooltipValue = "";
 
+            // vendor_id
+            $this->vendor_id->LinkCustomAttributes = "";
+            $this->vendor_id->HrefValue = "";
+            $this->vendor_id->TooltipValue = "";
+
             // price_id
             $this->price_id->LinkCustomAttributes = "";
             $this->price_id->HrefValue = "";
@@ -3519,6 +3662,11 @@ class MainTransactionsList extends MainTransactions
             $this->quantity->LinkCustomAttributes = "";
             $this->quantity->HrefValue = "";
             $this->quantity->TooltipValue = "";
+
+            // assigned_buses
+            $this->assigned_buses->LinkCustomAttributes = "";
+            $this->assigned_buses->HrefValue = "";
+            $this->assigned_buses->TooltipValue = "";
 
             // start_date
             $this->start_date->LinkCustomAttributes = "";
@@ -3699,6 +3847,42 @@ class MainTransactionsList extends MainTransactions
             $this->payment_date->EditValue = HtmlEncode(FormatDateTime($this->payment_date->CurrentValue, 5));
             $this->payment_date->PlaceHolder = RemoveHtml($this->payment_date->caption());
 
+            // vendor_id
+            $this->vendor_id->EditAttrs["class"] = "form-control";
+            $this->vendor_id->EditCustomAttributes = "";
+            if (!$Security->isAdmin() && $Security->isLoggedIn() && !$this->userIDAllow($this->CurrentAction)) { // Non system admin
+                if (trim(strval($this->vendor_id->CurrentValue)) == "") {
+                    $filterWrk = "0=1";
+                } else {
+                    $filterWrk = "\"id\"" . SearchString("=", $this->vendor_id->CurrentValue, DATATYPE_NUMBER, "");
+                }
+                $sqlWrk = $this->vendor_id->Lookup->getSql(true, $filterWrk, '', $this, false, true);
+                $rswrk = Conn()->executeQuery($sqlWrk)->fetchAll(\PDO::FETCH_BOTH);
+                $arwrk = $rswrk;
+                $this->vendor_id->EditValue = $arwrk;
+            } else {
+                $this->vendor_id->EditValue = HtmlEncode($this->vendor_id->CurrentValue);
+                $curVal = strval($this->vendor_id->CurrentValue);
+                if ($curVal != "") {
+                    $this->vendor_id->EditValue = $this->vendor_id->lookupCacheOption($curVal);
+                    if ($this->vendor_id->EditValue === null) { // Lookup from database
+                        $filterWrk = "\"id\"" . SearchString("=", $curVal, DATATYPE_NUMBER, "");
+                        $sqlWrk = $this->vendor_id->Lookup->getSql(false, $filterWrk, '', $this, true, true);
+                        $rswrk = Conn()->executeQuery($sqlWrk)->fetchAll(\PDO::FETCH_BOTH);
+                        $ari = count($rswrk);
+                        if ($ari > 0) { // Lookup values found
+                            $arwrk = $this->vendor_id->Lookup->renderViewRow($rswrk[0]);
+                            $this->vendor_id->EditValue = $this->vendor_id->displayValue($arwrk);
+                        } else {
+                            $this->vendor_id->EditValue = HtmlEncode($this->vendor_id->CurrentValue);
+                        }
+                    }
+                } else {
+                    $this->vendor_id->EditValue = null;
+                }
+                $this->vendor_id->PlaceHolder = RemoveHtml($this->vendor_id->caption());
+            }
+
             // price_id
             $this->price_id->EditAttrs["class"] = "form-control";
             $this->price_id->EditCustomAttributes = "";
@@ -3729,6 +3913,12 @@ class MainTransactionsList extends MainTransactions
             $this->quantity->EditCustomAttributes = "";
             $this->quantity->EditValue = HtmlEncode($this->quantity->CurrentValue);
             $this->quantity->PlaceHolder = RemoveHtml($this->quantity->caption());
+
+            // assigned_buses
+            $this->assigned_buses->EditAttrs["class"] = "form-control";
+            $this->assigned_buses->EditCustomAttributes = "";
+            $this->assigned_buses->EditValue = HtmlEncode($this->assigned_buses->CurrentValue);
+            $this->assigned_buses->PlaceHolder = RemoveHtml($this->assigned_buses->caption());
 
             // start_date
             $this->start_date->EditAttrs["class"] = "form-control";
@@ -3866,6 +4056,10 @@ class MainTransactionsList extends MainTransactions
             $this->payment_date->LinkCustomAttributes = "";
             $this->payment_date->HrefValue = "";
 
+            // vendor_id
+            $this->vendor_id->LinkCustomAttributes = "";
+            $this->vendor_id->HrefValue = "";
+
             // price_id
             $this->price_id->LinkCustomAttributes = "";
             $this->price_id->HrefValue = "";
@@ -3873,6 +4067,10 @@ class MainTransactionsList extends MainTransactions
             // quantity
             $this->quantity->LinkCustomAttributes = "";
             $this->quantity->HrefValue = "";
+
+            // assigned_buses
+            $this->assigned_buses->LinkCustomAttributes = "";
+            $this->assigned_buses->HrefValue = "";
 
             // start_date
             $this->start_date->LinkCustomAttributes = "";
@@ -4051,6 +4249,42 @@ class MainTransactionsList extends MainTransactions
             $this->payment_date->EditValue = HtmlEncode(FormatDateTime($this->payment_date->CurrentValue, 5));
             $this->payment_date->PlaceHolder = RemoveHtml($this->payment_date->caption());
 
+            // vendor_id
+            $this->vendor_id->EditAttrs["class"] = "form-control";
+            $this->vendor_id->EditCustomAttributes = "";
+            if (!$Security->isAdmin() && $Security->isLoggedIn() && !$this->userIDAllow($this->CurrentAction)) { // Non system admin
+                if (trim(strval($this->vendor_id->CurrentValue)) == "") {
+                    $filterWrk = "0=1";
+                } else {
+                    $filterWrk = "\"id\"" . SearchString("=", $this->vendor_id->CurrentValue, DATATYPE_NUMBER, "");
+                }
+                $sqlWrk = $this->vendor_id->Lookup->getSql(true, $filterWrk, '', $this, false, true);
+                $rswrk = Conn()->executeQuery($sqlWrk)->fetchAll(\PDO::FETCH_BOTH);
+                $arwrk = $rswrk;
+                $this->vendor_id->EditValue = $arwrk;
+            } else {
+                $this->vendor_id->EditValue = HtmlEncode($this->vendor_id->CurrentValue);
+                $curVal = strval($this->vendor_id->CurrentValue);
+                if ($curVal != "") {
+                    $this->vendor_id->EditValue = $this->vendor_id->lookupCacheOption($curVal);
+                    if ($this->vendor_id->EditValue === null) { // Lookup from database
+                        $filterWrk = "\"id\"" . SearchString("=", $curVal, DATATYPE_NUMBER, "");
+                        $sqlWrk = $this->vendor_id->Lookup->getSql(false, $filterWrk, '', $this, true, true);
+                        $rswrk = Conn()->executeQuery($sqlWrk)->fetchAll(\PDO::FETCH_BOTH);
+                        $ari = count($rswrk);
+                        if ($ari > 0) { // Lookup values found
+                            $arwrk = $this->vendor_id->Lookup->renderViewRow($rswrk[0]);
+                            $this->vendor_id->EditValue = $this->vendor_id->displayValue($arwrk);
+                        } else {
+                            $this->vendor_id->EditValue = HtmlEncode($this->vendor_id->CurrentValue);
+                        }
+                    }
+                } else {
+                    $this->vendor_id->EditValue = null;
+                }
+                $this->vendor_id->PlaceHolder = RemoveHtml($this->vendor_id->caption());
+            }
+
             // price_id
             $this->price_id->EditAttrs["class"] = "form-control";
             $this->price_id->EditCustomAttributes = "";
@@ -4081,6 +4315,12 @@ class MainTransactionsList extends MainTransactions
             $this->quantity->EditCustomAttributes = "";
             $this->quantity->EditValue = HtmlEncode($this->quantity->CurrentValue);
             $this->quantity->PlaceHolder = RemoveHtml($this->quantity->caption());
+
+            // assigned_buses
+            $this->assigned_buses->EditAttrs["class"] = "form-control";
+            $this->assigned_buses->EditCustomAttributes = "";
+            $this->assigned_buses->EditValue = HtmlEncode($this->assigned_buses->CurrentValue);
+            $this->assigned_buses->PlaceHolder = RemoveHtml($this->assigned_buses->caption());
 
             // start_date
             $this->start_date->EditAttrs["class"] = "form-control";
@@ -4218,6 +4458,10 @@ class MainTransactionsList extends MainTransactions
             $this->payment_date->LinkCustomAttributes = "";
             $this->payment_date->HrefValue = "";
 
+            // vendor_id
+            $this->vendor_id->LinkCustomAttributes = "";
+            $this->vendor_id->HrefValue = "";
+
             // price_id
             $this->price_id->LinkCustomAttributes = "";
             $this->price_id->HrefValue = "";
@@ -4225,6 +4469,10 @@ class MainTransactionsList extends MainTransactions
             // quantity
             $this->quantity->LinkCustomAttributes = "";
             $this->quantity->HrefValue = "";
+
+            // assigned_buses
+            $this->assigned_buses->LinkCustomAttributes = "";
+            $this->assigned_buses->HrefValue = "";
 
             // start_date
             $this->start_date->LinkCustomAttributes = "";
@@ -4366,6 +4614,14 @@ class MainTransactionsList extends MainTransactions
         if (!CheckStdDate($this->payment_date->FormValue)) {
             $this->payment_date->addErrorMessage($this->payment_date->getErrorMessage(false));
         }
+        if ($this->vendor_id->Required) {
+            if (!$this->vendor_id->IsDetailKey && EmptyValue($this->vendor_id->FormValue)) {
+                $this->vendor_id->addErrorMessage(str_replace("%s", $this->vendor_id->caption(), $this->vendor_id->RequiredErrorMessage));
+            }
+        }
+        if (!CheckInteger($this->vendor_id->FormValue)) {
+            $this->vendor_id->addErrorMessage($this->vendor_id->getErrorMessage(false));
+        }
         if ($this->price_id->Required) {
             if (!$this->price_id->IsDetailKey && EmptyValue($this->price_id->FormValue)) {
                 $this->price_id->addErrorMessage(str_replace("%s", $this->price_id->caption(), $this->price_id->RequiredErrorMessage));
@@ -4378,6 +4634,14 @@ class MainTransactionsList extends MainTransactions
         }
         if (!CheckInteger($this->quantity->FormValue)) {
             $this->quantity->addErrorMessage($this->quantity->getErrorMessage(false));
+        }
+        if ($this->assigned_buses->Required) {
+            if (!$this->assigned_buses->IsDetailKey && EmptyValue($this->assigned_buses->FormValue)) {
+                $this->assigned_buses->addErrorMessage(str_replace("%s", $this->assigned_buses->caption(), $this->assigned_buses->RequiredErrorMessage));
+            }
+        }
+        if (!CheckInteger($this->assigned_buses->FormValue)) {
+            $this->assigned_buses->addErrorMessage($this->assigned_buses->getErrorMessage(false));
         }
         if ($this->start_date->Required) {
             if (!$this->start_date->IsDetailKey && EmptyValue($this->start_date->FormValue)) {
@@ -4543,11 +4807,17 @@ class MainTransactionsList extends MainTransactions
             // payment_date
             $this->payment_date->setDbValueDef($rsnew, UnFormatDateTime($this->payment_date->CurrentValue, 5), null, $this->payment_date->ReadOnly);
 
+            // vendor_id
+            $this->vendor_id->setDbValueDef($rsnew, $this->vendor_id->CurrentValue, null, $this->vendor_id->ReadOnly);
+
             // price_id
             $this->price_id->setDbValueDef($rsnew, $this->price_id->CurrentValue, null, $this->price_id->ReadOnly);
 
             // quantity
             $this->quantity->setDbValueDef($rsnew, $this->quantity->CurrentValue, 0, $this->quantity->ReadOnly);
+
+            // assigned_buses
+            $this->assigned_buses->setDbValueDef($rsnew, $this->assigned_buses->CurrentValue, null, $this->assigned_buses->ReadOnly);
 
             // start_date
             $this->start_date->setDbValueDef($rsnew, UnFormatDateTime($this->start_date->CurrentValue, 5), null, $this->start_date->ReadOnly);
@@ -4569,6 +4839,25 @@ class MainTransactionsList extends MainTransactions
 
             // total
             $this->total->setDbValueDef($rsnew, $this->total->CurrentValue, null, $this->total->ReadOnly);
+
+            // Check referential integrity for master table 'y_operators'
+            $validMasterRecord = true;
+            $masterFilter = $this->sqlMasterFilter_y_operators();
+            $keyValue = $rsnew['operator_id'] ?? $rsold['operator_id'];
+            if (strval($keyValue) != "") {
+                $masterFilter = str_replace("@id@", AdjustSql($keyValue), $masterFilter);
+            } else {
+                $validMasterRecord = false;
+            }
+            if ($validMasterRecord) {
+                $rsmaster = Container("y_operators")->loadRs($masterFilter)->fetch();
+                $validMasterRecord = $rsmaster !== false;
+            }
+            if (!$validMasterRecord) {
+                $relatedRecordMsg = str_replace("%t", "y_operators", $Language->phrase("RelatedRecordRequired"));
+                $this->setFailureMessage($relatedRecordMsg);
+                return false;
+            }
 
             // Call Row Updating event
             $updateRow = $this->rowUpdating($rsold, $rsnew);
@@ -4634,8 +4923,10 @@ class MainTransactionsList extends MainTransactions
         $hash .= GetFieldHash($row['campaign_id']); // campaign_id
         $hash .= GetFieldHash($row['operator_id']); // operator_id
         $hash .= GetFieldHash($row['payment_date']); // payment_date
+        $hash .= GetFieldHash($row['vendor_id']); // vendor_id
         $hash .= GetFieldHash($row['price_id']); // price_id
         $hash .= GetFieldHash($row['quantity']); // quantity
+        $hash .= GetFieldHash($row['assigned_buses']); // assigned_buses
         $hash .= GetFieldHash($row['start_date']); // start_date
         $hash .= GetFieldHash($row['end_date']); // end_date
         $hash .= GetFieldHash($row['visible_status_id']); // visible_status_id
@@ -4650,6 +4941,18 @@ class MainTransactionsList extends MainTransactions
     protected function addRow($rsold = null)
     {
         global $Language, $Security;
+
+        // Check if valid User ID
+        $validUser = false;
+        if ($Security->currentUserID() != "" && !EmptyValue($this->vendor_id->CurrentValue) && !$Security->isAdmin()) { // Non system admin
+            $validUser = $Security->isValidUserID($this->vendor_id->CurrentValue);
+            if (!$validUser) {
+                $userIdMsg = str_replace("%c", CurrentUserID(), $Language->phrase("UnAuthorizedUserID"));
+                $userIdMsg = str_replace("%u", $this->vendor_id->CurrentValue, $userIdMsg);
+                $this->setFailureMessage($userIdMsg);
+                return false;
+            }
+        }
 
         // Check if valid key values for master user
         if ($Security->currentUserID() != "" && !$Security->isAdmin()) { // Non system admin
@@ -4676,6 +4979,24 @@ class MainTransactionsList extends MainTransactions
                 }
             }
         }
+
+        // Check referential integrity for master table 'main_transactions'
+        $validMasterRecord = true;
+        $masterFilter = $this->sqlMasterFilter_y_operators();
+        if (strval($this->operator_id->CurrentValue) != "") {
+            $masterFilter = str_replace("@id@", AdjustSql($this->operator_id->CurrentValue, "DB"), $masterFilter);
+        } else {
+            $validMasterRecord = false;
+        }
+        if ($validMasterRecord) {
+            $rsmaster = Container("y_operators")->loadRs($masterFilter)->fetch();
+            $validMasterRecord = $rsmaster !== false;
+        }
+        if (!$validMasterRecord) {
+            $relatedRecordMsg = str_replace("%t", "y_operators", $Language->phrase("RelatedRecordRequired"));
+            $this->setFailureMessage($relatedRecordMsg);
+            return false;
+        }
         $conn = $this->getConnection();
 
         // Load db values from rsold
@@ -4693,11 +5014,17 @@ class MainTransactionsList extends MainTransactions
         // payment_date
         $this->payment_date->setDbValueDef($rsnew, UnFormatDateTime($this->payment_date->CurrentValue, 5), null, false);
 
+        // vendor_id
+        $this->vendor_id->setDbValueDef($rsnew, $this->vendor_id->CurrentValue, null, false);
+
         // price_id
         $this->price_id->setDbValueDef($rsnew, $this->price_id->CurrentValue, null, false);
 
         // quantity
         $this->quantity->setDbValueDef($rsnew, $this->quantity->CurrentValue, 0, false);
+
+        // assigned_buses
+        $this->assigned_buses->setDbValueDef($rsnew, $this->assigned_buses->CurrentValue, null, false);
 
         // start_date
         $this->start_date->setDbValueDef($rsnew, UnFormatDateTime($this->start_date->CurrentValue, 5), null, false);
@@ -4761,8 +5088,10 @@ class MainTransactionsList extends MainTransactions
         $this->campaign_id->AdvancedSearch->load();
         $this->operator_id->AdvancedSearch->load();
         $this->payment_date->AdvancedSearch->load();
+        $this->vendor_id->AdvancedSearch->load();
         $this->price_id->AdvancedSearch->load();
         $this->quantity->AdvancedSearch->load();
+        $this->assigned_buses->AdvancedSearch->load();
         $this->start_date->AdvancedSearch->load();
         $this->end_date->AdvancedSearch->load();
         $this->visible_status_id->AdvancedSearch->load();
@@ -5045,6 +5374,16 @@ class MainTransactionsList extends MainTransactions
         }
     }
 
+    // Show link optionally based on User ID
+    protected function showOptionLink($id = "")
+    {
+        global $Security;
+        if ($Security->isLoggedIn() && !$Security->isAdmin() && !$this->userIDAllow($id)) {
+            return $Security->isValidUserID($this->vendor_id->CurrentValue);
+        }
+        return true;
+    }
+
     // Set up master/detail based on QueryString
     protected function setupMasterParms()
     {
@@ -5179,6 +5518,8 @@ class MainTransactionsList extends MainTransactions
                 case "x_campaign_id":
                     break;
                 case "x_operator_id":
+                    break;
+                case "x_vendor_id":
                     break;
                 case "x_price_id":
                     break;

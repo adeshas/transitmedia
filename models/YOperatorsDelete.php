@@ -657,6 +657,14 @@ class YOperatorsDelete extends YOperators
             $this->setFailureMessage($Language->phrase("NoRecord")); // No record found
             return false;
         }
+        foreach ($rows as $row) {
+            $rsdetail = Container("main_transactions")->loadRs("\"operator_id\" = " . QuotedValue($row['id'], DATATYPE_NUMBER, 'DB'))->fetch();
+            if ($rsdetail !== false) {
+                $relatedRecordMsg = str_replace("%t", "main_transactions", $Language->phrase("RelatedRecordExists"));
+                $this->setFailureMessage($relatedRecordMsg);
+                return false;
+            }
+        }
         $conn->beginTransaction();
 
         // Clone old rows

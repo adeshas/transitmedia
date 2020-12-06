@@ -27,8 +27,10 @@ loadjs.ready("head", function () {
         ["operator_id", [], fields.operator_id.isInvalid],
         ["payment_date", [ew.Validators.datetime(5)], fields.payment_date.isInvalid],
         ["y_payment_date", [ew.Validators.between], false],
+        ["vendor_id", [ew.Validators.integer], fields.vendor_id.isInvalid],
         ["price_id", [], fields.price_id.isInvalid],
         ["quantity", [ew.Validators.integer], fields.quantity.isInvalid],
+        ["assigned_buses", [ew.Validators.integer], fields.assigned_buses.isInvalid],
         ["start_date", [ew.Validators.datetime(5)], fields.start_date.isInvalid],
         ["y_start_date", [ew.Validators.between], false],
         ["end_date", [ew.Validators.datetime(5)], fields.end_date.isInvalid],
@@ -81,6 +83,7 @@ loadjs.ready("head", function () {
     // Dynamic selection lists
     fmain_transactionssearch.lists.campaign_id = <?= $Page->campaign_id->toClientList($Page) ?>;
     fmain_transactionssearch.lists.operator_id = <?= $Page->operator_id->toClientList($Page) ?>;
+    fmain_transactionssearch.lists.vendor_id = <?= $Page->vendor_id->toClientList($Page) ?>;
     fmain_transactionssearch.lists.price_id = <?= $Page->price_id->toClientList($Page) ?>;
     fmain_transactionssearch.lists.visible_status_id = <?= $Page->visible_status_id->toClientList($Page) ?>;
     fmain_transactionssearch.lists.status_id = <?= $Page->status_id->toClientList($Page) ?>;
@@ -128,8 +131,8 @@ $Page->showMessage();
     <div id="r_campaign_id" class="form-group row">
         <label for="x_campaign_id" class="<?= $Page->LeftColumnClass ?>"><span id="elh_main_transactions_campaign_id"><?= $Page->campaign_id->caption() ?></span>
         <span class="ew-search-operator">
-<?= $Language->phrase("=") ?>
-<input type="hidden" name="z_campaign_id" id="z_campaign_id" value="=">
+<?= $Language->phrase("LIKE") ?>
+<input type="hidden" name="z_campaign_id" id="z_campaign_id" value="LIKE">
 </span>
         </label>
         <div class="<?= $Page->RightColumnClass ?>"><div <?= $Page->campaign_id->cellAttributes() ?>>
@@ -213,6 +216,62 @@ loadjs.ready(["fmain_transactionssearch", "datetimepicker"], function() {
         </div></div>
     </div>
 <?php } ?>
+<?php if ($Page->vendor_id->Visible) { // vendor_id ?>
+    <div id="r_vendor_id" class="form-group row">
+        <label class="<?= $Page->LeftColumnClass ?>"><span id="elh_main_transactions_vendor_id"><?= $Page->vendor_id->caption() ?></span>
+        <span class="ew-search-operator">
+<?= $Language->phrase("=") ?>
+<input type="hidden" name="z_vendor_id" id="z_vendor_id" value="=">
+</span>
+        </label>
+        <div class="<?= $Page->RightColumnClass ?>"><div <?= $Page->vendor_id->cellAttributes() ?>>
+            <span id="el_main_transactions_vendor_id" class="ew-search-field">
+<?php if (!$Security->isAdmin() && $Security->isLoggedIn() && !$Page->userIDAllow("search")) { // Non system admin ?>
+    <select
+        id="x_vendor_id"
+        name="x_vendor_id"
+        class="form-control ew-select<?= $Page->vendor_id->isInvalidClass() ?>"
+        data-select2-id="main_transactions_x_vendor_id"
+        data-table="main_transactions"
+        data-field="x_vendor_id"
+        data-value-separator="<?= $Page->vendor_id->displayValueSeparatorAttribute() ?>"
+        data-placeholder="<?= HtmlEncode($Page->vendor_id->getPlaceHolder()) ?>"
+        <?= $Page->vendor_id->editAttributes() ?>>
+        <?= $Page->vendor_id->selectOptionListHtml("x_vendor_id") ?>
+    </select>
+    <div class="invalid-feedback"><?= $Page->vendor_id->getErrorMessage(false) ?></div>
+<?= $Page->vendor_id->Lookup->getParamTag($Page, "p_x_vendor_id") ?>
+<script>
+loadjs.ready("head", function() {
+    var el = document.querySelector("select[data-select2-id='main_transactions_x_vendor_id']"),
+        options = { name: "x_vendor_id", selectId: "main_transactions_x_vendor_id", language: ew.LANGUAGE_ID, dir: ew.IS_RTL ? "rtl" : "ltr" };
+    options.dropdownParent = $(el).closest("#ew-modal-dialog, #ew-add-opt-dialog")[0];
+    Object.assign(options, ew.vars.tables.main_transactions.fields.vendor_id.selectOptions);
+    ew.createSelect(options);
+});
+</script>
+<?php } else { ?>
+<?php
+$onchange = $Page->vendor_id->EditAttrs->prepend("onchange", "");
+$onchange = ($onchange) ? ' onchange="' . JsEncode($onchange) . '"' : '';
+$Page->vendor_id->EditAttrs["onchange"] = "";
+?>
+<span id="as_x_vendor_id" class="ew-auto-suggest">
+    <input type="<?= $Page->vendor_id->getInputTextType() ?>" class="form-control" name="sv_x_vendor_id" id="sv_x_vendor_id" value="<?= RemoveHtml($Page->vendor_id->EditValue) ?>" size="30" placeholder="<?= HtmlEncode($Page->vendor_id->getPlaceHolder()) ?>" data-placeholder="<?= HtmlEncode($Page->vendor_id->getPlaceHolder()) ?>"<?= $Page->vendor_id->editAttributes() ?>>
+</span>
+<input type="hidden" is="selection-list" class="form-control" data-table="main_transactions" data-field="x_vendor_id" data-input="sv_x_vendor_id" data-value-separator="<?= $Page->vendor_id->displayValueSeparatorAttribute() ?>" name="x_vendor_id" id="x_vendor_id" value="<?= HtmlEncode($Page->vendor_id->AdvancedSearch->SearchValue) ?>"<?= $onchange ?>>
+<div class="invalid-feedback"><?= $Page->vendor_id->getErrorMessage(false) ?></div>
+<script>
+loadjs.ready(["fmain_transactionssearch"], function() {
+    fmain_transactionssearch.createAutoSuggest(Object.assign({"id":"x_vendor_id","forceSelect":false}, ew.vars.tables.main_transactions.fields.vendor_id.autoSuggestOptions));
+});
+</script>
+<?= $Page->vendor_id->Lookup->getParamTag($Page, "p_x_vendor_id") ?>
+<?php } ?>
+</span>
+        </div></div>
+    </div>
+<?php } ?>
 <?php if ($Page->price_id->Visible) { // price_id ?>
     <div id="r_price_id" class="form-group row">
         <label for="x_price_id" class="<?= $Page->LeftColumnClass ?>"><span id="elh_main_transactions_price_id"><?= $Page->price_id->caption() ?></span>
@@ -242,6 +301,22 @@ loadjs.ready(["fmain_transactionssearch", "datetimepicker"], function() {
             <span id="el_main_transactions_quantity" class="ew-search-field">
 <input type="<?= $Page->quantity->getInputTextType() ?>" data-table="main_transactions" data-field="x_quantity" name="x_quantity" id="x_quantity" size="30" placeholder="<?= HtmlEncode($Page->quantity->getPlaceHolder()) ?>" value="<?= $Page->quantity->EditValue ?>"<?= $Page->quantity->editAttributes() ?>>
 <div class="invalid-feedback"><?= $Page->quantity->getErrorMessage(false) ?></div>
+</span>
+        </div></div>
+    </div>
+<?php } ?>
+<?php if ($Page->assigned_buses->Visible) { // assigned_buses ?>
+    <div id="r_assigned_buses" class="form-group row">
+        <label for="x_assigned_buses" class="<?= $Page->LeftColumnClass ?>"><span id="elh_main_transactions_assigned_buses"><?= $Page->assigned_buses->caption() ?></span>
+        <span class="ew-search-operator">
+<?= $Language->phrase("=") ?>
+<input type="hidden" name="z_assigned_buses" id="z_assigned_buses" value="=">
+</span>
+        </label>
+        <div class="<?= $Page->RightColumnClass ?>"><div <?= $Page->assigned_buses->cellAttributes() ?>>
+            <span id="el_main_transactions_assigned_buses" class="ew-search-field">
+<input type="<?= $Page->assigned_buses->getInputTextType() ?>" data-table="main_transactions" data-field="x_assigned_buses" name="x_assigned_buses" id="x_assigned_buses" size="30" placeholder="<?= HtmlEncode($Page->assigned_buses->getPlaceHolder()) ?>" value="<?= $Page->assigned_buses->EditValue ?>"<?= $Page->assigned_buses->editAttributes() ?>>
+<div class="invalid-feedback"><?= $Page->assigned_buses->getErrorMessage(false) ?></div>
 </span>
         </div></div>
     </div>

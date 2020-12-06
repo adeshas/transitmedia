@@ -86,6 +86,17 @@ $Page->showMessage();
 </td>
     </tr>
 <?php } ?>
+<?php if ($Page->vendor_id->Visible) { // vendor_id ?>
+    <tr id="r_vendor_id">
+        <td class="<?= $Page->TableLeftColumnClass ?>"><span id="elh_main_transactions_vendor_id"><?= $Page->vendor_id->caption() ?></span></td>
+        <td data-name="vendor_id" <?= $Page->vendor_id->cellAttributes() ?>>
+<span id="el_main_transactions_vendor_id">
+<span<?= $Page->vendor_id->viewAttributes() ?>>
+<?= $Page->vendor_id->getViewValue() ?></span>
+</span>
+</td>
+    </tr>
+<?php } ?>
 <?php if ($Page->price_id->Visible) { // price_id ?>
     <tr id="r_price_id">
         <td class="<?= $Page->TableLeftColumnClass ?>"><span id="elh_main_transactions_price_id"><?= $Page->price_id->caption() ?></span></td>
@@ -104,6 +115,17 @@ $Page->showMessage();
 <span id="el_main_transactions_quantity">
 <span<?= $Page->quantity->viewAttributes() ?>>
 <?= $Page->quantity->getViewValue() ?></span>
+</span>
+</td>
+    </tr>
+<?php } ?>
+<?php if ($Page->assigned_buses->Visible) { // assigned_buses ?>
+    <tr id="r_assigned_buses">
+        <td class="<?= $Page->TableLeftColumnClass ?>"><span id="elh_main_transactions_assigned_buses"><?= $Page->assigned_buses->caption() ?></span></td>
+        <td data-name="assigned_buses" <?= $Page->assigned_buses->cellAttributes() ?>>
+<span id="el_main_transactions_assigned_buses">
+<span<?= $Page->assigned_buses->viewAttributes() ?>>
+<?= $Page->assigned_buses->getViewValue() ?></span>
 </span>
 </td>
     </tr>

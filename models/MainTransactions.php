@@ -32,8 +32,10 @@ class MainTransactions extends DbTable
     public $campaign_id;
     public $operator_id;
     public $payment_date;
+    public $vendor_id;
     public $price_id;
     public $quantity;
+    public $assigned_buses;
     public $start_date;
     public $end_date;
     public $visible_status_id;
@@ -77,7 +79,6 @@ class MainTransactions extends DbTable
         $this->ShowMultipleDetails = false; // Show multiple details
         $this->GridAddRowCount = 5;
         $this->AllowAddDeleteRow = true; // Allow add/delete row
-        $this->UserIDAllowSecurity = Config("DEFAULT_USER_ID_ALLOW_SECURITY"); // Default User ID allowed permissions
         $this->BasicSearch = new BasicSearch($this->TableVar);
 
         // id
@@ -120,6 +121,14 @@ class MainTransactions extends DbTable
         $this->payment_date->DefaultErrorMessage = str_replace("%s", $GLOBALS["DATE_SEPARATOR"], $Language->phrase("IncorrectDateYMD"));
         $this->Fields['payment_date'] = &$this->payment_date;
 
+        // vendor_id
+        $this->vendor_id = new DbField('main_transactions', 'main_transactions', 'x_vendor_id', 'vendor_id', '(select main_campaigns.vendor_id from main_campaigns where main_transactions.campaign_id = main_campaigns.id)', 'CAST((select main_campaigns.vendor_id from main_campaigns where main_transactions.campaign_id = main_campaigns.id) AS varchar(255))', 3, 4, -1, false, '(select main_campaigns.vendor_id from main_campaigns where main_transactions.campaign_id = main_campaigns.id)', false, false, false, 'FORMATTED TEXT', 'TEXT');
+        $this->vendor_id->IsCustom = true; // Custom field
+        $this->vendor_id->Sortable = true; // Allow sort
+        $this->vendor_id->Lookup = new Lookup('vendor_id', 'y_vendors', false, 'id', ["name","","",""], [], [], [], [], [], [], '', '');
+        $this->vendor_id->DefaultErrorMessage = $Language->phrase("IncorrectInteger");
+        $this->Fields['vendor_id'] = &$this->vendor_id;
+
         // price_id
         $this->price_id = new DbField('main_transactions', 'main_transactions', 'x_price_id', 'price_id', '"price_id"', 'CAST("price_id" AS varchar(255))', 3, 4, -1, false, '"EV__price_id"', true, true, true, 'FORMATTED TEXT', 'SELECT');
         $this->price_id->Required = true; // Required field
@@ -137,6 +146,13 @@ class MainTransactions extends DbTable
         $this->quantity->Sortable = true; // Allow sort
         $this->quantity->DefaultErrorMessage = $Language->phrase("IncorrectInteger");
         $this->Fields['quantity'] = &$this->quantity;
+
+        // assigned_buses
+        $this->assigned_buses = new DbField('main_transactions', 'main_transactions', 'x_assigned_buses', 'assigned_buses', '(select count(*) from sub_transaction_details where sub_transaction_details.transaction_id = main_transactions.id)', 'CAST((select count(*) from sub_transaction_details where sub_transaction_details.transaction_id = main_transactions.id) AS varchar(255))', 20, 8, -1, false, '(select count(*) from sub_transaction_details where sub_transaction_details.transaction_id = main_transactions.id)', false, false, false, 'FORMATTED TEXT', 'TEXT');
+        $this->assigned_buses->IsCustom = true; // Custom field
+        $this->assigned_buses->Sortable = true; // Allow sort
+        $this->assigned_buses->DefaultErrorMessage = $Language->phrase("IncorrectInteger");
+        $this->Fields['assigned_buses'] = &$this->assigned_buses;
 
         // start_date
         $this->start_date = new DbField('main_transactions', 'main_transactions', 'x_start_date', 'start_date', '"start_date"', CastDateFieldForLike("\"start_date\"", 5, "DB"), 133, 4, 5, false, '"start_date"', false, false, false, 'FORMATTED TEXT', 'TEXT');
@@ -397,7 +413,7 @@ class MainTransactions extends DbTable
 
     public function getSqlSelect() // Select
     {
-        return $this->SqlSelect ?? $this->getQueryBuilder()->select("*, status_id AS \"visible_status_id\", quantity * (select v.price from view_pricing_all v where v.id = price_id) AS \"total\"");
+        return $this->SqlSelect ?? $this->getQueryBuilder()->select("*, (select main_campaigns.vendor_id from main_campaigns where main_transactions.campaign_id = main_campaigns.id) AS \"vendor_id\", (select count(*) from sub_transaction_details where sub_transaction_details.transaction_id = main_transactions.id) AS \"assigned_buses\", status_id AS \"visible_status_id\", quantity * (select v.price from view_pricing_all v where v.id = price_id) AS \"total\"");
     }
 
     public function sqlSelect() // For backward compatibility
@@ -415,7 +431,7 @@ class MainTransactions extends DbTable
         if ($this->SqlSelectList) {
             return $this->SqlSelectList;
         }
-        $from = "(SELECT *, status_id AS \"visible_status_id\", quantity * (select v.price from view_pricing_all v where v.id = price_id) AS \"total\", (SELECT \"name\" || '" . ValueSeparator(1, $this->campaign_id) . "' || \"quantity\" || '" . ValueSeparator(2, $this->campaign_id) . "' || \"bus_size_id\" || '" . ValueSeparator(3, $this->campaign_id) . "' || \"end_date\" FROM \"main_campaigns\" \"TMP_LOOKUPTABLE\" WHERE \"TMP_LOOKUPTABLE\".\"id\" = \"main_transactions\".\"campaign_id\" LIMIT 1) AS \"EV__campaign_id\", (SELECT \"price_details\" || '" . ValueSeparator(1, $this->price_id) . "' || \"platform_inventory\" FROM \"view_pricing_options\" \"TMP_LOOKUPTABLE\" WHERE \"TMP_LOOKUPTABLE\".\"price_id\" = \"main_transactions\".\"price_id\" LIMIT 1) AS \"EV__price_id\", (SELECT \"admin_name\" FROM \"x_transaction_status\" \"TMP_LOOKUPTABLE\" WHERE \"TMP_LOOKUPTABLE\".\"id\" = \"main_transactions\".\"status_id\" LIMIT 1) AS \"EV__status_id\", (SELECT \"name\" FROM \"x_print_status\" \"TMP_LOOKUPTABLE\" WHERE \"TMP_LOOKUPTABLE\".\"id\" = \"main_transactions\".\"print_status_id\" LIMIT 1) AS \"EV__print_status_id\", (SELECT \"name\" FROM \"x_payment_status\" \"TMP_LOOKUPTABLE\" WHERE \"TMP_LOOKUPTABLE\".\"id\" = \"main_transactions\".\"payment_status_id\" LIMIT 1) AS \"EV__payment_status_id\" FROM \"main_transactions\")";
+        $from = "(SELECT *, (select main_campaigns.vendor_id from main_campaigns where main_transactions.campaign_id = main_campaigns.id) AS \"vendor_id\", (select count(*) from sub_transaction_details where sub_transaction_details.transaction_id = main_transactions.id) AS \"assigned_buses\", status_id AS \"visible_status_id\", quantity * (select v.price from view_pricing_all v where v.id = price_id) AS \"total\", (SELECT \"name\" || '" . ValueSeparator(1, $this->campaign_id) . "' || \"quantity\" || '" . ValueSeparator(2, $this->campaign_id) . "' || \"bus_size_id\" || '" . ValueSeparator(3, $this->campaign_id) . "' || \"end_date\" FROM \"main_campaigns\" \"TMP_LOOKUPTABLE\" WHERE \"TMP_LOOKUPTABLE\".\"id\" = \"main_transactions\".\"campaign_id\" LIMIT 1) AS \"EV__campaign_id\", (SELECT \"price_details\" || '" . ValueSeparator(1, $this->price_id) . "' || \"platform_inventory\" FROM \"view_pricing_options\" \"TMP_LOOKUPTABLE\" WHERE \"TMP_LOOKUPTABLE\".\"price_id\" = \"main_transactions\".\"price_id\" LIMIT 1) AS \"EV__price_id\", (SELECT \"admin_name\" FROM \"x_transaction_status\" \"TMP_LOOKUPTABLE\" WHERE \"TMP_LOOKUPTABLE\".\"id\" = \"main_transactions\".\"status_id\" LIMIT 1) AS \"EV__status_id\", (SELECT \"name\" FROM \"x_print_status\" \"TMP_LOOKUPTABLE\" WHERE \"TMP_LOOKUPTABLE\".\"id\" = \"main_transactions\".\"print_status_id\" LIMIT 1) AS \"EV__print_status_id\", (SELECT \"name\" FROM \"x_payment_status\" \"TMP_LOOKUPTABLE\" WHERE \"TMP_LOOKUPTABLE\".\"id\" = \"main_transactions\".\"payment_status_id\" LIMIT 1) AS \"EV__payment_status_id\" FROM \"main_transactions\")";
         return $from . " \"TMP_TABLE\"";
     }
 
@@ -498,12 +514,7 @@ class MainTransactions extends DbTable
         global $Security;
         // Add User ID filter
         if ($Security->currentUserID() != "" && !$Security->isAdmin()) { // Non system admin
-            if ($this->getCurrentMasterTable() == "main_campaigns" || $this->getCurrentMasterTable() == "") {
-                $filter = $this->addDetailUserIDFilter($filter, "main_campaigns"); // Add detail User ID filter
-            }
-            if ($this->getCurrentMasterTable() == "y_operators" || $this->getCurrentMasterTable() == "") {
-                $filter = $this->addDetailUserIDFilter($filter, "y_operators"); // Add detail User ID filter
-            }
+            $filter = $this->addUserIDFilter($filter);
         }
         return $filter;
     }
@@ -911,8 +922,10 @@ class MainTransactions extends DbTable
         $this->campaign_id->DbValue = $row['campaign_id'];
         $this->operator_id->DbValue = $row['operator_id'];
         $this->payment_date->DbValue = $row['payment_date'];
+        $this->vendor_id->DbValue = $row['vendor_id'];
         $this->price_id->DbValue = $row['price_id'];
         $this->quantity->DbValue = $row['quantity'];
+        $this->assigned_buses->DbValue = $row['assigned_buses'];
         $this->start_date->DbValue = $row['start_date'];
         $this->end_date->DbValue = $row['end_date'];
         $this->visible_status_id->DbValue = $row['visible_status_id'];
@@ -1263,8 +1276,10 @@ SORTHTML;
         $this->campaign_id->setDbValue($row['campaign_id']);
         $this->operator_id->setDbValue($row['operator_id']);
         $this->payment_date->setDbValue($row['payment_date']);
+        $this->vendor_id->setDbValue($row['vendor_id']);
         $this->price_id->setDbValue($row['price_id']);
         $this->quantity->setDbValue($row['quantity']);
+        $this->assigned_buses->setDbValue($row['assigned_buses']);
         $this->start_date->setDbValue($row['start_date']);
         $this->end_date->setDbValue($row['end_date']);
         $this->visible_status_id->setDbValue($row['visible_status_id']);
@@ -1290,14 +1305,21 @@ SORTHTML;
         // id
 
         // campaign_id
+        $this->campaign_id->CellCssStyle = "white-space: nowrap;";
 
         // operator_id
 
         // payment_date
 
+        // vendor_id
+        $this->vendor_id->CellCssStyle = "white-space: nowrap;";
+
         // price_id
+        $this->price_id->CellCssStyle = "white-space: nowrap;";
 
         // quantity
+
+        // assigned_buses
 
         // start_date
 
@@ -1318,6 +1340,7 @@ SORTHTML;
         // ts_last_update
 
         // total
+        $this->total->CellCssStyle = "white-space: nowrap;";
 
         // id
         $this->id->ViewValue = $this->id->CurrentValue;
@@ -1375,6 +1398,28 @@ SORTHTML;
         $this->payment_date->ViewValue = FormatDateTime($this->payment_date->ViewValue, 5);
         $this->payment_date->ViewCustomAttributes = "";
 
+        // vendor_id
+        $this->vendor_id->ViewValue = $this->vendor_id->CurrentValue;
+        $curVal = strval($this->vendor_id->CurrentValue);
+        if ($curVal != "") {
+            $this->vendor_id->ViewValue = $this->vendor_id->lookupCacheOption($curVal);
+            if ($this->vendor_id->ViewValue === null) { // Lookup from database
+                $filterWrk = "\"id\"" . SearchString("=", $curVal, DATATYPE_NUMBER, "");
+                $sqlWrk = $this->vendor_id->Lookup->getSql(false, $filterWrk, '', $this, true, true);
+                $rswrk = Conn()->executeQuery($sqlWrk)->fetchAll(\PDO::FETCH_BOTH);
+                $ari = count($rswrk);
+                if ($ari > 0) { // Lookup values found
+                    $arwrk = $this->vendor_id->Lookup->renderViewRow($rswrk[0]);
+                    $this->vendor_id->ViewValue = $this->vendor_id->displayValue($arwrk);
+                } else {
+                    $this->vendor_id->ViewValue = $this->vendor_id->CurrentValue;
+                }
+            }
+        } else {
+            $this->vendor_id->ViewValue = null;
+        }
+        $this->vendor_id->ViewCustomAttributes = "";
+
         // price_id
         if ($this->price_id->VirtualValue != "") {
             $this->price_id->ViewValue = $this->price_id->VirtualValue;
@@ -1406,6 +1451,11 @@ SORTHTML;
         $this->quantity->CssClass = "font-weight-bold";
         $this->quantity->CellCssStyle .= "text-align: right;";
         $this->quantity->ViewCustomAttributes = "";
+
+        // assigned_buses
+        $this->assigned_buses->ViewValue = $this->assigned_buses->CurrentValue;
+        $this->assigned_buses->ViewValue = FormatNumber($this->assigned_buses->ViewValue, 0, -2, -2, -2);
+        $this->assigned_buses->ViewCustomAttributes = "";
 
         // start_date
         $this->start_date->ViewValue = $this->start_date->CurrentValue;
@@ -1574,6 +1624,11 @@ SORTHTML;
         $this->payment_date->HrefValue = "";
         $this->payment_date->TooltipValue = "";
 
+        // vendor_id
+        $this->vendor_id->LinkCustomAttributes = "";
+        $this->vendor_id->HrefValue = "";
+        $this->vendor_id->TooltipValue = "";
+
         // price_id
         $this->price_id->LinkCustomAttributes = "";
         $this->price_id->HrefValue = "";
@@ -1583,6 +1638,11 @@ SORTHTML;
         $this->quantity->LinkCustomAttributes = "";
         $this->quantity->HrefValue = "";
         $this->quantity->TooltipValue = "";
+
+        // assigned_buses
+        $this->assigned_buses->LinkCustomAttributes = "";
+        $this->assigned_buses->HrefValue = "";
+        $this->assigned_buses->TooltipValue = "";
 
         // start_date
         $this->start_date->LinkCustomAttributes = "";
@@ -1754,6 +1814,15 @@ SORTHTML;
         $this->payment_date->EditValue = FormatDateTime($this->payment_date->CurrentValue, 5);
         $this->payment_date->PlaceHolder = RemoveHtml($this->payment_date->caption());
 
+        // vendor_id
+        $this->vendor_id->EditAttrs["class"] = "form-control";
+        $this->vendor_id->EditCustomAttributes = "";
+        if (!$Security->isAdmin() && $Security->isLoggedIn() && !$this->userIDAllow("info")) { // Non system admin
+        } else {
+            $this->vendor_id->EditValue = $this->vendor_id->CurrentValue;
+            $this->vendor_id->PlaceHolder = RemoveHtml($this->vendor_id->caption());
+        }
+
         // price_id
         $this->price_id->EditAttrs["class"] = "form-control";
         $this->price_id->EditCustomAttributes = "";
@@ -1764,6 +1833,12 @@ SORTHTML;
         $this->quantity->EditCustomAttributes = "";
         $this->quantity->EditValue = $this->quantity->CurrentValue;
         $this->quantity->PlaceHolder = RemoveHtml($this->quantity->caption());
+
+        // assigned_buses
+        $this->assigned_buses->EditAttrs["class"] = "form-control";
+        $this->assigned_buses->EditCustomAttributes = "";
+        $this->assigned_buses->EditValue = $this->assigned_buses->CurrentValue;
+        $this->assigned_buses->PlaceHolder = RemoveHtml($this->assigned_buses->caption());
 
         // start_date
         $this->start_date->EditAttrs["class"] = "form-control";
@@ -1873,8 +1948,10 @@ SORTHTML;
                     $doc->exportCaption($this->campaign_id);
                     $doc->exportCaption($this->operator_id);
                     $doc->exportCaption($this->payment_date);
+                    $doc->exportCaption($this->vendor_id);
                     $doc->exportCaption($this->price_id);
                     $doc->exportCaption($this->quantity);
+                    $doc->exportCaption($this->assigned_buses);
                     $doc->exportCaption($this->start_date);
                     $doc->exportCaption($this->end_date);
                     $doc->exportCaption($this->visible_status_id);
@@ -1890,8 +1967,10 @@ SORTHTML;
                     $doc->exportCaption($this->campaign_id);
                     $doc->exportCaption($this->operator_id);
                     $doc->exportCaption($this->payment_date);
+                    $doc->exportCaption($this->vendor_id);
                     $doc->exportCaption($this->price_id);
                     $doc->exportCaption($this->quantity);
+                    $doc->exportCaption($this->assigned_buses);
                     $doc->exportCaption($this->start_date);
                     $doc->exportCaption($this->end_date);
                     $doc->exportCaption($this->visible_status_id);
@@ -1936,8 +2015,10 @@ SORTHTML;
                         $doc->exportField($this->campaign_id);
                         $doc->exportField($this->operator_id);
                         $doc->exportField($this->payment_date);
+                        $doc->exportField($this->vendor_id);
                         $doc->exportField($this->price_id);
                         $doc->exportField($this->quantity);
+                        $doc->exportField($this->assigned_buses);
                         $doc->exportField($this->start_date);
                         $doc->exportField($this->end_date);
                         $doc->exportField($this->visible_status_id);
@@ -1953,8 +2034,10 @@ SORTHTML;
                         $doc->exportField($this->campaign_id);
                         $doc->exportField($this->operator_id);
                         $doc->exportField($this->payment_date);
+                        $doc->exportField($this->vendor_id);
                         $doc->exportField($this->price_id);
                         $doc->exportField($this->quantity);
+                        $doc->exportField($this->assigned_buses);
                         $doc->exportField($this->start_date);
                         $doc->exportField($this->end_date);
                         $doc->exportField($this->visible_status_id);
@@ -1988,8 +2071,10 @@ SORTHTML;
                 $doc->exportAggregate($this->campaign_id, '');
                 $doc->exportAggregate($this->operator_id, '');
                 $doc->exportAggregate($this->payment_date, '');
+                $doc->exportAggregate($this->vendor_id, '');
                 $doc->exportAggregate($this->price_id, '');
                 $doc->exportAggregate($this->quantity, 'TOTAL');
+                $doc->exportAggregate($this->assigned_buses, '');
                 $doc->exportAggregate($this->start_date, '');
                 $doc->exportAggregate($this->end_date, '');
                 $doc->exportAggregate($this->visible_status_id, '');
@@ -2006,6 +2091,53 @@ SORTHTML;
         if (!$doc->ExportCustom) {
             $doc->exportTableFooter();
         }
+    }
+
+    // Add User ID filter
+    public function addUserIDFilter($filter = "")
+    {
+        global $Security;
+        $filterWrk = "";
+        $id = (CurrentPageID() == "list") ? $this->CurrentAction : CurrentPageID();
+        if (!$this->userIDAllow($id) && !$Security->isAdmin()) {
+            $filterWrk = $Security->userIdList();
+            if ($filterWrk != "") {
+                $filterWrk = '(select main_campaigns.vendor_id from main_campaigns where main_transactions.campaign_id = main_campaigns.id) IN (' . $filterWrk . ')';
+            }
+        }
+
+        // Call User ID Filtering event
+        $this->userIdFiltering($filterWrk);
+        AddFilter($filter, $filterWrk);
+        return $filter;
+    }
+
+    // User ID subquery
+    public function getUserIDSubquery(&$fld, &$masterfld)
+    {
+        global $UserTable;
+        $wrk = "";
+        $sql = "SELECT " . $masterfld->Expression . " FROM \"main_transactions\"";
+        $filter = $this->addUserIDFilter("");
+        if ($filter != "") {
+            $sql .= " WHERE " . $filter;
+        }
+
+        // List all values
+        if ($rs = Conn($UserTable->Dbid)->executeQuery($sql)->fetchAll(\PDO::FETCH_NUM)) {
+            foreach ($rs as $row) {
+                if ($wrk != "") {
+                    $wrk .= ",";
+                }
+                $wrk .= QuotedValue($row[0], $masterfld->DataType, Config("USER_TABLE_DBID"));
+            }
+        }
+        if ($wrk != "") {
+            $wrk = $fld->Expression . " IN (" . $wrk . ")";
+        } else { // No User ID value found
+            $wrk = "0=1";
+        }
+        return $wrk;
     }
 
     // Add master User ID filter

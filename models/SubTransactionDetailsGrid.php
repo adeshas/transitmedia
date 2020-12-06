@@ -482,6 +482,7 @@ class SubTransactionDetailsGrid extends SubTransactionDetails
         $this->created_by->Visible = false;
         $this->ts_created->Visible = false;
         $this->ts_last_update->Visible = false;
+        $this->vendor_id->setVisibility();
         $this->hideFieldsForAddEdit();
 
         // Global Page Loading event (in userfn*.php)
@@ -501,6 +502,7 @@ class SubTransactionDetailsGrid extends SubTransactionDetails
         // Set up lookup cache
         $this->setupLookupOptions($this->transaction_id);
         $this->setupLookupOptions($this->bus_id);
+        $this->setupLookupOptions($this->vendor_id);
 
         // Search filters
         $srchAdvanced = ""; // Advanced search filter
@@ -563,6 +565,13 @@ class SubTransactionDetailsGrid extends SubTransactionDetails
         // Restore master/detail filter
         $this->DbMasterFilter = $this->getMasterFilter(); // Restore master filter
         $this->DbDetailFilter = $this->getDetailFilter(); // Restore detail filter
+
+        // Add master User ID filter
+        if ($Security->currentUserID() != "" && !$Security->isAdmin()) { // Non system admin
+                if ($this->getCurrentMasterTable() == "main_transactions") {
+                    $this->DbMasterFilter = $this->addMasterUserIDFilter($this->DbMasterFilter, "main_transactions"); // Add master User ID filter
+                }
+        }
         AddFilter($filter, $this->DbDetailFilter);
         AddFilter($filter, $this->SearchWhere);
 
@@ -912,6 +921,9 @@ class SubTransactionDetailsGrid extends SubTransactionDetails
         if ($CurrentForm->hasValue("x_bus_id") && $CurrentForm->hasValue("o_bus_id") && $this->bus_id->CurrentValue != $this->bus_id->OldValue) {
             return false;
         }
+        if ($CurrentForm->hasValue("x_vendor_id") && $CurrentForm->hasValue("o_vendor_id") && $this->vendor_id->CurrentValue != $this->vendor_id->OldValue) {
+            return false;
+        }
         return true;
     }
 
@@ -995,6 +1007,7 @@ class SubTransactionDetailsGrid extends SubTransactionDetails
     {
         $this->transaction_id->clearErrorMessage();
         $this->bus_id->clearErrorMessage();
+        $this->vendor_id->clearErrorMessage();
     }
 
     // Set up sort parameters
@@ -1156,7 +1169,7 @@ class SubTransactionDetailsGrid extends SubTransactionDetails
             // "view"
             $opt = $this->ListOptions["view"];
             $viewcaption = HtmlTitle($Language->phrase("ViewLink"));
-            if ($Security->canView()) {
+            if ($Security->canView() && $this->showOptionLink("view")) {
                 $opt->Body = "<a class=\"ew-row-link ew-view\" title=\"" . $viewcaption . "\" data-caption=\"" . $viewcaption . "\" href=\"" . HtmlEncode(GetUrl($this->ViewUrl)) . "\">" . $Language->phrase("ViewLink") . "</a>";
             } else {
                 $opt->Body = "";
@@ -1165,7 +1178,7 @@ class SubTransactionDetailsGrid extends SubTransactionDetails
             // "edit"
             $opt = $this->ListOptions["edit"];
             $editcaption = HtmlTitle($Language->phrase("EditLink"));
-            if ($Security->canEdit()) {
+            if ($Security->canEdit() && $this->showOptionLink("edit")) {
                 $opt->Body = "<a class=\"ew-row-link ew-edit\" title=\"" . HtmlTitle($Language->phrase("EditLink")) . "\" data-caption=\"" . HtmlTitle($Language->phrase("EditLink")) . "\" href=\"" . HtmlEncode(GetUrl($this->EditUrl)) . "\">" . $Language->phrase("EditLink") . "</a>";
             } else {
                 $opt->Body = "";
@@ -1173,7 +1186,7 @@ class SubTransactionDetailsGrid extends SubTransactionDetails
 
             // "delete"
             $opt = $this->ListOptions["delete"];
-            if ($Security->canDelete()) {
+            if ($Security->canDelete() && $this->showOptionLink("delete")) {
             $opt->Body = "<a class=\"ew-row-link ew-delete\"" . "" . " title=\"" . HtmlTitle($Language->phrase("DeleteLink")) . "\" data-caption=\"" . HtmlTitle($Language->phrase("DeleteLink")) . "\" href=\"" . HtmlEncode(GetUrl($this->DeleteUrl)) . "\">" . $Language->phrase("DeleteLink") . "</a>";
             } else {
                 $opt->Body = "";
@@ -1261,6 +1274,8 @@ class SubTransactionDetailsGrid extends SubTransactionDetails
         $this->ts_created->OldValue = $this->ts_created->CurrentValue;
         $this->ts_last_update->CurrentValue = null;
         $this->ts_last_update->OldValue = $this->ts_last_update->CurrentValue;
+        $this->vendor_id->CurrentValue = CurrentUserID();
+        $this->vendor_id->OldValue = $this->vendor_id->CurrentValue;
     }
 
     // Load form values
@@ -1296,6 +1311,19 @@ class SubTransactionDetailsGrid extends SubTransactionDetails
             $this->bus_id->setOldValue($CurrentForm->getValue("o_bus_id"));
         }
 
+        // Check field name 'vendor_id' first before field var 'x_vendor_id'
+        $val = $CurrentForm->hasValue("vendor_id") ? $CurrentForm->getValue("vendor_id") : $CurrentForm->getValue("x_vendor_id");
+        if (!$this->vendor_id->IsDetailKey) {
+            if (IsApi() && $val === null) {
+                $this->vendor_id->Visible = false; // Disable update for API request
+            } else {
+                $this->vendor_id->setFormValue($val);
+            }
+        }
+        if ($CurrentForm->hasValue("o_vendor_id")) {
+            $this->vendor_id->setOldValue($CurrentForm->getValue("o_vendor_id"));
+        }
+
         // Check field name 'id' first before field var 'x_id'
         $val = $CurrentForm->hasValue("id") ? $CurrentForm->getValue("id") : $CurrentForm->getValue("x_id");
         if (!$this->id->IsDetailKey && !$this->isGridAdd() && !$this->isAdd()) {
@@ -1312,6 +1340,7 @@ class SubTransactionDetailsGrid extends SubTransactionDetails
         }
         $this->transaction_id->CurrentValue = $this->transaction_id->FormValue;
         $this->bus_id->CurrentValue = $this->bus_id->FormValue;
+        $this->vendor_id->CurrentValue = $this->vendor_id->FormValue;
     }
 
     // Load recordset
@@ -1393,6 +1422,7 @@ class SubTransactionDetailsGrid extends SubTransactionDetails
         $this->created_by->setDbValue($row['created_by']);
         $this->ts_created->setDbValue($row['ts_created']);
         $this->ts_last_update->setDbValue($row['ts_last_update']);
+        $this->vendor_id->setDbValue($row['vendor_id']);
     }
 
     // Return a row with default values
@@ -1406,6 +1436,7 @@ class SubTransactionDetailsGrid extends SubTransactionDetails
         $row['created_by'] = $this->created_by->CurrentValue;
         $row['ts_created'] = $this->ts_created->CurrentValue;
         $row['ts_last_update'] = $this->ts_last_update->CurrentValue;
+        $row['vendor_id'] = $this->vendor_id->CurrentValue;
         return $row;
     }
 
@@ -1452,6 +1483,8 @@ class SubTransactionDetailsGrid extends SubTransactionDetails
         // ts_created
 
         // ts_last_update
+
+        // vendor_id
         if ($this->RowType == ROWTYPE_VIEW) {
             // id
             $this->id->ViewValue = $this->id->CurrentValue;
@@ -1519,6 +1552,28 @@ class SubTransactionDetailsGrid extends SubTransactionDetails
             $this->ts_last_update->ViewValue = FormatDateTime($this->ts_last_update->ViewValue, 0);
             $this->ts_last_update->ViewCustomAttributes = "";
 
+            // vendor_id
+            $this->vendor_id->ViewValue = $this->vendor_id->CurrentValue;
+            $curVal = strval($this->vendor_id->CurrentValue);
+            if ($curVal != "") {
+                $this->vendor_id->ViewValue = $this->vendor_id->lookupCacheOption($curVal);
+                if ($this->vendor_id->ViewValue === null) { // Lookup from database
+                    $filterWrk = "\"id\"" . SearchString("=", $curVal, DATATYPE_NUMBER, "");
+                    $sqlWrk = $this->vendor_id->Lookup->getSql(false, $filterWrk, '', $this, true, true);
+                    $rswrk = Conn()->executeQuery($sqlWrk)->fetchAll(\PDO::FETCH_BOTH);
+                    $ari = count($rswrk);
+                    if ($ari > 0) { // Lookup values found
+                        $arwrk = $this->vendor_id->Lookup->renderViewRow($rswrk[0]);
+                        $this->vendor_id->ViewValue = $this->vendor_id->displayValue($arwrk);
+                    } else {
+                        $this->vendor_id->ViewValue = $this->vendor_id->CurrentValue;
+                    }
+                }
+            } else {
+                $this->vendor_id->ViewValue = null;
+            }
+            $this->vendor_id->ViewCustomAttributes = "";
+
             // transaction_id
             $this->transaction_id->LinkCustomAttributes = "";
             $this->transaction_id->HrefValue = "";
@@ -1528,6 +1583,11 @@ class SubTransactionDetailsGrid extends SubTransactionDetails
             $this->bus_id->LinkCustomAttributes = "";
             $this->bus_id->HrefValue = "";
             $this->bus_id->TooltipValue = "";
+
+            // vendor_id
+            $this->vendor_id->LinkCustomAttributes = "";
+            $this->vendor_id->HrefValue = "";
+            $this->vendor_id->TooltipValue = "";
         } elseif ($this->RowType == ROWTYPE_ADD) {
             // transaction_id
             $this->transaction_id->EditAttrs["class"] = "form-control";
@@ -1605,6 +1665,42 @@ class SubTransactionDetailsGrid extends SubTransactionDetails
             }
             $this->bus_id->PlaceHolder = RemoveHtml($this->bus_id->caption());
 
+            // vendor_id
+            $this->vendor_id->EditAttrs["class"] = "form-control";
+            $this->vendor_id->EditCustomAttributes = "";
+            if (!$Security->isAdmin() && $Security->isLoggedIn() && !$this->userIDAllow("grid")) { // Non system admin
+                if (trim(strval($this->vendor_id->CurrentValue)) == "") {
+                    $filterWrk = "0=1";
+                } else {
+                    $filterWrk = "\"id\"" . SearchString("=", $this->vendor_id->CurrentValue, DATATYPE_NUMBER, "");
+                }
+                $sqlWrk = $this->vendor_id->Lookup->getSql(true, $filterWrk, '', $this, false, true);
+                $rswrk = Conn()->executeQuery($sqlWrk)->fetchAll(\PDO::FETCH_BOTH);
+                $arwrk = $rswrk;
+                $this->vendor_id->EditValue = $arwrk;
+            } else {
+                $this->vendor_id->EditValue = HtmlEncode($this->vendor_id->CurrentValue);
+                $curVal = strval($this->vendor_id->CurrentValue);
+                if ($curVal != "") {
+                    $this->vendor_id->EditValue = $this->vendor_id->lookupCacheOption($curVal);
+                    if ($this->vendor_id->EditValue === null) { // Lookup from database
+                        $filterWrk = "\"id\"" . SearchString("=", $curVal, DATATYPE_NUMBER, "");
+                        $sqlWrk = $this->vendor_id->Lookup->getSql(false, $filterWrk, '', $this, true, true);
+                        $rswrk = Conn()->executeQuery($sqlWrk)->fetchAll(\PDO::FETCH_BOTH);
+                        $ari = count($rswrk);
+                        if ($ari > 0) { // Lookup values found
+                            $arwrk = $this->vendor_id->Lookup->renderViewRow($rswrk[0]);
+                            $this->vendor_id->EditValue = $this->vendor_id->displayValue($arwrk);
+                        } else {
+                            $this->vendor_id->EditValue = HtmlEncode($this->vendor_id->CurrentValue);
+                        }
+                    }
+                } else {
+                    $this->vendor_id->EditValue = null;
+                }
+                $this->vendor_id->PlaceHolder = RemoveHtml($this->vendor_id->caption());
+            }
+
             // Add refer script
 
             // transaction_id
@@ -1614,6 +1710,10 @@ class SubTransactionDetailsGrid extends SubTransactionDetails
             // bus_id
             $this->bus_id->LinkCustomAttributes = "";
             $this->bus_id->HrefValue = "";
+
+            // vendor_id
+            $this->vendor_id->LinkCustomAttributes = "";
+            $this->vendor_id->HrefValue = "";
         } elseif ($this->RowType == ROWTYPE_EDIT) {
             // transaction_id
             $this->transaction_id->EditAttrs["class"] = "form-control";
@@ -1691,6 +1791,42 @@ class SubTransactionDetailsGrid extends SubTransactionDetails
             }
             $this->bus_id->PlaceHolder = RemoveHtml($this->bus_id->caption());
 
+            // vendor_id
+            $this->vendor_id->EditAttrs["class"] = "form-control";
+            $this->vendor_id->EditCustomAttributes = "";
+            if (!$Security->isAdmin() && $Security->isLoggedIn() && !$this->userIDAllow("grid")) { // Non system admin
+                if (trim(strval($this->vendor_id->CurrentValue)) == "") {
+                    $filterWrk = "0=1";
+                } else {
+                    $filterWrk = "\"id\"" . SearchString("=", $this->vendor_id->CurrentValue, DATATYPE_NUMBER, "");
+                }
+                $sqlWrk = $this->vendor_id->Lookup->getSql(true, $filterWrk, '', $this, false, true);
+                $rswrk = Conn()->executeQuery($sqlWrk)->fetchAll(\PDO::FETCH_BOTH);
+                $arwrk = $rswrk;
+                $this->vendor_id->EditValue = $arwrk;
+            } else {
+                $this->vendor_id->EditValue = HtmlEncode($this->vendor_id->CurrentValue);
+                $curVal = strval($this->vendor_id->CurrentValue);
+                if ($curVal != "") {
+                    $this->vendor_id->EditValue = $this->vendor_id->lookupCacheOption($curVal);
+                    if ($this->vendor_id->EditValue === null) { // Lookup from database
+                        $filterWrk = "\"id\"" . SearchString("=", $curVal, DATATYPE_NUMBER, "");
+                        $sqlWrk = $this->vendor_id->Lookup->getSql(false, $filterWrk, '', $this, true, true);
+                        $rswrk = Conn()->executeQuery($sqlWrk)->fetchAll(\PDO::FETCH_BOTH);
+                        $ari = count($rswrk);
+                        if ($ari > 0) { // Lookup values found
+                            $arwrk = $this->vendor_id->Lookup->renderViewRow($rswrk[0]);
+                            $this->vendor_id->EditValue = $this->vendor_id->displayValue($arwrk);
+                        } else {
+                            $this->vendor_id->EditValue = HtmlEncode($this->vendor_id->CurrentValue);
+                        }
+                    }
+                } else {
+                    $this->vendor_id->EditValue = null;
+                }
+                $this->vendor_id->PlaceHolder = RemoveHtml($this->vendor_id->caption());
+            }
+
             // Edit refer script
 
             // transaction_id
@@ -1700,6 +1836,10 @@ class SubTransactionDetailsGrid extends SubTransactionDetails
             // bus_id
             $this->bus_id->LinkCustomAttributes = "";
             $this->bus_id->HrefValue = "";
+
+            // vendor_id
+            $this->vendor_id->LinkCustomAttributes = "";
+            $this->vendor_id->HrefValue = "";
         }
         if ($this->RowType == ROWTYPE_ADD || $this->RowType == ROWTYPE_EDIT || $this->RowType == ROWTYPE_SEARCH) { // Add/Edit/Search row
             $this->setupFieldTitles();
@@ -1729,6 +1869,14 @@ class SubTransactionDetailsGrid extends SubTransactionDetails
             if (!$this->bus_id->IsDetailKey && EmptyValue($this->bus_id->FormValue)) {
                 $this->bus_id->addErrorMessage(str_replace("%s", $this->bus_id->caption(), $this->bus_id->RequiredErrorMessage));
             }
+        }
+        if ($this->vendor_id->Required) {
+            if (!$this->vendor_id->IsDetailKey && EmptyValue($this->vendor_id->FormValue)) {
+                $this->vendor_id->addErrorMessage(str_replace("%s", $this->vendor_id->caption(), $this->vendor_id->RequiredErrorMessage));
+            }
+        }
+        if (!CheckInteger($this->vendor_id->FormValue)) {
+            $this->vendor_id->addErrorMessage($this->vendor_id->getErrorMessage(false));
         }
 
         // Return validate result
@@ -1847,6 +1995,9 @@ class SubTransactionDetailsGrid extends SubTransactionDetails
             // bus_id
             $this->bus_id->setDbValueDef($rsnew, $this->bus_id->CurrentValue, 0, $this->bus_id->ReadOnly);
 
+            // vendor_id
+            $this->vendor_id->setDbValueDef($rsnew, $this->vendor_id->CurrentValue, null, $this->vendor_id->ReadOnly);
+
             // Check referential integrity for master table 'main_transactions'
             $validMasterRecord = true;
             $masterFilter = $this->sqlMasterFilter_main_transactions();
@@ -1911,6 +2062,44 @@ class SubTransactionDetailsGrid extends SubTransactionDetails
     {
         global $Language, $Security;
 
+        // Check if valid User ID
+        $validUser = false;
+        if ($Security->currentUserID() != "" && !EmptyValue($this->vendor_id->CurrentValue) && !$Security->isAdmin()) { // Non system admin
+            $validUser = $Security->isValidUserID($this->vendor_id->CurrentValue);
+            if (!$validUser) {
+                $userIdMsg = str_replace("%c", CurrentUserID(), $Language->phrase("UnAuthorizedUserID"));
+                $userIdMsg = str_replace("%u", $this->vendor_id->CurrentValue, $userIdMsg);
+                $this->setFailureMessage($userIdMsg);
+                return false;
+            }
+        }
+
+        // Check if valid key values for master user
+        if ($Security->currentUserID() != "" && !$Security->isAdmin()) { // Non system admin
+            $masterFilter = $this->sqlMasterFilter_main_transactions();
+            if (strval($this->transaction_id->CurrentValue) != "") {
+                $masterFilter = str_replace("@id@", AdjustSql($this->transaction_id->CurrentValue, "DB"), $masterFilter);
+            } else {
+                $masterFilter = "";
+            }
+            if ($masterFilter != "") {
+                $rsmaster = Container("main_transactions")->loadRs($masterFilter)->fetch(\PDO::FETCH_ASSOC);
+                $this->MasterRecordExists = $rsmaster !== false;
+                $validMasterKey = true;
+                if ($this->MasterRecordExists) {
+                    $validMasterKey = $Security->isValidUserID($rsmaster['vendor_id']);
+                } elseif ($this->getCurrentMasterTable() == "main_transactions") {
+                    $validMasterKey = false;
+                }
+                if (!$validMasterKey) {
+                    $masterUserIdMsg = str_replace("%c", CurrentUserID(), $Language->phrase("UnAuthorizedMasterUserID"));
+                    $masterUserIdMsg = str_replace("%f", $masterFilter, $masterUserIdMsg);
+                    $this->setFailureMessage($masterUserIdMsg);
+                    return false;
+                }
+            }
+        }
+
         // Set up foreign key field value from Session
         if ($this->getCurrentMasterTable() == "main_transactions") {
             $this->transaction_id->CurrentValue = $this->transaction_id->getSessionValue();
@@ -1947,6 +2136,9 @@ class SubTransactionDetailsGrid extends SubTransactionDetails
         // bus_id
         $this->bus_id->setDbValueDef($rsnew, $this->bus_id->CurrentValue, 0, false);
 
+        // vendor_id
+        $this->vendor_id->setDbValueDef($rsnew, $this->vendor_id->CurrentValue, null, false);
+
         // Call Row Inserting event
         $insertRow = $this->rowInserting($rsold, $rsnew);
         if ($insertRow) {
@@ -1981,6 +2173,16 @@ class SubTransactionDetailsGrid extends SubTransactionDetails
         return $addRow;
     }
 
+    // Show link optionally based on User ID
+    protected function showOptionLink($id = "")
+    {
+        global $Security;
+        if ($Security->isLoggedIn() && !$Security->isAdmin() && !$this->userIDAllow($id)) {
+            return $Security->isValidUserID($this->vendor_id->CurrentValue);
+        }
+        return true;
+    }
+
     // Set up master/detail based on QueryString
     protected function setupMasterParms()
     {
@@ -2013,6 +2215,8 @@ class SubTransactionDetailsGrid extends SubTransactionDetails
                 case "x_transaction_id":
                     break;
                 case "x_bus_id":
+                    break;
+                case "x_vendor_id":
                     break;
                 default:
                     $lookupFilter = "";

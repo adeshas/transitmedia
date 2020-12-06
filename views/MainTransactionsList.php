@@ -24,8 +24,10 @@ loadjs.ready("head", function () {
         ["campaign_id", [fields.campaign_id.required ? ew.Validators.required(fields.campaign_id.caption) : null], fields.campaign_id.isInvalid],
         ["operator_id", [fields.operator_id.required ? ew.Validators.required(fields.operator_id.caption) : null], fields.operator_id.isInvalid],
         ["payment_date", [fields.payment_date.required ? ew.Validators.required(fields.payment_date.caption) : null, ew.Validators.datetime(5)], fields.payment_date.isInvalid],
+        ["vendor_id", [fields.vendor_id.required ? ew.Validators.required(fields.vendor_id.caption) : null, ew.Validators.integer], fields.vendor_id.isInvalid],
         ["price_id", [fields.price_id.required ? ew.Validators.required(fields.price_id.caption) : null], fields.price_id.isInvalid],
         ["quantity", [fields.quantity.required ? ew.Validators.required(fields.quantity.caption) : null, ew.Validators.integer], fields.quantity.isInvalid],
+        ["assigned_buses", [fields.assigned_buses.required ? ew.Validators.required(fields.assigned_buses.caption) : null, ew.Validators.integer], fields.assigned_buses.isInvalid],
         ["start_date", [fields.start_date.required ? ew.Validators.required(fields.start_date.caption) : null, ew.Validators.datetime(5)], fields.start_date.isInvalid],
         ["end_date", [fields.end_date.required ? ew.Validators.required(fields.end_date.caption) : null, ew.Validators.datetime(5)], fields.end_date.isInvalid],
         ["visible_status_id", [fields.visible_status_id.required ? ew.Validators.required(fields.visible_status_id.caption) : null], fields.visible_status_id.isInvalid],
@@ -96,9 +98,13 @@ loadjs.ready("head", function () {
             return false;
         if (ew.valueChanged(fobj, rowIndex, "payment_date", false))
             return false;
+        if (ew.valueChanged(fobj, rowIndex, "vendor_id", false))
+            return false;
         if (ew.valueChanged(fobj, rowIndex, "price_id", false))
             return false;
         if (ew.valueChanged(fobj, rowIndex, "quantity", false))
+            return false;
+        if (ew.valueChanged(fobj, rowIndex, "assigned_buses", false))
             return false;
         if (ew.valueChanged(fobj, rowIndex, "start_date", false))
             return false;
@@ -129,6 +135,7 @@ loadjs.ready("head", function () {
     // Dynamic selection lists
     fmain_transactionslist.lists.campaign_id = <?= $Page->campaign_id->toClientList($Page) ?>;
     fmain_transactionslist.lists.operator_id = <?= $Page->operator_id->toClientList($Page) ?>;
+    fmain_transactionslist.lists.vendor_id = <?= $Page->vendor_id->toClientList($Page) ?>;
     fmain_transactionslist.lists.price_id = <?= $Page->price_id->toClientList($Page) ?>;
     fmain_transactionslist.lists.visible_status_id = <?= $Page->visible_status_id->toClientList($Page) ?>;
     fmain_transactionslist.lists.status_id = <?= $Page->status_id->toClientList($Page) ?>;
@@ -271,7 +278,7 @@ $Page->ListOptions->render("header", "left");
         <th data-name="id" class="<?= $Page->id->headerCellClass() ?>"><div id="elh_main_transactions_id" class="main_transactions_id"><?= $Page->renderSort($Page->id) ?></div></th>
 <?php } ?>
 <?php if ($Page->campaign_id->Visible) { // campaign_id ?>
-        <th data-name="campaign_id" class="<?= $Page->campaign_id->headerCellClass() ?>"><div id="elh_main_transactions_campaign_id" class="main_transactions_campaign_id"><?= $Page->renderSort($Page->campaign_id) ?></div></th>
+        <th data-name="campaign_id" class="<?= $Page->campaign_id->headerCellClass() ?>" style="white-space: nowrap;"><div id="elh_main_transactions_campaign_id" class="main_transactions_campaign_id"><?= $Page->renderSort($Page->campaign_id) ?></div></th>
 <?php } ?>
 <?php if ($Page->operator_id->Visible) { // operator_id ?>
         <th data-name="operator_id" class="<?= $Page->operator_id->headerCellClass() ?>"><div id="elh_main_transactions_operator_id" class="main_transactions_operator_id"><?= $Page->renderSort($Page->operator_id) ?></div></th>
@@ -279,11 +286,17 @@ $Page->ListOptions->render("header", "left");
 <?php if ($Page->payment_date->Visible) { // payment_date ?>
         <th data-name="payment_date" class="<?= $Page->payment_date->headerCellClass() ?>"><div id="elh_main_transactions_payment_date" class="main_transactions_payment_date"><?= $Page->renderSort($Page->payment_date) ?></div></th>
 <?php } ?>
+<?php if ($Page->vendor_id->Visible) { // vendor_id ?>
+        <th data-name="vendor_id" class="<?= $Page->vendor_id->headerCellClass() ?>" style="white-space: nowrap;"><div id="elh_main_transactions_vendor_id" class="main_transactions_vendor_id"><?= $Page->renderSort($Page->vendor_id) ?></div></th>
+<?php } ?>
 <?php if ($Page->price_id->Visible) { // price_id ?>
-        <th data-name="price_id" class="<?= $Page->price_id->headerCellClass() ?>"><div id="elh_main_transactions_price_id" class="main_transactions_price_id"><?= $Page->renderSort($Page->price_id) ?></div></th>
+        <th data-name="price_id" class="<?= $Page->price_id->headerCellClass() ?>" style="white-space: nowrap;"><div id="elh_main_transactions_price_id" class="main_transactions_price_id"><?= $Page->renderSort($Page->price_id) ?></div></th>
 <?php } ?>
 <?php if ($Page->quantity->Visible) { // quantity ?>
         <th data-name="quantity" class="<?= $Page->quantity->headerCellClass() ?>"><div id="elh_main_transactions_quantity" class="main_transactions_quantity"><?= $Page->renderSort($Page->quantity) ?></div></th>
+<?php } ?>
+<?php if ($Page->assigned_buses->Visible) { // assigned_buses ?>
+        <th data-name="assigned_buses" class="<?= $Page->assigned_buses->headerCellClass() ?>"><div id="elh_main_transactions_assigned_buses" class="main_transactions_assigned_buses"><?= $Page->renderSort($Page->assigned_buses) ?></div></th>
 <?php } ?>
 <?php if ($Page->start_date->Visible) { // start_date ?>
         <th data-name="start_date" class="<?= $Page->start_date->headerCellClass() ?>"><div id="elh_main_transactions_start_date" class="main_transactions_start_date"><?= $Page->renderSort($Page->start_date) ?></div></th>
@@ -304,7 +317,7 @@ $Page->ListOptions->render("header", "left");
         <th data-name="payment_status_id" class="<?= $Page->payment_status_id->headerCellClass() ?>"><div id="elh_main_transactions_payment_status_id" class="main_transactions_payment_status_id"><?= $Page->renderSort($Page->payment_status_id) ?></div></th>
 <?php } ?>
 <?php if ($Page->total->Visible) { // total ?>
-        <th data-name="total" class="<?= $Page->total->headerCellClass() ?>"><div id="elh_main_transactions_total" class="main_transactions_total"><?= $Page->renderSort($Page->total) ?></div></th>
+        <th data-name="total" class="<?= $Page->total->headerCellClass() ?>" style="white-space: nowrap;"><div id="elh_main_transactions_total" class="main_transactions_total"><?= $Page->renderSort($Page->total) ?></div></th>
 <?php } ?>
 <?php
 // Render list options (header, right)
@@ -658,6 +671,113 @@ loadjs.ready(["fmain_transactionslist", "datetimepicker"], function() {
 <?php } ?>
 </td>
     <?php } ?>
+    <?php if ($Page->vendor_id->Visible) { // vendor_id ?>
+        <td data-name="vendor_id" <?= $Page->vendor_id->cellAttributes() ?>>
+<?php if ($Page->RowType == ROWTYPE_ADD) { // Add record ?>
+<?php if (!$Security->isAdmin() && $Security->isLoggedIn() && !$Page->userIDAllow($Page->CurrentAction)) { // Non system admin ?>
+<span id="el<?= $Page->RowCount ?>_main_transactions_vendor_id" class="form-group">
+    <select
+        id="x<?= $Page->RowIndex ?>_vendor_id"
+        name="x<?= $Page->RowIndex ?>_vendor_id"
+        class="form-control ew-select<?= $Page->vendor_id->isInvalidClass() ?>"
+        data-select2-id="main_transactions_x<?= $Page->RowIndex ?>_vendor_id"
+        data-table="main_transactions"
+        data-field="x_vendor_id"
+        data-value-separator="<?= $Page->vendor_id->displayValueSeparatorAttribute() ?>"
+        data-placeholder="<?= HtmlEncode($Page->vendor_id->getPlaceHolder()) ?>"
+        <?= $Page->vendor_id->editAttributes() ?>>
+        <?= $Page->vendor_id->selectOptionListHtml("x{$Page->RowIndex}_vendor_id") ?>
+    </select>
+    <div class="invalid-feedback"><?= $Page->vendor_id->getErrorMessage() ?></div>
+<?= $Page->vendor_id->Lookup->getParamTag($Page, "p_x" . $Page->RowIndex . "_vendor_id") ?>
+<script>
+loadjs.ready("head", function() {
+    var el = document.querySelector("select[data-select2-id='main_transactions_x<?= $Page->RowIndex ?>_vendor_id']"),
+        options = { name: "x<?= $Page->RowIndex ?>_vendor_id", selectId: "main_transactions_x<?= $Page->RowIndex ?>_vendor_id", language: ew.LANGUAGE_ID, dir: ew.IS_RTL ? "rtl" : "ltr" };
+    options.dropdownParent = $(el).closest("#ew-modal-dialog, #ew-add-opt-dialog")[0];
+    Object.assign(options, ew.vars.tables.main_transactions.fields.vendor_id.selectOptions);
+    ew.createSelect(options);
+});
+</script>
+</span>
+<?php } else { ?>
+<span id="el<?= $Page->RowCount ?>_main_transactions_vendor_id" class="form-group">
+<?php
+$onchange = $Page->vendor_id->EditAttrs->prepend("onchange", "");
+$onchange = ($onchange) ? ' onchange="' . JsEncode($onchange) . '"' : '';
+$Page->vendor_id->EditAttrs["onchange"] = "";
+?>
+<span id="as_x<?= $Page->RowIndex ?>_vendor_id" class="ew-auto-suggest">
+    <input type="<?= $Page->vendor_id->getInputTextType() ?>" class="form-control" name="sv_x<?= $Page->RowIndex ?>_vendor_id" id="sv_x<?= $Page->RowIndex ?>_vendor_id" value="<?= RemoveHtml($Page->vendor_id->EditValue) ?>" size="30" placeholder="<?= HtmlEncode($Page->vendor_id->getPlaceHolder()) ?>" data-placeholder="<?= HtmlEncode($Page->vendor_id->getPlaceHolder()) ?>"<?= $Page->vendor_id->editAttributes() ?>>
+</span>
+<input type="hidden" is="selection-list" class="form-control" data-table="main_transactions" data-field="x_vendor_id" data-input="sv_x<?= $Page->RowIndex ?>_vendor_id" data-value-separator="<?= $Page->vendor_id->displayValueSeparatorAttribute() ?>" name="x<?= $Page->RowIndex ?>_vendor_id" id="x<?= $Page->RowIndex ?>_vendor_id" value="<?= HtmlEncode($Page->vendor_id->CurrentValue) ?>"<?= $onchange ?>>
+<div class="invalid-feedback"><?= $Page->vendor_id->getErrorMessage() ?></div>
+<script>
+loadjs.ready(["fmain_transactionslist"], function() {
+    fmain_transactionslist.createAutoSuggest(Object.assign({"id":"x<?= $Page->RowIndex ?>_vendor_id","forceSelect":false}, ew.vars.tables.main_transactions.fields.vendor_id.autoSuggestOptions));
+});
+</script>
+<?= $Page->vendor_id->Lookup->getParamTag($Page, "p_x" . $Page->RowIndex . "_vendor_id") ?>
+</span>
+<?php } ?>
+<input type="hidden" data-table="main_transactions" data-field="x_vendor_id" data-hidden="1" name="o<?= $Page->RowIndex ?>_vendor_id" id="o<?= $Page->RowIndex ?>_vendor_id" value="<?= HtmlEncode($Page->vendor_id->OldValue) ?>">
+<?php } ?>
+<?php if ($Page->RowType == ROWTYPE_EDIT) { // Edit record ?>
+<?php if (!$Security->isAdmin() && $Security->isLoggedIn() && !$Page->userIDAllow($Page->CurrentAction)) { // Non system admin ?>
+<span id="el<?= $Page->RowCount ?>_main_transactions_vendor_id" class="form-group">
+    <select
+        id="x<?= $Page->RowIndex ?>_vendor_id"
+        name="x<?= $Page->RowIndex ?>_vendor_id"
+        class="form-control ew-select<?= $Page->vendor_id->isInvalidClass() ?>"
+        data-select2-id="main_transactions_x<?= $Page->RowIndex ?>_vendor_id"
+        data-table="main_transactions"
+        data-field="x_vendor_id"
+        data-value-separator="<?= $Page->vendor_id->displayValueSeparatorAttribute() ?>"
+        data-placeholder="<?= HtmlEncode($Page->vendor_id->getPlaceHolder()) ?>"
+        <?= $Page->vendor_id->editAttributes() ?>>
+        <?= $Page->vendor_id->selectOptionListHtml("x{$Page->RowIndex}_vendor_id") ?>
+    </select>
+    <div class="invalid-feedback"><?= $Page->vendor_id->getErrorMessage() ?></div>
+<?= $Page->vendor_id->Lookup->getParamTag($Page, "p_x" . $Page->RowIndex . "_vendor_id") ?>
+<script>
+loadjs.ready("head", function() {
+    var el = document.querySelector("select[data-select2-id='main_transactions_x<?= $Page->RowIndex ?>_vendor_id']"),
+        options = { name: "x<?= $Page->RowIndex ?>_vendor_id", selectId: "main_transactions_x<?= $Page->RowIndex ?>_vendor_id", language: ew.LANGUAGE_ID, dir: ew.IS_RTL ? "rtl" : "ltr" };
+    options.dropdownParent = $(el).closest("#ew-modal-dialog, #ew-add-opt-dialog")[0];
+    Object.assign(options, ew.vars.tables.main_transactions.fields.vendor_id.selectOptions);
+    ew.createSelect(options);
+});
+</script>
+</span>
+<?php } else { ?>
+<span id="el<?= $Page->RowCount ?>_main_transactions_vendor_id" class="form-group">
+<?php
+$onchange = $Page->vendor_id->EditAttrs->prepend("onchange", "");
+$onchange = ($onchange) ? ' onchange="' . JsEncode($onchange) . '"' : '';
+$Page->vendor_id->EditAttrs["onchange"] = "";
+?>
+<span id="as_x<?= $Page->RowIndex ?>_vendor_id" class="ew-auto-suggest">
+    <input type="<?= $Page->vendor_id->getInputTextType() ?>" class="form-control" name="sv_x<?= $Page->RowIndex ?>_vendor_id" id="sv_x<?= $Page->RowIndex ?>_vendor_id" value="<?= RemoveHtml($Page->vendor_id->EditValue) ?>" size="30" placeholder="<?= HtmlEncode($Page->vendor_id->getPlaceHolder()) ?>" data-placeholder="<?= HtmlEncode($Page->vendor_id->getPlaceHolder()) ?>"<?= $Page->vendor_id->editAttributes() ?>>
+</span>
+<input type="hidden" is="selection-list" class="form-control" data-table="main_transactions" data-field="x_vendor_id" data-input="sv_x<?= $Page->RowIndex ?>_vendor_id" data-value-separator="<?= $Page->vendor_id->displayValueSeparatorAttribute() ?>" name="x<?= $Page->RowIndex ?>_vendor_id" id="x<?= $Page->RowIndex ?>_vendor_id" value="<?= HtmlEncode($Page->vendor_id->CurrentValue) ?>"<?= $onchange ?>>
+<div class="invalid-feedback"><?= $Page->vendor_id->getErrorMessage() ?></div>
+<script>
+loadjs.ready(["fmain_transactionslist"], function() {
+    fmain_transactionslist.createAutoSuggest(Object.assign({"id":"x<?= $Page->RowIndex ?>_vendor_id","forceSelect":false}, ew.vars.tables.main_transactions.fields.vendor_id.autoSuggestOptions));
+});
+</script>
+<?= $Page->vendor_id->Lookup->getParamTag($Page, "p_x" . $Page->RowIndex . "_vendor_id") ?>
+</span>
+<?php } ?>
+<?php } ?>
+<?php if ($Page->RowType == ROWTYPE_VIEW) { // View record ?>
+<span id="el<?= $Page->RowCount ?>_main_transactions_vendor_id">
+<span<?= $Page->vendor_id->viewAttributes() ?>>
+<?= $Page->vendor_id->getViewValue() ?></span>
+</span>
+<?php } ?>
+</td>
+    <?php } ?>
     <?php if ($Page->price_id->Visible) { // price_id ?>
         <td data-name="price_id" <?= $Page->price_id->cellAttributes() ?>>
 <?php if ($Page->RowType == ROWTYPE_ADD) { // Add record ?>
@@ -742,6 +862,29 @@ loadjs.ready("head", function() {
 <span id="el<?= $Page->RowCount ?>_main_transactions_quantity">
 <span<?= $Page->quantity->viewAttributes() ?>>
 <?= $Page->quantity->getViewValue() ?></span>
+</span>
+<?php } ?>
+</td>
+    <?php } ?>
+    <?php if ($Page->assigned_buses->Visible) { // assigned_buses ?>
+        <td data-name="assigned_buses" <?= $Page->assigned_buses->cellAttributes() ?>>
+<?php if ($Page->RowType == ROWTYPE_ADD) { // Add record ?>
+<span id="el<?= $Page->RowCount ?>_main_transactions_assigned_buses" class="form-group">
+<input type="<?= $Page->assigned_buses->getInputTextType() ?>" data-table="main_transactions" data-field="x_assigned_buses" name="x<?= $Page->RowIndex ?>_assigned_buses" id="x<?= $Page->RowIndex ?>_assigned_buses" size="30" placeholder="<?= HtmlEncode($Page->assigned_buses->getPlaceHolder()) ?>" value="<?= $Page->assigned_buses->EditValue ?>"<?= $Page->assigned_buses->editAttributes() ?>>
+<div class="invalid-feedback"><?= $Page->assigned_buses->getErrorMessage() ?></div>
+</span>
+<input type="hidden" data-table="main_transactions" data-field="x_assigned_buses" data-hidden="1" name="o<?= $Page->RowIndex ?>_assigned_buses" id="o<?= $Page->RowIndex ?>_assigned_buses" value="<?= HtmlEncode($Page->assigned_buses->OldValue) ?>">
+<?php } ?>
+<?php if ($Page->RowType == ROWTYPE_EDIT) { // Edit record ?>
+<span id="el<?= $Page->RowCount ?>_main_transactions_assigned_buses" class="form-group">
+<input type="<?= $Page->assigned_buses->getInputTextType() ?>" data-table="main_transactions" data-field="x_assigned_buses" name="x<?= $Page->RowIndex ?>_assigned_buses" id="x<?= $Page->RowIndex ?>_assigned_buses" size="30" placeholder="<?= HtmlEncode($Page->assigned_buses->getPlaceHolder()) ?>" value="<?= $Page->assigned_buses->EditValue ?>"<?= $Page->assigned_buses->editAttributes() ?>>
+<div class="invalid-feedback"><?= $Page->assigned_buses->getErrorMessage() ?></div>
+</span>
+<?php } ?>
+<?php if ($Page->RowType == ROWTYPE_VIEW) { // View record ?>
+<span id="el<?= $Page->RowCount ?>_main_transactions_assigned_buses">
+<span<?= $Page->assigned_buses->viewAttributes() ?>>
+<?= $Page->assigned_buses->getViewValue() ?></span>
 </span>
 <?php } ?>
 </td>
@@ -1266,6 +1409,57 @@ loadjs.ready(["fmain_transactionslist", "datetimepicker"], function() {
 <input type="hidden" data-table="main_transactions" data-field="x_payment_date" data-hidden="1" name="o<?= $Page->RowIndex ?>_payment_date" id="o<?= $Page->RowIndex ?>_payment_date" value="<?= HtmlEncode($Page->payment_date->OldValue) ?>">
 </td>
     <?php } ?>
+    <?php if ($Page->vendor_id->Visible) { // vendor_id ?>
+        <td data-name="vendor_id">
+<?php if (!$Security->isAdmin() && $Security->isLoggedIn() && !$Page->userIDAllow($Page->CurrentAction)) { // Non system admin ?>
+<span id="el$rowindex$_main_transactions_vendor_id" class="form-group main_transactions_vendor_id">
+    <select
+        id="x<?= $Page->RowIndex ?>_vendor_id"
+        name="x<?= $Page->RowIndex ?>_vendor_id"
+        class="form-control ew-select<?= $Page->vendor_id->isInvalidClass() ?>"
+        data-select2-id="main_transactions_x<?= $Page->RowIndex ?>_vendor_id"
+        data-table="main_transactions"
+        data-field="x_vendor_id"
+        data-value-separator="<?= $Page->vendor_id->displayValueSeparatorAttribute() ?>"
+        data-placeholder="<?= HtmlEncode($Page->vendor_id->getPlaceHolder()) ?>"
+        <?= $Page->vendor_id->editAttributes() ?>>
+        <?= $Page->vendor_id->selectOptionListHtml("x{$Page->RowIndex}_vendor_id") ?>
+    </select>
+    <div class="invalid-feedback"><?= $Page->vendor_id->getErrorMessage() ?></div>
+<?= $Page->vendor_id->Lookup->getParamTag($Page, "p_x" . $Page->RowIndex . "_vendor_id") ?>
+<script>
+loadjs.ready("head", function() {
+    var el = document.querySelector("select[data-select2-id='main_transactions_x<?= $Page->RowIndex ?>_vendor_id']"),
+        options = { name: "x<?= $Page->RowIndex ?>_vendor_id", selectId: "main_transactions_x<?= $Page->RowIndex ?>_vendor_id", language: ew.LANGUAGE_ID, dir: ew.IS_RTL ? "rtl" : "ltr" };
+    options.dropdownParent = $(el).closest("#ew-modal-dialog, #ew-add-opt-dialog")[0];
+    Object.assign(options, ew.vars.tables.main_transactions.fields.vendor_id.selectOptions);
+    ew.createSelect(options);
+});
+</script>
+</span>
+<?php } else { ?>
+<span id="el$rowindex$_main_transactions_vendor_id" class="form-group main_transactions_vendor_id">
+<?php
+$onchange = $Page->vendor_id->EditAttrs->prepend("onchange", "");
+$onchange = ($onchange) ? ' onchange="' . JsEncode($onchange) . '"' : '';
+$Page->vendor_id->EditAttrs["onchange"] = "";
+?>
+<span id="as_x<?= $Page->RowIndex ?>_vendor_id" class="ew-auto-suggest">
+    <input type="<?= $Page->vendor_id->getInputTextType() ?>" class="form-control" name="sv_x<?= $Page->RowIndex ?>_vendor_id" id="sv_x<?= $Page->RowIndex ?>_vendor_id" value="<?= RemoveHtml($Page->vendor_id->EditValue) ?>" size="30" placeholder="<?= HtmlEncode($Page->vendor_id->getPlaceHolder()) ?>" data-placeholder="<?= HtmlEncode($Page->vendor_id->getPlaceHolder()) ?>"<?= $Page->vendor_id->editAttributes() ?>>
+</span>
+<input type="hidden" is="selection-list" class="form-control" data-table="main_transactions" data-field="x_vendor_id" data-input="sv_x<?= $Page->RowIndex ?>_vendor_id" data-value-separator="<?= $Page->vendor_id->displayValueSeparatorAttribute() ?>" name="x<?= $Page->RowIndex ?>_vendor_id" id="x<?= $Page->RowIndex ?>_vendor_id" value="<?= HtmlEncode($Page->vendor_id->CurrentValue) ?>"<?= $onchange ?>>
+<div class="invalid-feedback"><?= $Page->vendor_id->getErrorMessage() ?></div>
+<script>
+loadjs.ready(["fmain_transactionslist"], function() {
+    fmain_transactionslist.createAutoSuggest(Object.assign({"id":"x<?= $Page->RowIndex ?>_vendor_id","forceSelect":false}, ew.vars.tables.main_transactions.fields.vendor_id.autoSuggestOptions));
+});
+</script>
+<?= $Page->vendor_id->Lookup->getParamTag($Page, "p_x" . $Page->RowIndex . "_vendor_id") ?>
+</span>
+<?php } ?>
+<input type="hidden" data-table="main_transactions" data-field="x_vendor_id" data-hidden="1" name="o<?= $Page->RowIndex ?>_vendor_id" id="o<?= $Page->RowIndex ?>_vendor_id" value="<?= HtmlEncode($Page->vendor_id->OldValue) ?>">
+</td>
+    <?php } ?>
     <?php if ($Page->price_id->Visible) { // price_id ?>
         <td data-name="price_id">
 <span id="el$rowindex$_main_transactions_price_id" class="form-group main_transactions_price_id">
@@ -1303,6 +1497,15 @@ loadjs.ready("head", function() {
 <div class="invalid-feedback"><?= $Page->quantity->getErrorMessage() ?></div>
 </span>
 <input type="hidden" data-table="main_transactions" data-field="x_quantity" data-hidden="1" name="o<?= $Page->RowIndex ?>_quantity" id="o<?= $Page->RowIndex ?>_quantity" value="<?= HtmlEncode($Page->quantity->OldValue) ?>">
+</td>
+    <?php } ?>
+    <?php if ($Page->assigned_buses->Visible) { // assigned_buses ?>
+        <td data-name="assigned_buses">
+<span id="el$rowindex$_main_transactions_assigned_buses" class="form-group main_transactions_assigned_buses">
+<input type="<?= $Page->assigned_buses->getInputTextType() ?>" data-table="main_transactions" data-field="x_assigned_buses" name="x<?= $Page->RowIndex ?>_assigned_buses" id="x<?= $Page->RowIndex ?>_assigned_buses" size="30" placeholder="<?= HtmlEncode($Page->assigned_buses->getPlaceHolder()) ?>" value="<?= $Page->assigned_buses->EditValue ?>"<?= $Page->assigned_buses->editAttributes() ?>>
+<div class="invalid-feedback"><?= $Page->assigned_buses->getErrorMessage() ?></div>
+</span>
+<input type="hidden" data-table="main_transactions" data-field="x_assigned_buses" data-hidden="1" name="o<?= $Page->RowIndex ?>_assigned_buses" id="o<?= $Page->RowIndex ?>_assigned_buses" value="<?= HtmlEncode($Page->assigned_buses->OldValue) ?>">
 </td>
     <?php } ?>
     <?php if ($Page->start_date->Visible) { // start_date ?>
@@ -1516,6 +1719,11 @@ $Page->ListOptions->render("footer", "left");
         &nbsp;
         </span></td>
     <?php } ?>
+    <?php if ($Page->vendor_id->Visible) { // vendor_id ?>
+        <td data-name="vendor_id" class="<?= $Page->vendor_id->footerCellClass() ?>"><span id="elf_main_transactions_vendor_id" class="main_transactions_vendor_id">
+        &nbsp;
+        </span></td>
+    <?php } ?>
     <?php if ($Page->price_id->Visible) { // price_id ?>
         <td data-name="price_id" class="<?= $Page->price_id->footerCellClass() ?>"><span id="elf_main_transactions_price_id" class="main_transactions_price_id">
         &nbsp;
@@ -1525,6 +1733,11 @@ $Page->ListOptions->render("footer", "left");
         <td data-name="quantity" class="<?= $Page->quantity->footerCellClass() ?>"><span id="elf_main_transactions_quantity" class="main_transactions_quantity">
         <span class="ew-aggregate"><?= $Language->phrase("TOTAL") ?></span><span class="ew-aggregate-value">
         <?= $Page->quantity->ViewValue ?></span>
+        </span></td>
+    <?php } ?>
+    <?php if ($Page->assigned_buses->Visible) { // assigned_buses ?>
+        <td data-name="assigned_buses" class="<?= $Page->assigned_buses->footerCellClass() ?>"><span id="elf_main_transactions_assigned_buses" class="main_transactions_assigned_buses">
+        &nbsp;
         </span></td>
     <?php } ?>
     <?php if ($Page->start_date->Visible) { // start_date ?>

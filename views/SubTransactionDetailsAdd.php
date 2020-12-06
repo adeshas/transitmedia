@@ -19,7 +19,8 @@ loadjs.ready("head", function () {
     var fields = ew.vars.tables.sub_transaction_details.fields;
     fsub_transaction_detailsadd.addFields([
         ["transaction_id", [fields.transaction_id.required ? ew.Validators.required(fields.transaction_id.caption) : null], fields.transaction_id.isInvalid],
-        ["bus_id", [fields.bus_id.required ? ew.Validators.required(fields.bus_id.caption) : null], fields.bus_id.isInvalid]
+        ["bus_id", [fields.bus_id.required ? ew.Validators.required(fields.bus_id.caption) : null], fields.bus_id.isInvalid],
+        ["vendor_id", [fields.vendor_id.required ? ew.Validators.required(fields.vendor_id.caption) : null, ew.Validators.integer], fields.vendor_id.isInvalid]
     ]);
 
     // Set invalid fields
@@ -88,6 +89,7 @@ loadjs.ready("head", function () {
     // Dynamic selection lists
     fsub_transaction_detailsadd.lists.transaction_id = <?= $Page->transaction_id->toClientList($Page) ?>;
     fsub_transaction_detailsadd.lists.bus_id = <?= $Page->bus_id->toClientList($Page) ?>;
+    fsub_transaction_detailsadd.lists.vendor_id = <?= $Page->vendor_id->toClientList($Page) ?>;
     loadjs.done("fsub_transaction_detailsadd");
 });
 </script>
@@ -206,6 +208,69 @@ loadjs.ready("head", function() {
 <input type="text" readonly class="form-control-plaintext" value="<?= HtmlEncode(RemoveHtml($Page->bus_id->getDisplayValue($Page->bus_id->ViewValue))) ?>"></span>
 </span>
 <input type="hidden" data-table="sub_transaction_details" data-field="x_bus_id" data-hidden="1" name="x_bus_id" id="x_bus_id" value="<?= HtmlEncode($Page->bus_id->FormValue) ?>">
+<?php } ?>
+</div></div>
+    </div>
+<?php } ?>
+<?php if ($Page->vendor_id->Visible) { // vendor_id ?>
+    <div id="r_vendor_id" class="form-group row">
+        <label id="elh_sub_transaction_details_vendor_id" class="<?= $Page->LeftColumnClass ?>"><?= $Page->vendor_id->caption() ?><?= $Page->vendor_id->Required ? $Language->phrase("FieldRequiredIndicator") : "" ?></label>
+        <div class="<?= $Page->RightColumnClass ?>"><div <?= $Page->vendor_id->cellAttributes() ?>>
+<?php if (!$Page->isConfirm()) { ?>
+<?php if (!$Security->isAdmin() && $Security->isLoggedIn() && !$Page->userIDAllow("add")) { // Non system admin ?>
+<span id="el_sub_transaction_details_vendor_id">
+    <select
+        id="x_vendor_id"
+        name="x_vendor_id"
+        class="form-control ew-select<?= $Page->vendor_id->isInvalidClass() ?>"
+        data-select2-id="sub_transaction_details_x_vendor_id"
+        data-table="sub_transaction_details"
+        data-field="x_vendor_id"
+        data-value-separator="<?= $Page->vendor_id->displayValueSeparatorAttribute() ?>"
+        data-placeholder="<?= HtmlEncode($Page->vendor_id->getPlaceHolder()) ?>"
+        <?= $Page->vendor_id->editAttributes() ?>>
+        <?= $Page->vendor_id->selectOptionListHtml("x_vendor_id") ?>
+    </select>
+    <?= $Page->vendor_id->getCustomMessage() ?>
+    <div class="invalid-feedback"><?= $Page->vendor_id->getErrorMessage() ?></div>
+<?= $Page->vendor_id->Lookup->getParamTag($Page, "p_x_vendor_id") ?>
+<script>
+loadjs.ready("head", function() {
+    var el = document.querySelector("select[data-select2-id='sub_transaction_details_x_vendor_id']"),
+        options = { name: "x_vendor_id", selectId: "sub_transaction_details_x_vendor_id", language: ew.LANGUAGE_ID, dir: ew.IS_RTL ? "rtl" : "ltr" };
+    options.dropdownParent = $(el).closest("#ew-modal-dialog, #ew-add-opt-dialog")[0];
+    Object.assign(options, ew.vars.tables.sub_transaction_details.fields.vendor_id.selectOptions);
+    ew.createSelect(options);
+});
+</script>
+</span>
+<?php } else { ?>
+<span id="el_sub_transaction_details_vendor_id">
+<?php
+$onchange = $Page->vendor_id->EditAttrs->prepend("onchange", "");
+$onchange = ($onchange) ? ' onchange="' . JsEncode($onchange) . '"' : '';
+$Page->vendor_id->EditAttrs["onchange"] = "";
+?>
+<span id="as_x_vendor_id" class="ew-auto-suggest">
+    <input type="<?= $Page->vendor_id->getInputTextType() ?>" class="form-control" name="sv_x_vendor_id" id="sv_x_vendor_id" value="<?= RemoveHtml($Page->vendor_id->EditValue) ?>" size="30" placeholder="<?= HtmlEncode($Page->vendor_id->getPlaceHolder()) ?>" data-placeholder="<?= HtmlEncode($Page->vendor_id->getPlaceHolder()) ?>"<?= $Page->vendor_id->editAttributes() ?> aria-describedby="x_vendor_id_help">
+</span>
+<input type="hidden" is="selection-list" class="form-control" data-table="sub_transaction_details" data-field="x_vendor_id" data-input="sv_x_vendor_id" data-value-separator="<?= $Page->vendor_id->displayValueSeparatorAttribute() ?>" name="x_vendor_id" id="x_vendor_id" value="<?= HtmlEncode($Page->vendor_id->CurrentValue) ?>"<?= $onchange ?>>
+<?= $Page->vendor_id->getCustomMessage() ?>
+<div class="invalid-feedback"><?= $Page->vendor_id->getErrorMessage() ?></div>
+<script>
+loadjs.ready(["fsub_transaction_detailsadd"], function() {
+    fsub_transaction_detailsadd.createAutoSuggest(Object.assign({"id":"x_vendor_id","forceSelect":false}, ew.vars.tables.sub_transaction_details.fields.vendor_id.autoSuggestOptions));
+});
+</script>
+<?= $Page->vendor_id->Lookup->getParamTag($Page, "p_x_vendor_id") ?>
+</span>
+<?php } ?>
+<?php } else { ?>
+<span id="el_sub_transaction_details_vendor_id">
+<span<?= $Page->vendor_id->viewAttributes() ?>>
+<input type="text" readonly class="form-control-plaintext" value="<?= HtmlEncode(RemoveHtml($Page->vendor_id->getDisplayValue($Page->vendor_id->ViewValue))) ?>"></span>
+</span>
+<input type="hidden" data-table="sub_transaction_details" data-field="x_vendor_id" data-hidden="1" name="x_vendor_id" id="x_vendor_id" value="<?= HtmlEncode($Page->vendor_id->FormValue) ?>">
 <?php } ?>
 </div></div>
     </div>

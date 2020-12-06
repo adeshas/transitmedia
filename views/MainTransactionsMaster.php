@@ -53,6 +53,17 @@ $main_transactions = Container("main_transactions");
 </td>
         </tr>
 <?php } ?>
+<?php if ($main_transactions->vendor_id->Visible) { // vendor_id ?>
+        <tr id="r_vendor_id">
+            <td class="<?= $main_transactions->TableLeftColumnClass ?>"><?= $main_transactions->vendor_id->caption() ?></td>
+            <td <?= $main_transactions->vendor_id->cellAttributes() ?>>
+<span id="el_main_transactions_vendor_id">
+<span<?= $main_transactions->vendor_id->viewAttributes() ?>>
+<?= $main_transactions->vendor_id->getViewValue() ?></span>
+</span>
+</td>
+        </tr>
+<?php } ?>
 <?php if ($main_transactions->price_id->Visible) { // price_id ?>
         <tr id="r_price_id">
             <td class="<?= $main_transactions->TableLeftColumnClass ?>"><?= $main_transactions->price_id->caption() ?></td>
@@ -71,6 +82,17 @@ $main_transactions = Container("main_transactions");
 <span id="el_main_transactions_quantity">
 <span<?= $main_transactions->quantity->viewAttributes() ?>>
 <?= $main_transactions->quantity->getViewValue() ?></span>
+</span>
+</td>
+        </tr>
+<?php } ?>
+<?php if ($main_transactions->assigned_buses->Visible) { // assigned_buses ?>
+        <tr id="r_assigned_buses">
+            <td class="<?= $main_transactions->TableLeftColumnClass ?>"><?= $main_transactions->assigned_buses->caption() ?></td>
+            <td <?= $main_transactions->assigned_buses->cellAttributes() ?>>
+<span id="el_main_transactions_assigned_buses">
+<span<?= $main_transactions->assigned_buses->viewAttributes() ?>>
+<?= $main_transactions->assigned_buses->getViewValue() ?></span>
 </span>
 </td>
         </tr>

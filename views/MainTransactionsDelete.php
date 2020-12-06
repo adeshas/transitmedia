@@ -53,11 +53,17 @@ $Page->showMessage();
 <?php if ($Page->payment_date->Visible) { // payment_date ?>
         <th class="<?= $Page->payment_date->headerCellClass() ?>"><span id="elh_main_transactions_payment_date" class="main_transactions_payment_date"><?= $Page->payment_date->caption() ?></span></th>
 <?php } ?>
+<?php if ($Page->vendor_id->Visible) { // vendor_id ?>
+        <th class="<?= $Page->vendor_id->headerCellClass() ?>"><span id="elh_main_transactions_vendor_id" class="main_transactions_vendor_id"><?= $Page->vendor_id->caption() ?></span></th>
+<?php } ?>
 <?php if ($Page->price_id->Visible) { // price_id ?>
         <th class="<?= $Page->price_id->headerCellClass() ?>"><span id="elh_main_transactions_price_id" class="main_transactions_price_id"><?= $Page->price_id->caption() ?></span></th>
 <?php } ?>
 <?php if ($Page->quantity->Visible) { // quantity ?>
         <th class="<?= $Page->quantity->headerCellClass() ?>"><span id="elh_main_transactions_quantity" class="main_transactions_quantity"><?= $Page->quantity->caption() ?></span></th>
+<?php } ?>
+<?php if ($Page->assigned_buses->Visible) { // assigned_buses ?>
+        <th class="<?= $Page->assigned_buses->headerCellClass() ?>"><span id="elh_main_transactions_assigned_buses" class="main_transactions_assigned_buses"><?= $Page->assigned_buses->caption() ?></span></th>
 <?php } ?>
 <?php if ($Page->start_date->Visible) { // start_date ?>
         <th class="<?= $Page->start_date->headerCellClass() ?>"><span id="elh_main_transactions_start_date" class="main_transactions_start_date"><?= $Page->start_date->caption() ?></span></th>
@@ -133,6 +139,14 @@ while (!$Page->Recordset->EOF) {
 </span>
 </td>
 <?php } ?>
+<?php if ($Page->vendor_id->Visible) { // vendor_id ?>
+        <td <?= $Page->vendor_id->cellAttributes() ?>>
+<span id="el<?= $Page->RowCount ?>_main_transactions_vendor_id" class="main_transactions_vendor_id">
+<span<?= $Page->vendor_id->viewAttributes() ?>>
+<?= $Page->vendor_id->getViewValue() ?></span>
+</span>
+</td>
+<?php } ?>
 <?php if ($Page->price_id->Visible) { // price_id ?>
         <td <?= $Page->price_id->cellAttributes() ?>>
 <span id="el<?= $Page->RowCount ?>_main_transactions_price_id" class="main_transactions_price_id">
@@ -146,6 +160,14 @@ while (!$Page->Recordset->EOF) {
 <span id="el<?= $Page->RowCount ?>_main_transactions_quantity" class="main_transactions_quantity">
 <span<?= $Page->quantity->viewAttributes() ?>>
 <?= $Page->quantity->getViewValue() ?></span>
+</span>
+</td>
+<?php } ?>
+<?php if ($Page->assigned_buses->Visible) { // assigned_buses ?>
+        <td <?= $Page->assigned_buses->cellAttributes() ?>>
+<span id="el<?= $Page->RowCount ?>_main_transactions_assigned_buses" class="main_transactions_assigned_buses">
+<span<?= $Page->assigned_buses->viewAttributes() ?>>
+<?= $Page->assigned_buses->getViewValue() ?></span>
 </span>
 </td>
 <?php } ?>
