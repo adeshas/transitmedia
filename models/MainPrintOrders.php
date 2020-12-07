@@ -652,7 +652,7 @@ class MainPrintOrders extends DbTable
         if ($referUrl != "" && $referPageName != CurrentPageName() && $referPageName != "login") { // Referer not same page or login page
             $_SESSION[$name] = $referUrl; // Save to Session
         }
-        return $_SESSION[$name] ?? GetUrl("MainPrintOrdersList");
+        return $_SESSION[$name] ?? GetUrl("mainprintorderslist");
     }
 
     // Set return page URL
@@ -665,11 +665,11 @@ class MainPrintOrders extends DbTable
     public function getModalCaption($pageName)
     {
         global $Language;
-        if ($pageName == "MainPrintOrdersView") {
+        if ($pageName == "mainprintordersview") {
             return $Language->phrase("View");
-        } elseif ($pageName == "MainPrintOrdersEdit") {
+        } elseif ($pageName == "mainprintordersedit") {
             return $Language->phrase("Edit");
-        } elseif ($pageName == "MainPrintOrdersAdd") {
+        } elseif ($pageName == "mainprintordersadd") {
             return $Language->phrase("Add");
         } else {
             return "";
@@ -698,16 +698,16 @@ class MainPrintOrders extends DbTable
     // List URL
     public function getListUrl()
     {
-        return "MainPrintOrdersList";
+        return "mainprintorderslist";
     }
 
     // View URL
     public function getViewUrl($parm = "")
     {
         if ($parm != "") {
-            $url = $this->keyUrl("MainPrintOrdersView", $this->getUrlParm($parm));
+            $url = $this->keyUrl("mainprintordersview", $this->getUrlParm($parm));
         } else {
-            $url = $this->keyUrl("MainPrintOrdersView", $this->getUrlParm(Config("TABLE_SHOW_DETAIL") . "="));
+            $url = $this->keyUrl("mainprintordersview", $this->getUrlParm(Config("TABLE_SHOW_DETAIL") . "="));
         }
         return $this->addMasterUrl($url);
     }
@@ -716,9 +716,9 @@ class MainPrintOrders extends DbTable
     public function getAddUrl($parm = "")
     {
         if ($parm != "") {
-            $url = "MainPrintOrdersAdd?" . $this->getUrlParm($parm);
+            $url = "mainprintordersadd?" . $this->getUrlParm($parm);
         } else {
-            $url = "MainPrintOrdersAdd";
+            $url = "mainprintordersadd";
         }
         return $this->addMasterUrl($url);
     }
@@ -726,7 +726,7 @@ class MainPrintOrders extends DbTable
     // Edit URL
     public function getEditUrl($parm = "")
     {
-        $url = $this->keyUrl("MainPrintOrdersEdit", $this->getUrlParm($parm));
+        $url = $this->keyUrl("mainprintordersedit", $this->getUrlParm($parm));
         return $this->addMasterUrl($url);
     }
 
@@ -740,7 +740,7 @@ class MainPrintOrders extends DbTable
     // Copy URL
     public function getCopyUrl($parm = "")
     {
-        $url = $this->keyUrl("MainPrintOrdersAdd", $this->getUrlParm($parm));
+        $url = $this->keyUrl("mainprintordersadd", $this->getUrlParm($parm));
         return $this->addMasterUrl($url);
     }
 
@@ -754,7 +754,7 @@ class MainPrintOrders extends DbTable
     // Delete URL
     public function getDeleteUrl()
     {
-        return $this->keyUrl("MainPrintOrdersDelete", $this->getUrlParm());
+        return $this->keyUrl("mainprintordersdelete", $this->getUrlParm());
     }
 
     // Add master url

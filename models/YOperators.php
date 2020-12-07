@@ -221,7 +221,7 @@ class YOperators extends DbTable
             $detailUrl .= "&" . GetForeignKeyUrl("fk_id", $this->id->CurrentValue);
         }
         if ($detailUrl == "") {
-            $detailUrl = "YOperatorsList";
+            $detailUrl = "yoperatorslist";
         }
         return $detailUrl;
     }
@@ -674,7 +674,7 @@ class YOperators extends DbTable
         if ($referUrl != "" && $referPageName != CurrentPageName() && $referPageName != "login") { // Referer not same page or login page
             $_SESSION[$name] = $referUrl; // Save to Session
         }
-        return $_SESSION[$name] ?? GetUrl("YOperatorsList");
+        return $_SESSION[$name] ?? GetUrl("yoperatorslist");
     }
 
     // Set return page URL
@@ -687,11 +687,11 @@ class YOperators extends DbTable
     public function getModalCaption($pageName)
     {
         global $Language;
-        if ($pageName == "YOperatorsView") {
+        if ($pageName == "yoperatorsview") {
             return $Language->phrase("View");
-        } elseif ($pageName == "YOperatorsEdit") {
+        } elseif ($pageName == "yoperatorsedit") {
             return $Language->phrase("Edit");
-        } elseif ($pageName == "YOperatorsAdd") {
+        } elseif ($pageName == "yoperatorsadd") {
             return $Language->phrase("Add");
         } else {
             return "";
@@ -720,16 +720,16 @@ class YOperators extends DbTable
     // List URL
     public function getListUrl()
     {
-        return "YOperatorsList";
+        return "yoperatorslist";
     }
 
     // View URL
     public function getViewUrl($parm = "")
     {
         if ($parm != "") {
-            $url = $this->keyUrl("YOperatorsView", $this->getUrlParm($parm));
+            $url = $this->keyUrl("yoperatorsview", $this->getUrlParm($parm));
         } else {
-            $url = $this->keyUrl("YOperatorsView", $this->getUrlParm(Config("TABLE_SHOW_DETAIL") . "="));
+            $url = $this->keyUrl("yoperatorsview", $this->getUrlParm(Config("TABLE_SHOW_DETAIL") . "="));
         }
         return $this->addMasterUrl($url);
     }
@@ -738,9 +738,9 @@ class YOperators extends DbTable
     public function getAddUrl($parm = "")
     {
         if ($parm != "") {
-            $url = "YOperatorsAdd?" . $this->getUrlParm($parm);
+            $url = "yoperatorsadd?" . $this->getUrlParm($parm);
         } else {
-            $url = "YOperatorsAdd";
+            $url = "yoperatorsadd";
         }
         return $this->addMasterUrl($url);
     }
@@ -749,9 +749,9 @@ class YOperators extends DbTable
     public function getEditUrl($parm = "")
     {
         if ($parm != "") {
-            $url = $this->keyUrl("YOperatorsEdit", $this->getUrlParm($parm));
+            $url = $this->keyUrl("yoperatorsedit", $this->getUrlParm($parm));
         } else {
-            $url = $this->keyUrl("YOperatorsEdit", $this->getUrlParm(Config("TABLE_SHOW_DETAIL") . "="));
+            $url = $this->keyUrl("yoperatorsedit", $this->getUrlParm(Config("TABLE_SHOW_DETAIL") . "="));
         }
         return $this->addMasterUrl($url);
     }
@@ -767,9 +767,9 @@ class YOperators extends DbTable
     public function getCopyUrl($parm = "")
     {
         if ($parm != "") {
-            $url = $this->keyUrl("YOperatorsAdd", $this->getUrlParm($parm));
+            $url = $this->keyUrl("yoperatorsadd", $this->getUrlParm($parm));
         } else {
-            $url = $this->keyUrl("YOperatorsAdd", $this->getUrlParm(Config("TABLE_SHOW_DETAIL") . "="));
+            $url = $this->keyUrl("yoperatorsadd", $this->getUrlParm(Config("TABLE_SHOW_DETAIL") . "="));
         }
         return $this->addMasterUrl($url);
     }
@@ -784,7 +784,7 @@ class YOperators extends DbTable
     // Delete URL
     public function getDeleteUrl()
     {
-        return $this->keyUrl("YOperatorsDelete", $this->getUrlParm());
+        return $this->keyUrl("yoperatorsdelete", $this->getUrlParm());
     }
 
     // Add master url

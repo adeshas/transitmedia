@@ -238,7 +238,7 @@ class ViewTransactionsPerOperatorSearch extends ViewTransactionsPerOperator
                 $pageName = GetPageName($url);
                 if ($pageName != $this->getListUrl()) { // Not List page
                     $row["caption"] = $this->getModalCaption($pageName);
-                    if ($pageName == "ViewTransactionsPerOperatorView") {
+                    if ($pageName == "viewtransactionsperoperatorview") {
                         $row["view"] = "1";
                     }
                 } else { // List page should not be shown as modal => error
@@ -486,7 +486,7 @@ class ViewTransactionsPerOperatorSearch extends ViewTransactionsPerOperator
                 }
                 if ($srchStr != "") {
                     $srchStr = $this->getUrlParm($srchStr);
-                    $srchStr = "ViewTransactionsPerOperatorList" . "?" . $srchStr;
+                    $srchStr = "viewtransactionsperoperatorlist" . "?" . $srchStr;
                     $this->terminate($srchStr); // Go to list page
                     return;
                 }
@@ -1289,7 +1289,7 @@ class ViewTransactionsPerOperatorSearch extends ViewTransactionsPerOperator
         global $Breadcrumb, $Language;
         $Breadcrumb = new Breadcrumb("index");
         $url = CurrentUrl();
-        $Breadcrumb->add("list", $this->TableVar, $this->addMasterUrl("ViewTransactionsPerOperatorList"), "", $this->TableVar, true);
+        $Breadcrumb->add("list", $this->TableVar, $this->addMasterUrl("viewtransactionsperoperatorlist"), "", $this->TableVar, true);
         $pageId = "search";
         $Breadcrumb->add("search", $pageId, $url);
     }

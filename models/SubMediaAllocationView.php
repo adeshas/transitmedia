@@ -293,7 +293,7 @@ class SubMediaAllocationView extends SubMediaAllocation
                 $pageName = GetPageName($url);
                 if ($pageName != $this->getListUrl()) { // Not List page
                     $row["caption"] = $this->getModalCaption($pageName);
-                    if ($pageName == "SubMediaAllocationView") {
+                    if ($pageName == "submediaallocationview") {
                         $row["view"] = "1";
                     }
                 } else { // List page should not be shown as modal => error
@@ -537,7 +537,7 @@ class SubMediaAllocationView extends SubMediaAllocation
                 $this->id->setQueryStringValue($keyValue);
                 $this->RecKey["id"] = $this->id->QueryStringValue;
             } else {
-                $returnUrl = "SubMediaAllocationList"; // Return to list
+                $returnUrl = "submediaallocationlist"; // Return to list
             }
 
             // Get action
@@ -560,12 +560,12 @@ class SubMediaAllocationView extends SubMediaAllocation
                         if ($this->getSuccessMessage() == "" && $this->getFailureMessage() == "") {
                             $this->setFailureMessage($Language->phrase("NoRecord")); // Set no record message
                         }
-                        $returnUrl = "SubMediaAllocationList"; // No matching record, return to list
+                        $returnUrl = "submediaallocationlist"; // No matching record, return to list
                     }
                     break;
             }
         } else {
-            $returnUrl = "SubMediaAllocationList"; // Not page request, return to list
+            $returnUrl = "submediaallocationlist"; // Not page request, return to list
         }
         if ($returnUrl != "") {
             $this->terminate($returnUrl);
@@ -974,7 +974,7 @@ class SubMediaAllocationView extends SubMediaAllocation
         global $Breadcrumb, $Language;
         $Breadcrumb = new Breadcrumb("index");
         $url = CurrentUrl();
-        $Breadcrumb->add("list", $this->TableVar, $this->addMasterUrl("SubMediaAllocationList"), "", $this->TableVar, true);
+        $Breadcrumb->add("list", $this->TableVar, $this->addMasterUrl("submediaallocationlist"), "", $this->TableVar, true);
         $pageId = "view";
         $Breadcrumb->add("view", $pageId, $url);
     }

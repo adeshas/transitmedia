@@ -562,7 +562,7 @@ class XBusSizes extends DbTable
         if ($referUrl != "" && $referPageName != CurrentPageName() && $referPageName != "login") { // Referer not same page or login page
             $_SESSION[$name] = $referUrl; // Save to Session
         }
-        return $_SESSION[$name] ?? GetUrl("XBusSizesList");
+        return $_SESSION[$name] ?? GetUrl("xbussizeslist");
     }
 
     // Set return page URL
@@ -575,11 +575,11 @@ class XBusSizes extends DbTable
     public function getModalCaption($pageName)
     {
         global $Language;
-        if ($pageName == "XBusSizesView") {
+        if ($pageName == "xbussizesview") {
             return $Language->phrase("View");
-        } elseif ($pageName == "XBusSizesEdit") {
+        } elseif ($pageName == "xbussizesedit") {
             return $Language->phrase("Edit");
-        } elseif ($pageName == "XBusSizesAdd") {
+        } elseif ($pageName == "xbussizesadd") {
             return $Language->phrase("Add");
         } else {
             return "";
@@ -608,16 +608,16 @@ class XBusSizes extends DbTable
     // List URL
     public function getListUrl()
     {
-        return "XBusSizesList";
+        return "xbussizeslist";
     }
 
     // View URL
     public function getViewUrl($parm = "")
     {
         if ($parm != "") {
-            $url = $this->keyUrl("XBusSizesView", $this->getUrlParm($parm));
+            $url = $this->keyUrl("xbussizesview", $this->getUrlParm($parm));
         } else {
-            $url = $this->keyUrl("XBusSizesView", $this->getUrlParm(Config("TABLE_SHOW_DETAIL") . "="));
+            $url = $this->keyUrl("xbussizesview", $this->getUrlParm(Config("TABLE_SHOW_DETAIL") . "="));
         }
         return $this->addMasterUrl($url);
     }
@@ -626,9 +626,9 @@ class XBusSizes extends DbTable
     public function getAddUrl($parm = "")
     {
         if ($parm != "") {
-            $url = "XBusSizesAdd?" . $this->getUrlParm($parm);
+            $url = "xbussizesadd?" . $this->getUrlParm($parm);
         } else {
-            $url = "XBusSizesAdd";
+            $url = "xbussizesadd";
         }
         return $this->addMasterUrl($url);
     }
@@ -636,7 +636,7 @@ class XBusSizes extends DbTable
     // Edit URL
     public function getEditUrl($parm = "")
     {
-        $url = $this->keyUrl("XBusSizesEdit", $this->getUrlParm($parm));
+        $url = $this->keyUrl("xbussizesedit", $this->getUrlParm($parm));
         return $this->addMasterUrl($url);
     }
 
@@ -650,7 +650,7 @@ class XBusSizes extends DbTable
     // Copy URL
     public function getCopyUrl($parm = "")
     {
-        $url = $this->keyUrl("XBusSizesAdd", $this->getUrlParm($parm));
+        $url = $this->keyUrl("xbussizesadd", $this->getUrlParm($parm));
         return $this->addMasterUrl($url);
     }
 
@@ -664,7 +664,7 @@ class XBusSizes extends DbTable
     // Delete URL
     public function getDeleteUrl()
     {
-        return $this->keyUrl("XBusSizesDelete", $this->getUrlParm());
+        return $this->keyUrl("xbussizesdelete", $this->getUrlParm());
     }
 
     // Add master url

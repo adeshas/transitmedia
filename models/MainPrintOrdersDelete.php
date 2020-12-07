@@ -382,7 +382,7 @@ class MainPrintOrdersDelete extends MainPrintOrders
         $this->RecKeys = $this->getRecordKeys(); // Load record keys
         $filter = $this->getFilterFromRecordKeys();
         if ($filter == "") {
-            $this->terminate("MainPrintOrdersList"); // Prevent SQL injection, return to list
+            $this->terminate("mainprintorderslist"); // Prevent SQL injection, return to list
             return;
         }
 
@@ -428,7 +428,7 @@ class MainPrintOrdersDelete extends MainPrintOrders
                 if ($this->Recordset) {
                     $this->Recordset->close();
                 }
-                $this->terminate("MainPrintOrdersList"); // Return to list
+                $this->terminate("mainprintorderslist"); // Return to list
                 return;
             }
         }
@@ -820,7 +820,7 @@ class MainPrintOrdersDelete extends MainPrintOrders
         global $Breadcrumb, $Language;
         $Breadcrumb = new Breadcrumb("index");
         $url = CurrentUrl();
-        $Breadcrumb->add("list", $this->TableVar, $this->addMasterUrl("MainPrintOrdersList"), "", $this->TableVar, true);
+        $Breadcrumb->add("list", $this->TableVar, $this->addMasterUrl("mainprintorderslist"), "", $this->TableVar, true);
         $pageId = "delete";
         $Breadcrumb->add("delete", $pageId, $url);
     }

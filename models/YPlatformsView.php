@@ -293,7 +293,7 @@ class YPlatformsView extends YPlatforms
                 $pageName = GetPageName($url);
                 if ($pageName != $this->getListUrl()) { // Not List page
                     $row["caption"] = $this->getModalCaption($pageName);
-                    if ($pageName == "YPlatformsView") {
+                    if ($pageName == "yplatformsview") {
                         $row["view"] = "1";
                     }
                 } else { // List page should not be shown as modal => error
@@ -533,7 +533,7 @@ class YPlatformsView extends YPlatforms
                 $this->id->setQueryStringValue($keyValue);
                 $this->RecKey["id"] = $this->id->QueryStringValue;
             } else {
-                $returnUrl = "YPlatformsList"; // Return to list
+                $returnUrl = "yplatformslist"; // Return to list
             }
 
             // Get action
@@ -556,12 +556,12 @@ class YPlatformsView extends YPlatforms
                         if ($this->getSuccessMessage() == "" && $this->getFailureMessage() == "") {
                             $this->setFailureMessage($Language->phrase("NoRecord")); // Set no record message
                         }
-                        $returnUrl = "YPlatformsList"; // No matching record, return to list
+                        $returnUrl = "yplatformslist"; // No matching record, return to list
                     }
                     break;
             }
         } else {
-            $returnUrl = "YPlatformsList"; // Not page request, return to list
+            $returnUrl = "yplatformslist"; // Not page request, return to list
         }
         if ($returnUrl != "") {
             $this->terminate($returnUrl);
@@ -655,7 +655,7 @@ class YPlatformsView extends YPlatforms
         // "detail_main_campaigns"
         $item = &$option->add("detail_main_campaigns");
         $body = $Language->phrase("ViewPageDetailLink") . $Language->TablePhrase("main_campaigns", "TblCaption");
-        $body = "<a class=\"btn btn-default ew-row-link ew-detail\" data-action=\"list\" href=\"" . HtmlEncode(GetUrl("MainCampaignsList?" . Config("TABLE_SHOW_MASTER") . "=y_platforms&" . GetForeignKeyUrl("fk_id", $this->id->CurrentValue) . "")) . "\">" . $body . "</a>";
+        $body = "<a class=\"btn btn-default ew-row-link ew-detail\" data-action=\"list\" href=\"" . HtmlEncode(GetUrl("maincampaignslist?" . Config("TABLE_SHOW_MASTER") . "=y_platforms&" . GetForeignKeyUrl("fk_id", $this->id->CurrentValue) . "")) . "\">" . $body . "</a>";
         $links = "";
         $detailPageObj = Container("MainCampaignsGrid");
         if ($detailPageObj->DetailView && $Security->canView() && $Security->allowView(CurrentProjectID() . 'y_platforms')) {
@@ -692,7 +692,7 @@ class YPlatformsView extends YPlatforms
         // "detail_y_operators"
         $item = &$option->add("detail_y_operators");
         $body = $Language->phrase("ViewPageDetailLink") . $Language->TablePhrase("y_operators", "TblCaption");
-        $body = "<a class=\"btn btn-default ew-row-link ew-detail\" data-action=\"list\" href=\"" . HtmlEncode(GetUrl("YOperatorsList?" . Config("TABLE_SHOW_MASTER") . "=y_platforms&" . GetForeignKeyUrl("fk_id", $this->id->CurrentValue) . "")) . "\">" . $body . "</a>";
+        $body = "<a class=\"btn btn-default ew-row-link ew-detail\" data-action=\"list\" href=\"" . HtmlEncode(GetUrl("yoperatorslist?" . Config("TABLE_SHOW_MASTER") . "=y_platforms&" . GetForeignKeyUrl("fk_id", $this->id->CurrentValue) . "")) . "\">" . $body . "</a>";
         $links = "";
         $detailPageObj = Container("YOperatorsGrid");
         if ($detailPageObj->DetailView && $Security->canView() && $Security->allowView(CurrentProjectID() . 'y_platforms')) {
@@ -952,7 +952,7 @@ class YPlatformsView extends YPlatforms
         global $Breadcrumb, $Language;
         $Breadcrumb = new Breadcrumb("index");
         $url = CurrentUrl();
-        $Breadcrumb->add("list", $this->TableVar, $this->addMasterUrl("YPlatformsList"), "", $this->TableVar, true);
+        $Breadcrumb->add("list", $this->TableVar, $this->addMasterUrl("yplatformslist"), "", $this->TableVar, true);
         $pageId = "view";
         $Breadcrumb->add("view", $pageId, $url);
     }

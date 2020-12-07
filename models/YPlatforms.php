@@ -156,7 +156,7 @@ class YPlatforms extends DbTable
             $detailUrl .= "&" . GetForeignKeyUrl("fk_id", $this->id->CurrentValue);
         }
         if ($detailUrl == "") {
-            $detailUrl = "YPlatformsList";
+            $detailUrl = "yplatformslist";
         }
         return $detailUrl;
     }
@@ -607,7 +607,7 @@ class YPlatforms extends DbTable
         if ($referUrl != "" && $referPageName != CurrentPageName() && $referPageName != "login") { // Referer not same page or login page
             $_SESSION[$name] = $referUrl; // Save to Session
         }
-        return $_SESSION[$name] ?? GetUrl("YPlatformsList");
+        return $_SESSION[$name] ?? GetUrl("yplatformslist");
     }
 
     // Set return page URL
@@ -620,11 +620,11 @@ class YPlatforms extends DbTable
     public function getModalCaption($pageName)
     {
         global $Language;
-        if ($pageName == "YPlatformsView") {
+        if ($pageName == "yplatformsview") {
             return $Language->phrase("View");
-        } elseif ($pageName == "YPlatformsEdit") {
+        } elseif ($pageName == "yplatformsedit") {
             return $Language->phrase("Edit");
-        } elseif ($pageName == "YPlatformsAdd") {
+        } elseif ($pageName == "yplatformsadd") {
             return $Language->phrase("Add");
         } else {
             return "";
@@ -653,16 +653,16 @@ class YPlatforms extends DbTable
     // List URL
     public function getListUrl()
     {
-        return "YPlatformsList";
+        return "yplatformslist";
     }
 
     // View URL
     public function getViewUrl($parm = "")
     {
         if ($parm != "") {
-            $url = $this->keyUrl("YPlatformsView", $this->getUrlParm($parm));
+            $url = $this->keyUrl("yplatformsview", $this->getUrlParm($parm));
         } else {
-            $url = $this->keyUrl("YPlatformsView", $this->getUrlParm(Config("TABLE_SHOW_DETAIL") . "="));
+            $url = $this->keyUrl("yplatformsview", $this->getUrlParm(Config("TABLE_SHOW_DETAIL") . "="));
         }
         return $this->addMasterUrl($url);
     }
@@ -671,9 +671,9 @@ class YPlatforms extends DbTable
     public function getAddUrl($parm = "")
     {
         if ($parm != "") {
-            $url = "YPlatformsAdd?" . $this->getUrlParm($parm);
+            $url = "yplatformsadd?" . $this->getUrlParm($parm);
         } else {
-            $url = "YPlatformsAdd";
+            $url = "yplatformsadd";
         }
         return $this->addMasterUrl($url);
     }
@@ -682,9 +682,9 @@ class YPlatforms extends DbTable
     public function getEditUrl($parm = "")
     {
         if ($parm != "") {
-            $url = $this->keyUrl("YPlatformsEdit", $this->getUrlParm($parm));
+            $url = $this->keyUrl("yplatformsedit", $this->getUrlParm($parm));
         } else {
-            $url = $this->keyUrl("YPlatformsEdit", $this->getUrlParm(Config("TABLE_SHOW_DETAIL") . "="));
+            $url = $this->keyUrl("yplatformsedit", $this->getUrlParm(Config("TABLE_SHOW_DETAIL") . "="));
         }
         return $this->addMasterUrl($url);
     }
@@ -700,9 +700,9 @@ class YPlatforms extends DbTable
     public function getCopyUrl($parm = "")
     {
         if ($parm != "") {
-            $url = $this->keyUrl("YPlatformsAdd", $this->getUrlParm($parm));
+            $url = $this->keyUrl("yplatformsadd", $this->getUrlParm($parm));
         } else {
-            $url = $this->keyUrl("YPlatformsAdd", $this->getUrlParm(Config("TABLE_SHOW_DETAIL") . "="));
+            $url = $this->keyUrl("yplatformsadd", $this->getUrlParm(Config("TABLE_SHOW_DETAIL") . "="));
         }
         return $this->addMasterUrl($url);
     }
@@ -717,7 +717,7 @@ class YPlatforms extends DbTable
     // Delete URL
     public function getDeleteUrl()
     {
-        return $this->keyUrl("YPlatformsDelete", $this->getUrlParm());
+        return $this->keyUrl("yplatformsdelete", $this->getUrlParm());
     }
 
     // Add master url

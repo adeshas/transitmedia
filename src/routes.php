@@ -8,12 +8,12 @@ use Slim\Routing\RouteCollectorProxy;
 // Handle Routes
 return function (App $app) {
     // main_buses
-    $app->any('/MainBusesList[/{id}]', MainBusesController::class . ':list')->add(PermissionMiddleware::class)->setName('MainBusesList-main_buses-list'); // list
-    $app->any('/MainBusesAdd[/{id}]', MainBusesController::class . ':add')->add(PermissionMiddleware::class)->setName('MainBusesAdd-main_buses-add'); // add
-    $app->any('/MainBusesView[/{id}]', MainBusesController::class . ':view')->add(PermissionMiddleware::class)->setName('MainBusesView-main_buses-view'); // view
-    $app->any('/MainBusesEdit[/{id}]', MainBusesController::class . ':edit')->add(PermissionMiddleware::class)->setName('MainBusesEdit-main_buses-edit'); // edit
-    $app->any('/MainBusesUpdate', MainBusesController::class . ':update')->add(PermissionMiddleware::class)->setName('MainBusesUpdate-main_buses-update'); // update
-    $app->any('/MainBusesDelete[/{id}]', MainBusesController::class . ':delete')->add(PermissionMiddleware::class)->setName('MainBusesDelete-main_buses-delete'); // delete
+    $app->any('/mainbuseslist[/{id}]', MainBusesController::class . ':list')->add(PermissionMiddleware::class)->setName('mainbuseslist-main_buses-list'); // list
+    $app->any('/mainbusesadd[/{id}]', MainBusesController::class . ':add')->add(PermissionMiddleware::class)->setName('mainbusesadd-main_buses-add'); // add
+    $app->any('/mainbusesview[/{id}]', MainBusesController::class . ':view')->add(PermissionMiddleware::class)->setName('mainbusesview-main_buses-view'); // view
+    $app->any('/mainbusesedit[/{id}]', MainBusesController::class . ':edit')->add(PermissionMiddleware::class)->setName('mainbusesedit-main_buses-edit'); // edit
+    $app->any('/mainbusesupdate', MainBusesController::class . ':update')->add(PermissionMiddleware::class)->setName('mainbusesupdate-main_buses-update'); // update
+    $app->any('/mainbusesdelete[/{id}]', MainBusesController::class . ':delete')->add(PermissionMiddleware::class)->setName('mainbusesdelete-main_buses-delete'); // delete
     $app->group(
         '/main_buses',
         function (RouteCollectorProxy $group) {
@@ -27,11 +27,11 @@ return function (App $app) {
     );
 
     // main_campaigns
-    $app->any('/MainCampaignsList[/{id}]', MainCampaignsController::class . ':list')->add(PermissionMiddleware::class)->setName('MainCampaignsList-main_campaigns-list'); // list
-    $app->any('/MainCampaignsAdd[/{id}]', MainCampaignsController::class . ':add')->add(PermissionMiddleware::class)->setName('MainCampaignsAdd-main_campaigns-add'); // add
-    $app->any('/MainCampaignsView[/{id}]', MainCampaignsController::class . ':view')->add(PermissionMiddleware::class)->setName('MainCampaignsView-main_campaigns-view'); // view
-    $app->any('/MainCampaignsEdit[/{id}]', MainCampaignsController::class . ':edit')->add(PermissionMiddleware::class)->setName('MainCampaignsEdit-main_campaigns-edit'); // edit
-    $app->any('/MainCampaignsDelete[/{id}]', MainCampaignsController::class . ':delete')->add(PermissionMiddleware::class)->setName('MainCampaignsDelete-main_campaigns-delete'); // delete
+    $app->any('/maincampaignslist[/{id}]', MainCampaignsController::class . ':list')->add(PermissionMiddleware::class)->setName('maincampaignslist-main_campaigns-list'); // list
+    $app->any('/maincampaignsadd[/{id}]', MainCampaignsController::class . ':add')->add(PermissionMiddleware::class)->setName('maincampaignsadd-main_campaigns-add'); // add
+    $app->any('/maincampaignsview[/{id}]', MainCampaignsController::class . ':view')->add(PermissionMiddleware::class)->setName('maincampaignsview-main_campaigns-view'); // view
+    $app->any('/maincampaignsedit[/{id}]', MainCampaignsController::class . ':edit')->add(PermissionMiddleware::class)->setName('maincampaignsedit-main_campaigns-edit'); // edit
+    $app->any('/maincampaignsdelete[/{id}]', MainCampaignsController::class . ':delete')->add(PermissionMiddleware::class)->setName('maincampaignsdelete-main_campaigns-delete'); // delete
     $app->group(
         '/main_campaigns',
         function (RouteCollectorProxy $group) {
@@ -44,11 +44,11 @@ return function (App $app) {
     );
 
     // main_reports
-    $app->any('/MainReportsList[/{id}]', MainReportsController::class . ':list')->add(PermissionMiddleware::class)->setName('MainReportsList-main_reports-list'); // list
-    $app->any('/MainReportsAdd[/{id}]', MainReportsController::class . ':add')->add(PermissionMiddleware::class)->setName('MainReportsAdd-main_reports-add'); // add
-    $app->any('/MainReportsView[/{id}]', MainReportsController::class . ':view')->add(PermissionMiddleware::class)->setName('MainReportsView-main_reports-view'); // view
-    $app->any('/MainReportsEdit[/{id}]', MainReportsController::class . ':edit')->add(PermissionMiddleware::class)->setName('MainReportsEdit-main_reports-edit'); // edit
-    $app->any('/MainReportsDelete[/{id}]', MainReportsController::class . ':delete')->add(PermissionMiddleware::class)->setName('MainReportsDelete-main_reports-delete'); // delete
+    $app->any('/mainreportslist[/{id}]', MainReportsController::class . ':list')->add(PermissionMiddleware::class)->setName('mainreportslist-main_reports-list'); // list
+    $app->any('/mainreportsadd[/{id}]', MainReportsController::class . ':add')->add(PermissionMiddleware::class)->setName('mainreportsadd-main_reports-add'); // add
+    $app->any('/mainreportsview[/{id}]', MainReportsController::class . ':view')->add(PermissionMiddleware::class)->setName('mainreportsview-main_reports-view'); // view
+    $app->any('/mainreportsedit[/{id}]', MainReportsController::class . ':edit')->add(PermissionMiddleware::class)->setName('mainreportsedit-main_reports-edit'); // edit
+    $app->any('/mainreportsdelete[/{id}]', MainReportsController::class . ':delete')->add(PermissionMiddleware::class)->setName('mainreportsdelete-main_reports-delete'); // delete
     $app->group(
         '/main_reports',
         function (RouteCollectorProxy $group) {
@@ -61,13 +61,13 @@ return function (App $app) {
     );
 
     // main_transactions
-    $app->any('/MainTransactionsList[/{id}]', MainTransactionsController::class . ':list')->add(PermissionMiddleware::class)->setName('MainTransactionsList-main_transactions-list'); // list
-    $app->any('/MainTransactionsAdd[/{id}]', MainTransactionsController::class . ':add')->add(PermissionMiddleware::class)->setName('MainTransactionsAdd-main_transactions-add'); // add
-    $app->any('/MainTransactionsView[/{id}]', MainTransactionsController::class . ':view')->add(PermissionMiddleware::class)->setName('MainTransactionsView-main_transactions-view'); // view
-    $app->any('/MainTransactionsEdit[/{id}]', MainTransactionsController::class . ':edit')->add(PermissionMiddleware::class)->setName('MainTransactionsEdit-main_transactions-edit'); // edit
-    $app->any('/MainTransactionsUpdate', MainTransactionsController::class . ':update')->add(PermissionMiddleware::class)->setName('MainTransactionsUpdate-main_transactions-update'); // update
-    $app->any('/MainTransactionsDelete[/{id}]', MainTransactionsController::class . ':delete')->add(PermissionMiddleware::class)->setName('MainTransactionsDelete-main_transactions-delete'); // delete
-    $app->any('/MainTransactionsSearch', MainTransactionsController::class . ':search')->add(PermissionMiddleware::class)->setName('MainTransactionsSearch-main_transactions-search'); // search
+    $app->any('/maintransactionslist[/{id}]', MainTransactionsController::class . ':list')->add(PermissionMiddleware::class)->setName('maintransactionslist-main_transactions-list'); // list
+    $app->any('/maintransactionsadd[/{id}]', MainTransactionsController::class . ':add')->add(PermissionMiddleware::class)->setName('maintransactionsadd-main_transactions-add'); // add
+    $app->any('/maintransactionsview[/{id}]', MainTransactionsController::class . ':view')->add(PermissionMiddleware::class)->setName('maintransactionsview-main_transactions-view'); // view
+    $app->any('/maintransactionsedit[/{id}]', MainTransactionsController::class . ':edit')->add(PermissionMiddleware::class)->setName('maintransactionsedit-main_transactions-edit'); // edit
+    $app->any('/maintransactionsupdate', MainTransactionsController::class . ':update')->add(PermissionMiddleware::class)->setName('maintransactionsupdate-main_transactions-update'); // update
+    $app->any('/maintransactionsdelete[/{id}]', MainTransactionsController::class . ':delete')->add(PermissionMiddleware::class)->setName('maintransactionsdelete-main_transactions-delete'); // delete
+    $app->any('/maintransactionssearch', MainTransactionsController::class . ':search')->add(PermissionMiddleware::class)->setName('maintransactionssearch-main_transactions-search'); // search
     $app->group(
         '/main_transactions',
         function (RouteCollectorProxy $group) {
@@ -82,12 +82,12 @@ return function (App $app) {
     );
 
     // main_users
-    $app->any('/MainUsersList[/{id}]', MainUsersController::class . ':list')->add(PermissionMiddleware::class)->setName('MainUsersList-main_users-list'); // list
-    $app->any('/MainUsersAdd[/{id}]', MainUsersController::class . ':add')->add(PermissionMiddleware::class)->setName('MainUsersAdd-main_users-add'); // add
-    $app->any('/MainUsersView[/{id}]', MainUsersController::class . ':view')->add(PermissionMiddleware::class)->setName('MainUsersView-main_users-view'); // view
-    $app->any('/MainUsersEdit[/{id}]', MainUsersController::class . ':edit')->add(PermissionMiddleware::class)->setName('MainUsersEdit-main_users-edit'); // edit
-    $app->any('/MainUsersUpdate', MainUsersController::class . ':update')->add(PermissionMiddleware::class)->setName('MainUsersUpdate-main_users-update'); // update
-    $app->any('/MainUsersDelete[/{id}]', MainUsersController::class . ':delete')->add(PermissionMiddleware::class)->setName('MainUsersDelete-main_users-delete'); // delete
+    $app->any('/mainuserslist[/{id}]', MainUsersController::class . ':list')->add(PermissionMiddleware::class)->setName('mainuserslist-main_users-list'); // list
+    $app->any('/mainusersadd[/{id}]', MainUsersController::class . ':add')->add(PermissionMiddleware::class)->setName('mainusersadd-main_users-add'); // add
+    $app->any('/mainusersview[/{id}]', MainUsersController::class . ':view')->add(PermissionMiddleware::class)->setName('mainusersview-main_users-view'); // view
+    $app->any('/mainusersedit[/{id}]', MainUsersController::class . ':edit')->add(PermissionMiddleware::class)->setName('mainusersedit-main_users-edit'); // edit
+    $app->any('/mainusersupdate', MainUsersController::class . ':update')->add(PermissionMiddleware::class)->setName('mainusersupdate-main_users-update'); // update
+    $app->any('/mainusersdelete[/{id}]', MainUsersController::class . ':delete')->add(PermissionMiddleware::class)->setName('mainusersdelete-main_users-delete'); // delete
     $app->group(
         '/main_users',
         function (RouteCollectorProxy $group) {
@@ -101,14 +101,14 @@ return function (App $app) {
     );
 
     // spook
-    $app->any('/Spook', SpookController::class)->add(PermissionMiddleware::class)->setName('Spook-spook-custom'); // custom
+    $app->any('/spook', SpookController::class)->add(PermissionMiddleware::class)->setName('spook-spook-custom'); // custom
 
     // main_print_orders
-    $app->any('/MainPrintOrdersList[/{id}]', MainPrintOrdersController::class . ':list')->add(PermissionMiddleware::class)->setName('MainPrintOrdersList-main_print_orders-list'); // list
-    $app->any('/MainPrintOrdersAdd[/{id}]', MainPrintOrdersController::class . ':add')->add(PermissionMiddleware::class)->setName('MainPrintOrdersAdd-main_print_orders-add'); // add
-    $app->any('/MainPrintOrdersView[/{id}]', MainPrintOrdersController::class . ':view')->add(PermissionMiddleware::class)->setName('MainPrintOrdersView-main_print_orders-view'); // view
-    $app->any('/MainPrintOrdersEdit[/{id}]', MainPrintOrdersController::class . ':edit')->add(PermissionMiddleware::class)->setName('MainPrintOrdersEdit-main_print_orders-edit'); // edit
-    $app->any('/MainPrintOrdersDelete[/{id}]', MainPrintOrdersController::class . ':delete')->add(PermissionMiddleware::class)->setName('MainPrintOrdersDelete-main_print_orders-delete'); // delete
+    $app->any('/mainprintorderslist[/{id}]', MainPrintOrdersController::class . ':list')->add(PermissionMiddleware::class)->setName('mainprintorderslist-main_print_orders-list'); // list
+    $app->any('/mainprintordersadd[/{id}]', MainPrintOrdersController::class . ':add')->add(PermissionMiddleware::class)->setName('mainprintordersadd-main_print_orders-add'); // add
+    $app->any('/mainprintordersview[/{id}]', MainPrintOrdersController::class . ':view')->add(PermissionMiddleware::class)->setName('mainprintordersview-main_print_orders-view'); // view
+    $app->any('/mainprintordersedit[/{id}]', MainPrintOrdersController::class . ':edit')->add(PermissionMiddleware::class)->setName('mainprintordersedit-main_print_orders-edit'); // edit
+    $app->any('/mainprintordersdelete[/{id}]', MainPrintOrdersController::class . ':delete')->add(PermissionMiddleware::class)->setName('mainprintordersdelete-main_print_orders-delete'); // delete
     $app->group(
         '/main_print_orders',
         function (RouteCollectorProxy $group) {
@@ -121,10 +121,10 @@ return function (App $app) {
     );
 
     // sub_media_allocation
-    $app->any('/SubMediaAllocationList[/{id}]', SubMediaAllocationController::class . ':list')->add(PermissionMiddleware::class)->setName('SubMediaAllocationList-sub_media_allocation-list'); // list
-    $app->any('/SubMediaAllocationAdd[/{id}]', SubMediaAllocationController::class . ':add')->add(PermissionMiddleware::class)->setName('SubMediaAllocationAdd-sub_media_allocation-add'); // add
-    $app->any('/SubMediaAllocationView[/{id}]', SubMediaAllocationController::class . ':view')->add(PermissionMiddleware::class)->setName('SubMediaAllocationView-sub_media_allocation-view'); // view
-    $app->any('/SubMediaAllocationUpdate', SubMediaAllocationController::class . ':update')->add(PermissionMiddleware::class)->setName('SubMediaAllocationUpdate-sub_media_allocation-update'); // update
+    $app->any('/submediaallocationlist[/{id}]', SubMediaAllocationController::class . ':list')->add(PermissionMiddleware::class)->setName('submediaallocationlist-sub_media_allocation-list'); // list
+    $app->any('/submediaallocationadd[/{id}]', SubMediaAllocationController::class . ':add')->add(PermissionMiddleware::class)->setName('submediaallocationadd-sub_media_allocation-add'); // add
+    $app->any('/submediaallocationview[/{id}]', SubMediaAllocationController::class . ':view')->add(PermissionMiddleware::class)->setName('submediaallocationview-sub_media_allocation-view'); // view
+    $app->any('/submediaallocationupdate', SubMediaAllocationController::class . ':update')->add(PermissionMiddleware::class)->setName('submediaallocationupdate-sub_media_allocation-update'); // update
     $app->group(
         '/sub_media_allocation',
         function (RouteCollectorProxy $group) {
@@ -136,11 +136,11 @@ return function (App $app) {
     );
 
     // sub_renewal_requests
-    $app->any('/SubRenewalRequestsList[/{id}]', SubRenewalRequestsController::class . ':list')->add(PermissionMiddleware::class)->setName('SubRenewalRequestsList-sub_renewal_requests-list'); // list
-    $app->any('/SubRenewalRequestsAdd[/{id}]', SubRenewalRequestsController::class . ':add')->add(PermissionMiddleware::class)->setName('SubRenewalRequestsAdd-sub_renewal_requests-add'); // add
-    $app->any('/SubRenewalRequestsView[/{id}]', SubRenewalRequestsController::class . ':view')->add(PermissionMiddleware::class)->setName('SubRenewalRequestsView-sub_renewal_requests-view'); // view
-    $app->any('/SubRenewalRequestsEdit[/{id}]', SubRenewalRequestsController::class . ':edit')->add(PermissionMiddleware::class)->setName('SubRenewalRequestsEdit-sub_renewal_requests-edit'); // edit
-    $app->any('/SubRenewalRequestsDelete[/{id}]', SubRenewalRequestsController::class . ':delete')->add(PermissionMiddleware::class)->setName('SubRenewalRequestsDelete-sub_renewal_requests-delete'); // delete
+    $app->any('/subrenewalrequestslist[/{id}]', SubRenewalRequestsController::class . ':list')->add(PermissionMiddleware::class)->setName('subrenewalrequestslist-sub_renewal_requests-list'); // list
+    $app->any('/subrenewalrequestsadd[/{id}]', SubRenewalRequestsController::class . ':add')->add(PermissionMiddleware::class)->setName('subrenewalrequestsadd-sub_renewal_requests-add'); // add
+    $app->any('/subrenewalrequestsview[/{id}]', SubRenewalRequestsController::class . ':view')->add(PermissionMiddleware::class)->setName('subrenewalrequestsview-sub_renewal_requests-view'); // view
+    $app->any('/subrenewalrequestsedit[/{id}]', SubRenewalRequestsController::class . ':edit')->add(PermissionMiddleware::class)->setName('subrenewalrequestsedit-sub_renewal_requests-edit'); // edit
+    $app->any('/subrenewalrequestsdelete[/{id}]', SubRenewalRequestsController::class . ':delete')->add(PermissionMiddleware::class)->setName('subrenewalrequestsdelete-sub_renewal_requests-delete'); // delete
     $app->group(
         '/sub_renewal_requests',
         function (RouteCollectorProxy $group) {
@@ -153,7 +153,7 @@ return function (App $app) {
     );
 
     // view_pricing_initial
-    $app->any('/ViewPricingInitialList', ViewPricingInitialController::class . ':list')->add(PermissionMiddleware::class)->setName('ViewPricingInitialList-view_pricing_initial-list'); // list
+    $app->any('/viewpricinginitiallist', ViewPricingInitialController::class . ':list')->add(PermissionMiddleware::class)->setName('viewpricinginitiallist-view_pricing_initial-list'); // list
     $app->group(
         '/view_pricing_initial',
         function (RouteCollectorProxy $group) {
@@ -162,14 +162,14 @@ return function (App $app) {
     );
 
     // welcome
-    $app->any('/Welcome', WelcomeController::class)->add(PermissionMiddleware::class)->setName('Welcome-welcome-custom'); // custom
+    $app->any('/welcome', WelcomeController::class)->add(PermissionMiddleware::class)->setName('welcome-welcome-custom'); // custom
 
     // sub_transaction_details
-    $app->any('/SubTransactionDetailsList[/{id}]', SubTransactionDetailsController::class . ':list')->add(PermissionMiddleware::class)->setName('SubTransactionDetailsList-sub_transaction_details-list'); // list
-    $app->any('/SubTransactionDetailsAdd[/{id}]', SubTransactionDetailsController::class . ':add')->add(PermissionMiddleware::class)->setName('SubTransactionDetailsAdd-sub_transaction_details-add'); // add
-    $app->any('/SubTransactionDetailsView[/{id}]', SubTransactionDetailsController::class . ':view')->add(PermissionMiddleware::class)->setName('SubTransactionDetailsView-sub_transaction_details-view'); // view
-    $app->any('/SubTransactionDetailsEdit[/{id}]', SubTransactionDetailsController::class . ':edit')->add(PermissionMiddleware::class)->setName('SubTransactionDetailsEdit-sub_transaction_details-edit'); // edit
-    $app->any('/SubTransactionDetailsDelete[/{id}]', SubTransactionDetailsController::class . ':delete')->add(PermissionMiddleware::class)->setName('SubTransactionDetailsDelete-sub_transaction_details-delete'); // delete
+    $app->any('/subtransactiondetailslist[/{id}]', SubTransactionDetailsController::class . ':list')->add(PermissionMiddleware::class)->setName('subtransactiondetailslist-sub_transaction_details-list'); // list
+    $app->any('/subtransactiondetailsadd[/{id}]', SubTransactionDetailsController::class . ':add')->add(PermissionMiddleware::class)->setName('subtransactiondetailsadd-sub_transaction_details-add'); // add
+    $app->any('/subtransactiondetailsview[/{id}]', SubTransactionDetailsController::class . ':view')->add(PermissionMiddleware::class)->setName('subtransactiondetailsview-sub_transaction_details-view'); // view
+    $app->any('/subtransactiondetailsedit[/{id}]', SubTransactionDetailsController::class . ':edit')->add(PermissionMiddleware::class)->setName('subtransactiondetailsedit-sub_transaction_details-edit'); // edit
+    $app->any('/subtransactiondetailsdelete[/{id}]', SubTransactionDetailsController::class . ':delete')->add(PermissionMiddleware::class)->setName('subtransactiondetailsdelete-sub_transaction_details-delete'); // delete
     $app->group(
         '/sub_transaction_details',
         function (RouteCollectorProxy $group) {
@@ -182,8 +182,8 @@ return function (App $app) {
     );
 
     // x_bus_depot
-    $app->any('/XBusDepotList[/{id}]', XBusDepotController::class . ':list')->add(PermissionMiddleware::class)->setName('XBusDepotList-x_bus_depot-list'); // list
-    $app->any('/XBusDepotView[/{id}]', XBusDepotController::class . ':view')->add(PermissionMiddleware::class)->setName('XBusDepotView-x_bus_depot-view'); // view
+    $app->any('/xbusdepotlist[/{id}]', XBusDepotController::class . ':list')->add(PermissionMiddleware::class)->setName('xbusdepotlist-x_bus_depot-list'); // list
+    $app->any('/xbusdepotview[/{id}]', XBusDepotController::class . ':view')->add(PermissionMiddleware::class)->setName('xbusdepotview-x_bus_depot-view'); // view
     $app->group(
         '/x_bus_depot',
         function (RouteCollectorProxy $group) {
@@ -193,8 +193,8 @@ return function (App $app) {
     );
 
     // x_bus_sizes
-    $app->any('/XBusSizesList[/{id}]', XBusSizesController::class . ':list')->add(PermissionMiddleware::class)->setName('XBusSizesList-x_bus_sizes-list'); // list
-    $app->any('/XBusSizesView[/{id}]', XBusSizesController::class . ':view')->add(PermissionMiddleware::class)->setName('XBusSizesView-x_bus_sizes-view'); // view
+    $app->any('/xbussizeslist[/{id}]', XBusSizesController::class . ':list')->add(PermissionMiddleware::class)->setName('xbussizeslist-x_bus_sizes-list'); // list
+    $app->any('/xbussizesview[/{id}]', XBusSizesController::class . ':view')->add(PermissionMiddleware::class)->setName('xbussizesview-x_bus_sizes-view'); // view
     $app->group(
         '/x_bus_sizes',
         function (RouteCollectorProxy $group) {
@@ -204,8 +204,8 @@ return function (App $app) {
     );
 
     // x_bus_status
-    $app->any('/XBusStatusList[/{id}]', XBusStatusController::class . ':list')->add(PermissionMiddleware::class)->setName('XBusStatusList-x_bus_status-list'); // list
-    $app->any('/XBusStatusView[/{id}]', XBusStatusController::class . ':view')->add(PermissionMiddleware::class)->setName('XBusStatusView-x_bus_status-view'); // view
+    $app->any('/xbusstatuslist[/{id}]', XBusStatusController::class . ':list')->add(PermissionMiddleware::class)->setName('xbusstatuslist-x_bus_status-list'); // list
+    $app->any('/xbusstatusview[/{id}]', XBusStatusController::class . ':view')->add(PermissionMiddleware::class)->setName('xbusstatusview-x_bus_status-view'); // view
     $app->group(
         '/x_bus_status',
         function (RouteCollectorProxy $group) {
@@ -215,11 +215,11 @@ return function (App $app) {
     );
 
     // x_transaction_status
-    $app->any('/XTransactionStatusList[/{id}]', XTransactionStatusController::class . ':list')->add(PermissionMiddleware::class)->setName('XTransactionStatusList-x_transaction_status-list'); // list
-    $app->any('/XTransactionStatusAdd[/{id}]', XTransactionStatusController::class . ':add')->add(PermissionMiddleware::class)->setName('XTransactionStatusAdd-x_transaction_status-add'); // add
-    $app->any('/XTransactionStatusView[/{id}]', XTransactionStatusController::class . ':view')->add(PermissionMiddleware::class)->setName('XTransactionStatusView-x_transaction_status-view'); // view
-    $app->any('/XTransactionStatusEdit[/{id}]', XTransactionStatusController::class . ':edit')->add(PermissionMiddleware::class)->setName('XTransactionStatusEdit-x_transaction_status-edit'); // edit
-    $app->any('/XTransactionStatusDelete[/{id}]', XTransactionStatusController::class . ':delete')->add(PermissionMiddleware::class)->setName('XTransactionStatusDelete-x_transaction_status-delete'); // delete
+    $app->any('/xtransactionstatuslist[/{id}]', XTransactionStatusController::class . ':list')->add(PermissionMiddleware::class)->setName('xtransactionstatuslist-x_transaction_status-list'); // list
+    $app->any('/xtransactionstatusadd[/{id}]', XTransactionStatusController::class . ':add')->add(PermissionMiddleware::class)->setName('xtransactionstatusadd-x_transaction_status-add'); // add
+    $app->any('/xtransactionstatusview[/{id}]', XTransactionStatusController::class . ':view')->add(PermissionMiddleware::class)->setName('xtransactionstatusview-x_transaction_status-view'); // view
+    $app->any('/xtransactionstatusedit[/{id}]', XTransactionStatusController::class . ':edit')->add(PermissionMiddleware::class)->setName('xtransactionstatusedit-x_transaction_status-edit'); // edit
+    $app->any('/xtransactionstatusdelete[/{id}]', XTransactionStatusController::class . ':delete')->add(PermissionMiddleware::class)->setName('xtransactionstatusdelete-x_transaction_status-delete'); // delete
     $app->group(
         '/x_transaction_status',
         function (RouteCollectorProxy $group) {
@@ -232,8 +232,8 @@ return function (App $app) {
     );
 
     // x_payment_status
-    $app->any('/XPaymentStatusList[/{id}]', XPaymentStatusController::class . ':list')->add(PermissionMiddleware::class)->setName('XPaymentStatusList-x_payment_status-list'); // list
-    $app->any('/XPaymentStatusView[/{id}]', XPaymentStatusController::class . ':view')->add(PermissionMiddleware::class)->setName('XPaymentStatusView-x_payment_status-view'); // view
+    $app->any('/xpaymentstatuslist[/{id}]', XPaymentStatusController::class . ':list')->add(PermissionMiddleware::class)->setName('xpaymentstatuslist-x_payment_status-list'); // list
+    $app->any('/xpaymentstatusview[/{id}]', XPaymentStatusController::class . ':view')->add(PermissionMiddleware::class)->setName('xpaymentstatusview-x_payment_status-view'); // view
     $app->group(
         '/x_payment_status',
         function (RouteCollectorProxy $group) {
@@ -243,8 +243,8 @@ return function (App $app) {
     );
 
     // x_print_stage
-    $app->any('/XPrintStageList[/{id}]', XPrintStageController::class . ':list')->add(PermissionMiddleware::class)->setName('XPrintStageList-x_print_stage-list'); // list
-    $app->any('/XPrintStageView[/{id}]', XPrintStageController::class . ':view')->add(PermissionMiddleware::class)->setName('XPrintStageView-x_print_stage-view'); // view
+    $app->any('/xprintstagelist[/{id}]', XPrintStageController::class . ':list')->add(PermissionMiddleware::class)->setName('xprintstagelist-x_print_stage-list'); // list
+    $app->any('/xprintstageview[/{id}]', XPrintStageController::class . ':view')->add(PermissionMiddleware::class)->setName('xprintstageview-x_print_stage-view'); // view
     $app->group(
         '/x_print_stage',
         function (RouteCollectorProxy $group) {
@@ -254,8 +254,8 @@ return function (App $app) {
     );
 
     // x_print_status
-    $app->any('/XPrintStatusList[/{id}]', XPrintStatusController::class . ':list')->add(PermissionMiddleware::class)->setName('XPrintStatusList-x_print_status-list'); // list
-    $app->any('/XPrintStatusView[/{id}]', XPrintStatusController::class . ':view')->add(PermissionMiddleware::class)->setName('XPrintStatusView-x_print_status-view'); // view
+    $app->any('/xprintstatuslist[/{id}]', XPrintStatusController::class . ':list')->add(PermissionMiddleware::class)->setName('xprintstatuslist-x_print_status-list'); // list
+    $app->any('/xprintstatusview[/{id}]', XPrintStatusController::class . ':view')->add(PermissionMiddleware::class)->setName('xprintstatusview-x_print_status-view'); // view
     $app->group(
         '/x_print_status',
         function (RouteCollectorProxy $group) {
@@ -265,10 +265,10 @@ return function (App $app) {
     );
 
     // x_renewal_stage
-    $app->any('/XRenewalStageList[/{id}]', XRenewalStageController::class . ':list')->add(PermissionMiddleware::class)->setName('XRenewalStageList-x_renewal_stage-list'); // list
-    $app->any('/XRenewalStageAdd[/{id}]', XRenewalStageController::class . ':add')->add(PermissionMiddleware::class)->setName('XRenewalStageAdd-x_renewal_stage-add'); // add
-    $app->any('/XRenewalStageEdit[/{id}]', XRenewalStageController::class . ':edit')->add(PermissionMiddleware::class)->setName('XRenewalStageEdit-x_renewal_stage-edit'); // edit
-    $app->any('/XRenewalStageDelete[/{id}]', XRenewalStageController::class . ':delete')->add(PermissionMiddleware::class)->setName('XRenewalStageDelete-x_renewal_stage-delete'); // delete
+    $app->any('/xrenewalstagelist[/{id}]', XRenewalStageController::class . ':list')->add(PermissionMiddleware::class)->setName('xrenewalstagelist-x_renewal_stage-list'); // list
+    $app->any('/xrenewalstageadd[/{id}]', XRenewalStageController::class . ':add')->add(PermissionMiddleware::class)->setName('xrenewalstageadd-x_renewal_stage-add'); // add
+    $app->any('/xrenewalstageedit[/{id}]', XRenewalStageController::class . ':edit')->add(PermissionMiddleware::class)->setName('xrenewalstageedit-x_renewal_stage-edit'); // edit
+    $app->any('/xrenewalstagedelete[/{id}]', XRenewalStageController::class . ':delete')->add(PermissionMiddleware::class)->setName('xrenewalstagedelete-x_renewal_stage-delete'); // delete
     $app->group(
         '/x_renewal_stage',
         function (RouteCollectorProxy $group) {
@@ -280,7 +280,7 @@ return function (App $app) {
     );
 
     // x_report_types
-    $app->any('/XReportTypesList[/{id}]', XReportTypesController::class . ':list')->add(PermissionMiddleware::class)->setName('XReportTypesList-x_report_types-list'); // list
+    $app->any('/xreporttypeslist[/{id}]', XReportTypesController::class . ':list')->add(PermissionMiddleware::class)->setName('xreporttypeslist-x_report_types-list'); // list
     $app->group(
         '/x_report_types',
         function (RouteCollectorProxy $group) {
@@ -289,10 +289,10 @@ return function (App $app) {
     );
 
     // x_user_types
-    $app->any('/XUserTypesList[/{id}]', XUserTypesController::class . ':list')->add(PermissionMiddleware::class)->setName('XUserTypesList-x_user_types-list'); // list
-    $app->any('/XUserTypesAdd[/{id}]', XUserTypesController::class . ':add')->add(PermissionMiddleware::class)->setName('XUserTypesAdd-x_user_types-add'); // add
-    $app->any('/XUserTypesEdit[/{id}]', XUserTypesController::class . ':edit')->add(PermissionMiddleware::class)->setName('XUserTypesEdit-x_user_types-edit'); // edit
-    $app->any('/XUserTypesDelete[/{id}]', XUserTypesController::class . ':delete')->add(PermissionMiddleware::class)->setName('XUserTypesDelete-x_user_types-delete'); // delete
+    $app->any('/xusertypeslist[/{id}]', XUserTypesController::class . ':list')->add(PermissionMiddleware::class)->setName('xusertypeslist-x_user_types-list'); // list
+    $app->any('/xusertypesadd[/{id}]', XUserTypesController::class . ':add')->add(PermissionMiddleware::class)->setName('xusertypesadd-x_user_types-add'); // add
+    $app->any('/xusertypesedit[/{id}]', XUserTypesController::class . ':edit')->add(PermissionMiddleware::class)->setName('xusertypesedit-x_user_types-edit'); // edit
+    $app->any('/xusertypesdelete[/{id}]', XUserTypesController::class . ':delete')->add(PermissionMiddleware::class)->setName('xusertypesdelete-x_user_types-delete'); // delete
     $app->group(
         '/x_user_types',
         function (RouteCollectorProxy $group) {
@@ -304,8 +304,8 @@ return function (App $app) {
     );
 
     // y_inventory
-    $app->any('/YInventoryList[/{id}]', YInventoryController::class . ':list')->add(PermissionMiddleware::class)->setName('YInventoryList-y_inventory-list'); // list
-    $app->any('/YInventoryView[/{id}]', YInventoryController::class . ':view')->add(PermissionMiddleware::class)->setName('YInventoryView-y_inventory-view'); // view
+    $app->any('/yinventorylist[/{id}]', YInventoryController::class . ':list')->add(PermissionMiddleware::class)->setName('yinventorylist-y_inventory-list'); // list
+    $app->any('/yinventoryview[/{id}]', YInventoryController::class . ':view')->add(PermissionMiddleware::class)->setName('yinventoryview-y_inventory-view'); // view
     $app->group(
         '/y_inventory',
         function (RouteCollectorProxy $group) {
@@ -315,12 +315,12 @@ return function (App $app) {
     );
 
     // y_operators
-    $app->any('/YOperatorsList[/{id}]', YOperatorsController::class . ':list')->add(PermissionMiddleware::class)->setName('YOperatorsList-y_operators-list'); // list
-    $app->any('/YOperatorsAdd[/{id}]', YOperatorsController::class . ':add')->add(PermissionMiddleware::class)->setName('YOperatorsAdd-y_operators-add'); // add
-    $app->any('/YOperatorsView[/{id}]', YOperatorsController::class . ':view')->add(PermissionMiddleware::class)->setName('YOperatorsView-y_operators-view'); // view
-    $app->any('/YOperatorsEdit[/{id}]', YOperatorsController::class . ':edit')->add(PermissionMiddleware::class)->setName('YOperatorsEdit-y_operators-edit'); // edit
-    $app->any('/YOperatorsUpdate', YOperatorsController::class . ':update')->add(PermissionMiddleware::class)->setName('YOperatorsUpdate-y_operators-update'); // update
-    $app->any('/YOperatorsDelete[/{id}]', YOperatorsController::class . ':delete')->add(PermissionMiddleware::class)->setName('YOperatorsDelete-y_operators-delete'); // delete
+    $app->any('/yoperatorslist[/{id}]', YOperatorsController::class . ':list')->add(PermissionMiddleware::class)->setName('yoperatorslist-y_operators-list'); // list
+    $app->any('/yoperatorsadd[/{id}]', YOperatorsController::class . ':add')->add(PermissionMiddleware::class)->setName('yoperatorsadd-y_operators-add'); // add
+    $app->any('/yoperatorsview[/{id}]', YOperatorsController::class . ':view')->add(PermissionMiddleware::class)->setName('yoperatorsview-y_operators-view'); // view
+    $app->any('/yoperatorsedit[/{id}]', YOperatorsController::class . ':edit')->add(PermissionMiddleware::class)->setName('yoperatorsedit-y_operators-edit'); // edit
+    $app->any('/yoperatorsupdate', YOperatorsController::class . ':update')->add(PermissionMiddleware::class)->setName('yoperatorsupdate-y_operators-update'); // update
+    $app->any('/yoperatorsdelete[/{id}]', YOperatorsController::class . ':delete')->add(PermissionMiddleware::class)->setName('yoperatorsdelete-y_operators-delete'); // delete
     $app->group(
         '/y_operators',
         function (RouteCollectorProxy $group) {
@@ -334,11 +334,11 @@ return function (App $app) {
     );
 
     // y_printers
-    $app->any('/YPrintersList[/{id}]', YPrintersController::class . ':list')->add(PermissionMiddleware::class)->setName('YPrintersList-y_printers-list'); // list
-    $app->any('/YPrintersAdd[/{id}]', YPrintersController::class . ':add')->add(PermissionMiddleware::class)->setName('YPrintersAdd-y_printers-add'); // add
-    $app->any('/YPrintersView[/{id}]', YPrintersController::class . ':view')->add(PermissionMiddleware::class)->setName('YPrintersView-y_printers-view'); // view
-    $app->any('/YPrintersEdit[/{id}]', YPrintersController::class . ':edit')->add(PermissionMiddleware::class)->setName('YPrintersEdit-y_printers-edit'); // edit
-    $app->any('/YPrintersDelete[/{id}]', YPrintersController::class . ':delete')->add(PermissionMiddleware::class)->setName('YPrintersDelete-y_printers-delete'); // delete
+    $app->any('/yprinterslist[/{id}]', YPrintersController::class . ':list')->add(PermissionMiddleware::class)->setName('yprinterslist-y_printers-list'); // list
+    $app->any('/yprintersadd[/{id}]', YPrintersController::class . ':add')->add(PermissionMiddleware::class)->setName('yprintersadd-y_printers-add'); // add
+    $app->any('/yprintersview[/{id}]', YPrintersController::class . ':view')->add(PermissionMiddleware::class)->setName('yprintersview-y_printers-view'); // view
+    $app->any('/yprintersedit[/{id}]', YPrintersController::class . ':edit')->add(PermissionMiddleware::class)->setName('yprintersedit-y_printers-edit'); // edit
+    $app->any('/yprintersdelete[/{id}]', YPrintersController::class . ':delete')->add(PermissionMiddleware::class)->setName('yprintersdelete-y_printers-delete'); // delete
     $app->group(
         '/y_printers',
         function (RouteCollectorProxy $group) {
@@ -351,11 +351,11 @@ return function (App $app) {
     );
 
     // y_platforms
-    $app->any('/YPlatformsList[/{id}]', YPlatformsController::class . ':list')->add(PermissionMiddleware::class)->setName('YPlatformsList-y_platforms-list'); // list
-    $app->any('/YPlatformsAdd[/{id}]', YPlatformsController::class . ':add')->add(PermissionMiddleware::class)->setName('YPlatformsAdd-y_platforms-add'); // add
-    $app->any('/YPlatformsView[/{id}]', YPlatformsController::class . ':view')->add(PermissionMiddleware::class)->setName('YPlatformsView-y_platforms-view'); // view
-    $app->any('/YPlatformsEdit[/{id}]', YPlatformsController::class . ':edit')->add(PermissionMiddleware::class)->setName('YPlatformsEdit-y_platforms-edit'); // edit
-    $app->any('/YPlatformsDelete[/{id}]', YPlatformsController::class . ':delete')->add(PermissionMiddleware::class)->setName('YPlatformsDelete-y_platforms-delete'); // delete
+    $app->any('/yplatformslist[/{id}]', YPlatformsController::class . ':list')->add(PermissionMiddleware::class)->setName('yplatformslist-y_platforms-list'); // list
+    $app->any('/yplatformsadd[/{id}]', YPlatformsController::class . ':add')->add(PermissionMiddleware::class)->setName('yplatformsadd-y_platforms-add'); // add
+    $app->any('/yplatformsview[/{id}]', YPlatformsController::class . ':view')->add(PermissionMiddleware::class)->setName('yplatformsview-y_platforms-view'); // view
+    $app->any('/yplatformsedit[/{id}]', YPlatformsController::class . ':edit')->add(PermissionMiddleware::class)->setName('yplatformsedit-y_platforms-edit'); // edit
+    $app->any('/yplatformsdelete[/{id}]', YPlatformsController::class . ':delete')->add(PermissionMiddleware::class)->setName('yplatformsdelete-y_platforms-delete'); // delete
     $app->group(
         '/y_platforms',
         function (RouteCollectorProxy $group) {
@@ -368,10 +368,10 @@ return function (App $app) {
     );
 
     // y_vendors
-    $app->any('/YVendorsList[/{id}]', YVendorsController::class . ':list')->add(PermissionMiddleware::class)->setName('YVendorsList-y_vendors-list'); // list
-    $app->any('/YVendorsAdd[/{id}]', YVendorsController::class . ':add')->add(PermissionMiddleware::class)->setName('YVendorsAdd-y_vendors-add'); // add
-    $app->any('/YVendorsEdit[/{id}]', YVendorsController::class . ':edit')->add(PermissionMiddleware::class)->setName('YVendorsEdit-y_vendors-edit'); // edit
-    $app->any('/YVendorsDelete[/{id}]', YVendorsController::class . ':delete')->add(PermissionMiddleware::class)->setName('YVendorsDelete-y_vendors-delete'); // delete
+    $app->any('/yvendorslist[/{id}]', YVendorsController::class . ':list')->add(PermissionMiddleware::class)->setName('yvendorslist-y_vendors-list'); // list
+    $app->any('/yvendorsadd[/{id}]', YVendorsController::class . ':add')->add(PermissionMiddleware::class)->setName('yvendorsadd-y_vendors-add'); // add
+    $app->any('/yvendorsedit[/{id}]', YVendorsController::class . ':edit')->add(PermissionMiddleware::class)->setName('yvendorsedit-y_vendors-edit'); // edit
+    $app->any('/yvendorsdelete[/{id}]', YVendorsController::class . ':delete')->add(PermissionMiddleware::class)->setName('yvendorsdelete-y_vendors-delete'); // delete
     $app->group(
         '/y_vendors',
         function (RouteCollectorProxy $group) {
@@ -383,9 +383,9 @@ return function (App $app) {
     );
 
     // z_core_settings
-    $app->any('/ZCoreSettingsList[/{id}]', ZCoreSettingsController::class . ':list')->add(PermissionMiddleware::class)->setName('ZCoreSettingsList-z_core_settings-list'); // list
-    $app->any('/ZCoreSettingsAdd[/{id}]', ZCoreSettingsController::class . ':add')->add(PermissionMiddleware::class)->setName('ZCoreSettingsAdd-z_core_settings-add'); // add
-    $app->any('/ZCoreSettingsEdit[/{id}]', ZCoreSettingsController::class . ':edit')->add(PermissionMiddleware::class)->setName('ZCoreSettingsEdit-z_core_settings-edit'); // edit
+    $app->any('/zcoresettingslist[/{id}]', ZCoreSettingsController::class . ':list')->add(PermissionMiddleware::class)->setName('zcoresettingslist-z_core_settings-list'); // list
+    $app->any('/zcoresettingsadd[/{id}]', ZCoreSettingsController::class . ':add')->add(PermissionMiddleware::class)->setName('zcoresettingsadd-z_core_settings-add'); // add
+    $app->any('/zcoresettingsedit[/{id}]', ZCoreSettingsController::class . ':edit')->add(PermissionMiddleware::class)->setName('zcoresettingsedit-z_core_settings-edit'); // edit
     $app->group(
         '/z_core_settings',
         function (RouteCollectorProxy $group) {
@@ -396,7 +396,7 @@ return function (App $app) {
     );
 
     // view_pricing_all
-    $app->any('/ViewPricingAllList', ViewPricingAllController::class . ':list')->add(PermissionMiddleware::class)->setName('ViewPricingAllList-view_pricing_all-list'); // list
+    $app->any('/viewpricingalllist', ViewPricingAllController::class . ':list')->add(PermissionMiddleware::class)->setName('viewpricingalllist-view_pricing_all-list'); // list
     $app->group(
         '/view_pricing_all',
         function (RouteCollectorProxy $group) {
@@ -405,7 +405,7 @@ return function (App $app) {
     );
 
     // view_operators_platforms
-    $app->any('/ViewOperatorsPlatformsList', ViewOperatorsPlatformsController::class . ':list')->add(PermissionMiddleware::class)->setName('ViewOperatorsPlatformsList-view_operators_platforms-list'); // list
+    $app->any('/viewoperatorsplatformslist', ViewOperatorsPlatformsController::class . ':list')->add(PermissionMiddleware::class)->setName('viewoperatorsplatformslist-view_operators_platforms-list'); // list
     $app->group(
         '/view_operators_platforms',
         function (RouteCollectorProxy $group) {
@@ -414,7 +414,7 @@ return function (App $app) {
     );
 
     // view_pricing_options
-    $app->any('/ViewPricingOptionsList', ViewPricingOptionsController::class . ':list')->add(PermissionMiddleware::class)->setName('ViewPricingOptionsList-view_pricing_options-list'); // list
+    $app->any('/viewpricingoptionslist', ViewPricingOptionsController::class . ':list')->add(PermissionMiddleware::class)->setName('viewpricingoptionslist-view_pricing_options-list'); // list
     $app->group(
         '/view_pricing_options',
         function (RouteCollectorProxy $group) {
@@ -423,7 +423,7 @@ return function (App $app) {
     );
 
     // view_bus_trans_options
-    $app->any('/ViewBusTransOptionsList', ViewBusTransOptionsController::class . ':list')->add(PermissionMiddleware::class)->setName('ViewBusTransOptionsList-view_bus_trans_options-list'); // list
+    $app->any('/viewbustransoptionslist', ViewBusTransOptionsController::class . ':list')->add(PermissionMiddleware::class)->setName('viewbustransoptionslist-view_bus_trans_options-list'); // list
     $app->group(
         '/view_bus_trans_options',
         function (RouteCollectorProxy $group) {
@@ -432,7 +432,7 @@ return function (App $app) {
     );
 
     // view_buses_interior
-    $app->any('/ViewBusesInteriorList', ViewBusesInteriorController::class . ':list')->add(PermissionMiddleware::class)->setName('ViewBusesInteriorList-view_buses_interior-list'); // list
+    $app->any('/viewbusesinteriorlist', ViewBusesInteriorController::class . ':list')->add(PermissionMiddleware::class)->setName('viewbusesinteriorlist-view_buses_interior-list'); // list
     $app->group(
         '/view_buses_interior',
         function (RouteCollectorProxy $group) {
@@ -441,7 +441,7 @@ return function (App $app) {
     );
 
     // view_buses_exterior
-    $app->any('/ViewBusesExteriorList', ViewBusesExteriorController::class . ':list')->add(PermissionMiddleware::class)->setName('ViewBusesExteriorList-view_buses_exterior-list'); // list
+    $app->any('/viewbusesexteriorlist', ViewBusesExteriorController::class . ':list')->add(PermissionMiddleware::class)->setName('viewbusesexteriorlist-view_buses_exterior-list'); // list
     $app->group(
         '/view_buses_exterior',
         function (RouteCollectorProxy $group) {
@@ -450,7 +450,7 @@ return function (App $app) {
     );
 
     // view_bus_depot_summary
-    $app->any('/ViewBusDepotSummaryList', ViewBusDepotSummaryController::class . ':list')->add(PermissionMiddleware::class)->setName('ViewBusDepotSummaryList-view_bus_depot_summary-list'); // list
+    $app->any('/viewbusdepotsummarylist', ViewBusDepotSummaryController::class . ':list')->add(PermissionMiddleware::class)->setName('viewbusdepotsummarylist-view_bus_depot_summary-list'); // list
     $app->group(
         '/view_bus_depot_summary',
         function (RouteCollectorProxy $group) {
@@ -459,7 +459,7 @@ return function (App $app) {
     );
 
     // view_bus_int_summary_at_a_glance
-    $app->any('/ViewBusIntSummaryAtAGlanceList', ViewBusIntSummaryAtAGlanceController::class . ':list')->add(PermissionMiddleware::class)->setName('ViewBusIntSummaryAtAGlanceList-view_bus_int_summary_at_a_glance-list'); // list
+    $app->any('/viewbusintsummaryataglancelist', ViewBusIntSummaryAtAGlanceController::class . ':list')->add(PermissionMiddleware::class)->setName('viewbusintsummaryataglancelist-view_bus_int_summary_at_a_glance-list'); // list
     $app->group(
         '/view_bus_int_summary_at_a_glance',
         function (RouteCollectorProxy $group) {
@@ -468,7 +468,7 @@ return function (App $app) {
     );
 
     // view_bus_ext_summary_at_a_glance
-    $app->any('/ViewBusExtSummaryAtAGlanceList', ViewBusExtSummaryAtAGlanceController::class . ':list')->add(PermissionMiddleware::class)->setName('ViewBusExtSummaryAtAGlanceList-view_bus_ext_summary_at_a_glance-list'); // list
+    $app->any('/viewbusextsummaryataglancelist', ViewBusExtSummaryAtAGlanceController::class . ':list')->add(PermissionMiddleware::class)->setName('viewbusextsummaryataglancelist-view_bus_ext_summary_at_a_glance-list'); // list
     $app->group(
         '/view_bus_ext_summary_at_a_glance',
         function (RouteCollectorProxy $group) {
@@ -477,7 +477,7 @@ return function (App $app) {
     );
 
     // view_bus_summary
-    $app->any('/ViewBusSummaryList', ViewBusSummaryController::class . ':list')->add(PermissionMiddleware::class)->setName('ViewBusSummaryList-view_bus_summary-list'); // list
+    $app->any('/viewbussummarylist', ViewBusSummaryController::class . ':list')->add(PermissionMiddleware::class)->setName('viewbussummarylist-view_bus_summary-list'); // list
     $app->group(
         '/view_bus_summary',
         function (RouteCollectorProxy $group) {
@@ -486,10 +486,10 @@ return function (App $app) {
     );
 
     // private_functions
-    $app->any('/PrivateFunctions', PrivateFunctionsController::class)->add(PermissionMiddleware::class)->setName('PrivateFunctions-private_functions-custom'); // custom
+    $app->any('/privatefunctions', PrivateFunctionsController::class)->add(PermissionMiddleware::class)->setName('privatefunctions-private_functions-custom'); // custom
 
     // view_campaign_status
-    $app->any('/ViewCampaignStatusList', ViewCampaignStatusController::class . ':list')->add(PermissionMiddleware::class)->setName('ViewCampaignStatusList-view_campaign_status-list'); // list
+    $app->any('/viewcampaignstatuslist', ViewCampaignStatusController::class . ':list')->add(PermissionMiddleware::class)->setName('viewcampaignstatuslist-view_campaign_status-list'); // list
     $app->group(
         '/view_campaign_status',
         function (RouteCollectorProxy $group) {
@@ -498,7 +498,7 @@ return function (App $app) {
     );
 
     // view_payments_pending
-    $app->any('/ViewPaymentsPendingList', ViewPaymentsPendingController::class . ':list')->add(PermissionMiddleware::class)->setName('ViewPaymentsPendingList-view_payments_pending-list'); // list
+    $app->any('/viewpaymentspendinglist', ViewPaymentsPendingController::class . ':list')->add(PermissionMiddleware::class)->setName('viewpaymentspendinglist-view_payments_pending-list'); // list
     $app->group(
         '/view_payments_pending',
         function (RouteCollectorProxy $group) {
@@ -507,7 +507,7 @@ return function (App $app) {
     );
 
     // view_transactions_all
-    $app->any('/ViewTransactionsAllList', ViewTransactionsAllController::class . ':list')->add(PermissionMiddleware::class)->setName('ViewTransactionsAllList-view_transactions_all-list'); // list
+    $app->any('/viewtransactionsalllist', ViewTransactionsAllController::class . ':list')->add(PermissionMiddleware::class)->setName('viewtransactionsalllist-view_transactions_all-list'); // list
     $app->group(
         '/view_transactions_all',
         function (RouteCollectorProxy $group) {
@@ -516,7 +516,7 @@ return function (App $app) {
     );
 
     // view_operators
-    $app->any('/ViewOperatorsList', ViewOperatorsController::class . ':list')->add(PermissionMiddleware::class)->setName('ViewOperatorsList-view_operators-list'); // list
+    $app->any('/viewoperatorslist', ViewOperatorsController::class . ':list')->add(PermissionMiddleware::class)->setName('viewoperatorslist-view_operators-list'); // list
     $app->group(
         '/view_operators',
         function (RouteCollectorProxy $group) {
@@ -525,11 +525,11 @@ return function (App $app) {
     );
 
     // z_email_settings
-    $app->any('/ZEmailSettingsList[/{id}]', ZEmailSettingsController::class . ':list')->add(PermissionMiddleware::class)->setName('ZEmailSettingsList-z_email_settings-list'); // list
-    $app->any('/ZEmailSettingsAdd[/{id}]', ZEmailSettingsController::class . ':add')->add(PermissionMiddleware::class)->setName('ZEmailSettingsAdd-z_email_settings-add'); // add
-    $app->any('/ZEmailSettingsView[/{id}]', ZEmailSettingsController::class . ':view')->add(PermissionMiddleware::class)->setName('ZEmailSettingsView-z_email_settings-view'); // view
-    $app->any('/ZEmailSettingsEdit[/{id}]', ZEmailSettingsController::class . ':edit')->add(PermissionMiddleware::class)->setName('ZEmailSettingsEdit-z_email_settings-edit'); // edit
-    $app->any('/ZEmailSettingsDelete[/{id}]', ZEmailSettingsController::class . ':delete')->add(PermissionMiddleware::class)->setName('ZEmailSettingsDelete-z_email_settings-delete'); // delete
+    $app->any('/zemailsettingslist[/{id}]', ZEmailSettingsController::class . ':list')->add(PermissionMiddleware::class)->setName('zemailsettingslist-z_email_settings-list'); // list
+    $app->any('/zemailsettingsadd[/{id}]', ZEmailSettingsController::class . ':add')->add(PermissionMiddleware::class)->setName('zemailsettingsadd-z_email_settings-add'); // add
+    $app->any('/zemailsettingsview[/{id}]', ZEmailSettingsController::class . ':view')->add(PermissionMiddleware::class)->setName('zemailsettingsview-z_email_settings-view'); // view
+    $app->any('/zemailsettingsedit[/{id}]', ZEmailSettingsController::class . ':edit')->add(PermissionMiddleware::class)->setName('zemailsettingsedit-z_email_settings-edit'); // edit
+    $app->any('/zemailsettingsdelete[/{id}]', ZEmailSettingsController::class . ':delete')->add(PermissionMiddleware::class)->setName('zemailsettingsdelete-z_email_settings-delete'); // delete
     $app->group(
         '/z_email_settings',
         function (RouteCollectorProxy $group) {
@@ -542,8 +542,8 @@ return function (App $app) {
     );
 
     // view_transactions_per_operator
-    $app->any('/ViewTransactionsPerOperatorList', ViewTransactionsPerOperatorController::class . ':list')->add(PermissionMiddleware::class)->setName('ViewTransactionsPerOperatorList-view_transactions_per_operator-list'); // list
-    $app->any('/ViewTransactionsPerOperatorSearch', ViewTransactionsPerOperatorController::class . ':search')->add(PermissionMiddleware::class)->setName('ViewTransactionsPerOperatorSearch-view_transactions_per_operator-search'); // search
+    $app->any('/viewtransactionsperoperatorlist', ViewTransactionsPerOperatorController::class . ':list')->add(PermissionMiddleware::class)->setName('viewtransactionsperoperatorlist-view_transactions_per_operator-list'); // list
+    $app->any('/viewtransactionsperoperatorsearch', ViewTransactionsPerOperatorController::class . ':search')->add(PermissionMiddleware::class)->setName('viewtransactionsperoperatorsearch-view_transactions_per_operator-search'); // search
     $app->group(
         '/view_transactions_per_operator',
         function (RouteCollectorProxy $group) {
@@ -553,8 +553,8 @@ return function (App $app) {
     );
 
     // view_transactions_per_platform
-    $app->any('/ViewTransactionsPerPlatformList', ViewTransactionsPerPlatformController::class . ':list')->add(PermissionMiddleware::class)->setName('ViewTransactionsPerPlatformList-view_transactions_per_platform-list'); // list
-    $app->any('/ViewTransactionsPerPlatformSearch', ViewTransactionsPerPlatformController::class . ':search')->add(PermissionMiddleware::class)->setName('ViewTransactionsPerPlatformSearch-view_transactions_per_platform-search'); // search
+    $app->any('/viewtransactionsperplatformlist', ViewTransactionsPerPlatformController::class . ':list')->add(PermissionMiddleware::class)->setName('viewtransactionsperplatformlist-view_transactions_per_platform-list'); // list
+    $app->any('/viewtransactionsperplatformsearch', ViewTransactionsPerPlatformController::class . ':search')->add(PermissionMiddleware::class)->setName('viewtransactionsperplatformsearch-view_transactions_per_platform-search'); // search
     $app->group(
         '/view_transactions_per_platform',
         function (RouteCollectorProxy $group) {
@@ -564,7 +564,7 @@ return function (App $app) {
     );
 
     // view_vendors_operators
-    $app->any('/ViewVendorsOperatorsList', ViewVendorsOperatorsController::class . ':list')->add(PermissionMiddleware::class)->setName('ViewVendorsOperatorsList-view_vendors_operators-list'); // list
+    $app->any('/viewvendorsoperatorslist', ViewVendorsOperatorsController::class . ':list')->add(PermissionMiddleware::class)->setName('viewvendorsoperatorslist-view_vendors_operators-list'); // list
     $app->group(
         '/view_vendors_operators',
         function (RouteCollectorProxy $group) {
@@ -573,8 +573,8 @@ return function (App $app) {
     );
 
     // view_campaigns_pending
-    $app->any('/ViewCampaignsPendingList[/{transaction_id}]', ViewCampaignsPendingController::class . ':list')->add(PermissionMiddleware::class)->setName('ViewCampaignsPendingList-view_campaigns_pending-list'); // list
-    $app->any('/ViewCampaignsPendingView[/{transaction_id}]', ViewCampaignsPendingController::class . ':view')->add(PermissionMiddleware::class)->setName('ViewCampaignsPendingView-view_campaigns_pending-view'); // view
+    $app->any('/viewcampaignspendinglist[/{transaction_id}]', ViewCampaignsPendingController::class . ':list')->add(PermissionMiddleware::class)->setName('viewcampaignspendinglist-view_campaigns_pending-list'); // list
+    $app->any('/viewcampaignspendingview[/{transaction_id}]', ViewCampaignsPendingController::class . ':view')->add(PermissionMiddleware::class)->setName('viewcampaignspendingview-view_campaigns_pending-view'); // view
     $app->group(
         '/view_campaigns_pending',
         function (RouteCollectorProxy $group) {
@@ -584,7 +584,7 @@ return function (App $app) {
     );
 
     // view_buses_assigned
-    $app->any('/ViewBusesAssignedList', ViewBusesAssignedController::class . ':list')->add(PermissionMiddleware::class)->setName('ViewBusesAssignedList-view_buses_assigned-list'); // list
+    $app->any('/viewbusesassignedlist', ViewBusesAssignedController::class . ':list')->add(PermissionMiddleware::class)->setName('viewbusesassignedlist-view_buses_assigned-list'); // list
     $app->group(
         '/view_buses_assigned',
         function (RouteCollectorProxy $group) {
@@ -593,10 +593,10 @@ return function (App $app) {
     );
 
     // z_price_settings
-    $app->any('/ZPriceSettingsList[/{id}]', ZPriceSettingsController::class . ':list')->add(PermissionMiddleware::class)->setName('ZPriceSettingsList-z_price_settings-list'); // list
-    $app->any('/ZPriceSettingsView[/{id}]', ZPriceSettingsController::class . ':view')->add(PermissionMiddleware::class)->setName('ZPriceSettingsView-z_price_settings-view'); // view
-    $app->any('/ZPriceSettingsEdit[/{id}]', ZPriceSettingsController::class . ':edit')->add(PermissionMiddleware::class)->setName('ZPriceSettingsEdit-z_price_settings-edit'); // edit
-    $app->any('/ZPriceSettingsUpdate', ZPriceSettingsController::class . ':update')->add(PermissionMiddleware::class)->setName('ZPriceSettingsUpdate-z_price_settings-update'); // update
+    $app->any('/zpricesettingslist[/{id}]', ZPriceSettingsController::class . ':list')->add(PermissionMiddleware::class)->setName('zpricesettingslist-z_price_settings-list'); // list
+    $app->any('/zpricesettingsview[/{id}]', ZPriceSettingsController::class . ':view')->add(PermissionMiddleware::class)->setName('zpricesettingsview-z_price_settings-view'); // view
+    $app->any('/zpricesettingsedit[/{id}]', ZPriceSettingsController::class . ':edit')->add(PermissionMiddleware::class)->setName('zpricesettingsedit-z_price_settings-edit'); // edit
+    $app->any('/zpricesettingsupdate', ZPriceSettingsController::class . ':update')->add(PermissionMiddleware::class)->setName('zpricesettingsupdate-z_price_settings-update'); // update
     $app->group(
         '/z_price_settings',
         function (RouteCollectorProxy $group) {
@@ -608,11 +608,11 @@ return function (App $app) {
     );
 
     // w_vendors_operators
-    $app->any('/WVendorsOperatorsList[/{id}]', WVendorsOperatorsController::class . ':list')->add(PermissionMiddleware::class)->setName('WVendorsOperatorsList-w_vendors_operators-list'); // list
-    $app->any('/WVendorsOperatorsAdd[/{id}]', WVendorsOperatorsController::class . ':add')->add(PermissionMiddleware::class)->setName('WVendorsOperatorsAdd-w_vendors_operators-add'); // add
-    $app->any('/WVendorsOperatorsView[/{id}]', WVendorsOperatorsController::class . ':view')->add(PermissionMiddleware::class)->setName('WVendorsOperatorsView-w_vendors_operators-view'); // view
-    $app->any('/WVendorsOperatorsEdit[/{id}]', WVendorsOperatorsController::class . ':edit')->add(PermissionMiddleware::class)->setName('WVendorsOperatorsEdit-w_vendors_operators-edit'); // edit
-    $app->any('/WVendorsOperatorsDelete[/{id}]', WVendorsOperatorsController::class . ':delete')->add(PermissionMiddleware::class)->setName('WVendorsOperatorsDelete-w_vendors_operators-delete'); // delete
+    $app->any('/wvendorsoperatorslist[/{id}]', WVendorsOperatorsController::class . ':list')->add(PermissionMiddleware::class)->setName('wvendorsoperatorslist-w_vendors_operators-list'); // list
+    $app->any('/wvendorsoperatorsadd[/{id}]', WVendorsOperatorsController::class . ':add')->add(PermissionMiddleware::class)->setName('wvendorsoperatorsadd-w_vendors_operators-add'); // add
+    $app->any('/wvendorsoperatorsview[/{id}]', WVendorsOperatorsController::class . ':view')->add(PermissionMiddleware::class)->setName('wvendorsoperatorsview-w_vendors_operators-view'); // view
+    $app->any('/wvendorsoperatorsedit[/{id}]', WVendorsOperatorsController::class . ':edit')->add(PermissionMiddleware::class)->setName('wvendorsoperatorsedit-w_vendors_operators-edit'); // edit
+    $app->any('/wvendorsoperatorsdelete[/{id}]', WVendorsOperatorsController::class . ':delete')->add(PermissionMiddleware::class)->setName('wvendorsoperatorsdelete-w_vendors_operators-delete'); // delete
     $app->group(
         '/w_vendors_operators',
         function (RouteCollectorProxy $group) {
@@ -625,7 +625,7 @@ return function (App $app) {
     );
 
     // view_all_buses
-    $app->any('/ViewAllBusesList[/{id}]', ViewAllBusesController::class . ':list')->add(PermissionMiddleware::class)->setName('ViewAllBusesList-view_all_buses-list'); // list
+    $app->any('/viewallbuseslist[/{id}]', ViewAllBusesController::class . ':list')->add(PermissionMiddleware::class)->setName('viewallbuseslist-view_all_buses-list'); // list
     $app->group(
         '/view_all_buses',
         function (RouteCollectorProxy $group) {

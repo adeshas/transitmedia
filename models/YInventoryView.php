@@ -293,7 +293,7 @@ class YInventoryView extends YInventory
                 $pageName = GetPageName($url);
                 if ($pageName != $this->getListUrl()) { // Not List page
                     $row["caption"] = $this->getModalCaption($pageName);
-                    if ($pageName == "YInventoryView") {
+                    if ($pageName == "yinventoryview") {
                         $row["view"] = "1";
                     }
                 } else { // List page should not be shown as modal => error
@@ -527,7 +527,7 @@ class YInventoryView extends YInventory
                 $this->id->setQueryStringValue($keyValue);
                 $this->RecKey["id"] = $this->id->QueryStringValue;
             } else {
-                $returnUrl = "YInventoryList"; // Return to list
+                $returnUrl = "yinventorylist"; // Return to list
             }
 
             // Get action
@@ -550,12 +550,12 @@ class YInventoryView extends YInventory
                         if ($this->getSuccessMessage() == "" && $this->getFailureMessage() == "") {
                             $this->setFailureMessage($Language->phrase("NoRecord")); // Set no record message
                         }
-                        $returnUrl = "YInventoryList"; // No matching record, return to list
+                        $returnUrl = "yinventorylist"; // No matching record, return to list
                     }
                     break;
             }
         } else {
-            $returnUrl = "YInventoryList"; // Not page request, return to list
+            $returnUrl = "yinventorylist"; // Not page request, return to list
         }
         if ($returnUrl != "") {
             $this->terminate($returnUrl);
@@ -732,7 +732,7 @@ class YInventoryView extends YInventory
         global $Breadcrumb, $Language;
         $Breadcrumb = new Breadcrumb("index");
         $url = CurrentUrl();
-        $Breadcrumb->add("list", $this->TableVar, $this->addMasterUrl("YInventoryList"), "", $this->TableVar, true);
+        $Breadcrumb->add("list", $this->TableVar, $this->addMasterUrl("yinventorylist"), "", $this->TableVar, true);
         $pageId = "view";
         $Breadcrumb->add("view", $pageId, $url);
     }

@@ -238,7 +238,7 @@ class MainBusesUpdate extends MainBuses
                 $pageName = GetPageName($url);
                 if ($pageName != $this->getListUrl()) { // Not List page
                     $row["caption"] = $this->getModalCaption($pageName);
-                    if ($pageName == "MainBusesView") {
+                    if ($pageName == "mainbusesview") {
                         $row["view"] = "1";
                     }
                 } else { // List page should not be shown as modal => error
@@ -494,7 +494,7 @@ class MainBusesUpdate extends MainBuses
             $this->loadMultiUpdateValues(); // Load initial values to form
         }
         if (count($this->RecKeys) <= 0) {
-            $this->terminate("MainBusesList"); // No records selected, return to list
+            $this->terminate("mainbuseslist"); // No records selected, return to list
             return;
         }
         if ($this->isUpdate()) {
@@ -1650,7 +1650,7 @@ class MainBusesUpdate extends MainBuses
         global $Breadcrumb, $Language;
         $Breadcrumb = new Breadcrumb("index");
         $url = CurrentUrl();
-        $Breadcrumb->add("list", $this->TableVar, $this->addMasterUrl("MainBusesList"), "", $this->TableVar, true);
+        $Breadcrumb->add("list", $this->TableVar, $this->addMasterUrl("mainbuseslist"), "", $this->TableVar, true);
         $pageId = "update";
         $Breadcrumb->add("update", $pageId, $url);
     }

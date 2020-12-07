@@ -238,7 +238,7 @@ class YOperatorsEdit extends YOperators
                 $pageName = GetPageName($url);
                 if ($pageName != $this->getListUrl()) { // Not List page
                     $row["caption"] = $this->getModalCaption($pageName);
-                    if ($pageName == "YOperatorsView") {
+                    if ($pageName == "yoperatorsview") {
                         $row["view"] = "1";
                     }
                 } else { // List page should not be shown as modal => error
@@ -551,7 +551,7 @@ class YOperatorsEdit extends YOperators
                     if ($this->getFailureMessage() == "") {
                         $this->setFailureMessage($Language->phrase("NoRecord")); // No record found
                     }
-                    $this->terminate("YOperatorsList"); // No matching record, return to list
+                    $this->terminate("yoperatorslist"); // No matching record, return to list
                     return;
                 }
 
@@ -564,7 +564,7 @@ class YOperatorsEdit extends YOperators
                 } else {
                     $returnUrl = $this->getReturnUrl();
                 }
-                if (GetPageName($returnUrl) == "YOperatorsList") {
+                if (GetPageName($returnUrl) == "yoperatorslist") {
                     $returnUrl = $this->addMasterUrl($returnUrl); // List page, return to List page with correct master key if necessary
                 }
                 $this->SendEmail = true; // Send email on update success
@@ -1308,7 +1308,7 @@ class YOperatorsEdit extends YOperators
         global $Breadcrumb, $Language;
         $Breadcrumb = new Breadcrumb("index");
         $url = CurrentUrl();
-        $Breadcrumb->add("list", $this->TableVar, $this->addMasterUrl("YOperatorsList"), "", $this->TableVar, true);
+        $Breadcrumb->add("list", $this->TableVar, $this->addMasterUrl("yoperatorslist"), "", $this->TableVar, true);
         $pageId = "edit";
         $Breadcrumb->add("edit", $pageId, $url);
     }

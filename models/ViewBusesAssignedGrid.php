@@ -153,7 +153,7 @@ class ViewBusesAssignedGrid extends ViewBusesAssigned
 
         // Page URL
         $pageUrl = $this->pageUrl();
-        $this->AddUrl = "ViewBusesAssignedAdd";
+        $this->AddUrl = "viewbusesassignedadd";
 
         // Table name (for backward compatibility only)
         if (!defined(PROJECT_NAMESPACE . "TABLE_NAME")) {
@@ -565,7 +565,7 @@ class ViewBusesAssignedGrid extends ViewBusesAssigned
             $this->MasterRecordExists = $rsmaster !== false;
             if (!$this->MasterRecordExists) {
                 $this->setFailureMessage($Language->phrase("NoRecord")); // Set no record found
-                $this->terminate("ViewCampaignsPendingList"); // Return to master page
+                $this->terminate("viewcampaignspendinglist"); // Return to master page
                 return;
             } else {
                 $masterTbl->loadListRowValues($rsmaster);

@@ -238,7 +238,7 @@ class ZPriceSettingsUpdate extends ZPriceSettings
                 $pageName = GetPageName($url);
                 if ($pageName != $this->getListUrl()) { // Not List page
                     $row["caption"] = $this->getModalCaption($pageName);
-                    if ($pageName == "ZPriceSettingsView") {
+                    if ($pageName == "zpricesettingsview") {
                         $row["view"] = "1";
                     }
                 } else { // List page should not be shown as modal => error
@@ -496,7 +496,7 @@ class ZPriceSettingsUpdate extends ZPriceSettings
             $this->loadMultiUpdateValues(); // Load initial values to form
         }
         if (count($this->RecKeys) <= 0) {
-            $this->terminate("ZPriceSettingsList"); // No records selected, return to list
+            $this->terminate("zpricesettingslist"); // No records selected, return to list
             return;
         }
         if ($this->isUpdate()) {
@@ -1799,7 +1799,7 @@ class ZPriceSettingsUpdate extends ZPriceSettings
         global $Breadcrumb, $Language;
         $Breadcrumb = new Breadcrumb("index");
         $url = CurrentUrl();
-        $Breadcrumb->add("list", $this->TableVar, $this->addMasterUrl("ZPriceSettingsList"), "", $this->TableVar, true);
+        $Breadcrumb->add("list", $this->TableVar, $this->addMasterUrl("zpricesettingslist"), "", $this->TableVar, true);
         $pageId = "update";
         $Breadcrumb->add("update", $pageId, $url);
     }

@@ -182,12 +182,12 @@ class ViewBusDepotSummaryList extends ViewBusDepotSummary
         $this->ExportHtmlUrl = $pageUrl . "export=html";
         $this->ExportXmlUrl = $pageUrl . "export=xml";
         $this->ExportCsvUrl = $pageUrl . "export=csv";
-        $this->AddUrl = "ViewBusDepotSummaryAdd";
+        $this->AddUrl = "viewbusdepotsummaryadd";
         $this->InlineAddUrl = $pageUrl . "action=add";
         $this->GridAddUrl = $pageUrl . "action=gridadd";
         $this->GridEditUrl = $pageUrl . "action=gridedit";
-        $this->MultiDeleteUrl = "ViewBusDepotSummaryDelete";
-        $this->MultiUpdateUrl = "ViewBusDepotSummaryUpdate";
+        $this->MultiDeleteUrl = "viewbusdepotsummarydelete";
+        $this->MultiUpdateUrl = "viewbusdepotsummaryupdate";
 
         // Table name (for backward compatibility only)
         if (!defined(PROJECT_NAMESPACE . "TABLE_NAME")) {

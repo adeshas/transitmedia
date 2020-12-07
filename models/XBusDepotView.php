@@ -293,7 +293,7 @@ class XBusDepotView extends XBusDepot
                 $pageName = GetPageName($url);
                 if ($pageName != $this->getListUrl()) { // Not List page
                     $row["caption"] = $this->getModalCaption($pageName);
-                    if ($pageName == "XBusDepotView") {
+                    if ($pageName == "xbusdepotview") {
                         $row["view"] = "1";
                     }
                 } else { // List page should not be shown as modal => error
@@ -527,7 +527,7 @@ class XBusDepotView extends XBusDepot
                 $this->id->setQueryStringValue($keyValue);
                 $this->RecKey["id"] = $this->id->QueryStringValue;
             } else {
-                $returnUrl = "XBusDepotList"; // Return to list
+                $returnUrl = "xbusdepotlist"; // Return to list
             }
 
             // Get action
@@ -550,12 +550,12 @@ class XBusDepotView extends XBusDepot
                         if ($this->getSuccessMessage() == "" && $this->getFailureMessage() == "") {
                             $this->setFailureMessage($Language->phrase("NoRecord")); // Set no record message
                         }
-                        $returnUrl = "XBusDepotList"; // No matching record, return to list
+                        $returnUrl = "xbusdepotlist"; // No matching record, return to list
                     }
                     break;
             }
         } else {
-            $returnUrl = "XBusDepotList"; // Not page request, return to list
+            $returnUrl = "xbusdepotlist"; // Not page request, return to list
         }
         if ($returnUrl != "") {
             $this->terminate($returnUrl);
@@ -732,7 +732,7 @@ class XBusDepotView extends XBusDepot
         global $Breadcrumb, $Language;
         $Breadcrumb = new Breadcrumb("index");
         $url = CurrentUrl();
-        $Breadcrumb->add("list", $this->TableVar, $this->addMasterUrl("XBusDepotList"), "", $this->TableVar, true);
+        $Breadcrumb->add("list", $this->TableVar, $this->addMasterUrl("xbusdepotlist"), "", $this->TableVar, true);
         $pageId = "view";
         $Breadcrumb->add("view", $pageId, $url);
     }

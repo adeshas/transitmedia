@@ -182,12 +182,12 @@ class SubMediaAllocationList extends SubMediaAllocation
         $this->ExportHtmlUrl = $pageUrl . "export=html";
         $this->ExportXmlUrl = $pageUrl . "export=xml";
         $this->ExportCsvUrl = $pageUrl . "export=csv";
-        $this->AddUrl = "SubMediaAllocationAdd";
+        $this->AddUrl = "submediaallocationadd";
         $this->InlineAddUrl = $pageUrl . "action=add";
         $this->GridAddUrl = $pageUrl . "action=gridadd";
         $this->GridEditUrl = $pageUrl . "action=gridedit";
-        $this->MultiDeleteUrl = "SubMediaAllocationDelete";
-        $this->MultiUpdateUrl = "SubMediaAllocationUpdate";
+        $this->MultiDeleteUrl = "submediaallocationdelete";
+        $this->MultiUpdateUrl = "submediaallocationupdate";
 
         // Table name (for backward compatibility only)
         if (!defined(PROJECT_NAMESPACE . "TABLE_NAME")) {
@@ -796,7 +796,7 @@ class SubMediaAllocationList extends SubMediaAllocation
             $this->MasterRecordExists = $rsmaster !== false;
             if (!$this->MasterRecordExists) {
                 $this->setFailureMessage($Language->phrase("NoRecord")); // Set no record found
-                $this->terminate("MainCampaignsList"); // Return to master page
+                $this->terminate("maincampaignslist"); // Return to master page
                 return;
             } else {
                 $masterTbl->loadListRowValues($rsmaster);
@@ -812,7 +812,7 @@ class SubMediaAllocationList extends SubMediaAllocation
             $this->MasterRecordExists = $rsmaster !== false;
             if (!$this->MasterRecordExists) {
                 $this->setFailureMessage($Language->phrase("NoRecord")); // Set no record found
-                $this->terminate("MainBusesList"); // Return to master page
+                $this->terminate("mainbuseslist"); // Return to master page
                 return;
             } else {
                 $masterTbl->loadListRowValues($rsmaster);

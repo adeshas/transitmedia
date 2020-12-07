@@ -293,7 +293,7 @@ class YPrintersView extends YPrinters
                 $pageName = GetPageName($url);
                 if ($pageName != $this->getListUrl()) { // Not List page
                     $row["caption"] = $this->getModalCaption($pageName);
-                    if ($pageName == "YPrintersView") {
+                    if ($pageName == "yprintersview") {
                         $row["view"] = "1";
                     }
                 } else { // List page should not be shown as modal => error
@@ -529,7 +529,7 @@ class YPrintersView extends YPrinters
                 $this->id->setQueryStringValue($keyValue);
                 $this->RecKey["id"] = $this->id->QueryStringValue;
             } else {
-                $returnUrl = "YPrintersList"; // Return to list
+                $returnUrl = "yprinterslist"; // Return to list
             }
 
             // Get action
@@ -552,12 +552,12 @@ class YPrintersView extends YPrinters
                         if ($this->getSuccessMessage() == "" && $this->getFailureMessage() == "") {
                             $this->setFailureMessage($Language->phrase("NoRecord")); // Set no record message
                         }
-                        $returnUrl = "YPrintersList"; // No matching record, return to list
+                        $returnUrl = "yprinterslist"; // No matching record, return to list
                     }
                     break;
             }
         } else {
-            $returnUrl = "YPrintersList"; // Not page request, return to list
+            $returnUrl = "yprinterslist"; // Not page request, return to list
         }
         if ($returnUrl != "") {
             $this->terminate($returnUrl);
@@ -799,7 +799,7 @@ class YPrintersView extends YPrinters
         global $Breadcrumb, $Language;
         $Breadcrumb = new Breadcrumb("index");
         $url = CurrentUrl();
-        $Breadcrumb->add("list", $this->TableVar, $this->addMasterUrl("YPrintersList"), "", $this->TableVar, true);
+        $Breadcrumb->add("list", $this->TableVar, $this->addMasterUrl("yprinterslist"), "", $this->TableVar, true);
         $pageId = "view";
         $Breadcrumb->add("view", $pageId, $url);
     }

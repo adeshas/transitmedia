@@ -381,7 +381,7 @@ class SubTransactionDetailsDelete extends SubTransactionDetails
         $this->RecKeys = $this->getRecordKeys(); // Load record keys
         $filter = $this->getFilterFromRecordKeys();
         if ($filter == "") {
-            $this->terminate("SubTransactionDetailsList"); // Prevent SQL injection, return to list
+            $this->terminate("subtransactiondetailslist"); // Prevent SQL injection, return to list
             return;
         }
 
@@ -403,7 +403,7 @@ class SubTransactionDetailsDelete extends SubTransactionDetails
             }
         }
         if (!$res) {
-            $this->terminate("SubTransactionDetailsList"); // Return to list
+            $this->terminate("subtransactiondetailslist"); // Return to list
             return;
         }
 
@@ -446,7 +446,7 @@ class SubTransactionDetailsDelete extends SubTransactionDetails
                 if ($this->Recordset) {
                     $this->Recordset->close();
                 }
-                $this->terminate("SubTransactionDetailsList"); // Return to list
+                $this->terminate("subtransactiondetailslist"); // Return to list
                 return;
             }
         }
@@ -872,7 +872,7 @@ class SubTransactionDetailsDelete extends SubTransactionDetails
         global $Breadcrumb, $Language;
         $Breadcrumb = new Breadcrumb("index");
         $url = CurrentUrl();
-        $Breadcrumb->add("list", $this->TableVar, $this->addMasterUrl("SubTransactionDetailsList"), "", $this->TableVar, true);
+        $Breadcrumb->add("list", $this->TableVar, $this->addMasterUrl("subtransactiondetailslist"), "", $this->TableVar, true);
         $pageId = "delete";
         $Breadcrumb->add("delete", $pageId, $url);
     }

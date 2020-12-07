@@ -238,7 +238,7 @@ class SubTransactionDetailsEdit extends SubTransactionDetails
                 $pageName = GetPageName($url);
                 if ($pageName != $this->getListUrl()) { // Not List page
                     $row["caption"] = $this->getModalCaption($pageName);
-                    if ($pageName == "SubTransactionDetailsView") {
+                    if ($pageName == "subtransactiondetailsview") {
                         $row["view"] = "1";
                     }
                 } else { // List page should not be shown as modal => error
@@ -551,13 +551,13 @@ class SubTransactionDetailsEdit extends SubTransactionDetails
                     if ($this->getFailureMessage() == "") {
                         $this->setFailureMessage($Language->phrase("NoRecord")); // No record found
                     }
-                    $this->terminate("SubTransactionDetailsList"); // No matching record, return to list
+                    $this->terminate("subtransactiondetailslist"); // No matching record, return to list
                     return;
                 }
                 break;
             case "update": // Update
                 $returnUrl = $this->getReturnUrl();
-                if (GetPageName($returnUrl) == "SubTransactionDetailsList") {
+                if (GetPageName($returnUrl) == "subtransactiondetailslist") {
                     $returnUrl = $this->addMasterUrl($returnUrl); // List page, return to List page with correct master key if necessary
                 }
                 $this->SendEmail = true; // Send email on update success
@@ -1386,7 +1386,7 @@ class SubTransactionDetailsEdit extends SubTransactionDetails
         global $Breadcrumb, $Language;
         $Breadcrumb = new Breadcrumb("index");
         $url = CurrentUrl();
-        $Breadcrumb->add("list", $this->TableVar, $this->addMasterUrl("SubTransactionDetailsList"), "", $this->TableVar, true);
+        $Breadcrumb->add("list", $this->TableVar, $this->addMasterUrl("subtransactiondetailslist"), "", $this->TableVar, true);
         $pageId = "edit";
         $Breadcrumb->add("edit", $pageId, $url);
     }

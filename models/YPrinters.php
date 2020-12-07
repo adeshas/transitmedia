@@ -576,7 +576,7 @@ class YPrinters extends DbTable
         if ($referUrl != "" && $referPageName != CurrentPageName() && $referPageName != "login") { // Referer not same page or login page
             $_SESSION[$name] = $referUrl; // Save to Session
         }
-        return $_SESSION[$name] ?? GetUrl("YPrintersList");
+        return $_SESSION[$name] ?? GetUrl("yprinterslist");
     }
 
     // Set return page URL
@@ -589,11 +589,11 @@ class YPrinters extends DbTable
     public function getModalCaption($pageName)
     {
         global $Language;
-        if ($pageName == "YPrintersView") {
+        if ($pageName == "yprintersview") {
             return $Language->phrase("View");
-        } elseif ($pageName == "YPrintersEdit") {
+        } elseif ($pageName == "yprintersedit") {
             return $Language->phrase("Edit");
-        } elseif ($pageName == "YPrintersAdd") {
+        } elseif ($pageName == "yprintersadd") {
             return $Language->phrase("Add");
         } else {
             return "";
@@ -622,16 +622,16 @@ class YPrinters extends DbTable
     // List URL
     public function getListUrl()
     {
-        return "YPrintersList";
+        return "yprinterslist";
     }
 
     // View URL
     public function getViewUrl($parm = "")
     {
         if ($parm != "") {
-            $url = $this->keyUrl("YPrintersView", $this->getUrlParm($parm));
+            $url = $this->keyUrl("yprintersview", $this->getUrlParm($parm));
         } else {
-            $url = $this->keyUrl("YPrintersView", $this->getUrlParm(Config("TABLE_SHOW_DETAIL") . "="));
+            $url = $this->keyUrl("yprintersview", $this->getUrlParm(Config("TABLE_SHOW_DETAIL") . "="));
         }
         return $this->addMasterUrl($url);
     }
@@ -640,9 +640,9 @@ class YPrinters extends DbTable
     public function getAddUrl($parm = "")
     {
         if ($parm != "") {
-            $url = "YPrintersAdd?" . $this->getUrlParm($parm);
+            $url = "yprintersadd?" . $this->getUrlParm($parm);
         } else {
-            $url = "YPrintersAdd";
+            $url = "yprintersadd";
         }
         return $this->addMasterUrl($url);
     }
@@ -650,7 +650,7 @@ class YPrinters extends DbTable
     // Edit URL
     public function getEditUrl($parm = "")
     {
-        $url = $this->keyUrl("YPrintersEdit", $this->getUrlParm($parm));
+        $url = $this->keyUrl("yprintersedit", $this->getUrlParm($parm));
         return $this->addMasterUrl($url);
     }
 
@@ -664,7 +664,7 @@ class YPrinters extends DbTable
     // Copy URL
     public function getCopyUrl($parm = "")
     {
-        $url = $this->keyUrl("YPrintersAdd", $this->getUrlParm($parm));
+        $url = $this->keyUrl("yprintersadd", $this->getUrlParm($parm));
         return $this->addMasterUrl($url);
     }
 
@@ -678,7 +678,7 @@ class YPrinters extends DbTable
     // Delete URL
     public function getDeleteUrl()
     {
-        return $this->keyUrl("YPrintersDelete", $this->getUrlParm());
+        return $this->keyUrl("yprintersdelete", $this->getUrlParm());
     }
 
     // Add master url

@@ -559,7 +559,7 @@ class ViewOperators extends DbTable
         if ($referUrl != "" && $referPageName != CurrentPageName() && $referPageName != "login") { // Referer not same page or login page
             $_SESSION[$name] = $referUrl; // Save to Session
         }
-        return $_SESSION[$name] ?? GetUrl("ViewOperatorsList");
+        return $_SESSION[$name] ?? GetUrl("viewoperatorslist");
     }
 
     // Set return page URL
@@ -572,11 +572,11 @@ class ViewOperators extends DbTable
     public function getModalCaption($pageName)
     {
         global $Language;
-        if ($pageName == "ViewOperatorsView") {
+        if ($pageName == "viewoperatorsview") {
             return $Language->phrase("View");
-        } elseif ($pageName == "ViewOperatorsEdit") {
+        } elseif ($pageName == "viewoperatorsedit") {
             return $Language->phrase("Edit");
-        } elseif ($pageName == "ViewOperatorsAdd") {
+        } elseif ($pageName == "viewoperatorsadd") {
             return $Language->phrase("Add");
         } else {
             return "";
@@ -605,16 +605,16 @@ class ViewOperators extends DbTable
     // List URL
     public function getListUrl()
     {
-        return "ViewOperatorsList";
+        return "viewoperatorslist";
     }
 
     // View URL
     public function getViewUrl($parm = "")
     {
         if ($parm != "") {
-            $url = $this->keyUrl("ViewOperatorsView", $this->getUrlParm($parm));
+            $url = $this->keyUrl("viewoperatorsview", $this->getUrlParm($parm));
         } else {
-            $url = $this->keyUrl("ViewOperatorsView", $this->getUrlParm(Config("TABLE_SHOW_DETAIL") . "="));
+            $url = $this->keyUrl("viewoperatorsview", $this->getUrlParm(Config("TABLE_SHOW_DETAIL") . "="));
         }
         return $this->addMasterUrl($url);
     }
@@ -623,9 +623,9 @@ class ViewOperators extends DbTable
     public function getAddUrl($parm = "")
     {
         if ($parm != "") {
-            $url = "ViewOperatorsAdd?" . $this->getUrlParm($parm);
+            $url = "viewoperatorsadd?" . $this->getUrlParm($parm);
         } else {
-            $url = "ViewOperatorsAdd";
+            $url = "viewoperatorsadd";
         }
         return $this->addMasterUrl($url);
     }
@@ -633,7 +633,7 @@ class ViewOperators extends DbTable
     // Edit URL
     public function getEditUrl($parm = "")
     {
-        $url = $this->keyUrl("ViewOperatorsEdit", $this->getUrlParm($parm));
+        $url = $this->keyUrl("viewoperatorsedit", $this->getUrlParm($parm));
         return $this->addMasterUrl($url);
     }
 
@@ -647,7 +647,7 @@ class ViewOperators extends DbTable
     // Copy URL
     public function getCopyUrl($parm = "")
     {
-        $url = $this->keyUrl("ViewOperatorsAdd", $this->getUrlParm($parm));
+        $url = $this->keyUrl("viewoperatorsadd", $this->getUrlParm($parm));
         return $this->addMasterUrl($url);
     }
 
@@ -661,7 +661,7 @@ class ViewOperators extends DbTable
     // Delete URL
     public function getDeleteUrl()
     {
-        return $this->keyUrl("ViewOperatorsDelete", $this->getUrlParm());
+        return $this->keyUrl("viewoperatorsdelete", $this->getUrlParm());
     }
 
     // Add master url

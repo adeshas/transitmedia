@@ -373,7 +373,7 @@ class WVendorsOperatorsDelete extends WVendorsOperators
         $this->RecKeys = $this->getRecordKeys(); // Load record keys
         $filter = $this->getFilterFromRecordKeys();
         if ($filter == "") {
-            $this->terminate("WVendorsOperatorsList"); // Prevent SQL injection, return to list
+            $this->terminate("wvendorsoperatorslist"); // Prevent SQL injection, return to list
             return;
         }
 
@@ -419,7 +419,7 @@ class WVendorsOperatorsDelete extends WVendorsOperators
                 if ($this->Recordset) {
                     $this->Recordset->close();
                 }
-                $this->terminate("WVendorsOperatorsList"); // Return to list
+                $this->terminate("wvendorsoperatorslist"); // Return to list
                 return;
             }
         }
@@ -707,7 +707,7 @@ class WVendorsOperatorsDelete extends WVendorsOperators
         global $Breadcrumb, $Language;
         $Breadcrumb = new Breadcrumb("index");
         $url = CurrentUrl();
-        $Breadcrumb->add("list", $this->TableVar, $this->addMasterUrl("WVendorsOperatorsList"), "", $this->TableVar, true);
+        $Breadcrumb->add("list", $this->TableVar, $this->addMasterUrl("wvendorsoperatorslist"), "", $this->TableVar, true);
         $pageId = "delete";
         $Breadcrumb->add("delete", $pageId, $url);
     }

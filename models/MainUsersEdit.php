@@ -238,7 +238,7 @@ class MainUsersEdit extends MainUsers
                 $pageName = GetPageName($url);
                 if ($pageName != $this->getListUrl()) { // Not List page
                     $row["caption"] = $this->getModalCaption($pageName);
-                    if ($pageName == "MainUsersView") {
+                    if ($pageName == "mainusersview") {
                         $row["view"] = "1";
                     }
                 } else { // List page should not be shown as modal => error
@@ -554,7 +554,7 @@ class MainUsersEdit extends MainUsers
                     if ($this->getFailureMessage() == "") {
                         $this->setFailureMessage($Language->phrase("NoRecord")); // No record found
                     }
-                    $this->terminate("MainUsersList"); // No matching record, return to list
+                    $this->terminate("mainuserslist"); // No matching record, return to list
                     return;
                 }
 
@@ -567,7 +567,7 @@ class MainUsersEdit extends MainUsers
                 } else {
                     $returnUrl = $this->getReturnUrl();
                 }
-                if (GetPageName($returnUrl) == "MainUsersList") {
+                if (GetPageName($returnUrl) == "mainuserslist") {
                     $returnUrl = $this->addMasterUrl($returnUrl); // List page, return to List page with correct master key if necessary
                 }
                 $this->SendEmail = true; // Send email on update success
@@ -1466,7 +1466,7 @@ class MainUsersEdit extends MainUsers
         global $Breadcrumb, $Language;
         $Breadcrumb = new Breadcrumb("index");
         $url = CurrentUrl();
-        $Breadcrumb->add("list", $this->TableVar, $this->addMasterUrl("MainUsersList"), "", $this->TableVar, true);
+        $Breadcrumb->add("list", $this->TableVar, $this->addMasterUrl("mainuserslist"), "", $this->TableVar, true);
         $pageId = "edit";
         $Breadcrumb->add("edit", $pageId, $url);
     }

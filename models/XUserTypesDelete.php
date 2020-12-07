@@ -370,7 +370,7 @@ class XUserTypesDelete extends XUserTypes
         $this->RecKeys = $this->getRecordKeys(); // Load record keys
         $filter = $this->getFilterFromRecordKeys();
         if ($filter == "") {
-            $this->terminate("XUserTypesList"); // Prevent SQL injection, return to list
+            $this->terminate("xusertypeslist"); // Prevent SQL injection, return to list
             return;
         }
 
@@ -416,7 +416,7 @@ class XUserTypesDelete extends XUserTypes
                 if ($this->Recordset) {
                     $this->Recordset->close();
                 }
-                $this->terminate("XUserTypesList"); // Return to list
+                $this->terminate("xusertypeslist"); // Return to list
                 return;
             }
         }
@@ -654,7 +654,7 @@ class XUserTypesDelete extends XUserTypes
         global $Breadcrumb, $Language;
         $Breadcrumb = new Breadcrumb("index");
         $url = CurrentUrl();
-        $Breadcrumb->add("list", $this->TableVar, $this->addMasterUrl("XUserTypesList"), "", $this->TableVar, true);
+        $Breadcrumb->add("list", $this->TableVar, $this->addMasterUrl("xusertypeslist"), "", $this->TableVar, true);
         $pageId = "delete";
         $Breadcrumb->add("delete", $pageId, $url);
     }

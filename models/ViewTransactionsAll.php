@@ -706,7 +706,7 @@ class ViewTransactionsAll extends DbTable
         if ($referUrl != "" && $referPageName != CurrentPageName() && $referPageName != "login") { // Referer not same page or login page
             $_SESSION[$name] = $referUrl; // Save to Session
         }
-        return $_SESSION[$name] ?? GetUrl("ViewTransactionsAllList");
+        return $_SESSION[$name] ?? GetUrl("viewtransactionsalllist");
     }
 
     // Set return page URL
@@ -719,11 +719,11 @@ class ViewTransactionsAll extends DbTable
     public function getModalCaption($pageName)
     {
         global $Language;
-        if ($pageName == "ViewTransactionsAllView") {
+        if ($pageName == "viewtransactionsallview") {
             return $Language->phrase("View");
-        } elseif ($pageName == "ViewTransactionsAllEdit") {
+        } elseif ($pageName == "viewtransactionsalledit") {
             return $Language->phrase("Edit");
-        } elseif ($pageName == "ViewTransactionsAllAdd") {
+        } elseif ($pageName == "viewtransactionsalladd") {
             return $Language->phrase("Add");
         } else {
             return "";
@@ -752,16 +752,16 @@ class ViewTransactionsAll extends DbTable
     // List URL
     public function getListUrl()
     {
-        return "ViewTransactionsAllList";
+        return "viewtransactionsalllist";
     }
 
     // View URL
     public function getViewUrl($parm = "")
     {
         if ($parm != "") {
-            $url = $this->keyUrl("ViewTransactionsAllView", $this->getUrlParm($parm));
+            $url = $this->keyUrl("viewtransactionsallview", $this->getUrlParm($parm));
         } else {
-            $url = $this->keyUrl("ViewTransactionsAllView", $this->getUrlParm(Config("TABLE_SHOW_DETAIL") . "="));
+            $url = $this->keyUrl("viewtransactionsallview", $this->getUrlParm(Config("TABLE_SHOW_DETAIL") . "="));
         }
         return $this->addMasterUrl($url);
     }
@@ -770,9 +770,9 @@ class ViewTransactionsAll extends DbTable
     public function getAddUrl($parm = "")
     {
         if ($parm != "") {
-            $url = "ViewTransactionsAllAdd?" . $this->getUrlParm($parm);
+            $url = "viewtransactionsalladd?" . $this->getUrlParm($parm);
         } else {
-            $url = "ViewTransactionsAllAdd";
+            $url = "viewtransactionsalladd";
         }
         return $this->addMasterUrl($url);
     }
@@ -780,7 +780,7 @@ class ViewTransactionsAll extends DbTable
     // Edit URL
     public function getEditUrl($parm = "")
     {
-        $url = $this->keyUrl("ViewTransactionsAllEdit", $this->getUrlParm($parm));
+        $url = $this->keyUrl("viewtransactionsalledit", $this->getUrlParm($parm));
         return $this->addMasterUrl($url);
     }
 
@@ -794,7 +794,7 @@ class ViewTransactionsAll extends DbTable
     // Copy URL
     public function getCopyUrl($parm = "")
     {
-        $url = $this->keyUrl("ViewTransactionsAllAdd", $this->getUrlParm($parm));
+        $url = $this->keyUrl("viewtransactionsalladd", $this->getUrlParm($parm));
         return $this->addMasterUrl($url);
     }
 
@@ -808,7 +808,7 @@ class ViewTransactionsAll extends DbTable
     // Delete URL
     public function getDeleteUrl()
     {
-        return $this->keyUrl("ViewTransactionsAllDelete", $this->getUrlParm());
+        return $this->keyUrl("viewtransactionsalldelete", $this->getUrlParm());
     }
 
     // Add master url

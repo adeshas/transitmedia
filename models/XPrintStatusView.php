@@ -293,7 +293,7 @@ class XPrintStatusView extends XPrintStatus
                 $pageName = GetPageName($url);
                 if ($pageName != $this->getListUrl()) { // Not List page
                     $row["caption"] = $this->getModalCaption($pageName);
-                    if ($pageName == "XPrintStatusView") {
+                    if ($pageName == "xprintstatusview") {
                         $row["view"] = "1";
                     }
                 } else { // List page should not be shown as modal => error
@@ -527,7 +527,7 @@ class XPrintStatusView extends XPrintStatus
                 $this->id->setQueryStringValue($keyValue);
                 $this->RecKey["id"] = $this->id->QueryStringValue;
             } else {
-                $returnUrl = "XPrintStatusList"; // Return to list
+                $returnUrl = "xprintstatuslist"; // Return to list
             }
 
             // Get action
@@ -550,12 +550,12 @@ class XPrintStatusView extends XPrintStatus
                         if ($this->getSuccessMessage() == "" && $this->getFailureMessage() == "") {
                             $this->setFailureMessage($Language->phrase("NoRecord")); // Set no record message
                         }
-                        $returnUrl = "XPrintStatusList"; // No matching record, return to list
+                        $returnUrl = "xprintstatuslist"; // No matching record, return to list
                     }
                     break;
             }
         } else {
-            $returnUrl = "XPrintStatusList"; // Not page request, return to list
+            $returnUrl = "xprintstatuslist"; // Not page request, return to list
         }
         if ($returnUrl != "") {
             $this->terminate($returnUrl);
@@ -732,7 +732,7 @@ class XPrintStatusView extends XPrintStatus
         global $Breadcrumb, $Language;
         $Breadcrumb = new Breadcrumb("index");
         $url = CurrentUrl();
-        $Breadcrumb->add("list", $this->TableVar, $this->addMasterUrl("XPrintStatusList"), "", $this->TableVar, true);
+        $Breadcrumb->add("list", $this->TableVar, $this->addMasterUrl("xprintstatuslist"), "", $this->TableVar, true);
         $pageId = "view";
         $Breadcrumb->add("view", $pageId, $url);
     }

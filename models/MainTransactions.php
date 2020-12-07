@@ -390,7 +390,7 @@ class MainTransactions extends DbTable
             $detailUrl .= "&" . GetForeignKeyUrl("fk_id", $this->id->CurrentValue);
         }
         if ($detailUrl == "") {
-            $detailUrl = "MainTransactionsList";
+            $detailUrl = "maintransactionslist";
         }
         return $detailUrl;
     }
@@ -1007,7 +1007,7 @@ class MainTransactions extends DbTable
         if ($referUrl != "" && $referPageName != CurrentPageName() && $referPageName != "login") { // Referer not same page or login page
             $_SESSION[$name] = $referUrl; // Save to Session
         }
-        return $_SESSION[$name] ?? GetUrl("MainTransactionsList");
+        return $_SESSION[$name] ?? GetUrl("maintransactionslist");
     }
 
     // Set return page URL
@@ -1020,11 +1020,11 @@ class MainTransactions extends DbTable
     public function getModalCaption($pageName)
     {
         global $Language;
-        if ($pageName == "MainTransactionsView") {
+        if ($pageName == "maintransactionsview") {
             return $Language->phrase("View");
-        } elseif ($pageName == "MainTransactionsEdit") {
+        } elseif ($pageName == "maintransactionsedit") {
             return $Language->phrase("Edit");
-        } elseif ($pageName == "MainTransactionsAdd") {
+        } elseif ($pageName == "maintransactionsadd") {
             return $Language->phrase("Add");
         } else {
             return "";
@@ -1053,16 +1053,16 @@ class MainTransactions extends DbTable
     // List URL
     public function getListUrl()
     {
-        return "MainTransactionsList";
+        return "maintransactionslist";
     }
 
     // View URL
     public function getViewUrl($parm = "")
     {
         if ($parm != "") {
-            $url = $this->keyUrl("MainTransactionsView", $this->getUrlParm($parm));
+            $url = $this->keyUrl("maintransactionsview", $this->getUrlParm($parm));
         } else {
-            $url = $this->keyUrl("MainTransactionsView", $this->getUrlParm(Config("TABLE_SHOW_DETAIL") . "="));
+            $url = $this->keyUrl("maintransactionsview", $this->getUrlParm(Config("TABLE_SHOW_DETAIL") . "="));
         }
         return $this->addMasterUrl($url);
     }
@@ -1071,9 +1071,9 @@ class MainTransactions extends DbTable
     public function getAddUrl($parm = "")
     {
         if ($parm != "") {
-            $url = "MainTransactionsAdd?" . $this->getUrlParm($parm);
+            $url = "maintransactionsadd?" . $this->getUrlParm($parm);
         } else {
-            $url = "MainTransactionsAdd";
+            $url = "maintransactionsadd";
         }
         return $this->addMasterUrl($url);
     }
@@ -1082,9 +1082,9 @@ class MainTransactions extends DbTable
     public function getEditUrl($parm = "")
     {
         if ($parm != "") {
-            $url = $this->keyUrl("MainTransactionsEdit", $this->getUrlParm($parm));
+            $url = $this->keyUrl("maintransactionsedit", $this->getUrlParm($parm));
         } else {
-            $url = $this->keyUrl("MainTransactionsEdit", $this->getUrlParm(Config("TABLE_SHOW_DETAIL") . "="));
+            $url = $this->keyUrl("maintransactionsedit", $this->getUrlParm(Config("TABLE_SHOW_DETAIL") . "="));
         }
         return $this->addMasterUrl($url);
     }
@@ -1100,9 +1100,9 @@ class MainTransactions extends DbTable
     public function getCopyUrl($parm = "")
     {
         if ($parm != "") {
-            $url = $this->keyUrl("MainTransactionsAdd", $this->getUrlParm($parm));
+            $url = $this->keyUrl("maintransactionsadd", $this->getUrlParm($parm));
         } else {
-            $url = $this->keyUrl("MainTransactionsAdd", $this->getUrlParm(Config("TABLE_SHOW_DETAIL") . "="));
+            $url = $this->keyUrl("maintransactionsadd", $this->getUrlParm(Config("TABLE_SHOW_DETAIL") . "="));
         }
         return $this->addMasterUrl($url);
     }
@@ -1117,7 +1117,7 @@ class MainTransactions extends DbTable
     // Delete URL
     public function getDeleteUrl()
     {
-        return $this->keyUrl("MainTransactionsDelete", $this->getUrlParm());
+        return $this->keyUrl("maintransactionsdelete", $this->getUrlParm());
     }
 
     // Add master url

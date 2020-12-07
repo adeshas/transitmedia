@@ -153,7 +153,7 @@ class MainTransactionsGrid extends MainTransactions
 
         // Page URL
         $pageUrl = $this->pageUrl();
-        $this->AddUrl = "MainTransactionsAdd";
+        $this->AddUrl = "maintransactionsadd";
 
         // Table name (for backward compatibility only)
         if (!defined(PROJECT_NAMESPACE . "TABLE_NAME")) {
@@ -602,7 +602,7 @@ class MainTransactionsGrid extends MainTransactions
             $this->MasterRecordExists = $rsmaster !== false;
             if (!$this->MasterRecordExists) {
                 $this->setFailureMessage($Language->phrase("NoRecord")); // Set no record found
-                $this->terminate("MainCampaignsList"); // Return to master page
+                $this->terminate("maincampaignslist"); // Return to master page
                 return;
             } else {
                 $masterTbl->loadListRowValues($rsmaster);
@@ -618,7 +618,7 @@ class MainTransactionsGrid extends MainTransactions
             $this->MasterRecordExists = $rsmaster !== false;
             if (!$this->MasterRecordExists) {
                 $this->setFailureMessage($Language->phrase("NoRecord")); // Set no record found
-                $this->terminate("YOperatorsList"); // Return to master page
+                $this->terminate("yoperatorslist"); // Return to master page
                 return;
             } else {
                 $masterTbl->loadListRowValues($rsmaster);

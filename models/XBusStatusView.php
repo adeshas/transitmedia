@@ -293,7 +293,7 @@ class XBusStatusView extends XBusStatus
                 $pageName = GetPageName($url);
                 if ($pageName != $this->getListUrl()) { // Not List page
                     $row["caption"] = $this->getModalCaption($pageName);
-                    if ($pageName == "XBusStatusView") {
+                    if ($pageName == "xbusstatusview") {
                         $row["view"] = "1";
                     }
                 } else { // List page should not be shown as modal => error
@@ -528,7 +528,7 @@ class XBusStatusView extends XBusStatus
                 $this->id->setQueryStringValue($keyValue);
                 $this->RecKey["id"] = $this->id->QueryStringValue;
             } else {
-                $returnUrl = "XBusStatusList"; // Return to list
+                $returnUrl = "xbusstatuslist"; // Return to list
             }
 
             // Get action
@@ -551,12 +551,12 @@ class XBusStatusView extends XBusStatus
                         if ($this->getSuccessMessage() == "" && $this->getFailureMessage() == "") {
                             $this->setFailureMessage($Language->phrase("NoRecord")); // Set no record message
                         }
-                        $returnUrl = "XBusStatusList"; // No matching record, return to list
+                        $returnUrl = "xbusstatuslist"; // No matching record, return to list
                     }
                     break;
             }
         } else {
-            $returnUrl = "XBusStatusList"; // Not page request, return to list
+            $returnUrl = "xbusstatuslist"; // Not page request, return to list
         }
         if ($returnUrl != "") {
             $this->terminate($returnUrl);
@@ -750,7 +750,7 @@ class XBusStatusView extends XBusStatus
         global $Breadcrumb, $Language;
         $Breadcrumb = new Breadcrumb("index");
         $url = CurrentUrl();
-        $Breadcrumb->add("list", $this->TableVar, $this->addMasterUrl("XBusStatusList"), "", $this->TableVar, true);
+        $Breadcrumb->add("list", $this->TableVar, $this->addMasterUrl("xbusstatuslist"), "", $this->TableVar, true);
         $pageId = "view";
         $Breadcrumb->add("view", $pageId, $url);
     }

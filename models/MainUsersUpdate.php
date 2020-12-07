@@ -238,7 +238,7 @@ class MainUsersUpdate extends MainUsers
                 $pageName = GetPageName($url);
                 if ($pageName != $this->getListUrl()) { // Not List page
                     $row["caption"] = $this->getModalCaption($pageName);
-                    if ($pageName == "MainUsersView") {
+                    if ($pageName == "mainusersview") {
                         $row["view"] = "1";
                     }
                 } else { // List page should not be shown as modal => error
@@ -486,7 +486,7 @@ class MainUsersUpdate extends MainUsers
             }
         }
         if (!$res) {
-            $this->terminate("MainUsersList"); // Return to list
+            $this->terminate("mainuserslist"); // Return to list
             return;
         }
         if (Post("action") !== null && Post("action") !== "") {
@@ -505,7 +505,7 @@ class MainUsersUpdate extends MainUsers
             $this->loadMultiUpdateValues(); // Load initial values to form
         }
         if (count($this->RecKeys) <= 0) {
-            $this->terminate("MainUsersList"); // No records selected, return to list
+            $this->terminate("mainuserslist"); // No records selected, return to list
             return;
         }
         if ($this->isUpdate()) {
@@ -1371,7 +1371,7 @@ class MainUsersUpdate extends MainUsers
         global $Breadcrumb, $Language;
         $Breadcrumb = new Breadcrumb("index");
         $url = CurrentUrl();
-        $Breadcrumb->add("list", $this->TableVar, $this->addMasterUrl("MainUsersList"), "", $this->TableVar, true);
+        $Breadcrumb->add("list", $this->TableVar, $this->addMasterUrl("mainuserslist"), "", $this->TableVar, true);
         $pageId = "update";
         $Breadcrumb->add("update", $pageId, $url);
     }

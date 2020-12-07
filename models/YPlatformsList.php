@@ -182,12 +182,12 @@ class YPlatformsList extends YPlatforms
         $this->ExportHtmlUrl = $pageUrl . "export=html";
         $this->ExportXmlUrl = $pageUrl . "export=xml";
         $this->ExportCsvUrl = $pageUrl . "export=csv";
-        $this->AddUrl = "YPlatformsAdd?" . Config("TABLE_SHOW_DETAIL") . "=";
+        $this->AddUrl = "yplatformsadd?" . Config("TABLE_SHOW_DETAIL") . "=";
         $this->InlineAddUrl = $pageUrl . "action=add";
         $this->GridAddUrl = $pageUrl . "action=gridadd";
         $this->GridEditUrl = $pageUrl . "action=gridedit";
-        $this->MultiDeleteUrl = "YPlatformsDelete";
-        $this->MultiUpdateUrl = "YPlatformsUpdate";
+        $this->MultiDeleteUrl = "yplatformsdelete";
+        $this->MultiUpdateUrl = "yplatformsupdate";
 
         // Table name (for backward compatibility only)
         if (!defined(PROJECT_NAMESPACE . "TABLE_NAME")) {
@@ -1050,7 +1050,7 @@ class YPlatformsList extends YPlatforms
         $opt = $this->ListOptions["detail_main_campaigns"];
         if ($Security->allowList(CurrentProjectID() . 'main_campaigns')) {
             $body = $Language->phrase("DetailLink") . $Language->TablePhrase("main_campaigns", "TblCaption");
-            $body = "<a class=\"btn btn-default ew-row-link ew-detail\" data-action=\"list\" href=\"" . HtmlEncode("MainCampaignsList?" . Config("TABLE_SHOW_MASTER") . "=y_platforms&" . GetForeignKeyUrl("fk_id", $this->id->CurrentValue) . "") . "\">" . $body . "</a>";
+            $body = "<a class=\"btn btn-default ew-row-link ew-detail\" data-action=\"list\" href=\"" . HtmlEncode("maincampaignslist?" . Config("TABLE_SHOW_MASTER") . "=y_platforms&" . GetForeignKeyUrl("fk_id", $this->id->CurrentValue) . "") . "\">" . $body . "</a>";
             $links = "";
             $detailPage = Container("MainCampaignsGrid");
             if ($detailPage->DetailView && $Security->canView() && $Security->allowView(CurrentProjectID() . 'y_platforms')) {
@@ -1086,7 +1086,7 @@ class YPlatformsList extends YPlatforms
         $opt = $this->ListOptions["detail_y_operators"];
         if ($Security->allowList(CurrentProjectID() . 'y_operators')) {
             $body = $Language->phrase("DetailLink") . $Language->TablePhrase("y_operators", "TblCaption");
-            $body = "<a class=\"btn btn-default ew-row-link ew-detail\" data-action=\"list\" href=\"" . HtmlEncode("YOperatorsList?" . Config("TABLE_SHOW_MASTER") . "=y_platforms&" . GetForeignKeyUrl("fk_id", $this->id->CurrentValue) . "") . "\">" . $body . "</a>";
+            $body = "<a class=\"btn btn-default ew-row-link ew-detail\" data-action=\"list\" href=\"" . HtmlEncode("yoperatorslist?" . Config("TABLE_SHOW_MASTER") . "=y_platforms&" . GetForeignKeyUrl("fk_id", $this->id->CurrentValue) . "") . "\">" . $body . "</a>";
             $links = "";
             $detailPage = Container("YOperatorsGrid");
             if ($detailPage->DetailView && $Security->canView() && $Security->allowView(CurrentProjectID() . 'y_platforms')) {

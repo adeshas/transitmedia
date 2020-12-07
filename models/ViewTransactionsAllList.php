@@ -182,12 +182,12 @@ class ViewTransactionsAllList extends ViewTransactionsAll
         $this->ExportHtmlUrl = $pageUrl . "export=html";
         $this->ExportXmlUrl = $pageUrl . "export=xml";
         $this->ExportCsvUrl = $pageUrl . "export=csv";
-        $this->AddUrl = "ViewTransactionsAllAdd";
+        $this->AddUrl = "viewtransactionsalladd";
         $this->InlineAddUrl = $pageUrl . "action=add";
         $this->GridAddUrl = $pageUrl . "action=gridadd";
         $this->GridEditUrl = $pageUrl . "action=gridedit";
-        $this->MultiDeleteUrl = "ViewTransactionsAllDelete";
-        $this->MultiUpdateUrl = "ViewTransactionsAllUpdate";
+        $this->MultiDeleteUrl = "viewtransactionsalldelete";
+        $this->MultiUpdateUrl = "viewtransactionsallupdate";
 
         // Table name (for backward compatibility only)
         if (!defined(PROJECT_NAMESPACE . "TABLE_NAME")) {

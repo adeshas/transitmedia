@@ -238,7 +238,7 @@ class YPlatformsEdit extends YPlatforms
                 $pageName = GetPageName($url);
                 if ($pageName != $this->getListUrl()) { // Not List page
                     $row["caption"] = $this->getModalCaption($pageName);
-                    if ($pageName == "YPlatformsView") {
+                    if ($pageName == "yplatformsview") {
                         $row["view"] = "1";
                     }
                 } else { // List page should not be shown as modal => error
@@ -549,7 +549,7 @@ class YPlatformsEdit extends YPlatforms
                     if ($this->getFailureMessage() == "") {
                         $this->setFailureMessage($Language->phrase("NoRecord")); // No record found
                     }
-                    $this->terminate("YPlatformsList"); // No matching record, return to list
+                    $this->terminate("yplatformslist"); // No matching record, return to list
                     return;
                 }
 
@@ -562,7 +562,7 @@ class YPlatformsEdit extends YPlatforms
                 } else {
                     $returnUrl = $this->getReturnUrl();
                 }
-                if (GetPageName($returnUrl) == "YPlatformsList") {
+                if (GetPageName($returnUrl) == "yplatformslist") {
                     $returnUrl = $this->addMasterUrl($returnUrl); // List page, return to List page with correct master key if necessary
                 }
                 $this->SendEmail = true; // Send email on update success
@@ -1081,7 +1081,7 @@ class YPlatformsEdit extends YPlatforms
         global $Breadcrumb, $Language;
         $Breadcrumb = new Breadcrumb("index");
         $url = CurrentUrl();
-        $Breadcrumb->add("list", $this->TableVar, $this->addMasterUrl("YPlatformsList"), "", $this->TableVar, true);
+        $Breadcrumb->add("list", $this->TableVar, $this->addMasterUrl("yplatformslist"), "", $this->TableVar, true);
         $pageId = "edit";
         $Breadcrumb->add("edit", $pageId, $url);
     }

@@ -564,7 +564,7 @@ class XPrintStatus extends DbTable
         if ($referUrl != "" && $referPageName != CurrentPageName() && $referPageName != "login") { // Referer not same page or login page
             $_SESSION[$name] = $referUrl; // Save to Session
         }
-        return $_SESSION[$name] ?? GetUrl("XPrintStatusList");
+        return $_SESSION[$name] ?? GetUrl("xprintstatuslist");
     }
 
     // Set return page URL
@@ -577,11 +577,11 @@ class XPrintStatus extends DbTable
     public function getModalCaption($pageName)
     {
         global $Language;
-        if ($pageName == "XPrintStatusView") {
+        if ($pageName == "xprintstatusview") {
             return $Language->phrase("View");
-        } elseif ($pageName == "XPrintStatusEdit") {
+        } elseif ($pageName == "xprintstatusedit") {
             return $Language->phrase("Edit");
-        } elseif ($pageName == "XPrintStatusAdd") {
+        } elseif ($pageName == "xprintstatusadd") {
             return $Language->phrase("Add");
         } else {
             return "";
@@ -610,16 +610,16 @@ class XPrintStatus extends DbTable
     // List URL
     public function getListUrl()
     {
-        return "XPrintStatusList";
+        return "xprintstatuslist";
     }
 
     // View URL
     public function getViewUrl($parm = "")
     {
         if ($parm != "") {
-            $url = $this->keyUrl("XPrintStatusView", $this->getUrlParm($parm));
+            $url = $this->keyUrl("xprintstatusview", $this->getUrlParm($parm));
         } else {
-            $url = $this->keyUrl("XPrintStatusView", $this->getUrlParm(Config("TABLE_SHOW_DETAIL") . "="));
+            $url = $this->keyUrl("xprintstatusview", $this->getUrlParm(Config("TABLE_SHOW_DETAIL") . "="));
         }
         return $this->addMasterUrl($url);
     }
@@ -628,9 +628,9 @@ class XPrintStatus extends DbTable
     public function getAddUrl($parm = "")
     {
         if ($parm != "") {
-            $url = "XPrintStatusAdd?" . $this->getUrlParm($parm);
+            $url = "xprintstatusadd?" . $this->getUrlParm($parm);
         } else {
-            $url = "XPrintStatusAdd";
+            $url = "xprintstatusadd";
         }
         return $this->addMasterUrl($url);
     }
@@ -638,7 +638,7 @@ class XPrintStatus extends DbTable
     // Edit URL
     public function getEditUrl($parm = "")
     {
-        $url = $this->keyUrl("XPrintStatusEdit", $this->getUrlParm($parm));
+        $url = $this->keyUrl("xprintstatusedit", $this->getUrlParm($parm));
         return $this->addMasterUrl($url);
     }
 
@@ -652,7 +652,7 @@ class XPrintStatus extends DbTable
     // Copy URL
     public function getCopyUrl($parm = "")
     {
-        $url = $this->keyUrl("XPrintStatusAdd", $this->getUrlParm($parm));
+        $url = $this->keyUrl("xprintstatusadd", $this->getUrlParm($parm));
         return $this->addMasterUrl($url);
     }
 
@@ -666,7 +666,7 @@ class XPrintStatus extends DbTable
     // Delete URL
     public function getDeleteUrl()
     {
-        return $this->keyUrl("XPrintStatusDelete", $this->getUrlParm());
+        return $this->keyUrl("xprintstatusdelete", $this->getUrlParm());
     }
 
     // Add master url

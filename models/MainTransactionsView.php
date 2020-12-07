@@ -293,7 +293,7 @@ class MainTransactionsView extends MainTransactions
                 $pageName = GetPageName($url);
                 if ($pageName != $this->getListUrl()) { // Not List page
                     $row["caption"] = $this->getModalCaption($pageName);
-                    if ($pageName == "MainTransactionsView") {
+                    if ($pageName == "maintransactionsview") {
                         $row["view"] = "1";
                     }
                 } else { // List page should not be shown as modal => error
@@ -555,7 +555,7 @@ class MainTransactionsView extends MainTransactions
                 $this->id->setQueryStringValue($keyValue);
                 $this->RecKey["id"] = $this->id->QueryStringValue;
             } else {
-                $returnUrl = "MainTransactionsList"; // Return to list
+                $returnUrl = "maintransactionslist"; // Return to list
             }
 
             // Get action
@@ -578,12 +578,12 @@ class MainTransactionsView extends MainTransactions
                         if ($this->getSuccessMessage() == "" && $this->getFailureMessage() == "") {
                             $this->setFailureMessage($Language->phrase("NoRecord")); // Set no record message
                         }
-                        $returnUrl = "MainTransactionsList"; // No matching record, return to list
+                        $returnUrl = "maintransactionslist"; // No matching record, return to list
                     }
                     break;
             }
         } else {
-            $returnUrl = "MainTransactionsList"; // Not page request, return to list
+            $returnUrl = "maintransactionslist"; // Not page request, return to list
         }
         if ($returnUrl != "") {
             $this->terminate($returnUrl);
@@ -677,7 +677,7 @@ class MainTransactionsView extends MainTransactions
         // "detail_sub_transaction_details"
         $item = &$option->add("detail_sub_transaction_details");
         $body = $Language->phrase("ViewPageDetailLink") . $Language->TablePhrase("sub_transaction_details", "TblCaption");
-        $body = "<a class=\"btn btn-default ew-row-link ew-detail\" data-action=\"list\" href=\"" . HtmlEncode(GetUrl("SubTransactionDetailsList?" . Config("TABLE_SHOW_MASTER") . "=main_transactions&" . GetForeignKeyUrl("fk_id", $this->id->CurrentValue) . "")) . "\">" . $body . "</a>";
+        $body = "<a class=\"btn btn-default ew-row-link ew-detail\" data-action=\"list\" href=\"" . HtmlEncode(GetUrl("subtransactiondetailslist?" . Config("TABLE_SHOW_MASTER") . "=main_transactions&" . GetForeignKeyUrl("fk_id", $this->id->CurrentValue) . "")) . "\">" . $body . "</a>";
         $links = "";
         $detailPageObj = Container("SubTransactionDetailsGrid");
         if ($detailPageObj->DetailView && $Security->canView() && $Security->allowView(CurrentProjectID() . 'main_transactions')) {
@@ -1466,7 +1466,7 @@ class MainTransactionsView extends MainTransactions
         global $Breadcrumb, $Language;
         $Breadcrumb = new Breadcrumb("index");
         $url = CurrentUrl();
-        $Breadcrumb->add("list", $this->TableVar, $this->addMasterUrl("MainTransactionsList"), "", $this->TableVar, true);
+        $Breadcrumb->add("list", $this->TableVar, $this->addMasterUrl("maintransactionslist"), "", $this->TableVar, true);
         $pageId = "view";
         $Breadcrumb->add("view", $pageId, $url);
     }

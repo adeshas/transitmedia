@@ -713,7 +713,7 @@ class MainReports extends DbTable
         if ($referUrl != "" && $referPageName != CurrentPageName() && $referPageName != "login") { // Referer not same page or login page
             $_SESSION[$name] = $referUrl; // Save to Session
         }
-        return $_SESSION[$name] ?? GetUrl("MainReportsList");
+        return $_SESSION[$name] ?? GetUrl("mainreportslist");
     }
 
     // Set return page URL
@@ -726,11 +726,11 @@ class MainReports extends DbTable
     public function getModalCaption($pageName)
     {
         global $Language;
-        if ($pageName == "MainReportsView") {
+        if ($pageName == "mainreportsview") {
             return $Language->phrase("View");
-        } elseif ($pageName == "MainReportsEdit") {
+        } elseif ($pageName == "mainreportsedit") {
             return $Language->phrase("Edit");
-        } elseif ($pageName == "MainReportsAdd") {
+        } elseif ($pageName == "mainreportsadd") {
             return $Language->phrase("Add");
         } else {
             return "";
@@ -759,16 +759,16 @@ class MainReports extends DbTable
     // List URL
     public function getListUrl()
     {
-        return "MainReportsList";
+        return "mainreportslist";
     }
 
     // View URL
     public function getViewUrl($parm = "")
     {
         if ($parm != "") {
-            $url = $this->keyUrl("MainReportsView", $this->getUrlParm($parm));
+            $url = $this->keyUrl("mainreportsview", $this->getUrlParm($parm));
         } else {
-            $url = $this->keyUrl("MainReportsView", $this->getUrlParm(Config("TABLE_SHOW_DETAIL") . "="));
+            $url = $this->keyUrl("mainreportsview", $this->getUrlParm(Config("TABLE_SHOW_DETAIL") . "="));
         }
         return $this->addMasterUrl($url);
     }
@@ -777,9 +777,9 @@ class MainReports extends DbTable
     public function getAddUrl($parm = "")
     {
         if ($parm != "") {
-            $url = "MainReportsAdd?" . $this->getUrlParm($parm);
+            $url = "mainreportsadd?" . $this->getUrlParm($parm);
         } else {
-            $url = "MainReportsAdd";
+            $url = "mainreportsadd";
         }
         return $this->addMasterUrl($url);
     }
@@ -787,7 +787,7 @@ class MainReports extends DbTable
     // Edit URL
     public function getEditUrl($parm = "")
     {
-        $url = $this->keyUrl("MainReportsEdit", $this->getUrlParm($parm));
+        $url = $this->keyUrl("mainreportsedit", $this->getUrlParm($parm));
         return $this->addMasterUrl($url);
     }
 
@@ -801,7 +801,7 @@ class MainReports extends DbTable
     // Copy URL
     public function getCopyUrl($parm = "")
     {
-        $url = $this->keyUrl("MainReportsAdd", $this->getUrlParm($parm));
+        $url = $this->keyUrl("mainreportsadd", $this->getUrlParm($parm));
         return $this->addMasterUrl($url);
     }
 
@@ -815,7 +815,7 @@ class MainReports extends DbTable
     // Delete URL
     public function getDeleteUrl()
     {
-        return $this->keyUrl("MainReportsDelete", $this->getUrlParm());
+        return $this->keyUrl("mainreportsdelete", $this->getUrlParm());
     }
 
     // Add master url

@@ -398,7 +398,7 @@ class MainTransactionsDelete extends MainTransactions
         $this->RecKeys = $this->getRecordKeys(); // Load record keys
         $filter = $this->getFilterFromRecordKeys();
         if ($filter == "") {
-            $this->terminate("MainTransactionsList"); // Prevent SQL injection, return to list
+            $this->terminate("maintransactionslist"); // Prevent SQL injection, return to list
             return;
         }
 
@@ -420,7 +420,7 @@ class MainTransactionsDelete extends MainTransactions
             }
         }
         if (!$res) {
-            $this->terminate("MainTransactionsList"); // Return to list
+            $this->terminate("maintransactionslist"); // Return to list
             return;
         }
 
@@ -463,7 +463,7 @@ class MainTransactionsDelete extends MainTransactions
                 if ($this->Recordset) {
                     $this->Recordset->close();
                 }
-                $this->terminate("MainTransactionsList"); // Return to list
+                $this->terminate("maintransactionslist"); // Return to list
                 return;
             }
         }
@@ -1260,7 +1260,7 @@ class MainTransactionsDelete extends MainTransactions
         global $Breadcrumb, $Language;
         $Breadcrumb = new Breadcrumb("index");
         $url = CurrentUrl();
-        $Breadcrumb->add("list", $this->TableVar, $this->addMasterUrl("MainTransactionsList"), "", $this->TableVar, true);
+        $Breadcrumb->add("list", $this->TableVar, $this->addMasterUrl("maintransactionslist"), "", $this->TableVar, true);
         $pageId = "delete";
         $Breadcrumb->add("delete", $pageId, $url);
     }

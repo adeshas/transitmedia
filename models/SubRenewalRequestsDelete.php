@@ -373,7 +373,7 @@ class SubRenewalRequestsDelete extends SubRenewalRequests
         $this->RecKeys = $this->getRecordKeys(); // Load record keys
         $filter = $this->getFilterFromRecordKeys();
         if ($filter == "") {
-            $this->terminate("SubRenewalRequestsList"); // Prevent SQL injection, return to list
+            $this->terminate("subrenewalrequestslist"); // Prevent SQL injection, return to list
             return;
         }
 
@@ -419,7 +419,7 @@ class SubRenewalRequestsDelete extends SubRenewalRequests
                 if ($this->Recordset) {
                     $this->Recordset->close();
                 }
-                $this->terminate("SubRenewalRequestsList"); // Return to list
+                $this->terminate("subrenewalrequestslist"); // Return to list
                 return;
             }
         }
@@ -699,7 +699,7 @@ class SubRenewalRequestsDelete extends SubRenewalRequests
         global $Breadcrumb, $Language;
         $Breadcrumb = new Breadcrumb("index");
         $url = CurrentUrl();
-        $Breadcrumb->add("list", $this->TableVar, $this->addMasterUrl("SubRenewalRequestsList"), "", $this->TableVar, true);
+        $Breadcrumb->add("list", $this->TableVar, $this->addMasterUrl("subrenewalrequestslist"), "", $this->TableVar, true);
         $pageId = "delete";
         $Breadcrumb->add("delete", $pageId, $url);
     }

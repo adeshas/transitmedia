@@ -238,7 +238,7 @@ class YPrintersEdit extends YPrinters
                 $pageName = GetPageName($url);
                 if ($pageName != $this->getListUrl()) { // Not List page
                     $row["caption"] = $this->getModalCaption($pageName);
-                    if ($pageName == "YPrintersView") {
+                    if ($pageName == "yprintersview") {
                         $row["view"] = "1";
                     }
                 } else { // List page should not be shown as modal => error
@@ -542,13 +542,13 @@ class YPrintersEdit extends YPrinters
                     if ($this->getFailureMessage() == "") {
                         $this->setFailureMessage($Language->phrase("NoRecord")); // No record found
                     }
-                    $this->terminate("YPrintersList"); // No matching record, return to list
+                    $this->terminate("yprinterslist"); // No matching record, return to list
                     return;
                 }
                 break;
             case "update": // Update
                 $returnUrl = $this->getReturnUrl();
-                if (GetPageName($returnUrl) == "YPrintersList") {
+                if (GetPageName($returnUrl) == "yprinterslist") {
                     $returnUrl = $this->addMasterUrl($returnUrl); // List page, return to List page with correct master key if necessary
                 }
                 $this->SendEmail = true; // Send email on update success
@@ -975,7 +975,7 @@ class YPrintersEdit extends YPrinters
         global $Breadcrumb, $Language;
         $Breadcrumb = new Breadcrumb("index");
         $url = CurrentUrl();
-        $Breadcrumb->add("list", $this->TableVar, $this->addMasterUrl("YPrintersList"), "", $this->TableVar, true);
+        $Breadcrumb->add("list", $this->TableVar, $this->addMasterUrl("yprinterslist"), "", $this->TableVar, true);
         $pageId = "edit";
         $Breadcrumb->add("edit", $pageId, $url);
     }

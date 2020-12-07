@@ -238,7 +238,7 @@ class MainPrintOrdersAdd extends MainPrintOrders
                 $pageName = GetPageName($url);
                 if ($pageName != $this->getListUrl()) { // Not List page
                     $row["caption"] = $this->getModalCaption($pageName);
-                    if ($pageName == "MainPrintOrdersView") {
+                    if ($pageName == "mainprintordersview") {
                         $row["view"] = "1";
                     }
                 } else { // List page should not be shown as modal => error
@@ -524,7 +524,7 @@ class MainPrintOrdersAdd extends MainPrintOrders
                     if ($this->getFailureMessage() == "") {
                         $this->setFailureMessage($Language->phrase("NoRecord")); // No record found
                     }
-                    $this->terminate("MainPrintOrdersList"); // No matching record, return to list
+                    $this->terminate("mainprintorderslist"); // No matching record, return to list
                     return;
                 }
                 break;
@@ -535,9 +535,9 @@ class MainPrintOrdersAdd extends MainPrintOrders
                         $this->setSuccessMessage($Language->phrase("AddSuccess")); // Set up success message
                     }
                     $returnUrl = $this->getReturnUrl();
-                    if (GetPageName($returnUrl) == "MainPrintOrdersList") {
+                    if (GetPageName($returnUrl) == "mainprintorderslist") {
                         $returnUrl = $this->addMasterUrl($returnUrl); // List page, return to List page with correct master key if necessary
-                    } elseif (GetPageName($returnUrl) == "MainPrintOrdersView") {
+                    } elseif (GetPageName($returnUrl) == "mainprintordersview") {
                         $returnUrl = $this->getViewUrl(); // View page, return to View page with keyurl directly
                     }
                     if (IsApi()) { // Return to caller
@@ -1186,7 +1186,7 @@ class MainPrintOrdersAdd extends MainPrintOrders
         global $Breadcrumb, $Language;
         $Breadcrumb = new Breadcrumb("index");
         $url = CurrentUrl();
-        $Breadcrumb->add("list", $this->TableVar, $this->addMasterUrl("MainPrintOrdersList"), "", $this->TableVar, true);
+        $Breadcrumb->add("list", $this->TableVar, $this->addMasterUrl("mainprintorderslist"), "", $this->TableVar, true);
         $pageId = ($this->isCopy()) ? "Copy" : "Add";
         $Breadcrumb->add("add", $pageId, $url);
     }

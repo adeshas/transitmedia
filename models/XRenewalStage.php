@@ -564,7 +564,7 @@ class XRenewalStage extends DbTable
         if ($referUrl != "" && $referPageName != CurrentPageName() && $referPageName != "login") { // Referer not same page or login page
             $_SESSION[$name] = $referUrl; // Save to Session
         }
-        return $_SESSION[$name] ?? GetUrl("XRenewalStageList");
+        return $_SESSION[$name] ?? GetUrl("xrenewalstagelist");
     }
 
     // Set return page URL
@@ -577,11 +577,11 @@ class XRenewalStage extends DbTable
     public function getModalCaption($pageName)
     {
         global $Language;
-        if ($pageName == "XRenewalStageView") {
+        if ($pageName == "xrenewalstageview") {
             return $Language->phrase("View");
-        } elseif ($pageName == "XRenewalStageEdit") {
+        } elseif ($pageName == "xrenewalstageedit") {
             return $Language->phrase("Edit");
-        } elseif ($pageName == "XRenewalStageAdd") {
+        } elseif ($pageName == "xrenewalstageadd") {
             return $Language->phrase("Add");
         } else {
             return "";
@@ -610,16 +610,16 @@ class XRenewalStage extends DbTable
     // List URL
     public function getListUrl()
     {
-        return "XRenewalStageList";
+        return "xrenewalstagelist";
     }
 
     // View URL
     public function getViewUrl($parm = "")
     {
         if ($parm != "") {
-            $url = $this->keyUrl("XRenewalStageView", $this->getUrlParm($parm));
+            $url = $this->keyUrl("xrenewalstageview", $this->getUrlParm($parm));
         } else {
-            $url = $this->keyUrl("XRenewalStageView", $this->getUrlParm(Config("TABLE_SHOW_DETAIL") . "="));
+            $url = $this->keyUrl("xrenewalstageview", $this->getUrlParm(Config("TABLE_SHOW_DETAIL") . "="));
         }
         return $this->addMasterUrl($url);
     }
@@ -628,9 +628,9 @@ class XRenewalStage extends DbTable
     public function getAddUrl($parm = "")
     {
         if ($parm != "") {
-            $url = "XRenewalStageAdd?" . $this->getUrlParm($parm);
+            $url = "xrenewalstageadd?" . $this->getUrlParm($parm);
         } else {
-            $url = "XRenewalStageAdd";
+            $url = "xrenewalstageadd";
         }
         return $this->addMasterUrl($url);
     }
@@ -638,7 +638,7 @@ class XRenewalStage extends DbTable
     // Edit URL
     public function getEditUrl($parm = "")
     {
-        $url = $this->keyUrl("XRenewalStageEdit", $this->getUrlParm($parm));
+        $url = $this->keyUrl("xrenewalstageedit", $this->getUrlParm($parm));
         return $this->addMasterUrl($url);
     }
 
@@ -652,7 +652,7 @@ class XRenewalStage extends DbTable
     // Copy URL
     public function getCopyUrl($parm = "")
     {
-        $url = $this->keyUrl("XRenewalStageAdd", $this->getUrlParm($parm));
+        $url = $this->keyUrl("xrenewalstageadd", $this->getUrlParm($parm));
         return $this->addMasterUrl($url);
     }
 
@@ -666,7 +666,7 @@ class XRenewalStage extends DbTable
     // Delete URL
     public function getDeleteUrl()
     {
-        return $this->keyUrl("XRenewalStageDelete", $this->getUrlParm());
+        return $this->keyUrl("xrenewalstagedelete", $this->getUrlParm());
     }
 
     // Add master url

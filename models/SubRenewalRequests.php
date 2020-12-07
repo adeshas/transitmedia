@@ -587,7 +587,7 @@ class SubRenewalRequests extends DbTable
         if ($referUrl != "" && $referPageName != CurrentPageName() && $referPageName != "login") { // Referer not same page or login page
             $_SESSION[$name] = $referUrl; // Save to Session
         }
-        return $_SESSION[$name] ?? GetUrl("SubRenewalRequestsList");
+        return $_SESSION[$name] ?? GetUrl("subrenewalrequestslist");
     }
 
     // Set return page URL
@@ -600,11 +600,11 @@ class SubRenewalRequests extends DbTable
     public function getModalCaption($pageName)
     {
         global $Language;
-        if ($pageName == "SubRenewalRequestsView") {
+        if ($pageName == "subrenewalrequestsview") {
             return $Language->phrase("View");
-        } elseif ($pageName == "SubRenewalRequestsEdit") {
+        } elseif ($pageName == "subrenewalrequestsedit") {
             return $Language->phrase("Edit");
-        } elseif ($pageName == "SubRenewalRequestsAdd") {
+        } elseif ($pageName == "subrenewalrequestsadd") {
             return $Language->phrase("Add");
         } else {
             return "";
@@ -633,16 +633,16 @@ class SubRenewalRequests extends DbTable
     // List URL
     public function getListUrl()
     {
-        return "SubRenewalRequestsList";
+        return "subrenewalrequestslist";
     }
 
     // View URL
     public function getViewUrl($parm = "")
     {
         if ($parm != "") {
-            $url = $this->keyUrl("SubRenewalRequestsView", $this->getUrlParm($parm));
+            $url = $this->keyUrl("subrenewalrequestsview", $this->getUrlParm($parm));
         } else {
-            $url = $this->keyUrl("SubRenewalRequestsView", $this->getUrlParm(Config("TABLE_SHOW_DETAIL") . "="));
+            $url = $this->keyUrl("subrenewalrequestsview", $this->getUrlParm(Config("TABLE_SHOW_DETAIL") . "="));
         }
         return $this->addMasterUrl($url);
     }
@@ -651,9 +651,9 @@ class SubRenewalRequests extends DbTable
     public function getAddUrl($parm = "")
     {
         if ($parm != "") {
-            $url = "SubRenewalRequestsAdd?" . $this->getUrlParm($parm);
+            $url = "subrenewalrequestsadd?" . $this->getUrlParm($parm);
         } else {
-            $url = "SubRenewalRequestsAdd";
+            $url = "subrenewalrequestsadd";
         }
         return $this->addMasterUrl($url);
     }
@@ -661,7 +661,7 @@ class SubRenewalRequests extends DbTable
     // Edit URL
     public function getEditUrl($parm = "")
     {
-        $url = $this->keyUrl("SubRenewalRequestsEdit", $this->getUrlParm($parm));
+        $url = $this->keyUrl("subrenewalrequestsedit", $this->getUrlParm($parm));
         return $this->addMasterUrl($url);
     }
 
@@ -675,7 +675,7 @@ class SubRenewalRequests extends DbTable
     // Copy URL
     public function getCopyUrl($parm = "")
     {
-        $url = $this->keyUrl("SubRenewalRequestsAdd", $this->getUrlParm($parm));
+        $url = $this->keyUrl("subrenewalrequestsadd", $this->getUrlParm($parm));
         return $this->addMasterUrl($url);
     }
 
@@ -689,7 +689,7 @@ class SubRenewalRequests extends DbTable
     // Delete URL
     public function getDeleteUrl()
     {
-        return $this->keyUrl("SubRenewalRequestsDelete", $this->getUrlParm());
+        return $this->keyUrl("subrenewalrequestsdelete", $this->getUrlParm());
     }
 
     // Add master url

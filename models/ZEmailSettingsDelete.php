@@ -374,7 +374,7 @@ class ZEmailSettingsDelete extends ZEmailSettings
         $this->RecKeys = $this->getRecordKeys(); // Load record keys
         $filter = $this->getFilterFromRecordKeys();
         if ($filter == "") {
-            $this->terminate("ZEmailSettingsList"); // Prevent SQL injection, return to list
+            $this->terminate("zemailsettingslist"); // Prevent SQL injection, return to list
             return;
         }
 
@@ -420,7 +420,7 @@ class ZEmailSettingsDelete extends ZEmailSettings
                 if ($this->Recordset) {
                     $this->Recordset->close();
                 }
-                $this->terminate("ZEmailSettingsList"); // Return to list
+                $this->terminate("zemailsettingslist"); // Return to list
                 return;
             }
         }
@@ -709,7 +709,7 @@ class ZEmailSettingsDelete extends ZEmailSettings
         global $Breadcrumb, $Language;
         $Breadcrumb = new Breadcrumb("index");
         $url = CurrentUrl();
-        $Breadcrumb->add("list", $this->TableVar, $this->addMasterUrl("ZEmailSettingsList"), "", $this->TableVar, true);
+        $Breadcrumb->add("list", $this->TableVar, $this->addMasterUrl("zemailsettingslist"), "", $this->TableVar, true);
         $pageId = "delete";
         $Breadcrumb->add("delete", $pageId, $url);
     }

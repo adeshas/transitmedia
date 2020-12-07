@@ -238,7 +238,7 @@ class MainTransactionsSearch extends MainTransactions
                 $pageName = GetPageName($url);
                 if ($pageName != $this->getListUrl()) { // Not List page
                     $row["caption"] = $this->getModalCaption($pageName);
-                    if ($pageName == "MainTransactionsView") {
+                    if ($pageName == "maintransactionsview") {
                         $row["view"] = "1";
                     }
                 } else { // List page should not be shown as modal => error
@@ -493,7 +493,7 @@ class MainTransactionsSearch extends MainTransactions
                 }
                 if ($srchStr != "") {
                     $srchStr = $this->getUrlParm($srchStr);
-                    $srchStr = "MainTransactionsList" . "?" . $srchStr;
+                    $srchStr = "maintransactionslist" . "?" . $srchStr;
                     $this->terminate($srchStr); // Go to list page
                     return;
                 }
@@ -1426,7 +1426,7 @@ class MainTransactionsSearch extends MainTransactions
         global $Breadcrumb, $Language;
         $Breadcrumb = new Breadcrumb("index");
         $url = CurrentUrl();
-        $Breadcrumb->add("list", $this->TableVar, $this->addMasterUrl("MainTransactionsList"), "", $this->TableVar, true);
+        $Breadcrumb->add("list", $this->TableVar, $this->addMasterUrl("maintransactionslist"), "", $this->TableVar, true);
         $pageId = "search";
         $Breadcrumb->add("search", $pageId, $url);
     }

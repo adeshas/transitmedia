@@ -182,12 +182,12 @@ class ViewPaymentsPendingList extends ViewPaymentsPending
         $this->ExportHtmlUrl = $pageUrl . "export=html";
         $this->ExportXmlUrl = $pageUrl . "export=xml";
         $this->ExportCsvUrl = $pageUrl . "export=csv";
-        $this->AddUrl = "ViewPaymentsPendingAdd";
+        $this->AddUrl = "viewpaymentspendingadd";
         $this->InlineAddUrl = $pageUrl . "action=add";
         $this->GridAddUrl = $pageUrl . "action=gridadd";
         $this->GridEditUrl = $pageUrl . "action=gridedit";
-        $this->MultiDeleteUrl = "ViewPaymentsPendingDelete";
-        $this->MultiUpdateUrl = "ViewPaymentsPendingUpdate";
+        $this->MultiDeleteUrl = "viewpaymentspendingdelete";
+        $this->MultiUpdateUrl = "viewpaymentspendingupdate";
 
         // Table name (for backward compatibility only)
         if (!defined(PROJECT_NAMESPACE . "TABLE_NAME")) {

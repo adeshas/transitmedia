@@ -623,7 +623,7 @@ class ViewBusesInterior extends DbTable
         if ($referUrl != "" && $referPageName != CurrentPageName() && $referPageName != "login") { // Referer not same page or login page
             $_SESSION[$name] = $referUrl; // Save to Session
         }
-        return $_SESSION[$name] ?? GetUrl("ViewBusesInteriorList");
+        return $_SESSION[$name] ?? GetUrl("viewbusesinteriorlist");
     }
 
     // Set return page URL
@@ -636,11 +636,11 @@ class ViewBusesInterior extends DbTable
     public function getModalCaption($pageName)
     {
         global $Language;
-        if ($pageName == "ViewBusesInteriorView") {
+        if ($pageName == "viewbusesinteriorview") {
             return $Language->phrase("View");
-        } elseif ($pageName == "ViewBusesInteriorEdit") {
+        } elseif ($pageName == "viewbusesinterioredit") {
             return $Language->phrase("Edit");
-        } elseif ($pageName == "ViewBusesInteriorAdd") {
+        } elseif ($pageName == "viewbusesinterioradd") {
             return $Language->phrase("Add");
         } else {
             return "";
@@ -669,16 +669,16 @@ class ViewBusesInterior extends DbTable
     // List URL
     public function getListUrl()
     {
-        return "ViewBusesInteriorList";
+        return "viewbusesinteriorlist";
     }
 
     // View URL
     public function getViewUrl($parm = "")
     {
         if ($parm != "") {
-            $url = $this->keyUrl("ViewBusesInteriorView", $this->getUrlParm($parm));
+            $url = $this->keyUrl("viewbusesinteriorview", $this->getUrlParm($parm));
         } else {
-            $url = $this->keyUrl("ViewBusesInteriorView", $this->getUrlParm(Config("TABLE_SHOW_DETAIL") . "="));
+            $url = $this->keyUrl("viewbusesinteriorview", $this->getUrlParm(Config("TABLE_SHOW_DETAIL") . "="));
         }
         return $this->addMasterUrl($url);
     }
@@ -687,9 +687,9 @@ class ViewBusesInterior extends DbTable
     public function getAddUrl($parm = "")
     {
         if ($parm != "") {
-            $url = "ViewBusesInteriorAdd?" . $this->getUrlParm($parm);
+            $url = "viewbusesinterioradd?" . $this->getUrlParm($parm);
         } else {
-            $url = "ViewBusesInteriorAdd";
+            $url = "viewbusesinterioradd";
         }
         return $this->addMasterUrl($url);
     }
@@ -697,7 +697,7 @@ class ViewBusesInterior extends DbTable
     // Edit URL
     public function getEditUrl($parm = "")
     {
-        $url = $this->keyUrl("ViewBusesInteriorEdit", $this->getUrlParm($parm));
+        $url = $this->keyUrl("viewbusesinterioredit", $this->getUrlParm($parm));
         return $this->addMasterUrl($url);
     }
 
@@ -711,7 +711,7 @@ class ViewBusesInterior extends DbTable
     // Copy URL
     public function getCopyUrl($parm = "")
     {
-        $url = $this->keyUrl("ViewBusesInteriorAdd", $this->getUrlParm($parm));
+        $url = $this->keyUrl("viewbusesinterioradd", $this->getUrlParm($parm));
         return $this->addMasterUrl($url);
     }
 
@@ -725,7 +725,7 @@ class ViewBusesInterior extends DbTable
     // Delete URL
     public function getDeleteUrl()
     {
-        return $this->keyUrl("ViewBusesInteriorDelete", $this->getUrlParm());
+        return $this->keyUrl("viewbusesinteriordelete", $this->getUrlParm());
     }
 
     // Add master url

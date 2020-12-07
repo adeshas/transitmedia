@@ -238,7 +238,7 @@ class SubMediaAllocationAdd extends SubMediaAllocation
                 $pageName = GetPageName($url);
                 if ($pageName != $this->getListUrl()) { // Not List page
                     $row["caption"] = $this->getModalCaption($pageName);
-                    if ($pageName == "SubMediaAllocationView") {
+                    if ($pageName == "submediaallocationview") {
                         $row["view"] = "1";
                     }
                 } else { // List page should not be shown as modal => error
@@ -523,7 +523,7 @@ class SubMediaAllocationAdd extends SubMediaAllocation
                     if ($this->getFailureMessage() == "") {
                         $this->setFailureMessage($Language->phrase("NoRecord")); // No record found
                     }
-                    $this->terminate("SubMediaAllocationList"); // No matching record, return to list
+                    $this->terminate("submediaallocationlist"); // No matching record, return to list
                     return;
                 }
                 break;
@@ -534,9 +534,9 @@ class SubMediaAllocationAdd extends SubMediaAllocation
                         $this->setSuccessMessage($Language->phrase("AddSuccess")); // Set up success message
                     }
                     $returnUrl = $this->getReturnUrl();
-                    if (GetPageName($returnUrl) == "SubMediaAllocationList") {
+                    if (GetPageName($returnUrl) == "submediaallocationlist") {
                         $returnUrl = $this->addMasterUrl($returnUrl); // List page, return to List page with correct master key if necessary
-                    } elseif (GetPageName($returnUrl) == "SubMediaAllocationView") {
+                    } elseif (GetPageName($returnUrl) == "submediaallocationview") {
                         $returnUrl = $this->getViewUrl(); // View page, return to View page with keyurl directly
                     }
                     if (IsApi()) { // Return to caller
@@ -1333,7 +1333,7 @@ class SubMediaAllocationAdd extends SubMediaAllocation
         global $Breadcrumb, $Language;
         $Breadcrumb = new Breadcrumb("index");
         $url = CurrentUrl();
-        $Breadcrumb->add("list", $this->TableVar, $this->addMasterUrl("SubMediaAllocationList"), "", $this->TableVar, true);
+        $Breadcrumb->add("list", $this->TableVar, $this->addMasterUrl("submediaallocationlist"), "", $this->TableVar, true);
         $pageId = ($this->isCopy()) ? "Copy" : "Add";
         $Breadcrumb->add("add", $pageId, $url);
     }

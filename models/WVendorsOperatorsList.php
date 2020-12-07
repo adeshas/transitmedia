@@ -182,12 +182,12 @@ class WVendorsOperatorsList extends WVendorsOperators
         $this->ExportHtmlUrl = $pageUrl . "export=html";
         $this->ExportXmlUrl = $pageUrl . "export=xml";
         $this->ExportCsvUrl = $pageUrl . "export=csv";
-        $this->AddUrl = "WVendorsOperatorsAdd";
+        $this->AddUrl = "wvendorsoperatorsadd";
         $this->InlineAddUrl = $pageUrl . "action=add";
         $this->GridAddUrl = $pageUrl . "action=gridadd";
         $this->GridEditUrl = $pageUrl . "action=gridedit";
-        $this->MultiDeleteUrl = "WVendorsOperatorsDelete";
-        $this->MultiUpdateUrl = "WVendorsOperatorsUpdate";
+        $this->MultiDeleteUrl = "wvendorsoperatorsdelete";
+        $this->MultiUpdateUrl = "wvendorsoperatorsupdate";
 
         // Table name (for backward compatibility only)
         if (!defined(PROJECT_NAMESPACE . "TABLE_NAME")) {

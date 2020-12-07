@@ -293,7 +293,7 @@ class YOperatorsView extends YOperators
                 $pageName = GetPageName($url);
                 if ($pageName != $this->getListUrl()) { // Not List page
                     $row["caption"] = $this->getModalCaption($pageName);
-                    if ($pageName == "YOperatorsView") {
+                    if ($pageName == "yoperatorsview") {
                         $row["view"] = "1";
                     }
                 } else { // List page should not be shown as modal => error
@@ -535,7 +535,7 @@ class YOperatorsView extends YOperators
                 $this->id->setQueryStringValue($keyValue);
                 $this->RecKey["id"] = $this->id->QueryStringValue;
             } else {
-                $returnUrl = "YOperatorsList"; // Return to list
+                $returnUrl = "yoperatorslist"; // Return to list
             }
 
             // Get action
@@ -558,12 +558,12 @@ class YOperatorsView extends YOperators
                         if ($this->getSuccessMessage() == "" && $this->getFailureMessage() == "") {
                             $this->setFailureMessage($Language->phrase("NoRecord")); // Set no record message
                         }
-                        $returnUrl = "YOperatorsList"; // No matching record, return to list
+                        $returnUrl = "yoperatorslist"; // No matching record, return to list
                     }
                     break;
             }
         } else {
-            $returnUrl = "YOperatorsList"; // Not page request, return to list
+            $returnUrl = "yoperatorslist"; // Not page request, return to list
         }
         if ($returnUrl != "") {
             $this->terminate($returnUrl);
@@ -657,7 +657,7 @@ class YOperatorsView extends YOperators
         // "detail_main_transactions"
         $item = &$option->add("detail_main_transactions");
         $body = $Language->phrase("ViewPageDetailLink") . $Language->TablePhrase("main_transactions", "TblCaption");
-        $body = "<a class=\"btn btn-default ew-row-link ew-detail\" data-action=\"list\" href=\"" . HtmlEncode(GetUrl("MainTransactionsList?" . Config("TABLE_SHOW_MASTER") . "=y_operators&" . GetForeignKeyUrl("fk_id", $this->id->CurrentValue) . "")) . "\">" . $body . "</a>";
+        $body = "<a class=\"btn btn-default ew-row-link ew-detail\" data-action=\"list\" href=\"" . HtmlEncode(GetUrl("maintransactionslist?" . Config("TABLE_SHOW_MASTER") . "=y_operators&" . GetForeignKeyUrl("fk_id", $this->id->CurrentValue) . "")) . "\">" . $body . "</a>";
         $links = "";
         $detailPageObj = Container("MainTransactionsGrid");
         if ($detailPageObj->DetailView && $Security->canView() && $Security->allowView(CurrentProjectID() . 'y_operators')) {
@@ -1016,7 +1016,7 @@ class YOperatorsView extends YOperators
         global $Breadcrumb, $Language;
         $Breadcrumb = new Breadcrumb("index");
         $url = CurrentUrl();
-        $Breadcrumb->add("list", $this->TableVar, $this->addMasterUrl("YOperatorsList"), "", $this->TableVar, true);
+        $Breadcrumb->add("list", $this->TableVar, $this->addMasterUrl("yoperatorslist"), "", $this->TableVar, true);
         $pageId = "view";
         $Breadcrumb->add("view", $pageId, $url);
     }

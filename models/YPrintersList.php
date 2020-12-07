@@ -182,12 +182,12 @@ class YPrintersList extends YPrinters
         $this->ExportHtmlUrl = $pageUrl . "export=html";
         $this->ExportXmlUrl = $pageUrl . "export=xml";
         $this->ExportCsvUrl = $pageUrl . "export=csv";
-        $this->AddUrl = "YPrintersAdd";
+        $this->AddUrl = "yprintersadd";
         $this->InlineAddUrl = $pageUrl . "action=add";
         $this->GridAddUrl = $pageUrl . "action=gridadd";
         $this->GridEditUrl = $pageUrl . "action=gridedit";
-        $this->MultiDeleteUrl = "YPrintersDelete";
-        $this->MultiUpdateUrl = "YPrintersUpdate";
+        $this->MultiDeleteUrl = "yprintersdelete";
+        $this->MultiUpdateUrl = "yprintersupdate";
 
         // Table name (for backward compatibility only)
         if (!defined(PROJECT_NAMESPACE . "TABLE_NAME")) {

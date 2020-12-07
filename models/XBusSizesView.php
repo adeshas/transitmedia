@@ -293,7 +293,7 @@ class XBusSizesView extends XBusSizes
                 $pageName = GetPageName($url);
                 if ($pageName != $this->getListUrl()) { // Not List page
                     $row["caption"] = $this->getModalCaption($pageName);
-                    if ($pageName == "XBusSizesView") {
+                    if ($pageName == "xbussizesview") {
                         $row["view"] = "1";
                     }
                 } else { // List page should not be shown as modal => error
@@ -527,7 +527,7 @@ class XBusSizesView extends XBusSizes
                 $this->id->setQueryStringValue($keyValue);
                 $this->RecKey["id"] = $this->id->QueryStringValue;
             } else {
-                $returnUrl = "XBusSizesList"; // Return to list
+                $returnUrl = "xbussizeslist"; // Return to list
             }
 
             // Get action
@@ -550,12 +550,12 @@ class XBusSizesView extends XBusSizes
                         if ($this->getSuccessMessage() == "" && $this->getFailureMessage() == "") {
                             $this->setFailureMessage($Language->phrase("NoRecord")); // Set no record message
                         }
-                        $returnUrl = "XBusSizesList"; // No matching record, return to list
+                        $returnUrl = "xbussizeslist"; // No matching record, return to list
                     }
                     break;
             }
         } else {
-            $returnUrl = "XBusSizesList"; // Not page request, return to list
+            $returnUrl = "xbussizeslist"; // Not page request, return to list
         }
         if ($returnUrl != "") {
             $this->terminate($returnUrl);
@@ -732,7 +732,7 @@ class XBusSizesView extends XBusSizes
         global $Breadcrumb, $Language;
         $Breadcrumb = new Breadcrumb("index");
         $url = CurrentUrl();
-        $Breadcrumb->add("list", $this->TableVar, $this->addMasterUrl("XBusSizesList"), "", $this->TableVar, true);
+        $Breadcrumb->add("list", $this->TableVar, $this->addMasterUrl("xbussizeslist"), "", $this->TableVar, true);
         $pageId = "view";
         $Breadcrumb->add("view", $pageId, $url);
     }

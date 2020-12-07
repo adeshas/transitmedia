@@ -382,7 +382,7 @@ class MainReportsDelete extends MainReports
         $this->RecKeys = $this->getRecordKeys(); // Load record keys
         $filter = $this->getFilterFromRecordKeys();
         if ($filter == "") {
-            $this->terminate("MainReportsList"); // Prevent SQL injection, return to list
+            $this->terminate("mainreportslist"); // Prevent SQL injection, return to list
             return;
         }
 
@@ -404,7 +404,7 @@ class MainReportsDelete extends MainReports
             }
         }
         if (!$res) {
-            $this->terminate("MainReportsList"); // Return to list
+            $this->terminate("mainreportslist"); // Return to list
             return;
         }
 
@@ -447,7 +447,7 @@ class MainReportsDelete extends MainReports
                 if ($this->Recordset) {
                     $this->Recordset->close();
                 }
-                $this->terminate("MainReportsList"); // Return to list
+                $this->terminate("mainreportslist"); // Return to list
                 return;
             }
         }
@@ -873,7 +873,7 @@ class MainReportsDelete extends MainReports
         global $Breadcrumb, $Language;
         $Breadcrumb = new Breadcrumb("index");
         $url = CurrentUrl();
-        $Breadcrumb->add("list", $this->TableVar, $this->addMasterUrl("MainReportsList"), "", $this->TableVar, true);
+        $Breadcrumb->add("list", $this->TableVar, $this->addMasterUrl("mainreportslist"), "", $this->TableVar, true);
         $pageId = "delete";
         $Breadcrumb->add("delete", $pageId, $url);
     }

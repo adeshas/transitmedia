@@ -777,7 +777,7 @@ class SubTransactionDetails extends DbTable
         if ($referUrl != "" && $referPageName != CurrentPageName() && $referPageName != "login") { // Referer not same page or login page
             $_SESSION[$name] = $referUrl; // Save to Session
         }
-        return $_SESSION[$name] ?? GetUrl("SubTransactionDetailsList");
+        return $_SESSION[$name] ?? GetUrl("subtransactiondetailslist");
     }
 
     // Set return page URL
@@ -790,11 +790,11 @@ class SubTransactionDetails extends DbTable
     public function getModalCaption($pageName)
     {
         global $Language;
-        if ($pageName == "SubTransactionDetailsView") {
+        if ($pageName == "subtransactiondetailsview") {
             return $Language->phrase("View");
-        } elseif ($pageName == "SubTransactionDetailsEdit") {
+        } elseif ($pageName == "subtransactiondetailsedit") {
             return $Language->phrase("Edit");
-        } elseif ($pageName == "SubTransactionDetailsAdd") {
+        } elseif ($pageName == "subtransactiondetailsadd") {
             return $Language->phrase("Add");
         } else {
             return "";
@@ -823,16 +823,16 @@ class SubTransactionDetails extends DbTable
     // List URL
     public function getListUrl()
     {
-        return "SubTransactionDetailsList";
+        return "subtransactiondetailslist";
     }
 
     // View URL
     public function getViewUrl($parm = "")
     {
         if ($parm != "") {
-            $url = $this->keyUrl("SubTransactionDetailsView", $this->getUrlParm($parm));
+            $url = $this->keyUrl("subtransactiondetailsview", $this->getUrlParm($parm));
         } else {
-            $url = $this->keyUrl("SubTransactionDetailsView", $this->getUrlParm(Config("TABLE_SHOW_DETAIL") . "="));
+            $url = $this->keyUrl("subtransactiondetailsview", $this->getUrlParm(Config("TABLE_SHOW_DETAIL") . "="));
         }
         return $this->addMasterUrl($url);
     }
@@ -841,9 +841,9 @@ class SubTransactionDetails extends DbTable
     public function getAddUrl($parm = "")
     {
         if ($parm != "") {
-            $url = "SubTransactionDetailsAdd?" . $this->getUrlParm($parm);
+            $url = "subtransactiondetailsadd?" . $this->getUrlParm($parm);
         } else {
-            $url = "SubTransactionDetailsAdd";
+            $url = "subtransactiondetailsadd";
         }
         return $this->addMasterUrl($url);
     }
@@ -851,7 +851,7 @@ class SubTransactionDetails extends DbTable
     // Edit URL
     public function getEditUrl($parm = "")
     {
-        $url = $this->keyUrl("SubTransactionDetailsEdit", $this->getUrlParm($parm));
+        $url = $this->keyUrl("subtransactiondetailsedit", $this->getUrlParm($parm));
         return $this->addMasterUrl($url);
     }
 
@@ -865,7 +865,7 @@ class SubTransactionDetails extends DbTable
     // Copy URL
     public function getCopyUrl($parm = "")
     {
-        $url = $this->keyUrl("SubTransactionDetailsAdd", $this->getUrlParm($parm));
+        $url = $this->keyUrl("subtransactiondetailsadd", $this->getUrlParm($parm));
         return $this->addMasterUrl($url);
     }
 
@@ -879,7 +879,7 @@ class SubTransactionDetails extends DbTable
     // Delete URL
     public function getDeleteUrl()
     {
-        return $this->keyUrl("SubTransactionDetailsDelete", $this->getUrlParm());
+        return $this->keyUrl("subtransactiondetailsdelete", $this->getUrlParm());
     }
 
     // Add master url

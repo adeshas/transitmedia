@@ -182,12 +182,12 @@ class ViewOperatorsPlatformsList extends ViewOperatorsPlatforms
         $this->ExportHtmlUrl = $pageUrl . "export=html";
         $this->ExportXmlUrl = $pageUrl . "export=xml";
         $this->ExportCsvUrl = $pageUrl . "export=csv";
-        $this->AddUrl = "ViewOperatorsPlatformsAdd";
+        $this->AddUrl = "viewoperatorsplatformsadd";
         $this->InlineAddUrl = $pageUrl . "action=add";
         $this->GridAddUrl = $pageUrl . "action=gridadd";
         $this->GridEditUrl = $pageUrl . "action=gridedit";
-        $this->MultiDeleteUrl = "ViewOperatorsPlatformsDelete";
-        $this->MultiUpdateUrl = "ViewOperatorsPlatformsUpdate";
+        $this->MultiDeleteUrl = "viewoperatorsplatformsdelete";
+        $this->MultiUpdateUrl = "viewoperatorsplatformsupdate";
 
         // Table name (for backward compatibility only)
         if (!defined(PROJECT_NAMESPACE . "TABLE_NAME")) {

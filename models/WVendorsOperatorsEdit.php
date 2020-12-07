@@ -238,7 +238,7 @@ class WVendorsOperatorsEdit extends WVendorsOperators
                 $pageName = GetPageName($url);
                 if ($pageName != $this->getListUrl()) { // Not List page
                     $row["caption"] = $this->getModalCaption($pageName);
-                    if ($pageName == "WVendorsOperatorsView") {
+                    if ($pageName == "wvendorsoperatorsview") {
                         $row["view"] = "1";
                     }
                 } else { // List page should not be shown as modal => error
@@ -543,13 +543,13 @@ class WVendorsOperatorsEdit extends WVendorsOperators
                     if ($this->getFailureMessage() == "") {
                         $this->setFailureMessage($Language->phrase("NoRecord")); // No record found
                     }
-                    $this->terminate("WVendorsOperatorsList"); // No matching record, return to list
+                    $this->terminate("wvendorsoperatorslist"); // No matching record, return to list
                     return;
                 }
                 break;
             case "update": // Update
                 $returnUrl = $this->getReturnUrl();
-                if (GetPageName($returnUrl) == "WVendorsOperatorsList") {
+                if (GetPageName($returnUrl) == "wvendorsoperatorslist") {
                     $returnUrl = $this->addMasterUrl($returnUrl); // List page, return to List page with correct master key if necessary
                 }
                 $this->SendEmail = true; // Send email on update success
@@ -1005,7 +1005,7 @@ class WVendorsOperatorsEdit extends WVendorsOperators
         global $Breadcrumb, $Language;
         $Breadcrumb = new Breadcrumb("index");
         $url = CurrentUrl();
-        $Breadcrumb->add("list", $this->TableVar, $this->addMasterUrl("WVendorsOperatorsList"), "", $this->TableVar, true);
+        $Breadcrumb->add("list", $this->TableVar, $this->addMasterUrl("wvendorsoperatorslist"), "", $this->TableVar, true);
         $pageId = "edit";
         $Breadcrumb->add("edit", $pageId, $url);
     }

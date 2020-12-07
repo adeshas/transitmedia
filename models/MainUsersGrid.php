@@ -153,7 +153,7 @@ class MainUsersGrid extends MainUsers
 
         // Page URL
         $pageUrl = $this->pageUrl();
-        $this->AddUrl = "MainUsersAdd";
+        $this->AddUrl = "mainusersadd";
 
         // Table name (for backward compatibility only)
         if (!defined(PROJECT_NAMESPACE . "TABLE_NAME")) {
@@ -582,7 +582,7 @@ class MainUsersGrid extends MainUsers
             $this->MasterRecordExists = $rsmaster !== false;
             if (!$this->MasterRecordExists) {
                 $this->setFailureMessage($Language->phrase("NoRecord")); // Set no record found
-                $this->terminate("YVendorsList"); // Return to master page
+                $this->terminate("yvendorslist"); // Return to master page
                 return;
             } else {
                 $masterTbl->loadListRowValues($rsmaster);

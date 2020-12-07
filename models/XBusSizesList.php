@@ -182,12 +182,12 @@ class XBusSizesList extends XBusSizes
         $this->ExportHtmlUrl = $pageUrl . "export=html";
         $this->ExportXmlUrl = $pageUrl . "export=xml";
         $this->ExportCsvUrl = $pageUrl . "export=csv";
-        $this->AddUrl = "XBusSizesAdd";
+        $this->AddUrl = "xbussizesadd";
         $this->InlineAddUrl = $pageUrl . "action=add";
         $this->GridAddUrl = $pageUrl . "action=gridadd";
         $this->GridEditUrl = $pageUrl . "action=gridedit";
-        $this->MultiDeleteUrl = "XBusSizesDelete";
-        $this->MultiUpdateUrl = "XBusSizesUpdate";
+        $this->MultiDeleteUrl = "xbussizesdelete";
+        $this->MultiUpdateUrl = "xbussizesupdate";
 
         // Table name (for backward compatibility only)
         if (!defined(PROJECT_NAMESPACE . "TABLE_NAME")) {

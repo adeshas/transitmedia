@@ -238,7 +238,7 @@ class ZCoreSettingsAdd extends ZCoreSettings
                 $pageName = GetPageName($url);
                 if ($pageName != $this->getListUrl()) { // Not List page
                     $row["caption"] = $this->getModalCaption($pageName);
-                    if ($pageName == "ZCoreSettingsView") {
+                    if ($pageName == "zcoresettingsview") {
                         $row["view"] = "1";
                     }
                 } else { // List page should not be shown as modal => error
@@ -513,7 +513,7 @@ class ZCoreSettingsAdd extends ZCoreSettings
                     if ($this->getFailureMessage() == "") {
                         $this->setFailureMessage($Language->phrase("NoRecord")); // No record found
                     }
-                    $this->terminate("ZCoreSettingsList"); // No matching record, return to list
+                    $this->terminate("zcoresettingslist"); // No matching record, return to list
                     return;
                 }
                 break;
@@ -524,9 +524,9 @@ class ZCoreSettingsAdd extends ZCoreSettings
                         $this->setSuccessMessage($Language->phrase("AddSuccess")); // Set up success message
                     }
                     $returnUrl = $this->getReturnUrl();
-                    if (GetPageName($returnUrl) == "ZCoreSettingsList") {
+                    if (GetPageName($returnUrl) == "zcoresettingslist") {
                         $returnUrl = $this->addMasterUrl($returnUrl); // List page, return to List page with correct master key if necessary
-                    } elseif (GetPageName($returnUrl) == "ZCoreSettingsView") {
+                    } elseif (GetPageName($returnUrl) == "zcoresettingsview") {
                         $returnUrl = $this->getViewUrl(); // View page, return to View page with keyurl directly
                     }
                     if (IsApi()) { // Return to caller
@@ -876,7 +876,7 @@ class ZCoreSettingsAdd extends ZCoreSettings
         global $Breadcrumb, $Language;
         $Breadcrumb = new Breadcrumb("index");
         $url = CurrentUrl();
-        $Breadcrumb->add("list", $this->TableVar, $this->addMasterUrl("ZCoreSettingsList"), "", $this->TableVar, true);
+        $Breadcrumb->add("list", $this->TableVar, $this->addMasterUrl("zcoresettingslist"), "", $this->TableVar, true);
         $pageId = ($this->isCopy()) ? "Copy" : "Add";
         $Breadcrumb->add("add", $pageId, $url);
     }

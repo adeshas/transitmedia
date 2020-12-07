@@ -182,12 +182,12 @@ class XPrintStageList extends XPrintStage
         $this->ExportHtmlUrl = $pageUrl . "export=html";
         $this->ExportXmlUrl = $pageUrl . "export=xml";
         $this->ExportCsvUrl = $pageUrl . "export=csv";
-        $this->AddUrl = "XPrintStageAdd";
+        $this->AddUrl = "xprintstageadd";
         $this->InlineAddUrl = $pageUrl . "action=add";
         $this->GridAddUrl = $pageUrl . "action=gridadd";
         $this->GridEditUrl = $pageUrl . "action=gridedit";
-        $this->MultiDeleteUrl = "XPrintStageDelete";
-        $this->MultiUpdateUrl = "XPrintStageUpdate";
+        $this->MultiDeleteUrl = "xprintstagedelete";
+        $this->MultiUpdateUrl = "xprintstageupdate";
 
         // Table name (for backward compatibility only)
         if (!defined(PROJECT_NAMESPACE . "TABLE_NAME")) {

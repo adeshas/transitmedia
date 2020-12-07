@@ -293,7 +293,7 @@ class MainBusesView extends MainBuses
                 $pageName = GetPageName($url);
                 if ($pageName != $this->getListUrl()) { // Not List page
                     $row["caption"] = $this->getModalCaption($pageName);
-                    if ($pageName == "MainBusesView") {
+                    if ($pageName == "mainbusesview") {
                         $row["view"] = "1";
                     }
                 } else { // List page should not be shown as modal => error
@@ -543,7 +543,7 @@ class MainBusesView extends MainBuses
                 $this->id->setQueryStringValue($keyValue);
                 $this->RecKey["id"] = $this->id->QueryStringValue;
             } else {
-                $returnUrl = "MainBusesList"; // Return to list
+                $returnUrl = "mainbuseslist"; // Return to list
             }
 
             // Get action
@@ -566,12 +566,12 @@ class MainBusesView extends MainBuses
                         if ($this->getSuccessMessage() == "" && $this->getFailureMessage() == "") {
                             $this->setFailureMessage($Language->phrase("NoRecord")); // Set no record message
                         }
-                        $returnUrl = "MainBusesList"; // No matching record, return to list
+                        $returnUrl = "mainbuseslist"; // No matching record, return to list
                     }
                     break;
             }
         } else {
-            $returnUrl = "MainBusesList"; // Not page request, return to list
+            $returnUrl = "mainbuseslist"; // Not page request, return to list
         }
         if ($returnUrl != "") {
             $this->terminate($returnUrl);
@@ -665,7 +665,7 @@ class MainBusesView extends MainBuses
         // "detail_sub_media_allocation"
         $item = &$option->add("detail_sub_media_allocation");
         $body = $Language->phrase("ViewPageDetailLink") . $Language->TablePhrase("sub_media_allocation", "TblCaption");
-        $body = "<a class=\"btn btn-default ew-row-link ew-detail\" data-action=\"list\" href=\"" . HtmlEncode(GetUrl("SubMediaAllocationList?" . Config("TABLE_SHOW_MASTER") . "=main_buses&" . GetForeignKeyUrl("fk_id", $this->id->CurrentValue) . "")) . "\">" . $body . "</a>";
+        $body = "<a class=\"btn btn-default ew-row-link ew-detail\" data-action=\"list\" href=\"" . HtmlEncode(GetUrl("submediaallocationlist?" . Config("TABLE_SHOW_MASTER") . "=main_buses&" . GetForeignKeyUrl("fk_id", $this->id->CurrentValue) . "")) . "\">" . $body . "</a>";
         $links = "";
         $detailPageObj = Container("SubMediaAllocationGrid");
         if ($detailPageObj->DetailView && $Security->canView() && $Security->allowView(CurrentProjectID() . 'main_buses')) {
@@ -1131,7 +1131,7 @@ class MainBusesView extends MainBuses
         global $Breadcrumb, $Language;
         $Breadcrumb = new Breadcrumb("index");
         $url = CurrentUrl();
-        $Breadcrumb->add("list", $this->TableVar, $this->addMasterUrl("MainBusesList"), "", $this->TableVar, true);
+        $Breadcrumb->add("list", $this->TableVar, $this->addMasterUrl("mainbuseslist"), "", $this->TableVar, true);
         $pageId = "view";
         $Breadcrumb->add("view", $pageId, $url);
     }

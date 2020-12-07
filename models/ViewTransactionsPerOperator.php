@@ -702,7 +702,7 @@ class ViewTransactionsPerOperator extends DbTable
         if ($referUrl != "" && $referPageName != CurrentPageName() && $referPageName != "login") { // Referer not same page or login page
             $_SESSION[$name] = $referUrl; // Save to Session
         }
-        return $_SESSION[$name] ?? GetUrl("ViewTransactionsPerOperatorList");
+        return $_SESSION[$name] ?? GetUrl("viewtransactionsperoperatorlist");
     }
 
     // Set return page URL
@@ -715,11 +715,11 @@ class ViewTransactionsPerOperator extends DbTable
     public function getModalCaption($pageName)
     {
         global $Language;
-        if ($pageName == "ViewTransactionsPerOperatorView") {
+        if ($pageName == "viewtransactionsperoperatorview") {
             return $Language->phrase("View");
-        } elseif ($pageName == "ViewTransactionsPerOperatorEdit") {
+        } elseif ($pageName == "viewtransactionsperoperatoredit") {
             return $Language->phrase("Edit");
-        } elseif ($pageName == "ViewTransactionsPerOperatorAdd") {
+        } elseif ($pageName == "viewtransactionsperoperatoradd") {
             return $Language->phrase("Add");
         } else {
             return "";
@@ -748,16 +748,16 @@ class ViewTransactionsPerOperator extends DbTable
     // List URL
     public function getListUrl()
     {
-        return "ViewTransactionsPerOperatorList";
+        return "viewtransactionsperoperatorlist";
     }
 
     // View URL
     public function getViewUrl($parm = "")
     {
         if ($parm != "") {
-            $url = $this->keyUrl("ViewTransactionsPerOperatorView", $this->getUrlParm($parm));
+            $url = $this->keyUrl("viewtransactionsperoperatorview", $this->getUrlParm($parm));
         } else {
-            $url = $this->keyUrl("ViewTransactionsPerOperatorView", $this->getUrlParm(Config("TABLE_SHOW_DETAIL") . "="));
+            $url = $this->keyUrl("viewtransactionsperoperatorview", $this->getUrlParm(Config("TABLE_SHOW_DETAIL") . "="));
         }
         return $this->addMasterUrl($url);
     }
@@ -766,9 +766,9 @@ class ViewTransactionsPerOperator extends DbTable
     public function getAddUrl($parm = "")
     {
         if ($parm != "") {
-            $url = "ViewTransactionsPerOperatorAdd?" . $this->getUrlParm($parm);
+            $url = "viewtransactionsperoperatoradd?" . $this->getUrlParm($parm);
         } else {
-            $url = "ViewTransactionsPerOperatorAdd";
+            $url = "viewtransactionsperoperatoradd";
         }
         return $this->addMasterUrl($url);
     }
@@ -776,7 +776,7 @@ class ViewTransactionsPerOperator extends DbTable
     // Edit URL
     public function getEditUrl($parm = "")
     {
-        $url = $this->keyUrl("ViewTransactionsPerOperatorEdit", $this->getUrlParm($parm));
+        $url = $this->keyUrl("viewtransactionsperoperatoredit", $this->getUrlParm($parm));
         return $this->addMasterUrl($url);
     }
 
@@ -790,7 +790,7 @@ class ViewTransactionsPerOperator extends DbTable
     // Copy URL
     public function getCopyUrl($parm = "")
     {
-        $url = $this->keyUrl("ViewTransactionsPerOperatorAdd", $this->getUrlParm($parm));
+        $url = $this->keyUrl("viewtransactionsperoperatoradd", $this->getUrlParm($parm));
         return $this->addMasterUrl($url);
     }
 
@@ -804,7 +804,7 @@ class ViewTransactionsPerOperator extends DbTable
     // Delete URL
     public function getDeleteUrl()
     {
-        return $this->keyUrl("ViewTransactionsPerOperatorDelete", $this->getUrlParm());
+        return $this->keyUrl("viewtransactionsperoperatordelete", $this->getUrlParm());
     }
 
     // Add master url

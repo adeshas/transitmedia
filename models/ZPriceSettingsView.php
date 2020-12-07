@@ -293,7 +293,7 @@ class ZPriceSettingsView extends ZPriceSettings
                 $pageName = GetPageName($url);
                 if ($pageName != $this->getListUrl()) { // Not List page
                     $row["caption"] = $this->getModalCaption($pageName);
-                    if ($pageName == "ZPriceSettingsView") {
+                    if ($pageName == "zpricesettingsview") {
                         $row["view"] = "1";
                     }
                 } else { // List page should not be shown as modal => error
@@ -545,7 +545,7 @@ class ZPriceSettingsView extends ZPriceSettings
                 $this->id->setQueryStringValue($keyValue);
                 $this->RecKey["id"] = $this->id->QueryStringValue;
             } else {
-                $returnUrl = "ZPriceSettingsList"; // Return to list
+                $returnUrl = "zpricesettingslist"; // Return to list
             }
 
             // Get action
@@ -568,12 +568,12 @@ class ZPriceSettingsView extends ZPriceSettings
                         if ($this->getSuccessMessage() == "" && $this->getFailureMessage() == "") {
                             $this->setFailureMessage($Language->phrase("NoRecord")); // Set no record message
                         }
-                        $returnUrl = "ZPriceSettingsList"; // No matching record, return to list
+                        $returnUrl = "zpricesettingslist"; // No matching record, return to list
                     }
                     break;
             }
         } else {
-            $returnUrl = "ZPriceSettingsList"; // Not page request, return to list
+            $returnUrl = "zpricesettingslist"; // Not page request, return to list
         }
         if ($returnUrl != "") {
             $this->terminate($returnUrl);
@@ -1023,7 +1023,7 @@ class ZPriceSettingsView extends ZPriceSettings
         global $Breadcrumb, $Language;
         $Breadcrumb = new Breadcrumb("index");
         $url = CurrentUrl();
-        $Breadcrumb->add("list", $this->TableVar, $this->addMasterUrl("ZPriceSettingsList"), "", $this->TableVar, true);
+        $Breadcrumb->add("list", $this->TableVar, $this->addMasterUrl("zpricesettingslist"), "", $this->TableVar, true);
         $pageId = "view";
         $Breadcrumb->add("view", $pageId, $url);
     }

@@ -372,7 +372,7 @@ class XTransactionStatusDelete extends XTransactionStatus
         $this->RecKeys = $this->getRecordKeys(); // Load record keys
         $filter = $this->getFilterFromRecordKeys();
         if ($filter == "") {
-            $this->terminate("XTransactionStatusList"); // Prevent SQL injection, return to list
+            $this->terminate("xtransactionstatuslist"); // Prevent SQL injection, return to list
             return;
         }
 
@@ -418,7 +418,7 @@ class XTransactionStatusDelete extends XTransactionStatus
                 if ($this->Recordset) {
                     $this->Recordset->close();
                 }
-                $this->terminate("XTransactionStatusList"); // Return to list
+                $this->terminate("xtransactionstatuslist"); // Return to list
                 return;
             }
         }
@@ -681,7 +681,7 @@ class XTransactionStatusDelete extends XTransactionStatus
         global $Breadcrumb, $Language;
         $Breadcrumb = new Breadcrumb("index");
         $url = CurrentUrl();
-        $Breadcrumb->add("list", $this->TableVar, $this->addMasterUrl("XTransactionStatusList"), "", $this->TableVar, true);
+        $Breadcrumb->add("list", $this->TableVar, $this->addMasterUrl("xtransactionstatuslist"), "", $this->TableVar, true);
         $pageId = "delete";
         $Breadcrumb->add("delete", $pageId, $url);
     }

@@ -370,7 +370,7 @@ class XRenewalStageDelete extends XRenewalStage
         $this->RecKeys = $this->getRecordKeys(); // Load record keys
         $filter = $this->getFilterFromRecordKeys();
         if ($filter == "") {
-            $this->terminate("XRenewalStageList"); // Prevent SQL injection, return to list
+            $this->terminate("xrenewalstagelist"); // Prevent SQL injection, return to list
             return;
         }
 
@@ -416,7 +416,7 @@ class XRenewalStageDelete extends XRenewalStage
                 if ($this->Recordset) {
                     $this->Recordset->close();
                 }
-                $this->terminate("XRenewalStageList"); // Return to list
+                $this->terminate("xrenewalstagelist"); // Return to list
                 return;
             }
         }
@@ -654,7 +654,7 @@ class XRenewalStageDelete extends XRenewalStage
         global $Breadcrumb, $Language;
         $Breadcrumb = new Breadcrumb("index");
         $url = CurrentUrl();
-        $Breadcrumb->add("list", $this->TableVar, $this->addMasterUrl("XRenewalStageList"), "", $this->TableVar, true);
+        $Breadcrumb->add("list", $this->TableVar, $this->addMasterUrl("xrenewalstagelist"), "", $this->TableVar, true);
         $pageId = "delete";
         $Breadcrumb->add("delete", $pageId, $url);
     }

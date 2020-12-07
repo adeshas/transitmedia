@@ -293,7 +293,7 @@ class SubTransactionDetailsView extends SubTransactionDetails
                 $pageName = GetPageName($url);
                 if ($pageName != $this->getListUrl()) { // Not List page
                     $row["caption"] = $this->getModalCaption($pageName);
-                    if ($pageName == "SubTransactionDetailsView") {
+                    if ($pageName == "subtransactiondetailsview") {
                         $row["view"] = "1";
                     }
                 } else { // List page should not be shown as modal => error
@@ -538,7 +538,7 @@ class SubTransactionDetailsView extends SubTransactionDetails
                 $this->id->setQueryStringValue($keyValue);
                 $this->RecKey["id"] = $this->id->QueryStringValue;
             } else {
-                $returnUrl = "SubTransactionDetailsList"; // Return to list
+                $returnUrl = "subtransactiondetailslist"; // Return to list
             }
 
             // Get action
@@ -561,12 +561,12 @@ class SubTransactionDetailsView extends SubTransactionDetails
                         if ($this->getSuccessMessage() == "" && $this->getFailureMessage() == "") {
                             $this->setFailureMessage($Language->phrase("NoRecord")); // Set no record message
                         }
-                        $returnUrl = "SubTransactionDetailsList"; // No matching record, return to list
+                        $returnUrl = "subtransactiondetailslist"; // No matching record, return to list
                     }
                     break;
             }
         } else {
-            $returnUrl = "SubTransactionDetailsList"; // Not page request, return to list
+            $returnUrl = "subtransactiondetailslist"; // Not page request, return to list
         }
         if ($returnUrl != "") {
             $this->terminate($returnUrl);
@@ -962,7 +962,7 @@ class SubTransactionDetailsView extends SubTransactionDetails
         global $Breadcrumb, $Language;
         $Breadcrumb = new Breadcrumb("index");
         $url = CurrentUrl();
-        $Breadcrumb->add("list", $this->TableVar, $this->addMasterUrl("SubTransactionDetailsList"), "", $this->TableVar, true);
+        $Breadcrumb->add("list", $this->TableVar, $this->addMasterUrl("subtransactiondetailslist"), "", $this->TableVar, true);
         $pageId = "view";
         $Breadcrumb->add("view", $pageId, $url);
     }

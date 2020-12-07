@@ -182,12 +182,12 @@ class ViewCampaignsPendingList extends ViewCampaignsPending
         $this->ExportHtmlUrl = $pageUrl . "export=html";
         $this->ExportXmlUrl = $pageUrl . "export=xml";
         $this->ExportCsvUrl = $pageUrl . "export=csv";
-        $this->AddUrl = "ViewCampaignsPendingAdd?" . Config("TABLE_SHOW_DETAIL") . "=";
+        $this->AddUrl = "viewcampaignspendingadd?" . Config("TABLE_SHOW_DETAIL") . "=";
         $this->InlineAddUrl = $pageUrl . "action=add";
         $this->GridAddUrl = $pageUrl . "action=gridadd";
         $this->GridEditUrl = $pageUrl . "action=gridedit";
-        $this->MultiDeleteUrl = "ViewCampaignsPendingDelete";
-        $this->MultiUpdateUrl = "ViewCampaignsPendingUpdate";
+        $this->MultiDeleteUrl = "viewcampaignspendingdelete";
+        $this->MultiUpdateUrl = "viewcampaignspendingupdate";
 
         // Table name (for backward compatibility only)
         if (!defined(PROJECT_NAMESPACE . "TABLE_NAME")) {
@@ -1597,7 +1597,7 @@ class ViewCampaignsPendingList extends ViewCampaignsPending
         $opt = $this->ListOptions["detail_view_buses_assigned"];
         if ($Security->allowList(CurrentProjectID() . 'view_buses_assigned')) {
             $body = $Language->phrase("DetailLink") . $Language->TablePhrase("view_buses_assigned", "TblCaption");
-            $body = "<a class=\"btn btn-default ew-row-link ew-detail\" data-action=\"list\" href=\"" . HtmlEncode("ViewBusesAssignedList?" . Config("TABLE_SHOW_MASTER") . "=view_campaigns_pending&" . GetForeignKeyUrl("fk_transaction_id", $this->transaction_id->CurrentValue) . "") . "\">" . $body . "</a>";
+            $body = "<a class=\"btn btn-default ew-row-link ew-detail\" data-action=\"list\" href=\"" . HtmlEncode("viewbusesassignedlist?" . Config("TABLE_SHOW_MASTER") . "=view_campaigns_pending&" . GetForeignKeyUrl("fk_transaction_id", $this->transaction_id->CurrentValue) . "") . "\">" . $body . "</a>";
             $links = "";
             $detailPage = Container("ViewBusesAssignedGrid");
             if ($detailPage->DetailView && $Security->canView() && $Security->allowView(CurrentProjectID() . 'view_campaigns_pending')) {

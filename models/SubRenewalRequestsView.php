@@ -293,7 +293,7 @@ class SubRenewalRequestsView extends SubRenewalRequests
                 $pageName = GetPageName($url);
                 if ($pageName != $this->getListUrl()) { // Not List page
                     $row["caption"] = $this->getModalCaption($pageName);
-                    if ($pageName == "SubRenewalRequestsView") {
+                    if ($pageName == "subrenewalrequestsview") {
                         $row["view"] = "1";
                     }
                 } else { // List page should not be shown as modal => error
@@ -530,7 +530,7 @@ class SubRenewalRequestsView extends SubRenewalRequests
                 $this->id->setQueryStringValue($keyValue);
                 $this->RecKey["id"] = $this->id->QueryStringValue;
             } else {
-                $returnUrl = "SubRenewalRequestsList"; // Return to list
+                $returnUrl = "subrenewalrequestslist"; // Return to list
             }
 
             // Get action
@@ -553,12 +553,12 @@ class SubRenewalRequestsView extends SubRenewalRequests
                         if ($this->getSuccessMessage() == "" && $this->getFailureMessage() == "") {
                             $this->setFailureMessage($Language->phrase("NoRecord")); // Set no record message
                         }
-                        $returnUrl = "SubRenewalRequestsList"; // No matching record, return to list
+                        $returnUrl = "subrenewalrequestslist"; // No matching record, return to list
                     }
                     break;
             }
         } else {
-            $returnUrl = "SubRenewalRequestsList"; // Not page request, return to list
+            $returnUrl = "subrenewalrequestslist"; // Not page request, return to list
         }
         if ($returnUrl != "") {
             $this->terminate($returnUrl);
@@ -817,7 +817,7 @@ class SubRenewalRequestsView extends SubRenewalRequests
         global $Breadcrumb, $Language;
         $Breadcrumb = new Breadcrumb("index");
         $url = CurrentUrl();
-        $Breadcrumb->add("list", $this->TableVar, $this->addMasterUrl("SubRenewalRequestsList"), "", $this->TableVar, true);
+        $Breadcrumb->add("list", $this->TableVar, $this->addMasterUrl("subrenewalrequestslist"), "", $this->TableVar, true);
         $pageId = "view";
         $Breadcrumb->add("view", $pageId, $url);
     }

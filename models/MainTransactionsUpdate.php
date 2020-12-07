@@ -238,7 +238,7 @@ class MainTransactionsUpdate extends MainTransactions
                 $pageName = GetPageName($url);
                 if ($pageName != $this->getListUrl()) { // Not List page
                     $row["caption"] = $this->getModalCaption($pageName);
-                    if ($pageName == "MainTransactionsView") {
+                    if ($pageName == "maintransactionsview") {
                         $row["view"] = "1";
                     }
                 } else { // List page should not be shown as modal => error
@@ -503,7 +503,7 @@ class MainTransactionsUpdate extends MainTransactions
             }
         }
         if (!$res) {
-            $this->terminate("MainTransactionsList"); // Return to list
+            $this->terminate("maintransactionslist"); // Return to list
             return;
         }
         if (Post("action") !== null && Post("action") !== "") {
@@ -522,7 +522,7 @@ class MainTransactionsUpdate extends MainTransactions
             $this->loadMultiUpdateValues(); // Load initial values to form
         }
         if (count($this->RecKeys) <= 0) {
-            $this->terminate("MainTransactionsList"); // No records selected, return to list
+            $this->terminate("maintransactionslist"); // No records selected, return to list
             return;
         }
         if ($this->isUpdate()) {
@@ -2318,7 +2318,7 @@ class MainTransactionsUpdate extends MainTransactions
         global $Breadcrumb, $Language;
         $Breadcrumb = new Breadcrumb("index");
         $url = CurrentUrl();
-        $Breadcrumb->add("list", $this->TableVar, $this->addMasterUrl("MainTransactionsList"), "", $this->TableVar, true);
+        $Breadcrumb->add("list", $this->TableVar, $this->addMasterUrl("maintransactionslist"), "", $this->TableVar, true);
         $pageId = "update";
         $Breadcrumb->add("update", $pageId, $url);
     }
