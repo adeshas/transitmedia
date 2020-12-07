@@ -288,7 +288,7 @@ class ViewAllBuses extends DbTable
     public function getSqlWhere() // Where
     {
         $where = ($this->SqlWhere != "") ? $this->SqlWhere : "";
-        $this->DefaultFilter = ((CurrentUserLevel() == 5) ? "\"operator_id\" = (select o.id from y_vendors v, y_operators o where v.name = o.shortname and v.id = ".Profile()->vendor_id.")":"");
+        $this->DefaultFilter = ((CurrentUserLevel() == 5) ? "\"operator_id\" = (select o.id from y_vendors v, y_operators o where v.name ILIKE o.shortname and v.id = ".Profile()->vendor_id.")":"");
         AddFilter($where, $this->DefaultFilter);
         return $where;
     }
@@ -713,7 +713,7 @@ class ViewAllBuses extends DbTable
         if ($referUrl != "" && $referPageName != CurrentPageName() && $referPageName != "login") { // Referer not same page or login page
             $_SESSION[$name] = $referUrl; // Save to Session
         }
-        return $_SESSION[$name] ?? GetUrl("viewallbuseslist");
+        return $_SESSION[$name] ?? GetUrl("ViewAllBusesList");
     }
 
     // Set return page URL
@@ -726,11 +726,11 @@ class ViewAllBuses extends DbTable
     public function getModalCaption($pageName)
     {
         global $Language;
-        if ($pageName == "viewallbusesview") {
+        if ($pageName == "ViewAllBusesView") {
             return $Language->phrase("View");
-        } elseif ($pageName == "viewallbusesedit") {
+        } elseif ($pageName == "ViewAllBusesEdit") {
             return $Language->phrase("Edit");
-        } elseif ($pageName == "viewallbusesadd") {
+        } elseif ($pageName == "ViewAllBusesAdd") {
             return $Language->phrase("Add");
         } else {
             return "";
@@ -759,16 +759,16 @@ class ViewAllBuses extends DbTable
     // List URL
     public function getListUrl()
     {
-        return "viewallbuseslist";
+        return "ViewAllBusesList";
     }
 
     // View URL
     public function getViewUrl($parm = "")
     {
         if ($parm != "") {
-            $url = $this->keyUrl("viewallbusesview", $this->getUrlParm($parm));
+            $url = $this->keyUrl("ViewAllBusesView", $this->getUrlParm($parm));
         } else {
-            $url = $this->keyUrl("viewallbusesview", $this->getUrlParm(Config("TABLE_SHOW_DETAIL") . "="));
+            $url = $this->keyUrl("ViewAllBusesView", $this->getUrlParm(Config("TABLE_SHOW_DETAIL") . "="));
         }
         return $this->addMasterUrl($url);
     }
@@ -777,9 +777,9 @@ class ViewAllBuses extends DbTable
     public function getAddUrl($parm = "")
     {
         if ($parm != "") {
-            $url = "viewallbusesadd?" . $this->getUrlParm($parm);
+            $url = "ViewAllBusesAdd?" . $this->getUrlParm($parm);
         } else {
-            $url = "viewallbusesadd";
+            $url = "ViewAllBusesAdd";
         }
         return $this->addMasterUrl($url);
     }
@@ -787,7 +787,7 @@ class ViewAllBuses extends DbTable
     // Edit URL
     public function getEditUrl($parm = "")
     {
-        $url = $this->keyUrl("viewallbusesedit", $this->getUrlParm($parm));
+        $url = $this->keyUrl("ViewAllBusesEdit", $this->getUrlParm($parm));
         return $this->addMasterUrl($url);
     }
 
@@ -801,7 +801,7 @@ class ViewAllBuses extends DbTable
     // Copy URL
     public function getCopyUrl($parm = "")
     {
-        $url = $this->keyUrl("viewallbusesadd", $this->getUrlParm($parm));
+        $url = $this->keyUrl("ViewAllBusesAdd", $this->getUrlParm($parm));
         return $this->addMasterUrl($url);
     }
 
@@ -815,7 +815,7 @@ class ViewAllBuses extends DbTable
     // Delete URL
     public function getDeleteUrl()
     {
-        return $this->keyUrl("viewallbusesdelete", $this->getUrlParm());
+        return $this->keyUrl("ViewAllBusesDelete", $this->getUrlParm());
     }
 
     // Add master url

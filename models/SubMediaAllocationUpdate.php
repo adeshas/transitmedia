@@ -238,7 +238,7 @@ class SubMediaAllocationUpdate extends SubMediaAllocation
                 $pageName = GetPageName($url);
                 if ($pageName != $this->getListUrl()) { // Not List page
                     $row["caption"] = $this->getModalCaption($pageName);
-                    if ($pageName == "submediaallocationview") {
+                    if ($pageName == "SubMediaAllocationView") {
                         $row["view"] = "1";
                     }
                 } else { // List page should not be shown as modal => error
@@ -485,7 +485,7 @@ class SubMediaAllocationUpdate extends SubMediaAllocation
             $this->loadMultiUpdateValues(); // Load initial values to form
         }
         if (count($this->RecKeys) <= 0) {
-            $this->terminate("submediaallocationlist"); // No records selected, return to list
+            $this->terminate("SubMediaAllocationList"); // No records selected, return to list
             return;
         }
         if ($this->isUpdate()) {
@@ -1289,7 +1289,7 @@ class SubMediaAllocationUpdate extends SubMediaAllocation
         global $Breadcrumb, $Language;
         $Breadcrumb = new Breadcrumb("index");
         $url = CurrentUrl();
-        $Breadcrumb->add("list", $this->TableVar, $this->addMasterUrl("submediaallocationlist"), "", $this->TableVar, true);
+        $Breadcrumb->add("list", $this->TableVar, $this->addMasterUrl("SubMediaAllocationList"), "", $this->TableVar, true);
         $pageId = "update";
         $Breadcrumb->add("update", $pageId, $url);
     }

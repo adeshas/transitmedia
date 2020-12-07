@@ -398,7 +398,7 @@ class MainTransactionsDelete extends MainTransactions
         $this->RecKeys = $this->getRecordKeys(); // Load record keys
         $filter = $this->getFilterFromRecordKeys();
         if ($filter == "") {
-            $this->terminate("maintransactionslist"); // Prevent SQL injection, return to list
+            $this->terminate("MainTransactionsList"); // Prevent SQL injection, return to list
             return;
         }
 
@@ -420,7 +420,7 @@ class MainTransactionsDelete extends MainTransactions
             }
         }
         if (!$res) {
-            $this->terminate("maintransactionslist"); // Return to list
+            $this->terminate("MainTransactionsList"); // Return to list
             return;
         }
 
@@ -463,7 +463,7 @@ class MainTransactionsDelete extends MainTransactions
                 if ($this->Recordset) {
                     $this->Recordset->close();
                 }
-                $this->terminate("maintransactionslist"); // Return to list
+                $this->terminate("MainTransactionsList"); // Return to list
                 return;
             }
         }
@@ -655,8 +655,10 @@ class MainTransactionsDelete extends MainTransactions
         $this->price_id->CellCssStyle = "white-space: nowrap;";
 
         // quantity
+        $this->quantity->CellCssStyle = "white-space: nowrap;";
 
         // assigned_buses
+        $this->assigned_buses->CellCssStyle = "white-space: nowrap;";
 
         // start_date
 
@@ -792,6 +794,8 @@ class MainTransactionsDelete extends MainTransactions
             // assigned_buses
             $this->assigned_buses->ViewValue = $this->assigned_buses->CurrentValue;
             $this->assigned_buses->ViewValue = FormatNumber($this->assigned_buses->ViewValue, 0, -2, -2, -2);
+            $this->assigned_buses->CssClass = "font-weight-bold";
+            $this->assigned_buses->CellCssStyle .= "text-align: right;";
             $this->assigned_buses->ViewCustomAttributes = "";
 
             // start_date
@@ -1256,7 +1260,7 @@ class MainTransactionsDelete extends MainTransactions
         global $Breadcrumb, $Language;
         $Breadcrumb = new Breadcrumb("index");
         $url = CurrentUrl();
-        $Breadcrumb->add("list", $this->TableVar, $this->addMasterUrl("maintransactionslist"), "", $this->TableVar, true);
+        $Breadcrumb->add("list", $this->TableVar, $this->addMasterUrl("MainTransactionsList"), "", $this->TableVar, true);
         $pageId = "delete";
         $Breadcrumb->add("delete", $pageId, $url);
     }

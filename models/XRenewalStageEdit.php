@@ -238,7 +238,7 @@ class XRenewalStageEdit extends XRenewalStage
                 $pageName = GetPageName($url);
                 if ($pageName != $this->getListUrl()) { // Not List page
                     $row["caption"] = $this->getModalCaption($pageName);
-                    if ($pageName == "xrenewalstageview") {
+                    if ($pageName == "XRenewalStageView") {
                         $row["view"] = "1";
                     }
                 } else { // List page should not be shown as modal => error
@@ -540,13 +540,13 @@ class XRenewalStageEdit extends XRenewalStage
                     if ($this->getFailureMessage() == "") {
                         $this->setFailureMessage($Language->phrase("NoRecord")); // No record found
                     }
-                    $this->terminate("xrenewalstagelist"); // No matching record, return to list
+                    $this->terminate("XRenewalStageList"); // No matching record, return to list
                     return;
                 }
                 break;
             case "update": // Update
                 $returnUrl = $this->getReturnUrl();
-                if (GetPageName($returnUrl) == "xrenewalstagelist") {
+                if (GetPageName($returnUrl) == "XRenewalStageList") {
                     $returnUrl = $this->addMasterUrl($returnUrl); // List page, return to List page with correct master key if necessary
                 }
                 $this->SendEmail = true; // Send email on update success
@@ -882,7 +882,7 @@ class XRenewalStageEdit extends XRenewalStage
         global $Breadcrumb, $Language;
         $Breadcrumb = new Breadcrumb("index");
         $url = CurrentUrl();
-        $Breadcrumb->add("list", $this->TableVar, $this->addMasterUrl("xrenewalstagelist"), "", $this->TableVar, true);
+        $Breadcrumb->add("list", $this->TableVar, $this->addMasterUrl("XRenewalStageList"), "", $this->TableVar, true);
         $pageId = "edit";
         $Breadcrumb->add("edit", $pageId, $url);
     }

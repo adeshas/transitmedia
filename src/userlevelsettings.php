@@ -518,7 +518,25 @@ $USER_LEVEL_PRIVS = [["{7CA6B0F7-61EF-4DB7-A152-ED7AD2382C98}main_buses","-2","0
     ["{7CA6B0F7-61EF-4DB7-A152-ED7AD2382C98}view_all_buses","4","0"],
     ["{7CA6B0F7-61EF-4DB7-A152-ED7AD2382C98}view_all_buses","5","495"],
     ["{7CA6B0F7-61EF-4DB7-A152-ED7AD2382C98}view_all_buses","6","0"],
-    ["{7CA6B0F7-61EF-4DB7-A152-ED7AD2382C98}view_all_buses","7","0"]];
+    ["{7CA6B0F7-61EF-4DB7-A152-ED7AD2382C98}view_all_buses","7","0"],
+    ["{7CA6B0F7-61EF-4DB7-A152-ED7AD2382C98}download.php","-2","0"],
+    ["{7CA6B0F7-61EF-4DB7-A152-ED7AD2382C98}download.php","0","0"],
+    ["{7CA6B0F7-61EF-4DB7-A152-ED7AD2382C98}download.php","1","8"],
+    ["{7CA6B0F7-61EF-4DB7-A152-ED7AD2382C98}download.php","2","8"],
+    ["{7CA6B0F7-61EF-4DB7-A152-ED7AD2382C98}download.php","3","8"],
+    ["{7CA6B0F7-61EF-4DB7-A152-ED7AD2382C98}download.php","4","0"],
+    ["{7CA6B0F7-61EF-4DB7-A152-ED7AD2382C98}download.php","5","0"],
+    ["{7CA6B0F7-61EF-4DB7-A152-ED7AD2382C98}download.php","6","0"],
+    ["{7CA6B0F7-61EF-4DB7-A152-ED7AD2382C98}download.php","7","0"],
+    ["{7CA6B0F7-61EF-4DB7-A152-ED7AD2382C98}downloadbp.php","-2","0"],
+    ["{7CA6B0F7-61EF-4DB7-A152-ED7AD2382C98}downloadbp.php","0","0"],
+    ["{7CA6B0F7-61EF-4DB7-A152-ED7AD2382C98}downloadbp.php","1","8"],
+    ["{7CA6B0F7-61EF-4DB7-A152-ED7AD2382C98}downloadbp.php","2","8"],
+    ["{7CA6B0F7-61EF-4DB7-A152-ED7AD2382C98}downloadbp.php","3","8"],
+    ["{7CA6B0F7-61EF-4DB7-A152-ED7AD2382C98}downloadbp.php","4","0"],
+    ["{7CA6B0F7-61EF-4DB7-A152-ED7AD2382C98}downloadbp.php","5","0"],
+    ["{7CA6B0F7-61EF-4DB7-A152-ED7AD2382C98}downloadbp.php","6","0"],
+    ["{7CA6B0F7-61EF-4DB7-A152-ED7AD2382C98}downloadbp.php","7","0"]];
 // User level table info
 $USER_LEVEL_TABLES = [["main_buses","main_buses","Buses",true,"{7CA6B0F7-61EF-4DB7-A152-ED7AD2382C98}"],
     ["main_campaigns","main_campaigns","Campaigns",true,"{7CA6B0F7-61EF-4DB7-A152-ED7AD2382C98}"],
@@ -575,4 +593,6 @@ $USER_LEVEL_TABLES = [["main_buses","main_buses","Buses",true,"{7CA6B0F7-61EF-4D
     ["z_price_settings","z_price_settings","Pricing",true,"{7CA6B0F7-61EF-4DB7-A152-ED7AD2382C98}"],
     ["w_vendors_operators","w_vendors_operators","Vendors/Operators",true,"{7CA6B0F7-61EF-4DB7-A152-ED7AD2382C98}"],
     ["safety.sql","safetysql","Safety",true,"{7CA6B0F7-61EF-4DB7-A152-ED7AD2382C98}"],
-    ["view_all_buses","view_all_buses","All Buses",true,"{7CA6B0F7-61EF-4DB7-A152-ED7AD2382C98}"]];
+    ["view_all_buses","view_all_buses","All Buses",true,"{7CA6B0F7-61EF-4DB7-A152-ED7AD2382C98}"],
+    ["download.php","download","Download",true,"{7CA6B0F7-61EF-4DB7-A152-ED7AD2382C98}"],
+    ["downloadbp.php","downloadbp","Download Branders Pass",true,"{7CA6B0F7-61EF-4DB7-A152-ED7AD2382C98}"]];

@@ -238,7 +238,7 @@ class XUserTypesEdit extends XUserTypes
                 $pageName = GetPageName($url);
                 if ($pageName != $this->getListUrl()) { // Not List page
                     $row["caption"] = $this->getModalCaption($pageName);
-                    if ($pageName == "xusertypesview") {
+                    if ($pageName == "XUserTypesView") {
                         $row["view"] = "1";
                     }
                 } else { // List page should not be shown as modal => error
@@ -540,13 +540,13 @@ class XUserTypesEdit extends XUserTypes
                     if ($this->getFailureMessage() == "") {
                         $this->setFailureMessage($Language->phrase("NoRecord")); // No record found
                     }
-                    $this->terminate("xusertypeslist"); // No matching record, return to list
+                    $this->terminate("XUserTypesList"); // No matching record, return to list
                     return;
                 }
                 break;
             case "update": // Update
                 $returnUrl = $this->getReturnUrl();
-                if (GetPageName($returnUrl) == "xusertypeslist") {
+                if (GetPageName($returnUrl) == "XUserTypesList") {
                     $returnUrl = $this->addMasterUrl($returnUrl); // List page, return to List page with correct master key if necessary
                 }
                 $this->SendEmail = true; // Send email on update success
@@ -885,7 +885,7 @@ class XUserTypesEdit extends XUserTypes
         global $Breadcrumb, $Language;
         $Breadcrumb = new Breadcrumb("index");
         $url = CurrentUrl();
-        $Breadcrumb->add("list", $this->TableVar, $this->addMasterUrl("xusertypeslist"), "", $this->TableVar, true);
+        $Breadcrumb->add("list", $this->TableVar, $this->addMasterUrl("XUserTypesList"), "", $this->TableVar, true);
         $pageId = "edit";
         $Breadcrumb->add("edit", $pageId, $url);
     }

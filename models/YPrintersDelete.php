@@ -372,7 +372,7 @@ class YPrintersDelete extends YPrinters
         $this->RecKeys = $this->getRecordKeys(); // Load record keys
         $filter = $this->getFilterFromRecordKeys();
         if ($filter == "") {
-            $this->terminate("yprinterslist"); // Prevent SQL injection, return to list
+            $this->terminate("YPrintersList"); // Prevent SQL injection, return to list
             return;
         }
 
@@ -418,7 +418,7 @@ class YPrintersDelete extends YPrinters
                 if ($this->Recordset) {
                     $this->Recordset->close();
                 }
-                $this->terminate("yprinterslist"); // Return to list
+                $this->terminate("YPrintersList"); // Return to list
                 return;
             }
         }
@@ -681,7 +681,7 @@ class YPrintersDelete extends YPrinters
         global $Breadcrumb, $Language;
         $Breadcrumb = new Breadcrumb("index");
         $url = CurrentUrl();
-        $Breadcrumb->add("list", $this->TableVar, $this->addMasterUrl("yprinterslist"), "", $this->TableVar, true);
+        $Breadcrumb->add("list", $this->TableVar, $this->addMasterUrl("YPrintersList"), "", $this->TableVar, true);
         $pageId = "delete";
         $Breadcrumb->add("delete", $pageId, $url);
     }

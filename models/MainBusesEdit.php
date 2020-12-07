@@ -238,7 +238,7 @@ class MainBusesEdit extends MainBuses
                 $pageName = GetPageName($url);
                 if ($pageName != $this->getListUrl()) { // Not List page
                     $row["caption"] = $this->getModalCaption($pageName);
-                    if ($pageName == "mainbusesview") {
+                    if ($pageName == "MainBusesView") {
                         $row["view"] = "1";
                     }
                 } else { // List page should not be shown as modal => error
@@ -559,7 +559,7 @@ class MainBusesEdit extends MainBuses
                     if ($this->getFailureMessage() == "") {
                         $this->setFailureMessage($Language->phrase("NoRecord")); // No record found
                     }
-                    $this->terminate("mainbuseslist"); // No matching record, return to list
+                    $this->terminate("MainBusesList"); // No matching record, return to list
                     return;
                 }
 
@@ -572,7 +572,7 @@ class MainBusesEdit extends MainBuses
                 } else {
                     $returnUrl = $this->getReturnUrl();
                 }
-                if (GetPageName($returnUrl) == "mainbuseslist") {
+                if (GetPageName($returnUrl) == "MainBusesList") {
                     $returnUrl = $this->addMasterUrl($returnUrl); // List page, return to List page with correct master key if necessary
                 }
                 $this->SendEmail = true; // Send email on update success
@@ -1610,7 +1610,7 @@ class MainBusesEdit extends MainBuses
         global $Breadcrumb, $Language;
         $Breadcrumb = new Breadcrumb("index");
         $url = CurrentUrl();
-        $Breadcrumb->add("list", $this->TableVar, $this->addMasterUrl("mainbuseslist"), "", $this->TableVar, true);
+        $Breadcrumb->add("list", $this->TableVar, $this->addMasterUrl("MainBusesList"), "", $this->TableVar, true);
         $pageId = "edit";
         $Breadcrumb->add("edit", $pageId, $url);
     }

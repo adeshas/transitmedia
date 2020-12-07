@@ -238,7 +238,7 @@ class MainCampaignsEdit extends MainCampaigns
                 $pageName = GetPageName($url);
                 if ($pageName != $this->getListUrl()) { // Not List page
                     $row["caption"] = $this->getModalCaption($pageName);
-                    if ($pageName == "maincampaignsview") {
+                    if ($pageName == "MainCampaignsView") {
                         $row["view"] = "1";
                     }
                 } else { // List page should not be shown as modal => error
@@ -565,7 +565,7 @@ class MainCampaignsEdit extends MainCampaigns
                     if ($this->getFailureMessage() == "") {
                         $this->setFailureMessage($Language->phrase("NoRecord")); // No record found
                     }
-                    $this->terminate("maincampaignslist"); // No matching record, return to list
+                    $this->terminate("MainCampaignsList"); // No matching record, return to list
                     return;
                 }
 
@@ -578,7 +578,7 @@ class MainCampaignsEdit extends MainCampaigns
                 } else {
                     $returnUrl = $this->getReturnUrl();
                 }
-                if (GetPageName($returnUrl) == "maincampaignslist") {
+                if (GetPageName($returnUrl) == "MainCampaignsList") {
                     $returnUrl = $this->addMasterUrl($returnUrl); // List page, return to List page with correct master key if necessary
                 }
                 $this->SendEmail = true; // Send email on update success
@@ -2013,7 +2013,7 @@ class MainCampaignsEdit extends MainCampaigns
         global $Breadcrumb, $Language;
         $Breadcrumb = new Breadcrumb("index");
         $url = CurrentUrl();
-        $Breadcrumb->add("list", $this->TableVar, $this->addMasterUrl("maincampaignslist"), "", $this->TableVar, true);
+        $Breadcrumb->add("list", $this->TableVar, $this->addMasterUrl("MainCampaignsList"), "", $this->TableVar, true);
         $pageId = "edit";
         $Breadcrumb->add("edit", $pageId, $url);
     }

@@ -620,7 +620,7 @@ class ViewBusTransOptions extends DbTable
         if ($referUrl != "" && $referPageName != CurrentPageName() && $referPageName != "login") { // Referer not same page or login page
             $_SESSION[$name] = $referUrl; // Save to Session
         }
-        return $_SESSION[$name] ?? GetUrl("viewbustransoptionslist");
+        return $_SESSION[$name] ?? GetUrl("ViewBusTransOptionsList");
     }
 
     // Set return page URL
@@ -633,11 +633,11 @@ class ViewBusTransOptions extends DbTable
     public function getModalCaption($pageName)
     {
         global $Language;
-        if ($pageName == "viewbustransoptionsview") {
+        if ($pageName == "ViewBusTransOptionsView") {
             return $Language->phrase("View");
-        } elseif ($pageName == "viewbustransoptionsedit") {
+        } elseif ($pageName == "ViewBusTransOptionsEdit") {
             return $Language->phrase("Edit");
-        } elseif ($pageName == "viewbustransoptionsadd") {
+        } elseif ($pageName == "ViewBusTransOptionsAdd") {
             return $Language->phrase("Add");
         } else {
             return "";
@@ -666,16 +666,16 @@ class ViewBusTransOptions extends DbTable
     // List URL
     public function getListUrl()
     {
-        return "viewbustransoptionslist";
+        return "ViewBusTransOptionsList";
     }
 
     // View URL
     public function getViewUrl($parm = "")
     {
         if ($parm != "") {
-            $url = $this->keyUrl("viewbustransoptionsview", $this->getUrlParm($parm));
+            $url = $this->keyUrl("ViewBusTransOptionsView", $this->getUrlParm($parm));
         } else {
-            $url = $this->keyUrl("viewbustransoptionsview", $this->getUrlParm(Config("TABLE_SHOW_DETAIL") . "="));
+            $url = $this->keyUrl("ViewBusTransOptionsView", $this->getUrlParm(Config("TABLE_SHOW_DETAIL") . "="));
         }
         return $this->addMasterUrl($url);
     }
@@ -684,9 +684,9 @@ class ViewBusTransOptions extends DbTable
     public function getAddUrl($parm = "")
     {
         if ($parm != "") {
-            $url = "viewbustransoptionsadd?" . $this->getUrlParm($parm);
+            $url = "ViewBusTransOptionsAdd?" . $this->getUrlParm($parm);
         } else {
-            $url = "viewbustransoptionsadd";
+            $url = "ViewBusTransOptionsAdd";
         }
         return $this->addMasterUrl($url);
     }
@@ -694,7 +694,7 @@ class ViewBusTransOptions extends DbTable
     // Edit URL
     public function getEditUrl($parm = "")
     {
-        $url = $this->keyUrl("viewbustransoptionsedit", $this->getUrlParm($parm));
+        $url = $this->keyUrl("ViewBusTransOptionsEdit", $this->getUrlParm($parm));
         return $this->addMasterUrl($url);
     }
 
@@ -708,7 +708,7 @@ class ViewBusTransOptions extends DbTable
     // Copy URL
     public function getCopyUrl($parm = "")
     {
-        $url = $this->keyUrl("viewbustransoptionsadd", $this->getUrlParm($parm));
+        $url = $this->keyUrl("ViewBusTransOptionsAdd", $this->getUrlParm($parm));
         return $this->addMasterUrl($url);
     }
 
@@ -722,7 +722,7 @@ class ViewBusTransOptions extends DbTable
     // Delete URL
     public function getDeleteUrl()
     {
-        return $this->keyUrl("viewbustransoptionsdelete", $this->getUrlParm());
+        return $this->keyUrl("ViewBusTransOptionsDelete", $this->getUrlParm());
     }
 
     // Add master url

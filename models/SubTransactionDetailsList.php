@@ -182,12 +182,12 @@ class SubTransactionDetailsList extends SubTransactionDetails
         $this->ExportHtmlUrl = $pageUrl . "export=html";
         $this->ExportXmlUrl = $pageUrl . "export=xml";
         $this->ExportCsvUrl = $pageUrl . "export=csv";
-        $this->AddUrl = "subtransactiondetailsadd";
+        $this->AddUrl = "SubTransactionDetailsAdd";
         $this->InlineAddUrl = $pageUrl . "action=add";
         $this->GridAddUrl = $pageUrl . "action=gridadd";
         $this->GridEditUrl = $pageUrl . "action=gridedit";
-        $this->MultiDeleteUrl = "subtransactiondetailsdelete";
-        $this->MultiUpdateUrl = "subtransactiondetailsupdate";
+        $this->MultiDeleteUrl = "SubTransactionDetailsDelete";
+        $this->MultiUpdateUrl = "SubTransactionDetailsUpdate";
 
         // Table name (for backward compatibility only)
         if (!defined(PROJECT_NAMESPACE . "TABLE_NAME")) {
@@ -859,7 +859,7 @@ class SubTransactionDetailsList extends SubTransactionDetails
             $this->MasterRecordExists = $rsmaster !== false;
             if (!$this->MasterRecordExists) {
                 $this->setFailureMessage($Language->phrase("NoRecord")); // Set no record found
-                $this->terminate("maintransactionslist"); // Return to master page
+                $this->terminate("MainTransactionsList"); // Return to master page
                 return;
             } else {
                 $masterTbl->loadListRowValues($rsmaster);

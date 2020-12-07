@@ -231,7 +231,7 @@ class MainBuses extends DbTable
             $detailUrl .= "&" . GetForeignKeyUrl("fk_id", $this->id->CurrentValue);
         }
         if ($detailUrl == "") {
-            $detailUrl = "mainbuseslist";
+            $detailUrl = "MainBusesList";
         }
         return $detailUrl;
     }
@@ -689,7 +689,7 @@ class MainBuses extends DbTable
         if ($referUrl != "" && $referPageName != CurrentPageName() && $referPageName != "login") { // Referer not same page or login page
             $_SESSION[$name] = $referUrl; // Save to Session
         }
-        return $_SESSION[$name] ?? GetUrl("mainbuseslist");
+        return $_SESSION[$name] ?? GetUrl("MainBusesList");
     }
 
     // Set return page URL
@@ -702,11 +702,11 @@ class MainBuses extends DbTable
     public function getModalCaption($pageName)
     {
         global $Language;
-        if ($pageName == "mainbusesview") {
+        if ($pageName == "MainBusesView") {
             return $Language->phrase("View");
-        } elseif ($pageName == "mainbusesedit") {
+        } elseif ($pageName == "MainBusesEdit") {
             return $Language->phrase("Edit");
-        } elseif ($pageName == "mainbusesadd") {
+        } elseif ($pageName == "MainBusesAdd") {
             return $Language->phrase("Add");
         } else {
             return "";
@@ -735,16 +735,16 @@ class MainBuses extends DbTable
     // List URL
     public function getListUrl()
     {
-        return "mainbuseslist";
+        return "MainBusesList";
     }
 
     // View URL
     public function getViewUrl($parm = "")
     {
         if ($parm != "") {
-            $url = $this->keyUrl("mainbusesview", $this->getUrlParm($parm));
+            $url = $this->keyUrl("MainBusesView", $this->getUrlParm($parm));
         } else {
-            $url = $this->keyUrl("mainbusesview", $this->getUrlParm(Config("TABLE_SHOW_DETAIL") . "="));
+            $url = $this->keyUrl("MainBusesView", $this->getUrlParm(Config("TABLE_SHOW_DETAIL") . "="));
         }
         return $this->addMasterUrl($url);
     }
@@ -753,9 +753,9 @@ class MainBuses extends DbTable
     public function getAddUrl($parm = "")
     {
         if ($parm != "") {
-            $url = "mainbusesadd?" . $this->getUrlParm($parm);
+            $url = "MainBusesAdd?" . $this->getUrlParm($parm);
         } else {
-            $url = "mainbusesadd";
+            $url = "MainBusesAdd";
         }
         return $this->addMasterUrl($url);
     }
@@ -764,9 +764,9 @@ class MainBuses extends DbTable
     public function getEditUrl($parm = "")
     {
         if ($parm != "") {
-            $url = $this->keyUrl("mainbusesedit", $this->getUrlParm($parm));
+            $url = $this->keyUrl("MainBusesEdit", $this->getUrlParm($parm));
         } else {
-            $url = $this->keyUrl("mainbusesedit", $this->getUrlParm(Config("TABLE_SHOW_DETAIL") . "="));
+            $url = $this->keyUrl("MainBusesEdit", $this->getUrlParm(Config("TABLE_SHOW_DETAIL") . "="));
         }
         return $this->addMasterUrl($url);
     }
@@ -782,9 +782,9 @@ class MainBuses extends DbTable
     public function getCopyUrl($parm = "")
     {
         if ($parm != "") {
-            $url = $this->keyUrl("mainbusesadd", $this->getUrlParm($parm));
+            $url = $this->keyUrl("MainBusesAdd", $this->getUrlParm($parm));
         } else {
-            $url = $this->keyUrl("mainbusesadd", $this->getUrlParm(Config("TABLE_SHOW_DETAIL") . "="));
+            $url = $this->keyUrl("MainBusesAdd", $this->getUrlParm(Config("TABLE_SHOW_DETAIL") . "="));
         }
         return $this->addMasterUrl($url);
     }
@@ -799,7 +799,7 @@ class MainBuses extends DbTable
     // Delete URL
     public function getDeleteUrl()
     {
-        return $this->keyUrl("mainbusesdelete", $this->getUrlParm());
+        return $this->keyUrl("MainBusesDelete", $this->getUrlParm());
     }
 
     // Add master url

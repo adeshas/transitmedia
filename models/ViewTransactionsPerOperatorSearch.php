@@ -238,7 +238,7 @@ class ViewTransactionsPerOperatorSearch extends ViewTransactionsPerOperator
                 $pageName = GetPageName($url);
                 if ($pageName != $this->getListUrl()) { // Not List page
                     $row["caption"] = $this->getModalCaption($pageName);
-                    if ($pageName == "viewtransactionsperoperatorview") {
+                    if ($pageName == "ViewTransactionsPerOperatorView") {
                         $row["view"] = "1";
                     }
                 } else { // List page should not be shown as modal => error
@@ -449,6 +449,7 @@ class ViewTransactionsPerOperatorSearch extends ViewTransactionsPerOperator
         $this->bus_size_id->setVisibility();
         $this->vendor_search_id->setVisibility();
         $this->vendor_search_name->setVisibility();
+        $this->download->setVisibility();
         $this->hideFieldsForAddEdit();
 
         // Do not use lookup cache
@@ -485,7 +486,7 @@ class ViewTransactionsPerOperatorSearch extends ViewTransactionsPerOperator
                 }
                 if ($srchStr != "") {
                     $srchStr = $this->getUrlParm($srchStr);
-                    $srchStr = "viewtransactionsperoperatorlist" . "?" . $srchStr;
+                    $srchStr = "ViewTransactionsPerOperatorList" . "?" . $srchStr;
                     $this->terminate($srchStr); // Go to list page
                     return;
                 }
@@ -550,6 +551,7 @@ class ViewTransactionsPerOperatorSearch extends ViewTransactionsPerOperator
         $this->buildSearchUrl($srchUrl, $this->bus_size_id); // bus_size_id
         $this->buildSearchUrl($srchUrl, $this->vendor_search_id); // vendor_search_id
         $this->buildSearchUrl($srchUrl, $this->vendor_search_name); // vendor_search_name
+        $this->buildSearchUrl($srchUrl, $this->download); // download
         if ($srchUrl != "") {
             $srchUrl .= "&";
         }
@@ -699,6 +701,9 @@ class ViewTransactionsPerOperatorSearch extends ViewTransactionsPerOperator
         if ($this->vendor_search_name->AdvancedSearch->post()) {
             $hasValue = true;
         }
+        if ($this->download->AdvancedSearch->post()) {
+            $hasValue = true;
+        }
         return $hasValue;
     }
 
@@ -759,6 +764,8 @@ class ViewTransactionsPerOperatorSearch extends ViewTransactionsPerOperator
         // vendor_search_id
 
         // vendor_search_name
+
+        // download
         if ($this->RowType == ROWTYPE_VIEW) {
             // transaction_id
             $this->transaction_id->ViewValue = $this->transaction_id->CurrentValue;
@@ -871,6 +878,10 @@ class ViewTransactionsPerOperatorSearch extends ViewTransactionsPerOperator
             // vendor_search_name
             $this->vendor_search_name->ViewValue = $this->vendor_search_name->CurrentValue;
             $this->vendor_search_name->ViewCustomAttributes = "";
+
+            // download
+            $this->download->ViewValue = $this->download->CurrentValue;
+            $this->download->ViewCustomAttributes = "";
 
             // transaction_id
             $this->transaction_id->LinkCustomAttributes = "";
@@ -995,6 +1006,19 @@ class ViewTransactionsPerOperatorSearch extends ViewTransactionsPerOperator
             $this->vendor_search_name->LinkCustomAttributes = "";
             $this->vendor_search_name->HrefValue = "";
             $this->vendor_search_name->TooltipValue = "";
+
+            // download
+            $this->download->LinkCustomAttributes = "class='btn btn-block btn-info'";
+            if (!EmptyValue($this->transaction_id->CurrentValue)) {
+                $this->download->HrefValue = "download.php?v=v3.2&id=" . $this->transaction_id->CurrentValue; // Add prefix/suffix
+                $this->download->LinkAttrs["target"] = "_blank"; // Add target
+                if ($this->isExport()) {
+                    $this->download->HrefValue = FullUrl($this->download->HrefValue, "href");
+                }
+            } else {
+                $this->download->HrefValue = "";
+            }
+            $this->download->TooltipValue = "";
         } elseif ($this->RowType == ROWTYPE_SEARCH) {
             // transaction_id
             $this->transaction_id->EditAttrs["class"] = "form-control";
@@ -1151,6 +1175,12 @@ class ViewTransactionsPerOperatorSearch extends ViewTransactionsPerOperator
             }
             $this->vendor_search_name->EditValue = HtmlEncode($this->vendor_search_name->AdvancedSearch->SearchValue);
             $this->vendor_search_name->PlaceHolder = RemoveHtml($this->vendor_search_name->caption());
+
+            // download
+            $this->download->EditAttrs["class"] = "form-control";
+            $this->download->EditCustomAttributes = "";
+            $this->download->EditValue = HtmlEncode($this->download->AdvancedSearch->SearchValue);
+            $this->download->PlaceHolder = RemoveHtml($this->download->caption());
         }
         if ($this->RowType == ROWTYPE_ADD || $this->RowType == ROWTYPE_EDIT || $this->RowType == ROWTYPE_SEARCH) { // Add/Edit/Search row
             $this->setupFieldTitles();
@@ -1250,6 +1280,7 @@ class ViewTransactionsPerOperatorSearch extends ViewTransactionsPerOperator
         $this->bus_size_id->AdvancedSearch->load();
         $this->vendor_search_id->AdvancedSearch->load();
         $this->vendor_search_name->AdvancedSearch->load();
+        $this->download->AdvancedSearch->load();
     }
 
     // Set up Breadcrumb
@@ -1258,7 +1289,7 @@ class ViewTransactionsPerOperatorSearch extends ViewTransactionsPerOperator
         global $Breadcrumb, $Language;
         $Breadcrumb = new Breadcrumb("index");
         $url = CurrentUrl();
-        $Breadcrumb->add("list", $this->TableVar, $this->addMasterUrl("viewtransactionsperoperatorlist"), "", $this->TableVar, true);
+        $Breadcrumb->add("list", $this->TableVar, $this->addMasterUrl("ViewTransactionsPerOperatorList"), "", $this->TableVar, true);
         $pageId = "search";
         $Breadcrumb->add("search", $pageId, $url);
     }

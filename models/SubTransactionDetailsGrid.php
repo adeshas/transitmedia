@@ -153,7 +153,7 @@ class SubTransactionDetailsGrid extends SubTransactionDetails
 
         // Page URL
         $pageUrl = $this->pageUrl();
-        $this->AddUrl = "subtransactiondetailsadd";
+        $this->AddUrl = "SubTransactionDetailsAdd";
 
         // Table name (for backward compatibility only)
         if (!defined(PROJECT_NAMESPACE . "TABLE_NAME")) {
@@ -582,7 +582,7 @@ class SubTransactionDetailsGrid extends SubTransactionDetails
             $this->MasterRecordExists = $rsmaster !== false;
             if (!$this->MasterRecordExists) {
                 $this->setFailureMessage($Language->phrase("NoRecord")); // Set no record found
-                $this->terminate("maintransactionslist"); // Return to master page
+                $this->terminate("MainTransactionsList"); // Return to master page
                 return;
             } else {
                 $masterTbl->loadListRowValues($rsmaster);

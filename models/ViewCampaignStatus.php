@@ -574,7 +574,7 @@ class ViewCampaignStatus extends DbTable
         if ($referUrl != "" && $referPageName != CurrentPageName() && $referPageName != "login") { // Referer not same page or login page
             $_SESSION[$name] = $referUrl; // Save to Session
         }
-        return $_SESSION[$name] ?? GetUrl("viewcampaignstatuslist");
+        return $_SESSION[$name] ?? GetUrl("ViewCampaignStatusList");
     }
 
     // Set return page URL
@@ -587,11 +587,11 @@ class ViewCampaignStatus extends DbTable
     public function getModalCaption($pageName)
     {
         global $Language;
-        if ($pageName == "viewcampaignstatusview") {
+        if ($pageName == "ViewCampaignStatusView") {
             return $Language->phrase("View");
-        } elseif ($pageName == "viewcampaignstatusedit") {
+        } elseif ($pageName == "ViewCampaignStatusEdit") {
             return $Language->phrase("Edit");
-        } elseif ($pageName == "viewcampaignstatusadd") {
+        } elseif ($pageName == "ViewCampaignStatusAdd") {
             return $Language->phrase("Add");
         } else {
             return "";
@@ -620,16 +620,16 @@ class ViewCampaignStatus extends DbTable
     // List URL
     public function getListUrl()
     {
-        return "viewcampaignstatuslist";
+        return "ViewCampaignStatusList";
     }
 
     // View URL
     public function getViewUrl($parm = "")
     {
         if ($parm != "") {
-            $url = $this->keyUrl("viewcampaignstatusview", $this->getUrlParm($parm));
+            $url = $this->keyUrl("ViewCampaignStatusView", $this->getUrlParm($parm));
         } else {
-            $url = $this->keyUrl("viewcampaignstatusview", $this->getUrlParm(Config("TABLE_SHOW_DETAIL") . "="));
+            $url = $this->keyUrl("ViewCampaignStatusView", $this->getUrlParm(Config("TABLE_SHOW_DETAIL") . "="));
         }
         return $this->addMasterUrl($url);
     }
@@ -638,9 +638,9 @@ class ViewCampaignStatus extends DbTable
     public function getAddUrl($parm = "")
     {
         if ($parm != "") {
-            $url = "viewcampaignstatusadd?" . $this->getUrlParm($parm);
+            $url = "ViewCampaignStatusAdd?" . $this->getUrlParm($parm);
         } else {
-            $url = "viewcampaignstatusadd";
+            $url = "ViewCampaignStatusAdd";
         }
         return $this->addMasterUrl($url);
     }
@@ -648,7 +648,7 @@ class ViewCampaignStatus extends DbTable
     // Edit URL
     public function getEditUrl($parm = "")
     {
-        $url = $this->keyUrl("viewcampaignstatusedit", $this->getUrlParm($parm));
+        $url = $this->keyUrl("ViewCampaignStatusEdit", $this->getUrlParm($parm));
         return $this->addMasterUrl($url);
     }
 
@@ -662,7 +662,7 @@ class ViewCampaignStatus extends DbTable
     // Copy URL
     public function getCopyUrl($parm = "")
     {
-        $url = $this->keyUrl("viewcampaignstatusadd", $this->getUrlParm($parm));
+        $url = $this->keyUrl("ViewCampaignStatusAdd", $this->getUrlParm($parm));
         return $this->addMasterUrl($url);
     }
 
@@ -676,7 +676,7 @@ class ViewCampaignStatus extends DbTable
     // Delete URL
     public function getDeleteUrl()
     {
-        return $this->keyUrl("viewcampaignstatusdelete", $this->getUrlParm());
+        return $this->keyUrl("ViewCampaignStatusDelete", $this->getUrlParm());
     }
 
     // Add master url

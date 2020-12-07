@@ -38,7 +38,8 @@ loadjs.ready("head", function () {
         ["transaction_status", [], fields.transaction_status.isInvalid],
         ["quantity", [ew.Validators.integer], fields.quantity.isInvalid],
         ["operator_fee", [], fields.operator_fee.isInvalid],
-        ["total", [], fields.total.isInvalid]
+        ["total", [], fields.total.isInvalid],
+        ["download", [], fields.download.isInvalid]
     ]);
 
     // Set invalid fields
@@ -354,6 +355,9 @@ $Page->ListOptions->render("header", "left");
 <?php if ($Page->total->Visible) { // total ?>
         <th data-name="total" class="<?= $Page->total->headerCellClass() ?>" style="white-space: nowrap;"><div id="elh_view_transactions_per_operator_total" class="view_transactions_per_operator_total"><?= $Page->renderSort($Page->total) ?></div></th>
 <?php } ?>
+<?php if ($Page->download->Visible) { // download ?>
+        <th data-name="download" class="<?= $Page->download->headerCellClass() ?>" style="white-space: nowrap;"><div id="elh_view_transactions_per_operator_download" class="view_transactions_per_operator_download"><?= $Page->renderSort($Page->download) ?></div></th>
+<?php } ?>
 <?php
 // Render list options (header, right)
 $Page->ListOptions->render("header", "right");
@@ -524,6 +528,19 @@ $Page->ListOptions->render("body", "left", $Page->RowCount);
 </span>
 </td>
     <?php } ?>
+    <?php if ($Page->download->Visible) { // download ?>
+        <td data-name="download" <?= $Page->download->cellAttributes() ?>>
+<span id="el<?= $Page->RowCount ?>_view_transactions_per_operator_download">
+<span<?= $Page->download->viewAttributes() ?>>
+<?php if (!EmptyString($Page->download->getViewValue()) && $Page->download->linkAttributes() != "") { ?>
+<a<?= $Page->download->linkAttributes() ?>><?= $Page->download->getViewValue() ?></a>
+<?php } else { ?>
+<?= $Page->download->getViewValue() ?>
+<?php } ?>
+</span>
+</span>
+</td>
+    <?php } ?>
 <?php
 // Render list options (body, right)
 $Page->ListOptions->render("body", "right", $Page->RowCount);
@@ -614,6 +631,11 @@ $Page->ListOptions->render("footer", "left");
         <td data-name="total" class="<?= $Page->total->footerCellClass() ?>"><span id="elf_view_transactions_per_operator_total" class="view_transactions_per_operator_total">
         <span class="ew-aggregate"><?= $Language->phrase("TOTAL") ?></span><span class="ew-aggregate-value">
         <?= $Page->total->ViewValue ?></span>
+        </span></td>
+    <?php } ?>
+    <?php if ($Page->download->Visible) { // download ?>
+        <td data-name="download" class="<?= $Page->download->footerCellClass() ?>"><span id="elf_view_transactions_per_operator_download" class="view_transactions_per_operator_download">
+        &nbsp;
         </span></td>
     <?php } ?>
 <?php

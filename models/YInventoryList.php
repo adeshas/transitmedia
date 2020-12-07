@@ -182,12 +182,12 @@ class YInventoryList extends YInventory
         $this->ExportHtmlUrl = $pageUrl . "export=html";
         $this->ExportXmlUrl = $pageUrl . "export=xml";
         $this->ExportCsvUrl = $pageUrl . "export=csv";
-        $this->AddUrl = "yinventoryadd";
+        $this->AddUrl = "YInventoryAdd";
         $this->InlineAddUrl = $pageUrl . "action=add";
         $this->GridAddUrl = $pageUrl . "action=gridadd";
         $this->GridEditUrl = $pageUrl . "action=gridedit";
-        $this->MultiDeleteUrl = "yinventorydelete";
-        $this->MultiUpdateUrl = "yinventoryupdate";
+        $this->MultiDeleteUrl = "YInventoryDelete";
+        $this->MultiUpdateUrl = "YInventoryUpdate";
 
         // Table name (for backward compatibility only)
         if (!defined(PROJECT_NAMESPACE . "TABLE_NAME")) {

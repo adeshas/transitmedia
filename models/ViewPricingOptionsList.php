@@ -182,12 +182,12 @@ class ViewPricingOptionsList extends ViewPricingOptions
         $this->ExportHtmlUrl = $pageUrl . "export=html";
         $this->ExportXmlUrl = $pageUrl . "export=xml";
         $this->ExportCsvUrl = $pageUrl . "export=csv";
-        $this->AddUrl = "viewpricingoptionsadd";
+        $this->AddUrl = "ViewPricingOptionsAdd";
         $this->InlineAddUrl = $pageUrl . "action=add";
         $this->GridAddUrl = $pageUrl . "action=gridadd";
         $this->GridEditUrl = $pageUrl . "action=gridedit";
-        $this->MultiDeleteUrl = "viewpricingoptionsdelete";
-        $this->MultiUpdateUrl = "viewpricingoptionsupdate";
+        $this->MultiDeleteUrl = "ViewPricingOptionsDelete";
+        $this->MultiUpdateUrl = "ViewPricingOptionsUpdate";
 
         // Table name (for backward compatibility only)
         if (!defined(PROJECT_NAMESPACE . "TABLE_NAME")) {

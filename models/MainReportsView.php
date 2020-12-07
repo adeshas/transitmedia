@@ -293,7 +293,7 @@ class MainReportsView extends MainReports
                 $pageName = GetPageName($url);
                 if ($pageName != $this->getListUrl()) { // Not List page
                     $row["caption"] = $this->getModalCaption($pageName);
-                    if ($pageName == "mainreportsview") {
+                    if ($pageName == "MainReportsView") {
                         $row["view"] = "1";
                     }
                 } else { // List page should not be shown as modal => error
@@ -539,7 +539,7 @@ class MainReportsView extends MainReports
                 $this->id->setQueryStringValue($keyValue);
                 $this->RecKey["id"] = $this->id->QueryStringValue;
             } else {
-                $returnUrl = "mainreportslist"; // Return to list
+                $returnUrl = "MainReportsList"; // Return to list
             }
 
             // Get action
@@ -562,12 +562,12 @@ class MainReportsView extends MainReports
                         if ($this->getSuccessMessage() == "" && $this->getFailureMessage() == "") {
                             $this->setFailureMessage($Language->phrase("NoRecord")); // Set no record message
                         }
-                        $returnUrl = "mainreportslist"; // No matching record, return to list
+                        $returnUrl = "MainReportsList"; // No matching record, return to list
                     }
                     break;
             }
         } else {
-            $returnUrl = "mainreportslist"; // Not page request, return to list
+            $returnUrl = "MainReportsList"; // Not page request, return to list
         }
         if ($returnUrl != "") {
             $this->terminate($returnUrl);
@@ -967,7 +967,7 @@ class MainReportsView extends MainReports
         global $Breadcrumb, $Language;
         $Breadcrumb = new Breadcrumb("index");
         $url = CurrentUrl();
-        $Breadcrumb->add("list", $this->TableVar, $this->addMasterUrl("mainreportslist"), "", $this->TableVar, true);
+        $Breadcrumb->add("list", $this->TableVar, $this->addMasterUrl("MainReportsList"), "", $this->TableVar, true);
         $pageId = "view";
         $Breadcrumb->add("view", $pageId, $url);
     }

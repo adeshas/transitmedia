@@ -238,7 +238,7 @@ class XUserTypesAdd extends XUserTypes
                 $pageName = GetPageName($url);
                 if ($pageName != $this->getListUrl()) { // Not List page
                     $row["caption"] = $this->getModalCaption($pageName);
-                    if ($pageName == "xusertypesview") {
+                    if ($pageName == "XUserTypesView") {
                         $row["view"] = "1";
                     }
                 } else { // List page should not be shown as modal => error
@@ -512,7 +512,7 @@ class XUserTypesAdd extends XUserTypes
                     if ($this->getFailureMessage() == "") {
                         $this->setFailureMessage($Language->phrase("NoRecord")); // No record found
                     }
-                    $this->terminate("xusertypeslist"); // No matching record, return to list
+                    $this->terminate("XUserTypesList"); // No matching record, return to list
                     return;
                 }
                 break;
@@ -523,9 +523,9 @@ class XUserTypesAdd extends XUserTypes
                         $this->setSuccessMessage($Language->phrase("AddSuccess")); // Set up success message
                     }
                     $returnUrl = $this->getReturnUrl();
-                    if (GetPageName($returnUrl) == "xusertypeslist") {
+                    if (GetPageName($returnUrl) == "XUserTypesList") {
                         $returnUrl = $this->addMasterUrl($returnUrl); // List page, return to List page with correct master key if necessary
-                    } elseif (GetPageName($returnUrl) == "xusertypesview") {
+                    } elseif (GetPageName($returnUrl) == "XUserTypesView") {
                         $returnUrl = $this->getViewUrl(); // View page, return to View page with keyurl directly
                     }
                     if (IsApi()) { // Return to caller
@@ -831,7 +831,7 @@ class XUserTypesAdd extends XUserTypes
         global $Breadcrumb, $Language;
         $Breadcrumb = new Breadcrumb("index");
         $url = CurrentUrl();
-        $Breadcrumb->add("list", $this->TableVar, $this->addMasterUrl("xusertypeslist"), "", $this->TableVar, true);
+        $Breadcrumb->add("list", $this->TableVar, $this->addMasterUrl("XUserTypesList"), "", $this->TableVar, true);
         $pageId = ($this->isCopy()) ? "Copy" : "Add";
         $Breadcrumb->add("add", $pageId, $url);
     }

@@ -182,12 +182,12 @@ class ViewBusSummaryList extends ViewBusSummary
         $this->ExportHtmlUrl = $pageUrl . "export=html";
         $this->ExportXmlUrl = $pageUrl . "export=xml";
         $this->ExportCsvUrl = $pageUrl . "export=csv";
-        $this->AddUrl = "viewbussummaryadd";
+        $this->AddUrl = "ViewBusSummaryAdd";
         $this->InlineAddUrl = $pageUrl . "action=add";
         $this->GridAddUrl = $pageUrl . "action=gridadd";
         $this->GridEditUrl = $pageUrl . "action=gridedit";
-        $this->MultiDeleteUrl = "viewbussummarydelete";
-        $this->MultiUpdateUrl = "viewbussummaryupdate";
+        $this->MultiDeleteUrl = "ViewBusSummaryDelete";
+        $this->MultiUpdateUrl = "ViewBusSummaryUpdate";
 
         // Table name (for backward compatibility only)
         if (!defined(PROJECT_NAMESPACE . "TABLE_NAME")) {

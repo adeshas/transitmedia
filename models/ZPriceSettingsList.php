@@ -182,12 +182,12 @@ class ZPriceSettingsList extends ZPriceSettings
         $this->ExportHtmlUrl = $pageUrl . "export=html";
         $this->ExportXmlUrl = $pageUrl . "export=xml";
         $this->ExportCsvUrl = $pageUrl . "export=csv";
-        $this->AddUrl = "zpricesettingsadd";
+        $this->AddUrl = "ZPriceSettingsAdd";
         $this->InlineAddUrl = $pageUrl . "action=add";
         $this->GridAddUrl = $pageUrl . "action=gridadd";
         $this->GridEditUrl = $pageUrl . "action=gridedit";
-        $this->MultiDeleteUrl = "zpricesettingsdelete";
-        $this->MultiUpdateUrl = "zpricesettingsupdate";
+        $this->MultiDeleteUrl = "ZPriceSettingsDelete";
+        $this->MultiUpdateUrl = "ZPriceSettingsUpdate";
 
         // Table name (for backward compatibility only)
         if (!defined(PROJECT_NAMESPACE . "TABLE_NAME")) {

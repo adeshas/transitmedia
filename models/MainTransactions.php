@@ -390,7 +390,7 @@ class MainTransactions extends DbTable
             $detailUrl .= "&" . GetForeignKeyUrl("fk_id", $this->id->CurrentValue);
         }
         if ($detailUrl == "") {
-            $detailUrl = "maintransactionslist";
+            $detailUrl = "MainTransactionsList";
         }
         return $detailUrl;
     }
@@ -1007,7 +1007,7 @@ class MainTransactions extends DbTable
         if ($referUrl != "" && $referPageName != CurrentPageName() && $referPageName != "login") { // Referer not same page or login page
             $_SESSION[$name] = $referUrl; // Save to Session
         }
-        return $_SESSION[$name] ?? GetUrl("maintransactionslist");
+        return $_SESSION[$name] ?? GetUrl("MainTransactionsList");
     }
 
     // Set return page URL
@@ -1020,11 +1020,11 @@ class MainTransactions extends DbTable
     public function getModalCaption($pageName)
     {
         global $Language;
-        if ($pageName == "maintransactionsview") {
+        if ($pageName == "MainTransactionsView") {
             return $Language->phrase("View");
-        } elseif ($pageName == "maintransactionsedit") {
+        } elseif ($pageName == "MainTransactionsEdit") {
             return $Language->phrase("Edit");
-        } elseif ($pageName == "maintransactionsadd") {
+        } elseif ($pageName == "MainTransactionsAdd") {
             return $Language->phrase("Add");
         } else {
             return "";
@@ -1053,16 +1053,16 @@ class MainTransactions extends DbTable
     // List URL
     public function getListUrl()
     {
-        return "maintransactionslist";
+        return "MainTransactionsList";
     }
 
     // View URL
     public function getViewUrl($parm = "")
     {
         if ($parm != "") {
-            $url = $this->keyUrl("maintransactionsview", $this->getUrlParm($parm));
+            $url = $this->keyUrl("MainTransactionsView", $this->getUrlParm($parm));
         } else {
-            $url = $this->keyUrl("maintransactionsview", $this->getUrlParm(Config("TABLE_SHOW_DETAIL") . "="));
+            $url = $this->keyUrl("MainTransactionsView", $this->getUrlParm(Config("TABLE_SHOW_DETAIL") . "="));
         }
         return $this->addMasterUrl($url);
     }
@@ -1071,9 +1071,9 @@ class MainTransactions extends DbTable
     public function getAddUrl($parm = "")
     {
         if ($parm != "") {
-            $url = "maintransactionsadd?" . $this->getUrlParm($parm);
+            $url = "MainTransactionsAdd?" . $this->getUrlParm($parm);
         } else {
-            $url = "maintransactionsadd";
+            $url = "MainTransactionsAdd";
         }
         return $this->addMasterUrl($url);
     }
@@ -1082,9 +1082,9 @@ class MainTransactions extends DbTable
     public function getEditUrl($parm = "")
     {
         if ($parm != "") {
-            $url = $this->keyUrl("maintransactionsedit", $this->getUrlParm($parm));
+            $url = $this->keyUrl("MainTransactionsEdit", $this->getUrlParm($parm));
         } else {
-            $url = $this->keyUrl("maintransactionsedit", $this->getUrlParm(Config("TABLE_SHOW_DETAIL") . "="));
+            $url = $this->keyUrl("MainTransactionsEdit", $this->getUrlParm(Config("TABLE_SHOW_DETAIL") . "="));
         }
         return $this->addMasterUrl($url);
     }
@@ -1100,9 +1100,9 @@ class MainTransactions extends DbTable
     public function getCopyUrl($parm = "")
     {
         if ($parm != "") {
-            $url = $this->keyUrl("maintransactionsadd", $this->getUrlParm($parm));
+            $url = $this->keyUrl("MainTransactionsAdd", $this->getUrlParm($parm));
         } else {
-            $url = $this->keyUrl("maintransactionsadd", $this->getUrlParm(Config("TABLE_SHOW_DETAIL") . "="));
+            $url = $this->keyUrl("MainTransactionsAdd", $this->getUrlParm(Config("TABLE_SHOW_DETAIL") . "="));
         }
         return $this->addMasterUrl($url);
     }
@@ -1117,7 +1117,7 @@ class MainTransactions extends DbTable
     // Delete URL
     public function getDeleteUrl()
     {
-        return $this->keyUrl("maintransactionsdelete", $this->getUrlParm());
+        return $this->keyUrl("MainTransactionsDelete", $this->getUrlParm());
     }
 
     // Add master url
@@ -1318,8 +1318,10 @@ SORTHTML;
         $this->price_id->CellCssStyle = "white-space: nowrap;";
 
         // quantity
+        $this->quantity->CellCssStyle = "white-space: nowrap;";
 
         // assigned_buses
+        $this->assigned_buses->CellCssStyle = "white-space: nowrap;";
 
         // start_date
 
@@ -1455,6 +1457,8 @@ SORTHTML;
         // assigned_buses
         $this->assigned_buses->ViewValue = $this->assigned_buses->CurrentValue;
         $this->assigned_buses->ViewValue = FormatNumber($this->assigned_buses->ViewValue, 0, -2, -2, -2);
+        $this->assigned_buses->CssClass = "font-weight-bold";
+        $this->assigned_buses->CellCssStyle .= "text-align: right;";
         $this->assigned_buses->ViewCustomAttributes = "";
 
         // start_date

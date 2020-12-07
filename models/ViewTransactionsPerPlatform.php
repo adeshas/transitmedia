@@ -690,7 +690,7 @@ class ViewTransactionsPerPlatform extends DbTable
         if ($referUrl != "" && $referPageName != CurrentPageName() && $referPageName != "login") { // Referer not same page or login page
             $_SESSION[$name] = $referUrl; // Save to Session
         }
-        return $_SESSION[$name] ?? GetUrl("viewtransactionsperplatformlist");
+        return $_SESSION[$name] ?? GetUrl("ViewTransactionsPerPlatformList");
     }
 
     // Set return page URL
@@ -703,11 +703,11 @@ class ViewTransactionsPerPlatform extends DbTable
     public function getModalCaption($pageName)
     {
         global $Language;
-        if ($pageName == "viewtransactionsperplatformview") {
+        if ($pageName == "ViewTransactionsPerPlatformView") {
             return $Language->phrase("View");
-        } elseif ($pageName == "viewtransactionsperplatformedit") {
+        } elseif ($pageName == "ViewTransactionsPerPlatformEdit") {
             return $Language->phrase("Edit");
-        } elseif ($pageName == "viewtransactionsperplatformadd") {
+        } elseif ($pageName == "ViewTransactionsPerPlatformAdd") {
             return $Language->phrase("Add");
         } else {
             return "";
@@ -736,16 +736,16 @@ class ViewTransactionsPerPlatform extends DbTable
     // List URL
     public function getListUrl()
     {
-        return "viewtransactionsperplatformlist";
+        return "ViewTransactionsPerPlatformList";
     }
 
     // View URL
     public function getViewUrl($parm = "")
     {
         if ($parm != "") {
-            $url = $this->keyUrl("viewtransactionsperplatformview", $this->getUrlParm($parm));
+            $url = $this->keyUrl("ViewTransactionsPerPlatformView", $this->getUrlParm($parm));
         } else {
-            $url = $this->keyUrl("viewtransactionsperplatformview", $this->getUrlParm(Config("TABLE_SHOW_DETAIL") . "="));
+            $url = $this->keyUrl("ViewTransactionsPerPlatformView", $this->getUrlParm(Config("TABLE_SHOW_DETAIL") . "="));
         }
         return $this->addMasterUrl($url);
     }
@@ -754,9 +754,9 @@ class ViewTransactionsPerPlatform extends DbTable
     public function getAddUrl($parm = "")
     {
         if ($parm != "") {
-            $url = "viewtransactionsperplatformadd?" . $this->getUrlParm($parm);
+            $url = "ViewTransactionsPerPlatformAdd?" . $this->getUrlParm($parm);
         } else {
-            $url = "viewtransactionsperplatformadd";
+            $url = "ViewTransactionsPerPlatformAdd";
         }
         return $this->addMasterUrl($url);
     }
@@ -764,7 +764,7 @@ class ViewTransactionsPerPlatform extends DbTable
     // Edit URL
     public function getEditUrl($parm = "")
     {
-        $url = $this->keyUrl("viewtransactionsperplatformedit", $this->getUrlParm($parm));
+        $url = $this->keyUrl("ViewTransactionsPerPlatformEdit", $this->getUrlParm($parm));
         return $this->addMasterUrl($url);
     }
 
@@ -778,7 +778,7 @@ class ViewTransactionsPerPlatform extends DbTable
     // Copy URL
     public function getCopyUrl($parm = "")
     {
-        $url = $this->keyUrl("viewtransactionsperplatformadd", $this->getUrlParm($parm));
+        $url = $this->keyUrl("ViewTransactionsPerPlatformAdd", $this->getUrlParm($parm));
         return $this->addMasterUrl($url);
     }
 
@@ -792,7 +792,7 @@ class ViewTransactionsPerPlatform extends DbTable
     // Delete URL
     public function getDeleteUrl()
     {
-        return $this->keyUrl("viewtransactionsperplatformdelete", $this->getUrlParm());
+        return $this->keyUrl("ViewTransactionsPerPlatformDelete", $this->getUrlParm());
     }
 
     // Add master url

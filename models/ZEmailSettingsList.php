@@ -182,12 +182,12 @@ class ZEmailSettingsList extends ZEmailSettings
         $this->ExportHtmlUrl = $pageUrl . "export=html";
         $this->ExportXmlUrl = $pageUrl . "export=xml";
         $this->ExportCsvUrl = $pageUrl . "export=csv";
-        $this->AddUrl = "zemailsettingsadd";
+        $this->AddUrl = "ZEmailSettingsAdd";
         $this->InlineAddUrl = $pageUrl . "action=add";
         $this->GridAddUrl = $pageUrl . "action=gridadd";
         $this->GridEditUrl = $pageUrl . "action=gridedit";
-        $this->MultiDeleteUrl = "zemailsettingsdelete";
-        $this->MultiUpdateUrl = "zemailsettingsupdate";
+        $this->MultiDeleteUrl = "ZEmailSettingsDelete";
+        $this->MultiUpdateUrl = "ZEmailSettingsUpdate";
 
         // Table name (for backward compatibility only)
         if (!defined(PROJECT_NAMESPACE . "TABLE_NAME")) {

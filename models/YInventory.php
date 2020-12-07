@@ -562,7 +562,7 @@ class YInventory extends DbTable
         if ($referUrl != "" && $referPageName != CurrentPageName() && $referPageName != "login") { // Referer not same page or login page
             $_SESSION[$name] = $referUrl; // Save to Session
         }
-        return $_SESSION[$name] ?? GetUrl("yinventorylist");
+        return $_SESSION[$name] ?? GetUrl("YInventoryList");
     }
 
     // Set return page URL
@@ -575,11 +575,11 @@ class YInventory extends DbTable
     public function getModalCaption($pageName)
     {
         global $Language;
-        if ($pageName == "yinventoryview") {
+        if ($pageName == "YInventoryView") {
             return $Language->phrase("View");
-        } elseif ($pageName == "yinventoryedit") {
+        } elseif ($pageName == "YInventoryEdit") {
             return $Language->phrase("Edit");
-        } elseif ($pageName == "yinventoryadd") {
+        } elseif ($pageName == "YInventoryAdd") {
             return $Language->phrase("Add");
         } else {
             return "";
@@ -608,16 +608,16 @@ class YInventory extends DbTable
     // List URL
     public function getListUrl()
     {
-        return "yinventorylist";
+        return "YInventoryList";
     }
 
     // View URL
     public function getViewUrl($parm = "")
     {
         if ($parm != "") {
-            $url = $this->keyUrl("yinventoryview", $this->getUrlParm($parm));
+            $url = $this->keyUrl("YInventoryView", $this->getUrlParm($parm));
         } else {
-            $url = $this->keyUrl("yinventoryview", $this->getUrlParm(Config("TABLE_SHOW_DETAIL") . "="));
+            $url = $this->keyUrl("YInventoryView", $this->getUrlParm(Config("TABLE_SHOW_DETAIL") . "="));
         }
         return $this->addMasterUrl($url);
     }
@@ -626,9 +626,9 @@ class YInventory extends DbTable
     public function getAddUrl($parm = "")
     {
         if ($parm != "") {
-            $url = "yinventoryadd?" . $this->getUrlParm($parm);
+            $url = "YInventoryAdd?" . $this->getUrlParm($parm);
         } else {
-            $url = "yinventoryadd";
+            $url = "YInventoryAdd";
         }
         return $this->addMasterUrl($url);
     }
@@ -636,7 +636,7 @@ class YInventory extends DbTable
     // Edit URL
     public function getEditUrl($parm = "")
     {
-        $url = $this->keyUrl("yinventoryedit", $this->getUrlParm($parm));
+        $url = $this->keyUrl("YInventoryEdit", $this->getUrlParm($parm));
         return $this->addMasterUrl($url);
     }
 
@@ -650,7 +650,7 @@ class YInventory extends DbTable
     // Copy URL
     public function getCopyUrl($parm = "")
     {
-        $url = $this->keyUrl("yinventoryadd", $this->getUrlParm($parm));
+        $url = $this->keyUrl("YInventoryAdd", $this->getUrlParm($parm));
         return $this->addMasterUrl($url);
     }
 
@@ -664,7 +664,7 @@ class YInventory extends DbTable
     // Delete URL
     public function getDeleteUrl()
     {
-        return $this->keyUrl("yinventorydelete", $this->getUrlParm());
+        return $this->keyUrl("YInventoryDelete", $this->getUrlParm());
     }
 
     // Add master url

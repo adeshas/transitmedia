@@ -186,10 +186,10 @@ $Grid->ListOptions->render("header", "left");
         <th data-name="price_id" class="<?= $Grid->price_id->headerCellClass() ?>" style="white-space: nowrap;"><div id="elh_main_transactions_price_id" class="main_transactions_price_id"><?= $Grid->renderSort($Grid->price_id) ?></div></th>
 <?php } ?>
 <?php if ($Grid->quantity->Visible) { // quantity ?>
-        <th data-name="quantity" class="<?= $Grid->quantity->headerCellClass() ?>"><div id="elh_main_transactions_quantity" class="main_transactions_quantity"><?= $Grid->renderSort($Grid->quantity) ?></div></th>
+        <th data-name="quantity" class="<?= $Grid->quantity->headerCellClass() ?>" style="white-space: nowrap;"><div id="elh_main_transactions_quantity" class="main_transactions_quantity"><?= $Grid->renderSort($Grid->quantity) ?></div></th>
 <?php } ?>
 <?php if ($Grid->assigned_buses->Visible) { // assigned_buses ?>
-        <th data-name="assigned_buses" class="<?= $Grid->assigned_buses->headerCellClass() ?>"><div id="elh_main_transactions_assigned_buses" class="main_transactions_assigned_buses"><?= $Grid->renderSort($Grid->assigned_buses) ?></div></th>
+        <th data-name="assigned_buses" class="<?= $Grid->assigned_buses->headerCellClass() ?>" style="white-space: nowrap;"><div id="elh_main_transactions_assigned_buses" class="main_transactions_assigned_buses"><?= $Grid->renderSort($Grid->assigned_buses) ?></div></th>
 <?php } ?>
 <?php if ($Grid->start_date->Visible) { // start_date ?>
         <th data-name="start_date" class="<?= $Grid->start_date->headerCellClass() ?>"><div id="elh_main_transactions_start_date" class="main_transactions_start_date"><?= $Grid->renderSort($Grid->start_date) ?></div></th>

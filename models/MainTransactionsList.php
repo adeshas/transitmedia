@@ -182,12 +182,12 @@ class MainTransactionsList extends MainTransactions
         $this->ExportHtmlUrl = $pageUrl . "export=html";
         $this->ExportXmlUrl = $pageUrl . "export=xml";
         $this->ExportCsvUrl = $pageUrl . "export=csv";
-        $this->AddUrl = "maintransactionsadd?" . Config("TABLE_SHOW_DETAIL") . "=";
+        $this->AddUrl = "MainTransactionsAdd?" . Config("TABLE_SHOW_DETAIL") . "=";
         $this->InlineAddUrl = $pageUrl . "action=add";
         $this->GridAddUrl = $pageUrl . "action=gridadd";
         $this->GridEditUrl = $pageUrl . "action=gridedit";
-        $this->MultiDeleteUrl = "maintransactionsdelete";
-        $this->MultiUpdateUrl = "maintransactionsupdate";
+        $this->MultiDeleteUrl = "MainTransactionsDelete";
+        $this->MultiUpdateUrl = "MainTransactionsUpdate";
 
         // Table name (for backward compatibility only)
         if (!defined(PROJECT_NAMESPACE . "TABLE_NAME")) {
@@ -890,7 +890,7 @@ class MainTransactionsList extends MainTransactions
             $this->MasterRecordExists = $rsmaster !== false;
             if (!$this->MasterRecordExists) {
                 $this->setFailureMessage($Language->phrase("NoRecord")); // Set no record found
-                $this->terminate("maincampaignslist"); // Return to master page
+                $this->terminate("MainCampaignsList"); // Return to master page
                 return;
             } else {
                 $masterTbl->loadListRowValues($rsmaster);
@@ -906,7 +906,7 @@ class MainTransactionsList extends MainTransactions
             $this->MasterRecordExists = $rsmaster !== false;
             if (!$this->MasterRecordExists) {
                 $this->setFailureMessage($Language->phrase("NoRecord")); // Set no record found
-                $this->terminate("yoperatorslist"); // Return to master page
+                $this->terminate("YOperatorsList"); // Return to master page
                 return;
             } else {
                 $masterTbl->loadListRowValues($rsmaster);
@@ -2393,7 +2393,7 @@ class MainTransactionsList extends MainTransactions
         $opt = $this->ListOptions["detail_sub_transaction_details"];
         if ($Security->allowList(CurrentProjectID() . 'sub_transaction_details') && $this->showOptionLink()) {
             $body = $Language->phrase("DetailLink") . $Language->TablePhrase("sub_transaction_details", "TblCaption");
-            $body = "<a class=\"btn btn-default ew-row-link ew-detail\" data-action=\"list\" href=\"" . HtmlEncode("subtransactiondetailslist?" . Config("TABLE_SHOW_MASTER") . "=main_transactions&" . GetForeignKeyUrl("fk_id", $this->id->CurrentValue) . "") . "\">" . $body . "</a>";
+            $body = "<a class=\"btn btn-default ew-row-link ew-detail\" data-action=\"list\" href=\"" . HtmlEncode("SubTransactionDetailsList?" . Config("TABLE_SHOW_MASTER") . "=main_transactions&" . GetForeignKeyUrl("fk_id", $this->id->CurrentValue) . "") . "\">" . $body . "</a>";
             $links = "";
             $detailPage = Container("SubTransactionDetailsGrid");
             if ($detailPage->DetailView && $Security->canView() && $this->showOptionLink("view") && $Security->allowView(CurrentProjectID() . 'main_transactions')) {
@@ -3332,8 +3332,10 @@ class MainTransactionsList extends MainTransactions
         $this->price_id->CellCssStyle = "white-space: nowrap;";
 
         // quantity
+        $this->quantity->CellCssStyle = "white-space: nowrap;";
 
         // assigned_buses
+        $this->assigned_buses->CellCssStyle = "white-space: nowrap;";
 
         // start_date
 
@@ -3479,6 +3481,8 @@ class MainTransactionsList extends MainTransactions
             // assigned_buses
             $this->assigned_buses->ViewValue = $this->assigned_buses->CurrentValue;
             $this->assigned_buses->ViewValue = FormatNumber($this->assigned_buses->ViewValue, 0, -2, -2, -2);
+            $this->assigned_buses->CssClass = "font-weight-bold";
+            $this->assigned_buses->CellCssStyle .= "text-align: right;";
             $this->assigned_buses->ViewCustomAttributes = "";
 
             // start_date
@@ -5221,7 +5225,7 @@ class MainTransactionsList extends MainTransactions
 
         // Advanced search button
         $item = &$this->SearchOptions->add("advancedsearch");
-        $item->Body = "<a class=\"btn btn-default ew-advanced-search\" title=\"" . $Language->phrase("AdvancedSearch") . "\" data-caption=\"" . $Language->phrase("AdvancedSearch") . "\" href=\"maintransactionssearch\">" . $Language->phrase("AdvancedSearchBtn") . "</a>";
+        $item->Body = "<a class=\"btn btn-default ew-advanced-search\" title=\"" . $Language->phrase("AdvancedSearch") . "\" data-caption=\"" . $Language->phrase("AdvancedSearch") . "\" href=\"MainTransactionsSearch\">" . $Language->phrase("AdvancedSearchBtn") . "</a>";
         $item->Visible = true;
 
         // Button group for search

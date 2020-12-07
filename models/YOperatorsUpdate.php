@@ -238,7 +238,7 @@ class YOperatorsUpdate extends YOperators
                 $pageName = GetPageName($url);
                 if ($pageName != $this->getListUrl()) { // Not List page
                     $row["caption"] = $this->getModalCaption($pageName);
-                    if ($pageName == "yoperatorsview") {
+                    if ($pageName == "YOperatorsView") {
                         $row["view"] = "1";
                     }
                 } else { // List page should not be shown as modal => error
@@ -483,7 +483,7 @@ class YOperatorsUpdate extends YOperators
             $this->loadMultiUpdateValues(); // Load initial values to form
         }
         if (count($this->RecKeys) <= 0) {
-            $this->terminate("yoperatorslist"); // No records selected, return to list
+            $this->terminate("YOperatorsList"); // No records selected, return to list
             return;
         }
         if ($this->isUpdate()) {
@@ -1153,7 +1153,7 @@ class YOperatorsUpdate extends YOperators
         global $Breadcrumb, $Language;
         $Breadcrumb = new Breadcrumb("index");
         $url = CurrentUrl();
-        $Breadcrumb->add("list", $this->TableVar, $this->addMasterUrl("yoperatorslist"), "", $this->TableVar, true);
+        $Breadcrumb->add("list", $this->TableVar, $this->addMasterUrl("YOperatorsList"), "", $this->TableVar, true);
         $pageId = "update";
         $Breadcrumb->add("update", $pageId, $url);
     }

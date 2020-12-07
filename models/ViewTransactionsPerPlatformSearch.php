@@ -238,7 +238,7 @@ class ViewTransactionsPerPlatformSearch extends ViewTransactionsPerPlatform
                 $pageName = GetPageName($url);
                 if ($pageName != $this->getListUrl()) { // Not List page
                     $row["caption"] = $this->getModalCaption($pageName);
-                    if ($pageName == "viewtransactionsperplatformview") {
+                    if ($pageName == "ViewTransactionsPerPlatformView") {
                         $row["view"] = "1";
                     }
                 } else { // List page should not be shown as modal => error
@@ -485,7 +485,7 @@ class ViewTransactionsPerPlatformSearch extends ViewTransactionsPerPlatform
                 }
                 if ($srchStr != "") {
                     $srchStr = $this->getUrlParm($srchStr);
-                    $srchStr = "viewtransactionsperplatformlist" . "?" . $srchStr;
+                    $srchStr = "ViewTransactionsPerPlatformList" . "?" . $srchStr;
                     $this->terminate($srchStr); // Go to list page
                     return;
                 }
@@ -1245,7 +1245,7 @@ class ViewTransactionsPerPlatformSearch extends ViewTransactionsPerPlatform
         global $Breadcrumb, $Language;
         $Breadcrumb = new Breadcrumb("index");
         $url = CurrentUrl();
-        $Breadcrumb->add("list", $this->TableVar, $this->addMasterUrl("viewtransactionsperplatformlist"), "", $this->TableVar, true);
+        $Breadcrumb->add("list", $this->TableVar, $this->addMasterUrl("ViewTransactionsPerPlatformList"), "", $this->TableVar, true);
         $pageId = "search";
         $Breadcrumb->add("search", $pageId, $url);
     }

@@ -182,12 +182,12 @@ class XBusDepotList extends XBusDepot
         $this->ExportHtmlUrl = $pageUrl . "export=html";
         $this->ExportXmlUrl = $pageUrl . "export=xml";
         $this->ExportCsvUrl = $pageUrl . "export=csv";
-        $this->AddUrl = "xbusdepotadd";
+        $this->AddUrl = "XBusDepotAdd";
         $this->InlineAddUrl = $pageUrl . "action=add";
         $this->GridAddUrl = $pageUrl . "action=gridadd";
         $this->GridEditUrl = $pageUrl . "action=gridedit";
-        $this->MultiDeleteUrl = "xbusdepotdelete";
-        $this->MultiUpdateUrl = "xbusdepotupdate";
+        $this->MultiDeleteUrl = "XBusDepotDelete";
+        $this->MultiUpdateUrl = "XBusDepotUpdate";
 
         // Table name (for backward compatibility only)
         if (!defined(PROJECT_NAMESPACE . "TABLE_NAME")) {

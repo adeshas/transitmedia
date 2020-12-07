@@ -182,12 +182,12 @@ class YVendorsList extends YVendors
         $this->ExportHtmlUrl = $pageUrl . "export=html";
         $this->ExportXmlUrl = $pageUrl . "export=xml";
         $this->ExportCsvUrl = $pageUrl . "export=csv";
-        $this->AddUrl = "yvendorsadd?" . Config("TABLE_SHOW_DETAIL") . "=";
+        $this->AddUrl = "YVendorsAdd?" . Config("TABLE_SHOW_DETAIL") . "=";
         $this->InlineAddUrl = $pageUrl . "action=add";
         $this->GridAddUrl = $pageUrl . "action=gridadd";
         $this->GridEditUrl = $pageUrl . "action=gridedit";
-        $this->MultiDeleteUrl = "yvendorsdelete";
-        $this->MultiUpdateUrl = "yvendorsupdate";
+        $this->MultiDeleteUrl = "YVendorsDelete";
+        $this->MultiUpdateUrl = "YVendorsUpdate";
 
         // Table name (for backward compatibility only)
         if (!defined(PROJECT_NAMESPACE . "TABLE_NAME")) {
@@ -1314,7 +1314,7 @@ class YVendorsList extends YVendors
         $opt = $this->ListOptions["detail_main_users"];
         if ($Security->allowList(CurrentProjectID() . 'main_users') && $this->showOptionLink()) {
             $body = $Language->phrase("DetailLink") . $Language->TablePhrase("main_users", "TblCaption");
-            $body = "<a class=\"btn btn-default ew-row-link ew-detail\" data-action=\"list\" href=\"" . HtmlEncode("mainuserslist?" . Config("TABLE_SHOW_MASTER") . "=y_vendors&" . GetForeignKeyUrl("fk_id", $this->id->CurrentValue) . "") . "\">" . $body . "</a>";
+            $body = "<a class=\"btn btn-default ew-row-link ew-detail\" data-action=\"list\" href=\"" . HtmlEncode("MainUsersList?" . Config("TABLE_SHOW_MASTER") . "=y_vendors&" . GetForeignKeyUrl("fk_id", $this->id->CurrentValue) . "") . "\">" . $body . "</a>";
             $links = "";
             $detailPage = Container("MainUsersGrid");
             if ($detailPage->DetailEdit && $Security->canEdit() && $this->showOptionLink("edit") && $Security->allowEdit(CurrentProjectID() . 'y_vendors')) {
@@ -1341,7 +1341,7 @@ class YVendorsList extends YVendors
         $opt = $this->ListOptions["detail_main_campaigns"];
         if ($Security->allowList(CurrentProjectID() . 'main_campaigns') && $this->showOptionLink()) {
             $body = $Language->phrase("DetailLink") . $Language->TablePhrase("main_campaigns", "TblCaption");
-            $body = "<a class=\"btn btn-default ew-row-link ew-detail\" data-action=\"list\" href=\"" . HtmlEncode("maincampaignslist?" . Config("TABLE_SHOW_MASTER") . "=y_vendors&" . GetForeignKeyUrl("fk_id", $this->id->CurrentValue) . "") . "\">" . $body . "</a>";
+            $body = "<a class=\"btn btn-default ew-row-link ew-detail\" data-action=\"list\" href=\"" . HtmlEncode("MainCampaignsList?" . Config("TABLE_SHOW_MASTER") . "=y_vendors&" . GetForeignKeyUrl("fk_id", $this->id->CurrentValue) . "") . "\">" . $body . "</a>";
             $links = "";
             $detailPage = Container("MainCampaignsGrid");
             if ($detailPage->DetailEdit && $Security->canEdit() && $this->showOptionLink("edit") && $Security->allowEdit(CurrentProjectID() . 'y_vendors')) {

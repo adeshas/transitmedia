@@ -703,7 +703,7 @@ class SubMediaAllocation extends DbTable
         if ($referUrl != "" && $referPageName != CurrentPageName() && $referPageName != "login") { // Referer not same page or login page
             $_SESSION[$name] = $referUrl; // Save to Session
         }
-        return $_SESSION[$name] ?? GetUrl("submediaallocationlist");
+        return $_SESSION[$name] ?? GetUrl("SubMediaAllocationList");
     }
 
     // Set return page URL
@@ -716,11 +716,11 @@ class SubMediaAllocation extends DbTable
     public function getModalCaption($pageName)
     {
         global $Language;
-        if ($pageName == "submediaallocationview") {
+        if ($pageName == "SubMediaAllocationView") {
             return $Language->phrase("View");
-        } elseif ($pageName == "submediaallocationedit") {
+        } elseif ($pageName == "SubMediaAllocationEdit") {
             return $Language->phrase("Edit");
-        } elseif ($pageName == "submediaallocationadd") {
+        } elseif ($pageName == "SubMediaAllocationAdd") {
             return $Language->phrase("Add");
         } else {
             return "";
@@ -749,16 +749,16 @@ class SubMediaAllocation extends DbTable
     // List URL
     public function getListUrl()
     {
-        return "submediaallocationlist";
+        return "SubMediaAllocationList";
     }
 
     // View URL
     public function getViewUrl($parm = "")
     {
         if ($parm != "") {
-            $url = $this->keyUrl("submediaallocationview", $this->getUrlParm($parm));
+            $url = $this->keyUrl("SubMediaAllocationView", $this->getUrlParm($parm));
         } else {
-            $url = $this->keyUrl("submediaallocationview", $this->getUrlParm(Config("TABLE_SHOW_DETAIL") . "="));
+            $url = $this->keyUrl("SubMediaAllocationView", $this->getUrlParm(Config("TABLE_SHOW_DETAIL") . "="));
         }
         return $this->addMasterUrl($url);
     }
@@ -767,9 +767,9 @@ class SubMediaAllocation extends DbTable
     public function getAddUrl($parm = "")
     {
         if ($parm != "") {
-            $url = "submediaallocationadd?" . $this->getUrlParm($parm);
+            $url = "SubMediaAllocationAdd?" . $this->getUrlParm($parm);
         } else {
-            $url = "submediaallocationadd";
+            $url = "SubMediaAllocationAdd";
         }
         return $this->addMasterUrl($url);
     }
@@ -777,7 +777,7 @@ class SubMediaAllocation extends DbTable
     // Edit URL
     public function getEditUrl($parm = "")
     {
-        $url = $this->keyUrl("submediaallocationedit", $this->getUrlParm($parm));
+        $url = $this->keyUrl("SubMediaAllocationEdit", $this->getUrlParm($parm));
         return $this->addMasterUrl($url);
     }
 
@@ -791,7 +791,7 @@ class SubMediaAllocation extends DbTable
     // Copy URL
     public function getCopyUrl($parm = "")
     {
-        $url = $this->keyUrl("submediaallocationadd", $this->getUrlParm($parm));
+        $url = $this->keyUrl("SubMediaAllocationAdd", $this->getUrlParm($parm));
         return $this->addMasterUrl($url);
     }
 
@@ -805,7 +805,7 @@ class SubMediaAllocation extends DbTable
     // Delete URL
     public function getDeleteUrl()
     {
-        return $this->keyUrl("submediaallocationdelete", $this->getUrlParm());
+        return $this->keyUrl("SubMediaAllocationDelete", $this->getUrlParm());
     }
 
     // Add master url

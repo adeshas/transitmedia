@@ -182,12 +182,12 @@ class YOperatorsList extends YOperators
         $this->ExportHtmlUrl = $pageUrl . "export=html";
         $this->ExportXmlUrl = $pageUrl . "export=xml";
         $this->ExportCsvUrl = $pageUrl . "export=csv";
-        $this->AddUrl = "yoperatorsadd?" . Config("TABLE_SHOW_DETAIL") . "=";
+        $this->AddUrl = "YOperatorsAdd?" . Config("TABLE_SHOW_DETAIL") . "=";
         $this->InlineAddUrl = $pageUrl . "action=add";
         $this->GridAddUrl = $pageUrl . "action=gridadd";
         $this->GridEditUrl = $pageUrl . "action=gridedit";
-        $this->MultiDeleteUrl = "yoperatorsdelete";
-        $this->MultiUpdateUrl = "yoperatorsupdate";
+        $this->MultiDeleteUrl = "YOperatorsDelete";
+        $this->MultiUpdateUrl = "YOperatorsUpdate";
 
         // Table name (for backward compatibility only)
         if (!defined(PROJECT_NAMESPACE . "TABLE_NAME")) {
@@ -830,7 +830,7 @@ class YOperatorsList extends YOperators
             $this->MasterRecordExists = $rsmaster !== false;
             if (!$this->MasterRecordExists) {
                 $this->setFailureMessage($Language->phrase("NoRecord")); // Set no record found
-                $this->terminate("yplatformslist"); // Return to master page
+                $this->terminate("YPlatformsList"); // Return to master page
                 return;
             } else {
                 $masterTbl->loadListRowValues($rsmaster);
@@ -1876,7 +1876,7 @@ class YOperatorsList extends YOperators
         $opt = $this->ListOptions["detail_main_transactions"];
         if ($Security->allowList(CurrentProjectID() . 'main_transactions')) {
             $body = $Language->phrase("DetailLink") . $Language->TablePhrase("main_transactions", "TblCaption");
-            $body = "<a class=\"btn btn-default ew-row-link ew-detail\" data-action=\"list\" href=\"" . HtmlEncode("maintransactionslist?" . Config("TABLE_SHOW_MASTER") . "=y_operators&" . GetForeignKeyUrl("fk_id", $this->id->CurrentValue) . "") . "\">" . $body . "</a>";
+            $body = "<a class=\"btn btn-default ew-row-link ew-detail\" data-action=\"list\" href=\"" . HtmlEncode("MainTransactionsList?" . Config("TABLE_SHOW_MASTER") . "=y_operators&" . GetForeignKeyUrl("fk_id", $this->id->CurrentValue) . "") . "\">" . $body . "</a>";
             $links = "";
             $detailPage = Container("MainTransactionsGrid");
             if ($detailPage->DetailView && $Security->canView() && $Security->allowView(CurrentProjectID() . 'y_operators')) {

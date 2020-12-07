@@ -153,7 +153,7 @@ class MainTransactionsGrid extends MainTransactions
 
         // Page URL
         $pageUrl = $this->pageUrl();
-        $this->AddUrl = "maintransactionsadd";
+        $this->AddUrl = "MainTransactionsAdd";
 
         // Table name (for backward compatibility only)
         if (!defined(PROJECT_NAMESPACE . "TABLE_NAME")) {
@@ -602,7 +602,7 @@ class MainTransactionsGrid extends MainTransactions
             $this->MasterRecordExists = $rsmaster !== false;
             if (!$this->MasterRecordExists) {
                 $this->setFailureMessage($Language->phrase("NoRecord")); // Set no record found
-                $this->terminate("maincampaignslist"); // Return to master page
+                $this->terminate("MainCampaignsList"); // Return to master page
                 return;
             } else {
                 $masterTbl->loadListRowValues($rsmaster);
@@ -618,7 +618,7 @@ class MainTransactionsGrid extends MainTransactions
             $this->MasterRecordExists = $rsmaster !== false;
             if (!$this->MasterRecordExists) {
                 $this->setFailureMessage($Language->phrase("NoRecord")); // Set no record found
-                $this->terminate("yoperatorslist"); // Return to master page
+                $this->terminate("YOperatorsList"); // Return to master page
                 return;
             } else {
                 $masterTbl->loadListRowValues($rsmaster);
@@ -1794,8 +1794,10 @@ class MainTransactionsGrid extends MainTransactions
         $this->price_id->CellCssStyle = "white-space: nowrap;";
 
         // quantity
+        $this->quantity->CellCssStyle = "white-space: nowrap;";
 
         // assigned_buses
+        $this->assigned_buses->CellCssStyle = "white-space: nowrap;";
 
         // start_date
 
@@ -1941,6 +1943,8 @@ class MainTransactionsGrid extends MainTransactions
             // assigned_buses
             $this->assigned_buses->ViewValue = $this->assigned_buses->CurrentValue;
             $this->assigned_buses->ViewValue = FormatNumber($this->assigned_buses->ViewValue, 0, -2, -2, -2);
+            $this->assigned_buses->CssClass = "font-weight-bold";
+            $this->assigned_buses->CellCssStyle .= "text-align: right;";
             $this->assigned_buses->ViewCustomAttributes = "";
 
             // start_date

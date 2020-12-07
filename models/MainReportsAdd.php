@@ -238,7 +238,7 @@ class MainReportsAdd extends MainReports
                 $pageName = GetPageName($url);
                 if ($pageName != $this->getListUrl()) { // Not List page
                     $row["caption"] = $this->getModalCaption($pageName);
-                    if ($pageName == "mainreportsview") {
+                    if ($pageName == "MainReportsView") {
                         $row["view"] = "1";
                     }
                 } else { // List page should not be shown as modal => error
@@ -524,7 +524,7 @@ class MainReportsAdd extends MainReports
                     if ($this->getFailureMessage() == "") {
                         $this->setFailureMessage($Language->phrase("NoRecord")); // No record found
                     }
-                    $this->terminate("mainreportslist"); // No matching record, return to list
+                    $this->terminate("MainReportsList"); // No matching record, return to list
                     return;
                 }
                 break;
@@ -535,9 +535,9 @@ class MainReportsAdd extends MainReports
                         $this->setSuccessMessage($Language->phrase("AddSuccess")); // Set up success message
                     }
                     $returnUrl = $this->getReturnUrl();
-                    if (GetPageName($returnUrl) == "mainreportslist") {
+                    if (GetPageName($returnUrl) == "MainReportsList") {
                         $returnUrl = $this->addMasterUrl($returnUrl); // List page, return to List page with correct master key if necessary
-                    } elseif (GetPageName($returnUrl) == "mainreportsview") {
+                    } elseif (GetPageName($returnUrl) == "MainReportsView") {
                         $returnUrl = $this->getViewUrl(); // View page, return to View page with keyurl directly
                     }
                     if (IsApi()) { // Return to caller
@@ -1345,7 +1345,7 @@ class MainReportsAdd extends MainReports
         global $Breadcrumb, $Language;
         $Breadcrumb = new Breadcrumb("index");
         $url = CurrentUrl();
-        $Breadcrumb->add("list", $this->TableVar, $this->addMasterUrl("mainreportslist"), "", $this->TableVar, true);
+        $Breadcrumb->add("list", $this->TableVar, $this->addMasterUrl("MainReportsList"), "", $this->TableVar, true);
         $pageId = ($this->isCopy()) ? "Copy" : "Add";
         $Breadcrumb->add("add", $pageId, $url);
     }

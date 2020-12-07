@@ -182,12 +182,12 @@ class MainUsersList extends MainUsers
         $this->ExportHtmlUrl = $pageUrl . "export=html";
         $this->ExportXmlUrl = $pageUrl . "export=xml";
         $this->ExportCsvUrl = $pageUrl . "export=csv";
-        $this->AddUrl = "mainusersadd?" . Config("TABLE_SHOW_DETAIL") . "=";
+        $this->AddUrl = "MainUsersAdd?" . Config("TABLE_SHOW_DETAIL") . "=";
         $this->InlineAddUrl = $pageUrl . "action=add";
         $this->GridAddUrl = $pageUrl . "action=gridadd";
         $this->GridEditUrl = $pageUrl . "action=gridedit";
-        $this->MultiDeleteUrl = "mainusersdelete";
-        $this->MultiUpdateUrl = "mainusersupdate";
+        $this->MultiDeleteUrl = "MainUsersDelete";
+        $this->MultiUpdateUrl = "MainUsersUpdate";
 
         // Table name (for backward compatibility only)
         if (!defined(PROJECT_NAMESPACE . "TABLE_NAME")) {
@@ -848,7 +848,7 @@ class MainUsersList extends MainUsers
             $this->MasterRecordExists = $rsmaster !== false;
             if (!$this->MasterRecordExists) {
                 $this->setFailureMessage($Language->phrase("NoRecord")); // Set no record found
-                $this->terminate("yvendorslist"); // Return to master page
+                $this->terminate("YVendorsList"); // Return to master page
                 return;
             } else {
                 $masterTbl->loadListRowValues($rsmaster);
@@ -1967,7 +1967,7 @@ class MainUsersList extends MainUsers
         $opt = $this->ListOptions["detail_main_campaigns"];
         if ($Security->allowList(CurrentProjectID() . 'main_campaigns') && $this->showOptionLink()) {
             $body = $Language->phrase("DetailLink") . $Language->TablePhrase("main_campaigns", "TblCaption");
-            $body = "<a class=\"btn btn-default ew-row-link ew-detail\" data-action=\"list\" href=\"" . HtmlEncode("maincampaignslist?" . Config("TABLE_SHOW_MASTER") . "=main_users&" . GetForeignKeyUrl("fk_id", $this->id->CurrentValue) . "") . "\">" . $body . "</a>";
+            $body = "<a class=\"btn btn-default ew-row-link ew-detail\" data-action=\"list\" href=\"" . HtmlEncode("MainCampaignsList?" . Config("TABLE_SHOW_MASTER") . "=main_users&" . GetForeignKeyUrl("fk_id", $this->id->CurrentValue) . "") . "\">" . $body . "</a>";
             $links = "";
             $detailPage = Container("MainCampaignsGrid");
             if ($detailPage->DetailView && $Security->canView() && $this->showOptionLink("view") && $Security->allowView(CurrentProjectID() . 'main_users')) {

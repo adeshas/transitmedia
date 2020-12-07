@@ -577,7 +577,7 @@ class WVendorsOperators extends DbTable
         if ($referUrl != "" && $referPageName != CurrentPageName() && $referPageName != "login") { // Referer not same page or login page
             $_SESSION[$name] = $referUrl; // Save to Session
         }
-        return $_SESSION[$name] ?? GetUrl("wvendorsoperatorslist");
+        return $_SESSION[$name] ?? GetUrl("WVendorsOperatorsList");
     }
 
     // Set return page URL
@@ -590,11 +590,11 @@ class WVendorsOperators extends DbTable
     public function getModalCaption($pageName)
     {
         global $Language;
-        if ($pageName == "wvendorsoperatorsview") {
+        if ($pageName == "WVendorsOperatorsView") {
             return $Language->phrase("View");
-        } elseif ($pageName == "wvendorsoperatorsedit") {
+        } elseif ($pageName == "WVendorsOperatorsEdit") {
             return $Language->phrase("Edit");
-        } elseif ($pageName == "wvendorsoperatorsadd") {
+        } elseif ($pageName == "WVendorsOperatorsAdd") {
             return $Language->phrase("Add");
         } else {
             return "";
@@ -623,16 +623,16 @@ class WVendorsOperators extends DbTable
     // List URL
     public function getListUrl()
     {
-        return "wvendorsoperatorslist";
+        return "WVendorsOperatorsList";
     }
 
     // View URL
     public function getViewUrl($parm = "")
     {
         if ($parm != "") {
-            $url = $this->keyUrl("wvendorsoperatorsview", $this->getUrlParm($parm));
+            $url = $this->keyUrl("WVendorsOperatorsView", $this->getUrlParm($parm));
         } else {
-            $url = $this->keyUrl("wvendorsoperatorsview", $this->getUrlParm(Config("TABLE_SHOW_DETAIL") . "="));
+            $url = $this->keyUrl("WVendorsOperatorsView", $this->getUrlParm(Config("TABLE_SHOW_DETAIL") . "="));
         }
         return $this->addMasterUrl($url);
     }
@@ -641,9 +641,9 @@ class WVendorsOperators extends DbTable
     public function getAddUrl($parm = "")
     {
         if ($parm != "") {
-            $url = "wvendorsoperatorsadd?" . $this->getUrlParm($parm);
+            $url = "WVendorsOperatorsAdd?" . $this->getUrlParm($parm);
         } else {
-            $url = "wvendorsoperatorsadd";
+            $url = "WVendorsOperatorsAdd";
         }
         return $this->addMasterUrl($url);
     }
@@ -651,7 +651,7 @@ class WVendorsOperators extends DbTable
     // Edit URL
     public function getEditUrl($parm = "")
     {
-        $url = $this->keyUrl("wvendorsoperatorsedit", $this->getUrlParm($parm));
+        $url = $this->keyUrl("WVendorsOperatorsEdit", $this->getUrlParm($parm));
         return $this->addMasterUrl($url);
     }
 
@@ -665,7 +665,7 @@ class WVendorsOperators extends DbTable
     // Copy URL
     public function getCopyUrl($parm = "")
     {
-        $url = $this->keyUrl("wvendorsoperatorsadd", $this->getUrlParm($parm));
+        $url = $this->keyUrl("WVendorsOperatorsAdd", $this->getUrlParm($parm));
         return $this->addMasterUrl($url);
     }
 
@@ -679,7 +679,7 @@ class WVendorsOperators extends DbTable
     // Delete URL
     public function getDeleteUrl()
     {
-        return $this->keyUrl("wvendorsoperatorsdelete", $this->getUrlParm());
+        return $this->keyUrl("WVendorsOperatorsDelete", $this->getUrlParm());
     }
 
     // Add master url

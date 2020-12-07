@@ -182,12 +182,12 @@ class ViewBusesAssignedList extends ViewBusesAssigned
         $this->ExportHtmlUrl = $pageUrl . "export=html";
         $this->ExportXmlUrl = $pageUrl . "export=xml";
         $this->ExportCsvUrl = $pageUrl . "export=csv";
-        $this->AddUrl = "viewbusesassignedadd";
+        $this->AddUrl = "ViewBusesAssignedAdd";
         $this->InlineAddUrl = $pageUrl . "action=add";
         $this->GridAddUrl = $pageUrl . "action=gridadd";
         $this->GridEditUrl = $pageUrl . "action=gridedit";
-        $this->MultiDeleteUrl = "viewbusesassigneddelete";
-        $this->MultiUpdateUrl = "viewbusesassignedupdate";
+        $this->MultiDeleteUrl = "ViewBusesAssignedDelete";
+        $this->MultiUpdateUrl = "ViewBusesAssignedUpdate";
 
         // Table name (for backward compatibility only)
         if (!defined(PROJECT_NAMESPACE . "TABLE_NAME")) {
@@ -749,7 +749,7 @@ class ViewBusesAssignedList extends ViewBusesAssigned
             $this->MasterRecordExists = $rsmaster !== false;
             if (!$this->MasterRecordExists) {
                 $this->setFailureMessage($Language->phrase("NoRecord")); // Set no record found
-                $this->terminate("viewcampaignspendinglist"); // Return to master page
+                $this->terminate("ViewCampaignsPendingList"); // Return to master page
                 return;
             } else {
                 $masterTbl->loadListRowValues($rsmaster);

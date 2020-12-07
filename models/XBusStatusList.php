@@ -182,12 +182,12 @@ class XBusStatusList extends XBusStatus
         $this->ExportHtmlUrl = $pageUrl . "export=html";
         $this->ExportXmlUrl = $pageUrl . "export=xml";
         $this->ExportCsvUrl = $pageUrl . "export=csv";
-        $this->AddUrl = "xbusstatusadd";
+        $this->AddUrl = "XBusStatusAdd";
         $this->InlineAddUrl = $pageUrl . "action=add";
         $this->GridAddUrl = $pageUrl . "action=gridadd";
         $this->GridEditUrl = $pageUrl . "action=gridedit";
-        $this->MultiDeleteUrl = "xbusstatusdelete";
-        $this->MultiUpdateUrl = "xbusstatusupdate";
+        $this->MultiDeleteUrl = "XBusStatusDelete";
+        $this->MultiUpdateUrl = "XBusStatusUpdate";
 
         // Table name (for backward compatibility only)
         if (!defined(PROJECT_NAMESPACE . "TABLE_NAME")) {

@@ -182,12 +182,12 @@ class XTransactionStatusList extends XTransactionStatus
         $this->ExportHtmlUrl = $pageUrl . "export=html";
         $this->ExportXmlUrl = $pageUrl . "export=xml";
         $this->ExportCsvUrl = $pageUrl . "export=csv";
-        $this->AddUrl = "xtransactionstatusadd";
+        $this->AddUrl = "XTransactionStatusAdd";
         $this->InlineAddUrl = $pageUrl . "action=add";
         $this->GridAddUrl = $pageUrl . "action=gridadd";
         $this->GridEditUrl = $pageUrl . "action=gridedit";
-        $this->MultiDeleteUrl = "xtransactionstatusdelete";
-        $this->MultiUpdateUrl = "xtransactionstatusupdate";
+        $this->MultiDeleteUrl = "XTransactionStatusDelete";
+        $this->MultiUpdateUrl = "XTransactionStatusUpdate";
 
         // Table name (for backward compatibility only)
         if (!defined(PROJECT_NAMESPACE . "TABLE_NAME")) {

@@ -293,7 +293,7 @@ class WVendorsOperatorsView extends WVendorsOperators
                 $pageName = GetPageName($url);
                 if ($pageName != $this->getListUrl()) { // Not List page
                     $row["caption"] = $this->getModalCaption($pageName);
-                    if ($pageName == "wvendorsoperatorsview") {
+                    if ($pageName == "WVendorsOperatorsView") {
                         $row["view"] = "1";
                     }
                 } else { // List page should not be shown as modal => error
@@ -530,7 +530,7 @@ class WVendorsOperatorsView extends WVendorsOperators
                 $this->id->setQueryStringValue($keyValue);
                 $this->RecKey["id"] = $this->id->QueryStringValue;
             } else {
-                $returnUrl = "wvendorsoperatorslist"; // Return to list
+                $returnUrl = "WVendorsOperatorsList"; // Return to list
             }
 
             // Get action
@@ -553,12 +553,12 @@ class WVendorsOperatorsView extends WVendorsOperators
                         if ($this->getSuccessMessage() == "" && $this->getFailureMessage() == "") {
                             $this->setFailureMessage($Language->phrase("NoRecord")); // Set no record message
                         }
-                        $returnUrl = "wvendorsoperatorslist"; // No matching record, return to list
+                        $returnUrl = "WVendorsOperatorsList"; // No matching record, return to list
                     }
                     break;
             }
         } else {
-            $returnUrl = "wvendorsoperatorslist"; // Not page request, return to list
+            $returnUrl = "WVendorsOperatorsList"; // Not page request, return to list
         }
         if ($returnUrl != "") {
             $this->terminate($returnUrl);
@@ -825,7 +825,7 @@ class WVendorsOperatorsView extends WVendorsOperators
         global $Breadcrumb, $Language;
         $Breadcrumb = new Breadcrumb("index");
         $url = CurrentUrl();
-        $Breadcrumb->add("list", $this->TableVar, $this->addMasterUrl("wvendorsoperatorslist"), "", $this->TableVar, true);
+        $Breadcrumb->add("list", $this->TableVar, $this->addMasterUrl("WVendorsOperatorsList"), "", $this->TableVar, true);
         $pageId = "view";
         $Breadcrumb->add("view", $pageId, $url);
     }

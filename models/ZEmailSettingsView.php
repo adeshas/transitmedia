@@ -293,7 +293,7 @@ class ZEmailSettingsView extends ZEmailSettings
                 $pageName = GetPageName($url);
                 if ($pageName != $this->getListUrl()) { // Not List page
                     $row["caption"] = $this->getModalCaption($pageName);
-                    if ($pageName == "zemailsettingsview") {
+                    if ($pageName == "ZEmailSettingsView") {
                         $row["view"] = "1";
                     }
                 } else { // List page should not be shown as modal => error
@@ -531,7 +531,7 @@ class ZEmailSettingsView extends ZEmailSettings
                 $this->id->setQueryStringValue($keyValue);
                 $this->RecKey["id"] = $this->id->QueryStringValue;
             } else {
-                $returnUrl = "zemailsettingslist"; // Return to list
+                $returnUrl = "ZEmailSettingsList"; // Return to list
             }
 
             // Get action
@@ -554,12 +554,12 @@ class ZEmailSettingsView extends ZEmailSettings
                         if ($this->getSuccessMessage() == "" && $this->getFailureMessage() == "") {
                             $this->setFailureMessage($Language->phrase("NoRecord")); // Set no record message
                         }
-                        $returnUrl = "zemailsettingslist"; // No matching record, return to list
+                        $returnUrl = "ZEmailSettingsList"; // No matching record, return to list
                     }
                     break;
             }
         } else {
-            $returnUrl = "zemailsettingslist"; // Not page request, return to list
+            $returnUrl = "ZEmailSettingsList"; // Not page request, return to list
         }
         if ($returnUrl != "") {
             $this->terminate($returnUrl);
@@ -827,7 +827,7 @@ class ZEmailSettingsView extends ZEmailSettings
         global $Breadcrumb, $Language;
         $Breadcrumb = new Breadcrumb("index");
         $url = CurrentUrl();
-        $Breadcrumb->add("list", $this->TableVar, $this->addMasterUrl("zemailsettingslist"), "", $this->TableVar, true);
+        $Breadcrumb->add("list", $this->TableVar, $this->addMasterUrl("ZEmailSettingsList"), "", $this->TableVar, true);
         $pageId = "view";
         $Breadcrumb->add("view", $pageId, $url);
     }

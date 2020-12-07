@@ -564,7 +564,7 @@ class XPaymentStatus extends DbTable
         if ($referUrl != "" && $referPageName != CurrentPageName() && $referPageName != "login") { // Referer not same page or login page
             $_SESSION[$name] = $referUrl; // Save to Session
         }
-        return $_SESSION[$name] ?? GetUrl("xpaymentstatuslist");
+        return $_SESSION[$name] ?? GetUrl("XPaymentStatusList");
     }
 
     // Set return page URL
@@ -577,11 +577,11 @@ class XPaymentStatus extends DbTable
     public function getModalCaption($pageName)
     {
         global $Language;
-        if ($pageName == "xpaymentstatusview") {
+        if ($pageName == "XPaymentStatusView") {
             return $Language->phrase("View");
-        } elseif ($pageName == "xpaymentstatusedit") {
+        } elseif ($pageName == "XPaymentStatusEdit") {
             return $Language->phrase("Edit");
-        } elseif ($pageName == "xpaymentstatusadd") {
+        } elseif ($pageName == "XPaymentStatusAdd") {
             return $Language->phrase("Add");
         } else {
             return "";
@@ -610,16 +610,16 @@ class XPaymentStatus extends DbTable
     // List URL
     public function getListUrl()
     {
-        return "xpaymentstatuslist";
+        return "XPaymentStatusList";
     }
 
     // View URL
     public function getViewUrl($parm = "")
     {
         if ($parm != "") {
-            $url = $this->keyUrl("xpaymentstatusview", $this->getUrlParm($parm));
+            $url = $this->keyUrl("XPaymentStatusView", $this->getUrlParm($parm));
         } else {
-            $url = $this->keyUrl("xpaymentstatusview", $this->getUrlParm(Config("TABLE_SHOW_DETAIL") . "="));
+            $url = $this->keyUrl("XPaymentStatusView", $this->getUrlParm(Config("TABLE_SHOW_DETAIL") . "="));
         }
         return $this->addMasterUrl($url);
     }
@@ -628,9 +628,9 @@ class XPaymentStatus extends DbTable
     public function getAddUrl($parm = "")
     {
         if ($parm != "") {
-            $url = "xpaymentstatusadd?" . $this->getUrlParm($parm);
+            $url = "XPaymentStatusAdd?" . $this->getUrlParm($parm);
         } else {
-            $url = "xpaymentstatusadd";
+            $url = "XPaymentStatusAdd";
         }
         return $this->addMasterUrl($url);
     }
@@ -638,7 +638,7 @@ class XPaymentStatus extends DbTable
     // Edit URL
     public function getEditUrl($parm = "")
     {
-        $url = $this->keyUrl("xpaymentstatusedit", $this->getUrlParm($parm));
+        $url = $this->keyUrl("XPaymentStatusEdit", $this->getUrlParm($parm));
         return $this->addMasterUrl($url);
     }
 
@@ -652,7 +652,7 @@ class XPaymentStatus extends DbTable
     // Copy URL
     public function getCopyUrl($parm = "")
     {
-        $url = $this->keyUrl("xpaymentstatusadd", $this->getUrlParm($parm));
+        $url = $this->keyUrl("XPaymentStatusAdd", $this->getUrlParm($parm));
         return $this->addMasterUrl($url);
     }
 
@@ -666,7 +666,7 @@ class XPaymentStatus extends DbTable
     // Delete URL
     public function getDeleteUrl()
     {
-        return $this->keyUrl("xpaymentstatusdelete", $this->getUrlParm());
+        return $this->keyUrl("XPaymentStatusDelete", $this->getUrlParm());
     }
 
     // Add master url

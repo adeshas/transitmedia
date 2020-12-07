@@ -550,7 +550,7 @@ class ViewBusDepotSummary extends DbTable
         if ($referUrl != "" && $referPageName != CurrentPageName() && $referPageName != "login") { // Referer not same page or login page
             $_SESSION[$name] = $referUrl; // Save to Session
         }
-        return $_SESSION[$name] ?? GetUrl("viewbusdepotsummarylist");
+        return $_SESSION[$name] ?? GetUrl("ViewBusDepotSummaryList");
     }
 
     // Set return page URL
@@ -563,11 +563,11 @@ class ViewBusDepotSummary extends DbTable
     public function getModalCaption($pageName)
     {
         global $Language;
-        if ($pageName == "viewbusdepotsummaryview") {
+        if ($pageName == "ViewBusDepotSummaryView") {
             return $Language->phrase("View");
-        } elseif ($pageName == "viewbusdepotsummaryedit") {
+        } elseif ($pageName == "ViewBusDepotSummaryEdit") {
             return $Language->phrase("Edit");
-        } elseif ($pageName == "viewbusdepotsummaryadd") {
+        } elseif ($pageName == "ViewBusDepotSummaryAdd") {
             return $Language->phrase("Add");
         } else {
             return "";
@@ -596,16 +596,16 @@ class ViewBusDepotSummary extends DbTable
     // List URL
     public function getListUrl()
     {
-        return "viewbusdepotsummarylist";
+        return "ViewBusDepotSummaryList";
     }
 
     // View URL
     public function getViewUrl($parm = "")
     {
         if ($parm != "") {
-            $url = $this->keyUrl("viewbusdepotsummaryview", $this->getUrlParm($parm));
+            $url = $this->keyUrl("ViewBusDepotSummaryView", $this->getUrlParm($parm));
         } else {
-            $url = $this->keyUrl("viewbusdepotsummaryview", $this->getUrlParm(Config("TABLE_SHOW_DETAIL") . "="));
+            $url = $this->keyUrl("ViewBusDepotSummaryView", $this->getUrlParm(Config("TABLE_SHOW_DETAIL") . "="));
         }
         return $this->addMasterUrl($url);
     }
@@ -614,9 +614,9 @@ class ViewBusDepotSummary extends DbTable
     public function getAddUrl($parm = "")
     {
         if ($parm != "") {
-            $url = "viewbusdepotsummaryadd?" . $this->getUrlParm($parm);
+            $url = "ViewBusDepotSummaryAdd?" . $this->getUrlParm($parm);
         } else {
-            $url = "viewbusdepotsummaryadd";
+            $url = "ViewBusDepotSummaryAdd";
         }
         return $this->addMasterUrl($url);
     }
@@ -624,7 +624,7 @@ class ViewBusDepotSummary extends DbTable
     // Edit URL
     public function getEditUrl($parm = "")
     {
-        $url = $this->keyUrl("viewbusdepotsummaryedit", $this->getUrlParm($parm));
+        $url = $this->keyUrl("ViewBusDepotSummaryEdit", $this->getUrlParm($parm));
         return $this->addMasterUrl($url);
     }
 
@@ -638,7 +638,7 @@ class ViewBusDepotSummary extends DbTable
     // Copy URL
     public function getCopyUrl($parm = "")
     {
-        $url = $this->keyUrl("viewbusdepotsummaryadd", $this->getUrlParm($parm));
+        $url = $this->keyUrl("ViewBusDepotSummaryAdd", $this->getUrlParm($parm));
         return $this->addMasterUrl($url);
     }
 
@@ -652,7 +652,7 @@ class ViewBusDepotSummary extends DbTable
     // Delete URL
     public function getDeleteUrl()
     {
-        return $this->keyUrl("viewbusdepotsummarydelete", $this->getUrlParm());
+        return $this->keyUrl("ViewBusDepotSummaryDelete", $this->getUrlParm());
     }
 
     // Add master url

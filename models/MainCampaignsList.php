@@ -182,12 +182,12 @@ class MainCampaignsList extends MainCampaigns
         $this->ExportHtmlUrl = $pageUrl . "export=html";
         $this->ExportXmlUrl = $pageUrl . "export=xml";
         $this->ExportCsvUrl = $pageUrl . "export=csv";
-        $this->AddUrl = "maincampaignsadd?" . Config("TABLE_SHOW_DETAIL") . "=";
+        $this->AddUrl = "MainCampaignsAdd?" . Config("TABLE_SHOW_DETAIL") . "=";
         $this->InlineAddUrl = $pageUrl . "action=add";
         $this->GridAddUrl = $pageUrl . "action=gridadd";
         $this->GridEditUrl = $pageUrl . "action=gridedit";
-        $this->MultiDeleteUrl = "maincampaignsdelete";
-        $this->MultiUpdateUrl = "maincampaignsupdate";
+        $this->MultiDeleteUrl = "MainCampaignsDelete";
+        $this->MultiUpdateUrl = "MainCampaignsUpdate";
 
         // Table name (for backward compatibility only)
         if (!defined(PROJECT_NAMESPACE . "TABLE_NAME")) {
@@ -783,7 +783,7 @@ class MainCampaignsList extends MainCampaigns
             $this->MasterRecordExists = $rsmaster !== false;
             if (!$this->MasterRecordExists) {
                 $this->setFailureMessage($Language->phrase("NoRecord")); // Set no record found
-                $this->terminate("yvendorslist"); // Return to master page
+                $this->terminate("YVendorsList"); // Return to master page
                 return;
             } else {
                 $masterTbl->loadListRowValues($rsmaster);
@@ -799,7 +799,7 @@ class MainCampaignsList extends MainCampaigns
             $this->MasterRecordExists = $rsmaster !== false;
             if (!$this->MasterRecordExists) {
                 $this->setFailureMessage($Language->phrase("NoRecord")); // Set no record found
-                $this->terminate("mainuserslist"); // Return to master page
+                $this->terminate("MainUsersList"); // Return to master page
                 return;
             } else {
                 $masterTbl->loadListRowValues($rsmaster);
@@ -815,7 +815,7 @@ class MainCampaignsList extends MainCampaigns
             $this->MasterRecordExists = $rsmaster !== false;
             if (!$this->MasterRecordExists) {
                 $this->setFailureMessage($Language->phrase("NoRecord")); // Set no record found
-                $this->terminate("yplatformslist"); // Return to master page
+                $this->terminate("YPlatformsList"); // Return to master page
                 return;
             } else {
                 $masterTbl->loadListRowValues($rsmaster);
@@ -1569,7 +1569,7 @@ class MainCampaignsList extends MainCampaigns
         $opt = $this->ListOptions["detail_sub_media_allocation"];
         if ($Security->allowList(CurrentProjectID() . 'sub_media_allocation') && $this->showOptionLink()) {
             $body = $Language->phrase("DetailLink") . $Language->TablePhrase("sub_media_allocation", "TblCaption");
-            $body = "<a class=\"btn btn-default ew-row-link ew-detail\" data-action=\"list\" href=\"" . HtmlEncode("submediaallocationlist?" . Config("TABLE_SHOW_MASTER") . "=main_campaigns&" . GetForeignKeyUrl("fk_id", $this->id->CurrentValue) . "") . "\">" . $body . "</a>";
+            $body = "<a class=\"btn btn-default ew-row-link ew-detail\" data-action=\"list\" href=\"" . HtmlEncode("SubMediaAllocationList?" . Config("TABLE_SHOW_MASTER") . "=main_campaigns&" . GetForeignKeyUrl("fk_id", $this->id->CurrentValue) . "") . "\">" . $body . "</a>";
             $links = "";
             $detailPage = Container("SubMediaAllocationGrid");
             if ($detailPage->DetailView && $Security->canView() && $this->showOptionLink("view") && $Security->allowView(CurrentProjectID() . 'main_campaigns')) {
@@ -1605,7 +1605,7 @@ class MainCampaignsList extends MainCampaigns
         $opt = $this->ListOptions["detail_main_transactions"];
         if ($Security->allowList(CurrentProjectID() . 'main_transactions') && $this->showOptionLink()) {
             $body = $Language->phrase("DetailLink") . $Language->TablePhrase("main_transactions", "TblCaption");
-            $body = "<a class=\"btn btn-default ew-row-link ew-detail\" data-action=\"list\" href=\"" . HtmlEncode("maintransactionslist?" . Config("TABLE_SHOW_MASTER") . "=main_campaigns&" . GetForeignKeyUrl("fk_id", $this->id->CurrentValue) . "") . "\">" . $body . "</a>";
+            $body = "<a class=\"btn btn-default ew-row-link ew-detail\" data-action=\"list\" href=\"" . HtmlEncode("MainTransactionsList?" . Config("TABLE_SHOW_MASTER") . "=main_campaigns&" . GetForeignKeyUrl("fk_id", $this->id->CurrentValue) . "") . "\">" . $body . "</a>";
             $links = "";
             $detailPage = Container("MainTransactionsGrid");
             if ($detailPage->DetailView && $Security->canView() && $this->showOptionLink("view") && $Security->allowView(CurrentProjectID() . 'main_campaigns')) {

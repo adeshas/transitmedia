@@ -573,7 +573,7 @@ class ZCoreSettings extends DbTable
         if ($referUrl != "" && $referPageName != CurrentPageName() && $referPageName != "login") { // Referer not same page or login page
             $_SESSION[$name] = $referUrl; // Save to Session
         }
-        return $_SESSION[$name] ?? GetUrl("zcoresettingslist");
+        return $_SESSION[$name] ?? GetUrl("ZCoreSettingsList");
     }
 
     // Set return page URL
@@ -586,11 +586,11 @@ class ZCoreSettings extends DbTable
     public function getModalCaption($pageName)
     {
         global $Language;
-        if ($pageName == "zcoresettingsview") {
+        if ($pageName == "ZCoreSettingsView") {
             return $Language->phrase("View");
-        } elseif ($pageName == "zcoresettingsedit") {
+        } elseif ($pageName == "ZCoreSettingsEdit") {
             return $Language->phrase("Edit");
-        } elseif ($pageName == "zcoresettingsadd") {
+        } elseif ($pageName == "ZCoreSettingsAdd") {
             return $Language->phrase("Add");
         } else {
             return "";
@@ -619,16 +619,16 @@ class ZCoreSettings extends DbTable
     // List URL
     public function getListUrl()
     {
-        return "zcoresettingslist";
+        return "ZCoreSettingsList";
     }
 
     // View URL
     public function getViewUrl($parm = "")
     {
         if ($parm != "") {
-            $url = $this->keyUrl("zcoresettingsview", $this->getUrlParm($parm));
+            $url = $this->keyUrl("ZCoreSettingsView", $this->getUrlParm($parm));
         } else {
-            $url = $this->keyUrl("zcoresettingsview", $this->getUrlParm(Config("TABLE_SHOW_DETAIL") . "="));
+            $url = $this->keyUrl("ZCoreSettingsView", $this->getUrlParm(Config("TABLE_SHOW_DETAIL") . "="));
         }
         return $this->addMasterUrl($url);
     }
@@ -637,9 +637,9 @@ class ZCoreSettings extends DbTable
     public function getAddUrl($parm = "")
     {
         if ($parm != "") {
-            $url = "zcoresettingsadd?" . $this->getUrlParm($parm);
+            $url = "ZCoreSettingsAdd?" . $this->getUrlParm($parm);
         } else {
-            $url = "zcoresettingsadd";
+            $url = "ZCoreSettingsAdd";
         }
         return $this->addMasterUrl($url);
     }
@@ -647,7 +647,7 @@ class ZCoreSettings extends DbTable
     // Edit URL
     public function getEditUrl($parm = "")
     {
-        $url = $this->keyUrl("zcoresettingsedit", $this->getUrlParm($parm));
+        $url = $this->keyUrl("ZCoreSettingsEdit", $this->getUrlParm($parm));
         return $this->addMasterUrl($url);
     }
 
@@ -661,7 +661,7 @@ class ZCoreSettings extends DbTable
     // Copy URL
     public function getCopyUrl($parm = "")
     {
-        $url = $this->keyUrl("zcoresettingsadd", $this->getUrlParm($parm));
+        $url = $this->keyUrl("ZCoreSettingsAdd", $this->getUrlParm($parm));
         return $this->addMasterUrl($url);
     }
 
@@ -675,7 +675,7 @@ class ZCoreSettings extends DbTable
     // Delete URL
     public function getDeleteUrl()
     {
-        return $this->keyUrl("zcoresettingsdelete", $this->getUrlParm());
+        return $this->keyUrl("ZCoreSettingsDelete", $this->getUrlParm());
     }
 
     // Add master url

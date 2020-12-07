@@ -238,7 +238,7 @@ class YPlatformsAdd extends YPlatforms
                 $pageName = GetPageName($url);
                 if ($pageName != $this->getListUrl()) { // Not List page
                     $row["caption"] = $this->getModalCaption($pageName);
-                    if ($pageName == "yplatformsview") {
+                    if ($pageName == "YPlatformsView") {
                         $row["view"] = "1";
                     }
                 } else { // List page should not be shown as modal => error
@@ -521,7 +521,7 @@ class YPlatformsAdd extends YPlatforms
                     if ($this->getFailureMessage() == "") {
                         $this->setFailureMessage($Language->phrase("NoRecord")); // No record found
                     }
-                    $this->terminate("yplatformslist"); // No matching record, return to list
+                    $this->terminate("YPlatformsList"); // No matching record, return to list
                     return;
                 }
 
@@ -539,9 +539,9 @@ class YPlatformsAdd extends YPlatforms
                     } else {
                         $returnUrl = $this->getReturnUrl();
                     }
-                    if (GetPageName($returnUrl) == "yplatformslist") {
+                    if (GetPageName($returnUrl) == "YPlatformsList") {
                         $returnUrl = $this->addMasterUrl($returnUrl); // List page, return to List page with correct master key if necessary
-                    } elseif (GetPageName($returnUrl) == "yplatformsview") {
+                    } elseif (GetPageName($returnUrl) == "YPlatformsView") {
                         $returnUrl = $this->getViewUrl(); // View page, return to View page with keyurl directly
                     }
                     if (IsApi()) { // Return to caller
@@ -1046,7 +1046,7 @@ class YPlatformsAdd extends YPlatforms
         global $Breadcrumb, $Language;
         $Breadcrumb = new Breadcrumb("index");
         $url = CurrentUrl();
-        $Breadcrumb->add("list", $this->TableVar, $this->addMasterUrl("yplatformslist"), "", $this->TableVar, true);
+        $Breadcrumb->add("list", $this->TableVar, $this->addMasterUrl("YPlatformsList"), "", $this->TableVar, true);
         $pageId = ($this->isCopy()) ? "Copy" : "Add";
         $Breadcrumb->add("add", $pageId, $url);
     }

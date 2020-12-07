@@ -381,7 +381,7 @@ class MainUsersDelete extends MainUsers
         $this->RecKeys = $this->getRecordKeys(); // Load record keys
         $filter = $this->getFilterFromRecordKeys();
         if ($filter == "") {
-            $this->terminate("mainuserslist"); // Prevent SQL injection, return to list
+            $this->terminate("MainUsersList"); // Prevent SQL injection, return to list
             return;
         }
 
@@ -403,7 +403,7 @@ class MainUsersDelete extends MainUsers
             }
         }
         if (!$res) {
-            $this->terminate("mainuserslist"); // Return to list
+            $this->terminate("MainUsersList"); // Return to list
             return;
         }
 
@@ -446,7 +446,7 @@ class MainUsersDelete extends MainUsers
                 if ($this->Recordset) {
                     $this->Recordset->close();
                 }
-                $this->terminate("mainuserslist"); // Return to list
+                $this->terminate("MainUsersList"); // Return to list
                 return;
             }
         }
@@ -882,7 +882,7 @@ class MainUsersDelete extends MainUsers
         global $Breadcrumb, $Language;
         $Breadcrumb = new Breadcrumb("index");
         $url = CurrentUrl();
-        $Breadcrumb->add("list", $this->TableVar, $this->addMasterUrl("mainuserslist"), "", $this->TableVar, true);
+        $Breadcrumb->add("list", $this->TableVar, $this->addMasterUrl("MainUsersList"), "", $this->TableVar, true);
         $pageId = "delete";
         $Breadcrumb->add("delete", $pageId, $url);
     }

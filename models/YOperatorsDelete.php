@@ -378,7 +378,7 @@ class YOperatorsDelete extends YOperators
         $this->RecKeys = $this->getRecordKeys(); // Load record keys
         $filter = $this->getFilterFromRecordKeys();
         if ($filter == "") {
-            $this->terminate("yoperatorslist"); // Prevent SQL injection, return to list
+            $this->terminate("YOperatorsList"); // Prevent SQL injection, return to list
             return;
         }
 
@@ -424,7 +424,7 @@ class YOperatorsDelete extends YOperators
                 if ($this->Recordset) {
                     $this->Recordset->close();
                 }
-                $this->terminate("yoperatorslist"); // Return to list
+                $this->terminate("YOperatorsList"); // Return to list
                 return;
             }
         }
@@ -807,7 +807,7 @@ class YOperatorsDelete extends YOperators
         global $Breadcrumb, $Language;
         $Breadcrumb = new Breadcrumb("index");
         $url = CurrentUrl();
-        $Breadcrumb->add("list", $this->TableVar, $this->addMasterUrl("yoperatorslist"), "", $this->TableVar, true);
+        $Breadcrumb->add("list", $this->TableVar, $this->addMasterUrl("YOperatorsList"), "", $this->TableVar, true);
         $pageId = "delete";
         $Breadcrumb->add("delete", $pageId, $url);
     }

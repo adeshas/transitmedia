@@ -238,7 +238,7 @@ class MainPrintOrdersEdit extends MainPrintOrders
                 $pageName = GetPageName($url);
                 if ($pageName != $this->getListUrl()) { // Not List page
                     $row["caption"] = $this->getModalCaption($pageName);
-                    if ($pageName == "mainprintordersview") {
+                    if ($pageName == "MainPrintOrdersView") {
                         $row["view"] = "1";
                     }
                 } else { // List page should not be shown as modal => error
@@ -553,13 +553,13 @@ class MainPrintOrdersEdit extends MainPrintOrders
                     if ($this->getFailureMessage() == "") {
                         $this->setFailureMessage($Language->phrase("NoRecord")); // No record found
                     }
-                    $this->terminate("mainprintorderslist"); // No matching record, return to list
+                    $this->terminate("MainPrintOrdersList"); // No matching record, return to list
                     return;
                 }
                 break;
             case "update": // Update
                 $returnUrl = $this->getReturnUrl();
-                if (GetPageName($returnUrl) == "mainprintorderslist") {
+                if (GetPageName($returnUrl) == "MainPrintOrdersList") {
                     $returnUrl = $this->addMasterUrl($returnUrl); // List page, return to List page with correct master key if necessary
                 }
                 $this->SendEmail = true; // Send email on update success
@@ -1299,7 +1299,7 @@ class MainPrintOrdersEdit extends MainPrintOrders
         global $Breadcrumb, $Language;
         $Breadcrumb = new Breadcrumb("index");
         $url = CurrentUrl();
-        $Breadcrumb->add("list", $this->TableVar, $this->addMasterUrl("mainprintorderslist"), "", $this->TableVar, true);
+        $Breadcrumb->add("list", $this->TableVar, $this->addMasterUrl("MainPrintOrdersList"), "", $this->TableVar, true);
         $pageId = "edit";
         $Breadcrumb->add("edit", $pageId, $url);
     }

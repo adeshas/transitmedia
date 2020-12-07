@@ -679,7 +679,7 @@ class ViewPaymentsPending extends DbTable
         if ($referUrl != "" && $referPageName != CurrentPageName() && $referPageName != "login") { // Referer not same page or login page
             $_SESSION[$name] = $referUrl; // Save to Session
         }
-        return $_SESSION[$name] ?? GetUrl("viewpaymentspendinglist");
+        return $_SESSION[$name] ?? GetUrl("ViewPaymentsPendingList");
     }
 
     // Set return page URL
@@ -692,11 +692,11 @@ class ViewPaymentsPending extends DbTable
     public function getModalCaption($pageName)
     {
         global $Language;
-        if ($pageName == "viewpaymentspendingview") {
+        if ($pageName == "ViewPaymentsPendingView") {
             return $Language->phrase("View");
-        } elseif ($pageName == "viewpaymentspendingedit") {
+        } elseif ($pageName == "ViewPaymentsPendingEdit") {
             return $Language->phrase("Edit");
-        } elseif ($pageName == "viewpaymentspendingadd") {
+        } elseif ($pageName == "ViewPaymentsPendingAdd") {
             return $Language->phrase("Add");
         } else {
             return "";
@@ -725,16 +725,16 @@ class ViewPaymentsPending extends DbTable
     // List URL
     public function getListUrl()
     {
-        return "viewpaymentspendinglist";
+        return "ViewPaymentsPendingList";
     }
 
     // View URL
     public function getViewUrl($parm = "")
     {
         if ($parm != "") {
-            $url = $this->keyUrl("viewpaymentspendingview", $this->getUrlParm($parm));
+            $url = $this->keyUrl("ViewPaymentsPendingView", $this->getUrlParm($parm));
         } else {
-            $url = $this->keyUrl("viewpaymentspendingview", $this->getUrlParm(Config("TABLE_SHOW_DETAIL") . "="));
+            $url = $this->keyUrl("ViewPaymentsPendingView", $this->getUrlParm(Config("TABLE_SHOW_DETAIL") . "="));
         }
         return $this->addMasterUrl($url);
     }
@@ -743,9 +743,9 @@ class ViewPaymentsPending extends DbTable
     public function getAddUrl($parm = "")
     {
         if ($parm != "") {
-            $url = "viewpaymentspendingadd?" . $this->getUrlParm($parm);
+            $url = "ViewPaymentsPendingAdd?" . $this->getUrlParm($parm);
         } else {
-            $url = "viewpaymentspendingadd";
+            $url = "ViewPaymentsPendingAdd";
         }
         return $this->addMasterUrl($url);
     }
@@ -753,7 +753,7 @@ class ViewPaymentsPending extends DbTable
     // Edit URL
     public function getEditUrl($parm = "")
     {
-        $url = $this->keyUrl("viewpaymentspendingedit", $this->getUrlParm($parm));
+        $url = $this->keyUrl("ViewPaymentsPendingEdit", $this->getUrlParm($parm));
         return $this->addMasterUrl($url);
     }
 
@@ -767,7 +767,7 @@ class ViewPaymentsPending extends DbTable
     // Copy URL
     public function getCopyUrl($parm = "")
     {
-        $url = $this->keyUrl("viewpaymentspendingadd", $this->getUrlParm($parm));
+        $url = $this->keyUrl("ViewPaymentsPendingAdd", $this->getUrlParm($parm));
         return $this->addMasterUrl($url);
     }
 
@@ -781,7 +781,7 @@ class ViewPaymentsPending extends DbTable
     // Delete URL
     public function getDeleteUrl()
     {
-        return $this->keyUrl("viewpaymentspendingdelete", $this->getUrlParm());
+        return $this->keyUrl("ViewPaymentsPendingDelete", $this->getUrlParm());
     }
 
     // Add master url

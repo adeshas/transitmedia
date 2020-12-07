@@ -182,12 +182,12 @@ class ViewTransactionsPerOperatorList extends ViewTransactionsPerOperator
         $this->ExportHtmlUrl = $pageUrl . "export=html";
         $this->ExportXmlUrl = $pageUrl . "export=xml";
         $this->ExportCsvUrl = $pageUrl . "export=csv";
-        $this->AddUrl = "viewtransactionsperoperatoradd";
+        $this->AddUrl = "ViewTransactionsPerOperatorAdd";
         $this->InlineAddUrl = $pageUrl . "action=add";
         $this->GridAddUrl = $pageUrl . "action=gridadd";
         $this->GridEditUrl = $pageUrl . "action=gridedit";
-        $this->MultiDeleteUrl = "viewtransactionsperoperatordelete";
-        $this->MultiUpdateUrl = "viewtransactionsperoperatorupdate";
+        $this->MultiDeleteUrl = "ViewTransactionsPerOperatorDelete";
+        $this->MultiUpdateUrl = "ViewTransactionsPerOperatorUpdate";
 
         // Table name (for backward compatibility only)
         if (!defined(PROJECT_NAMESPACE . "TABLE_NAME")) {
@@ -603,6 +603,7 @@ class ViewTransactionsPerOperatorList extends ViewTransactionsPerOperator
         $this->bus_size_id->Visible = false;
         $this->vendor_search_id->Visible = false;
         $this->vendor_search_name->Visible = false;
+        $this->download->setVisibility();
         $this->hideFieldsForAddEdit();
 
         // Global Page Loading event (in userfn*.php)
@@ -945,6 +946,7 @@ class ViewTransactionsPerOperatorList extends ViewTransactionsPerOperator
         $filterList = Concat($filterList, $this->bus_size_id->AdvancedSearch->toJson(), ","); // Field bus_size_id
         $filterList = Concat($filterList, $this->vendor_search_id->AdvancedSearch->toJson(), ","); // Field vendor_search_id
         $filterList = Concat($filterList, $this->vendor_search_name->AdvancedSearch->toJson(), ","); // Field vendor_search_name
+        $filterList = Concat($filterList, $this->download->AdvancedSearch->toJson(), ","); // Field download
         if ($this->BasicSearch->Keyword != "") {
             $wrk = "\"" . Config("TABLE_BASIC_SEARCH") . "\":\"" . JsEncode($this->BasicSearch->Keyword) . "\",\"" . Config("TABLE_BASIC_SEARCH_TYPE") . "\":\"" . JsEncode($this->BasicSearch->Type) . "\"";
             $filterList = Concat($filterList, $wrk, ",");
@@ -1168,6 +1170,14 @@ class ViewTransactionsPerOperatorList extends ViewTransactionsPerOperator
         $this->vendor_search_name->AdvancedSearch->SearchValue2 = @$filter["y_vendor_search_name"];
         $this->vendor_search_name->AdvancedSearch->SearchOperator2 = @$filter["w_vendor_search_name"];
         $this->vendor_search_name->AdvancedSearch->save();
+
+        // Field download
+        $this->download->AdvancedSearch->SearchValue = @$filter["x_download"];
+        $this->download->AdvancedSearch->SearchOperator = @$filter["z_download"];
+        $this->download->AdvancedSearch->SearchCondition = @$filter["v_download"];
+        $this->download->AdvancedSearch->SearchValue2 = @$filter["y_download"];
+        $this->download->AdvancedSearch->SearchOperator2 = @$filter["w_download"];
+        $this->download->AdvancedSearch->save();
         $this->BasicSearch->setKeyword(@$filter[Config("TABLE_BASIC_SEARCH")]);
         $this->BasicSearch->setType(@$filter[Config("TABLE_BASIC_SEARCH_TYPE")]);
     }
@@ -1203,6 +1213,7 @@ class ViewTransactionsPerOperatorList extends ViewTransactionsPerOperator
         $this->buildSearchSql($where, $this->bus_size_id, $default, false); // bus_size_id
         $this->buildSearchSql($where, $this->vendor_search_id, $default, false); // vendor_search_id
         $this->buildSearchSql($where, $this->vendor_search_name, $default, false); // vendor_search_name
+        $this->buildSearchSql($where, $this->download, $default, false); // download
 
         // Set up search parm
         if (!$default && $where != "" && in_array($this->Command, ["", "reset", "resetall"])) {
@@ -1232,6 +1243,7 @@ class ViewTransactionsPerOperatorList extends ViewTransactionsPerOperator
             $this->bus_size_id->AdvancedSearch->save(); // bus_size_id
             $this->vendor_search_id->AdvancedSearch->save(); // vendor_search_id
             $this->vendor_search_name->AdvancedSearch->save(); // vendor_search_name
+            $this->download->AdvancedSearch->save(); // download
         }
         return $where;
     }
@@ -1498,6 +1510,9 @@ class ViewTransactionsPerOperatorList extends ViewTransactionsPerOperator
         if ($this->vendor_search_name->AdvancedSearch->issetSession()) {
             return true;
         }
+        if ($this->download->AdvancedSearch->issetSession()) {
+            return true;
+        }
         return false;
     }
 
@@ -1553,6 +1568,7 @@ class ViewTransactionsPerOperatorList extends ViewTransactionsPerOperator
                 $this->bus_size_id->AdvancedSearch->unsetSession();
                 $this->vendor_search_id->AdvancedSearch->unsetSession();
                 $this->vendor_search_name->AdvancedSearch->unsetSession();
+                $this->download->AdvancedSearch->unsetSession();
     }
 
     // Restore all search parameters
@@ -1587,6 +1603,7 @@ class ViewTransactionsPerOperatorList extends ViewTransactionsPerOperator
                 $this->bus_size_id->AdvancedSearch->load();
                 $this->vendor_search_id->AdvancedSearch->load();
                 $this->vendor_search_name->AdvancedSearch->load();
+                $this->download->AdvancedSearch->load();
     }
 
     // Set up sort parameters
@@ -1608,6 +1625,7 @@ class ViewTransactionsPerOperatorList extends ViewTransactionsPerOperator
             $this->updateSort($this->quantity); // quantity
             $this->updateSort($this->operator_fee); // operator_fee
             $this->updateSort($this->total); // total
+            $this->updateSort($this->download); // download
             $this->setStartRecordNumber(1); // Reset start position
         }
     }
@@ -1674,6 +1692,7 @@ class ViewTransactionsPerOperatorList extends ViewTransactionsPerOperator
                 $this->bus_size_id->setSort("");
                 $this->vendor_search_id->setSort("");
                 $this->vendor_search_name->setSort("");
+                $this->download->setSort("");
             }
 
             // Reset start position
@@ -2134,6 +2153,14 @@ class ViewTransactionsPerOperatorList extends ViewTransactionsPerOperator
                 $this->Command = "search";
             }
         }
+
+        // download
+        if (!$this->isAddOrEdit() && $this->download->AdvancedSearch->get()) {
+            $hasValue = true;
+            if (($this->download->AdvancedSearch->SearchValue != "" || $this->download->AdvancedSearch->SearchValue2 != "") && $this->Command == "") {
+                $this->Command = "search";
+            }
+        }
         return $hasValue;
     }
 
@@ -2228,6 +2255,7 @@ class ViewTransactionsPerOperatorList extends ViewTransactionsPerOperator
         $this->bus_size_id->setDbValue($row['bus_size_id']);
         $this->vendor_search_id->setDbValue($row['vendor_search_id']);
         $this->vendor_search_name->setDbValue($row['vendor_search_name']);
+        $this->download->setDbValue($row['download']);
     }
 
     // Return a row with default values
@@ -2257,6 +2285,7 @@ class ViewTransactionsPerOperatorList extends ViewTransactionsPerOperator
         $row['bus_size_id'] = null;
         $row['vendor_search_id'] = null;
         $row['vendor_search_name'] = null;
+        $row['download'] = null;
         return $row;
     }
 
@@ -2353,6 +2382,9 @@ class ViewTransactionsPerOperatorList extends ViewTransactionsPerOperator
         // vendor_search_name
         $this->vendor_search_name->CellCssStyle = "white-space: nowrap;";
 
+        // download
+        $this->download->CellCssStyle = "white-space: nowrap;";
+
         // Accumulate aggregate value
         if ($this->RowType != ROWTYPE_AGGREGATEINIT && $this->RowType != ROWTYPE_AGGREGATE) {
             if (is_numeric($this->quantity->CurrentValue)) {
@@ -2429,6 +2461,10 @@ class ViewTransactionsPerOperatorList extends ViewTransactionsPerOperator
             $this->total->CellCssStyle .= "text-align: right;";
             $this->total->ViewCustomAttributes = "";
 
+            // download
+            $this->download->ViewValue = $this->download->CurrentValue;
+            $this->download->ViewCustomAttributes = "";
+
             // transaction_id
             $this->transaction_id->LinkCustomAttributes = "";
             $this->transaction_id->HrefValue = "";
@@ -2497,6 +2533,19 @@ class ViewTransactionsPerOperatorList extends ViewTransactionsPerOperator
             $this->total->LinkCustomAttributes = "";
             $this->total->HrefValue = "";
             $this->total->TooltipValue = "";
+
+            // download
+            $this->download->LinkCustomAttributes = "class='btn btn-block btn-info'";
+            if (!EmptyValue($this->transaction_id->CurrentValue)) {
+                $this->download->HrefValue = "download.php?v=v3.2&id=" . $this->transaction_id->CurrentValue; // Add prefix/suffix
+                $this->download->LinkAttrs["target"] = "_blank"; // Add target
+                if ($this->isExport()) {
+                    $this->download->HrefValue = FullUrl($this->download->HrefValue, "href");
+                }
+            } else {
+                $this->download->HrefValue = "";
+            }
+            $this->download->TooltipValue = "";
         } elseif ($this->RowType == ROWTYPE_SEARCH) {
             // transaction_id
             $this->transaction_id->EditAttrs["class"] = "form-control";
@@ -2581,6 +2630,12 @@ class ViewTransactionsPerOperatorList extends ViewTransactionsPerOperator
             $this->total->EditCustomAttributes = "";
             $this->total->EditValue = HtmlEncode($this->total->AdvancedSearch->SearchValue);
             $this->total->PlaceHolder = RemoveHtml($this->total->caption());
+
+            // download
+            $this->download->EditAttrs["class"] = "form-control";
+            $this->download->EditCustomAttributes = "";
+            $this->download->EditValue = HtmlEncode($this->download->AdvancedSearch->SearchValue);
+            $this->download->PlaceHolder = RemoveHtml($this->download->caption());
         } elseif ($this->RowType == ROWTYPE_AGGREGATEINIT) { // Initialize aggregate row
                     $this->quantity->Total = 0; // Initialize total
                     $this->operator_fee->Total = 0; // Initialize total
@@ -2668,6 +2723,7 @@ class ViewTransactionsPerOperatorList extends ViewTransactionsPerOperator
         $this->bus_size_id->AdvancedSearch->load();
         $this->vendor_search_id->AdvancedSearch->load();
         $this->vendor_search_name->AdvancedSearch->load();
+        $this->download->AdvancedSearch->load();
     }
 
     // Get export HTML tag
@@ -2787,7 +2843,7 @@ class ViewTransactionsPerOperatorList extends ViewTransactionsPerOperator
 
         // Advanced search button
         $item = &$this->SearchOptions->add("advancedsearch");
-        $item->Body = "<a class=\"btn btn-default ew-advanced-search\" title=\"" . $Language->phrase("AdvancedSearch") . "\" data-caption=\"" . $Language->phrase("AdvancedSearch") . "\" href=\"viewtransactionsperoperatorsearch\">" . $Language->phrase("AdvancedSearchBtn") . "</a>";
+        $item->Body = "<a class=\"btn btn-default ew-advanced-search\" title=\"" . $Language->phrase("AdvancedSearch") . "\" data-caption=\"" . $Language->phrase("AdvancedSearch") . "\" href=\"ViewTransactionsPerOperatorSearch\">" . $Language->phrase("AdvancedSearchBtn") . "</a>";
         $item->Visible = true;
 
         // Button group for search

@@ -652,7 +652,7 @@ class MainPrintOrders extends DbTable
         if ($referUrl != "" && $referPageName != CurrentPageName() && $referPageName != "login") { // Referer not same page or login page
             $_SESSION[$name] = $referUrl; // Save to Session
         }
-        return $_SESSION[$name] ?? GetUrl("mainprintorderslist");
+        return $_SESSION[$name] ?? GetUrl("MainPrintOrdersList");
     }
 
     // Set return page URL
@@ -665,11 +665,11 @@ class MainPrintOrders extends DbTable
     public function getModalCaption($pageName)
     {
         global $Language;
-        if ($pageName == "mainprintordersview") {
+        if ($pageName == "MainPrintOrdersView") {
             return $Language->phrase("View");
-        } elseif ($pageName == "mainprintordersedit") {
+        } elseif ($pageName == "MainPrintOrdersEdit") {
             return $Language->phrase("Edit");
-        } elseif ($pageName == "mainprintordersadd") {
+        } elseif ($pageName == "MainPrintOrdersAdd") {
             return $Language->phrase("Add");
         } else {
             return "";
@@ -698,16 +698,16 @@ class MainPrintOrders extends DbTable
     // List URL
     public function getListUrl()
     {
-        return "mainprintorderslist";
+        return "MainPrintOrdersList";
     }
 
     // View URL
     public function getViewUrl($parm = "")
     {
         if ($parm != "") {
-            $url = $this->keyUrl("mainprintordersview", $this->getUrlParm($parm));
+            $url = $this->keyUrl("MainPrintOrdersView", $this->getUrlParm($parm));
         } else {
-            $url = $this->keyUrl("mainprintordersview", $this->getUrlParm(Config("TABLE_SHOW_DETAIL") . "="));
+            $url = $this->keyUrl("MainPrintOrdersView", $this->getUrlParm(Config("TABLE_SHOW_DETAIL") . "="));
         }
         return $this->addMasterUrl($url);
     }
@@ -716,9 +716,9 @@ class MainPrintOrders extends DbTable
     public function getAddUrl($parm = "")
     {
         if ($parm != "") {
-            $url = "mainprintordersadd?" . $this->getUrlParm($parm);
+            $url = "MainPrintOrdersAdd?" . $this->getUrlParm($parm);
         } else {
-            $url = "mainprintordersadd";
+            $url = "MainPrintOrdersAdd";
         }
         return $this->addMasterUrl($url);
     }
@@ -726,7 +726,7 @@ class MainPrintOrders extends DbTable
     // Edit URL
     public function getEditUrl($parm = "")
     {
-        $url = $this->keyUrl("mainprintordersedit", $this->getUrlParm($parm));
+        $url = $this->keyUrl("MainPrintOrdersEdit", $this->getUrlParm($parm));
         return $this->addMasterUrl($url);
     }
 
@@ -740,7 +740,7 @@ class MainPrintOrders extends DbTable
     // Copy URL
     public function getCopyUrl($parm = "")
     {
-        $url = $this->keyUrl("mainprintordersadd", $this->getUrlParm($parm));
+        $url = $this->keyUrl("MainPrintOrdersAdd", $this->getUrlParm($parm));
         return $this->addMasterUrl($url);
     }
 
@@ -754,7 +754,7 @@ class MainPrintOrders extends DbTable
     // Delete URL
     public function getDeleteUrl()
     {
-        return $this->keyUrl("mainprintordersdelete", $this->getUrlParm());
+        return $this->keyUrl("MainPrintOrdersDelete", $this->getUrlParm());
     }
 
     // Add master url
@@ -1064,7 +1064,7 @@ SORTHTML;
         // link
         $this->link->LinkCustomAttributes = "";
         if (!EmptyValue($this->id->CurrentValue)) {
-            $this->link->HrefValue = "download.php?id=" . (!empty($this->id->ViewValue) && !is_array($this->id->ViewValue) ? RemoveHtml($this->id->ViewValue) : $this->id->CurrentValue); // Add prefix/suffix
+            $this->link->HrefValue = "downloadbp.php?id=" . (!empty($this->id->ViewValue) && !is_array($this->id->ViewValue) ? RemoveHtml($this->id->ViewValue) : $this->id->CurrentValue); // Add prefix/suffix
             $this->link->LinkAttrs["target"] = "_blank"; // Add target
             if ($this->isExport()) {
                 $this->link->HrefValue = FullUrl($this->link->HrefValue, "href");
@@ -1427,8 +1427,8 @@ SORTHTML;
     	//}
     	if ($rsold["approved"] == 'f' && $rsnew["approved"] == '1') {
     		// Email to TM
-    		$editfile = '/opt/lampp/htdocs/printingandbranding/passes_source/ppt/slides/slide1.xml';
-    		$immutabletemplate = '/opt/lampp/htdocs/printingandbranding/passes_run/template.xml';
+    		$editfile = '/opt/lampp/htdocs/printingandbrandingv3/passes_source/ppt/slides/slide1.xml';
+    		$immutabletemplate = '/opt/lampp/htdocs/printingandbrandingv3/passes_run/template.xml';
     		$id = $rsold["id"];
     		$sql = <<<EOT
     SELECT id, campaign_id,
@@ -1465,8 +1465,8 @@ SORTHTML;
 
     // STEP 2
     			// Zip file
-    			$zipfile = '/opt/lampp/htdocs/printingandbranding/passes_run/file.pptx';
-    			$rootPath = realpath('/opt/lampp/htdocs/printingandbranding/passes_source');
+    			$zipfile = '/opt/lampp/htdocs/printingandbrandingv3/passes_run/file.pptx';
+    			$rootPath = realpath('/opt/lampp/htdocs/printingandbrandingv3/passes_source');
     			// print_r($rootPath);
     			// exit;
     			// Initialize archive object
@@ -1498,7 +1498,7 @@ SORTHTML;
     // STEP 3
     		if (strpos($_SERVER['SERVER_NAME'], 'localhost') === false) {
     			// Copy file to temp folder for conversion
-    			$final_file = '/opt/lampp/htdocs/printingandbranding/passes_temp/BRANDERS_PASS_' . $replacements['X0XPRINTCODEX0X'] . '.pptx';
+    			$final_file = '/opt/lampp/htdocs/printingandbrandingv3/passes_temp/BRANDERS_PASS_' . $replacements['X0XPRINTCODEX0X'] . '.pptx';
     			if (file_exists($final_file)) {
     				unlink($final_file);
     			}
@@ -1521,7 +1521,7 @@ SORTHTML;
     		$bcc = $final_bcc;
     		debugdump("BRANDERS PASS exposed_emails",$exposed_emails);
     		#===============================================================
-    		$attachment = '/opt/lampp/htdocs/printingandbranding/passes/BRANDERS_PASS_434-' . $id . '.pdf';
+    		$attachment = '/opt/lampp/htdocs/printingandbrandingv3/passes/BRANDERS_PASS_434-' . $id . '.pdf';
     		$subject = "BRANDERS PASS";
     		$msg = "Please find branders pass attached.";
     		$msgtxt = "Please find branders pass attached.";

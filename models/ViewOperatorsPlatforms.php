@@ -545,7 +545,7 @@ class ViewOperatorsPlatforms extends DbTable
         if ($referUrl != "" && $referPageName != CurrentPageName() && $referPageName != "login") { // Referer not same page or login page
             $_SESSION[$name] = $referUrl; // Save to Session
         }
-        return $_SESSION[$name] ?? GetUrl("viewoperatorsplatformslist");
+        return $_SESSION[$name] ?? GetUrl("ViewOperatorsPlatformsList");
     }
 
     // Set return page URL
@@ -558,11 +558,11 @@ class ViewOperatorsPlatforms extends DbTable
     public function getModalCaption($pageName)
     {
         global $Language;
-        if ($pageName == "viewoperatorsplatformsview") {
+        if ($pageName == "ViewOperatorsPlatformsView") {
             return $Language->phrase("View");
-        } elseif ($pageName == "viewoperatorsplatformsedit") {
+        } elseif ($pageName == "ViewOperatorsPlatformsEdit") {
             return $Language->phrase("Edit");
-        } elseif ($pageName == "viewoperatorsplatformsadd") {
+        } elseif ($pageName == "ViewOperatorsPlatformsAdd") {
             return $Language->phrase("Add");
         } else {
             return "";
@@ -591,16 +591,16 @@ class ViewOperatorsPlatforms extends DbTable
     // List URL
     public function getListUrl()
     {
-        return "viewoperatorsplatformslist";
+        return "ViewOperatorsPlatformsList";
     }
 
     // View URL
     public function getViewUrl($parm = "")
     {
         if ($parm != "") {
-            $url = $this->keyUrl("viewoperatorsplatformsview", $this->getUrlParm($parm));
+            $url = $this->keyUrl("ViewOperatorsPlatformsView", $this->getUrlParm($parm));
         } else {
-            $url = $this->keyUrl("viewoperatorsplatformsview", $this->getUrlParm(Config("TABLE_SHOW_DETAIL") . "="));
+            $url = $this->keyUrl("ViewOperatorsPlatformsView", $this->getUrlParm(Config("TABLE_SHOW_DETAIL") . "="));
         }
         return $this->addMasterUrl($url);
     }
@@ -609,9 +609,9 @@ class ViewOperatorsPlatforms extends DbTable
     public function getAddUrl($parm = "")
     {
         if ($parm != "") {
-            $url = "viewoperatorsplatformsadd?" . $this->getUrlParm($parm);
+            $url = "ViewOperatorsPlatformsAdd?" . $this->getUrlParm($parm);
         } else {
-            $url = "viewoperatorsplatformsadd";
+            $url = "ViewOperatorsPlatformsAdd";
         }
         return $this->addMasterUrl($url);
     }
@@ -619,7 +619,7 @@ class ViewOperatorsPlatforms extends DbTable
     // Edit URL
     public function getEditUrl($parm = "")
     {
-        $url = $this->keyUrl("viewoperatorsplatformsedit", $this->getUrlParm($parm));
+        $url = $this->keyUrl("ViewOperatorsPlatformsEdit", $this->getUrlParm($parm));
         return $this->addMasterUrl($url);
     }
 
@@ -633,7 +633,7 @@ class ViewOperatorsPlatforms extends DbTable
     // Copy URL
     public function getCopyUrl($parm = "")
     {
-        $url = $this->keyUrl("viewoperatorsplatformsadd", $this->getUrlParm($parm));
+        $url = $this->keyUrl("ViewOperatorsPlatformsAdd", $this->getUrlParm($parm));
         return $this->addMasterUrl($url);
     }
 
@@ -647,7 +647,7 @@ class ViewOperatorsPlatforms extends DbTable
     // Delete URL
     public function getDeleteUrl()
     {
-        return $this->keyUrl("viewoperatorsplatformsdelete", $this->getUrlParm());
+        return $this->keyUrl("ViewOperatorsPlatformsDelete", $this->getUrlParm());
     }
 
     // Add master url

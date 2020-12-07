@@ -182,12 +182,12 @@ class ViewVendorsOperatorsList extends ViewVendorsOperators
         $this->ExportHtmlUrl = $pageUrl . "export=html";
         $this->ExportXmlUrl = $pageUrl . "export=xml";
         $this->ExportCsvUrl = $pageUrl . "export=csv";
-        $this->AddUrl = "viewvendorsoperatorsadd";
+        $this->AddUrl = "ViewVendorsOperatorsAdd";
         $this->InlineAddUrl = $pageUrl . "action=add";
         $this->GridAddUrl = $pageUrl . "action=gridadd";
         $this->GridEditUrl = $pageUrl . "action=gridedit";
-        $this->MultiDeleteUrl = "viewvendorsoperatorsdelete";
-        $this->MultiUpdateUrl = "viewvendorsoperatorsupdate";
+        $this->MultiDeleteUrl = "ViewVendorsOperatorsDelete";
+        $this->MultiUpdateUrl = "ViewVendorsOperatorsUpdate";
 
         // Table name (for backward compatibility only)
         if (!defined(PROJECT_NAMESPACE . "TABLE_NAME")) {

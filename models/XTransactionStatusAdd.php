@@ -238,7 +238,7 @@ class XTransactionStatusAdd extends XTransactionStatus
                 $pageName = GetPageName($url);
                 if ($pageName != $this->getListUrl()) { // Not List page
                     $row["caption"] = $this->getModalCaption($pageName);
-                    if ($pageName == "xtransactionstatusview") {
+                    if ($pageName == "XTransactionStatusView") {
                         $row["view"] = "1";
                     }
                 } else { // List page should not be shown as modal => error
@@ -514,7 +514,7 @@ class XTransactionStatusAdd extends XTransactionStatus
                     if ($this->getFailureMessage() == "") {
                         $this->setFailureMessage($Language->phrase("NoRecord")); // No record found
                     }
-                    $this->terminate("xtransactionstatuslist"); // No matching record, return to list
+                    $this->terminate("XTransactionStatusList"); // No matching record, return to list
                     return;
                 }
                 break;
@@ -525,9 +525,9 @@ class XTransactionStatusAdd extends XTransactionStatus
                         $this->setSuccessMessage($Language->phrase("AddSuccess")); // Set up success message
                     }
                     $returnUrl = $this->getReturnUrl();
-                    if (GetPageName($returnUrl) == "xtransactionstatuslist") {
+                    if (GetPageName($returnUrl) == "XTransactionStatusList") {
                         $returnUrl = $this->addMasterUrl($returnUrl); // List page, return to List page with correct master key if necessary
-                    } elseif (GetPageName($returnUrl) == "xtransactionstatusview") {
+                    } elseif (GetPageName($returnUrl) == "XTransactionStatusView") {
                         $returnUrl = $this->getViewUrl(); // View page, return to View page with keyurl directly
                     }
                     if (IsApi()) { // Return to caller
@@ -930,7 +930,7 @@ class XTransactionStatusAdd extends XTransactionStatus
         global $Breadcrumb, $Language;
         $Breadcrumb = new Breadcrumb("index");
         $url = CurrentUrl();
-        $Breadcrumb->add("list", $this->TableVar, $this->addMasterUrl("xtransactionstatuslist"), "", $this->TableVar, true);
+        $Breadcrumb->add("list", $this->TableVar, $this->addMasterUrl("XTransactionStatusList"), "", $this->TableVar, true);
         $pageId = ($this->isCopy()) ? "Copy" : "Add";
         $Breadcrumb->add("add", $pageId, $url);
     }

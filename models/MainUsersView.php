@@ -293,7 +293,7 @@ class MainUsersView extends MainUsers
                 $pageName = GetPageName($url);
                 if ($pageName != $this->getListUrl()) { // Not List page
                     $row["caption"] = $this->getModalCaption($pageName);
-                    if ($pageName == "mainusersview") {
+                    if ($pageName == "MainUsersView") {
                         $row["view"] = "1";
                     }
                 } else { // List page should not be shown as modal => error
@@ -538,7 +538,7 @@ class MainUsersView extends MainUsers
                 $this->id->setQueryStringValue($keyValue);
                 $this->RecKey["id"] = $this->id->QueryStringValue;
             } else {
-                $returnUrl = "mainuserslist"; // Return to list
+                $returnUrl = "MainUsersList"; // Return to list
             }
 
             // Get action
@@ -561,12 +561,12 @@ class MainUsersView extends MainUsers
                         if ($this->getSuccessMessage() == "" && $this->getFailureMessage() == "") {
                             $this->setFailureMessage($Language->phrase("NoRecord")); // Set no record message
                         }
-                        $returnUrl = "mainuserslist"; // No matching record, return to list
+                        $returnUrl = "MainUsersList"; // No matching record, return to list
                     }
                     break;
             }
         } else {
-            $returnUrl = "mainuserslist"; // Not page request, return to list
+            $returnUrl = "MainUsersList"; // Not page request, return to list
         }
         if ($returnUrl != "") {
             $this->terminate($returnUrl);
@@ -670,7 +670,7 @@ class MainUsersView extends MainUsers
         // "detail_main_campaigns"
         $item = &$option->add("detail_main_campaigns");
         $body = $Language->phrase("ViewPageDetailLink") . $Language->TablePhrase("main_campaigns", "TblCaption");
-        $body = "<a class=\"btn btn-default ew-row-link ew-detail\" data-action=\"list\" href=\"" . HtmlEncode(GetUrl("maincampaignslist?" . Config("TABLE_SHOW_MASTER") . "=main_users&" . GetForeignKeyUrl("fk_id", $this->id->CurrentValue) . "")) . "\">" . $body . "</a>";
+        $body = "<a class=\"btn btn-default ew-row-link ew-detail\" data-action=\"list\" href=\"" . HtmlEncode(GetUrl("MainCampaignsList?" . Config("TABLE_SHOW_MASTER") . "=main_users&" . GetForeignKeyUrl("fk_id", $this->id->CurrentValue) . "")) . "\">" . $body . "</a>";
         $links = "";
         $detailPageObj = Container("MainCampaignsGrid");
         if ($detailPageObj->DetailView && $Security->canView() && $Security->allowView(CurrentProjectID() . 'main_users')) {
@@ -1098,7 +1098,7 @@ class MainUsersView extends MainUsers
         global $Breadcrumb, $Language;
         $Breadcrumb = new Breadcrumb("index");
         $url = CurrentUrl();
-        $Breadcrumb->add("list", $this->TableVar, $this->addMasterUrl("mainuserslist"), "", $this->TableVar, true);
+        $Breadcrumb->add("list", $this->TableVar, $this->addMasterUrl("MainUsersList"), "", $this->TableVar, true);
         $pageId = "view";
         $Breadcrumb->add("view", $pageId, $url);
     }

@@ -182,12 +182,12 @@ class XPaymentStatusList extends XPaymentStatus
         $this->ExportHtmlUrl = $pageUrl . "export=html";
         $this->ExportXmlUrl = $pageUrl . "export=xml";
         $this->ExportCsvUrl = $pageUrl . "export=csv";
-        $this->AddUrl = "xpaymentstatusadd";
+        $this->AddUrl = "XPaymentStatusAdd";
         $this->InlineAddUrl = $pageUrl . "action=add";
         $this->GridAddUrl = $pageUrl . "action=gridadd";
         $this->GridEditUrl = $pageUrl . "action=gridedit";
-        $this->MultiDeleteUrl = "xpaymentstatusdelete";
-        $this->MultiUpdateUrl = "xpaymentstatusupdate";
+        $this->MultiDeleteUrl = "XPaymentStatusDelete";
+        $this->MultiUpdateUrl = "XPaymentStatusUpdate";
 
         // Table name (for backward compatibility only)
         if (!defined(PROJECT_NAMESPACE . "TABLE_NAME")) {

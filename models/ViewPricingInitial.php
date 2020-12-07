@@ -663,7 +663,7 @@ class ViewPricingInitial extends DbTable
         if ($referUrl != "" && $referPageName != CurrentPageName() && $referPageName != "login") { // Referer not same page or login page
             $_SESSION[$name] = $referUrl; // Save to Session
         }
-        return $_SESSION[$name] ?? GetUrl("viewpricinginitiallist");
+        return $_SESSION[$name] ?? GetUrl("ViewPricingInitialList");
     }
 
     // Set return page URL
@@ -676,11 +676,11 @@ class ViewPricingInitial extends DbTable
     public function getModalCaption($pageName)
     {
         global $Language;
-        if ($pageName == "viewpricinginitialview") {
+        if ($pageName == "ViewPricingInitialView") {
             return $Language->phrase("View");
-        } elseif ($pageName == "viewpricinginitialedit") {
+        } elseif ($pageName == "ViewPricingInitialEdit") {
             return $Language->phrase("Edit");
-        } elseif ($pageName == "viewpricinginitialadd") {
+        } elseif ($pageName == "ViewPricingInitialAdd") {
             return $Language->phrase("Add");
         } else {
             return "";
@@ -709,16 +709,16 @@ class ViewPricingInitial extends DbTable
     // List URL
     public function getListUrl()
     {
-        return "viewpricinginitiallist";
+        return "ViewPricingInitialList";
     }
 
     // View URL
     public function getViewUrl($parm = "")
     {
         if ($parm != "") {
-            $url = $this->keyUrl("viewpricinginitialview", $this->getUrlParm($parm));
+            $url = $this->keyUrl("ViewPricingInitialView", $this->getUrlParm($parm));
         } else {
-            $url = $this->keyUrl("viewpricinginitialview", $this->getUrlParm(Config("TABLE_SHOW_DETAIL") . "="));
+            $url = $this->keyUrl("ViewPricingInitialView", $this->getUrlParm(Config("TABLE_SHOW_DETAIL") . "="));
         }
         return $this->addMasterUrl($url);
     }
@@ -727,9 +727,9 @@ class ViewPricingInitial extends DbTable
     public function getAddUrl($parm = "")
     {
         if ($parm != "") {
-            $url = "viewpricinginitialadd?" . $this->getUrlParm($parm);
+            $url = "ViewPricingInitialAdd?" . $this->getUrlParm($parm);
         } else {
-            $url = "viewpricinginitialadd";
+            $url = "ViewPricingInitialAdd";
         }
         return $this->addMasterUrl($url);
     }
@@ -737,7 +737,7 @@ class ViewPricingInitial extends DbTable
     // Edit URL
     public function getEditUrl($parm = "")
     {
-        $url = $this->keyUrl("viewpricinginitialedit", $this->getUrlParm($parm));
+        $url = $this->keyUrl("ViewPricingInitialEdit", $this->getUrlParm($parm));
         return $this->addMasterUrl($url);
     }
 
@@ -751,7 +751,7 @@ class ViewPricingInitial extends DbTable
     // Copy URL
     public function getCopyUrl($parm = "")
     {
-        $url = $this->keyUrl("viewpricinginitialadd", $this->getUrlParm($parm));
+        $url = $this->keyUrl("ViewPricingInitialAdd", $this->getUrlParm($parm));
         return $this->addMasterUrl($url);
     }
 
@@ -765,7 +765,7 @@ class ViewPricingInitial extends DbTable
     // Delete URL
     public function getDeleteUrl()
     {
-        return $this->keyUrl("viewpricinginitialdelete", $this->getUrlParm());
+        return $this->keyUrl("ViewPricingInitialDelete", $this->getUrlParm());
     }
 
     // Add master url

@@ -182,12 +182,12 @@ class ViewTransactionsPerPlatformList extends ViewTransactionsPerPlatform
         $this->ExportHtmlUrl = $pageUrl . "export=html";
         $this->ExportXmlUrl = $pageUrl . "export=xml";
         $this->ExportCsvUrl = $pageUrl . "export=csv";
-        $this->AddUrl = "viewtransactionsperplatformadd";
+        $this->AddUrl = "ViewTransactionsPerPlatformAdd";
         $this->InlineAddUrl = $pageUrl . "action=add";
         $this->GridAddUrl = $pageUrl . "action=gridadd";
         $this->GridEditUrl = $pageUrl . "action=gridedit";
-        $this->MultiDeleteUrl = "viewtransactionsperplatformdelete";
-        $this->MultiUpdateUrl = "viewtransactionsperplatformupdate";
+        $this->MultiDeleteUrl = "ViewTransactionsPerPlatformDelete";
+        $this->MultiUpdateUrl = "ViewTransactionsPerPlatformUpdate";
 
         // Table name (for backward compatibility only)
         if (!defined(PROJECT_NAMESPACE . "TABLE_NAME")) {
@@ -2672,7 +2672,7 @@ class ViewTransactionsPerPlatformList extends ViewTransactionsPerPlatform
 
         // Advanced search button
         $item = &$this->SearchOptions->add("advancedsearch");
-        $item->Body = "<a class=\"btn btn-default ew-advanced-search\" title=\"" . $Language->phrase("AdvancedSearch") . "\" data-caption=\"" . $Language->phrase("AdvancedSearch") . "\" href=\"viewtransactionsperplatformsearch\">" . $Language->phrase("AdvancedSearchBtn") . "</a>";
+        $item->Body = "<a class=\"btn btn-default ew-advanced-search\" title=\"" . $Language->phrase("AdvancedSearch") . "\" data-caption=\"" . $Language->phrase("AdvancedSearch") . "\" href=\"ViewTransactionsPerPlatformSearch\">" . $Language->phrase("AdvancedSearchBtn") . "</a>";
         $item->Visible = true;
 
         // Button group for search

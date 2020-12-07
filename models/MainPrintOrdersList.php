@@ -182,12 +182,12 @@ class MainPrintOrdersList extends MainPrintOrders
         $this->ExportHtmlUrl = $pageUrl . "export=html";
         $this->ExportXmlUrl = $pageUrl . "export=xml";
         $this->ExportCsvUrl = $pageUrl . "export=csv";
-        $this->AddUrl = "mainprintordersadd";
+        $this->AddUrl = "MainPrintOrdersAdd";
         $this->InlineAddUrl = $pageUrl . "action=add";
         $this->GridAddUrl = $pageUrl . "action=gridadd";
         $this->GridEditUrl = $pageUrl . "action=gridedit";
-        $this->MultiDeleteUrl = "mainprintordersdelete";
-        $this->MultiUpdateUrl = "mainprintordersupdate";
+        $this->MultiDeleteUrl = "MainPrintOrdersDelete";
+        $this->MultiUpdateUrl = "MainPrintOrdersUpdate";
 
         // Table name (for backward compatibility only)
         if (!defined(PROJECT_NAMESPACE . "TABLE_NAME")) {
@@ -1877,7 +1877,7 @@ class MainPrintOrdersList extends MainPrintOrders
             // link
             $this->link->LinkCustomAttributes = "";
             if (!EmptyValue($this->id->CurrentValue)) {
-                $this->link->HrefValue = "download.php?id=" . (!empty($this->id->ViewValue) && !is_array($this->id->ViewValue) ? RemoveHtml($this->id->ViewValue) : $this->id->CurrentValue); // Add prefix/suffix
+                $this->link->HrefValue = "downloadbp.php?id=" . (!empty($this->id->ViewValue) && !is_array($this->id->ViewValue) ? RemoveHtml($this->id->ViewValue) : $this->id->CurrentValue); // Add prefix/suffix
                 $this->link->LinkAttrs["target"] = "_blank"; // Add target
                 if ($this->isExport()) {
                     $this->link->HrefValue = FullUrl($this->link->HrefValue, "href");

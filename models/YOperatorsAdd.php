@@ -238,7 +238,7 @@ class YOperatorsAdd extends YOperators
                 $pageName = GetPageName($url);
                 if ($pageName != $this->getListUrl()) { // Not List page
                     $row["caption"] = $this->getModalCaption($pageName);
-                    if ($pageName == "yoperatorsview") {
+                    if ($pageName == "YOperatorsView") {
                         $row["view"] = "1";
                     }
                 } else { // List page should not be shown as modal => error
@@ -524,7 +524,7 @@ class YOperatorsAdd extends YOperators
                     if ($this->getFailureMessage() == "") {
                         $this->setFailureMessage($Language->phrase("NoRecord")); // No record found
                     }
-                    $this->terminate("yoperatorslist"); // No matching record, return to list
+                    $this->terminate("YOperatorsList"); // No matching record, return to list
                     return;
                 }
 
@@ -542,9 +542,9 @@ class YOperatorsAdd extends YOperators
                     } else {
                         $returnUrl = $this->getReturnUrl();
                     }
-                    if (GetPageName($returnUrl) == "yoperatorslist") {
+                    if (GetPageName($returnUrl) == "YOperatorsList") {
                         $returnUrl = $this->addMasterUrl($returnUrl); // List page, return to List page with correct master key if necessary
-                    } elseif (GetPageName($returnUrl) == "yoperatorsview") {
+                    } elseif (GetPageName($returnUrl) == "YOperatorsView") {
                         $returnUrl = $this->getViewUrl(); // View page, return to View page with keyurl directly
                     }
                     if (IsApi()) { // Return to caller
@@ -1268,7 +1268,7 @@ class YOperatorsAdd extends YOperators
         global $Breadcrumb, $Language;
         $Breadcrumb = new Breadcrumb("index");
         $url = CurrentUrl();
-        $Breadcrumb->add("list", $this->TableVar, $this->addMasterUrl("yoperatorslist"), "", $this->TableVar, true);
+        $Breadcrumb->add("list", $this->TableVar, $this->addMasterUrl("YOperatorsList"), "", $this->TableVar, true);
         $pageId = ($this->isCopy()) ? "Copy" : "Add";
         $Breadcrumb->add("add", $pageId, $url);
     }

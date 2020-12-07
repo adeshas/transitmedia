@@ -564,7 +564,7 @@ class XBusDepot extends DbTable
         if ($referUrl != "" && $referPageName != CurrentPageName() && $referPageName != "login") { // Referer not same page or login page
             $_SESSION[$name] = $referUrl; // Save to Session
         }
-        return $_SESSION[$name] ?? GetUrl("xbusdepotlist");
+        return $_SESSION[$name] ?? GetUrl("XBusDepotList");
     }
 
     // Set return page URL
@@ -577,11 +577,11 @@ class XBusDepot extends DbTable
     public function getModalCaption($pageName)
     {
         global $Language;
-        if ($pageName == "xbusdepotview") {
+        if ($pageName == "XBusDepotView") {
             return $Language->phrase("View");
-        } elseif ($pageName == "xbusdepotedit") {
+        } elseif ($pageName == "XBusDepotEdit") {
             return $Language->phrase("Edit");
-        } elseif ($pageName == "xbusdepotadd") {
+        } elseif ($pageName == "XBusDepotAdd") {
             return $Language->phrase("Add");
         } else {
             return "";
@@ -610,16 +610,16 @@ class XBusDepot extends DbTable
     // List URL
     public function getListUrl()
     {
-        return "xbusdepotlist";
+        return "XBusDepotList";
     }
 
     // View URL
     public function getViewUrl($parm = "")
     {
         if ($parm != "") {
-            $url = $this->keyUrl("xbusdepotview", $this->getUrlParm($parm));
+            $url = $this->keyUrl("XBusDepotView", $this->getUrlParm($parm));
         } else {
-            $url = $this->keyUrl("xbusdepotview", $this->getUrlParm(Config("TABLE_SHOW_DETAIL") . "="));
+            $url = $this->keyUrl("XBusDepotView", $this->getUrlParm(Config("TABLE_SHOW_DETAIL") . "="));
         }
         return $this->addMasterUrl($url);
     }
@@ -628,9 +628,9 @@ class XBusDepot extends DbTable
     public function getAddUrl($parm = "")
     {
         if ($parm != "") {
-            $url = "xbusdepotadd?" . $this->getUrlParm($parm);
+            $url = "XBusDepotAdd?" . $this->getUrlParm($parm);
         } else {
-            $url = "xbusdepotadd";
+            $url = "XBusDepotAdd";
         }
         return $this->addMasterUrl($url);
     }
@@ -638,7 +638,7 @@ class XBusDepot extends DbTable
     // Edit URL
     public function getEditUrl($parm = "")
     {
-        $url = $this->keyUrl("xbusdepotedit", $this->getUrlParm($parm));
+        $url = $this->keyUrl("XBusDepotEdit", $this->getUrlParm($parm));
         return $this->addMasterUrl($url);
     }
 
@@ -652,7 +652,7 @@ class XBusDepot extends DbTable
     // Copy URL
     public function getCopyUrl($parm = "")
     {
-        $url = $this->keyUrl("xbusdepotadd", $this->getUrlParm($parm));
+        $url = $this->keyUrl("XBusDepotAdd", $this->getUrlParm($parm));
         return $this->addMasterUrl($url);
     }
 
@@ -666,7 +666,7 @@ class XBusDepot extends DbTable
     // Delete URL
     public function getDeleteUrl()
     {
-        return $this->keyUrl("xbusdepotdelete", $this->getUrlParm());
+        return $this->keyUrl("XBusDepotDelete", $this->getUrlParm());
     }
 
     // Add master url

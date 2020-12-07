@@ -153,7 +153,7 @@ class MainCampaignsGrid extends MainCampaigns
 
         // Page URL
         $pageUrl = $this->pageUrl();
-        $this->AddUrl = "maincampaignsadd";
+        $this->AddUrl = "MainCampaignsAdd";
 
         // Table name (for backward compatibility only)
         if (!defined(PROJECT_NAMESPACE . "TABLE_NAME")) {
@@ -599,7 +599,7 @@ class MainCampaignsGrid extends MainCampaigns
             $this->MasterRecordExists = $rsmaster !== false;
             if (!$this->MasterRecordExists) {
                 $this->setFailureMessage($Language->phrase("NoRecord")); // Set no record found
-                $this->terminate("yvendorslist"); // Return to master page
+                $this->terminate("YVendorsList"); // Return to master page
                 return;
             } else {
                 $masterTbl->loadListRowValues($rsmaster);
@@ -615,7 +615,7 @@ class MainCampaignsGrid extends MainCampaigns
             $this->MasterRecordExists = $rsmaster !== false;
             if (!$this->MasterRecordExists) {
                 $this->setFailureMessage($Language->phrase("NoRecord")); // Set no record found
-                $this->terminate("mainuserslist"); // Return to master page
+                $this->terminate("MainUsersList"); // Return to master page
                 return;
             } else {
                 $masterTbl->loadListRowValues($rsmaster);
@@ -631,7 +631,7 @@ class MainCampaignsGrid extends MainCampaigns
             $this->MasterRecordExists = $rsmaster !== false;
             if (!$this->MasterRecordExists) {
                 $this->setFailureMessage($Language->phrase("NoRecord")); // Set no record found
-                $this->terminate("yplatformslist"); // Return to master page
+                $this->terminate("YPlatformsList"); // Return to master page
                 return;
             } else {
                 $masterTbl->loadListRowValues($rsmaster);

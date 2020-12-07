@@ -182,12 +182,12 @@ class ZCoreSettingsList extends ZCoreSettings
         $this->ExportHtmlUrl = $pageUrl . "export=html";
         $this->ExportXmlUrl = $pageUrl . "export=xml";
         $this->ExportCsvUrl = $pageUrl . "export=csv";
-        $this->AddUrl = "zcoresettingsadd";
+        $this->AddUrl = "ZCoreSettingsAdd";
         $this->InlineAddUrl = $pageUrl . "action=add";
         $this->GridAddUrl = $pageUrl . "action=gridadd";
         $this->GridEditUrl = $pageUrl . "action=gridedit";
-        $this->MultiDeleteUrl = "zcoresettingsdelete";
-        $this->MultiUpdateUrl = "zcoresettingsupdate";
+        $this->MultiDeleteUrl = "ZCoreSettingsDelete";
+        $this->MultiUpdateUrl = "ZCoreSettingsUpdate";
 
         // Table name (for backward compatibility only)
         if (!defined(PROJECT_NAMESPACE . "TABLE_NAME")) {

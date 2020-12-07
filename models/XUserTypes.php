@@ -564,7 +564,7 @@ class XUserTypes extends DbTable
         if ($referUrl != "" && $referPageName != CurrentPageName() && $referPageName != "login") { // Referer not same page or login page
             $_SESSION[$name] = $referUrl; // Save to Session
         }
-        return $_SESSION[$name] ?? GetUrl("xusertypeslist");
+        return $_SESSION[$name] ?? GetUrl("XUserTypesList");
     }
 
     // Set return page URL
@@ -577,11 +577,11 @@ class XUserTypes extends DbTable
     public function getModalCaption($pageName)
     {
         global $Language;
-        if ($pageName == "xusertypesview") {
+        if ($pageName == "XUserTypesView") {
             return $Language->phrase("View");
-        } elseif ($pageName == "xusertypesedit") {
+        } elseif ($pageName == "XUserTypesEdit") {
             return $Language->phrase("Edit");
-        } elseif ($pageName == "xusertypesadd") {
+        } elseif ($pageName == "XUserTypesAdd") {
             return $Language->phrase("Add");
         } else {
             return "";
@@ -610,16 +610,16 @@ class XUserTypes extends DbTable
     // List URL
     public function getListUrl()
     {
-        return "xusertypeslist";
+        return "XUserTypesList";
     }
 
     // View URL
     public function getViewUrl($parm = "")
     {
         if ($parm != "") {
-            $url = $this->keyUrl("xusertypesview", $this->getUrlParm($parm));
+            $url = $this->keyUrl("XUserTypesView", $this->getUrlParm($parm));
         } else {
-            $url = $this->keyUrl("xusertypesview", $this->getUrlParm(Config("TABLE_SHOW_DETAIL") . "="));
+            $url = $this->keyUrl("XUserTypesView", $this->getUrlParm(Config("TABLE_SHOW_DETAIL") . "="));
         }
         return $this->addMasterUrl($url);
     }
@@ -628,9 +628,9 @@ class XUserTypes extends DbTable
     public function getAddUrl($parm = "")
     {
         if ($parm != "") {
-            $url = "xusertypesadd?" . $this->getUrlParm($parm);
+            $url = "XUserTypesAdd?" . $this->getUrlParm($parm);
         } else {
-            $url = "xusertypesadd";
+            $url = "XUserTypesAdd";
         }
         return $this->addMasterUrl($url);
     }
@@ -638,7 +638,7 @@ class XUserTypes extends DbTable
     // Edit URL
     public function getEditUrl($parm = "")
     {
-        $url = $this->keyUrl("xusertypesedit", $this->getUrlParm($parm));
+        $url = $this->keyUrl("XUserTypesEdit", $this->getUrlParm($parm));
         return $this->addMasterUrl($url);
     }
 
@@ -652,7 +652,7 @@ class XUserTypes extends DbTable
     // Copy URL
     public function getCopyUrl($parm = "")
     {
-        $url = $this->keyUrl("xusertypesadd", $this->getUrlParm($parm));
+        $url = $this->keyUrl("XUserTypesAdd", $this->getUrlParm($parm));
         return $this->addMasterUrl($url);
     }
 
@@ -666,7 +666,7 @@ class XUserTypes extends DbTable
     // Delete URL
     public function getDeleteUrl()
     {
-        return $this->keyUrl("xusertypesdelete", $this->getUrlParm());
+        return $this->keyUrl("XUserTypesDelete", $this->getUrlParm());
     }
 
     // Add master url

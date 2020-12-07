@@ -51,6 +51,7 @@ class ViewTransactionsPerOperator extends DbTable
     public $bus_size_id;
     public $vendor_search_id;
     public $vendor_search_name;
+    public $download;
 
     // Page ID
     public $PageID = ""; // To be overridden by subclass
@@ -215,6 +216,12 @@ class ViewTransactionsPerOperator extends DbTable
         $this->vendor_search_name = new DbField('view_transactions_per_operator', 'view_transactions_per_operator', 'x_vendor_search_name', 'vendor_search_name', '"vendor_search_name"', '"vendor_search_name"', 200, 0, -1, false, '"vendor_search_name"', false, false, false, 'FORMATTED TEXT', 'TEXT');
         $this->vendor_search_name->Sortable = true; // Allow sort
         $this->Fields['vendor_search_name'] = &$this->vendor_search_name;
+
+        // download
+        $this->download = new DbField('view_transactions_per_operator', 'view_transactions_per_operator', 'x_download', 'download', '\'DOWNLOAD P/O\'', '\'DOWNLOAD P/O\'', 201, 0, -1, false, '\'DOWNLOAD P/O\'', false, false, false, 'FORMATTED TEXT', 'TEXTAREA');
+        $this->download->IsCustom = true; // Custom field
+        $this->download->Sortable = true; // Allow sort
+        $this->Fields['download'] = &$this->download;
     }
 
     // Field Visibility
@@ -272,7 +279,7 @@ class ViewTransactionsPerOperator extends DbTable
 
     public function getSqlSelect() // Select
     {
-        return $this->SqlSelect ?? $this->getQueryBuilder()->select("*, quantity * operator_fee AS \"total\"");
+        return $this->SqlSelect ?? $this->getQueryBuilder()->select("*, quantity * operator_fee AS \"total\", 'DOWNLOAD P/O' AS \"download\"");
     }
 
     public function sqlSelect() // For backward compatibility
@@ -647,6 +654,7 @@ class ViewTransactionsPerOperator extends DbTable
         $this->bus_size_id->DbValue = $row['bus_size_id'];
         $this->vendor_search_id->DbValue = $row['vendor_search_id'];
         $this->vendor_search_name->DbValue = $row['vendor_search_name'];
+        $this->download->DbValue = $row['download'];
     }
 
     // Delete uploaded files
@@ -694,7 +702,7 @@ class ViewTransactionsPerOperator extends DbTable
         if ($referUrl != "" && $referPageName != CurrentPageName() && $referPageName != "login") { // Referer not same page or login page
             $_SESSION[$name] = $referUrl; // Save to Session
         }
-        return $_SESSION[$name] ?? GetUrl("viewtransactionsperoperatorlist");
+        return $_SESSION[$name] ?? GetUrl("ViewTransactionsPerOperatorList");
     }
 
     // Set return page URL
@@ -707,11 +715,11 @@ class ViewTransactionsPerOperator extends DbTable
     public function getModalCaption($pageName)
     {
         global $Language;
-        if ($pageName == "viewtransactionsperoperatorview") {
+        if ($pageName == "ViewTransactionsPerOperatorView") {
             return $Language->phrase("View");
-        } elseif ($pageName == "viewtransactionsperoperatoredit") {
+        } elseif ($pageName == "ViewTransactionsPerOperatorEdit") {
             return $Language->phrase("Edit");
-        } elseif ($pageName == "viewtransactionsperoperatoradd") {
+        } elseif ($pageName == "ViewTransactionsPerOperatorAdd") {
             return $Language->phrase("Add");
         } else {
             return "";
@@ -740,16 +748,16 @@ class ViewTransactionsPerOperator extends DbTable
     // List URL
     public function getListUrl()
     {
-        return "viewtransactionsperoperatorlist";
+        return "ViewTransactionsPerOperatorList";
     }
 
     // View URL
     public function getViewUrl($parm = "")
     {
         if ($parm != "") {
-            $url = $this->keyUrl("viewtransactionsperoperatorview", $this->getUrlParm($parm));
+            $url = $this->keyUrl("ViewTransactionsPerOperatorView", $this->getUrlParm($parm));
         } else {
-            $url = $this->keyUrl("viewtransactionsperoperatorview", $this->getUrlParm(Config("TABLE_SHOW_DETAIL") . "="));
+            $url = $this->keyUrl("ViewTransactionsPerOperatorView", $this->getUrlParm(Config("TABLE_SHOW_DETAIL") . "="));
         }
         return $this->addMasterUrl($url);
     }
@@ -758,9 +766,9 @@ class ViewTransactionsPerOperator extends DbTable
     public function getAddUrl($parm = "")
     {
         if ($parm != "") {
-            $url = "viewtransactionsperoperatoradd?" . $this->getUrlParm($parm);
+            $url = "ViewTransactionsPerOperatorAdd?" . $this->getUrlParm($parm);
         } else {
-            $url = "viewtransactionsperoperatoradd";
+            $url = "ViewTransactionsPerOperatorAdd";
         }
         return $this->addMasterUrl($url);
     }
@@ -768,7 +776,7 @@ class ViewTransactionsPerOperator extends DbTable
     // Edit URL
     public function getEditUrl($parm = "")
     {
-        $url = $this->keyUrl("viewtransactionsperoperatoredit", $this->getUrlParm($parm));
+        $url = $this->keyUrl("ViewTransactionsPerOperatorEdit", $this->getUrlParm($parm));
         return $this->addMasterUrl($url);
     }
 
@@ -782,7 +790,7 @@ class ViewTransactionsPerOperator extends DbTable
     // Copy URL
     public function getCopyUrl($parm = "")
     {
-        $url = $this->keyUrl("viewtransactionsperoperatoradd", $this->getUrlParm($parm));
+        $url = $this->keyUrl("ViewTransactionsPerOperatorAdd", $this->getUrlParm($parm));
         return $this->addMasterUrl($url);
     }
 
@@ -796,7 +804,7 @@ class ViewTransactionsPerOperator extends DbTable
     // Delete URL
     public function getDeleteUrl()
     {
-        return $this->keyUrl("viewtransactionsperoperatordelete", $this->getUrlParm());
+        return $this->keyUrl("ViewTransactionsPerOperatorDelete", $this->getUrlParm());
     }
 
     // Add master url
@@ -944,6 +952,7 @@ SORTHTML;
         $this->bus_size_id->setDbValue($row['bus_size_id']);
         $this->vendor_search_id->setDbValue($row['vendor_search_id']);
         $this->vendor_search_name->setDbValue($row['vendor_search_name']);
+        $this->download->setDbValue($row['download']);
     }
 
     // Render list row values
@@ -1024,6 +1033,9 @@ SORTHTML;
 
         // vendor_search_name
         $this->vendor_search_name->CellCssStyle = "white-space: nowrap;";
+
+        // download
+        $this->download->CellCssStyle = "white-space: nowrap;";
 
         // transaction_id
         $this->transaction_id->ViewValue = $this->transaction_id->CurrentValue;
@@ -1136,6 +1148,10 @@ SORTHTML;
         // vendor_search_name
         $this->vendor_search_name->ViewValue = $this->vendor_search_name->CurrentValue;
         $this->vendor_search_name->ViewCustomAttributes = "";
+
+        // download
+        $this->download->ViewValue = $this->download->CurrentValue;
+        $this->download->ViewCustomAttributes = "";
 
         // transaction_id
         $this->transaction_id->LinkCustomAttributes = "";
@@ -1260,6 +1276,19 @@ SORTHTML;
         $this->vendor_search_name->LinkCustomAttributes = "";
         $this->vendor_search_name->HrefValue = "";
         $this->vendor_search_name->TooltipValue = "";
+
+        // download
+        $this->download->LinkCustomAttributes = "class='btn btn-block btn-info'";
+        if (!EmptyValue($this->transaction_id->CurrentValue)) {
+            $this->download->HrefValue = "download.php?v=v3.2&id=" . $this->transaction_id->CurrentValue; // Add prefix/suffix
+            $this->download->LinkAttrs["target"] = "_blank"; // Add target
+            if ($this->isExport()) {
+                $this->download->HrefValue = FullUrl($this->download->HrefValue, "href");
+            }
+        } else {
+            $this->download->HrefValue = "";
+        }
+        $this->download->TooltipValue = "";
 
         // Call Row Rendered event
         $this->rowRendered();
@@ -1431,6 +1460,12 @@ SORTHTML;
         }
         $this->vendor_search_name->EditValue = $this->vendor_search_name->CurrentValue;
         $this->vendor_search_name->PlaceHolder = RemoveHtml($this->vendor_search_name->caption());
+
+        // download
+        $this->download->EditAttrs["class"] = "form-control";
+        $this->download->EditCustomAttributes = "";
+        $this->download->EditValue = $this->download->CurrentValue;
+        $this->download->PlaceHolder = RemoveHtml($this->download->caption());
 
         // Call Row Rendered event
         $this->rowRendered();

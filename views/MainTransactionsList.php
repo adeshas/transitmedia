@@ -293,10 +293,10 @@ $Page->ListOptions->render("header", "left");
         <th data-name="price_id" class="<?= $Page->price_id->headerCellClass() ?>" style="white-space: nowrap;"><div id="elh_main_transactions_price_id" class="main_transactions_price_id"><?= $Page->renderSort($Page->price_id) ?></div></th>
 <?php } ?>
 <?php if ($Page->quantity->Visible) { // quantity ?>
-        <th data-name="quantity" class="<?= $Page->quantity->headerCellClass() ?>"><div id="elh_main_transactions_quantity" class="main_transactions_quantity"><?= $Page->renderSort($Page->quantity) ?></div></th>
+        <th data-name="quantity" class="<?= $Page->quantity->headerCellClass() ?>" style="white-space: nowrap;"><div id="elh_main_transactions_quantity" class="main_transactions_quantity"><?= $Page->renderSort($Page->quantity) ?></div></th>
 <?php } ?>
 <?php if ($Page->assigned_buses->Visible) { // assigned_buses ?>
-        <th data-name="assigned_buses" class="<?= $Page->assigned_buses->headerCellClass() ?>"><div id="elh_main_transactions_assigned_buses" class="main_transactions_assigned_buses"><?= $Page->renderSort($Page->assigned_buses) ?></div></th>
+        <th data-name="assigned_buses" class="<?= $Page->assigned_buses->headerCellClass() ?>" style="white-space: nowrap;"><div id="elh_main_transactions_assigned_buses" class="main_transactions_assigned_buses"><?= $Page->renderSort($Page->assigned_buses) ?></div></th>
 <?php } ?>
 <?php if ($Page->start_date->Visible) { // start_date ?>
         <th data-name="start_date" class="<?= $Page->start_date->headerCellClass() ?>"><div id="elh_main_transactions_start_date" class="main_transactions_start_date"><?= $Page->renderSort($Page->start_date) ?></div></th>

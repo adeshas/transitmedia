@@ -375,7 +375,7 @@ class MainCampaigns extends DbTable
             $detailUrl .= "&" . GetForeignKeyUrl("fk_id", $this->id->CurrentValue);
         }
         if ($detailUrl == "") {
-            $detailUrl = "maincampaignslist";
+            $detailUrl = "MainCampaignsList";
         }
         return $detailUrl;
     }
@@ -842,7 +842,7 @@ class MainCampaigns extends DbTable
         if ($referUrl != "" && $referPageName != CurrentPageName() && $referPageName != "login") { // Referer not same page or login page
             $_SESSION[$name] = $referUrl; // Save to Session
         }
-        return $_SESSION[$name] ?? GetUrl("maincampaignslist");
+        return $_SESSION[$name] ?? GetUrl("MainCampaignsList");
     }
 
     // Set return page URL
@@ -855,11 +855,11 @@ class MainCampaigns extends DbTable
     public function getModalCaption($pageName)
     {
         global $Language;
-        if ($pageName == "maincampaignsview") {
+        if ($pageName == "MainCampaignsView") {
             return $Language->phrase("View");
-        } elseif ($pageName == "maincampaignsedit") {
+        } elseif ($pageName == "MainCampaignsEdit") {
             return $Language->phrase("Edit");
-        } elseif ($pageName == "maincampaignsadd") {
+        } elseif ($pageName == "MainCampaignsAdd") {
             return $Language->phrase("Add");
         } else {
             return "";
@@ -888,16 +888,16 @@ class MainCampaigns extends DbTable
     // List URL
     public function getListUrl()
     {
-        return "maincampaignslist";
+        return "MainCampaignsList";
     }
 
     // View URL
     public function getViewUrl($parm = "")
     {
         if ($parm != "") {
-            $url = $this->keyUrl("maincampaignsview", $this->getUrlParm($parm));
+            $url = $this->keyUrl("MainCampaignsView", $this->getUrlParm($parm));
         } else {
-            $url = $this->keyUrl("maincampaignsview", $this->getUrlParm(Config("TABLE_SHOW_DETAIL") . "="));
+            $url = $this->keyUrl("MainCampaignsView", $this->getUrlParm(Config("TABLE_SHOW_DETAIL") . "="));
         }
         return $this->addMasterUrl($url);
     }
@@ -906,9 +906,9 @@ class MainCampaigns extends DbTable
     public function getAddUrl($parm = "")
     {
         if ($parm != "") {
-            $url = "maincampaignsadd?" . $this->getUrlParm($parm);
+            $url = "MainCampaignsAdd?" . $this->getUrlParm($parm);
         } else {
-            $url = "maincampaignsadd";
+            $url = "MainCampaignsAdd";
         }
         return $this->addMasterUrl($url);
     }
@@ -917,9 +917,9 @@ class MainCampaigns extends DbTable
     public function getEditUrl($parm = "")
     {
         if ($parm != "") {
-            $url = $this->keyUrl("maincampaignsedit", $this->getUrlParm($parm));
+            $url = $this->keyUrl("MainCampaignsEdit", $this->getUrlParm($parm));
         } else {
-            $url = $this->keyUrl("maincampaignsedit", $this->getUrlParm(Config("TABLE_SHOW_DETAIL") . "="));
+            $url = $this->keyUrl("MainCampaignsEdit", $this->getUrlParm(Config("TABLE_SHOW_DETAIL") . "="));
         }
         return $this->addMasterUrl($url);
     }
@@ -935,9 +935,9 @@ class MainCampaigns extends DbTable
     public function getCopyUrl($parm = "")
     {
         if ($parm != "") {
-            $url = $this->keyUrl("maincampaignsadd", $this->getUrlParm($parm));
+            $url = $this->keyUrl("MainCampaignsAdd", $this->getUrlParm($parm));
         } else {
-            $url = $this->keyUrl("maincampaignsadd", $this->getUrlParm(Config("TABLE_SHOW_DETAIL") . "="));
+            $url = $this->keyUrl("MainCampaignsAdd", $this->getUrlParm(Config("TABLE_SHOW_DETAIL") . "="));
         }
         return $this->addMasterUrl($url);
     }
@@ -952,7 +952,7 @@ class MainCampaigns extends DbTable
     // Delete URL
     public function getDeleteUrl()
     {
-        return $this->keyUrl("maincampaignsdelete", $this->getUrlParm());
+        return $this->keyUrl("MainCampaignsDelete", $this->getUrlParm());
     }
 
     // Add master url

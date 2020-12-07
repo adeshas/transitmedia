@@ -238,7 +238,7 @@ class SubRenewalRequestsAdd extends SubRenewalRequests
                 $pageName = GetPageName($url);
                 if ($pageName != $this->getListUrl()) { // Not List page
                     $row["caption"] = $this->getModalCaption($pageName);
-                    if ($pageName == "subrenewalrequestsview") {
+                    if ($pageName == "SubRenewalRequestsView") {
                         $row["view"] = "1";
                     }
                 } else { // List page should not be shown as modal => error
@@ -515,7 +515,7 @@ class SubRenewalRequestsAdd extends SubRenewalRequests
                     if ($this->getFailureMessage() == "") {
                         $this->setFailureMessage($Language->phrase("NoRecord")); // No record found
                     }
-                    $this->terminate("subrenewalrequestslist"); // No matching record, return to list
+                    $this->terminate("SubRenewalRequestsList"); // No matching record, return to list
                     return;
                 }
                 break;
@@ -526,9 +526,9 @@ class SubRenewalRequestsAdd extends SubRenewalRequests
                         $this->setSuccessMessage($Language->phrase("AddSuccess")); // Set up success message
                     }
                     $returnUrl = $this->getReturnUrl();
-                    if (GetPageName($returnUrl) == "subrenewalrequestslist") {
+                    if (GetPageName($returnUrl) == "SubRenewalRequestsList") {
                         $returnUrl = $this->addMasterUrl($returnUrl); // List page, return to List page with correct master key if necessary
-                    } elseif (GetPageName($returnUrl) == "subrenewalrequestsview") {
+                    } elseif (GetPageName($returnUrl) == "SubRenewalRequestsView") {
                         $returnUrl = $this->getViewUrl(); // View page, return to View page with keyurl directly
                     }
                     if (IsApi()) { // Return to caller
@@ -982,7 +982,7 @@ class SubRenewalRequestsAdd extends SubRenewalRequests
         global $Breadcrumb, $Language;
         $Breadcrumb = new Breadcrumb("index");
         $url = CurrentUrl();
-        $Breadcrumb->add("list", $this->TableVar, $this->addMasterUrl("subrenewalrequestslist"), "", $this->TableVar, true);
+        $Breadcrumb->add("list", $this->TableVar, $this->addMasterUrl("SubRenewalRequestsList"), "", $this->TableVar, true);
         $pageId = ($this->isCopy()) ? "Copy" : "Add";
         $Breadcrumb->add("add", $pageId, $url);
     }

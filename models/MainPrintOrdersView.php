@@ -293,7 +293,7 @@ class MainPrintOrdersView extends MainPrintOrders
                 $pageName = GetPageName($url);
                 if ($pageName != $this->getListUrl()) { // Not List page
                     $row["caption"] = $this->getModalCaption($pageName);
-                    if ($pageName == "mainprintordersview") {
+                    if ($pageName == "MainPrintOrdersView") {
                         $row["view"] = "1";
                     }
                 } else { // List page should not be shown as modal => error
@@ -539,7 +539,7 @@ class MainPrintOrdersView extends MainPrintOrders
                 $this->id->setQueryStringValue($keyValue);
                 $this->RecKey["id"] = $this->id->QueryStringValue;
             } else {
-                $returnUrl = "mainprintorderslist"; // Return to list
+                $returnUrl = "MainPrintOrdersList"; // Return to list
             }
 
             // Get action
@@ -562,12 +562,12 @@ class MainPrintOrdersView extends MainPrintOrders
                         if ($this->getSuccessMessage() == "" && $this->getFailureMessage() == "") {
                             $this->setFailureMessage($Language->phrase("NoRecord")); // Set no record message
                         }
-                        $returnUrl = "mainprintorderslist"; // No matching record, return to list
+                        $returnUrl = "MainPrintOrdersList"; // No matching record, return to list
                     }
                     break;
             }
         } else {
-            $returnUrl = "mainprintorderslist"; // Not page request, return to list
+            $returnUrl = "MainPrintOrdersList"; // Not page request, return to list
         }
         if ($returnUrl != "") {
             $this->terminate($returnUrl);
@@ -907,7 +907,7 @@ class MainPrintOrdersView extends MainPrintOrders
             // link
             $this->link->LinkCustomAttributes = "";
             if (!EmptyValue($this->id->CurrentValue)) {
-                $this->link->HrefValue = "download.php?id=" . (!empty($this->id->ViewValue) && !is_array($this->id->ViewValue) ? RemoveHtml($this->id->ViewValue) : $this->id->CurrentValue); // Add prefix/suffix
+                $this->link->HrefValue = "downloadbp.php?id=" . (!empty($this->id->ViewValue) && !is_array($this->id->ViewValue) ? RemoveHtml($this->id->ViewValue) : $this->id->CurrentValue); // Add prefix/suffix
                 $this->link->LinkAttrs["target"] = "_blank"; // Add target
                 if ($this->isExport()) {
                     $this->link->HrefValue = FullUrl($this->link->HrefValue, "href");
@@ -965,7 +965,7 @@ class MainPrintOrdersView extends MainPrintOrders
         global $Breadcrumb, $Language;
         $Breadcrumb = new Breadcrumb("index");
         $url = CurrentUrl();
-        $Breadcrumb->add("list", $this->TableVar, $this->addMasterUrl("mainprintorderslist"), "", $this->TableVar, true);
+        $Breadcrumb->add("list", $this->TableVar, $this->addMasterUrl("MainPrintOrdersList"), "", $this->TableVar, true);
         $pageId = "view";
         $Breadcrumb->add("view", $pageId, $url);
     }

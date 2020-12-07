@@ -182,12 +182,12 @@ class XUserTypesList extends XUserTypes
         $this->ExportHtmlUrl = $pageUrl . "export=html";
         $this->ExportXmlUrl = $pageUrl . "export=xml";
         $this->ExportCsvUrl = $pageUrl . "export=csv";
-        $this->AddUrl = "xusertypesadd";
+        $this->AddUrl = "XUserTypesAdd";
         $this->InlineAddUrl = $pageUrl . "action=add";
         $this->GridAddUrl = $pageUrl . "action=gridadd";
         $this->GridEditUrl = $pageUrl . "action=gridedit";
-        $this->MultiDeleteUrl = "xusertypesdelete";
-        $this->MultiUpdateUrl = "xusertypesupdate";
+        $this->MultiDeleteUrl = "XUserTypesDelete";
+        $this->MultiUpdateUrl = "XUserTypesUpdate";
 
         // Table name (for backward compatibility only)
         if (!defined(PROJECT_NAMESPACE . "TABLE_NAME")) {

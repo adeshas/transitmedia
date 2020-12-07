@@ -238,7 +238,7 @@ class MainTransactionsUpdate extends MainTransactions
                 $pageName = GetPageName($url);
                 if ($pageName != $this->getListUrl()) { // Not List page
                     $row["caption"] = $this->getModalCaption($pageName);
-                    if ($pageName == "maintransactionsview") {
+                    if ($pageName == "MainTransactionsView") {
                         $row["view"] = "1";
                     }
                 } else { // List page should not be shown as modal => error
@@ -503,7 +503,7 @@ class MainTransactionsUpdate extends MainTransactions
             }
         }
         if (!$res) {
-            $this->terminate("maintransactionslist"); // Return to list
+            $this->terminate("MainTransactionsList"); // Return to list
             return;
         }
         if (Post("action") !== null && Post("action") !== "") {
@@ -522,7 +522,7 @@ class MainTransactionsUpdate extends MainTransactions
             $this->loadMultiUpdateValues(); // Load initial values to form
         }
         if (count($this->RecKeys) <= 0) {
-            $this->terminate("maintransactionslist"); // No records selected, return to list
+            $this->terminate("MainTransactionsList"); // No records selected, return to list
             return;
         }
         if ($this->isUpdate()) {
@@ -1250,6 +1250,8 @@ class MainTransactionsUpdate extends MainTransactions
             // assigned_buses
             $this->assigned_buses->ViewValue = $this->assigned_buses->CurrentValue;
             $this->assigned_buses->ViewValue = FormatNumber($this->assigned_buses->ViewValue, 0, -2, -2, -2);
+            $this->assigned_buses->CssClass = "font-weight-bold";
+            $this->assigned_buses->CellCssStyle .= "text-align: right;";
             $this->assigned_buses->ViewCustomAttributes = "";
 
             // start_date
@@ -2316,7 +2318,7 @@ class MainTransactionsUpdate extends MainTransactions
         global $Breadcrumb, $Language;
         $Breadcrumb = new Breadcrumb("index");
         $url = CurrentUrl();
-        $Breadcrumb->add("list", $this->TableVar, $this->addMasterUrl("maintransactionslist"), "", $this->TableVar, true);
+        $Breadcrumb->add("list", $this->TableVar, $this->addMasterUrl("MainTransactionsList"), "", $this->TableVar, true);
         $pageId = "update";
         $Breadcrumb->add("update", $pageId, $url);
     }

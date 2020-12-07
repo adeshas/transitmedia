@@ -238,7 +238,7 @@ class MainTransactionsAdd extends MainTransactions
                 $pageName = GetPageName($url);
                 if ($pageName != $this->getListUrl()) { // Not List page
                     $row["caption"] = $this->getModalCaption($pageName);
-                    if ($pageName == "maintransactionsview") {
+                    if ($pageName == "MainTransactionsView") {
                         $row["view"] = "1";
                     }
                 } else { // List page should not be shown as modal => error
@@ -544,7 +544,7 @@ class MainTransactionsAdd extends MainTransactions
                     if ($this->getFailureMessage() == "") {
                         $this->setFailureMessage($Language->phrase("NoRecord")); // No record found
                     }
-                    $this->terminate("maintransactionslist"); // No matching record, return to list
+                    $this->terminate("MainTransactionsList"); // No matching record, return to list
                     return;
                 }
 
@@ -562,9 +562,9 @@ class MainTransactionsAdd extends MainTransactions
                     } else {
                         $returnUrl = $this->getReturnUrl();
                     }
-                    if (GetPageName($returnUrl) == "maintransactionslist") {
+                    if (GetPageName($returnUrl) == "MainTransactionsList") {
                         $returnUrl = $this->addMasterUrl($returnUrl); // List page, return to List page with correct master key if necessary
-                    } elseif (GetPageName($returnUrl) == "maintransactionsview") {
+                    } elseif (GetPageName($returnUrl) == "MainTransactionsView") {
                         $returnUrl = $this->getViewUrl(); // View page, return to View page with keyurl directly
                     }
                     if (IsApi()) { // Return to caller
@@ -1137,6 +1137,8 @@ class MainTransactionsAdd extends MainTransactions
             // assigned_buses
             $this->assigned_buses->ViewValue = $this->assigned_buses->CurrentValue;
             $this->assigned_buses->ViewValue = FormatNumber($this->assigned_buses->ViewValue, 0, -2, -2, -2);
+            $this->assigned_buses->CssClass = "font-weight-bold";
+            $this->assigned_buses->CellCssStyle .= "text-align: right;";
             $this->assigned_buses->ViewCustomAttributes = "";
 
             // start_date
@@ -2205,7 +2207,7 @@ class MainTransactionsAdd extends MainTransactions
         global $Breadcrumb, $Language;
         $Breadcrumb = new Breadcrumb("index");
         $url = CurrentUrl();
-        $Breadcrumb->add("list", $this->TableVar, $this->addMasterUrl("maintransactionslist"), "", $this->TableVar, true);
+        $Breadcrumb->add("list", $this->TableVar, $this->addMasterUrl("MainTransactionsList"), "", $this->TableVar, true);
         $pageId = ($this->isCopy()) ? "Copy" : "Add";
         $Breadcrumb->add("add", $pageId, $url);
     }

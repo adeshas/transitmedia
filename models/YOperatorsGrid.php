@@ -153,7 +153,7 @@ class YOperatorsGrid extends YOperators
 
         // Page URL
         $pageUrl = $this->pageUrl();
-        $this->AddUrl = "yoperatorsadd";
+        $this->AddUrl = "YOperatorsAdd";
 
         // Table name (for backward compatibility only)
         if (!defined(PROJECT_NAMESPACE . "TABLE_NAME")) {
@@ -572,7 +572,7 @@ class YOperatorsGrid extends YOperators
             $this->MasterRecordExists = $rsmaster !== false;
             if (!$this->MasterRecordExists) {
                 $this->setFailureMessage($Language->phrase("NoRecord")); // Set no record found
-                $this->terminate("yplatformslist"); // Return to master page
+                $this->terminate("YPlatformsList"); // Return to master page
                 return;
             } else {
                 $masterTbl->loadListRowValues($rsmaster);

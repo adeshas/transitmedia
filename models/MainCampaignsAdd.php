@@ -238,7 +238,7 @@ class MainCampaignsAdd extends MainCampaigns
                 $pageName = GetPageName($url);
                 if ($pageName != $this->getListUrl()) { // Not List page
                     $row["caption"] = $this->getModalCaption($pageName);
-                    if ($pageName == "maincampaignsview") {
+                    if ($pageName == "MainCampaignsView") {
                         $row["view"] = "1";
                     }
                 } else { // List page should not be shown as modal => error
@@ -538,7 +538,7 @@ class MainCampaignsAdd extends MainCampaigns
                     if ($this->getFailureMessage() == "") {
                         $this->setFailureMessage($Language->phrase("NoRecord")); // No record found
                     }
-                    $this->terminate("maincampaignslist"); // No matching record, return to list
+                    $this->terminate("MainCampaignsList"); // No matching record, return to list
                     return;
                 }
 
@@ -551,10 +551,10 @@ class MainCampaignsAdd extends MainCampaigns
                     if ($this->getSuccessMessage() == "" && Post("addopt") != "1") { // Skip success message for addopt (done in JavaScript)
                         $this->setSuccessMessage($Language->phrase("AddSuccess")); // Set up success message
                     }
-                    $returnUrl = "maincampaignslist";
-                    if (GetPageName($returnUrl) == "maincampaignslist") {
+                    $returnUrl = "MainCampaignsList";
+                    if (GetPageName($returnUrl) == "MainCampaignsList") {
                         $returnUrl = $this->addMasterUrl($returnUrl); // List page, return to List page with correct master key if necessary
-                    } elseif (GetPageName($returnUrl) == "maincampaignsview") {
+                    } elseif (GetPageName($returnUrl) == "MainCampaignsView") {
                         $returnUrl = $this->getViewUrl(); // View page, return to View page with keyurl directly
                     }
                     if (IsApi()) { // Return to caller
@@ -1962,7 +1962,7 @@ class MainCampaignsAdd extends MainCampaigns
         global $Breadcrumb, $Language;
         $Breadcrumb = new Breadcrumb("index");
         $url = CurrentUrl();
-        $Breadcrumb->add("list", $this->TableVar, $this->addMasterUrl("maincampaignslist"), "", $this->TableVar, true);
+        $Breadcrumb->add("list", $this->TableVar, $this->addMasterUrl("MainCampaignsList"), "", $this->TableVar, true);
         $pageId = ($this->isCopy()) ? "Copy" : "Add";
         $Breadcrumb->add("add", $pageId, $url);
     }

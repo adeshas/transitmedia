@@ -316,7 +316,7 @@ class ViewCampaignsPending extends DbTable
             $detailUrl .= "&" . GetForeignKeyUrl("fk_transaction_id", $this->transaction_id->CurrentValue);
         }
         if ($detailUrl == "") {
-            $detailUrl = "viewcampaignspendinglist";
+            $detailUrl = "ViewCampaignsPendingList";
         }
         return $detailUrl;
     }
@@ -788,7 +788,7 @@ class ViewCampaignsPending extends DbTable
         if ($referUrl != "" && $referPageName != CurrentPageName() && $referPageName != "login") { // Referer not same page or login page
             $_SESSION[$name] = $referUrl; // Save to Session
         }
-        return $_SESSION[$name] ?? GetUrl("viewcampaignspendinglist");
+        return $_SESSION[$name] ?? GetUrl("ViewCampaignsPendingList");
     }
 
     // Set return page URL
@@ -801,11 +801,11 @@ class ViewCampaignsPending extends DbTable
     public function getModalCaption($pageName)
     {
         global $Language;
-        if ($pageName == "viewcampaignspendingview") {
+        if ($pageName == "ViewCampaignsPendingView") {
             return $Language->phrase("View");
-        } elseif ($pageName == "viewcampaignspendingedit") {
+        } elseif ($pageName == "ViewCampaignsPendingEdit") {
             return $Language->phrase("Edit");
-        } elseif ($pageName == "viewcampaignspendingadd") {
+        } elseif ($pageName == "ViewCampaignsPendingAdd") {
             return $Language->phrase("Add");
         } else {
             return "";
@@ -834,16 +834,16 @@ class ViewCampaignsPending extends DbTable
     // List URL
     public function getListUrl()
     {
-        return "viewcampaignspendinglist";
+        return "ViewCampaignsPendingList";
     }
 
     // View URL
     public function getViewUrl($parm = "")
     {
         if ($parm != "") {
-            $url = $this->keyUrl("viewcampaignspendingview", $this->getUrlParm($parm));
+            $url = $this->keyUrl("ViewCampaignsPendingView", $this->getUrlParm($parm));
         } else {
-            $url = $this->keyUrl("viewcampaignspendingview", $this->getUrlParm(Config("TABLE_SHOW_DETAIL") . "="));
+            $url = $this->keyUrl("ViewCampaignsPendingView", $this->getUrlParm(Config("TABLE_SHOW_DETAIL") . "="));
         }
         return $this->addMasterUrl($url);
     }
@@ -852,9 +852,9 @@ class ViewCampaignsPending extends DbTable
     public function getAddUrl($parm = "")
     {
         if ($parm != "") {
-            $url = "viewcampaignspendingadd?" . $this->getUrlParm($parm);
+            $url = "ViewCampaignsPendingAdd?" . $this->getUrlParm($parm);
         } else {
-            $url = "viewcampaignspendingadd";
+            $url = "ViewCampaignsPendingAdd";
         }
         return $this->addMasterUrl($url);
     }
@@ -863,9 +863,9 @@ class ViewCampaignsPending extends DbTable
     public function getEditUrl($parm = "")
     {
         if ($parm != "") {
-            $url = $this->keyUrl("viewcampaignspendingedit", $this->getUrlParm($parm));
+            $url = $this->keyUrl("ViewCampaignsPendingEdit", $this->getUrlParm($parm));
         } else {
-            $url = $this->keyUrl("viewcampaignspendingedit", $this->getUrlParm(Config("TABLE_SHOW_DETAIL") . "="));
+            $url = $this->keyUrl("ViewCampaignsPendingEdit", $this->getUrlParm(Config("TABLE_SHOW_DETAIL") . "="));
         }
         return $this->addMasterUrl($url);
     }
@@ -881,9 +881,9 @@ class ViewCampaignsPending extends DbTable
     public function getCopyUrl($parm = "")
     {
         if ($parm != "") {
-            $url = $this->keyUrl("viewcampaignspendingadd", $this->getUrlParm($parm));
+            $url = $this->keyUrl("ViewCampaignsPendingAdd", $this->getUrlParm($parm));
         } else {
-            $url = $this->keyUrl("viewcampaignspendingadd", $this->getUrlParm(Config("TABLE_SHOW_DETAIL") . "="));
+            $url = $this->keyUrl("ViewCampaignsPendingAdd", $this->getUrlParm(Config("TABLE_SHOW_DETAIL") . "="));
         }
         return $this->addMasterUrl($url);
     }
@@ -898,7 +898,7 @@ class ViewCampaignsPending extends DbTable
     // Delete URL
     public function getDeleteUrl()
     {
-        return $this->keyUrl("viewcampaignspendingdelete", $this->getUrlParm());
+        return $this->keyUrl("ViewCampaignsPendingDelete", $this->getUrlParm());
     }
 
     // Add master url

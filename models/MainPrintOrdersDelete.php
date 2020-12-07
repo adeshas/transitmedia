@@ -382,7 +382,7 @@ class MainPrintOrdersDelete extends MainPrintOrders
         $this->RecKeys = $this->getRecordKeys(); // Load record keys
         $filter = $this->getFilterFromRecordKeys();
         if ($filter == "") {
-            $this->terminate("mainprintorderslist"); // Prevent SQL injection, return to list
+            $this->terminate("MainPrintOrdersList"); // Prevent SQL injection, return to list
             return;
         }
 
@@ -428,7 +428,7 @@ class MainPrintOrdersDelete extends MainPrintOrders
                 if ($this->Recordset) {
                     $this->Recordset->close();
                 }
-                $this->terminate("mainprintorderslist"); // Return to list
+                $this->terminate("MainPrintOrdersList"); // Return to list
                 return;
             }
         }
@@ -694,7 +694,7 @@ class MainPrintOrdersDelete extends MainPrintOrders
             // link
             $this->link->LinkCustomAttributes = "";
             if (!EmptyValue($this->id->CurrentValue)) {
-                $this->link->HrefValue = "download.php?id=" . (!empty($this->id->ViewValue) && !is_array($this->id->ViewValue) ? RemoveHtml($this->id->ViewValue) : $this->id->CurrentValue); // Add prefix/suffix
+                $this->link->HrefValue = "downloadbp.php?id=" . (!empty($this->id->ViewValue) && !is_array($this->id->ViewValue) ? RemoveHtml($this->id->ViewValue) : $this->id->CurrentValue); // Add prefix/suffix
                 $this->link->LinkAttrs["target"] = "_blank"; // Add target
                 if ($this->isExport()) {
                     $this->link->HrefValue = FullUrl($this->link->HrefValue, "href");
@@ -820,7 +820,7 @@ class MainPrintOrdersDelete extends MainPrintOrders
         global $Breadcrumb, $Language;
         $Breadcrumb = new Breadcrumb("index");
         $url = CurrentUrl();
-        $Breadcrumb->add("list", $this->TableVar, $this->addMasterUrl("mainprintorderslist"), "", $this->TableVar, true);
+        $Breadcrumb->add("list", $this->TableVar, $this->addMasterUrl("MainPrintOrdersList"), "", $this->TableVar, true);
         $pageId = "delete";
         $Breadcrumb->add("delete", $pageId, $url);
     }

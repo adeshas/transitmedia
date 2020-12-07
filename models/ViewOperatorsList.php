@@ -182,12 +182,12 @@ class ViewOperatorsList extends ViewOperators
         $this->ExportHtmlUrl = $pageUrl . "export=html";
         $this->ExportXmlUrl = $pageUrl . "export=xml";
         $this->ExportCsvUrl = $pageUrl . "export=csv";
-        $this->AddUrl = "viewoperatorsadd";
+        $this->AddUrl = "ViewOperatorsAdd";
         $this->InlineAddUrl = $pageUrl . "action=add";
         $this->GridAddUrl = $pageUrl . "action=gridadd";
         $this->GridEditUrl = $pageUrl . "action=gridedit";
-        $this->MultiDeleteUrl = "viewoperatorsdelete";
-        $this->MultiUpdateUrl = "viewoperatorsupdate";
+        $this->MultiDeleteUrl = "ViewOperatorsDelete";
+        $this->MultiUpdateUrl = "ViewOperatorsUpdate";
 
         // Table name (for backward compatibility only)
         if (!defined(PROJECT_NAMESPACE . "TABLE_NAME")) {

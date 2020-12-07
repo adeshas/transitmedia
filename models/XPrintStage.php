@@ -562,7 +562,7 @@ class XPrintStage extends DbTable
         if ($referUrl != "" && $referPageName != CurrentPageName() && $referPageName != "login") { // Referer not same page or login page
             $_SESSION[$name] = $referUrl; // Save to Session
         }
-        return $_SESSION[$name] ?? GetUrl("xprintstagelist");
+        return $_SESSION[$name] ?? GetUrl("XPrintStageList");
     }
 
     // Set return page URL
@@ -575,11 +575,11 @@ class XPrintStage extends DbTable
     public function getModalCaption($pageName)
     {
         global $Language;
-        if ($pageName == "xprintstageview") {
+        if ($pageName == "XPrintStageView") {
             return $Language->phrase("View");
-        } elseif ($pageName == "xprintstageedit") {
+        } elseif ($pageName == "XPrintStageEdit") {
             return $Language->phrase("Edit");
-        } elseif ($pageName == "xprintstageadd") {
+        } elseif ($pageName == "XPrintStageAdd") {
             return $Language->phrase("Add");
         } else {
             return "";
@@ -608,16 +608,16 @@ class XPrintStage extends DbTable
     // List URL
     public function getListUrl()
     {
-        return "xprintstagelist";
+        return "XPrintStageList";
     }
 
     // View URL
     public function getViewUrl($parm = "")
     {
         if ($parm != "") {
-            $url = $this->keyUrl("xprintstageview", $this->getUrlParm($parm));
+            $url = $this->keyUrl("XPrintStageView", $this->getUrlParm($parm));
         } else {
-            $url = $this->keyUrl("xprintstageview", $this->getUrlParm(Config("TABLE_SHOW_DETAIL") . "="));
+            $url = $this->keyUrl("XPrintStageView", $this->getUrlParm(Config("TABLE_SHOW_DETAIL") . "="));
         }
         return $this->addMasterUrl($url);
     }
@@ -626,9 +626,9 @@ class XPrintStage extends DbTable
     public function getAddUrl($parm = "")
     {
         if ($parm != "") {
-            $url = "xprintstageadd?" . $this->getUrlParm($parm);
+            $url = "XPrintStageAdd?" . $this->getUrlParm($parm);
         } else {
-            $url = "xprintstageadd";
+            $url = "XPrintStageAdd";
         }
         return $this->addMasterUrl($url);
     }
@@ -636,7 +636,7 @@ class XPrintStage extends DbTable
     // Edit URL
     public function getEditUrl($parm = "")
     {
-        $url = $this->keyUrl("xprintstageedit", $this->getUrlParm($parm));
+        $url = $this->keyUrl("XPrintStageEdit", $this->getUrlParm($parm));
         return $this->addMasterUrl($url);
     }
 
@@ -650,7 +650,7 @@ class XPrintStage extends DbTable
     // Copy URL
     public function getCopyUrl($parm = "")
     {
-        $url = $this->keyUrl("xprintstageadd", $this->getUrlParm($parm));
+        $url = $this->keyUrl("XPrintStageAdd", $this->getUrlParm($parm));
         return $this->addMasterUrl($url);
     }
 
@@ -664,7 +664,7 @@ class XPrintStage extends DbTable
     // Delete URL
     public function getDeleteUrl()
     {
-        return $this->keyUrl("xprintstagedelete", $this->getUrlParm());
+        return $this->keyUrl("XPrintStageDelete", $this->getUrlParm());
     }
 
     // Add master url

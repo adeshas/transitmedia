@@ -559,7 +559,7 @@ class XReportTypes extends DbTable
         if ($referUrl != "" && $referPageName != CurrentPageName() && $referPageName != "login") { // Referer not same page or login page
             $_SESSION[$name] = $referUrl; // Save to Session
         }
-        return $_SESSION[$name] ?? GetUrl("xreporttypeslist");
+        return $_SESSION[$name] ?? GetUrl("XReportTypesList");
     }
 
     // Set return page URL
@@ -572,11 +572,11 @@ class XReportTypes extends DbTable
     public function getModalCaption($pageName)
     {
         global $Language;
-        if ($pageName == "xreporttypesview") {
+        if ($pageName == "XReportTypesView") {
             return $Language->phrase("View");
-        } elseif ($pageName == "xreporttypesedit") {
+        } elseif ($pageName == "XReportTypesEdit") {
             return $Language->phrase("Edit");
-        } elseif ($pageName == "xreporttypesadd") {
+        } elseif ($pageName == "XReportTypesAdd") {
             return $Language->phrase("Add");
         } else {
             return "";
@@ -605,16 +605,16 @@ class XReportTypes extends DbTable
     // List URL
     public function getListUrl()
     {
-        return "xreporttypeslist";
+        return "XReportTypesList";
     }
 
     // View URL
     public function getViewUrl($parm = "")
     {
         if ($parm != "") {
-            $url = $this->keyUrl("xreporttypesview", $this->getUrlParm($parm));
+            $url = $this->keyUrl("XReportTypesView", $this->getUrlParm($parm));
         } else {
-            $url = $this->keyUrl("xreporttypesview", $this->getUrlParm(Config("TABLE_SHOW_DETAIL") . "="));
+            $url = $this->keyUrl("XReportTypesView", $this->getUrlParm(Config("TABLE_SHOW_DETAIL") . "="));
         }
         return $this->addMasterUrl($url);
     }
@@ -623,9 +623,9 @@ class XReportTypes extends DbTable
     public function getAddUrl($parm = "")
     {
         if ($parm != "") {
-            $url = "xreporttypesadd?" . $this->getUrlParm($parm);
+            $url = "XReportTypesAdd?" . $this->getUrlParm($parm);
         } else {
-            $url = "xreporttypesadd";
+            $url = "XReportTypesAdd";
         }
         return $this->addMasterUrl($url);
     }
@@ -633,7 +633,7 @@ class XReportTypes extends DbTable
     // Edit URL
     public function getEditUrl($parm = "")
     {
-        $url = $this->keyUrl("xreporttypesedit", $this->getUrlParm($parm));
+        $url = $this->keyUrl("XReportTypesEdit", $this->getUrlParm($parm));
         return $this->addMasterUrl($url);
     }
 
@@ -647,7 +647,7 @@ class XReportTypes extends DbTable
     // Copy URL
     public function getCopyUrl($parm = "")
     {
-        $url = $this->keyUrl("xreporttypesadd", $this->getUrlParm($parm));
+        $url = $this->keyUrl("XReportTypesAdd", $this->getUrlParm($parm));
         return $this->addMasterUrl($url);
     }
 
@@ -661,7 +661,7 @@ class XReportTypes extends DbTable
     // Delete URL
     public function getDeleteUrl()
     {
-        return $this->keyUrl("xreporttypesdelete", $this->getUrlParm());
+        return $this->keyUrl("XReportTypesDelete", $this->getUrlParm());
     }
 
     // Add master url

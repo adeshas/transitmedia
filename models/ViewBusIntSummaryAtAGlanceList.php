@@ -182,12 +182,12 @@ class ViewBusIntSummaryAtAGlanceList extends ViewBusIntSummaryAtAGlance
         $this->ExportHtmlUrl = $pageUrl . "export=html";
         $this->ExportXmlUrl = $pageUrl . "export=xml";
         $this->ExportCsvUrl = $pageUrl . "export=csv";
-        $this->AddUrl = "viewbusintsummaryataglanceadd";
+        $this->AddUrl = "ViewBusIntSummaryAtAGlanceAdd";
         $this->InlineAddUrl = $pageUrl . "action=add";
         $this->GridAddUrl = $pageUrl . "action=gridadd";
         $this->GridEditUrl = $pageUrl . "action=gridedit";
-        $this->MultiDeleteUrl = "viewbusintsummaryataglancedelete";
-        $this->MultiUpdateUrl = "viewbusintsummaryataglanceupdate";
+        $this->MultiDeleteUrl = "ViewBusIntSummaryAtAGlanceDelete";
+        $this->MultiUpdateUrl = "ViewBusIntSummaryAtAGlanceUpdate";
 
         // Table name (for backward compatibility only)
         if (!defined(PROJECT_NAMESPACE . "TABLE_NAME")) {

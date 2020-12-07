@@ -293,7 +293,7 @@ class ViewCampaignsPendingView extends ViewCampaignsPending
                 $pageName = GetPageName($url);
                 if ($pageName != $this->getListUrl()) { // Not List page
                     $row["caption"] = $this->getModalCaption($pageName);
-                    if ($pageName == "viewcampaignspendingview") {
+                    if ($pageName == "ViewCampaignsPendingView") {
                         $row["view"] = "1";
                     }
                 } else { // List page should not be shown as modal => error
@@ -551,7 +551,7 @@ class ViewCampaignsPendingView extends ViewCampaignsPending
                 $this->transaction_id->setQueryStringValue($keyValue);
                 $this->RecKey["transaction_id"] = $this->transaction_id->QueryStringValue;
             } else {
-                $returnUrl = "viewcampaignspendinglist"; // Return to list
+                $returnUrl = "ViewCampaignsPendingList"; // Return to list
             }
 
             // Get action
@@ -574,12 +574,12 @@ class ViewCampaignsPendingView extends ViewCampaignsPending
                         if ($this->getSuccessMessage() == "" && $this->getFailureMessage() == "") {
                             $this->setFailureMessage($Language->phrase("NoRecord")); // Set no record message
                         }
-                        $returnUrl = "viewcampaignspendinglist"; // No matching record, return to list
+                        $returnUrl = "ViewCampaignsPendingList"; // No matching record, return to list
                     }
                     break;
             }
         } else {
-            $returnUrl = "viewcampaignspendinglist"; // Not page request, return to list
+            $returnUrl = "ViewCampaignsPendingList"; // Not page request, return to list
         }
         if ($returnUrl != "") {
             $this->terminate($returnUrl);
@@ -644,7 +644,7 @@ class ViewCampaignsPendingView extends ViewCampaignsPending
         // "detail_view_buses_assigned"
         $item = &$option->add("detail_view_buses_assigned");
         $body = $Language->phrase("ViewPageDetailLink") . $Language->TablePhrase("view_buses_assigned", "TblCaption");
-        $body = "<a class=\"btn btn-default ew-row-link ew-detail\" data-action=\"list\" href=\"" . HtmlEncode(GetUrl("viewbusesassignedlist?" . Config("TABLE_SHOW_MASTER") . "=view_campaigns_pending&" . GetForeignKeyUrl("fk_transaction_id", $this->transaction_id->CurrentValue) . "")) . "\">" . $body . "</a>";
+        $body = "<a class=\"btn btn-default ew-row-link ew-detail\" data-action=\"list\" href=\"" . HtmlEncode(GetUrl("ViewBusesAssignedList?" . Config("TABLE_SHOW_MASTER") . "=view_campaigns_pending&" . GetForeignKeyUrl("fk_transaction_id", $this->transaction_id->CurrentValue) . "")) . "\">" . $body . "</a>";
         $links = "";
         $detailPageObj = Container("ViewBusesAssignedGrid");
         if ($detailPageObj->DetailView && $Security->canView() && $Security->allowView(CurrentProjectID() . 'view_campaigns_pending')) {
@@ -1170,7 +1170,7 @@ class ViewCampaignsPendingView extends ViewCampaignsPending
         global $Breadcrumb, $Language;
         $Breadcrumb = new Breadcrumb("index");
         $url = CurrentUrl();
-        $Breadcrumb->add("list", $this->TableVar, $this->addMasterUrl("viewcampaignspendinglist"), "", $this->TableVar, true);
+        $Breadcrumb->add("list", $this->TableVar, $this->addMasterUrl("ViewCampaignsPendingList"), "", $this->TableVar, true);
         $pageId = "view";
         $Breadcrumb->add("view", $pageId, $url);
     }

@@ -182,12 +182,12 @@ class ViewBusTransOptionsList extends ViewBusTransOptions
         $this->ExportHtmlUrl = $pageUrl . "export=html";
         $this->ExportXmlUrl = $pageUrl . "export=xml";
         $this->ExportCsvUrl = $pageUrl . "export=csv";
-        $this->AddUrl = "viewbustransoptionsadd";
+        $this->AddUrl = "ViewBusTransOptionsAdd";
         $this->InlineAddUrl = $pageUrl . "action=add";
         $this->GridAddUrl = $pageUrl . "action=gridadd";
         $this->GridEditUrl = $pageUrl . "action=gridedit";
-        $this->MultiDeleteUrl = "viewbustransoptionsdelete";
-        $this->MultiUpdateUrl = "viewbustransoptionsupdate";
+        $this->MultiDeleteUrl = "ViewBusTransOptionsDelete";
+        $this->MultiUpdateUrl = "ViewBusTransOptionsUpdate";
 
         // Table name (for backward compatibility only)
         if (!defined(PROJECT_NAMESPACE . "TABLE_NAME")) {

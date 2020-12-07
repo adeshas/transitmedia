@@ -182,12 +182,12 @@ class MainBusesList extends MainBuses
         $this->ExportHtmlUrl = $pageUrl . "export=html";
         $this->ExportXmlUrl = $pageUrl . "export=xml";
         $this->ExportCsvUrl = $pageUrl . "export=csv";
-        $this->AddUrl = "mainbusesadd?" . Config("TABLE_SHOW_DETAIL") . "=";
+        $this->AddUrl = "MainBusesAdd?" . Config("TABLE_SHOW_DETAIL") . "=";
         $this->InlineAddUrl = $pageUrl . "action=add";
         $this->GridAddUrl = $pageUrl . "action=gridadd";
         $this->GridEditUrl = $pageUrl . "action=gridedit";
-        $this->MultiDeleteUrl = "mainbusesdelete";
-        $this->MultiUpdateUrl = "mainbusesupdate";
+        $this->MultiDeleteUrl = "MainBusesDelete";
+        $this->MultiUpdateUrl = "MainBusesUpdate";
 
         // Table name (for backward compatibility only)
         if (!defined(PROJECT_NAMESPACE . "TABLE_NAME")) {
@@ -2091,7 +2091,7 @@ class MainBusesList extends MainBuses
         $opt = $this->ListOptions["detail_sub_media_allocation"];
         if ($Security->allowList(CurrentProjectID() . 'sub_media_allocation')) {
             $body = $Language->phrase("DetailLink") . $Language->TablePhrase("sub_media_allocation", "TblCaption");
-            $body = "<a class=\"btn btn-default ew-row-link ew-detail\" data-action=\"list\" href=\"" . HtmlEncode("submediaallocationlist?" . Config("TABLE_SHOW_MASTER") . "=main_buses&" . GetForeignKeyUrl("fk_id", $this->id->CurrentValue) . "") . "\">" . $body . "</a>";
+            $body = "<a class=\"btn btn-default ew-row-link ew-detail\" data-action=\"list\" href=\"" . HtmlEncode("SubMediaAllocationList?" . Config("TABLE_SHOW_MASTER") . "=main_buses&" . GetForeignKeyUrl("fk_id", $this->id->CurrentValue) . "") . "\">" . $body . "</a>";
             $links = "";
             $detailPage = Container("SubMediaAllocationGrid");
             if ($detailPage->DetailView && $Security->canView() && $Security->allowView(CurrentProjectID() . 'main_buses')) {

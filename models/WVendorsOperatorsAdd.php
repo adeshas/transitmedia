@@ -238,7 +238,7 @@ class WVendorsOperatorsAdd extends WVendorsOperators
                 $pageName = GetPageName($url);
                 if ($pageName != $this->getListUrl()) { // Not List page
                     $row["caption"] = $this->getModalCaption($pageName);
-                    if ($pageName == "wvendorsoperatorsview") {
+                    if ($pageName == "WVendorsOperatorsView") {
                         $row["view"] = "1";
                     }
                 } else { // List page should not be shown as modal => error
@@ -515,7 +515,7 @@ class WVendorsOperatorsAdd extends WVendorsOperators
                     if ($this->getFailureMessage() == "") {
                         $this->setFailureMessage($Language->phrase("NoRecord")); // No record found
                     }
-                    $this->terminate("wvendorsoperatorslist"); // No matching record, return to list
+                    $this->terminate("WVendorsOperatorsList"); // No matching record, return to list
                     return;
                 }
                 break;
@@ -526,9 +526,9 @@ class WVendorsOperatorsAdd extends WVendorsOperators
                         $this->setSuccessMessage($Language->phrase("AddSuccess")); // Set up success message
                     }
                     $returnUrl = $this->getReturnUrl();
-                    if (GetPageName($returnUrl) == "wvendorsoperatorslist") {
+                    if (GetPageName($returnUrl) == "WVendorsOperatorsList") {
                         $returnUrl = $this->addMasterUrl($returnUrl); // List page, return to List page with correct master key if necessary
-                    } elseif (GetPageName($returnUrl) == "wvendorsoperatorsview") {
+                    } elseif (GetPageName($returnUrl) == "WVendorsOperatorsView") {
                         $returnUrl = $this->getViewUrl(); // View page, return to View page with keyurl directly
                     }
                     if (IsApi()) { // Return to caller
@@ -954,7 +954,7 @@ class WVendorsOperatorsAdd extends WVendorsOperators
         global $Breadcrumb, $Language;
         $Breadcrumb = new Breadcrumb("index");
         $url = CurrentUrl();
-        $Breadcrumb->add("list", $this->TableVar, $this->addMasterUrl("wvendorsoperatorslist"), "", $this->TableVar, true);
+        $Breadcrumb->add("list", $this->TableVar, $this->addMasterUrl("WVendorsOperatorsList"), "", $this->TableVar, true);
         $pageId = ($this->isCopy()) ? "Copy" : "Add";
         $Breadcrumb->add("add", $pageId, $url);
     }

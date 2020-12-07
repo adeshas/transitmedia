@@ -293,7 +293,7 @@ class XTransactionStatusView extends XTransactionStatus
                 $pageName = GetPageName($url);
                 if ($pageName != $this->getListUrl()) { // Not List page
                     $row["caption"] = $this->getModalCaption($pageName);
-                    if ($pageName == "xtransactionstatusview") {
+                    if ($pageName == "XTransactionStatusView") {
                         $row["view"] = "1";
                     }
                 } else { // List page should not be shown as modal => error
@@ -529,7 +529,7 @@ class XTransactionStatusView extends XTransactionStatus
                 $this->id->setQueryStringValue($keyValue);
                 $this->RecKey["id"] = $this->id->QueryStringValue;
             } else {
-                $returnUrl = "xtransactionstatuslist"; // Return to list
+                $returnUrl = "XTransactionStatusList"; // Return to list
             }
 
             // Get action
@@ -552,12 +552,12 @@ class XTransactionStatusView extends XTransactionStatus
                         if ($this->getSuccessMessage() == "" && $this->getFailureMessage() == "") {
                             $this->setFailureMessage($Language->phrase("NoRecord")); // Set no record message
                         }
-                        $returnUrl = "xtransactionstatuslist"; // No matching record, return to list
+                        $returnUrl = "XTransactionStatusList"; // No matching record, return to list
                     }
                     break;
             }
         } else {
-            $returnUrl = "xtransactionstatuslist"; // Not page request, return to list
+            $returnUrl = "XTransactionStatusList"; // Not page request, return to list
         }
         if ($returnUrl != "") {
             $this->terminate($returnUrl);
@@ -789,7 +789,7 @@ class XTransactionStatusView extends XTransactionStatus
         global $Breadcrumb, $Language;
         $Breadcrumb = new Breadcrumb("index");
         $url = CurrentUrl();
-        $Breadcrumb->add("list", $this->TableVar, $this->addMasterUrl("xtransactionstatuslist"), "", $this->TableVar, true);
+        $Breadcrumb->add("list", $this->TableVar, $this->addMasterUrl("XTransactionStatusList"), "", $this->TableVar, true);
         $pageId = "view";
         $Breadcrumb->add("view", $pageId, $url);
     }

@@ -386,7 +386,7 @@ class MainBusesDelete extends MainBuses
         $this->RecKeys = $this->getRecordKeys(); // Load record keys
         $filter = $this->getFilterFromRecordKeys();
         if ($filter == "") {
-            $this->terminate("mainbuseslist"); // Prevent SQL injection, return to list
+            $this->terminate("MainBusesList"); // Prevent SQL injection, return to list
             return;
         }
 
@@ -432,7 +432,7 @@ class MainBusesDelete extends MainBuses
                 if ($this->Recordset) {
                     $this->Recordset->close();
                 }
-                $this->terminate("mainbuseslist"); // Return to list
+                $this->terminate("MainBusesList"); // Return to list
                 return;
             }
         }
@@ -907,7 +907,7 @@ class MainBusesDelete extends MainBuses
         global $Breadcrumb, $Language;
         $Breadcrumb = new Breadcrumb("index");
         $url = CurrentUrl();
-        $Breadcrumb->add("list", $this->TableVar, $this->addMasterUrl("mainbuseslist"), "", $this->TableVar, true);
+        $Breadcrumb->add("list", $this->TableVar, $this->addMasterUrl("MainBusesList"), "", $this->TableVar, true);
         $pageId = "delete";
         $Breadcrumb->add("delete", $pageId, $url);
     }

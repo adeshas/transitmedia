@@ -182,12 +182,12 @@ class ViewBusesExteriorList extends ViewBusesExterior
         $this->ExportHtmlUrl = $pageUrl . "export=html";
         $this->ExportXmlUrl = $pageUrl . "export=xml";
         $this->ExportCsvUrl = $pageUrl . "export=csv";
-        $this->AddUrl = "viewbusesexterioradd";
+        $this->AddUrl = "ViewBusesExteriorAdd";
         $this->InlineAddUrl = $pageUrl . "action=add";
         $this->GridAddUrl = $pageUrl . "action=gridadd";
         $this->GridEditUrl = $pageUrl . "action=gridedit";
-        $this->MultiDeleteUrl = "viewbusesexteriordelete";
-        $this->MultiUpdateUrl = "viewbusesexteriorupdate";
+        $this->MultiDeleteUrl = "ViewBusesExteriorDelete";
+        $this->MultiUpdateUrl = "ViewBusesExteriorUpdate";
 
         // Table name (for backward compatibility only)
         if (!defined(PROJECT_NAMESPACE . "TABLE_NAME")) {

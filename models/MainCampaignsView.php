@@ -293,7 +293,7 @@ class MainCampaignsView extends MainCampaigns
                 $pageName = GetPageName($url);
                 if ($pageName != $this->getListUrl()) { // Not List page
                     $row["caption"] = $this->getModalCaption($pageName);
-                    if ($pageName == "maincampaignsview") {
+                    if ($pageName == "MainCampaignsView") {
                         $row["view"] = "1";
                     }
                 } else { // List page should not be shown as modal => error
@@ -549,7 +549,7 @@ class MainCampaignsView extends MainCampaigns
                 $this->id->setQueryStringValue($keyValue);
                 $this->RecKey["id"] = $this->id->QueryStringValue;
             } else {
-                $returnUrl = "maincampaignslist"; // Return to list
+                $returnUrl = "MainCampaignsList"; // Return to list
             }
 
             // Get action
@@ -572,12 +572,12 @@ class MainCampaignsView extends MainCampaigns
                         if ($this->getSuccessMessage() == "" && $this->getFailureMessage() == "") {
                             $this->setFailureMessage($Language->phrase("NoRecord")); // Set no record message
                         }
-                        $returnUrl = "maincampaignslist"; // No matching record, return to list
+                        $returnUrl = "MainCampaignsList"; // No matching record, return to list
                     }
                     break;
             }
         } else {
-            $returnUrl = "maincampaignslist"; // Not page request, return to list
+            $returnUrl = "MainCampaignsList"; // Not page request, return to list
         }
         if ($returnUrl != "") {
             $this->terminate($returnUrl);
@@ -671,7 +671,7 @@ class MainCampaignsView extends MainCampaigns
         // "detail_sub_media_allocation"
         $item = &$option->add("detail_sub_media_allocation");
         $body = $Language->phrase("ViewPageDetailLink") . $Language->TablePhrase("sub_media_allocation", "TblCaption");
-        $body = "<a class=\"btn btn-default ew-row-link ew-detail\" data-action=\"list\" href=\"" . HtmlEncode(GetUrl("submediaallocationlist?" . Config("TABLE_SHOW_MASTER") . "=main_campaigns&" . GetForeignKeyUrl("fk_id", $this->id->CurrentValue) . "")) . "\">" . $body . "</a>";
+        $body = "<a class=\"btn btn-default ew-row-link ew-detail\" data-action=\"list\" href=\"" . HtmlEncode(GetUrl("SubMediaAllocationList?" . Config("TABLE_SHOW_MASTER") . "=main_campaigns&" . GetForeignKeyUrl("fk_id", $this->id->CurrentValue) . "")) . "\">" . $body . "</a>";
         $links = "";
         $detailPageObj = Container("SubMediaAllocationGrid");
         if ($detailPageObj->DetailView && $Security->canView() && $Security->allowView(CurrentProjectID() . 'main_campaigns')) {
@@ -708,7 +708,7 @@ class MainCampaignsView extends MainCampaigns
         // "detail_main_transactions"
         $item = &$option->add("detail_main_transactions");
         $body = $Language->phrase("ViewPageDetailLink") . $Language->TablePhrase("main_transactions", "TblCaption");
-        $body = "<a class=\"btn btn-default ew-row-link ew-detail\" data-action=\"list\" href=\"" . HtmlEncode(GetUrl("maintransactionslist?" . Config("TABLE_SHOW_MASTER") . "=main_campaigns&" . GetForeignKeyUrl("fk_id", $this->id->CurrentValue) . "")) . "\">" . $body . "</a>";
+        $body = "<a class=\"btn btn-default ew-row-link ew-detail\" data-action=\"list\" href=\"" . HtmlEncode(GetUrl("MainTransactionsList?" . Config("TABLE_SHOW_MASTER") . "=main_campaigns&" . GetForeignKeyUrl("fk_id", $this->id->CurrentValue) . "")) . "\">" . $body . "</a>";
         $links = "";
         $detailPageObj = Container("MainTransactionsGrid");
         if ($detailPageObj->DetailView && $Security->canView() && $Security->allowView(CurrentProjectID() . 'main_campaigns')) {
@@ -1370,7 +1370,7 @@ class MainCampaignsView extends MainCampaigns
         global $Breadcrumb, $Language;
         $Breadcrumb = new Breadcrumb("index");
         $url = CurrentUrl();
-        $Breadcrumb->add("list", $this->TableVar, $this->addMasterUrl("maincampaignslist"), "", $this->TableVar, true);
+        $Breadcrumb->add("list", $this->TableVar, $this->addMasterUrl("MainCampaignsList"), "", $this->TableVar, true);
         $pageId = "view";
         $Breadcrumb->add("view", $pageId, $url);
     }

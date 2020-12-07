@@ -695,7 +695,7 @@ class ZPriceSettings extends DbTable
         if ($referUrl != "" && $referPageName != CurrentPageName() && $referPageName != "login") { // Referer not same page or login page
             $_SESSION[$name] = $referUrl; // Save to Session
         }
-        return $_SESSION[$name] ?? GetUrl("zpricesettingslist");
+        return $_SESSION[$name] ?? GetUrl("ZPriceSettingsList");
     }
 
     // Set return page URL
@@ -708,11 +708,11 @@ class ZPriceSettings extends DbTable
     public function getModalCaption($pageName)
     {
         global $Language;
-        if ($pageName == "zpricesettingsview") {
+        if ($pageName == "ZPriceSettingsView") {
             return $Language->phrase("View");
-        } elseif ($pageName == "zpricesettingsedit") {
+        } elseif ($pageName == "ZPriceSettingsEdit") {
             return $Language->phrase("Edit");
-        } elseif ($pageName == "zpricesettingsadd") {
+        } elseif ($pageName == "ZPriceSettingsAdd") {
             return $Language->phrase("Add");
         } else {
             return "";
@@ -741,16 +741,16 @@ class ZPriceSettings extends DbTable
     // List URL
     public function getListUrl()
     {
-        return "zpricesettingslist";
+        return "ZPriceSettingsList";
     }
 
     // View URL
     public function getViewUrl($parm = "")
     {
         if ($parm != "") {
-            $url = $this->keyUrl("zpricesettingsview", $this->getUrlParm($parm));
+            $url = $this->keyUrl("ZPriceSettingsView", $this->getUrlParm($parm));
         } else {
-            $url = $this->keyUrl("zpricesettingsview", $this->getUrlParm(Config("TABLE_SHOW_DETAIL") . "="));
+            $url = $this->keyUrl("ZPriceSettingsView", $this->getUrlParm(Config("TABLE_SHOW_DETAIL") . "="));
         }
         return $this->addMasterUrl($url);
     }
@@ -759,9 +759,9 @@ class ZPriceSettings extends DbTable
     public function getAddUrl($parm = "")
     {
         if ($parm != "") {
-            $url = "zpricesettingsadd?" . $this->getUrlParm($parm);
+            $url = "ZPriceSettingsAdd?" . $this->getUrlParm($parm);
         } else {
-            $url = "zpricesettingsadd";
+            $url = "ZPriceSettingsAdd";
         }
         return $this->addMasterUrl($url);
     }
@@ -769,7 +769,7 @@ class ZPriceSettings extends DbTable
     // Edit URL
     public function getEditUrl($parm = "")
     {
-        $url = $this->keyUrl("zpricesettingsedit", $this->getUrlParm($parm));
+        $url = $this->keyUrl("ZPriceSettingsEdit", $this->getUrlParm($parm));
         return $this->addMasterUrl($url);
     }
 
@@ -783,7 +783,7 @@ class ZPriceSettings extends DbTable
     // Copy URL
     public function getCopyUrl($parm = "")
     {
-        $url = $this->keyUrl("zpricesettingsadd", $this->getUrlParm($parm));
+        $url = $this->keyUrl("ZPriceSettingsAdd", $this->getUrlParm($parm));
         return $this->addMasterUrl($url);
     }
 
@@ -797,7 +797,7 @@ class ZPriceSettings extends DbTable
     // Delete URL
     public function getDeleteUrl()
     {
-        return $this->keyUrl("zpricesettingsdelete", $this->getUrlParm());
+        return $this->keyUrl("ZPriceSettingsDelete", $this->getUrlParm());
     }
 
     // Add master url
