@@ -1,4 +1,5 @@
 <?php
+$id = (int) $_GET["id"];
 
 
 
@@ -6,10 +7,11 @@ if (isset($_GET["id"])) {
 	// Get parameters
 	if ($_GET["v"] = 'v3.1') {
 		$file = '/opt/tmscripts/invoices_test3.1/TRANSIT_MEDIA_PURCHASE_ORDER_IPOV3-TM-' . $_GET["id"] . '_' . $_GET["v"] . '.pdf';
+		$e = `/opt/lampp/bin/php /opt/tmscripts/TMDOC_generate_invoice_v3.php $id 1`;
 
 	} elseif ($_GET["v"] = 'v3.2') {
 		$file = '/opt/tmscripts/invoices_test3.2/TRANSIT_MEDIA_PURCHASE_ORDER_IPOV3-TM-' . $_GET["id"] . '_' . $_GET["v"] . '.pdf';
-
+		$e = `/opt/lampp/bin/php /opt/tmscripts/TMDOC_generate_invoice_v3.php $id 2`;
 	}
 
 	if (!file_exists($file)) {

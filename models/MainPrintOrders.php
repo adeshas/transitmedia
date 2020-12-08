@@ -1425,7 +1425,7 @@ SORTHTML;
     	//if (strpos($_SERVER['SERVER_NAME'], 'localhost') === false) {
     	//	require_once 'emailrun.php';
     	//}
-    	if ($rsold["approved"] == 'f' && $rsnew["approved"] == '1') {
+    	if ($rsold["approved"] === false && $rsnew["approved"] === '1') {
     		// Email to TM
     		$editfile = '/opt/lampp/htdocs/printingandbrandingv3/passes_source/ppt/slides/slide1.xml';
     		$immutabletemplate = '/opt/lampp/htdocs/printingandbrandingv3/passes_run/template.xml';
