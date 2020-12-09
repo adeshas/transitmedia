@@ -271,7 +271,7 @@ function sendTMmail($from, $to, $subject, $msg, $msgtxt="", $attach = null, $cc 
         $msg = html_entity_decode($msg);
 		
 		$email->Content = $msg;
-		$debugme = deubgEmail($email,TRUE);
+		//$debugme = deubgEmail($email,TRUE);
         $email->Content = beautify_email($msg);
         $email->AltBody = $msgtxt;
 
@@ -281,7 +281,7 @@ function sendTMmail($from, $to, $subject, $msg, $msgtxt="", $attach = null, $cc 
 		
 		// var_dump($email->Recipient);		
 		// exit;
-        // $email->send();
+        $email->send();
 
 
 }

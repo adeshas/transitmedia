@@ -1372,6 +1372,7 @@ SORTHTML;
                 $this->campaign_id->ViewValue = null;
             }
         }
+        $this->campaign_id->CssClass = "font-weight-bold";
         $this->campaign_id->ViewCustomAttributes = "";
 
         // operator_id
@@ -1779,6 +1780,7 @@ SORTHTML;
                     $this->campaign_id->ViewValue = null;
                 }
             }
+            $this->campaign_id->CssClass = "font-weight-bold";
             $this->campaign_id->ViewCustomAttributes = "";
         } else {
             $this->campaign_id->PlaceHolder = RemoveHtml($this->campaign_id->caption());

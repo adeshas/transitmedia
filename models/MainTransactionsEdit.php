@@ -1041,6 +1041,7 @@ class MainTransactionsEdit extends MainTransactions
                     $this->campaign_id->ViewValue = null;
                 }
             }
+            $this->campaign_id->CssClass = "font-weight-bold";
             $this->campaign_id->ViewCustomAttributes = "";
 
             // operator_id
@@ -1401,6 +1402,7 @@ class MainTransactionsEdit extends MainTransactions
                         $this->campaign_id->ViewValue = null;
                     }
                 }
+                $this->campaign_id->CssClass = "font-weight-bold";
                 $this->campaign_id->ViewCustomAttributes = "";
             } else {
                 $curVal = trim(strval($this->campaign_id->CurrentValue));
