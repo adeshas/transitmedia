@@ -405,7 +405,7 @@ class XUserTypes extends DbTable
         $success = $this->insertSql($rs)->execute();
         if ($success) {
             // Get insert id if necessary
-            $this->id->setDbValue($conn->fetchColumn("SELECT currval('user_types_id_seq'::regclass)"));
+            $this->id->setDbValue($conn->fetchColumn("SELECT currval('public.x_user_types_id_seq'::regclass)"));
             $rs['id'] = $this->id->DbValue;
         }
         return $success;

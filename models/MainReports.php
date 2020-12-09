@@ -546,7 +546,7 @@ class MainReports extends DbTable
         $success = $this->insertSql($rs)->execute();
         if ($success) {
             // Get insert id if necessary
-            $this->id->setDbValue($conn->fetchColumn("SELECT currval('exterior_reports_id_seq'::regclass)"));
+            $this->id->setDbValue($conn->fetchColumn("SELECT currval('public.main_reports_id_seq'::regclass)"));
             $rs['id'] = $this->id->DbValue;
         }
         return $success;

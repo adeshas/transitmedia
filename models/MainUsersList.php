@@ -595,6 +595,7 @@ class MainUsersList extends MainUsers
         $this->user_type->setVisibility();
         $this->vendor_id->setVisibility();
         $this->reportsto->setVisibility();
+        $this->ts->Visible = false;
         $this->hideFieldsForAddEdit();
 
         // Global Page Loading event (in userfn*.php)
@@ -1390,6 +1391,7 @@ class MainUsersList extends MainUsers
         $filterList = Concat($filterList, $this->user_type->AdvancedSearch->toJson(), ","); // Field user_type
         $filterList = Concat($filterList, $this->vendor_id->AdvancedSearch->toJson(), ","); // Field vendor_id
         $filterList = Concat($filterList, $this->reportsto->AdvancedSearch->toJson(), ","); // Field reportsto
+        $filterList = Concat($filterList, $this->ts->AdvancedSearch->toJson(), ","); // Field ts
         if ($this->BasicSearch->Keyword != "") {
             $wrk = "\"" . Config("TABLE_BASIC_SEARCH") . "\":\"" . JsEncode($this->BasicSearch->Keyword) . "\",\"" . Config("TABLE_BASIC_SEARCH_TYPE") . "\":\"" . JsEncode($this->BasicSearch->Type) . "\"";
             $filterList = Concat($filterList, $wrk, ",");
@@ -1493,6 +1495,14 @@ class MainUsersList extends MainUsers
         $this->reportsto->AdvancedSearch->SearchValue2 = @$filter["y_reportsto"];
         $this->reportsto->AdvancedSearch->SearchOperator2 = @$filter["w_reportsto"];
         $this->reportsto->AdvancedSearch->save();
+
+        // Field ts
+        $this->ts->AdvancedSearch->SearchValue = @$filter["x_ts"];
+        $this->ts->AdvancedSearch->SearchOperator = @$filter["z_ts"];
+        $this->ts->AdvancedSearch->SearchCondition = @$filter["v_ts"];
+        $this->ts->AdvancedSearch->SearchValue2 = @$filter["y_ts"];
+        $this->ts->AdvancedSearch->SearchOperator2 = @$filter["w_ts"];
+        $this->ts->AdvancedSearch->save();
         $this->BasicSearch->setKeyword(@$filter[Config("TABLE_BASIC_SEARCH")]);
         $this->BasicSearch->setType(@$filter[Config("TABLE_BASIC_SEARCH_TYPE")]);
     }
@@ -1734,6 +1744,7 @@ class MainUsersList extends MainUsers
                 $this->user_type->setSort("");
                 $this->vendor_id->setSort("");
                 $this->reportsto->setSort("");
+                $this->ts->setSort("");
             }
 
             // Reset start position
@@ -2335,6 +2346,8 @@ class MainUsersList extends MainUsers
         $this->vendor_id->OldValue = $this->vendor_id->CurrentValue;
         $this->reportsto->CurrentValue = null;
         $this->reportsto->OldValue = $this->reportsto->CurrentValue;
+        $this->ts->CurrentValue = null;
+        $this->ts->OldValue = $this->ts->CurrentValue;
     }
 
     // Load basic search values
@@ -2546,6 +2559,7 @@ class MainUsersList extends MainUsers
         $this->user_type->setDbValue($row['user_type']);
         $this->vendor_id->setDbValue($row['vendor_id']);
         $this->reportsto->setDbValue($row['reportsto']);
+        $this->ts->setDbValue($row['ts']);
     }
 
     // Return a row with default values
@@ -2561,6 +2575,7 @@ class MainUsersList extends MainUsers
         $row['user_type'] = $this->user_type->CurrentValue;
         $row['vendor_id'] = $this->vendor_id->CurrentValue;
         $row['reportsto'] = $this->reportsto->CurrentValue;
+        $row['ts'] = $this->ts->CurrentValue;
         return $row;
     }
 
@@ -2613,6 +2628,8 @@ class MainUsersList extends MainUsers
         // vendor_id
 
         // reportsto
+
+        // ts
         if ($this->RowType == ROWTYPE_VIEW) {
             // id
             $this->id->ViewValue = $this->id->CurrentValue;
@@ -2687,6 +2704,11 @@ class MainUsersList extends MainUsers
                 $this->reportsto->ViewValue = null;
             }
             $this->reportsto->ViewCustomAttributes = "";
+
+            // ts
+            $this->ts->ViewValue = $this->ts->CurrentValue;
+            $this->ts->ViewValue = FormatDateTime($this->ts->ViewValue, 0);
+            $this->ts->ViewCustomAttributes = "";
 
             // id
             $this->id->LinkCustomAttributes = "";

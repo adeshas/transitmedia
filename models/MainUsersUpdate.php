@@ -441,6 +441,7 @@ class MainUsersUpdate extends MainUsers
         $this->user_type->setVisibility();
         $this->vendor_id->setVisibility();
         $this->reportsto->setVisibility();
+        $this->ts->setVisibility();
         $this->hideFieldsForAddEdit();
 
         // Do not use lookup cache
@@ -569,6 +570,7 @@ class MainUsersUpdate extends MainUsers
                     $this->user_type->setDbValue($rs->fields['user_type']);
                     $this->vendor_id->setDbValue($rs->fields['vendor_id']);
                     $this->reportsto->setDbValue($rs->fields['reportsto']);
+                    $this->ts->setDbValue($rs->fields['ts']);
                 } else {
                     if (!CompareValue($this->name->DbValue, $rs->fields['name'])) {
                         $this->name->CurrentValue = null;
@@ -590,6 +592,9 @@ class MainUsersUpdate extends MainUsers
                     }
                     if (!CompareValue($this->reportsto->DbValue, $rs->fields['reportsto'])) {
                         $this->reportsto->CurrentValue = null;
+                    }
+                    if (!CompareValue($this->ts->DbValue, $rs->fields['ts'])) {
+                        $this->ts->CurrentValue = null;
                     }
                 }
                 $i++;
@@ -743,6 +748,18 @@ class MainUsersUpdate extends MainUsers
         }
         $this->reportsto->MultiUpdate = $CurrentForm->getValue("u_reportsto");
 
+        // Check field name 'ts' first before field var 'x_ts'
+        $val = $CurrentForm->hasValue("ts") ? $CurrentForm->getValue("ts") : $CurrentForm->getValue("x_ts");
+        if (!$this->ts->IsDetailKey) {
+            if (IsApi() && $val === null) {
+                $this->ts->Visible = false; // Disable update for API request
+            } else {
+                $this->ts->setFormValue($val);
+            }
+            $this->ts->CurrentValue = UnFormatDateTime($this->ts->CurrentValue, 0);
+        }
+        $this->ts->MultiUpdate = $CurrentForm->getValue("u_ts");
+
         // Check field name 'id' first before field var 'x_id'
         $val = $CurrentForm->hasValue("id") ? $CurrentForm->getValue("id") : $CurrentForm->getValue("x_id");
         if (!$this->id->IsDetailKey) {
@@ -762,6 +779,8 @@ class MainUsersUpdate extends MainUsers
         $this->user_type->CurrentValue = $this->user_type->FormValue;
         $this->vendor_id->CurrentValue = $this->vendor_id->FormValue;
         $this->reportsto->CurrentValue = $this->reportsto->FormValue;
+        $this->ts->CurrentValue = $this->ts->FormValue;
+        $this->ts->CurrentValue = UnFormatDateTime($this->ts->CurrentValue, 0);
     }
 
     // Load recordset
@@ -840,6 +859,7 @@ class MainUsersUpdate extends MainUsers
         $this->user_type->setDbValue($row['user_type']);
         $this->vendor_id->setDbValue($row['vendor_id']);
         $this->reportsto->setDbValue($row['reportsto']);
+        $this->ts->setDbValue($row['ts']);
     }
 
     // Return a row with default values
@@ -854,6 +874,7 @@ class MainUsersUpdate extends MainUsers
         $row['user_type'] = null;
         $row['vendor_id'] = null;
         $row['reportsto'] = null;
+        $row['ts'] = null;
         return $row;
     }
 
@@ -884,6 +905,8 @@ class MainUsersUpdate extends MainUsers
         // vendor_id
 
         // reportsto
+
+        // ts
         if ($this->RowType == ROWTYPE_VIEW) {
             // id
             $this->id->ViewValue = $this->id->CurrentValue;
@@ -959,6 +982,11 @@ class MainUsersUpdate extends MainUsers
             }
             $this->reportsto->ViewCustomAttributes = "";
 
+            // ts
+            $this->ts->ViewValue = $this->ts->CurrentValue;
+            $this->ts->ViewValue = FormatDateTime($this->ts->ViewValue, 0);
+            $this->ts->ViewCustomAttributes = "";
+
             // name
             $this->name->LinkCustomAttributes = "";
             $this->name->HrefValue = "";
@@ -993,6 +1021,11 @@ class MainUsersUpdate extends MainUsers
             $this->reportsto->LinkCustomAttributes = "";
             $this->reportsto->HrefValue = "";
             $this->reportsto->TooltipValue = "";
+
+            // ts
+            $this->ts->LinkCustomAttributes = "";
+            $this->ts->HrefValue = "";
+            $this->ts->TooltipValue = "";
         } elseif ($this->RowType == ROWTYPE_EDIT) {
             // name
             $this->name->EditAttrs["class"] = "form-control";
@@ -1139,6 +1172,12 @@ class MainUsersUpdate extends MainUsers
                 $this->reportsto->PlaceHolder = RemoveHtml($this->reportsto->caption());
             }
 
+            // ts
+            $this->ts->EditAttrs["class"] = "form-control";
+            $this->ts->EditCustomAttributes = "";
+            $this->ts->EditValue = HtmlEncode(FormatDateTime($this->ts->CurrentValue, 8));
+            $this->ts->PlaceHolder = RemoveHtml($this->ts->caption());
+
             // Edit refer script
 
             // name
@@ -1168,6 +1207,10 @@ class MainUsersUpdate extends MainUsers
             // reportsto
             $this->reportsto->LinkCustomAttributes = "";
             $this->reportsto->HrefValue = "";
+
+            // ts
+            $this->ts->LinkCustomAttributes = "";
+            $this->ts->HrefValue = "";
         }
         if ($this->RowType == ROWTYPE_ADD || $this->RowType == ROWTYPE_EDIT || $this->RowType == ROWTYPE_SEARCH) { // Add/Edit/Search row
             $this->setupFieldTitles();
@@ -1203,6 +1246,9 @@ class MainUsersUpdate extends MainUsers
             $updateCnt++;
         }
         if ($this->reportsto->multiUpdateSelected()) {
+            $updateCnt++;
+        }
+        if ($this->ts->multiUpdateSelected()) {
             $updateCnt++;
         }
         if ($updateCnt == 0) {
@@ -1254,6 +1300,16 @@ class MainUsersUpdate extends MainUsers
         if ($this->reportsto->Required) {
             if ($this->reportsto->MultiUpdate != "" && !$this->reportsto->IsDetailKey && EmptyValue($this->reportsto->FormValue)) {
                 $this->reportsto->addErrorMessage(str_replace("%s", $this->reportsto->caption(), $this->reportsto->RequiredErrorMessage));
+            }
+        }
+        if ($this->ts->Required) {
+            if ($this->ts->MultiUpdate != "" && !$this->ts->IsDetailKey && EmptyValue($this->ts->FormValue)) {
+                $this->ts->addErrorMessage(str_replace("%s", $this->ts->caption(), $this->ts->RequiredErrorMessage));
+            }
+        }
+        if ($this->ts->MultiUpdate != "") {
+            if (!CheckDate($this->ts->FormValue)) {
+                $this->ts->addErrorMessage($this->ts->getErrorMessage(false));
             }
         }
 
@@ -1314,6 +1370,9 @@ class MainUsersUpdate extends MainUsers
 
             // reportsto
             $this->reportsto->setDbValueDef($rsnew, $this->reportsto->CurrentValue, null, $this->reportsto->ReadOnly || $this->reportsto->MultiUpdate != "1");
+
+            // ts
+            $this->ts->setDbValueDef($rsnew, UnFormatDateTime($this->ts->CurrentValue, 0), null, $this->ts->ReadOnly || $this->ts->MultiUpdate != "1");
 
             // Call Row Updating event
             $updateRow = $this->rowUpdating($rsold, $rsnew);

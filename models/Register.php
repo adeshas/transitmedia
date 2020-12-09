@@ -535,6 +535,8 @@ class Register extends MainUsers
         $this->vendor_id->OldValue = $this->vendor_id->CurrentValue;
         $this->reportsto->CurrentValue = null;
         $this->reportsto->OldValue = $this->reportsto->CurrentValue;
+        $this->ts->CurrentValue = null;
+        $this->ts->OldValue = $this->ts->CurrentValue;
     }
 
     // Load form values
@@ -659,6 +661,7 @@ class Register extends MainUsers
         $this->user_type->setDbValue($row['user_type']);
         $this->vendor_id->setDbValue($row['vendor_id']);
         $this->reportsto->setDbValue($row['reportsto']);
+        $this->ts->setDbValue($row['ts']);
     }
 
     // Return a row with default values
@@ -674,6 +677,7 @@ class Register extends MainUsers
         $row['user_type'] = $this->user_type->CurrentValue;
         $row['vendor_id'] = $this->vendor_id->CurrentValue;
         $row['reportsto'] = $this->reportsto->CurrentValue;
+        $row['ts'] = $this->ts->CurrentValue;
         return $row;
     }
 
@@ -704,6 +708,8 @@ class Register extends MainUsers
         // vendor_id
 
         // reportsto
+
+        // ts
         if ($this->RowType == ROWTYPE_VIEW) {
             // id
             $this->id->ViewValue = $this->id->CurrentValue;
@@ -778,6 +784,11 @@ class Register extends MainUsers
                 $this->reportsto->ViewValue = null;
             }
             $this->reportsto->ViewCustomAttributes = "";
+
+            // ts
+            $this->ts->ViewValue = $this->ts->CurrentValue;
+            $this->ts->ViewValue = FormatDateTime($this->ts->ViewValue, 0);
+            $this->ts->ViewCustomAttributes = "";
 
             // name
             $this->name->LinkCustomAttributes = "";

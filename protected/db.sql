@@ -5,7 +5,7 @@
 -- Dumped from database version 11.2
 -- Dumped by pg_dump version 11.2
 
--- Started on 2020-11-18 11:56:23
+-- Started on 2020-12-09 09:32:42
 
 SET statement_timeout = 0;
 SET lock_timeout = 0;
@@ -17,330 +17,9 @@ SET check_function_bodies = false;
 SET client_min_messages = warning;
 SET row_security = off;
 
-ALTER TABLE IF EXISTS ONLY public.main_campaigns DROP CONSTRAINT IF EXISTS pricing_id_fk;
-ALTER TABLE IF EXISTS ONLY public.main_campaigns DROP CONSTRAINT IF EXISTS platform_id_fk;
-ALTER TABLE IF EXISTS ONLY public.y_operators DROP CONSTRAINT IF EXISTS operator_platorm_id_fk;
-ALTER TABLE IF EXISTS ONLY public.main_campaigns DROP CONSTRAINT IF EXISTS inventory_id_fk;
-ALTER TABLE IF EXISTS ONLY public.main_reports DROP CONSTRAINT IF EXISTS exterior_reports_fk2;
-ALTER TABLE IF EXISTS ONLY public.main_reports DROP CONSTRAINT IF EXISTS exterior_reports_fk1;
-ALTER TABLE IF EXISTS ONLY public.main_buses DROP CONSTRAINT IF EXISTS buses_fk4;
-ALTER TABLE IF EXISTS ONLY public.main_buses DROP CONSTRAINT IF EXISTS buses_fk3;
-ALTER TABLE IF EXISTS ONLY public.main_buses DROP CONSTRAINT IF EXISTS buses_fk2;
-ALTER TABLE IF EXISTS ONLY public.main_buses DROP CONSTRAINT IF EXISTS buses_fk1;
-ALTER TABLE IF EXISTS ONLY public.main_buses DROP CONSTRAINT IF EXISTS buses_fk0;
-ALTER TABLE IF EXISTS ONLY public.main_buses DROP CONSTRAINT IF EXISTS buses_depot_fk;
-ALTER TABLE IF EXISTS ONLY public.main_campaigns DROP CONSTRAINT IF EXISTS bus_size_id_fk;
-ALTER TABLE IF EXISTS ONLY public.sub_media_allocation DROP CONSTRAINT IF EXISTS allocation_campaign_id_fk;
-ALTER TABLE IF EXISTS ONLY public.sub_media_allocation DROP CONSTRAINT IF EXISTS allocation_bus_id_fk;
-CREATE OR REPLACE VIEW public.view_campaign_status AS
-SELECT
-    NULL::integer AS id,
-    NULL::text AS name,
-    NULL::bigint AS pending,
-    NULL::bigint AS approved,
-    NULL::bigint AS denied,
-    NULL::text AS status,
-    NULL::text AS status_matrix,
-    NULL::text AS status_json;
-DROP INDEX IF EXISTS public.fki_buses_depot_fk;
-ALTER TABLE IF EXISTS ONLY public.z_core_settings DROP CONSTRAINT IF EXISTS z_core_settings_pkey;
-ALTER TABLE IF EXISTS ONLY public.y_vendors DROP CONSTRAINT IF EXISTS y_vendors_pkey;
-ALTER TABLE IF EXISTS ONLY public.x_user_types DROP CONSTRAINT IF EXISTS x_user_types_pkey;
-ALTER TABLE IF EXISTS ONLY public.x_report_types DROP CONSTRAINT IF EXISTS x_report_types_pkey;
-ALTER TABLE IF EXISTS ONLY public.x_renewal_stage DROP CONSTRAINT IF EXISTS x_renewal_stage_pkey;
-ALTER TABLE IF EXISTS ONLY public.w_vendors_operators DROP CONSTRAINT IF EXISTS w_vendors_operators_id_pk;
-ALTER TABLE IF EXISTS ONLY public.main_users DROP CONSTRAINT IF EXISTS test_id_pk;
-ALTER TABLE IF EXISTS ONLY public.sub_transaction_details DROP CONSTRAINT IF EXISTS sub_tran_details_id_pk;
-ALTER TABLE IF EXISTS ONLY public.sub_renewal_requests DROP CONSTRAINT IF EXISTS renewal_requests_id_pk;
-ALTER TABLE IF EXISTS ONLY public.y_printers DROP CONSTRAINT IF EXISTS printers_pkey;
-ALTER TABLE IF EXISTS ONLY public.x_print_status DROP CONSTRAINT IF EXISTS print_status_pk;
-ALTER TABLE IF EXISTS ONLY public.x_print_status DROP CONSTRAINT IF EXISTS print_status_name_key;
-ALTER TABLE IF EXISTS ONLY public.x_print_stage DROP CONSTRAINT IF EXISTS print_stage_id_pk;
-ALTER TABLE IF EXISTS ONLY public.main_print_orders DROP CONSTRAINT IF EXISTS print_orders_pk0;
-ALTER TABLE IF EXISTS ONLY public.z_price_settings DROP CONSTRAINT IF EXISTS pricing_id_pk;
-ALTER TABLE IF EXISTS ONLY public.y_platforms DROP CONSTRAINT IF EXISTS platform_id_pk;
-ALTER TABLE IF EXISTS ONLY public.x_payment_status DROP CONSTRAINT IF EXISTS payment_status_pk;
-ALTER TABLE IF EXISTS ONLY public.x_payment_status DROP CONSTRAINT IF EXISTS payment_status_name_key;
-ALTER TABLE IF EXISTS ONLY public.y_operators DROP CONSTRAINT IF EXISTS operator_id_pk;
-ALTER TABLE IF EXISTS ONLY public.main_campaigns DROP CONSTRAINT IF EXISTS new_campaign_id_pk;
-ALTER TABLE IF EXISTS ONLY public.main_transactions DROP CONSTRAINT IF EXISTS main_transactions_pkey;
-ALTER TABLE IF EXISTS ONLY public.y_inventory DROP CONSTRAINT IF EXISTS inventory_id_pk;
-ALTER TABLE IF EXISTS ONLY public.main_reports DROP CONSTRAINT IF EXISTS exterior_reports_pk;
-ALTER TABLE IF EXISTS ONLY public.z_email_settings DROP CONSTRAINT IF EXISTS email_settings_pk;
-ALTER TABLE IF EXISTS ONLY public.z_email_settings DROP CONSTRAINT IF EXISTS email_settings_name_uk;
-ALTER TABLE IF EXISTS ONLY public.x_transaction_status DROP CONSTRAINT IF EXISTS campaign_status_pk;
-ALTER TABLE IF EXISTS ONLY public.main_buses DROP CONSTRAINT IF EXISTS buses_pk;
-ALTER TABLE IF EXISTS ONLY public.main_buses DROP CONSTRAINT IF EXISTS buses_number_key;
-ALTER TABLE IF EXISTS ONLY public.x_bus_status DROP CONSTRAINT IF EXISTS bus_status_pk;
-ALTER TABLE IF EXISTS ONLY public.x_bus_status DROP CONSTRAINT IF EXISTS bus_status_name_key;
-ALTER TABLE IF EXISTS ONLY public.x_bus_sizes DROP CONSTRAINT IF EXISTS bus_sizes_id_pk;
-ALTER TABLE IF EXISTS ONLY public.x_bus_depot DROP CONSTRAINT IF EXISTS bus_depot_unique;
-ALTER TABLE IF EXISTS ONLY public.x_bus_depot DROP CONSTRAINT IF EXISTS bus_depot_pk;
-ALTER TABLE IF EXISTS ONLY public.sub_media_allocation DROP CONSTRAINT IF EXISTS allocation_id_pk;
-ALTER TABLE IF EXISTS ONLY public.sub_media_allocation DROP CONSTRAINT IF EXISTS allocation_bus_campaign_uk;
-ALTER TABLE IF EXISTS public.z_price_settings ALTER COLUMN id DROP DEFAULT;
-ALTER TABLE IF EXISTS public.z_email_settings ALTER COLUMN id DROP DEFAULT;
-ALTER TABLE IF EXISTS public.z_core_settings ALTER COLUMN id DROP DEFAULT;
-ALTER TABLE IF EXISTS public.y_vendors ALTER COLUMN id DROP DEFAULT;
-ALTER TABLE IF EXISTS public.y_printers ALTER COLUMN id DROP DEFAULT;
-ALTER TABLE IF EXISTS public.y_platforms ALTER COLUMN id DROP DEFAULT;
-ALTER TABLE IF EXISTS public.y_operators ALTER COLUMN id DROP DEFAULT;
-ALTER TABLE IF EXISTS public.y_inventory ALTER COLUMN id DROP DEFAULT;
-ALTER TABLE IF EXISTS public.x_user_types ALTER COLUMN id DROP DEFAULT;
-ALTER TABLE IF EXISTS public.x_transaction_status ALTER COLUMN id DROP DEFAULT;
-ALTER TABLE IF EXISTS public.x_renewal_stage ALTER COLUMN id DROP DEFAULT;
-ALTER TABLE IF EXISTS public.x_print_status ALTER COLUMN id DROP DEFAULT;
-ALTER TABLE IF EXISTS public.x_print_stage ALTER COLUMN id DROP DEFAULT;
-ALTER TABLE IF EXISTS public.x_payment_status ALTER COLUMN id DROP DEFAULT;
-ALTER TABLE IF EXISTS public.x_bus_status ALTER COLUMN id DROP DEFAULT;
-ALTER TABLE IF EXISTS public.x_bus_sizes ALTER COLUMN id DROP DEFAULT;
-ALTER TABLE IF EXISTS public.x_bus_depot ALTER COLUMN id DROP DEFAULT;
-ALTER TABLE IF EXISTS public.w_vendors_operators ALTER COLUMN id DROP DEFAULT;
-ALTER TABLE IF EXISTS public.sub_transaction_details ALTER COLUMN id DROP DEFAULT;
-ALTER TABLE IF EXISTS public.sub_renewal_requests ALTER COLUMN id DROP DEFAULT;
-ALTER TABLE IF EXISTS public.sub_media_allocation ALTER COLUMN id DROP DEFAULT;
-ALTER TABLE IF EXISTS public.main_users ALTER COLUMN id DROP DEFAULT;
-ALTER TABLE IF EXISTS public.main_transactions ALTER COLUMN id DROP DEFAULT;
-ALTER TABLE IF EXISTS public.main_reports ALTER COLUMN id DROP DEFAULT;
-ALTER TABLE IF EXISTS public.main_print_orders ALTER COLUMN id DROP DEFAULT;
-ALTER TABLE IF EXISTS public.main_campaigns ALTER COLUMN id DROP DEFAULT;
-ALTER TABLE IF EXISTS public.main_buses ALTER COLUMN id DROP DEFAULT;
-DROP TABLE IF EXISTS public.x_report_types;
-DROP SEQUENCE IF EXISTS public.w_vendors_operators_id_seq;
-DROP VIEW IF EXISTS public.view_transactions_per_platform;
-DROP VIEW IF EXISTS public.view_transactions_per_operator;
-DROP VIEW IF EXISTS public.view_vendors_operators;
-DROP TABLE IF EXISTS public.w_vendors_operators;
-DROP VIEW IF EXISTS public.view_transactions_all;
-DROP VIEW IF EXISTS public.view_pricing_options;
-DROP VIEW IF EXISTS public.view_pricing_initial;
-DROP VIEW IF EXISTS public.view_pricing_all;
-DROP VIEW IF EXISTS public.view_payments_pending;
-DROP VIEW IF EXISTS public.view_operators_platforms;
-DROP VIEW IF EXISTS public.view_operators;
-DROP VIEW IF EXISTS public.view_campaigns_pending;
-DROP VIEW IF EXISTS public.view_campaign_status;
-DROP VIEW IF EXISTS public.view_buses_interior;
-DROP VIEW IF EXISTS public.view_buses_exterior;
-DROP VIEW IF EXISTS public.view_buses_assigned;
-DROP VIEW IF EXISTS public.view_bus_trans_options;
-DROP VIEW IF EXISTS public.view_bus_summary;
-DROP VIEW IF EXISTS public.view_bus_int_summary_at_a_glance;
-DROP VIEW IF EXISTS public.view_bus_ext_summary_at_a_glance;
-DROP VIEW IF EXISTS public.view_bus_depot_summary;
-DROP SEQUENCE IF EXISTS public.vendors_id_seq;
-DROP TABLE IF EXISTS public.y_vendors;
-DROP SEQUENCE IF EXISTS public.users_id_seq;
-DROP SEQUENCE IF EXISTS public.user_types_id_seq;
-DROP TABLE IF EXISTS public.x_user_types;
-DROP SEQUENCE IF EXISTS public.transactions_id_seq;
-DROP SEQUENCE IF EXISTS public.transaction_details_id_seq;
-DROP TABLE IF EXISTS public.sub_transaction_details;
-DROP SEQUENCE IF EXISTS public.renewal_stage_id_seq;
-DROP TABLE IF EXISTS public.x_renewal_stage;
-DROP SEQUENCE IF EXISTS public.renewal_requests_id_seq;
-DROP TABLE IF EXISTS public.sub_renewal_requests;
-DROP SEQUENCE IF EXISTS public.printers_id_seq;
-DROP TABLE IF EXISTS public.y_printers;
-DROP SEQUENCE IF EXISTS public.print_status_id_seq;
-DROP TABLE IF EXISTS public.x_print_status;
-DROP SEQUENCE IF EXISTS public.print_stage_id_seq;
-DROP TABLE IF EXISTS public.x_print_stage;
-DROP SEQUENCE IF EXISTS public.print_orders_id_seq;
-DROP SEQUENCE IF EXISTS public.pricing_id_seq;
-DROP TABLE IF EXISTS public.z_price_settings;
-DROP SEQUENCE IF EXISTS public.platforms_id_seq;
-DROP TABLE IF EXISTS public.y_platforms;
-DROP SEQUENCE IF EXISTS public.payment_status_id_seq;
-DROP TABLE IF EXISTS public.x_payment_status;
-DROP SEQUENCE IF EXISTS public.operators_id_seq;
-DROP TABLE IF EXISTS public.y_operators;
-DROP SEQUENCE IF EXISTS public.new_campaign_id_seq;
-DROP TABLE IF EXISTS public.main_users;
-DROP TABLE IF EXISTS public.main_transactions;
-DROP TABLE IF EXISTS public.main_print_orders;
-DROP TABLE IF EXISTS public.main_campaigns;
-DROP SEQUENCE IF EXISTS public.inventory_id_seq;
-DROP TABLE IF EXISTS public.y_inventory;
-DROP SEQUENCE IF EXISTS public.exterior_reports_id_seq;
-DROP TABLE IF EXISTS public.main_reports;
-DROP SEQUENCE IF EXISTS public.email_settings_id_seq;
-DROP TABLE IF EXISTS public.z_email_settings;
-DROP SEQUENCE IF EXISTS public.core_settings_id_seq;
-DROP TABLE IF EXISTS public.z_core_settings;
-DROP SEQUENCE IF EXISTS public.campaign_status_id_seq;
-DROP TABLE IF EXISTS public.x_transaction_status;
-DROP SEQUENCE IF EXISTS public.buses_id_seq;
-DROP TABLE IF EXISTS public.main_buses;
-DROP SEQUENCE IF EXISTS public.bus_status_id_seq;
-DROP TABLE IF EXISTS public.x_bus_status;
-DROP SEQUENCE IF EXISTS public.bus_sizes_id_seq;
-DROP TABLE IF EXISTS public.x_bus_sizes;
-DROP SEQUENCE IF EXISTS public.bus_depot_id_seq;
-DROP TABLE IF EXISTS public.x_bus_depot;
-DROP SEQUENCE IF EXISTS public.allocation_id_seq;
-DROP TABLE IF EXISTS public.sub_media_allocation;
 SET default_tablespace = '';
 
 SET default_with_oids = false;
-
---
--- TOC entry 220 (class 1259 OID 34183)
--- Name: sub_media_allocation; Type: TABLE; Schema: public; Owner: postgres
---
-
-CREATE TABLE public.sub_media_allocation (
-    id integer NOT NULL,
-    bus_id integer,
-    campaign_id integer,
-    active boolean DEFAULT false NOT NULL,
-    created_by integer,
-    ts_created timestamp with time zone DEFAULT now(),
-    ts_last_update timestamp with time zone
-);
-
-
-ALTER TABLE public.sub_media_allocation OWNER TO postgres;
-
---
--- TOC entry 219 (class 1259 OID 34181)
--- Name: allocation_id_seq; Type: SEQUENCE; Schema: public; Owner: postgres
---
-
-CREATE SEQUENCE public.allocation_id_seq
-    AS integer
-    START WITH 1
-    INCREMENT BY 1
-    NO MINVALUE
-    NO MAXVALUE
-    CACHE 1;
-
-
-ALTER TABLE public.allocation_id_seq OWNER TO postgres;
-
---
--- TOC entry 3283 (class 0 OID 0)
--- Dependencies: 219
--- Name: allocation_id_seq; Type: SEQUENCE OWNED BY; Schema: public; Owner: postgres
---
-
-ALTER SEQUENCE public.allocation_id_seq OWNED BY public.sub_media_allocation.id;
-
-
---
--- TOC entry 214 (class 1259 OID 34110)
--- Name: x_bus_depot; Type: TABLE; Schema: public; Owner: postgres
---
-
-CREATE TABLE public.x_bus_depot (
-    id integer NOT NULL,
-    name text NOT NULL
-);
-
-
-ALTER TABLE public.x_bus_depot OWNER TO postgres;
-
---
--- TOC entry 213 (class 1259 OID 34108)
--- Name: bus_depot_id_seq; Type: SEQUENCE; Schema: public; Owner: postgres
---
-
-CREATE SEQUENCE public.bus_depot_id_seq
-    AS integer
-    START WITH 1
-    INCREMENT BY 1
-    NO MINVALUE
-    NO MAXVALUE
-    CACHE 1;
-
-
-ALTER TABLE public.bus_depot_id_seq OWNER TO postgres;
-
---
--- TOC entry 3284 (class 0 OID 0)
--- Dependencies: 213
--- Name: bus_depot_id_seq; Type: SEQUENCE OWNED BY; Schema: public; Owner: postgres
---
-
-ALTER SEQUENCE public.bus_depot_id_seq OWNED BY public.x_bus_depot.id;
-
-
---
--- TOC entry 209 (class 1259 OID 33978)
--- Name: x_bus_sizes; Type: TABLE; Schema: public; Owner: postgres
---
-
-CREATE TABLE public.x_bus_sizes (
-    id integer NOT NULL,
-    name text
-);
-
-
-ALTER TABLE public.x_bus_sizes OWNER TO postgres;
-
---
--- TOC entry 208 (class 1259 OID 33976)
--- Name: bus_sizes_id_seq; Type: SEQUENCE; Schema: public; Owner: postgres
---
-
-CREATE SEQUENCE public.bus_sizes_id_seq
-    AS integer
-    START WITH 1
-    INCREMENT BY 1
-    NO MINVALUE
-    NO MAXVALUE
-    CACHE 1;
-
-
-ALTER TABLE public.bus_sizes_id_seq OWNER TO postgres;
-
---
--- TOC entry 3285 (class 0 OID 0)
--- Dependencies: 208
--- Name: bus_sizes_id_seq; Type: SEQUENCE OWNED BY; Schema: public; Owner: postgres
---
-
-ALTER SEQUENCE public.bus_sizes_id_seq OWNED BY public.x_bus_sizes.id;
-
-
---
--- TOC entry 216 (class 1259 OID 34123)
--- Name: x_bus_status; Type: TABLE; Schema: public; Owner: postgres
---
-
-CREATE TABLE public.x_bus_status (
-    id integer NOT NULL,
-    name character varying NOT NULL,
-    availability boolean NOT NULL
-);
-
-
-ALTER TABLE public.x_bus_status OWNER TO postgres;
-
---
--- TOC entry 215 (class 1259 OID 34121)
--- Name: bus_status_id_seq; Type: SEQUENCE; Schema: public; Owner: postgres
---
-
-CREATE SEQUENCE public.bus_status_id_seq
-    AS integer
-    START WITH 1
-    INCREMENT BY 1
-    NO MINVALUE
-    NO MAXVALUE
-    CACHE 1;
-
-
-ALTER TABLE public.bus_status_id_seq OWNER TO postgres;
-
---
--- TOC entry 3286 (class 0 OID 0)
--- Dependencies: 215
--- Name: bus_status_id_seq; Type: SEQUENCE OWNED BY; Schema: public; Owner: postgres
---
-
-ALTER SEQUENCE public.bus_status_id_seq OWNED BY public.x_bus_status.id;
-
 
 --
 -- TOC entry 218 (class 1259 OID 34136)
@@ -366,10 +45,10 @@ ALTER TABLE public.main_buses OWNER TO postgres;
 
 --
 -- TOC entry 217 (class 1259 OID 34134)
--- Name: buses_id_seq; Type: SEQUENCE; Schema: public; Owner: postgres
+-- Name: main_buses_id_seq; Type: SEQUENCE; Schema: public; Owner: postgres
 --
 
-CREATE SEQUENCE public.buses_id_seq
+CREATE SEQUENCE public.main_buses_id_seq
     AS integer
     START WITH 1
     INCREMENT BY 1
@@ -378,220 +57,15 @@ CREATE SEQUENCE public.buses_id_seq
     CACHE 1;
 
 
-ALTER TABLE public.buses_id_seq OWNER TO postgres;
-
---
--- TOC entry 3287 (class 0 OID 0)
--- Dependencies: 217
--- Name: buses_id_seq; Type: SEQUENCE OWNED BY; Schema: public; Owner: postgres
---
-
-ALTER SEQUENCE public.buses_id_seq OWNED BY public.main_buses.id;
-
-
---
--- TOC entry 226 (class 1259 OID 42281)
--- Name: x_transaction_status; Type: TABLE; Schema: public; Owner: postgres
---
-
-CREATE TABLE public.x_transaction_status (
-    id integer NOT NULL,
-    name character varying NOT NULL,
-    admin_name character varying,
-    operator_name character varying
-);
-
-
-ALTER TABLE public.x_transaction_status OWNER TO postgres;
-
---
--- TOC entry 225 (class 1259 OID 42279)
--- Name: campaign_status_id_seq; Type: SEQUENCE; Schema: public; Owner: postgres
---
-
-CREATE SEQUENCE public.campaign_status_id_seq
-    AS integer
-    START WITH 1
-    INCREMENT BY 1
-    NO MINVALUE
-    NO MAXVALUE
-    CACHE 1;
-
-
-ALTER TABLE public.campaign_status_id_seq OWNER TO postgres;
+ALTER TABLE public.main_buses_id_seq OWNER TO postgres;
 
 --
 -- TOC entry 3288 (class 0 OID 0)
--- Dependencies: 225
--- Name: campaign_status_id_seq; Type: SEQUENCE OWNED BY; Schema: public; Owner: postgres
+-- Dependencies: 217
+-- Name: main_buses_id_seq; Type: SEQUENCE OWNED BY; Schema: public; Owner: postgres
 --
 
-ALTER SEQUENCE public.campaign_status_id_seq OWNED BY public.x_transaction_status.id;
-
-
---
--- TOC entry 237 (class 1259 OID 42427)
--- Name: z_core_settings; Type: TABLE; Schema: public; Owner: postgres
---
-
-CREATE TABLE public.z_core_settings (
-    id integer NOT NULL,
-    name character varying NOT NULL,
-    value character varying NOT NULL
-);
-
-
-ALTER TABLE public.z_core_settings OWNER TO postgres;
-
---
--- TOC entry 236 (class 1259 OID 42425)
--- Name: core_settings_id_seq; Type: SEQUENCE; Schema: public; Owner: postgres
---
-
-CREATE SEQUENCE public.core_settings_id_seq
-    AS integer
-    START WITH 1
-    INCREMENT BY 1
-    NO MINVALUE
-    NO MAXVALUE
-    CACHE 1;
-
-
-ALTER TABLE public.core_settings_id_seq OWNER TO postgres;
-
---
--- TOC entry 3289 (class 0 OID 0)
--- Dependencies: 236
--- Name: core_settings_id_seq; Type: SEQUENCE OWNED BY; Schema: public; Owner: postgres
---
-
-ALTER SEQUENCE public.core_settings_id_seq OWNED BY public.z_core_settings.id;
-
-
---
--- TOC entry 235 (class 1259 OID 42414)
--- Name: z_email_settings; Type: TABLE; Schema: public; Owner: postgres
---
-
-CREATE TABLE public.z_email_settings (
-    id integer NOT NULL,
-    name character varying(60) NOT NULL,
-    description text,
-    to_value text,
-    cc_value text,
-    bcc_value text
-);
-
-
-ALTER TABLE public.z_email_settings OWNER TO postgres;
-
---
--- TOC entry 234 (class 1259 OID 42412)
--- Name: email_settings_id_seq; Type: SEQUENCE; Schema: public; Owner: postgres
---
-
-CREATE SEQUENCE public.email_settings_id_seq
-    AS integer
-    START WITH 1
-    INCREMENT BY 1
-    NO MINVALUE
-    NO MAXVALUE
-    CACHE 1;
-
-
-ALTER TABLE public.email_settings_id_seq OWNER TO postgres;
-
---
--- TOC entry 3290 (class 0 OID 0)
--- Dependencies: 234
--- Name: email_settings_id_seq; Type: SEQUENCE OWNED BY; Schema: public; Owner: postgres
---
-
-ALTER SEQUENCE public.email_settings_id_seq OWNED BY public.z_email_settings.id;
-
-
---
--- TOC entry 233 (class 1259 OID 42392)
--- Name: main_reports; Type: TABLE; Schema: public; Owner: postgres
---
-
-CREATE TABLE public.main_reports (
-    id integer NOT NULL,
-    date date NOT NULL,
-    image text,
-    video text,
-    comments text,
-    vendor_id integer NOT NULL,
-    ref_bus_id integer,
-    campaign_id integer NOT NULL,
-    ts_created timestamp with time zone DEFAULT now() NOT NULL,
-    type_id integer
-);
-
-
-ALTER TABLE public.main_reports OWNER TO postgres;
-
---
--- TOC entry 232 (class 1259 OID 42390)
--- Name: exterior_reports_id_seq; Type: SEQUENCE; Schema: public; Owner: postgres
---
-
-CREATE SEQUENCE public.exterior_reports_id_seq
-    AS integer
-    START WITH 1
-    INCREMENT BY 1
-    NO MINVALUE
-    NO MAXVALUE
-    CACHE 1;
-
-
-ALTER TABLE public.exterior_reports_id_seq OWNER TO postgres;
-
---
--- TOC entry 3291 (class 0 OID 0)
--- Dependencies: 232
--- Name: exterior_reports_id_seq; Type: SEQUENCE OWNED BY; Schema: public; Owner: postgres
---
-
-ALTER SEQUENCE public.exterior_reports_id_seq OWNED BY public.main_reports.id;
-
-
---
--- TOC entry 205 (class 1259 OID 33956)
--- Name: y_inventory; Type: TABLE; Schema: public; Owner: postgres
---
-
-CREATE TABLE public.y_inventory (
-    id integer NOT NULL,
-    name text
-);
-
-
-ALTER TABLE public.y_inventory OWNER TO postgres;
-
---
--- TOC entry 204 (class 1259 OID 33954)
--- Name: inventory_id_seq; Type: SEQUENCE; Schema: public; Owner: postgres
---
-
-CREATE SEQUENCE public.inventory_id_seq
-    AS integer
-    START WITH 1
-    INCREMENT BY 1
-    NO MINVALUE
-    NO MAXVALUE
-    CACHE 1;
-
-
-ALTER TABLE public.inventory_id_seq OWNER TO postgres;
-
---
--- TOC entry 3292 (class 0 OID 0)
--- Dependencies: 204
--- Name: inventory_id_seq; Type: SEQUENCE OWNED BY; Schema: public; Owner: postgres
---
-
-ALTER SEQUENCE public.inventory_id_seq OWNED BY public.y_inventory.id;
+ALTER SEQUENCE public.main_buses_id_seq OWNED BY public.main_buses.id;
 
 
 --
@@ -620,6 +94,31 @@ CREATE TABLE public.main_campaigns (
 ALTER TABLE public.main_campaigns OWNER TO postgres;
 
 --
+-- TOC entry 210 (class 1259 OID 33999)
+-- Name: main_campaigns_id_seq; Type: SEQUENCE; Schema: public; Owner: postgres
+--
+
+CREATE SEQUENCE public.main_campaigns_id_seq
+    AS integer
+    START WITH 1
+    INCREMENT BY 1
+    NO MINVALUE
+    NO MAXVALUE
+    CACHE 1;
+
+
+ALTER TABLE public.main_campaigns_id_seq OWNER TO postgres;
+
+--
+-- TOC entry 3289 (class 0 OID 0)
+-- Dependencies: 210
+-- Name: main_campaigns_id_seq; Type: SEQUENCE OWNED BY; Schema: public; Owner: postgres
+--
+
+ALTER SEQUENCE public.main_campaigns_id_seq OWNED BY public.main_campaigns.id;
+
+
+--
 -- TOC entry 270 (class 1259 OID 50814)
 -- Name: main_print_orders; Type: TABLE; Schema: public; Owner: postgres
 --
@@ -638,6 +137,77 @@ CREATE TABLE public.main_print_orders (
 
 
 ALTER TABLE public.main_print_orders OWNER TO postgres;
+
+--
+-- TOC entry 269 (class 1259 OID 50812)
+-- Name: main_print_orders_id_seq; Type: SEQUENCE; Schema: public; Owner: postgres
+--
+
+CREATE SEQUENCE public.main_print_orders_id_seq
+    AS integer
+    START WITH 1
+    INCREMENT BY 1
+    NO MINVALUE
+    NO MAXVALUE
+    CACHE 1;
+
+
+ALTER TABLE public.main_print_orders_id_seq OWNER TO postgres;
+
+--
+-- TOC entry 3290 (class 0 OID 0)
+-- Dependencies: 269
+-- Name: main_print_orders_id_seq; Type: SEQUENCE OWNED BY; Schema: public; Owner: postgres
+--
+
+ALTER SEQUENCE public.main_print_orders_id_seq OWNED BY public.main_print_orders.id;
+
+
+--
+-- TOC entry 233 (class 1259 OID 42392)
+-- Name: main_reports; Type: TABLE; Schema: public; Owner: postgres
+--
+
+CREATE TABLE public.main_reports (
+    id integer NOT NULL,
+    date date NOT NULL,
+    image text,
+    video text,
+    comments text,
+    vendor_id integer NOT NULL,
+    ref_bus_id integer,
+    campaign_id integer NOT NULL,
+    ts_created timestamp with time zone DEFAULT now() NOT NULL,
+    type_id integer
+);
+
+
+ALTER TABLE public.main_reports OWNER TO postgres;
+
+--
+-- TOC entry 232 (class 1259 OID 42390)
+-- Name: main_reports_id_seq; Type: SEQUENCE; Schema: public; Owner: postgres
+--
+
+CREATE SEQUENCE public.main_reports_id_seq
+    AS integer
+    START WITH 1
+    INCREMENT BY 1
+    NO MINVALUE
+    NO MAXVALUE
+    CACHE 1;
+
+
+ALTER TABLE public.main_reports_id_seq OWNER TO postgres;
+
+--
+-- TOC entry 3291 (class 0 OID 0)
+-- Dependencies: 232
+-- Name: main_reports_id_seq; Type: SEQUENCE OWNED BY; Schema: public; Owner: postgres
+--
+
+ALTER SEQUENCE public.main_reports_id_seq OWNED BY public.main_reports.id;
+
 
 --
 -- TOC entry 239 (class 1259 OID 42437)
@@ -665,6 +235,31 @@ CREATE TABLE public.main_transactions (
 ALTER TABLE public.main_transactions OWNER TO postgres;
 
 --
+-- TOC entry 238 (class 1259 OID 42435)
+-- Name: main_transactions_id_seq; Type: SEQUENCE; Schema: public; Owner: postgres
+--
+
+CREATE SEQUENCE public.main_transactions_id_seq
+    AS integer
+    START WITH 1
+    INCREMENT BY 1
+    NO MINVALUE
+    NO MAXVALUE
+    CACHE 1;
+
+
+ALTER TABLE public.main_transactions_id_seq OWNER TO postgres;
+
+--
+-- TOC entry 3292 (class 0 OID 0)
+-- Dependencies: 238
+-- Name: main_transactions_id_seq; Type: SEQUENCE OWNED BY; Schema: public; Owner: postgres
+--
+
+ALTER SEQUENCE public.main_transactions_id_seq OWNED BY public.main_transactions.id;
+
+
+--
 -- TOC entry 197 (class 1259 OID 33870)
 -- Name: main_users; Type: TABLE; Schema: public; Owner: postgres
 --
@@ -684,11 +279,11 @@ CREATE TABLE public.main_users (
 ALTER TABLE public.main_users OWNER TO postgres;
 
 --
--- TOC entry 210 (class 1259 OID 33999)
--- Name: new_campaign_id_seq; Type: SEQUENCE; Schema: public; Owner: postgres
+-- TOC entry 196 (class 1259 OID 33868)
+-- Name: main_users_id_seq; Type: SEQUENCE; Schema: public; Owner: postgres
 --
 
-CREATE SEQUENCE public.new_campaign_id_seq
+CREATE SEQUENCE public.main_users_id_seq
     AS integer
     START WITH 1
     INCREMENT BY 1
@@ -697,40 +292,41 @@ CREATE SEQUENCE public.new_campaign_id_seq
     CACHE 1;
 
 
-ALTER TABLE public.new_campaign_id_seq OWNER TO postgres;
+ALTER TABLE public.main_users_id_seq OWNER TO postgres;
 
 --
 -- TOC entry 3293 (class 0 OID 0)
--- Dependencies: 210
--- Name: new_campaign_id_seq; Type: SEQUENCE OWNED BY; Schema: public; Owner: postgres
+-- Dependencies: 196
+-- Name: main_users_id_seq; Type: SEQUENCE OWNED BY; Schema: public; Owner: postgres
 --
 
-ALTER SEQUENCE public.new_campaign_id_seq OWNED BY public.main_campaigns.id;
+ALTER SEQUENCE public.main_users_id_seq OWNED BY public.main_users.id;
 
 
 --
--- TOC entry 201 (class 1259 OID 33930)
--- Name: y_operators; Type: TABLE; Schema: public; Owner: postgres
+-- TOC entry 220 (class 1259 OID 34183)
+-- Name: sub_media_allocation; Type: TABLE; Schema: public; Owner: postgres
 --
 
-CREATE TABLE public.y_operators (
+CREATE TABLE public.sub_media_allocation (
     id integer NOT NULL,
-    name character varying(50),
-    shortname character varying(50),
-    platform_id integer,
-    email character varying,
-    contact_name character varying
+    bus_id integer,
+    campaign_id integer,
+    active boolean DEFAULT false NOT NULL,
+    created_by integer,
+    ts_created timestamp with time zone DEFAULT now(),
+    ts_last_update timestamp with time zone
 );
 
 
-ALTER TABLE public.y_operators OWNER TO postgres;
+ALTER TABLE public.sub_media_allocation OWNER TO postgres;
 
 --
--- TOC entry 200 (class 1259 OID 33928)
--- Name: operators_id_seq; Type: SEQUENCE; Schema: public; Owner: postgres
+-- TOC entry 219 (class 1259 OID 34181)
+-- Name: sub_media_allocation_id_seq; Type: SEQUENCE; Schema: public; Owner: postgres
 --
 
-CREATE SEQUENCE public.operators_id_seq
+CREATE SEQUENCE public.sub_media_allocation_id_seq
     AS integer
     START WITH 1
     INCREMENT BY 1
@@ -739,286 +335,15 @@ CREATE SEQUENCE public.operators_id_seq
     CACHE 1;
 
 
-ALTER TABLE public.operators_id_seq OWNER TO postgres;
+ALTER TABLE public.sub_media_allocation_id_seq OWNER TO postgres;
 
 --
 -- TOC entry 3294 (class 0 OID 0)
--- Dependencies: 200
--- Name: operators_id_seq; Type: SEQUENCE OWNED BY; Schema: public; Owner: postgres
+-- Dependencies: 219
+-- Name: sub_media_allocation_id_seq; Type: SEQUENCE OWNED BY; Schema: public; Owner: postgres
 --
 
-ALTER SEQUENCE public.operators_id_seq OWNED BY public.y_operators.id;
-
-
---
--- TOC entry 224 (class 1259 OID 42268)
--- Name: x_payment_status; Type: TABLE; Schema: public; Owner: postgres
---
-
-CREATE TABLE public.x_payment_status (
-    id integer NOT NULL,
-    name character varying NOT NULL
-);
-
-
-ALTER TABLE public.x_payment_status OWNER TO postgres;
-
---
--- TOC entry 223 (class 1259 OID 42266)
--- Name: payment_status_id_seq; Type: SEQUENCE; Schema: public; Owner: postgres
---
-
-CREATE SEQUENCE public.payment_status_id_seq
-    AS integer
-    START WITH 1
-    INCREMENT BY 1
-    NO MINVALUE
-    NO MAXVALUE
-    CACHE 1;
-
-
-ALTER TABLE public.payment_status_id_seq OWNER TO postgres;
-
---
--- TOC entry 3295 (class 0 OID 0)
--- Dependencies: 223
--- Name: payment_status_id_seq; Type: SEQUENCE OWNED BY; Schema: public; Owner: postgres
---
-
-ALTER SEQUENCE public.payment_status_id_seq OWNED BY public.x_payment_status.id;
-
-
---
--- TOC entry 199 (class 1259 OID 33919)
--- Name: y_platforms; Type: TABLE; Schema: public; Owner: postgres
---
-
-CREATE TABLE public.y_platforms (
-    id integer NOT NULL,
-    name character varying(50),
-    shortname character varying(50),
-    email character varying
-);
-
-
-ALTER TABLE public.y_platforms OWNER TO postgres;
-
---
--- TOC entry 198 (class 1259 OID 33917)
--- Name: platforms_id_seq; Type: SEQUENCE; Schema: public; Owner: postgres
---
-
-CREATE SEQUENCE public.platforms_id_seq
-    AS integer
-    START WITH 1
-    INCREMENT BY 1
-    NO MINVALUE
-    NO MAXVALUE
-    CACHE 1;
-
-
-ALTER TABLE public.platforms_id_seq OWNER TO postgres;
-
---
--- TOC entry 3296 (class 0 OID 0)
--- Dependencies: 198
--- Name: platforms_id_seq; Type: SEQUENCE OWNED BY; Schema: public; Owner: postgres
---
-
-ALTER SEQUENCE public.platforms_id_seq OWNED BY public.y_platforms.id;
-
-
---
--- TOC entry 203 (class 1259 OID 33943)
--- Name: z_price_settings; Type: TABLE; Schema: public; Owner: postgres
---
-
-CREATE TABLE public.z_price_settings (
-    id integer NOT NULL,
-    platform_id integer NOT NULL,
-    inventory_id integer NOT NULL,
-    print_stage_id integer,
-    bus_size_id integer,
-    details text,
-    max_limit integer,
-    min_limit integer,
-    price bigint,
-    operator_fee bigint,
-    agency_fee bigint,
-    lamata_fee bigint,
-    lasaa_fee bigint,
-    printers_fee bigint,
-    active boolean DEFAULT false NOT NULL,
-    ts_created timestamp with time zone DEFAULT now() NOT NULL
-);
-
-
-ALTER TABLE public.z_price_settings OWNER TO postgres;
-
---
--- TOC entry 202 (class 1259 OID 33941)
--- Name: pricing_id_seq; Type: SEQUENCE; Schema: public; Owner: postgres
---
-
-CREATE SEQUENCE public.pricing_id_seq
-    AS integer
-    START WITH 1
-    INCREMENT BY 1
-    NO MINVALUE
-    NO MAXVALUE
-    CACHE 1;
-
-
-ALTER TABLE public.pricing_id_seq OWNER TO postgres;
-
---
--- TOC entry 3297 (class 0 OID 0)
--- Dependencies: 202
--- Name: pricing_id_seq; Type: SEQUENCE OWNED BY; Schema: public; Owner: postgres
---
-
-ALTER SEQUENCE public.pricing_id_seq OWNED BY public.z_price_settings.id;
-
-
---
--- TOC entry 269 (class 1259 OID 50812)
--- Name: print_orders_id_seq; Type: SEQUENCE; Schema: public; Owner: postgres
---
-
-CREATE SEQUENCE public.print_orders_id_seq
-    AS integer
-    START WITH 1
-    INCREMENT BY 1
-    NO MINVALUE
-    NO MAXVALUE
-    CACHE 1;
-
-
-ALTER TABLE public.print_orders_id_seq OWNER TO postgres;
-
---
--- TOC entry 3298 (class 0 OID 0)
--- Dependencies: 269
--- Name: print_orders_id_seq; Type: SEQUENCE OWNED BY; Schema: public; Owner: postgres
---
-
-ALTER SEQUENCE public.print_orders_id_seq OWNED BY public.main_print_orders.id;
-
-
---
--- TOC entry 207 (class 1259 OID 33967)
--- Name: x_print_stage; Type: TABLE; Schema: public; Owner: postgres
---
-
-CREATE TABLE public.x_print_stage (
-    id integer NOT NULL,
-    name text
-);
-
-
-ALTER TABLE public.x_print_stage OWNER TO postgres;
-
---
--- TOC entry 206 (class 1259 OID 33965)
--- Name: print_stage_id_seq; Type: SEQUENCE; Schema: public; Owner: postgres
---
-
-CREATE SEQUENCE public.print_stage_id_seq
-    AS integer
-    START WITH 1
-    INCREMENT BY 1
-    NO MINVALUE
-    NO MAXVALUE
-    CACHE 1;
-
-
-ALTER TABLE public.print_stage_id_seq OWNER TO postgres;
-
---
--- TOC entry 3299 (class 0 OID 0)
--- Dependencies: 206
--- Name: print_stage_id_seq; Type: SEQUENCE OWNED BY; Schema: public; Owner: postgres
---
-
-ALTER SEQUENCE public.print_stage_id_seq OWNED BY public.x_print_stage.id;
-
-
---
--- TOC entry 222 (class 1259 OID 42255)
--- Name: x_print_status; Type: TABLE; Schema: public; Owner: postgres
---
-
-CREATE TABLE public.x_print_status (
-    id integer NOT NULL,
-    name character varying NOT NULL
-);
-
-
-ALTER TABLE public.x_print_status OWNER TO postgres;
-
---
--- TOC entry 221 (class 1259 OID 42253)
--- Name: print_status_id_seq; Type: SEQUENCE; Schema: public; Owner: postgres
---
-
-CREATE SEQUENCE public.print_status_id_seq
-    AS integer
-    START WITH 1
-    INCREMENT BY 1
-    NO MINVALUE
-    NO MAXVALUE
-    CACHE 1;
-
-
-ALTER TABLE public.print_status_id_seq OWNER TO postgres;
-
---
--- TOC entry 3300 (class 0 OID 0)
--- Dependencies: 221
--- Name: print_status_id_seq; Type: SEQUENCE OWNED BY; Schema: public; Owner: postgres
---
-
-ALTER SEQUENCE public.print_status_id_seq OWNED BY public.x_print_status.id;
-
-
---
--- TOC entry 268 (class 1259 OID 50803)
--- Name: y_printers; Type: TABLE; Schema: public; Owner: postgres
---
-
-CREATE TABLE public.y_printers (
-    id integer NOT NULL,
-    name text,
-    passcode character varying(5),
-    email text
-);
-
-
-ALTER TABLE public.y_printers OWNER TO postgres;
-
---
--- TOC entry 267 (class 1259 OID 50801)
--- Name: printers_id_seq; Type: SEQUENCE; Schema: public; Owner: postgres
---
-
-CREATE SEQUENCE public.printers_id_seq
-    AS integer
-    START WITH 1
-    INCREMENT BY 1
-    NO MINVALUE
-    NO MAXVALUE
-    CACHE 1;
-
-
-ALTER TABLE public.printers_id_seq OWNER TO postgres;
-
---
--- TOC entry 3301 (class 0 OID 0)
--- Dependencies: 267
--- Name: printers_id_seq; Type: SEQUENCE OWNED BY; Schema: public; Owner: postgres
---
-
-ALTER SEQUENCE public.printers_id_seq OWNED BY public.y_printers.id;
+ALTER SEQUENCE public.sub_media_allocation_id_seq OWNED BY public.sub_media_allocation.id;
 
 
 --
@@ -1039,10 +364,10 @@ ALTER TABLE public.sub_renewal_requests OWNER TO postgres;
 
 --
 -- TOC entry 240 (class 1259 OID 42446)
--- Name: renewal_requests_id_seq; Type: SEQUENCE; Schema: public; Owner: postgres
+-- Name: sub_renewal_requests_id_seq; Type: SEQUENCE; Schema: public; Owner: postgres
 --
 
-CREATE SEQUENCE public.renewal_requests_id_seq
+CREATE SEQUENCE public.sub_renewal_requests_id_seq
     AS integer
     START WITH 1
     INCREMENT BY 1
@@ -1051,53 +376,15 @@ CREATE SEQUENCE public.renewal_requests_id_seq
     CACHE 1;
 
 
-ALTER TABLE public.renewal_requests_id_seq OWNER TO postgres;
+ALTER TABLE public.sub_renewal_requests_id_seq OWNER TO postgres;
 
 --
--- TOC entry 3302 (class 0 OID 0)
+-- TOC entry 3295 (class 0 OID 0)
 -- Dependencies: 240
--- Name: renewal_requests_id_seq; Type: SEQUENCE OWNED BY; Schema: public; Owner: postgres
+-- Name: sub_renewal_requests_id_seq; Type: SEQUENCE OWNED BY; Schema: public; Owner: postgres
 --
 
-ALTER SEQUENCE public.renewal_requests_id_seq OWNED BY public.sub_renewal_requests.id;
-
-
---
--- TOC entry 245 (class 1259 OID 42473)
--- Name: x_renewal_stage; Type: TABLE; Schema: public; Owner: postgres
---
-
-CREATE TABLE public.x_renewal_stage (
-    id integer NOT NULL,
-    name text NOT NULL
-);
-
-
-ALTER TABLE public.x_renewal_stage OWNER TO postgres;
-
---
--- TOC entry 244 (class 1259 OID 42471)
--- Name: renewal_stage_id_seq; Type: SEQUENCE; Schema: public; Owner: postgres
---
-
-CREATE SEQUENCE public.renewal_stage_id_seq
-    AS integer
-    START WITH 1
-    INCREMENT BY 1
-    NO MINVALUE
-    NO MAXVALUE
-    CACHE 1;
-
-
-ALTER TABLE public.renewal_stage_id_seq OWNER TO postgres;
-
---
--- TOC entry 3303 (class 0 OID 0)
--- Dependencies: 244
--- Name: renewal_stage_id_seq; Type: SEQUENCE OWNED BY; Schema: public; Owner: postgres
---
-
-ALTER SEQUENCE public.renewal_stage_id_seq OWNED BY public.x_renewal_stage.id;
+ALTER SEQUENCE public.sub_renewal_requests_id_seq OWNED BY public.sub_renewal_requests.id;
 
 
 --
@@ -1119,10 +406,10 @@ ALTER TABLE public.sub_transaction_details OWNER TO postgres;
 
 --
 -- TOC entry 242 (class 1259 OID 42454)
--- Name: transaction_details_id_seq; Type: SEQUENCE; Schema: public; Owner: postgres
+-- Name: sub_transaction_details_id_seq; Type: SEQUENCE; Schema: public; Owner: postgres
 --
 
-CREATE SEQUENCE public.transaction_details_id_seq
+CREATE SEQUENCE public.sub_transaction_details_id_seq
     AS integer
     START WITH 1
     INCREMENT BY 1
@@ -1131,104 +418,88 @@ CREATE SEQUENCE public.transaction_details_id_seq
     CACHE 1;
 
 
-ALTER TABLE public.transaction_details_id_seq OWNER TO postgres;
+ALTER TABLE public.sub_transaction_details_id_seq OWNER TO postgres;
 
 --
--- TOC entry 3304 (class 0 OID 0)
+-- TOC entry 3296 (class 0 OID 0)
 -- Dependencies: 242
--- Name: transaction_details_id_seq; Type: SEQUENCE OWNED BY; Schema: public; Owner: postgres
+-- Name: sub_transaction_details_id_seq; Type: SEQUENCE OWNED BY; Schema: public; Owner: postgres
 --
 
-ALTER SEQUENCE public.transaction_details_id_seq OWNED BY public.sub_transaction_details.id;
-
-
---
--- TOC entry 238 (class 1259 OID 42435)
--- Name: transactions_id_seq; Type: SEQUENCE; Schema: public; Owner: postgres
---
-
-CREATE SEQUENCE public.transactions_id_seq
-    AS integer
-    START WITH 1
-    INCREMENT BY 1
-    NO MINVALUE
-    NO MAXVALUE
-    CACHE 1;
-
-
-ALTER TABLE public.transactions_id_seq OWNER TO postgres;
-
---
--- TOC entry 3305 (class 0 OID 0)
--- Dependencies: 238
--- Name: transactions_id_seq; Type: SEQUENCE OWNED BY; Schema: public; Owner: postgres
---
-
-ALTER SEQUENCE public.transactions_id_seq OWNED BY public.main_transactions.id;
+ALTER SEQUENCE public.sub_transaction_details_id_seq OWNED BY public.sub_transaction_details.id;
 
 
 --
--- TOC entry 230 (class 1259 OID 42308)
--- Name: x_user_types; Type: TABLE; Schema: public; Owner: postgres
+-- TOC entry 214 (class 1259 OID 34110)
+-- Name: x_bus_depot; Type: TABLE; Schema: public; Owner: postgres
 --
 
-CREATE TABLE public.x_user_types (
+CREATE TABLE public.x_bus_depot (
     id integer NOT NULL,
-    name character varying NOT NULL
+    name text NOT NULL
 );
 
 
-ALTER TABLE public.x_user_types OWNER TO postgres;
+ALTER TABLE public.x_bus_depot OWNER TO postgres;
 
 --
--- TOC entry 229 (class 1259 OID 42306)
--- Name: user_types_id_seq; Type: SEQUENCE; Schema: public; Owner: postgres
+-- TOC entry 209 (class 1259 OID 33978)
+-- Name: x_bus_sizes; Type: TABLE; Schema: public; Owner: postgres
 --
 
-CREATE SEQUENCE public.user_types_id_seq
-    AS integer
-    START WITH 1
-    INCREMENT BY 1
-    NO MINVALUE
-    NO MAXVALUE
-    CACHE 1;
+CREATE TABLE public.x_bus_sizes (
+    id integer NOT NULL,
+    name text
+);
 
 
-ALTER TABLE public.user_types_id_seq OWNER TO postgres;
+ALTER TABLE public.x_bus_sizes OWNER TO postgres;
 
 --
--- TOC entry 3306 (class 0 OID 0)
--- Dependencies: 229
--- Name: user_types_id_seq; Type: SEQUENCE OWNED BY; Schema: public; Owner: postgres
+-- TOC entry 216 (class 1259 OID 34123)
+-- Name: x_bus_status; Type: TABLE; Schema: public; Owner: postgres
 --
 
-ALTER SEQUENCE public.user_types_id_seq OWNED BY public.x_user_types.id;
+CREATE TABLE public.x_bus_status (
+    id integer NOT NULL,
+    name character varying NOT NULL,
+    availability boolean NOT NULL
+);
 
 
---
--- TOC entry 196 (class 1259 OID 33868)
--- Name: users_id_seq; Type: SEQUENCE; Schema: public; Owner: postgres
---
-
-CREATE SEQUENCE public.users_id_seq
-    AS integer
-    START WITH 1
-    INCREMENT BY 1
-    NO MINVALUE
-    NO MAXVALUE
-    CACHE 1;
-
-
-ALTER TABLE public.users_id_seq OWNER TO postgres;
+ALTER TABLE public.x_bus_status OWNER TO postgres;
 
 --
--- TOC entry 3307 (class 0 OID 0)
--- Dependencies: 196
--- Name: users_id_seq; Type: SEQUENCE OWNED BY; Schema: public; Owner: postgres
+-- TOC entry 201 (class 1259 OID 33930)
+-- Name: y_operators; Type: TABLE; Schema: public; Owner: postgres
 --
 
-ALTER SEQUENCE public.users_id_seq OWNED BY public.main_users.id;
+CREATE TABLE public.y_operators (
+    id integer NOT NULL,
+    name character varying(50),
+    shortname character varying(50),
+    platform_id integer,
+    email character varying,
+    contact_name character varying
+);
 
+
+ALTER TABLE public.y_operators OWNER TO postgres;
+
+--
+-- TOC entry 199 (class 1259 OID 33919)
+-- Name: y_platforms; Type: TABLE; Schema: public; Owner: postgres
+--
+
+CREATE TABLE public.y_platforms (
+    id integer NOT NULL,
+    name character varying(50),
+    shortname character varying(50),
+    email character varying
+);
+
+
+ALTER TABLE public.y_platforms OWNER TO postgres;
 
 --
 -- TOC entry 228 (class 1259 OID 42299)
@@ -1244,29 +515,57 @@ CREATE TABLE public.y_vendors (
 ALTER TABLE public.y_vendors OWNER TO postgres;
 
 --
--- TOC entry 227 (class 1259 OID 42297)
--- Name: vendors_id_seq; Type: SEQUENCE; Schema: public; Owner: postgres
+-- TOC entry 271 (class 1259 OID 50848)
+-- Name: view_all_buses; Type: VIEW; Schema: public; Owner: postgres
 --
 
-CREATE SEQUENCE public.vendors_id_seq
-    AS integer
-    START WITH 1
-    INCREMENT BY 1
-    NO MINVALUE
-    NO MAXVALUE
-    CACHE 1;
+CREATE VIEW public.view_all_buses AS
+ SELECT main_buses.id,
+    main_buses.number,
+    ( SELECT y.name
+           FROM public.y_platforms y
+          WHERE (y.id = main_buses.platform_id)) AS platform,
+    ( SELECT o.name
+           FROM public.y_operators o
+          WHERE (o.id = main_buses.operator_id)) AS operator,
+    ( SELECT c.name
+           FROM public.main_campaigns c
+          WHERE (c.id = main_buses.exterior_campaign_id)) AS exterior_campaign,
+    ( SELECT v.name
+           FROM public.y_vendors v
+          WHERE (v.id = ( SELECT c.vendor_id
+                   FROM public.main_campaigns c
+                  WHERE (c.id = main_buses.exterior_campaign_id)))) AS exterior_campaign_vendor,
+    ( SELECT c.name
+           FROM public.main_campaigns c
+          WHERE (c.id = main_buses.interior_campaign_id)) AS interior_campaign,
+    ( SELECT v.name
+           FROM public.y_vendors v
+          WHERE (v.id = ( SELECT c.vendor_id
+                   FROM public.main_campaigns c
+                  WHERE (c.id = main_buses.interior_campaign_id)))) AS interior_campaign_vendor,
+    ( SELECT b.name
+           FROM public.x_bus_status b
+          WHERE (b.id = main_buses.bus_status_id)) AS bus_status,
+    ( SELECT b.name
+           FROM public.x_bus_sizes b
+          WHERE (b.id = main_buses.bus_size_id)) AS bus_size,
+    ( SELECT b.name
+           FROM public.x_bus_depot b
+          WHERE (b.id = main_buses.bus_depot_id)) AS bus_depot,
+    main_buses.ts_created,
+    main_buses.ts_last_update,
+    main_buses.bus_status_id,
+    main_buses.bus_size_id,
+    main_buses.bus_depot_id,
+    main_buses.platform_id,
+    main_buses.operator_id,
+    main_buses.exterior_campaign_id,
+    main_buses.interior_campaign_id
+   FROM public.main_buses;
 
 
-ALTER TABLE public.vendors_id_seq OWNER TO postgres;
-
---
--- TOC entry 3308 (class 0 OID 0)
--- Dependencies: 227
--- Name: vendors_id_seq; Type: SEQUENCE OWNED BY; Schema: public; Owner: postgres
---
-
-ALTER SEQUENCE public.vendors_id_seq OWNED BY public.y_vendors.id;
-
+ALTER TABLE public.view_all_buses OWNER TO postgres;
 
 --
 -- TOC entry 252 (class 1259 OID 50637)
@@ -1534,11 +833,92 @@ SELECT
 ALTER TABLE public.view_campaign_status OWNER TO postgres;
 
 --
+-- TOC entry 224 (class 1259 OID 42268)
+-- Name: x_payment_status; Type: TABLE; Schema: public; Owner: postgres
+--
+
+CREATE TABLE public.x_payment_status (
+    id integer NOT NULL,
+    name character varying NOT NULL
+);
+
+
+ALTER TABLE public.x_payment_status OWNER TO postgres;
+
+--
+-- TOC entry 207 (class 1259 OID 33967)
+-- Name: x_print_stage; Type: TABLE; Schema: public; Owner: postgres
+--
+
+CREATE TABLE public.x_print_stage (
+    id integer NOT NULL,
+    name text
+);
+
+
+ALTER TABLE public.x_print_stage OWNER TO postgres;
+
+--
+-- TOC entry 226 (class 1259 OID 42281)
+-- Name: x_transaction_status; Type: TABLE; Schema: public; Owner: postgres
+--
+
+CREATE TABLE public.x_transaction_status (
+    id integer NOT NULL,
+    name character varying NOT NULL,
+    admin_name character varying,
+    operator_name character varying
+);
+
+
+ALTER TABLE public.x_transaction_status OWNER TO postgres;
+
+--
+-- TOC entry 205 (class 1259 OID 33956)
+-- Name: y_inventory; Type: TABLE; Schema: public; Owner: postgres
+--
+
+CREATE TABLE public.y_inventory (
+    id integer NOT NULL,
+    name text
+);
+
+
+ALTER TABLE public.y_inventory OWNER TO postgres;
+
+--
+-- TOC entry 203 (class 1259 OID 33943)
+-- Name: z_price_settings; Type: TABLE; Schema: public; Owner: postgres
+--
+
+CREATE TABLE public.z_price_settings (
+    id integer NOT NULL,
+    platform_id integer NOT NULL,
+    inventory_id integer NOT NULL,
+    print_stage_id integer,
+    bus_size_id integer,
+    details text,
+    max_limit integer,
+    min_limit integer,
+    price bigint,
+    operator_fee bigint,
+    agency_fee bigint,
+    lamata_fee bigint,
+    lasaa_fee bigint,
+    printers_fee bigint,
+    active boolean DEFAULT false NOT NULL,
+    ts_created timestamp with time zone DEFAULT now() NOT NULL
+);
+
+
+ALTER TABLE public.z_price_settings OWNER TO postgres;
+
+--
 -- TOC entry 265 (class 1259 OID 50785)
 -- Name: view_campaigns_pending; Type: VIEW; Schema: public; Owner: postgres
 --
 
-CREATE VIEW public.view_campaigns_pending WITH (security_barrier='false') AS
+CREATE VIEW public.view_campaigns_pending AS
  SELECT t.payment_date,
     t.start_date,
     t.end_date,
@@ -1584,6 +964,19 @@ CREATE VIEW public.view_campaigns_pending WITH (security_barrier='false') AS
 ALTER TABLE public.view_campaigns_pending OWNER TO postgres;
 
 --
+-- TOC entry 230 (class 1259 OID 42308)
+-- Name: x_user_types; Type: TABLE; Schema: public; Owner: postgres
+--
+
+CREATE TABLE public.x_user_types (
+    id integer NOT NULL,
+    name character varying NOT NULL
+);
+
+
+ALTER TABLE public.x_user_types OWNER TO postgres;
+
+--
 -- TOC entry 259 (class 1259 OID 50727)
 -- Name: view_operators; Type: VIEW; Schema: public; Owner: postgres
 --
@@ -1618,6 +1011,19 @@ CREATE VIEW public.view_operators_platforms WITH (security_barrier='false') AS
 
 
 ALTER TABLE public.view_operators_platforms OWNER TO postgres;
+
+--
+-- TOC entry 222 (class 1259 OID 42255)
+-- Name: x_print_status; Type: TABLE; Schema: public; Owner: postgres
+--
+
+CREATE TABLE public.x_print_status (
+    id integer NOT NULL,
+    name character varying NOT NULL
+);
+
+
+ALTER TABLE public.x_print_status OWNER TO postgres;
 
 --
 -- TOC entry 257 (class 1259 OID 50704)
@@ -1928,12 +1334,200 @@ CREATE SEQUENCE public.w_vendors_operators_id_seq
 ALTER TABLE public.w_vendors_operators_id_seq OWNER TO postgres;
 
 --
--- TOC entry 3309 (class 0 OID 0)
+-- TOC entry 3297 (class 0 OID 0)
 -- Dependencies: 260
 -- Name: w_vendors_operators_id_seq; Type: SEQUENCE OWNED BY; Schema: public; Owner: postgres
 --
 
 ALTER SEQUENCE public.w_vendors_operators_id_seq OWNED BY public.w_vendors_operators.id;
+
+
+--
+-- TOC entry 213 (class 1259 OID 34108)
+-- Name: x_bus_depot_id_seq; Type: SEQUENCE; Schema: public; Owner: postgres
+--
+
+CREATE SEQUENCE public.x_bus_depot_id_seq
+    AS integer
+    START WITH 1
+    INCREMENT BY 1
+    NO MINVALUE
+    NO MAXVALUE
+    CACHE 1;
+
+
+ALTER TABLE public.x_bus_depot_id_seq OWNER TO postgres;
+
+--
+-- TOC entry 3298 (class 0 OID 0)
+-- Dependencies: 213
+-- Name: x_bus_depot_id_seq; Type: SEQUENCE OWNED BY; Schema: public; Owner: postgres
+--
+
+ALTER SEQUENCE public.x_bus_depot_id_seq OWNED BY public.x_bus_depot.id;
+
+
+--
+-- TOC entry 208 (class 1259 OID 33976)
+-- Name: x_bus_sizes_id_seq; Type: SEQUENCE; Schema: public; Owner: postgres
+--
+
+CREATE SEQUENCE public.x_bus_sizes_id_seq
+    AS integer
+    START WITH 1
+    INCREMENT BY 1
+    NO MINVALUE
+    NO MAXVALUE
+    CACHE 1;
+
+
+ALTER TABLE public.x_bus_sizes_id_seq OWNER TO postgres;
+
+--
+-- TOC entry 3299 (class 0 OID 0)
+-- Dependencies: 208
+-- Name: x_bus_sizes_id_seq; Type: SEQUENCE OWNED BY; Schema: public; Owner: postgres
+--
+
+ALTER SEQUENCE public.x_bus_sizes_id_seq OWNED BY public.x_bus_sizes.id;
+
+
+--
+-- TOC entry 215 (class 1259 OID 34121)
+-- Name: x_bus_status_id_seq; Type: SEQUENCE; Schema: public; Owner: postgres
+--
+
+CREATE SEQUENCE public.x_bus_status_id_seq
+    AS integer
+    START WITH 1
+    INCREMENT BY 1
+    NO MINVALUE
+    NO MAXVALUE
+    CACHE 1;
+
+
+ALTER TABLE public.x_bus_status_id_seq OWNER TO postgres;
+
+--
+-- TOC entry 3300 (class 0 OID 0)
+-- Dependencies: 215
+-- Name: x_bus_status_id_seq; Type: SEQUENCE OWNED BY; Schema: public; Owner: postgres
+--
+
+ALTER SEQUENCE public.x_bus_status_id_seq OWNED BY public.x_bus_status.id;
+
+
+--
+-- TOC entry 223 (class 1259 OID 42266)
+-- Name: x_payment_status_id_seq; Type: SEQUENCE; Schema: public; Owner: postgres
+--
+
+CREATE SEQUENCE public.x_payment_status_id_seq
+    AS integer
+    START WITH 1
+    INCREMENT BY 1
+    NO MINVALUE
+    NO MAXVALUE
+    CACHE 1;
+
+
+ALTER TABLE public.x_payment_status_id_seq OWNER TO postgres;
+
+--
+-- TOC entry 3301 (class 0 OID 0)
+-- Dependencies: 223
+-- Name: x_payment_status_id_seq; Type: SEQUENCE OWNED BY; Schema: public; Owner: postgres
+--
+
+ALTER SEQUENCE public.x_payment_status_id_seq OWNED BY public.x_payment_status.id;
+
+
+--
+-- TOC entry 206 (class 1259 OID 33965)
+-- Name: x_print_stage_id_seq; Type: SEQUENCE; Schema: public; Owner: postgres
+--
+
+CREATE SEQUENCE public.x_print_stage_id_seq
+    AS integer
+    START WITH 1
+    INCREMENT BY 1
+    NO MINVALUE
+    NO MAXVALUE
+    CACHE 1;
+
+
+ALTER TABLE public.x_print_stage_id_seq OWNER TO postgres;
+
+--
+-- TOC entry 3302 (class 0 OID 0)
+-- Dependencies: 206
+-- Name: x_print_stage_id_seq; Type: SEQUENCE OWNED BY; Schema: public; Owner: postgres
+--
+
+ALTER SEQUENCE public.x_print_stage_id_seq OWNED BY public.x_print_stage.id;
+
+
+--
+-- TOC entry 221 (class 1259 OID 42253)
+-- Name: x_print_status_id_seq; Type: SEQUENCE; Schema: public; Owner: postgres
+--
+
+CREATE SEQUENCE public.x_print_status_id_seq
+    AS integer
+    START WITH 1
+    INCREMENT BY 1
+    NO MINVALUE
+    NO MAXVALUE
+    CACHE 1;
+
+
+ALTER TABLE public.x_print_status_id_seq OWNER TO postgres;
+
+--
+-- TOC entry 3303 (class 0 OID 0)
+-- Dependencies: 221
+-- Name: x_print_status_id_seq; Type: SEQUENCE OWNED BY; Schema: public; Owner: postgres
+--
+
+ALTER SEQUENCE public.x_print_status_id_seq OWNED BY public.x_print_status.id;
+
+
+--
+-- TOC entry 245 (class 1259 OID 42473)
+-- Name: x_renewal_stage; Type: TABLE; Schema: public; Owner: postgres
+--
+
+CREATE TABLE public.x_renewal_stage (
+    id integer NOT NULL,
+    name text NOT NULL
+);
+
+
+ALTER TABLE public.x_renewal_stage OWNER TO postgres;
+
+--
+-- TOC entry 244 (class 1259 OID 42471)
+-- Name: x_renewal_stage_id_seq; Type: SEQUENCE; Schema: public; Owner: postgres
+--
+
+CREATE SEQUENCE public.x_renewal_stage_id_seq
+    AS integer
+    START WITH 1
+    INCREMENT BY 1
+    NO MINVALUE
+    NO MAXVALUE
+    CACHE 1;
+
+
+ALTER TABLE public.x_renewal_stage_id_seq OWNER TO postgres;
+
+--
+-- TOC entry 3304 (class 0 OID 0)
+-- Dependencies: 244
+-- Name: x_renewal_stage_id_seq; Type: SEQUENCE OWNED BY; Schema: public; Owner: postgres
+--
+
+ALTER SEQUENCE public.x_renewal_stage_id_seq OWNED BY public.x_renewal_stage.id;
 
 
 --
@@ -1950,79 +1544,375 @@ CREATE TABLE public.x_report_types (
 ALTER TABLE public.x_report_types OWNER TO postgres;
 
 --
--- TOC entry 2963 (class 2604 OID 34139)
+-- TOC entry 225 (class 1259 OID 42279)
+-- Name: x_transaction_status_id_seq; Type: SEQUENCE; Schema: public; Owner: postgres
+--
+
+CREATE SEQUENCE public.x_transaction_status_id_seq
+    AS integer
+    START WITH 1
+    INCREMENT BY 1
+    NO MINVALUE
+    NO MAXVALUE
+    CACHE 1;
+
+
+ALTER TABLE public.x_transaction_status_id_seq OWNER TO postgres;
+
+--
+-- TOC entry 3305 (class 0 OID 0)
+-- Dependencies: 225
+-- Name: x_transaction_status_id_seq; Type: SEQUENCE OWNED BY; Schema: public; Owner: postgres
+--
+
+ALTER SEQUENCE public.x_transaction_status_id_seq OWNED BY public.x_transaction_status.id;
+
+
+--
+-- TOC entry 229 (class 1259 OID 42306)
+-- Name: x_user_types_id_seq; Type: SEQUENCE; Schema: public; Owner: postgres
+--
+
+CREATE SEQUENCE public.x_user_types_id_seq
+    AS integer
+    START WITH 1
+    INCREMENT BY 1
+    NO MINVALUE
+    NO MAXVALUE
+    CACHE 1;
+
+
+ALTER TABLE public.x_user_types_id_seq OWNER TO postgres;
+
+--
+-- TOC entry 3306 (class 0 OID 0)
+-- Dependencies: 229
+-- Name: x_user_types_id_seq; Type: SEQUENCE OWNED BY; Schema: public; Owner: postgres
+--
+
+ALTER SEQUENCE public.x_user_types_id_seq OWNED BY public.x_user_types.id;
+
+
+--
+-- TOC entry 204 (class 1259 OID 33954)
+-- Name: y_inventory_id_seq; Type: SEQUENCE; Schema: public; Owner: postgres
+--
+
+CREATE SEQUENCE public.y_inventory_id_seq
+    AS integer
+    START WITH 1
+    INCREMENT BY 1
+    NO MINVALUE
+    NO MAXVALUE
+    CACHE 1;
+
+
+ALTER TABLE public.y_inventory_id_seq OWNER TO postgres;
+
+--
+-- TOC entry 3307 (class 0 OID 0)
+-- Dependencies: 204
+-- Name: y_inventory_id_seq; Type: SEQUENCE OWNED BY; Schema: public; Owner: postgres
+--
+
+ALTER SEQUENCE public.y_inventory_id_seq OWNED BY public.y_inventory.id;
+
+
+--
+-- TOC entry 200 (class 1259 OID 33928)
+-- Name: y_operators_id_seq; Type: SEQUENCE; Schema: public; Owner: postgres
+--
+
+CREATE SEQUENCE public.y_operators_id_seq
+    AS integer
+    START WITH 1
+    INCREMENT BY 1
+    NO MINVALUE
+    NO MAXVALUE
+    CACHE 1;
+
+
+ALTER TABLE public.y_operators_id_seq OWNER TO postgres;
+
+--
+-- TOC entry 3308 (class 0 OID 0)
+-- Dependencies: 200
+-- Name: y_operators_id_seq; Type: SEQUENCE OWNED BY; Schema: public; Owner: postgres
+--
+
+ALTER SEQUENCE public.y_operators_id_seq OWNED BY public.y_operators.id;
+
+
+--
+-- TOC entry 198 (class 1259 OID 33917)
+-- Name: y_platforms_id_seq; Type: SEQUENCE; Schema: public; Owner: postgres
+--
+
+CREATE SEQUENCE public.y_platforms_id_seq
+    AS integer
+    START WITH 1
+    INCREMENT BY 1
+    NO MINVALUE
+    NO MAXVALUE
+    CACHE 1;
+
+
+ALTER TABLE public.y_platforms_id_seq OWNER TO postgres;
+
+--
+-- TOC entry 3309 (class 0 OID 0)
+-- Dependencies: 198
+-- Name: y_platforms_id_seq; Type: SEQUENCE OWNED BY; Schema: public; Owner: postgres
+--
+
+ALTER SEQUENCE public.y_platforms_id_seq OWNED BY public.y_platforms.id;
+
+
+--
+-- TOC entry 268 (class 1259 OID 50803)
+-- Name: y_printers; Type: TABLE; Schema: public; Owner: postgres
+--
+
+CREATE TABLE public.y_printers (
+    id integer NOT NULL,
+    name text,
+    passcode character varying(5),
+    email text
+);
+
+
+ALTER TABLE public.y_printers OWNER TO postgres;
+
+--
+-- TOC entry 267 (class 1259 OID 50801)
+-- Name: y_printers_id_seq; Type: SEQUENCE; Schema: public; Owner: postgres
+--
+
+CREATE SEQUENCE public.y_printers_id_seq
+    AS integer
+    START WITH 1
+    INCREMENT BY 1
+    NO MINVALUE
+    NO MAXVALUE
+    CACHE 1;
+
+
+ALTER TABLE public.y_printers_id_seq OWNER TO postgres;
+
+--
+-- TOC entry 3310 (class 0 OID 0)
+-- Dependencies: 267
+-- Name: y_printers_id_seq; Type: SEQUENCE OWNED BY; Schema: public; Owner: postgres
+--
+
+ALTER SEQUENCE public.y_printers_id_seq OWNED BY public.y_printers.id;
+
+
+--
+-- TOC entry 227 (class 1259 OID 42297)
+-- Name: y_vendors_id_seq; Type: SEQUENCE; Schema: public; Owner: postgres
+--
+
+CREATE SEQUENCE public.y_vendors_id_seq
+    AS integer
+    START WITH 1
+    INCREMENT BY 1
+    NO MINVALUE
+    NO MAXVALUE
+    CACHE 1;
+
+
+ALTER TABLE public.y_vendors_id_seq OWNER TO postgres;
+
+--
+-- TOC entry 3311 (class 0 OID 0)
+-- Dependencies: 227
+-- Name: y_vendors_id_seq; Type: SEQUENCE OWNED BY; Schema: public; Owner: postgres
+--
+
+ALTER SEQUENCE public.y_vendors_id_seq OWNED BY public.y_vendors.id;
+
+
+--
+-- TOC entry 237 (class 1259 OID 42427)
+-- Name: z_core_settings; Type: TABLE; Schema: public; Owner: postgres
+--
+
+CREATE TABLE public.z_core_settings (
+    id integer NOT NULL,
+    name character varying NOT NULL,
+    value character varying NOT NULL
+);
+
+
+ALTER TABLE public.z_core_settings OWNER TO postgres;
+
+--
+-- TOC entry 236 (class 1259 OID 42425)
+-- Name: z_core_settings_id_seq; Type: SEQUENCE; Schema: public; Owner: postgres
+--
+
+CREATE SEQUENCE public.z_core_settings_id_seq
+    AS integer
+    START WITH 1
+    INCREMENT BY 1
+    NO MINVALUE
+    NO MAXVALUE
+    CACHE 1;
+
+
+ALTER TABLE public.z_core_settings_id_seq OWNER TO postgres;
+
+--
+-- TOC entry 3312 (class 0 OID 0)
+-- Dependencies: 236
+-- Name: z_core_settings_id_seq; Type: SEQUENCE OWNED BY; Schema: public; Owner: postgres
+--
+
+ALTER SEQUENCE public.z_core_settings_id_seq OWNED BY public.z_core_settings.id;
+
+
+--
+-- TOC entry 235 (class 1259 OID 42414)
+-- Name: z_email_settings; Type: TABLE; Schema: public; Owner: postgres
+--
+
+CREATE TABLE public.z_email_settings (
+    id integer NOT NULL,
+    name character varying(60) NOT NULL,
+    description text,
+    to_value text,
+    cc_value text,
+    bcc_value text
+);
+
+
+ALTER TABLE public.z_email_settings OWNER TO postgres;
+
+--
+-- TOC entry 234 (class 1259 OID 42412)
+-- Name: z_email_settings_id_seq; Type: SEQUENCE; Schema: public; Owner: postgres
+--
+
+CREATE SEQUENCE public.z_email_settings_id_seq
+    AS integer
+    START WITH 1
+    INCREMENT BY 1
+    NO MINVALUE
+    NO MAXVALUE
+    CACHE 1;
+
+
+ALTER TABLE public.z_email_settings_id_seq OWNER TO postgres;
+
+--
+-- TOC entry 3313 (class 0 OID 0)
+-- Dependencies: 234
+-- Name: z_email_settings_id_seq; Type: SEQUENCE OWNED BY; Schema: public; Owner: postgres
+--
+
+ALTER SEQUENCE public.z_email_settings_id_seq OWNED BY public.z_email_settings.id;
+
+
+--
+-- TOC entry 202 (class 1259 OID 33941)
+-- Name: z_price_settings_id_seq; Type: SEQUENCE; Schema: public; Owner: postgres
+--
+
+CREATE SEQUENCE public.z_price_settings_id_seq
+    AS integer
+    START WITH 1
+    INCREMENT BY 1
+    NO MINVALUE
+    NO MAXVALUE
+    CACHE 1;
+
+
+ALTER TABLE public.z_price_settings_id_seq OWNER TO postgres;
+
+--
+-- TOC entry 3314 (class 0 OID 0)
+-- Dependencies: 202
+-- Name: z_price_settings_id_seq; Type: SEQUENCE OWNED BY; Schema: public; Owner: postgres
+--
+
+ALTER SEQUENCE public.z_price_settings_id_seq OWNED BY public.z_price_settings.id;
+
+
+--
+-- TOC entry 2967 (class 2604 OID 34139)
 -- Name: main_buses id; Type: DEFAULT; Schema: public; Owner: postgres
 --
 
-ALTER TABLE ONLY public.main_buses ALTER COLUMN id SET DEFAULT nextval('public.buses_id_seq'::regclass);
+ALTER TABLE ONLY public.main_buses ALTER COLUMN id SET DEFAULT nextval('public.main_buses_id_seq'::regclass);
 
 
 --
--- TOC entry 2957 (class 2604 OID 34004)
+-- TOC entry 2961 (class 2604 OID 34004)
 -- Name: main_campaigns id; Type: DEFAULT; Schema: public; Owner: postgres
 --
 
-ALTER TABLE ONLY public.main_campaigns ALTER COLUMN id SET DEFAULT nextval('public.new_campaign_id_seq'::regclass);
+ALTER TABLE ONLY public.main_campaigns ALTER COLUMN id SET DEFAULT nextval('public.main_campaigns_id_seq'::regclass);
 
 
 --
--- TOC entry 2992 (class 2604 OID 50817)
+-- TOC entry 2996 (class 2604 OID 50817)
 -- Name: main_print_orders id; Type: DEFAULT; Schema: public; Owner: postgres
 --
 
-ALTER TABLE ONLY public.main_print_orders ALTER COLUMN id SET DEFAULT nextval('public.print_orders_id_seq'::regclass);
+ALTER TABLE ONLY public.main_print_orders ALTER COLUMN id SET DEFAULT nextval('public.main_print_orders_id_seq'::regclass);
 
 
 --
--- TOC entry 2975 (class 2604 OID 42395)
+-- TOC entry 2979 (class 2604 OID 42395)
 -- Name: main_reports id; Type: DEFAULT; Schema: public; Owner: postgres
 --
 
-ALTER TABLE ONLY public.main_reports ALTER COLUMN id SET DEFAULT nextval('public.exterior_reports_id_seq'::regclass);
+ALTER TABLE ONLY public.main_reports ALTER COLUMN id SET DEFAULT nextval('public.main_reports_id_seq'::regclass);
 
 
 --
--- TOC entry 2979 (class 2604 OID 42440)
+-- TOC entry 2983 (class 2604 OID 42440)
 -- Name: main_transactions id; Type: DEFAULT; Schema: public; Owner: postgres
 --
 
-ALTER TABLE ONLY public.main_transactions ALTER COLUMN id SET DEFAULT nextval('public.transactions_id_seq'::regclass);
+ALTER TABLE ONLY public.main_transactions ALTER COLUMN id SET DEFAULT nextval('public.main_transactions_id_seq'::regclass);
 
 
 --
--- TOC entry 2948 (class 2604 OID 33873)
+-- TOC entry 2952 (class 2604 OID 33873)
 -- Name: main_users id; Type: DEFAULT; Schema: public; Owner: postgres
 --
 
-ALTER TABLE ONLY public.main_users ALTER COLUMN id SET DEFAULT nextval('public.users_id_seq'::regclass);
+ALTER TABLE ONLY public.main_users ALTER COLUMN id SET DEFAULT nextval('public.main_users_id_seq'::regclass);
 
 
 --
--- TOC entry 2967 (class 2604 OID 34186)
+-- TOC entry 2971 (class 2604 OID 34186)
 -- Name: sub_media_allocation id; Type: DEFAULT; Schema: public; Owner: postgres
 --
 
-ALTER TABLE ONLY public.sub_media_allocation ALTER COLUMN id SET DEFAULT nextval('public.allocation_id_seq'::regclass);
+ALTER TABLE ONLY public.sub_media_allocation ALTER COLUMN id SET DEFAULT nextval('public.sub_media_allocation_id_seq'::regclass);
 
 
 --
--- TOC entry 2985 (class 2604 OID 42451)
+-- TOC entry 2989 (class 2604 OID 42451)
 -- Name: sub_renewal_requests id; Type: DEFAULT; Schema: public; Owner: postgres
 --
 
-ALTER TABLE ONLY public.sub_renewal_requests ALTER COLUMN id SET DEFAULT nextval('public.renewal_requests_id_seq'::regclass);
+ALTER TABLE ONLY public.sub_renewal_requests ALTER COLUMN id SET DEFAULT nextval('public.sub_renewal_requests_id_seq'::regclass);
 
 
 --
--- TOC entry 2986 (class 2604 OID 42459)
+-- TOC entry 2990 (class 2604 OID 42459)
 -- Name: sub_transaction_details id; Type: DEFAULT; Schema: public; Owner: postgres
 --
 
-ALTER TABLE ONLY public.sub_transaction_details ALTER COLUMN id SET DEFAULT nextval('public.transaction_details_id_seq'::regclass);
+ALTER TABLE ONLY public.sub_transaction_details ALTER COLUMN id SET DEFAULT nextval('public.sub_transaction_details_id_seq'::regclass);
 
 
 --
--- TOC entry 2990 (class 2604 OID 50754)
+-- TOC entry 2994 (class 2604 OID 50754)
 -- Name: w_vendors_operators id; Type: DEFAULT; Schema: public; Owner: postgres
 --
 
@@ -2030,143 +1920,143 @@ ALTER TABLE ONLY public.w_vendors_operators ALTER COLUMN id SET DEFAULT nextval(
 
 
 --
--- TOC entry 2961 (class 2604 OID 34113)
+-- TOC entry 2965 (class 2604 OID 34113)
 -- Name: x_bus_depot id; Type: DEFAULT; Schema: public; Owner: postgres
 --
 
-ALTER TABLE ONLY public.x_bus_depot ALTER COLUMN id SET DEFAULT nextval('public.bus_depot_id_seq'::regclass);
+ALTER TABLE ONLY public.x_bus_depot ALTER COLUMN id SET DEFAULT nextval('public.x_bus_depot_id_seq'::regclass);
 
 
 --
--- TOC entry 2956 (class 2604 OID 33981)
+-- TOC entry 2960 (class 2604 OID 33981)
 -- Name: x_bus_sizes id; Type: DEFAULT; Schema: public; Owner: postgres
 --
 
-ALTER TABLE ONLY public.x_bus_sizes ALTER COLUMN id SET DEFAULT nextval('public.bus_sizes_id_seq'::regclass);
+ALTER TABLE ONLY public.x_bus_sizes ALTER COLUMN id SET DEFAULT nextval('public.x_bus_sizes_id_seq'::regclass);
 
 
 --
--- TOC entry 2962 (class 2604 OID 34126)
+-- TOC entry 2966 (class 2604 OID 34126)
 -- Name: x_bus_status id; Type: DEFAULT; Schema: public; Owner: postgres
 --
 
-ALTER TABLE ONLY public.x_bus_status ALTER COLUMN id SET DEFAULT nextval('public.bus_status_id_seq'::regclass);
+ALTER TABLE ONLY public.x_bus_status ALTER COLUMN id SET DEFAULT nextval('public.x_bus_status_id_seq'::regclass);
 
 
 --
--- TOC entry 2971 (class 2604 OID 42271)
+-- TOC entry 2975 (class 2604 OID 42271)
 -- Name: x_payment_status id; Type: DEFAULT; Schema: public; Owner: postgres
 --
 
-ALTER TABLE ONLY public.x_payment_status ALTER COLUMN id SET DEFAULT nextval('public.payment_status_id_seq'::regclass);
+ALTER TABLE ONLY public.x_payment_status ALTER COLUMN id SET DEFAULT nextval('public.x_payment_status_id_seq'::regclass);
 
 
 --
--- TOC entry 2955 (class 2604 OID 33970)
+-- TOC entry 2959 (class 2604 OID 33970)
 -- Name: x_print_stage id; Type: DEFAULT; Schema: public; Owner: postgres
 --
 
-ALTER TABLE ONLY public.x_print_stage ALTER COLUMN id SET DEFAULT nextval('public.print_stage_id_seq'::regclass);
+ALTER TABLE ONLY public.x_print_stage ALTER COLUMN id SET DEFAULT nextval('public.x_print_stage_id_seq'::regclass);
 
 
 --
--- TOC entry 2970 (class 2604 OID 42258)
+-- TOC entry 2974 (class 2604 OID 42258)
 -- Name: x_print_status id; Type: DEFAULT; Schema: public; Owner: postgres
 --
 
-ALTER TABLE ONLY public.x_print_status ALTER COLUMN id SET DEFAULT nextval('public.print_status_id_seq'::regclass);
+ALTER TABLE ONLY public.x_print_status ALTER COLUMN id SET DEFAULT nextval('public.x_print_status_id_seq'::regclass);
 
 
 --
--- TOC entry 2989 (class 2604 OID 42476)
+-- TOC entry 2993 (class 2604 OID 42476)
 -- Name: x_renewal_stage id; Type: DEFAULT; Schema: public; Owner: postgres
 --
 
-ALTER TABLE ONLY public.x_renewal_stage ALTER COLUMN id SET DEFAULT nextval('public.renewal_stage_id_seq'::regclass);
+ALTER TABLE ONLY public.x_renewal_stage ALTER COLUMN id SET DEFAULT nextval('public.x_renewal_stage_id_seq'::regclass);
 
 
 --
--- TOC entry 2972 (class 2604 OID 42284)
+-- TOC entry 2976 (class 2604 OID 42284)
 -- Name: x_transaction_status id; Type: DEFAULT; Schema: public; Owner: postgres
 --
 
-ALTER TABLE ONLY public.x_transaction_status ALTER COLUMN id SET DEFAULT nextval('public.campaign_status_id_seq'::regclass);
+ALTER TABLE ONLY public.x_transaction_status ALTER COLUMN id SET DEFAULT nextval('public.x_transaction_status_id_seq'::regclass);
 
 
 --
--- TOC entry 2974 (class 2604 OID 42311)
+-- TOC entry 2978 (class 2604 OID 42311)
 -- Name: x_user_types id; Type: DEFAULT; Schema: public; Owner: postgres
 --
 
-ALTER TABLE ONLY public.x_user_types ALTER COLUMN id SET DEFAULT nextval('public.user_types_id_seq'::regclass);
+ALTER TABLE ONLY public.x_user_types ALTER COLUMN id SET DEFAULT nextval('public.x_user_types_id_seq'::regclass);
 
 
 --
--- TOC entry 2954 (class 2604 OID 33959)
+-- TOC entry 2958 (class 2604 OID 33959)
 -- Name: y_inventory id; Type: DEFAULT; Schema: public; Owner: postgres
 --
 
-ALTER TABLE ONLY public.y_inventory ALTER COLUMN id SET DEFAULT nextval('public.inventory_id_seq'::regclass);
+ALTER TABLE ONLY public.y_inventory ALTER COLUMN id SET DEFAULT nextval('public.y_inventory_id_seq'::regclass);
 
 
 --
--- TOC entry 2950 (class 2604 OID 33933)
+-- TOC entry 2954 (class 2604 OID 33933)
 -- Name: y_operators id; Type: DEFAULT; Schema: public; Owner: postgres
 --
 
-ALTER TABLE ONLY public.y_operators ALTER COLUMN id SET DEFAULT nextval('public.operators_id_seq'::regclass);
+ALTER TABLE ONLY public.y_operators ALTER COLUMN id SET DEFAULT nextval('public.y_operators_id_seq'::regclass);
 
 
 --
--- TOC entry 2949 (class 2604 OID 33922)
+-- TOC entry 2953 (class 2604 OID 33922)
 -- Name: y_platforms id; Type: DEFAULT; Schema: public; Owner: postgres
 --
 
-ALTER TABLE ONLY public.y_platforms ALTER COLUMN id SET DEFAULT nextval('public.platforms_id_seq'::regclass);
+ALTER TABLE ONLY public.y_platforms ALTER COLUMN id SET DEFAULT nextval('public.y_platforms_id_seq'::regclass);
 
 
 --
--- TOC entry 2991 (class 2604 OID 50806)
+-- TOC entry 2995 (class 2604 OID 50806)
 -- Name: y_printers id; Type: DEFAULT; Schema: public; Owner: postgres
 --
 
-ALTER TABLE ONLY public.y_printers ALTER COLUMN id SET DEFAULT nextval('public.printers_id_seq'::regclass);
+ALTER TABLE ONLY public.y_printers ALTER COLUMN id SET DEFAULT nextval('public.y_printers_id_seq'::regclass);
 
 
 --
--- TOC entry 2973 (class 2604 OID 42302)
+-- TOC entry 2977 (class 2604 OID 42302)
 -- Name: y_vendors id; Type: DEFAULT; Schema: public; Owner: postgres
 --
 
-ALTER TABLE ONLY public.y_vendors ALTER COLUMN id SET DEFAULT nextval('public.vendors_id_seq'::regclass);
+ALTER TABLE ONLY public.y_vendors ALTER COLUMN id SET DEFAULT nextval('public.y_vendors_id_seq'::regclass);
 
 
 --
--- TOC entry 2978 (class 2604 OID 42430)
+-- TOC entry 2982 (class 2604 OID 42430)
 -- Name: z_core_settings id; Type: DEFAULT; Schema: public; Owner: postgres
 --
 
-ALTER TABLE ONLY public.z_core_settings ALTER COLUMN id SET DEFAULT nextval('public.core_settings_id_seq'::regclass);
+ALTER TABLE ONLY public.z_core_settings ALTER COLUMN id SET DEFAULT nextval('public.z_core_settings_id_seq'::regclass);
 
 
 --
--- TOC entry 2977 (class 2604 OID 42417)
+-- TOC entry 2981 (class 2604 OID 42417)
 -- Name: z_email_settings id; Type: DEFAULT; Schema: public; Owner: postgres
 --
 
-ALTER TABLE ONLY public.z_email_settings ALTER COLUMN id SET DEFAULT nextval('public.email_settings_id_seq'::regclass);
+ALTER TABLE ONLY public.z_email_settings ALTER COLUMN id SET DEFAULT nextval('public.z_email_settings_id_seq'::regclass);
 
 
 --
--- TOC entry 2951 (class 2604 OID 33946)
+-- TOC entry 2955 (class 2604 OID 33946)
 -- Name: z_price_settings id; Type: DEFAULT; Schema: public; Owner: postgres
 --
 
-ALTER TABLE ONLY public.z_price_settings ALTER COLUMN id SET DEFAULT nextval('public.pricing_id_seq'::regclass);
+ALTER TABLE ONLY public.z_price_settings ALTER COLUMN id SET DEFAULT nextval('public.z_price_settings_id_seq'::regclass);
 
 
 --
--- TOC entry 3244 (class 0 OID 34136)
+-- TOC entry 3249 (class 0 OID 34136)
 -- Dependencies: 218
 -- Data for Name: main_buses; Type: TABLE DATA; Schema: public; Owner: postgres
 --
@@ -2649,7 +2539,7 @@ INSERT INTO public.main_buses VALUES (536, '391', 1, 1, NULL, NULL, 7, '2017-12-
 
 
 --
--- TOC entry 3238 (class 0 OID 34001)
+-- TOC entry 3243 (class 0 OID 34001)
 -- Dependencies: 211
 -- Data for Name: main_campaigns; Type: TABLE DATA; Schema: public; Owner: postgres
 --
@@ -2710,7 +2600,7 @@ INSERT INTO public.main_campaigns VALUES (127, 1, 1, 1, 9, 20, '2020-11-05', '20
 
 
 --
--- TOC entry 3277 (class 0 OID 50814)
+-- TOC entry 3282 (class 0 OID 50814)
 -- Dependencies: 270
 -- Data for Name: main_print_orders; Type: TABLE DATA; Schema: public; Owner: postgres
 --
@@ -2720,7 +2610,7 @@ INSERT INTO public.main_print_orders VALUES (2, 204, 5, '2020-11-17 15:48:52.531
 
 
 --
--- TOC entry 3259 (class 0 OID 42392)
+-- TOC entry 3264 (class 0 OID 42392)
 -- Dependencies: 233
 -- Data for Name: main_reports; Type: TABLE DATA; Schema: public; Owner: postgres
 --
@@ -2728,7 +2618,7 @@ INSERT INTO public.main_print_orders VALUES (2, 204, 5, '2020-11-17 15:48:52.531
 
 
 --
--- TOC entry 3265 (class 0 OID 42437)
+-- TOC entry 3270 (class 0 OID 42437)
 -- Dependencies: 239
 -- Data for Name: main_transactions; Type: TABLE DATA; Schema: public; Owner: postgres
 --
@@ -2761,7 +2651,7 @@ INSERT INTO public.main_transactions VALUES (20, 129, 2, 3, 1, 1, 1, -1, '2020-1
 
 
 --
--- TOC entry 3224 (class 0 OID 33870)
+-- TOC entry 3229 (class 0 OID 33870)
 -- Dependencies: 197
 -- Data for Name: main_users; Type: TABLE DATA; Schema: public; Owner: postgres
 --
@@ -2794,7 +2684,7 @@ INSERT INTO public.main_users VALUES (24, 'Wale Makinde', 15, 'wale.makinde', '1
 
 
 --
--- TOC entry 3246 (class 0 OID 34183)
+-- TOC entry 3251 (class 0 OID 34183)
 -- Dependencies: 220
 -- Data for Name: sub_media_allocation; Type: TABLE DATA; Schema: public; Owner: postgres
 --
@@ -2802,7 +2692,7 @@ INSERT INTO public.main_users VALUES (24, 'Wale Makinde', 15, 'wale.makinde', '1
 
 
 --
--- TOC entry 3267 (class 0 OID 42448)
+-- TOC entry 3272 (class 0 OID 42448)
 -- Dependencies: 241
 -- Data for Name: sub_renewal_requests; Type: TABLE DATA; Schema: public; Owner: postgres
 --
@@ -2810,7 +2700,7 @@ INSERT INTO public.main_users VALUES (24, 'Wale Makinde', 15, 'wale.makinde', '1
 
 
 --
--- TOC entry 3269 (class 0 OID 42456)
+-- TOC entry 3274 (class 0 OID 42456)
 -- Dependencies: 243
 -- Data for Name: sub_transaction_details; Type: TABLE DATA; Schema: public; Owner: postgres
 --
@@ -2840,7 +2730,7 @@ INSERT INTO public.sub_transaction_details VALUES (27, 25, 25, 13, '2020-11-11 1
 
 
 --
--- TOC entry 3273 (class 0 OID 50751)
+-- TOC entry 3278 (class 0 OID 50751)
 -- Dependencies: 261
 -- Data for Name: w_vendors_operators; Type: TABLE DATA; Schema: public; Owner: postgres
 --
@@ -2855,7 +2745,7 @@ INSERT INTO public.w_vendors_operators VALUES (6, 14, 1);
 
 
 --
--- TOC entry 3240 (class 0 OID 34110)
+-- TOC entry 3245 (class 0 OID 34110)
 -- Dependencies: 214
 -- Data for Name: x_bus_depot; Type: TABLE DATA; Schema: public; Owner: postgres
 --
@@ -2868,7 +2758,7 @@ INSERT INTO public.x_bus_depot VALUES (5, 'IKOTUN - IKEJA');
 
 
 --
--- TOC entry 3236 (class 0 OID 33978)
+-- TOC entry 3241 (class 0 OID 33978)
 -- Dependencies: 209
 -- Data for Name: x_bus_sizes; Type: TABLE DATA; Schema: public; Owner: postgres
 --
@@ -2878,7 +2768,7 @@ INSERT INTO public.x_bus_sizes VALUES (2, 'Medium');
 
 
 --
--- TOC entry 3242 (class 0 OID 34123)
+-- TOC entry 3247 (class 0 OID 34123)
 -- Dependencies: 216
 -- Data for Name: x_bus_status; Type: TABLE DATA; Schema: public; Owner: postgres
 --
@@ -2900,7 +2790,7 @@ INSERT INTO public.x_bus_status VALUES (15, 'Engine Service', false);
 
 
 --
--- TOC entry 3250 (class 0 OID 42268)
+-- TOC entry 3255 (class 0 OID 42268)
 -- Dependencies: 224
 -- Data for Name: x_payment_status; Type: TABLE DATA; Schema: public; Owner: postgres
 --
@@ -2911,7 +2801,7 @@ INSERT INTO public.x_payment_status VALUES (3, 'DENIED');
 
 
 --
--- TOC entry 3234 (class 0 OID 33967)
+-- TOC entry 3239 (class 0 OID 33967)
 -- Dependencies: 207
 -- Data for Name: x_print_stage; Type: TABLE DATA; Schema: public; Owner: postgres
 --
@@ -2921,7 +2811,7 @@ INSERT INTO public.x_print_stage VALUES (2, 'Renewal / without Print');
 
 
 --
--- TOC entry 3248 (class 0 OID 42255)
+-- TOC entry 3253 (class 0 OID 42255)
 -- Dependencies: 222
 -- Data for Name: x_print_status; Type: TABLE DATA; Schema: public; Owner: postgres
 --
@@ -2932,7 +2822,7 @@ INSERT INTO public.x_print_status VALUES (3, 'DENIED');
 
 
 --
--- TOC entry 3271 (class 0 OID 42473)
+-- TOC entry 3276 (class 0 OID 42473)
 -- Dependencies: 245
 -- Data for Name: x_renewal_stage; Type: TABLE DATA; Schema: public; Owner: postgres
 --
@@ -2945,7 +2835,7 @@ INSERT INTO public.x_renewal_stage VALUES (3, 'PENDING APPROVAL');
 
 
 --
--- TOC entry 3257 (class 0 OID 42384)
+-- TOC entry 3262 (class 0 OID 42384)
 -- Dependencies: 231
 -- Data for Name: x_report_types; Type: TABLE DATA; Schema: public; Owner: postgres
 --
@@ -2955,7 +2845,7 @@ INSERT INTO public.x_report_types VALUES (2, 'Close-out');
 
 
 --
--- TOC entry 3252 (class 0 OID 42281)
+-- TOC entry 3257 (class 0 OID 42281)
 -- Dependencies: 226
 -- Data for Name: x_transaction_status; Type: TABLE DATA; Schema: public; Owner: postgres
 --
@@ -2968,7 +2858,7 @@ INSERT INTO public.x_transaction_status VALUES (2, 'APPROVED ACTIVE', 'APPROVED 
 
 
 --
--- TOC entry 3256 (class 0 OID 42308)
+-- TOC entry 3261 (class 0 OID 42308)
 -- Dependencies: 230
 -- Data for Name: x_user_types; Type: TABLE DATA; Schema: public; Owner: postgres
 --
@@ -2985,7 +2875,7 @@ INSERT INTO public.x_user_types VALUES (7, 'Print Manager');
 
 
 --
--- TOC entry 3232 (class 0 OID 33956)
+-- TOC entry 3237 (class 0 OID 33956)
 -- Dependencies: 205
 -- Data for Name: y_inventory; Type: TABLE DATA; Schema: public; Owner: postgres
 --
@@ -2996,7 +2886,7 @@ INSERT INTO public.y_inventory VALUES (3, 'BRT TV');
 
 
 --
--- TOC entry 3228 (class 0 OID 33930)
+-- TOC entry 3233 (class 0 OID 33930)
 -- Dependencies: 201
 -- Data for Name: y_operators; Type: TABLE DATA; Schema: public; Owner: postgres
 --
@@ -3004,11 +2894,11 @@ INSERT INTO public.y_inventory VALUES (3, 'BRT TV');
 INSERT INTO public.y_operators VALUES (2, 'Transport Services Limited', 'TSL', 2, 'test@tsl.com', 'TSL Contact');
 INSERT INTO public.y_operators VALUES (3, 'Lagos Bus Services Limited', 'LBSL', 2, 'test@lbsl.com', 'LBSL Contact');
 INSERT INTO public.y_operators VALUES (4, 'Primero (Lagos Bus Reform)', 'Primero LBR', 2, 'test@primerotsl.com', 'Jeleel Atunwa');
-INSERT INTO public.y_operators VALUES (1, 'Primero TSL', 'Primero', 1, 'test@primerotsl.com', 'Jeleel Atunwa');
+INSERT INTO public.y_operators VALUES (1, 'Primero TSL', 'Primero TSL', 1, 'test@primerotsl.com', 'Jeleel Atunwa');
 
 
 --
--- TOC entry 3226 (class 0 OID 33919)
+-- TOC entry 3231 (class 0 OID 33919)
 -- Dependencies: 199
 -- Data for Name: y_platforms; Type: TABLE DATA; Schema: public; Owner: postgres
 --
@@ -3018,7 +2908,7 @@ INSERT INTO public.y_platforms VALUES (2, 'Lagos Bus Reform', 'LBR - LAMATA', NU
 
 
 --
--- TOC entry 3275 (class 0 OID 50803)
+-- TOC entry 3280 (class 0 OID 50803)
 -- Dependencies: 268
 -- Data for Name: y_printers; Type: TABLE DATA; Schema: public; Owner: postgres
 --
@@ -3032,7 +2922,7 @@ INSERT INTO public.y_printers VALUES (6, 'Test Printer', 'TP', 'Johnson.udoeka@v
 
 
 --
--- TOC entry 3254 (class 0 OID 42299)
+-- TOC entry 3259 (class 0 OID 42299)
 -- Dependencies: 228
 -- Data for Name: y_vendors; Type: TABLE DATA; Schema: public; Owner: postgres
 --
@@ -3061,7 +2951,7 @@ INSERT INTO public.y_vendors VALUES (21, 'N-Gauge');
 
 
 --
--- TOC entry 3263 (class 0 OID 42427)
+-- TOC entry 3268 (class 0 OID 42427)
 -- Dependencies: 237
 -- Data for Name: z_core_settings; Type: TABLE DATA; Schema: public; Owner: postgres
 --
@@ -3242,7 +3132,7 @@ INSERT INTO public.z_core_settings VALUES (8, 'campaign_approved', '<p>Hello [x_
 
 
 --
--- TOC entry 3261 (class 0 OID 42414)
+-- TOC entry 3266 (class 0 OID 42414)
 -- Dependencies: 235
 -- Data for Name: z_email_settings; Type: TABLE DATA; Schema: public; Owner: postgres
 --
@@ -3272,7 +3162,7 @@ johnson.udoeka@transitmedia.com.ng');
 
 
 --
--- TOC entry 3230 (class 0 OID 33943)
+-- TOC entry 3235 (class 0 OID 33943)
 -- Dependencies: 203
 -- Data for Name: z_price_settings; Type: TABLE DATA; Schema: public; Owner: postgres
 --
@@ -3309,241 +3199,88 @@ INSERT INTO public.z_price_settings VALUES (3, 2, 1, 1, 2, 'per month per bus', 
 
 
 --
--- TOC entry 3310 (class 0 OID 0)
--- Dependencies: 219
--- Name: allocation_id_seq; Type: SEQUENCE SET; Schema: public; Owner: postgres
---
-
-SELECT pg_catalog.setval('public.allocation_id_seq', 4, true);
-
-
---
--- TOC entry 3311 (class 0 OID 0)
--- Dependencies: 213
--- Name: bus_depot_id_seq; Type: SEQUENCE SET; Schema: public; Owner: postgres
---
-
-SELECT pg_catalog.setval('public.bus_depot_id_seq', 5, true);
-
-
---
--- TOC entry 3312 (class 0 OID 0)
--- Dependencies: 208
--- Name: bus_sizes_id_seq; Type: SEQUENCE SET; Schema: public; Owner: postgres
---
-
-SELECT pg_catalog.setval('public.bus_sizes_id_seq', 2, true);
-
-
---
--- TOC entry 3313 (class 0 OID 0)
--- Dependencies: 215
--- Name: bus_status_id_seq; Type: SEQUENCE SET; Schema: public; Owner: postgres
---
-
-SELECT pg_catalog.setval('public.bus_status_id_seq', 1, true);
-
-
---
--- TOC entry 3314 (class 0 OID 0)
--- Dependencies: 217
--- Name: buses_id_seq; Type: SEQUENCE SET; Schema: public; Owner: postgres
---
-
-SELECT pg_catalog.setval('public.buses_id_seq', 536, true);
-
-
---
 -- TOC entry 3315 (class 0 OID 0)
--- Dependencies: 225
--- Name: campaign_status_id_seq; Type: SEQUENCE SET; Schema: public; Owner: postgres
+-- Dependencies: 217
+-- Name: main_buses_id_seq; Type: SEQUENCE SET; Schema: public; Owner: postgres
 --
 
-SELECT pg_catalog.setval('public.campaign_status_id_seq', 5, true);
+SELECT pg_catalog.setval('public.main_buses_id_seq', 536, true);
 
 
 --
 -- TOC entry 3316 (class 0 OID 0)
--- Dependencies: 236
--- Name: core_settings_id_seq; Type: SEQUENCE SET; Schema: public; Owner: postgres
+-- Dependencies: 210
+-- Name: main_campaigns_id_seq; Type: SEQUENCE SET; Schema: public; Owner: postgres
 --
 
-SELECT pg_catalog.setval('public.core_settings_id_seq', 18, true);
+SELECT pg_catalog.setval('public.main_campaigns_id_seq', 206, true);
 
 
 --
 -- TOC entry 3317 (class 0 OID 0)
--- Dependencies: 234
--- Name: email_settings_id_seq; Type: SEQUENCE SET; Schema: public; Owner: postgres
+-- Dependencies: 269
+-- Name: main_print_orders_id_seq; Type: SEQUENCE SET; Schema: public; Owner: postgres
 --
 
-SELECT pg_catalog.setval('public.email_settings_id_seq', 1, false);
+SELECT pg_catalog.setval('public.main_print_orders_id_seq', 2, true);
 
 
 --
 -- TOC entry 3318 (class 0 OID 0)
 -- Dependencies: 232
--- Name: exterior_reports_id_seq; Type: SEQUENCE SET; Schema: public; Owner: postgres
+-- Name: main_reports_id_seq; Type: SEQUENCE SET; Schema: public; Owner: postgres
 --
 
-SELECT pg_catalog.setval('public.exterior_reports_id_seq', 3, true);
+SELECT pg_catalog.setval('public.main_reports_id_seq', 3, true);
 
 
 --
 -- TOC entry 3319 (class 0 OID 0)
--- Dependencies: 204
--- Name: inventory_id_seq; Type: SEQUENCE SET; Schema: public; Owner: postgres
+-- Dependencies: 238
+-- Name: main_transactions_id_seq; Type: SEQUENCE SET; Schema: public; Owner: postgres
 --
 
-SELECT pg_catalog.setval('public.inventory_id_seq', 3, true);
+SELECT pg_catalog.setval('public.main_transactions_id_seq', 29, true);
 
 
 --
 -- TOC entry 3320 (class 0 OID 0)
--- Dependencies: 210
--- Name: new_campaign_id_seq; Type: SEQUENCE SET; Schema: public; Owner: postgres
+-- Dependencies: 196
+-- Name: main_users_id_seq; Type: SEQUENCE SET; Schema: public; Owner: postgres
 --
 
-SELECT pg_catalog.setval('public.new_campaign_id_seq', 206, true);
+SELECT pg_catalog.setval('public.main_users_id_seq', 25, true);
 
 
 --
 -- TOC entry 3321 (class 0 OID 0)
--- Dependencies: 200
--- Name: operators_id_seq; Type: SEQUENCE SET; Schema: public; Owner: postgres
+-- Dependencies: 219
+-- Name: sub_media_allocation_id_seq; Type: SEQUENCE SET; Schema: public; Owner: postgres
 --
 
-SELECT pg_catalog.setval('public.operators_id_seq', 4, true);
+SELECT pg_catalog.setval('public.sub_media_allocation_id_seq', 4, true);
 
 
 --
 -- TOC entry 3322 (class 0 OID 0)
--- Dependencies: 223
--- Name: payment_status_id_seq; Type: SEQUENCE SET; Schema: public; Owner: postgres
+-- Dependencies: 240
+-- Name: sub_renewal_requests_id_seq; Type: SEQUENCE SET; Schema: public; Owner: postgres
 --
 
-SELECT pg_catalog.setval('public.payment_status_id_seq', 1, false);
+SELECT pg_catalog.setval('public.sub_renewal_requests_id_seq', 1, false);
 
 
 --
 -- TOC entry 3323 (class 0 OID 0)
--- Dependencies: 198
--- Name: platforms_id_seq; Type: SEQUENCE SET; Schema: public; Owner: postgres
+-- Dependencies: 242
+-- Name: sub_transaction_details_id_seq; Type: SEQUENCE SET; Schema: public; Owner: postgres
 --
 
-SELECT pg_catalog.setval('public.platforms_id_seq', 2, true);
+SELECT pg_catalog.setval('public.sub_transaction_details_id_seq', 27, true);
 
 
 --
 -- TOC entry 3324 (class 0 OID 0)
--- Dependencies: 202
--- Name: pricing_id_seq; Type: SEQUENCE SET; Schema: public; Owner: postgres
---
-
-SELECT pg_catalog.setval('public.pricing_id_seq', 29, true);
-
-
---
--- TOC entry 3325 (class 0 OID 0)
--- Dependencies: 269
--- Name: print_orders_id_seq; Type: SEQUENCE SET; Schema: public; Owner: postgres
---
-
-SELECT pg_catalog.setval('public.print_orders_id_seq', 2, true);
-
-
---
--- TOC entry 3326 (class 0 OID 0)
--- Dependencies: 206
--- Name: print_stage_id_seq; Type: SEQUENCE SET; Schema: public; Owner: postgres
---
-
-SELECT pg_catalog.setval('public.print_stage_id_seq', 2, true);
-
-
---
--- TOC entry 3327 (class 0 OID 0)
--- Dependencies: 221
--- Name: print_status_id_seq; Type: SEQUENCE SET; Schema: public; Owner: postgres
---
-
-SELECT pg_catalog.setval('public.print_status_id_seq', 1, false);
-
-
---
--- TOC entry 3328 (class 0 OID 0)
--- Dependencies: 267
--- Name: printers_id_seq; Type: SEQUENCE SET; Schema: public; Owner: postgres
---
-
-SELECT pg_catalog.setval('public.printers_id_seq', 1, false);
-
-
---
--- TOC entry 3329 (class 0 OID 0)
--- Dependencies: 240
--- Name: renewal_requests_id_seq; Type: SEQUENCE SET; Schema: public; Owner: postgres
---
-
-SELECT pg_catalog.setval('public.renewal_requests_id_seq', 1, false);
-
-
---
--- TOC entry 3330 (class 0 OID 0)
--- Dependencies: 244
--- Name: renewal_stage_id_seq; Type: SEQUENCE SET; Schema: public; Owner: postgres
---
-
-SELECT pg_catalog.setval('public.renewal_stage_id_seq', 6, true);
-
-
---
--- TOC entry 3331 (class 0 OID 0)
--- Dependencies: 242
--- Name: transaction_details_id_seq; Type: SEQUENCE SET; Schema: public; Owner: postgres
---
-
-SELECT pg_catalog.setval('public.transaction_details_id_seq', 27, true);
-
-
---
--- TOC entry 3332 (class 0 OID 0)
--- Dependencies: 238
--- Name: transactions_id_seq; Type: SEQUENCE SET; Schema: public; Owner: postgres
---
-
-SELECT pg_catalog.setval('public.transactions_id_seq', 29, true);
-
-
---
--- TOC entry 3333 (class 0 OID 0)
--- Dependencies: 229
--- Name: user_types_id_seq; Type: SEQUENCE SET; Schema: public; Owner: postgres
---
-
-SELECT pg_catalog.setval('public.user_types_id_seq', 7, true);
-
-
---
--- TOC entry 3334 (class 0 OID 0)
--- Dependencies: 196
--- Name: users_id_seq; Type: SEQUENCE SET; Schema: public; Owner: postgres
---
-
-SELECT pg_catalog.setval('public.users_id_seq', 25, true);
-
-
---
--- TOC entry 3335 (class 0 OID 0)
--- Dependencies: 227
--- Name: vendors_id_seq; Type: SEQUENCE SET; Schema: public; Owner: postgres
---
-
-SELECT pg_catalog.setval('public.vendors_id_seq', 21, true);
-
-
---
--- TOC entry 3336 (class 0 OID 0)
 -- Dependencies: 260
 -- Name: w_vendors_operators_id_seq; Type: SEQUENCE SET; Schema: public; Owner: postgres
 --
@@ -3552,7 +3289,160 @@ SELECT pg_catalog.setval('public.w_vendors_operators_id_seq', 7, true);
 
 
 --
--- TOC entry 3026 (class 2606 OID 34200)
+-- TOC entry 3325 (class 0 OID 0)
+-- Dependencies: 213
+-- Name: x_bus_depot_id_seq; Type: SEQUENCE SET; Schema: public; Owner: postgres
+--
+
+SELECT pg_catalog.setval('public.x_bus_depot_id_seq', 5, true);
+
+
+--
+-- TOC entry 3326 (class 0 OID 0)
+-- Dependencies: 208
+-- Name: x_bus_sizes_id_seq; Type: SEQUENCE SET; Schema: public; Owner: postgres
+--
+
+SELECT pg_catalog.setval('public.x_bus_sizes_id_seq', 2, true);
+
+
+--
+-- TOC entry 3327 (class 0 OID 0)
+-- Dependencies: 215
+-- Name: x_bus_status_id_seq; Type: SEQUENCE SET; Schema: public; Owner: postgres
+--
+
+SELECT pg_catalog.setval('public.x_bus_status_id_seq', 1, true);
+
+
+--
+-- TOC entry 3328 (class 0 OID 0)
+-- Dependencies: 223
+-- Name: x_payment_status_id_seq; Type: SEQUENCE SET; Schema: public; Owner: postgres
+--
+
+SELECT pg_catalog.setval('public.x_payment_status_id_seq', 1, false);
+
+
+--
+-- TOC entry 3329 (class 0 OID 0)
+-- Dependencies: 206
+-- Name: x_print_stage_id_seq; Type: SEQUENCE SET; Schema: public; Owner: postgres
+--
+
+SELECT pg_catalog.setval('public.x_print_stage_id_seq', 2, true);
+
+
+--
+-- TOC entry 3330 (class 0 OID 0)
+-- Dependencies: 221
+-- Name: x_print_status_id_seq; Type: SEQUENCE SET; Schema: public; Owner: postgres
+--
+
+SELECT pg_catalog.setval('public.x_print_status_id_seq', 1, false);
+
+
+--
+-- TOC entry 3331 (class 0 OID 0)
+-- Dependencies: 244
+-- Name: x_renewal_stage_id_seq; Type: SEQUENCE SET; Schema: public; Owner: postgres
+--
+
+SELECT pg_catalog.setval('public.x_renewal_stage_id_seq', 6, true);
+
+
+--
+-- TOC entry 3332 (class 0 OID 0)
+-- Dependencies: 225
+-- Name: x_transaction_status_id_seq; Type: SEQUENCE SET; Schema: public; Owner: postgres
+--
+
+SELECT pg_catalog.setval('public.x_transaction_status_id_seq', 5, true);
+
+
+--
+-- TOC entry 3333 (class 0 OID 0)
+-- Dependencies: 229
+-- Name: x_user_types_id_seq; Type: SEQUENCE SET; Schema: public; Owner: postgres
+--
+
+SELECT pg_catalog.setval('public.x_user_types_id_seq', 7, true);
+
+
+--
+-- TOC entry 3334 (class 0 OID 0)
+-- Dependencies: 204
+-- Name: y_inventory_id_seq; Type: SEQUENCE SET; Schema: public; Owner: postgres
+--
+
+SELECT pg_catalog.setval('public.y_inventory_id_seq', 3, true);
+
+
+--
+-- TOC entry 3335 (class 0 OID 0)
+-- Dependencies: 200
+-- Name: y_operators_id_seq; Type: SEQUENCE SET; Schema: public; Owner: postgres
+--
+
+SELECT pg_catalog.setval('public.y_operators_id_seq', 4, true);
+
+
+--
+-- TOC entry 3336 (class 0 OID 0)
+-- Dependencies: 198
+-- Name: y_platforms_id_seq; Type: SEQUENCE SET; Schema: public; Owner: postgres
+--
+
+SELECT pg_catalog.setval('public.y_platforms_id_seq', 2, true);
+
+
+--
+-- TOC entry 3337 (class 0 OID 0)
+-- Dependencies: 267
+-- Name: y_printers_id_seq; Type: SEQUENCE SET; Schema: public; Owner: postgres
+--
+
+SELECT pg_catalog.setval('public.y_printers_id_seq', 1, false);
+
+
+--
+-- TOC entry 3338 (class 0 OID 0)
+-- Dependencies: 227
+-- Name: y_vendors_id_seq; Type: SEQUENCE SET; Schema: public; Owner: postgres
+--
+
+SELECT pg_catalog.setval('public.y_vendors_id_seq', 21, true);
+
+
+--
+-- TOC entry 3339 (class 0 OID 0)
+-- Dependencies: 236
+-- Name: z_core_settings_id_seq; Type: SEQUENCE SET; Schema: public; Owner: postgres
+--
+
+SELECT pg_catalog.setval('public.z_core_settings_id_seq', 18, true);
+
+
+--
+-- TOC entry 3340 (class 0 OID 0)
+-- Dependencies: 234
+-- Name: z_email_settings_id_seq; Type: SEQUENCE SET; Schema: public; Owner: postgres
+--
+
+SELECT pg_catalog.setval('public.z_email_settings_id_seq', 1, false);
+
+
+--
+-- TOC entry 3341 (class 0 OID 0)
+-- Dependencies: 202
+-- Name: z_price_settings_id_seq; Type: SEQUENCE SET; Schema: public; Owner: postgres
+--
+
+SELECT pg_catalog.setval('public.z_price_settings_id_seq', 29, true);
+
+
+--
+-- TOC entry 3030 (class 2606 OID 34200)
 -- Name: sub_media_allocation allocation_bus_campaign_uk; Type: CONSTRAINT; Schema: public; Owner: postgres
 --
 
@@ -3561,259 +3451,97 @@ ALTER TABLE ONLY public.sub_media_allocation
 
 
 --
--- TOC entry 3028 (class 2606 OID 34188)
--- Name: sub_media_allocation allocation_id_pk; Type: CONSTRAINT; Schema: public; Owner: postgres
---
-
-ALTER TABLE ONLY public.sub_media_allocation
-    ADD CONSTRAINT allocation_id_pk PRIMARY KEY (id);
-
-
---
--- TOC entry 3013 (class 2606 OID 34118)
--- Name: x_bus_depot bus_depot_pk; Type: CONSTRAINT; Schema: public; Owner: postgres
---
-
-ALTER TABLE ONLY public.x_bus_depot
-    ADD CONSTRAINT bus_depot_pk PRIMARY KEY (id);
-
-
---
--- TOC entry 3015 (class 2606 OID 34120)
--- Name: x_bus_depot bus_depot_unique; Type: CONSTRAINT; Schema: public; Owner: postgres
---
-
-ALTER TABLE ONLY public.x_bus_depot
-    ADD CONSTRAINT bus_depot_unique UNIQUE (name);
-
-
---
--- TOC entry 3009 (class 2606 OID 33986)
--- Name: x_bus_sizes bus_sizes_id_pk; Type: CONSTRAINT; Schema: public; Owner: postgres
---
-
-ALTER TABLE ONLY public.x_bus_sizes
-    ADD CONSTRAINT bus_sizes_id_pk PRIMARY KEY (id);
-
-
---
--- TOC entry 3017 (class 2606 OID 34133)
--- Name: x_bus_status bus_status_name_key; Type: CONSTRAINT; Schema: public; Owner: postgres
---
-
-ALTER TABLE ONLY public.x_bus_status
-    ADD CONSTRAINT bus_status_name_key UNIQUE (name);
-
-
---
--- TOC entry 3019 (class 2606 OID 34131)
--- Name: x_bus_status bus_status_pk; Type: CONSTRAINT; Schema: public; Owner: postgres
---
-
-ALTER TABLE ONLY public.x_bus_status
-    ADD CONSTRAINT bus_status_pk PRIMARY KEY (id);
-
-
---
--- TOC entry 3021 (class 2606 OID 34149)
--- Name: main_buses buses_number_key; Type: CONSTRAINT; Schema: public; Owner: postgres
+-- TOC entry 3026 (class 2606 OID 34147)
+-- Name: main_buses main_buses_id_pk; Type: CONSTRAINT; Schema: public; Owner: postgres
 --
 
 ALTER TABLE ONLY public.main_buses
-    ADD CONSTRAINT buses_number_key UNIQUE (number);
+    ADD CONSTRAINT main_buses_id_pk PRIMARY KEY (id);
 
 
 --
--- TOC entry 3023 (class 2606 OID 34147)
--- Name: main_buses buses_pk; Type: CONSTRAINT; Schema: public; Owner: postgres
+-- TOC entry 3028 (class 2606 OID 34149)
+-- Name: main_buses main_buses_number_uk; Type: CONSTRAINT; Schema: public; Owner: postgres
 --
 
 ALTER TABLE ONLY public.main_buses
-    ADD CONSTRAINT buses_pk PRIMARY KEY (id);
+    ADD CONSTRAINT main_buses_number_uk UNIQUE (number);
 
 
 --
--- TOC entry 3038 (class 2606 OID 42289)
--- Name: x_transaction_status campaign_status_pk; Type: CONSTRAINT; Schema: public; Owner: postgres
---
-
-ALTER TABLE ONLY public.x_transaction_status
-    ADD CONSTRAINT campaign_status_pk PRIMARY KEY (id);
-
-
---
--- TOC entry 3048 (class 2606 OID 42424)
--- Name: z_email_settings email_settings_name_uk; Type: CONSTRAINT; Schema: public; Owner: postgres
---
-
-ALTER TABLE ONLY public.z_email_settings
-    ADD CONSTRAINT email_settings_name_uk UNIQUE (name);
-
-
---
--- TOC entry 3050 (class 2606 OID 42422)
--- Name: z_email_settings email_settings_pk; Type: CONSTRAINT; Schema: public; Owner: postgres
---
-
-ALTER TABLE ONLY public.z_email_settings
-    ADD CONSTRAINT email_settings_pk PRIMARY KEY (id);
-
-
---
--- TOC entry 3046 (class 2606 OID 42401)
--- Name: main_reports exterior_reports_pk; Type: CONSTRAINT; Schema: public; Owner: postgres
---
-
-ALTER TABLE ONLY public.main_reports
-    ADD CONSTRAINT exterior_reports_pk PRIMARY KEY (id);
-
-
---
--- TOC entry 3005 (class 2606 OID 33964)
--- Name: y_inventory inventory_id_pk; Type: CONSTRAINT; Schema: public; Owner: postgres
---
-
-ALTER TABLE ONLY public.y_inventory
-    ADD CONSTRAINT inventory_id_pk PRIMARY KEY (id);
-
-
---
--- TOC entry 3054 (class 2606 OID 50605)
--- Name: main_transactions main_transactions_pkey; Type: CONSTRAINT; Schema: public; Owner: postgres
---
-
-ALTER TABLE ONLY public.main_transactions
-    ADD CONSTRAINT main_transactions_pkey PRIMARY KEY (id);
-
-
---
--- TOC entry 3011 (class 2606 OID 34006)
--- Name: main_campaigns new_campaign_id_pk; Type: CONSTRAINT; Schema: public; Owner: postgres
+-- TOC entry 3015 (class 2606 OID 34006)
+-- Name: main_campaigns main_campaigns_id_pk; Type: CONSTRAINT; Schema: public; Owner: postgres
 --
 
 ALTER TABLE ONLY public.main_campaigns
-    ADD CONSTRAINT new_campaign_id_pk PRIMARY KEY (id);
+    ADD CONSTRAINT main_campaigns_id_pk PRIMARY KEY (id);
 
 
 --
--- TOC entry 3001 (class 2606 OID 33935)
--- Name: y_operators operator_id_pk; Type: CONSTRAINT; Schema: public; Owner: postgres
+-- TOC entry 3050 (class 2606 OID 42401)
+-- Name: main_reports main_exterior_reports_id_pk; Type: CONSTRAINT; Schema: public; Owner: postgres
 --
 
-ALTER TABLE ONLY public.y_operators
-    ADD CONSTRAINT operator_id_pk PRIMARY KEY (id);
-
-
---
--- TOC entry 3034 (class 2606 OID 42278)
--- Name: x_payment_status payment_status_name_key; Type: CONSTRAINT; Schema: public; Owner: postgres
---
-
-ALTER TABLE ONLY public.x_payment_status
-    ADD CONSTRAINT payment_status_name_key UNIQUE (name);
+ALTER TABLE ONLY public.main_reports
+    ADD CONSTRAINT main_exterior_reports_id_pk PRIMARY KEY (id);
 
 
 --
--- TOC entry 3036 (class 2606 OID 42276)
--- Name: x_payment_status payment_status_pk; Type: CONSTRAINT; Schema: public; Owner: postgres
---
-
-ALTER TABLE ONLY public.x_payment_status
-    ADD CONSTRAINT payment_status_pk PRIMARY KEY (id);
-
-
---
--- TOC entry 2999 (class 2606 OID 33924)
--- Name: y_platforms platform_id_pk; Type: CONSTRAINT; Schema: public; Owner: postgres
---
-
-ALTER TABLE ONLY public.y_platforms
-    ADD CONSTRAINT platform_id_pk PRIMARY KEY (id);
-
-
---
--- TOC entry 3003 (class 2606 OID 33951)
--- Name: z_price_settings pricing_id_pk; Type: CONSTRAINT; Schema: public; Owner: postgres
---
-
-ALTER TABLE ONLY public.z_price_settings
-    ADD CONSTRAINT pricing_id_pk PRIMARY KEY (id);
-
-
---
--- TOC entry 3066 (class 2606 OID 50825)
--- Name: main_print_orders print_orders_pk0; Type: CONSTRAINT; Schema: public; Owner: postgres
+-- TOC entry 3070 (class 2606 OID 50825)
+-- Name: main_print_orders main_print_orders_pk; Type: CONSTRAINT; Schema: public; Owner: postgres
 --
 
 ALTER TABLE ONLY public.main_print_orders
-    ADD CONSTRAINT print_orders_pk0 PRIMARY KEY (id);
+    ADD CONSTRAINT main_print_orders_pk PRIMARY KEY (id);
 
 
 --
--- TOC entry 3007 (class 2606 OID 33975)
--- Name: x_print_stage print_stage_id_pk; Type: CONSTRAINT; Schema: public; Owner: postgres
+-- TOC entry 3058 (class 2606 OID 50605)
+-- Name: main_transactions main_transactions_id_pk; Type: CONSTRAINT; Schema: public; Owner: postgres
 --
 
-ALTER TABLE ONLY public.x_print_stage
-    ADD CONSTRAINT print_stage_id_pk PRIMARY KEY (id);
-
-
---
--- TOC entry 3030 (class 2606 OID 42265)
--- Name: x_print_status print_status_name_key; Type: CONSTRAINT; Schema: public; Owner: postgres
---
-
-ALTER TABLE ONLY public.x_print_status
-    ADD CONSTRAINT print_status_name_key UNIQUE (name);
+ALTER TABLE ONLY public.main_transactions
+    ADD CONSTRAINT main_transactions_id_pk PRIMARY KEY (id);
 
 
 --
--- TOC entry 3032 (class 2606 OID 42263)
--- Name: x_print_status print_status_pk; Type: CONSTRAINT; Schema: public; Owner: postgres
---
-
-ALTER TABLE ONLY public.x_print_status
-    ADD CONSTRAINT print_status_pk PRIMARY KEY (id);
-
-
---
--- TOC entry 3064 (class 2606 OID 50811)
--- Name: y_printers printers_pkey; Type: CONSTRAINT; Schema: public; Owner: postgres
---
-
-ALTER TABLE ONLY public.y_printers
-    ADD CONSTRAINT printers_pkey PRIMARY KEY (id);
-
-
---
--- TOC entry 3056 (class 2606 OID 42453)
--- Name: sub_renewal_requests renewal_requests_id_pk; Type: CONSTRAINT; Schema: public; Owner: postgres
---
-
-ALTER TABLE ONLY public.sub_renewal_requests
-    ADD CONSTRAINT renewal_requests_id_pk PRIMARY KEY (id);
-
-
---
--- TOC entry 3058 (class 2606 OID 50607)
--- Name: sub_transaction_details sub_tran_details_id_pk; Type: CONSTRAINT; Schema: public; Owner: postgres
---
-
-ALTER TABLE ONLY public.sub_transaction_details
-    ADD CONSTRAINT sub_tran_details_id_pk PRIMARY KEY (id);
-
-
---
--- TOC entry 2997 (class 2606 OID 33878)
--- Name: main_users test_id_pk; Type: CONSTRAINT; Schema: public; Owner: postgres
+-- TOC entry 3001 (class 2606 OID 33878)
+-- Name: main_users main_users_id_pk; Type: CONSTRAINT; Schema: public; Owner: postgres
 --
 
 ALTER TABLE ONLY public.main_users
-    ADD CONSTRAINT test_id_pk PRIMARY KEY (id);
+    ADD CONSTRAINT main_users_id_pk PRIMARY KEY (id);
 
 
 --
--- TOC entry 3062 (class 2606 OID 50756)
+-- TOC entry 3032 (class 2606 OID 34188)
+-- Name: sub_media_allocation sub_media_allocation_id_pk; Type: CONSTRAINT; Schema: public; Owner: postgres
+--
+
+ALTER TABLE ONLY public.sub_media_allocation
+    ADD CONSTRAINT sub_media_allocation_id_pk PRIMARY KEY (id);
+
+
+--
+-- TOC entry 3060 (class 2606 OID 42453)
+-- Name: sub_renewal_requests sub_renewal_requests_id_pk; Type: CONSTRAINT; Schema: public; Owner: postgres
+--
+
+ALTER TABLE ONLY public.sub_renewal_requests
+    ADD CONSTRAINT sub_renewal_requests_id_pk PRIMARY KEY (id);
+
+
+--
+-- TOC entry 3062 (class 2606 OID 50607)
+-- Name: sub_transaction_details sub_transaction_details_id_pk; Type: CONSTRAINT; Schema: public; Owner: postgres
+--
+
+ALTER TABLE ONLY public.sub_transaction_details
+    ADD CONSTRAINT sub_transaction_details_id_pk PRIMARY KEY (id);
+
+
+--
+-- TOC entry 3066 (class 2606 OID 50756)
 -- Name: w_vendors_operators w_vendors_operators_id_pk; Type: CONSTRAINT; Schema: public; Owner: postgres
 --
 
@@ -3822,7 +3550,106 @@ ALTER TABLE ONLY public.w_vendors_operators
 
 
 --
--- TOC entry 3060 (class 2606 OID 50711)
+-- TOC entry 3017 (class 2606 OID 34118)
+-- Name: x_bus_depot x_bus_depot_pk; Type: CONSTRAINT; Schema: public; Owner: postgres
+--
+
+ALTER TABLE ONLY public.x_bus_depot
+    ADD CONSTRAINT x_bus_depot_pk PRIMARY KEY (id);
+
+
+--
+-- TOC entry 3019 (class 2606 OID 34120)
+-- Name: x_bus_depot x_bus_depot_unique; Type: CONSTRAINT; Schema: public; Owner: postgres
+--
+
+ALTER TABLE ONLY public.x_bus_depot
+    ADD CONSTRAINT x_bus_depot_unique UNIQUE (name);
+
+
+--
+-- TOC entry 3013 (class 2606 OID 33986)
+-- Name: x_bus_sizes x_bus_sizes_id_pk; Type: CONSTRAINT; Schema: public; Owner: postgres
+--
+
+ALTER TABLE ONLY public.x_bus_sizes
+    ADD CONSTRAINT x_bus_sizes_id_pk PRIMARY KEY (id);
+
+
+--
+-- TOC entry 3021 (class 2606 OID 34133)
+-- Name: x_bus_status x_bus_status_name_key; Type: CONSTRAINT; Schema: public; Owner: postgres
+--
+
+ALTER TABLE ONLY public.x_bus_status
+    ADD CONSTRAINT x_bus_status_name_key UNIQUE (name);
+
+
+--
+-- TOC entry 3023 (class 2606 OID 34131)
+-- Name: x_bus_status x_bus_status_pk; Type: CONSTRAINT; Schema: public; Owner: postgres
+--
+
+ALTER TABLE ONLY public.x_bus_status
+    ADD CONSTRAINT x_bus_status_pk PRIMARY KEY (id);
+
+
+--
+-- TOC entry 3042 (class 2606 OID 42289)
+-- Name: x_transaction_status x_campaign_status_pk; Type: CONSTRAINT; Schema: public; Owner: postgres
+--
+
+ALTER TABLE ONLY public.x_transaction_status
+    ADD CONSTRAINT x_campaign_status_pk PRIMARY KEY (id);
+
+
+--
+-- TOC entry 3038 (class 2606 OID 42278)
+-- Name: x_payment_status x_payment_status_name_key; Type: CONSTRAINT; Schema: public; Owner: postgres
+--
+
+ALTER TABLE ONLY public.x_payment_status
+    ADD CONSTRAINT x_payment_status_name_key UNIQUE (name);
+
+
+--
+-- TOC entry 3040 (class 2606 OID 42276)
+-- Name: x_payment_status x_payment_status_pk; Type: CONSTRAINT; Schema: public; Owner: postgres
+--
+
+ALTER TABLE ONLY public.x_payment_status
+    ADD CONSTRAINT x_payment_status_pk PRIMARY KEY (id);
+
+
+--
+-- TOC entry 3011 (class 2606 OID 33975)
+-- Name: x_print_stage x_print_stage_id_pk; Type: CONSTRAINT; Schema: public; Owner: postgres
+--
+
+ALTER TABLE ONLY public.x_print_stage
+    ADD CONSTRAINT x_print_stage_id_pk PRIMARY KEY (id);
+
+
+--
+-- TOC entry 3034 (class 2606 OID 42265)
+-- Name: x_print_status x_print_status_name_key; Type: CONSTRAINT; Schema: public; Owner: postgres
+--
+
+ALTER TABLE ONLY public.x_print_status
+    ADD CONSTRAINT x_print_status_name_key UNIQUE (name);
+
+
+--
+-- TOC entry 3036 (class 2606 OID 42263)
+-- Name: x_print_status x_print_status_pk; Type: CONSTRAINT; Schema: public; Owner: postgres
+--
+
+ALTER TABLE ONLY public.x_print_status
+    ADD CONSTRAINT x_print_status_pk PRIMARY KEY (id);
+
+
+--
+-- TOC entry 3064 (class 2606 OID 50711)
 -- Name: x_renewal_stage x_renewal_stage_pkey; Type: CONSTRAINT; Schema: public; Owner: postgres
 --
 
@@ -3831,7 +3658,7 @@ ALTER TABLE ONLY public.x_renewal_stage
 
 
 --
--- TOC entry 3044 (class 2606 OID 50721)
+-- TOC entry 3048 (class 2606 OID 50721)
 -- Name: x_report_types x_report_types_pkey; Type: CONSTRAINT; Schema: public; Owner: postgres
 --
 
@@ -3840,7 +3667,7 @@ ALTER TABLE ONLY public.x_report_types
 
 
 --
--- TOC entry 3042 (class 2606 OID 50717)
+-- TOC entry 3046 (class 2606 OID 50717)
 -- Name: x_user_types x_user_types_pkey; Type: CONSTRAINT; Schema: public; Owner: postgres
 --
 
@@ -3849,7 +3676,43 @@ ALTER TABLE ONLY public.x_user_types
 
 
 --
--- TOC entry 3040 (class 2606 OID 50719)
+-- TOC entry 3009 (class 2606 OID 33964)
+-- Name: y_inventory y_inventory_id_pk; Type: CONSTRAINT; Schema: public; Owner: postgres
+--
+
+ALTER TABLE ONLY public.y_inventory
+    ADD CONSTRAINT y_inventory_id_pk PRIMARY KEY (id);
+
+
+--
+-- TOC entry 3005 (class 2606 OID 33935)
+-- Name: y_operators y_operator_id_pk; Type: CONSTRAINT; Schema: public; Owner: postgres
+--
+
+ALTER TABLE ONLY public.y_operators
+    ADD CONSTRAINT y_operator_id_pk PRIMARY KEY (id);
+
+
+--
+-- TOC entry 3003 (class 2606 OID 33924)
+-- Name: y_platforms y_platform_id_pk; Type: CONSTRAINT; Schema: public; Owner: postgres
+--
+
+ALTER TABLE ONLY public.y_platforms
+    ADD CONSTRAINT y_platform_id_pk PRIMARY KEY (id);
+
+
+--
+-- TOC entry 3068 (class 2606 OID 50811)
+-- Name: y_printers y_printers_pkey; Type: CONSTRAINT; Schema: public; Owner: postgres
+--
+
+ALTER TABLE ONLY public.y_printers
+    ADD CONSTRAINT y_printers_pkey PRIMARY KEY (id);
+
+
+--
+-- TOC entry 3044 (class 2606 OID 50719)
 -- Name: y_vendors y_vendors_pkey; Type: CONSTRAINT; Schema: public; Owner: postgres
 --
 
@@ -3858,7 +3721,7 @@ ALTER TABLE ONLY public.y_vendors
 
 
 --
--- TOC entry 3052 (class 2606 OID 50676)
+-- TOC entry 3056 (class 2606 OID 50676)
 -- Name: z_core_settings z_core_settings_pkey; Type: CONSTRAINT; Schema: public; Owner: postgres
 --
 
@@ -3867,15 +3730,42 @@ ALTER TABLE ONLY public.z_core_settings
 
 
 --
+-- TOC entry 3052 (class 2606 OID 42424)
+-- Name: z_email_settings z_email_settings_name_uk; Type: CONSTRAINT; Schema: public; Owner: postgres
+--
+
+ALTER TABLE ONLY public.z_email_settings
+    ADD CONSTRAINT z_email_settings_name_uk UNIQUE (name);
+
+
+--
+-- TOC entry 3054 (class 2606 OID 42422)
+-- Name: z_email_settings z_email_settings_pk; Type: CONSTRAINT; Schema: public; Owner: postgres
+--
+
+ALTER TABLE ONLY public.z_email_settings
+    ADD CONSTRAINT z_email_settings_pk PRIMARY KEY (id);
+
+
+--
+-- TOC entry 3007 (class 2606 OID 33951)
+-- Name: z_price_settings z_pricing_id_pk; Type: CONSTRAINT; Schema: public; Owner: postgres
+--
+
+ALTER TABLE ONLY public.z_price_settings
+    ADD CONSTRAINT z_pricing_id_pk PRIMARY KEY (id);
+
+
+--
 -- TOC entry 3024 (class 1259 OID 34180)
--- Name: fki_buses_depot_fk; Type: INDEX; Schema: public; Owner: postgres
+-- Name: fki_main_buses_depot_fk; Type: INDEX; Schema: public; Owner: postgres
 --
 
-CREATE INDEX fki_buses_depot_fk ON public.main_buses USING btree (bus_depot_id);
+CREATE INDEX fki_main_buses_depot_fk ON public.main_buses USING btree (bus_depot_id);
 
 
 --
--- TOC entry 3214 (class 2618 OID 50702)
+-- TOC entry 3218 (class 2618 OID 50702)
 -- Name: view_campaign_status _RETURN; Type: RULE; Schema: public; Owner: postgres
 --
 
@@ -3920,7 +3810,7 @@ CREATE OR REPLACE VIEW public.view_campaign_status AS
 
 
 --
--- TOC entry 3078 (class 2606 OID 34189)
+-- TOC entry 3082 (class 2606 OID 34189)
 -- Name: sub_media_allocation allocation_bus_id_fk; Type: FK CONSTRAINT; Schema: public; Owner: postgres
 --
 
@@ -3929,7 +3819,7 @@ ALTER TABLE ONLY public.sub_media_allocation
 
 
 --
--- TOC entry 3079 (class 2606 OID 34194)
+-- TOC entry 3083 (class 2606 OID 34194)
 -- Name: sub_media_allocation allocation_campaign_id_fk; Type: FK CONSTRAINT; Schema: public; Owner: postgres
 --
 
@@ -3938,7 +3828,7 @@ ALTER TABLE ONLY public.sub_media_allocation
 
 
 --
--- TOC entry 3070 (class 2606 OID 34022)
+-- TOC entry 3074 (class 2606 OID 34022)
 -- Name: main_campaigns bus_size_id_fk; Type: FK CONSTRAINT; Schema: public; Owner: postgres
 --
 
@@ -3947,61 +3837,7 @@ ALTER TABLE ONLY public.main_campaigns
 
 
 --
--- TOC entry 3072 (class 2606 OID 34150)
--- Name: main_buses buses_depot_fk; Type: FK CONSTRAINT; Schema: public; Owner: postgres
---
-
-ALTER TABLE ONLY public.main_buses
-    ADD CONSTRAINT buses_depot_fk FOREIGN KEY (bus_depot_id) REFERENCES public.x_bus_depot(id);
-
-
---
--- TOC entry 3074 (class 2606 OID 34160)
--- Name: main_buses buses_fk0; Type: FK CONSTRAINT; Schema: public; Owner: postgres
---
-
-ALTER TABLE ONLY public.main_buses
-    ADD CONSTRAINT buses_fk0 FOREIGN KEY (operator_id) REFERENCES public.y_operators(id);
-
-
---
--- TOC entry 3075 (class 2606 OID 34165)
--- Name: main_buses buses_fk1; Type: FK CONSTRAINT; Schema: public; Owner: postgres
---
-
-ALTER TABLE ONLY public.main_buses
-    ADD CONSTRAINT buses_fk1 FOREIGN KEY (exterior_campaign_id) REFERENCES public.main_campaigns(id) ON DELETE SET NULL;
-
-
---
--- TOC entry 3076 (class 2606 OID 34170)
--- Name: main_buses buses_fk2; Type: FK CONSTRAINT; Schema: public; Owner: postgres
---
-
-ALTER TABLE ONLY public.main_buses
-    ADD CONSTRAINT buses_fk2 FOREIGN KEY (interior_campaign_id) REFERENCES public.main_campaigns(id);
-
-
---
--- TOC entry 3077 (class 2606 OID 34175)
--- Name: main_buses buses_fk3; Type: FK CONSTRAINT; Schema: public; Owner: postgres
---
-
-ALTER TABLE ONLY public.main_buses
-    ADD CONSTRAINT buses_fk3 FOREIGN KEY (bus_status_id) REFERENCES public.x_bus_status(id);
-
-
---
--- TOC entry 3073 (class 2606 OID 34155)
--- Name: main_buses buses_fk4; Type: FK CONSTRAINT; Schema: public; Owner: postgres
---
-
-ALTER TABLE ONLY public.main_buses
-    ADD CONSTRAINT buses_fk4 FOREIGN KEY (operator_id) REFERENCES public.y_operators(id);
-
-
---
--- TOC entry 3080 (class 2606 OID 42402)
+-- TOC entry 3084 (class 2606 OID 42402)
 -- Name: main_reports exterior_reports_fk1; Type: FK CONSTRAINT; Schema: public; Owner: postgres
 --
 
@@ -4010,7 +3846,7 @@ ALTER TABLE ONLY public.main_reports
 
 
 --
--- TOC entry 3081 (class 2606 OID 42407)
+-- TOC entry 3085 (class 2606 OID 42407)
 -- Name: main_reports exterior_reports_fk2; Type: FK CONSTRAINT; Schema: public; Owner: postgres
 --
 
@@ -4019,7 +3855,7 @@ ALTER TABLE ONLY public.main_reports
 
 
 --
--- TOC entry 3069 (class 2606 OID 34012)
+-- TOC entry 3073 (class 2606 OID 34012)
 -- Name: main_campaigns inventory_id_fk; Type: FK CONSTRAINT; Schema: public; Owner: postgres
 --
 
@@ -4028,7 +3864,61 @@ ALTER TABLE ONLY public.main_campaigns
 
 
 --
--- TOC entry 3067 (class 2606 OID 33936)
+-- TOC entry 3076 (class 2606 OID 34150)
+-- Name: main_buses main_buses_depot_fk; Type: FK CONSTRAINT; Schema: public; Owner: postgres
+--
+
+ALTER TABLE ONLY public.main_buses
+    ADD CONSTRAINT main_buses_depot_fk FOREIGN KEY (bus_depot_id) REFERENCES public.x_bus_depot(id);
+
+
+--
+-- TOC entry 3081 (class 2606 OID 34160)
+-- Name: main_buses main_buses_fk0; Type: FK CONSTRAINT; Schema: public; Owner: postgres
+--
+
+ALTER TABLE ONLY public.main_buses
+    ADD CONSTRAINT main_buses_fk0 FOREIGN KEY (operator_id) REFERENCES public.y_operators(id);
+
+
+--
+-- TOC entry 3080 (class 2606 OID 34165)
+-- Name: main_buses main_buses_fk1; Type: FK CONSTRAINT; Schema: public; Owner: postgres
+--
+
+ALTER TABLE ONLY public.main_buses
+    ADD CONSTRAINT main_buses_fk1 FOREIGN KEY (exterior_campaign_id) REFERENCES public.main_campaigns(id) ON DELETE SET NULL;
+
+
+--
+-- TOC entry 3079 (class 2606 OID 34170)
+-- Name: main_buses main_buses_fk2; Type: FK CONSTRAINT; Schema: public; Owner: postgres
+--
+
+ALTER TABLE ONLY public.main_buses
+    ADD CONSTRAINT main_buses_fk2 FOREIGN KEY (interior_campaign_id) REFERENCES public.main_campaigns(id);
+
+
+--
+-- TOC entry 3078 (class 2606 OID 34175)
+-- Name: main_buses main_buses_fk3; Type: FK CONSTRAINT; Schema: public; Owner: postgres
+--
+
+ALTER TABLE ONLY public.main_buses
+    ADD CONSTRAINT main_buses_fk3 FOREIGN KEY (bus_status_id) REFERENCES public.x_bus_status(id);
+
+
+--
+-- TOC entry 3077 (class 2606 OID 34155)
+-- Name: main_buses main_buses_fk4; Type: FK CONSTRAINT; Schema: public; Owner: postgres
+--
+
+ALTER TABLE ONLY public.main_buses
+    ADD CONSTRAINT main_buses_fk4 FOREIGN KEY (operator_id) REFERENCES public.y_operators(id);
+
+
+--
+-- TOC entry 3071 (class 2606 OID 33936)
 -- Name: y_operators operator_platorm_id_fk; Type: FK CONSTRAINT; Schema: public; Owner: postgres
 --
 
@@ -4037,7 +3927,7 @@ ALTER TABLE ONLY public.y_operators
 
 
 --
--- TOC entry 3068 (class 2606 OID 34007)
+-- TOC entry 3072 (class 2606 OID 34007)
 -- Name: main_campaigns platform_id_fk; Type: FK CONSTRAINT; Schema: public; Owner: postgres
 --
 
@@ -4046,7 +3936,7 @@ ALTER TABLE ONLY public.main_campaigns
 
 
 --
--- TOC entry 3071 (class 2606 OID 34027)
+-- TOC entry 3075 (class 2606 OID 34027)
 -- Name: main_campaigns pricing_id_fk; Type: FK CONSTRAINT; Schema: public; Owner: postgres
 --
 
@@ -4054,7 +3944,7 @@ ALTER TABLE ONLY public.main_campaigns
     ADD CONSTRAINT pricing_id_fk FOREIGN KEY (price_id) REFERENCES public.z_price_settings(id);
 
 
--- Completed on 2020-11-18 11:56:29
+-- Completed on 2020-12-09 09:32:46
 
 --
 -- PostgreSQL database dump complete

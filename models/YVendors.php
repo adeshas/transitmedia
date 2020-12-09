@@ -440,7 +440,7 @@ class YVendors extends DbTable
         $success = $this->insertSql($rs)->execute();
         if ($success) {
             // Get insert id if necessary
-            $this->id->setDbValue($conn->fetchColumn("SELECT currval('vendors_id_seq'::regclass)"));
+            $this->id->setDbValue($conn->fetchColumn("SELECT currval('public.y_vendors_id_seq'::regclass)"));
             $rs['id'] = $this->id->DbValue;
         }
         return $success;

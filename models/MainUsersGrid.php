@@ -484,6 +484,7 @@ class MainUsersGrid extends MainUsers
         $this->user_type->setVisibility();
         $this->vendor_id->setVisibility();
         $this->reportsto->setVisibility();
+        $this->ts->Visible = false;
         $this->hideFieldsForAddEdit();
 
         // Global Page Loading event (in userfn*.php)
@@ -1309,6 +1310,8 @@ class MainUsersGrid extends MainUsers
         $this->vendor_id->OldValue = $this->vendor_id->CurrentValue;
         $this->reportsto->CurrentValue = null;
         $this->reportsto->OldValue = $this->reportsto->CurrentValue;
+        $this->ts->CurrentValue = null;
+        $this->ts->OldValue = $this->ts->CurrentValue;
     }
 
     // Load form values
@@ -1508,6 +1511,7 @@ class MainUsersGrid extends MainUsers
         $this->user_type->setDbValue($row['user_type']);
         $this->vendor_id->setDbValue($row['vendor_id']);
         $this->reportsto->setDbValue($row['reportsto']);
+        $this->ts->setDbValue($row['ts']);
     }
 
     // Return a row with default values
@@ -1523,6 +1527,7 @@ class MainUsersGrid extends MainUsers
         $row['user_type'] = $this->user_type->CurrentValue;
         $row['vendor_id'] = $this->vendor_id->CurrentValue;
         $row['reportsto'] = $this->reportsto->CurrentValue;
+        $row['ts'] = $this->ts->CurrentValue;
         return $row;
     }
 
@@ -1573,6 +1578,8 @@ class MainUsersGrid extends MainUsers
         // vendor_id
 
         // reportsto
+
+        // ts
         if ($this->RowType == ROWTYPE_VIEW) {
             // id
             $this->id->ViewValue = $this->id->CurrentValue;
@@ -1647,6 +1654,11 @@ class MainUsersGrid extends MainUsers
                 $this->reportsto->ViewValue = null;
             }
             $this->reportsto->ViewCustomAttributes = "";
+
+            // ts
+            $this->ts->ViewValue = $this->ts->CurrentValue;
+            $this->ts->ViewValue = FormatDateTime($this->ts->ViewValue, 0);
+            $this->ts->ViewCustomAttributes = "";
 
             // id
             $this->id->LinkCustomAttributes = "";

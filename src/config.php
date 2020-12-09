@@ -171,7 +171,7 @@ $CONFIG = [
 
     // General
     "UNFORMAT_YEAR" => 50, // Unformat year
-    "RANDOM_KEY" => 'ZkdeSu2rgz5W1So9', // Random key for encryption
+    "RANDOM_KEY" => '9543woh3QOM9TATO', // Random key for encryption
     "ENCRYPTION_KEY" => '', // Encryption key for data protection
     "PROJECT_STYLESHEET_FILENAME" => "css/test.css", // Project stylesheet file name
     "PROJECT_CHARSET" => "utf-8", // Project charset
@@ -325,7 +325,7 @@ $CONFIG = [
     "CSRF_PREFIX" => "csrf",
     "ENCRYPTION_ENABLED" => false, // Encryption enabled
     "ADMIN_USER_NAME" => "admin", // Administrator user name
-    "ADMIN_PASSWORD" => "admin", // Administrator password
+    "ADMIN_PASSWORD" => "adminqwerty12345", // Administrator password
     "USE_CUSTOM_LOGIN" => true, // Use custom login
     "ALLOW_LOGIN_BY_URL" => false, // Allow login by URL
     "ALLOW_LOGIN_BY_SESSION" => false, // Allow login by session variables

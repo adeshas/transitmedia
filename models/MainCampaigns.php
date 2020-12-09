@@ -670,7 +670,7 @@ class MainCampaigns extends DbTable
         $success = $this->insertSql($rs)->execute();
         if ($success) {
             // Get insert id if necessary
-            $this->id->setDbValue($conn->fetchColumn("SELECT currval('new_campaign_id_seq'::regclass)"));
+            $this->id->setDbValue($conn->fetchColumn("SELECT currval('public.main_campaigns_id_seq'::regclass)"));
             $rs['id'] = $this->id->DbValue;
         }
         return $success;

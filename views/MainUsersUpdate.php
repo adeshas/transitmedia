@@ -24,7 +24,8 @@ loadjs.ready("head", function () {
         ["_email", [fields._email.required ? ew.Validators.required(fields._email.caption) : null, ew.Validators.email, ew.Validators.selected], fields._email.isInvalid],
         ["user_type", [fields.user_type.required ? ew.Validators.required(fields.user_type.caption) : null], fields.user_type.isInvalid],
         ["vendor_id", [fields.vendor_id.required ? ew.Validators.required(fields.vendor_id.caption) : null], fields.vendor_id.isInvalid],
-        ["reportsto", [fields.reportsto.required ? ew.Validators.required(fields.reportsto.caption) : null], fields.reportsto.isInvalid]
+        ["reportsto", [fields.reportsto.required ? ew.Validators.required(fields.reportsto.caption) : null], fields.reportsto.isInvalid],
+        ["ts", [fields.ts.required ? ew.Validators.required(fields.ts.caption) : null, ew.Validators.datetime(0), ew.Validators.selected], fields.ts.isInvalid]
     ]);
 
     // Set invalid fields
@@ -486,6 +487,45 @@ $Page->showMessage();
                 <input type="text" readonly class="form-control-plaintext" value="<?= HtmlEncode(RemoveHtml($Page->reportsto->getDisplayValue($Page->reportsto->ViewValue))) ?>"></span>
                 </span>
                 <input type="hidden" data-table="main_users" data-field="x_reportsto" data-hidden="1" name="x_reportsto" id="x_reportsto" value="<?= HtmlEncode($Page->reportsto->FormValue) ?>">
+                <?php } ?>
+            </div>
+        </div>
+    </div>
+<?php } ?>
+<?php if ($Page->ts->Visible && (!$Page->isConfirm() || $Page->ts->multiUpdateSelected())) { // ts ?>
+    <div id="r_ts" class="form-group row">
+        <label for="x_ts" class="<?= $Page->LeftColumnClass ?>">
+            <?php if (!$Page->isConfirm()) { ?>
+            <div class="custom-control custom-checkbox">
+                <input type="checkbox" name="u_ts" id="u_ts" class="custom-control-input ew-multi-select" value="1"<?= $Page->ts->multiUpdateSelected() ? " checked" : "" ?>>
+                <label class="custom-control-label" for="u_ts"><?= $Page->ts->caption() ?></label>
+            </div>
+            <?php } else { ?>
+            <input type="hidden" name="u_ts" id="u_ts" value="<?= $Page->ts->MultiUpdate ?>">
+            <?= $Page->ts->caption() ?>
+            <?php } ?>
+        </label>
+        <div class="<?= $Page->RightColumnClass ?>">
+            <div <?= $Page->ts->cellAttributes() ?>>
+                <?php if (!$Page->isConfirm()) { ?>
+                <span id="el_main_users_ts">
+                <input type="<?= $Page->ts->getInputTextType() ?>" data-table="main_users" data-field="x_ts" name="x_ts" id="x_ts" placeholder="<?= HtmlEncode($Page->ts->getPlaceHolder()) ?>" value="<?= $Page->ts->EditValue ?>"<?= $Page->ts->editAttributes() ?> aria-describedby="x_ts_help">
+                <?= $Page->ts->getCustomMessage() ?>
+                <div class="invalid-feedback"><?= $Page->ts->getErrorMessage() ?></div>
+                <?php if (!$Page->ts->ReadOnly && !$Page->ts->Disabled && !isset($Page->ts->EditAttrs["readonly"]) && !isset($Page->ts->EditAttrs["disabled"])) { ?>
+                <script>
+                loadjs.ready(["fmain_usersupdate", "datetimepicker"], function() {
+                    ew.createDateTimePicker("fmain_usersupdate", "x_ts", {"ignoreReadonly":true,"useCurrent":false,"format":0});
+                });
+                </script>
+                <?php } ?>
+                </span>
+                <?php } else { ?>
+                <span id="el_main_users_ts">
+                <span<?= $Page->ts->viewAttributes() ?>>
+                <input type="text" readonly class="form-control-plaintext" value="<?= HtmlEncode(RemoveHtml($Page->ts->getDisplayValue($Page->ts->ViewValue))) ?>"></span>
+                </span>
+                <input type="hidden" data-table="main_users" data-field="x_ts" data-hidden="1" name="x_ts" id="x_ts" value="<?= HtmlEncode($Page->ts->FormValue) ?>">
                 <?php } ?>
             </div>
         </div>

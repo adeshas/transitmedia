@@ -444,6 +444,7 @@ class MainUsersAdd extends MainUsers
         $this->user_type->setVisibility();
         $this->vendor_id->setVisibility();
         $this->reportsto->setVisibility();
+        $this->ts->setVisibility();
         $this->hideFieldsForAddEdit();
 
         // Do not use lookup cache
@@ -629,6 +630,8 @@ class MainUsersAdd extends MainUsers
         $this->vendor_id->OldValue = $this->vendor_id->CurrentValue;
         $this->reportsto->CurrentValue = null;
         $this->reportsto->OldValue = $this->reportsto->CurrentValue;
+        $this->ts->CurrentValue = null;
+        $this->ts->OldValue = $this->ts->CurrentValue;
     }
 
     // Load form values
@@ -707,6 +710,17 @@ class MainUsersAdd extends MainUsers
             }
         }
 
+        // Check field name 'ts' first before field var 'x_ts'
+        $val = $CurrentForm->hasValue("ts") ? $CurrentForm->getValue("ts") : $CurrentForm->getValue("x_ts");
+        if (!$this->ts->IsDetailKey) {
+            if (IsApi() && $val === null) {
+                $this->ts->Visible = false; // Disable update for API request
+            } else {
+                $this->ts->setFormValue($val);
+            }
+            $this->ts->CurrentValue = UnFormatDateTime($this->ts->CurrentValue, 0);
+        }
+
         // Check field name 'id' first before field var 'x_id'
         $val = $CurrentForm->hasValue("id") ? $CurrentForm->getValue("id") : $CurrentForm->getValue("x_id");
     }
@@ -722,6 +736,8 @@ class MainUsersAdd extends MainUsers
         $this->user_type->CurrentValue = $this->user_type->FormValue;
         $this->vendor_id->CurrentValue = $this->vendor_id->FormValue;
         $this->reportsto->CurrentValue = $this->reportsto->FormValue;
+        $this->ts->CurrentValue = $this->ts->FormValue;
+        $this->ts->CurrentValue = UnFormatDateTime($this->ts->CurrentValue, 0);
         $this->resetDetailParms();
     }
 
@@ -789,6 +805,7 @@ class MainUsersAdd extends MainUsers
         $this->user_type->setDbValue($row['user_type']);
         $this->vendor_id->setDbValue($row['vendor_id']);
         $this->reportsto->setDbValue($row['reportsto']);
+        $this->ts->setDbValue($row['ts']);
     }
 
     // Return a row with default values
@@ -804,6 +821,7 @@ class MainUsersAdd extends MainUsers
         $row['user_type'] = $this->user_type->CurrentValue;
         $row['vendor_id'] = $this->vendor_id->CurrentValue;
         $row['reportsto'] = $this->reportsto->CurrentValue;
+        $row['ts'] = $this->ts->CurrentValue;
         return $row;
     }
 
@@ -850,6 +868,8 @@ class MainUsersAdd extends MainUsers
         // vendor_id
 
         // reportsto
+
+        // ts
         if ($this->RowType == ROWTYPE_VIEW) {
             // id
             $this->id->ViewValue = $this->id->CurrentValue;
@@ -925,6 +945,11 @@ class MainUsersAdd extends MainUsers
             }
             $this->reportsto->ViewCustomAttributes = "";
 
+            // ts
+            $this->ts->ViewValue = $this->ts->CurrentValue;
+            $this->ts->ViewValue = FormatDateTime($this->ts->ViewValue, 0);
+            $this->ts->ViewCustomAttributes = "";
+
             // name
             $this->name->LinkCustomAttributes = "";
             $this->name->HrefValue = "";
@@ -959,6 +984,11 @@ class MainUsersAdd extends MainUsers
             $this->reportsto->LinkCustomAttributes = "";
             $this->reportsto->HrefValue = "";
             $this->reportsto->TooltipValue = "";
+
+            // ts
+            $this->ts->LinkCustomAttributes = "";
+            $this->ts->HrefValue = "";
+            $this->ts->TooltipValue = "";
         } elseif ($this->RowType == ROWTYPE_ADD) {
             // name
             $this->name->EditAttrs["class"] = "form-control";
@@ -1082,6 +1112,12 @@ class MainUsersAdd extends MainUsers
                 $this->reportsto->PlaceHolder = RemoveHtml($this->reportsto->caption());
             }
 
+            // ts
+            $this->ts->EditAttrs["class"] = "form-control";
+            $this->ts->EditCustomAttributes = "";
+            $this->ts->EditValue = HtmlEncode(FormatDateTime($this->ts->CurrentValue, 8));
+            $this->ts->PlaceHolder = RemoveHtml($this->ts->caption());
+
             // Add refer script
 
             // name
@@ -1111,6 +1147,10 @@ class MainUsersAdd extends MainUsers
             // reportsto
             $this->reportsto->LinkCustomAttributes = "";
             $this->reportsto->HrefValue = "";
+
+            // ts
+            $this->ts->LinkCustomAttributes = "";
+            $this->ts->HrefValue = "";
         }
         if ($this->RowType == ROWTYPE_ADD || $this->RowType == ROWTYPE_EDIT || $this->RowType == ROWTYPE_SEARCH) { // Add/Edit/Search row
             $this->setupFieldTitles();
@@ -1171,6 +1211,14 @@ class MainUsersAdd extends MainUsers
             if (!$this->reportsto->IsDetailKey && EmptyValue($this->reportsto->FormValue)) {
                 $this->reportsto->addErrorMessage(str_replace("%s", $this->reportsto->caption(), $this->reportsto->RequiredErrorMessage));
             }
+        }
+        if ($this->ts->Required) {
+            if (!$this->ts->IsDetailKey && EmptyValue($this->ts->FormValue)) {
+                $this->ts->addErrorMessage(str_replace("%s", $this->ts->caption(), $this->ts->RequiredErrorMessage));
+            }
+        }
+        if (!CheckDate($this->ts->FormValue)) {
+            $this->ts->addErrorMessage($this->ts->getErrorMessage(false));
         }
 
         // Validate detail grid
@@ -1283,6 +1331,9 @@ class MainUsersAdd extends MainUsers
 
         // reportsto
         $this->reportsto->setDbValueDef($rsnew, $this->reportsto->CurrentValue, null, false);
+
+        // ts
+        $this->ts->setDbValueDef($rsnew, UnFormatDateTime($this->ts->CurrentValue, 0), null, false);
 
         // Call Row Inserting event
         $insertRow = $this->rowInserting($rsold, $rsnew);

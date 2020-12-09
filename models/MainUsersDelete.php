@@ -354,6 +354,7 @@ class MainUsersDelete extends MainUsers
         $this->user_type->setVisibility();
         $this->vendor_id->setVisibility();
         $this->reportsto->setVisibility();
+        $this->ts->Visible = false;
         $this->hideFieldsForAddEdit();
 
         // Do not use lookup cache
@@ -548,6 +549,7 @@ class MainUsersDelete extends MainUsers
         $this->user_type->setDbValue($row['user_type']);
         $this->vendor_id->setDbValue($row['vendor_id']);
         $this->reportsto->setDbValue($row['reportsto']);
+        $this->ts->setDbValue($row['ts']);
     }
 
     // Return a row with default values
@@ -562,6 +564,7 @@ class MainUsersDelete extends MainUsers
         $row['user_type'] = null;
         $row['vendor_id'] = null;
         $row['reportsto'] = null;
+        $row['ts'] = null;
         return $row;
     }
 
@@ -592,6 +595,8 @@ class MainUsersDelete extends MainUsers
         // vendor_id
 
         // reportsto
+
+        // ts
         if ($this->RowType == ROWTYPE_VIEW) {
             // id
             $this->id->ViewValue = $this->id->CurrentValue;
@@ -666,6 +671,11 @@ class MainUsersDelete extends MainUsers
                 $this->reportsto->ViewValue = null;
             }
             $this->reportsto->ViewCustomAttributes = "";
+
+            // ts
+            $this->ts->ViewValue = $this->ts->CurrentValue;
+            $this->ts->ViewValue = FormatDateTime($this->ts->ViewValue, 0);
+            $this->ts->ViewCustomAttributes = "";
 
             // id
             $this->id->LinkCustomAttributes = "";

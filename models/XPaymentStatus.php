@@ -405,7 +405,7 @@ class XPaymentStatus extends DbTable
         $success = $this->insertSql($rs)->execute();
         if ($success) {
             // Get insert id if necessary
-            $this->id->setDbValue($conn->fetchColumn("SELECT currval('payment_status_id_seq'::regclass)"));
+            $this->id->setDbValue($conn->fetchColumn("SELECT currval('public.x_payment_status_id_seq'::regclass)"));
             $rs['id'] = $this->id->DbValue;
         }
         return $success;

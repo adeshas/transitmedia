@@ -36,6 +36,7 @@ class MainUsers extends DbTable
     public $user_type;
     public $vendor_id;
     public $reportsto;
+    public $ts;
 
     // Page ID
     public $PageID = ""; // To be overridden by subclass
@@ -140,6 +141,12 @@ class MainUsers extends DbTable
         $this->reportsto->Lookup = new Lookup('reportsto', 'y_vendors', false, 'id', ["name","","",""], [], [], [], [], [], [], '', '');
         $this->reportsto->DefaultErrorMessage = $Language->phrase("IncorrectInteger");
         $this->Fields['reportsto'] = &$this->reportsto;
+
+        // ts
+        $this->ts = new DbField('main_users', 'main_users', 'x_ts', 'ts', '"ts"', CastDateFieldForLike("\"ts\"", 0, "DB"), 135, 8, 0, false, '"ts"', false, false, false, 'FORMATTED TEXT', 'TEXT');
+        $this->ts->Sortable = true; // Allow sort
+        $this->ts->DefaultErrorMessage = str_replace("%s", $GLOBALS["DATE_FORMAT"], $Language->phrase("IncorrectDate"));
+        $this->Fields['ts'] = &$this->ts;
     }
 
     // Field Visibility
@@ -550,7 +557,7 @@ class MainUsers extends DbTable
         $success = $this->insertSql($rs)->execute();
         if ($success) {
             // Get insert id if necessary
-            $this->id->setDbValue($conn->fetchColumn("SELECT currval('users_id_seq'::regclass)"));
+            $this->id->setDbValue($conn->fetchColumn("SELECT currval('public.main_users_id_seq'::regclass)"));
             $rs['id'] = $this->id->DbValue;
         }
         return $success;
@@ -650,6 +657,7 @@ class MainUsers extends DbTable
         $this->user_type->DbValue = $row['user_type'];
         $this->vendor_id->DbValue = $row['vendor_id'];
         $this->reportsto->DbValue = $row['reportsto'];
+        $this->ts->DbValue = $row['ts'];
     }
 
     // Delete uploaded files
@@ -990,6 +998,7 @@ SORTHTML;
         $this->user_type->setDbValue($row['user_type']);
         $this->vendor_id->setDbValue($row['vendor_id']);
         $this->reportsto->setDbValue($row['reportsto']);
+        $this->ts->setDbValue($row['ts']);
     }
 
     // Render list row values
@@ -1017,6 +1026,8 @@ SORTHTML;
         // vendor_id
 
         // reportsto
+
+        // ts
 
         // id
         $this->id->ViewValue = $this->id->CurrentValue;
@@ -1092,6 +1103,11 @@ SORTHTML;
         }
         $this->reportsto->ViewCustomAttributes = "";
 
+        // ts
+        $this->ts->ViewValue = $this->ts->CurrentValue;
+        $this->ts->ViewValue = FormatDateTime($this->ts->ViewValue, 0);
+        $this->ts->ViewCustomAttributes = "";
+
         // id
         $this->id->LinkCustomAttributes = "";
         $this->id->HrefValue = "";
@@ -1131,6 +1147,11 @@ SORTHTML;
         $this->reportsto->LinkCustomAttributes = "";
         $this->reportsto->HrefValue = "";
         $this->reportsto->TooltipValue = "";
+
+        // ts
+        $this->ts->LinkCustomAttributes = "";
+        $this->ts->HrefValue = "";
+        $this->ts->TooltipValue = "";
 
         // Call Row Rendered event
         $this->rowRendered();
@@ -1249,6 +1270,12 @@ SORTHTML;
             $this->reportsto->PlaceHolder = RemoveHtml($this->reportsto->caption());
         }
 
+        // ts
+        $this->ts->EditAttrs["class"] = "form-control";
+        $this->ts->EditCustomAttributes = "";
+        $this->ts->EditValue = FormatDateTime($this->ts->CurrentValue, 8);
+        $this->ts->PlaceHolder = RemoveHtml($this->ts->caption());
+
         // Call Row Rendered event
         $this->rowRendered();
     }
@@ -1285,12 +1312,14 @@ SORTHTML;
                     $doc->exportCaption($this->user_type);
                     $doc->exportCaption($this->vendor_id);
                     $doc->exportCaption($this->reportsto);
+                    $doc->exportCaption($this->ts);
                 } else {
                     $doc->exportCaption($this->id);
                     $doc->exportCaption($this->_email);
                     $doc->exportCaption($this->user_type);
                     $doc->exportCaption($this->vendor_id);
                     $doc->exportCaption($this->reportsto);
+                    $doc->exportCaption($this->ts);
                 }
                 $doc->endExportRow();
             }
@@ -1328,12 +1357,14 @@ SORTHTML;
                         $doc->exportField($this->user_type);
                         $doc->exportField($this->vendor_id);
                         $doc->exportField($this->reportsto);
+                        $doc->exportField($this->ts);
                     } else {
                         $doc->exportField($this->id);
                         $doc->exportField($this->_email);
                         $doc->exportField($this->user_type);
                         $doc->exportField($this->vendor_id);
                         $doc->exportField($this->reportsto);
+                        $doc->exportField($this->ts);
                     }
                     $doc->endExportRow($rowCnt);
                 }

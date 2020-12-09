@@ -446,7 +446,7 @@ class YPlatforms extends DbTable
         $success = $this->insertSql($rs)->execute();
         if ($success) {
             // Get insert id if necessary
-            $this->id->setDbValue($conn->fetchColumn("SELECT currval('platforms_id_seq'::regclass)"));
+            $this->id->setDbValue($conn->fetchColumn("SELECT currval('public.y_platforms_id_seq'::regclass)"));
             $rs['id'] = $this->id->DbValue;
         }
         return $success;

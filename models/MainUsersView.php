@@ -498,6 +498,7 @@ class MainUsersView extends MainUsers
         $this->user_type->setVisibility();
         $this->vendor_id->setVisibility();
         $this->reportsto->setVisibility();
+        $this->ts->setVisibility();
         $this->hideFieldsForAddEdit();
 
         // Do not use lookup cache
@@ -810,6 +811,7 @@ class MainUsersView extends MainUsers
         $this->user_type->setDbValue($row['user_type']);
         $this->vendor_id->setDbValue($row['vendor_id']);
         $this->reportsto->setDbValue($row['reportsto']);
+        $this->ts->setDbValue($row['ts']);
     }
 
     // Return a row with default values
@@ -824,6 +826,7 @@ class MainUsersView extends MainUsers
         $row['user_type'] = null;
         $row['vendor_id'] = null;
         $row['reportsto'] = null;
+        $row['ts'] = null;
         return $row;
     }
 
@@ -860,6 +863,8 @@ class MainUsersView extends MainUsers
         // vendor_id
 
         // reportsto
+
+        // ts
         if ($this->RowType == ROWTYPE_VIEW) {
             // id
             $this->id->ViewValue = $this->id->CurrentValue;
@@ -935,6 +940,11 @@ class MainUsersView extends MainUsers
             }
             $this->reportsto->ViewCustomAttributes = "";
 
+            // ts
+            $this->ts->ViewValue = $this->ts->CurrentValue;
+            $this->ts->ViewValue = FormatDateTime($this->ts->ViewValue, 0);
+            $this->ts->ViewCustomAttributes = "";
+
             // id
             $this->id->LinkCustomAttributes = "";
             $this->id->HrefValue = "";
@@ -974,6 +984,11 @@ class MainUsersView extends MainUsers
             $this->reportsto->LinkCustomAttributes = "";
             $this->reportsto->HrefValue = "";
             $this->reportsto->TooltipValue = "";
+
+            // ts
+            $this->ts->LinkCustomAttributes = "";
+            $this->ts->HrefValue = "";
+            $this->ts->TooltipValue = "";
         }
 
         // Call Row Rendered event
