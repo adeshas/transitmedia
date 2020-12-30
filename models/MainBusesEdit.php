@@ -522,6 +522,9 @@ class MainBusesEdit extends MainBuses
                 }
             }
 
+            // Set up master detail parameters
+            $this->setupMasterParms();
+
             // Load recordset
             if ($this->isShow()) {
                 // Load current record
@@ -1228,77 +1231,146 @@ class MainBusesEdit extends MainBuses
             // bus_status_id
             $this->bus_status_id->EditAttrs["class"] = "form-control";
             $this->bus_status_id->EditCustomAttributes = "";
-            $curVal = trim(strval($this->bus_status_id->CurrentValue));
-            if ($curVal != "") {
-                $this->bus_status_id->ViewValue = $this->bus_status_id->lookupCacheOption($curVal);
-            } else {
-                $this->bus_status_id->ViewValue = $this->bus_status_id->Lookup !== null && is_array($this->bus_status_id->Lookup->Options) ? $curVal : null;
-            }
-            if ($this->bus_status_id->ViewValue !== null) { // Load from cache
-                $this->bus_status_id->EditValue = array_values($this->bus_status_id->Lookup->Options);
-            } else { // Lookup from database
-                if ($curVal == "") {
-                    $filterWrk = "0=1";
+            if ($this->bus_status_id->getSessionValue() != "") {
+                $this->bus_status_id->CurrentValue = GetForeignKeyValue($this->bus_status_id->getSessionValue());
+                $curVal = strval($this->bus_status_id->CurrentValue);
+                if ($curVal != "") {
+                    $this->bus_status_id->ViewValue = $this->bus_status_id->lookupCacheOption($curVal);
+                    if ($this->bus_status_id->ViewValue === null) { // Lookup from database
+                        $filterWrk = "\"id\"" . SearchString("=", $curVal, DATATYPE_NUMBER, "");
+                        $sqlWrk = $this->bus_status_id->Lookup->getSql(false, $filterWrk, '', $this, true, true);
+                        $rswrk = Conn()->executeQuery($sqlWrk)->fetchAll(\PDO::FETCH_BOTH);
+                        $ari = count($rswrk);
+                        if ($ari > 0) { // Lookup values found
+                            $arwrk = $this->bus_status_id->Lookup->renderViewRow($rswrk[0]);
+                            $this->bus_status_id->ViewValue = $this->bus_status_id->displayValue($arwrk);
+                        } else {
+                            $this->bus_status_id->ViewValue = $this->bus_status_id->CurrentValue;
+                        }
+                    }
                 } else {
-                    $filterWrk = "\"id\"" . SearchString("=", $this->bus_status_id->CurrentValue, DATATYPE_NUMBER, "");
+                    $this->bus_status_id->ViewValue = null;
                 }
-                $sqlWrk = $this->bus_status_id->Lookup->getSql(true, $filterWrk, '', $this, false, true);
-                $rswrk = Conn()->executeQuery($sqlWrk)->fetchAll(\PDO::FETCH_BOTH);
-                $ari = count($rswrk);
-                $arwrk = $rswrk;
-                $this->bus_status_id->EditValue = $arwrk;
+                $this->bus_status_id->ViewCustomAttributes = "";
+            } else {
+                $curVal = trim(strval($this->bus_status_id->CurrentValue));
+                if ($curVal != "") {
+                    $this->bus_status_id->ViewValue = $this->bus_status_id->lookupCacheOption($curVal);
+                } else {
+                    $this->bus_status_id->ViewValue = $this->bus_status_id->Lookup !== null && is_array($this->bus_status_id->Lookup->Options) ? $curVal : null;
+                }
+                if ($this->bus_status_id->ViewValue !== null) { // Load from cache
+                    $this->bus_status_id->EditValue = array_values($this->bus_status_id->Lookup->Options);
+                } else { // Lookup from database
+                    if ($curVal == "") {
+                        $filterWrk = "0=1";
+                    } else {
+                        $filterWrk = "\"id\"" . SearchString("=", $this->bus_status_id->CurrentValue, DATATYPE_NUMBER, "");
+                    }
+                    $sqlWrk = $this->bus_status_id->Lookup->getSql(true, $filterWrk, '', $this, false, true);
+                    $rswrk = Conn()->executeQuery($sqlWrk)->fetchAll(\PDO::FETCH_BOTH);
+                    $ari = count($rswrk);
+                    $arwrk = $rswrk;
+                    $this->bus_status_id->EditValue = $arwrk;
+                }
+                $this->bus_status_id->PlaceHolder = RemoveHtml($this->bus_status_id->caption());
             }
-            $this->bus_status_id->PlaceHolder = RemoveHtml($this->bus_status_id->caption());
 
             // bus_size_id
             $this->bus_size_id->EditAttrs["class"] = "form-control";
             $this->bus_size_id->EditCustomAttributes = "";
-            $curVal = trim(strval($this->bus_size_id->CurrentValue));
-            if ($curVal != "") {
-                $this->bus_size_id->ViewValue = $this->bus_size_id->lookupCacheOption($curVal);
-            } else {
-                $this->bus_size_id->ViewValue = $this->bus_size_id->Lookup !== null && is_array($this->bus_size_id->Lookup->Options) ? $curVal : null;
-            }
-            if ($this->bus_size_id->ViewValue !== null) { // Load from cache
-                $this->bus_size_id->EditValue = array_values($this->bus_size_id->Lookup->Options);
-            } else { // Lookup from database
-                if ($curVal == "") {
-                    $filterWrk = "0=1";
+            if ($this->bus_size_id->getSessionValue() != "") {
+                $this->bus_size_id->CurrentValue = GetForeignKeyValue($this->bus_size_id->getSessionValue());
+                $curVal = strval($this->bus_size_id->CurrentValue);
+                if ($curVal != "") {
+                    $this->bus_size_id->ViewValue = $this->bus_size_id->lookupCacheOption($curVal);
+                    if ($this->bus_size_id->ViewValue === null) { // Lookup from database
+                        $filterWrk = "\"id\"" . SearchString("=", $curVal, DATATYPE_NUMBER, "");
+                        $sqlWrk = $this->bus_size_id->Lookup->getSql(false, $filterWrk, '', $this, true, true);
+                        $rswrk = Conn()->executeQuery($sqlWrk)->fetchAll(\PDO::FETCH_BOTH);
+                        $ari = count($rswrk);
+                        if ($ari > 0) { // Lookup values found
+                            $arwrk = $this->bus_size_id->Lookup->renderViewRow($rswrk[0]);
+                            $this->bus_size_id->ViewValue = $this->bus_size_id->displayValue($arwrk);
+                        } else {
+                            $this->bus_size_id->ViewValue = $this->bus_size_id->CurrentValue;
+                        }
+                    }
                 } else {
-                    $filterWrk = "\"id\"" . SearchString("=", $this->bus_size_id->CurrentValue, DATATYPE_NUMBER, "");
+                    $this->bus_size_id->ViewValue = null;
                 }
-                $sqlWrk = $this->bus_size_id->Lookup->getSql(true, $filterWrk, '', $this, false, true);
-                $rswrk = Conn()->executeQuery($sqlWrk)->fetchAll(\PDO::FETCH_BOTH);
-                $ari = count($rswrk);
-                $arwrk = $rswrk;
-                $this->bus_size_id->EditValue = $arwrk;
+                $this->bus_size_id->ViewCustomAttributes = "";
+            } else {
+                $curVal = trim(strval($this->bus_size_id->CurrentValue));
+                if ($curVal != "") {
+                    $this->bus_size_id->ViewValue = $this->bus_size_id->lookupCacheOption($curVal);
+                } else {
+                    $this->bus_size_id->ViewValue = $this->bus_size_id->Lookup !== null && is_array($this->bus_size_id->Lookup->Options) ? $curVal : null;
+                }
+                if ($this->bus_size_id->ViewValue !== null) { // Load from cache
+                    $this->bus_size_id->EditValue = array_values($this->bus_size_id->Lookup->Options);
+                } else { // Lookup from database
+                    if ($curVal == "") {
+                        $filterWrk = "0=1";
+                    } else {
+                        $filterWrk = "\"id\"" . SearchString("=", $this->bus_size_id->CurrentValue, DATATYPE_NUMBER, "");
+                    }
+                    $sqlWrk = $this->bus_size_id->Lookup->getSql(true, $filterWrk, '', $this, false, true);
+                    $rswrk = Conn()->executeQuery($sqlWrk)->fetchAll(\PDO::FETCH_BOTH);
+                    $ari = count($rswrk);
+                    $arwrk = $rswrk;
+                    $this->bus_size_id->EditValue = $arwrk;
+                }
+                $this->bus_size_id->PlaceHolder = RemoveHtml($this->bus_size_id->caption());
             }
-            $this->bus_size_id->PlaceHolder = RemoveHtml($this->bus_size_id->caption());
 
             // bus_depot_id
             $this->bus_depot_id->EditAttrs["class"] = "form-control";
             $this->bus_depot_id->EditCustomAttributes = "";
-            $curVal = trim(strval($this->bus_depot_id->CurrentValue));
-            if ($curVal != "") {
-                $this->bus_depot_id->ViewValue = $this->bus_depot_id->lookupCacheOption($curVal);
-            } else {
-                $this->bus_depot_id->ViewValue = $this->bus_depot_id->Lookup !== null && is_array($this->bus_depot_id->Lookup->Options) ? $curVal : null;
-            }
-            if ($this->bus_depot_id->ViewValue !== null) { // Load from cache
-                $this->bus_depot_id->EditValue = array_values($this->bus_depot_id->Lookup->Options);
-            } else { // Lookup from database
-                if ($curVal == "") {
-                    $filterWrk = "0=1";
+            if ($this->bus_depot_id->getSessionValue() != "") {
+                $this->bus_depot_id->CurrentValue = GetForeignKeyValue($this->bus_depot_id->getSessionValue());
+                $curVal = strval($this->bus_depot_id->CurrentValue);
+                if ($curVal != "") {
+                    $this->bus_depot_id->ViewValue = $this->bus_depot_id->lookupCacheOption($curVal);
+                    if ($this->bus_depot_id->ViewValue === null) { // Lookup from database
+                        $filterWrk = "\"id\"" . SearchString("=", $curVal, DATATYPE_NUMBER, "");
+                        $sqlWrk = $this->bus_depot_id->Lookup->getSql(false, $filterWrk, '', $this, true, true);
+                        $rswrk = Conn()->executeQuery($sqlWrk)->fetchAll(\PDO::FETCH_BOTH);
+                        $ari = count($rswrk);
+                        if ($ari > 0) { // Lookup values found
+                            $arwrk = $this->bus_depot_id->Lookup->renderViewRow($rswrk[0]);
+                            $this->bus_depot_id->ViewValue = $this->bus_depot_id->displayValue($arwrk);
+                        } else {
+                            $this->bus_depot_id->ViewValue = $this->bus_depot_id->CurrentValue;
+                        }
+                    }
                 } else {
-                    $filterWrk = "\"id\"" . SearchString("=", $this->bus_depot_id->CurrentValue, DATATYPE_NUMBER, "");
+                    $this->bus_depot_id->ViewValue = null;
                 }
-                $sqlWrk = $this->bus_depot_id->Lookup->getSql(true, $filterWrk, '', $this, false, true);
-                $rswrk = Conn()->executeQuery($sqlWrk)->fetchAll(\PDO::FETCH_BOTH);
-                $ari = count($rswrk);
-                $arwrk = $rswrk;
-                $this->bus_depot_id->EditValue = $arwrk;
+                $this->bus_depot_id->ViewCustomAttributes = "";
+            } else {
+                $curVal = trim(strval($this->bus_depot_id->CurrentValue));
+                if ($curVal != "") {
+                    $this->bus_depot_id->ViewValue = $this->bus_depot_id->lookupCacheOption($curVal);
+                } else {
+                    $this->bus_depot_id->ViewValue = $this->bus_depot_id->Lookup !== null && is_array($this->bus_depot_id->Lookup->Options) ? $curVal : null;
+                }
+                if ($this->bus_depot_id->ViewValue !== null) { // Load from cache
+                    $this->bus_depot_id->EditValue = array_values($this->bus_depot_id->Lookup->Options);
+                } else { // Lookup from database
+                    if ($curVal == "") {
+                        $filterWrk = "0=1";
+                    } else {
+                        $filterWrk = "\"id\"" . SearchString("=", $this->bus_depot_id->CurrentValue, DATATYPE_NUMBER, "");
+                    }
+                    $sqlWrk = $this->bus_depot_id->Lookup->getSql(true, $filterWrk, '', $this, false, true);
+                    $rswrk = Conn()->executeQuery($sqlWrk)->fetchAll(\PDO::FETCH_BOTH);
+                    $ari = count($rswrk);
+                    $arwrk = $rswrk;
+                    $this->bus_depot_id->EditValue = $arwrk;
+                }
+                $this->bus_depot_id->PlaceHolder = RemoveHtml($this->bus_depot_id->caption());
             }
-            $this->bus_depot_id->PlaceHolder = RemoveHtml($this->bus_depot_id->caption());
 
             // Edit refer script
 
@@ -1478,12 +1550,21 @@ class MainBusesEdit extends MainBuses
             $this->interior_campaign_id->setDbValueDef($rsnew, $this->interior_campaign_id->CurrentValue, null, $this->interior_campaign_id->ReadOnly);
 
             // bus_status_id
+            if ($this->bus_status_id->getSessionValue() != "") {
+                $this->bus_status_id->ReadOnly = true;
+            }
             $this->bus_status_id->setDbValueDef($rsnew, $this->bus_status_id->CurrentValue, 0, $this->bus_status_id->ReadOnly);
 
             // bus_size_id
+            if ($this->bus_size_id->getSessionValue() != "") {
+                $this->bus_size_id->ReadOnly = true;
+            }
             $this->bus_size_id->setDbValueDef($rsnew, $this->bus_size_id->CurrentValue, null, $this->bus_size_id->ReadOnly);
 
             // bus_depot_id
+            if ($this->bus_depot_id->getSessionValue() != "") {
+                $this->bus_depot_id->ReadOnly = true;
+            }
             $this->bus_depot_id->setDbValueDef($rsnew, $this->bus_depot_id->CurrentValue, null, $this->bus_depot_id->ReadOnly);
 
             // Call Row Updating event
@@ -1544,6 +1625,142 @@ class MainBusesEdit extends MainBuses
             WriteJson(["success" => true, $this->TableVar => $row]);
         }
         return $editRow;
+    }
+
+    // Set up master/detail based on QueryString
+    protected function setupMasterParms()
+    {
+        $validMaster = false;
+        // Get the keys for master table
+        if (($master = Get(Config("TABLE_SHOW_MASTER"), Get(Config("TABLE_MASTER")))) !== null) {
+            $masterTblVar = $master;
+            if ($masterTblVar == "") {
+                $validMaster = true;
+                $this->DbMasterFilter = "";
+                $this->DbDetailFilter = "";
+            }
+            if ($masterTblVar == "x_bus_status") {
+                $validMaster = true;
+                $masterTbl = Container("x_bus_status");
+                if (($parm = Get("fk_id", Get("bus_status_id"))) !== null) {
+                    $masterTbl->id->setQueryStringValue($parm);
+                    $this->bus_status_id->setQueryStringValue($masterTbl->id->QueryStringValue);
+                    $this->bus_status_id->setSessionValue($this->bus_status_id->QueryStringValue);
+                    if (!is_numeric($masterTbl->id->QueryStringValue)) {
+                        $validMaster = false;
+                    }
+                } else {
+                    $validMaster = false;
+                }
+            }
+            if ($masterTblVar == "x_bus_sizes") {
+                $validMaster = true;
+                $masterTbl = Container("x_bus_sizes");
+                if (($parm = Get("fk_id", Get("bus_size_id"))) !== null) {
+                    $masterTbl->id->setQueryStringValue($parm);
+                    $this->bus_size_id->setQueryStringValue($masterTbl->id->QueryStringValue);
+                    $this->bus_size_id->setSessionValue($this->bus_size_id->QueryStringValue);
+                    if (!is_numeric($masterTbl->id->QueryStringValue)) {
+                        $validMaster = false;
+                    }
+                } else {
+                    $validMaster = false;
+                }
+            }
+            if ($masterTblVar == "x_bus_depot") {
+                $validMaster = true;
+                $masterTbl = Container("x_bus_depot");
+                if (($parm = Get("fk_id", Get("bus_depot_id"))) !== null) {
+                    $masterTbl->id->setQueryStringValue($parm);
+                    $this->bus_depot_id->setQueryStringValue($masterTbl->id->QueryStringValue);
+                    $this->bus_depot_id->setSessionValue($this->bus_depot_id->QueryStringValue);
+                    if (!is_numeric($masterTbl->id->QueryStringValue)) {
+                        $validMaster = false;
+                    }
+                } else {
+                    $validMaster = false;
+                }
+            }
+        } elseif (($master = Post(Config("TABLE_SHOW_MASTER"), Post(Config("TABLE_MASTER")))) !== null) {
+            $masterTblVar = $master;
+            if ($masterTblVar == "") {
+                    $validMaster = true;
+                    $this->DbMasterFilter = "";
+                    $this->DbDetailFilter = "";
+            }
+            if ($masterTblVar == "x_bus_status") {
+                $validMaster = true;
+                $masterTbl = Container("x_bus_status");
+                if (($parm = Post("fk_id", Post("bus_status_id"))) !== null) {
+                    $masterTbl->id->setFormValue($parm);
+                    $this->bus_status_id->setFormValue($masterTbl->id->FormValue);
+                    $this->bus_status_id->setSessionValue($this->bus_status_id->FormValue);
+                    if (!is_numeric($masterTbl->id->FormValue)) {
+                        $validMaster = false;
+                    }
+                } else {
+                    $validMaster = false;
+                }
+            }
+            if ($masterTblVar == "x_bus_sizes") {
+                $validMaster = true;
+                $masterTbl = Container("x_bus_sizes");
+                if (($parm = Post("fk_id", Post("bus_size_id"))) !== null) {
+                    $masterTbl->id->setFormValue($parm);
+                    $this->bus_size_id->setFormValue($masterTbl->id->FormValue);
+                    $this->bus_size_id->setSessionValue($this->bus_size_id->FormValue);
+                    if (!is_numeric($masterTbl->id->FormValue)) {
+                        $validMaster = false;
+                    }
+                } else {
+                    $validMaster = false;
+                }
+            }
+            if ($masterTblVar == "x_bus_depot") {
+                $validMaster = true;
+                $masterTbl = Container("x_bus_depot");
+                if (($parm = Post("fk_id", Post("bus_depot_id"))) !== null) {
+                    $masterTbl->id->setFormValue($parm);
+                    $this->bus_depot_id->setFormValue($masterTbl->id->FormValue);
+                    $this->bus_depot_id->setSessionValue($this->bus_depot_id->FormValue);
+                    if (!is_numeric($masterTbl->id->FormValue)) {
+                        $validMaster = false;
+                    }
+                } else {
+                    $validMaster = false;
+                }
+            }
+        }
+        if ($validMaster) {
+            // Save current master table
+            $this->setCurrentMasterTable($masterTblVar);
+            $this->setSessionWhere($this->getDetailFilter());
+
+            // Reset start record counter (new master key)
+            if (!$this->isAddOrEdit()) {
+                $this->StartRecord = 1;
+                $this->setStartRecordNumber($this->StartRecord);
+            }
+
+            // Clear previous master key from Session
+            if ($masterTblVar != "x_bus_status") {
+                if ($this->bus_status_id->CurrentValue == "") {
+                    $this->bus_status_id->setSessionValue("");
+                }
+            }
+            if ($masterTblVar != "x_bus_sizes") {
+                if ($this->bus_size_id->CurrentValue == "") {
+                    $this->bus_size_id->setSessionValue("");
+                }
+            }
+            if ($masterTblVar != "x_bus_depot") {
+                if ($this->bus_depot_id->CurrentValue == "") {
+                    $this->bus_depot_id->setSessionValue("");
+                }
+            }
+        }
+        $this->DbMasterFilter = $this->getMasterFilter(); // Get master filter
+        $this->DbDetailFilter = $this->getDetailFilter(); // Get detail filter
     }
 
     // Set up detail parms based on QueryString

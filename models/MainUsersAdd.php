@@ -444,7 +444,7 @@ class MainUsersAdd extends MainUsers
         $this->user_type->setVisibility();
         $this->vendor_id->setVisibility();
         $this->reportsto->setVisibility();
-        $this->ts->setVisibility();
+        $this->ts->Visible = false;
         $this->hideFieldsForAddEdit();
 
         // Do not use lookup cache
@@ -710,17 +710,6 @@ class MainUsersAdd extends MainUsers
             }
         }
 
-        // Check field name 'ts' first before field var 'x_ts'
-        $val = $CurrentForm->hasValue("ts") ? $CurrentForm->getValue("ts") : $CurrentForm->getValue("x_ts");
-        if (!$this->ts->IsDetailKey) {
-            if (IsApi() && $val === null) {
-                $this->ts->Visible = false; // Disable update for API request
-            } else {
-                $this->ts->setFormValue($val);
-            }
-            $this->ts->CurrentValue = UnFormatDateTime($this->ts->CurrentValue, 0);
-        }
-
         // Check field name 'id' first before field var 'x_id'
         $val = $CurrentForm->hasValue("id") ? $CurrentForm->getValue("id") : $CurrentForm->getValue("x_id");
     }
@@ -736,8 +725,6 @@ class MainUsersAdd extends MainUsers
         $this->user_type->CurrentValue = $this->user_type->FormValue;
         $this->vendor_id->CurrentValue = $this->vendor_id->FormValue;
         $this->reportsto->CurrentValue = $this->reportsto->FormValue;
-        $this->ts->CurrentValue = $this->ts->FormValue;
-        $this->ts->CurrentValue = UnFormatDateTime($this->ts->CurrentValue, 0);
         $this->resetDetailParms();
     }
 
@@ -984,11 +971,6 @@ class MainUsersAdd extends MainUsers
             $this->reportsto->LinkCustomAttributes = "";
             $this->reportsto->HrefValue = "";
             $this->reportsto->TooltipValue = "";
-
-            // ts
-            $this->ts->LinkCustomAttributes = "";
-            $this->ts->HrefValue = "";
-            $this->ts->TooltipValue = "";
         } elseif ($this->RowType == ROWTYPE_ADD) {
             // name
             $this->name->EditAttrs["class"] = "form-control";
@@ -1112,12 +1094,6 @@ class MainUsersAdd extends MainUsers
                 $this->reportsto->PlaceHolder = RemoveHtml($this->reportsto->caption());
             }
 
-            // ts
-            $this->ts->EditAttrs["class"] = "form-control";
-            $this->ts->EditCustomAttributes = "";
-            $this->ts->EditValue = HtmlEncode(FormatDateTime($this->ts->CurrentValue, 8));
-            $this->ts->PlaceHolder = RemoveHtml($this->ts->caption());
-
             // Add refer script
 
             // name
@@ -1147,10 +1123,6 @@ class MainUsersAdd extends MainUsers
             // reportsto
             $this->reportsto->LinkCustomAttributes = "";
             $this->reportsto->HrefValue = "";
-
-            // ts
-            $this->ts->LinkCustomAttributes = "";
-            $this->ts->HrefValue = "";
         }
         if ($this->RowType == ROWTYPE_ADD || $this->RowType == ROWTYPE_EDIT || $this->RowType == ROWTYPE_SEARCH) { // Add/Edit/Search row
             $this->setupFieldTitles();
@@ -1211,14 +1183,6 @@ class MainUsersAdd extends MainUsers
             if (!$this->reportsto->IsDetailKey && EmptyValue($this->reportsto->FormValue)) {
                 $this->reportsto->addErrorMessage(str_replace("%s", $this->reportsto->caption(), $this->reportsto->RequiredErrorMessage));
             }
-        }
-        if ($this->ts->Required) {
-            if (!$this->ts->IsDetailKey && EmptyValue($this->ts->FormValue)) {
-                $this->ts->addErrorMessage(str_replace("%s", $this->ts->caption(), $this->ts->RequiredErrorMessage));
-            }
-        }
-        if (!CheckDate($this->ts->FormValue)) {
-            $this->ts->addErrorMessage($this->ts->getErrorMessage(false));
         }
 
         // Validate detail grid
@@ -1331,9 +1295,6 @@ class MainUsersAdd extends MainUsers
 
         // reportsto
         $this->reportsto->setDbValueDef($rsnew, $this->reportsto->CurrentValue, null, false);
-
-        // ts
-        $this->ts->setDbValueDef($rsnew, UnFormatDateTime($this->ts->CurrentValue, 0), null, false);
 
         // Call Row Inserting event
         $insertRow = $this->rowInserting($rsold, $rsnew);

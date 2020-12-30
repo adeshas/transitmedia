@@ -2717,7 +2717,7 @@ class ViewCampaignsPendingList extends ViewCampaignsPending
     // Row Custom Action event
     public function rowCustomAction($action, $row)
     {
-    	require_once 'views\PrivateFunctions.php';
+    	require_once 'views/PrivateFunctions.php';
 
         // Return false to abort
         $this->UpdateTable = '"main_transactions"';

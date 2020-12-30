@@ -580,11 +580,11 @@ class ViewBusDepotSummaryList extends ViewBusDepotSummary
 
         // Setup export options
         $this->setupExportOptions();
-        $this->depot->Visible = false;
+        $this->depot->setVisibility();
         $this->total_buses->setVisibility();
-        $this->bus_codes->Visible = false;
-        $this->good_bus_codes->Visible = false;
-        $this->bad_bus_codes->Visible = false;
+        $this->bus_codes->setVisibility();
+        $this->good_bus_codes->setVisibility();
+        $this->bad_bus_codes->setVisibility();
         $this->hideFieldsForAddEdit();
 
         // Global Page Loading event (in userfn*.php)
@@ -661,8 +661,33 @@ class ViewBusDepotSummaryList extends ViewBusDepotSummary
                 $this->OtherOptions->hideAllOptions();
             }
 
+            // Get default search criteria
+            AddFilter($this->DefaultSearchWhere, $this->basicSearchWhere(true));
+
+            // Get basic search values
+            $this->loadBasicSearchValues();
+
+            // Process filter list
+            if ($this->processFilterList()) {
+                $this->terminate();
+                return;
+            }
+
+            // Restore search parms from Session if not searching / reset / export
+            if (($this->isExport() || $this->Command != "search" && $this->Command != "reset" && $this->Command != "resetall") && $this->Command != "json" && $this->checkSearchParms()) {
+                $this->restoreSearchParms();
+            }
+
+            // Call Recordset SearchValidated event
+            $this->recordsetSearchValidated();
+
             // Set up sorting order
             $this->setupSortOrder();
+
+            // Get basic search criteria
+            if (!$this->hasInvalidFields()) {
+                $srchBasic = $this->basicSearchWhere();
+            }
         }
 
         // Restore display records
@@ -676,6 +701,31 @@ class ViewBusDepotSummaryList extends ViewBusDepotSummary
         // Load Sorting Order
         if ($this->Command != "json") {
             $this->loadSortOrder();
+        }
+
+        // Load search default if no existing search criteria
+        if (!$this->checkSearchParms()) {
+            // Load basic search from default
+            $this->BasicSearch->loadDefault();
+            if ($this->BasicSearch->Keyword != "") {
+                $srchBasic = $this->basicSearchWhere();
+            }
+        }
+
+        // Build search criteria
+        AddFilter($this->SearchWhere, $srchAdvanced);
+        AddFilter($this->SearchWhere, $srchBasic);
+
+        // Call Recordset_Searching event
+        $this->recordsetSearching($this->SearchWhere);
+
+        // Save search criteria
+        if ($this->Command == "search" && !$this->RestoreSearch) {
+            $this->setSearchWhere($this->SearchWhere); // Save to Session
+            $this->StartRecord = 1; // Reset start record counter
+            $this->setStartRecordNumber($this->StartRecord);
+        } elseif ($this->Command != "json") {
+            $this->SearchWhere = $this->getSearchWhere();
         }
 
         // Build filter
@@ -824,6 +874,265 @@ class ViewBusDepotSummaryList extends ViewBusDepotSummary
         return $wrkFilter;
     }
 
+    // Get list of filters
+    public function getFilterList()
+    {
+        global $UserProfile;
+
+        // Initialize
+        $filterList = "";
+        $savedFilterList = "";
+        $filterList = Concat($filterList, $this->depot->AdvancedSearch->toJson(), ","); // Field depot
+        $filterList = Concat($filterList, $this->total_buses->AdvancedSearch->toJson(), ","); // Field total_buses
+        $filterList = Concat($filterList, $this->bus_codes->AdvancedSearch->toJson(), ","); // Field bus_codes
+        $filterList = Concat($filterList, $this->good_bus_codes->AdvancedSearch->toJson(), ","); // Field good_bus_codes
+        $filterList = Concat($filterList, $this->bad_bus_codes->AdvancedSearch->toJson(), ","); // Field bad_bus_codes
+        if ($this->BasicSearch->Keyword != "") {
+            $wrk = "\"" . Config("TABLE_BASIC_SEARCH") . "\":\"" . JsEncode($this->BasicSearch->Keyword) . "\",\"" . Config("TABLE_BASIC_SEARCH_TYPE") . "\":\"" . JsEncode($this->BasicSearch->Type) . "\"";
+            $filterList = Concat($filterList, $wrk, ",");
+        }
+
+        // Return filter list in JSON
+        if ($filterList != "") {
+            $filterList = "\"data\":{" . $filterList . "}";
+        }
+        if ($savedFilterList != "") {
+            $filterList = Concat($filterList, "\"filters\":" . $savedFilterList, ",");
+        }
+        return ($filterList != "") ? "{" . $filterList . "}" : "null";
+    }
+
+    // Process filter list
+    protected function processFilterList()
+    {
+        global $UserProfile;
+        if (Post("ajax") == "savefilters") { // Save filter request (Ajax)
+            $filters = Post("filters");
+            $UserProfile->setSearchFilters(CurrentUserName(), "fview_bus_depot_summarylistsrch", $filters);
+            WriteJson([["success" => true]]); // Success
+            return true;
+        } elseif (Post("cmd") == "resetfilter") {
+            $this->restoreFilterList();
+        }
+        return false;
+    }
+
+    // Restore list of filters
+    protected function restoreFilterList()
+    {
+        // Return if not reset filter
+        if (Post("cmd") !== "resetfilter") {
+            return false;
+        }
+        $filter = json_decode(Post("filter"), true);
+        $this->Command = "search";
+
+        // Field depot
+        $this->depot->AdvancedSearch->SearchValue = @$filter["x_depot"];
+        $this->depot->AdvancedSearch->SearchOperator = @$filter["z_depot"];
+        $this->depot->AdvancedSearch->SearchCondition = @$filter["v_depot"];
+        $this->depot->AdvancedSearch->SearchValue2 = @$filter["y_depot"];
+        $this->depot->AdvancedSearch->SearchOperator2 = @$filter["w_depot"];
+        $this->depot->AdvancedSearch->save();
+
+        // Field total_buses
+        $this->total_buses->AdvancedSearch->SearchValue = @$filter["x_total_buses"];
+        $this->total_buses->AdvancedSearch->SearchOperator = @$filter["z_total_buses"];
+        $this->total_buses->AdvancedSearch->SearchCondition = @$filter["v_total_buses"];
+        $this->total_buses->AdvancedSearch->SearchValue2 = @$filter["y_total_buses"];
+        $this->total_buses->AdvancedSearch->SearchOperator2 = @$filter["w_total_buses"];
+        $this->total_buses->AdvancedSearch->save();
+
+        // Field bus_codes
+        $this->bus_codes->AdvancedSearch->SearchValue = @$filter["x_bus_codes"];
+        $this->bus_codes->AdvancedSearch->SearchOperator = @$filter["z_bus_codes"];
+        $this->bus_codes->AdvancedSearch->SearchCondition = @$filter["v_bus_codes"];
+        $this->bus_codes->AdvancedSearch->SearchValue2 = @$filter["y_bus_codes"];
+        $this->bus_codes->AdvancedSearch->SearchOperator2 = @$filter["w_bus_codes"];
+        $this->bus_codes->AdvancedSearch->save();
+
+        // Field good_bus_codes
+        $this->good_bus_codes->AdvancedSearch->SearchValue = @$filter["x_good_bus_codes"];
+        $this->good_bus_codes->AdvancedSearch->SearchOperator = @$filter["z_good_bus_codes"];
+        $this->good_bus_codes->AdvancedSearch->SearchCondition = @$filter["v_good_bus_codes"];
+        $this->good_bus_codes->AdvancedSearch->SearchValue2 = @$filter["y_good_bus_codes"];
+        $this->good_bus_codes->AdvancedSearch->SearchOperator2 = @$filter["w_good_bus_codes"];
+        $this->good_bus_codes->AdvancedSearch->save();
+
+        // Field bad_bus_codes
+        $this->bad_bus_codes->AdvancedSearch->SearchValue = @$filter["x_bad_bus_codes"];
+        $this->bad_bus_codes->AdvancedSearch->SearchOperator = @$filter["z_bad_bus_codes"];
+        $this->bad_bus_codes->AdvancedSearch->SearchCondition = @$filter["v_bad_bus_codes"];
+        $this->bad_bus_codes->AdvancedSearch->SearchValue2 = @$filter["y_bad_bus_codes"];
+        $this->bad_bus_codes->AdvancedSearch->SearchOperator2 = @$filter["w_bad_bus_codes"];
+        $this->bad_bus_codes->AdvancedSearch->save();
+        $this->BasicSearch->setKeyword(@$filter[Config("TABLE_BASIC_SEARCH")]);
+        $this->BasicSearch->setType(@$filter[Config("TABLE_BASIC_SEARCH_TYPE")]);
+    }
+
+    // Return basic search SQL
+    protected function basicSearchSql($arKeywords, $type)
+    {
+        $where = "";
+        $this->buildBasicSearchSql($where, $this->depot, $arKeywords, $type);
+        $this->buildBasicSearchSql($where, $this->bus_codes, $arKeywords, $type);
+        $this->buildBasicSearchSql($where, $this->good_bus_codes, $arKeywords, $type);
+        $this->buildBasicSearchSql($where, $this->bad_bus_codes, $arKeywords, $type);
+        return $where;
+    }
+
+    // Build basic search SQL
+    protected function buildBasicSearchSql(&$where, &$fld, $arKeywords, $type)
+    {
+        $defCond = ($type == "OR") ? "OR" : "AND";
+        $arSql = []; // Array for SQL parts
+        $arCond = []; // Array for search conditions
+        $cnt = count($arKeywords);
+        $j = 0; // Number of SQL parts
+        for ($i = 0; $i < $cnt; $i++) {
+            $keyword = $arKeywords[$i];
+            $keyword = trim($keyword);
+            if (Config("BASIC_SEARCH_IGNORE_PATTERN") != "") {
+                $keyword = preg_replace(Config("BASIC_SEARCH_IGNORE_PATTERN"), "\\", $keyword);
+                $ar = explode("\\", $keyword);
+            } else {
+                $ar = [$keyword];
+            }
+            foreach ($ar as $keyword) {
+                if ($keyword != "") {
+                    $wrk = "";
+                    if ($keyword == "OR" && $type == "") {
+                        if ($j > 0) {
+                            $arCond[$j - 1] = "OR";
+                        }
+                    } elseif ($keyword == Config("NULL_VALUE")) {
+                        $wrk = $fld->Expression . " IS NULL";
+                    } elseif ($keyword == Config("NOT_NULL_VALUE")) {
+                        $wrk = $fld->Expression . " IS NOT NULL";
+                    } elseif ($fld->IsVirtual && $fld->Visible) {
+                        $wrk = $fld->VirtualExpression . Like(QuotedValue("%" . $keyword . "%", DATATYPE_STRING, $this->Dbid), $this->Dbid);
+                    } elseif ($fld->DataType != DATATYPE_NUMBER || is_numeric($keyword)) {
+                        $wrk = $fld->BasicSearchExpression . Like(QuotedValue("%" . $keyword . "%", DATATYPE_STRING, $this->Dbid), $this->Dbid);
+                    }
+                    if ($wrk != "") {
+                        $arSql[$j] = $wrk;
+                        $arCond[$j] = $defCond;
+                        $j += 1;
+                    }
+                }
+            }
+        }
+        $cnt = count($arSql);
+        $quoted = false;
+        $sql = "";
+        if ($cnt > 0) {
+            for ($i = 0; $i < $cnt - 1; $i++) {
+                if ($arCond[$i] == "OR") {
+                    if (!$quoted) {
+                        $sql .= "(";
+                    }
+                    $quoted = true;
+                }
+                $sql .= $arSql[$i];
+                if ($quoted && $arCond[$i] != "OR") {
+                    $sql .= ")";
+                    $quoted = false;
+                }
+                $sql .= " " . $arCond[$i] . " ";
+            }
+            $sql .= $arSql[$cnt - 1];
+            if ($quoted) {
+                $sql .= ")";
+            }
+        }
+        if ($sql != "") {
+            if ($where != "") {
+                $where .= " OR ";
+            }
+            $where .= "(" . $sql . ")";
+        }
+    }
+
+    // Return basic search WHERE clause based on search keyword and type
+    protected function basicSearchWhere($default = false)
+    {
+        global $Security;
+        $searchStr = "";
+        if (!$Security->canSearch()) {
+            return "";
+        }
+        $searchKeyword = ($default) ? $this->BasicSearch->KeywordDefault : $this->BasicSearch->Keyword;
+        $searchType = ($default) ? $this->BasicSearch->TypeDefault : $this->BasicSearch->Type;
+
+        // Get search SQL
+        if ($searchKeyword != "") {
+            $ar = $this->BasicSearch->keywordList($default);
+            // Search keyword in any fields
+            if (($searchType == "OR" || $searchType == "AND") && $this->BasicSearch->BasicSearchAnyFields) {
+                foreach ($ar as $keyword) {
+                    if ($keyword != "") {
+                        if ($searchStr != "") {
+                            $searchStr .= " " . $searchType . " ";
+                        }
+                        $searchStr .= "(" . $this->basicSearchSql([$keyword], $searchType) . ")";
+                    }
+                }
+            } else {
+                $searchStr = $this->basicSearchSql($ar, $searchType);
+            }
+            if (!$default && in_array($this->Command, ["", "reset", "resetall"])) {
+                $this->Command = "search";
+            }
+        }
+        if (!$default && $this->Command == "search") {
+            $this->BasicSearch->setKeyword($searchKeyword);
+            $this->BasicSearch->setType($searchType);
+        }
+        return $searchStr;
+    }
+
+    // Check if search parm exists
+    protected function checkSearchParms()
+    {
+        // Check basic search
+        if ($this->BasicSearch->issetSession()) {
+            return true;
+        }
+        return false;
+    }
+
+    // Clear all search parameters
+    protected function resetSearchParms()
+    {
+        // Clear search WHERE clause
+        $this->SearchWhere = "";
+        $this->setSearchWhere($this->SearchWhere);
+
+        // Clear basic search parameters
+        $this->resetBasicSearchParms();
+    }
+
+    // Load advanced search default values
+    protected function loadAdvancedSearchDefault()
+    {
+        return false;
+    }
+
+    // Clear all basic search parameters
+    protected function resetBasicSearchParms()
+    {
+        $this->BasicSearch->unsetSession();
+    }
+
+    // Restore all search parameters
+    protected function restoreSearchParms()
+    {
+        $this->RestoreSearch = true;
+
+        // Restore basic search values
+        $this->BasicSearch->load();
+    }
+
     // Set up sort parameters
     protected function setupSortOrder()
     {
@@ -831,7 +1140,11 @@ class ViewBusDepotSummaryList extends ViewBusDepotSummary
         if (Get("order") !== null) {
             $this->CurrentOrder = Get("order");
             $this->CurrentOrderType = Get("ordertype", "");
+            $this->updateSort($this->depot); // depot
             $this->updateSort($this->total_buses); // total_buses
+            $this->updateSort($this->bus_codes); // bus_codes
+            $this->updateSort($this->good_bus_codes); // good_bus_codes
+            $this->updateSort($this->bad_bus_codes); // bad_bus_codes
             $this->setStartRecordNumber(1); // Reset start position
         }
     }
@@ -862,6 +1175,11 @@ class ViewBusDepotSummaryList extends ViewBusDepotSummary
     {
         // Check if reset command
         if (StartsString("reset", $this->Command)) {
+            // Reset search criteria
+            if ($this->Command == "reset" || $this->Command == "resetall") {
+                $this->resetSearchParms();
+            }
+
             // Reset (clear) sorting order
             if ($this->Command == "resetsort") {
                 $orderBy = "";
@@ -997,10 +1315,10 @@ class ViewBusDepotSummaryList extends ViewBusDepotSummary
         // Filter button
         $item = &$this->FilterOptions->add("savecurrentfilter");
         $item->Body = "<a class=\"ew-save-filter\" data-form=\"fview_bus_depot_summarylistsrch\" href=\"#\" onclick=\"return false;\">" . $Language->phrase("SaveCurrentFilter") . "</a>";
-        $item->Visible = false;
+        $item->Visible = true;
         $item = &$this->FilterOptions->add("deletefilter");
         $item->Body = "<a class=\"ew-delete-filter\" data-form=\"fview_bus_depot_summarylistsrch\" href=\"#\" onclick=\"return false;\">" . $Language->phrase("DeleteFilter") . "</a>";
-        $item->Visible = false;
+        $item->Visible = true;
         $this->FilterOptions->UseDropDownButton = true;
         $this->FilterOptions->UseButtonGroup = !$this->FilterOptions->UseDropDownButton;
         $this->FilterOptions->DropDownButtonPhrase = $Language->phrase("Filters");
@@ -1132,6 +1450,16 @@ class ViewBusDepotSummaryList extends ViewBusDepotSummary
     {
     }
 
+    // Load basic search values
+    protected function loadBasicSearchValues()
+    {
+        $this->BasicSearch->setKeyword(Get(Config("TABLE_BASIC_SEARCH"), ""), false);
+        if ($this->BasicSearch->Keyword != "" && $this->Command == "") {
+            $this->Command = "search";
+        }
+        $this->BasicSearch->setType(Get(Config("TABLE_BASIC_SEARCH_TYPE"), ""), false);
+    }
+
     // Load recordset
     public function loadRecordset($offset = -1, $rowcnt = -1)
     {
@@ -1244,6 +1572,7 @@ class ViewBusDepotSummaryList extends ViewBusDepotSummary
         // Common render codes for all row types
 
         // depot
+        $this->depot->CellCssStyle = "white-space: nowrap;";
 
         // total_buses
 
@@ -1253,15 +1582,51 @@ class ViewBusDepotSummaryList extends ViewBusDepotSummary
 
         // bad_bus_codes
         if ($this->RowType == ROWTYPE_VIEW) {
+            // depot
+            $this->depot->ViewValue = $this->depot->CurrentValue;
+            $this->depot->ViewCustomAttributes = "";
+
             // total_buses
             $this->total_buses->ViewValue = $this->total_buses->CurrentValue;
             $this->total_buses->ViewValue = FormatNumber($this->total_buses->ViewValue, 0, -2, -2, -2);
             $this->total_buses->ViewCustomAttributes = "";
 
+            // bus_codes
+            $this->bus_codes->ViewValue = $this->bus_codes->CurrentValue;
+            $this->bus_codes->ViewCustomAttributes = "";
+
+            // good_bus_codes
+            $this->good_bus_codes->ViewValue = $this->good_bus_codes->CurrentValue;
+            $this->good_bus_codes->ViewCustomAttributes = "";
+
+            // bad_bus_codes
+            $this->bad_bus_codes->ViewValue = $this->bad_bus_codes->CurrentValue;
+            $this->bad_bus_codes->ViewCustomAttributes = "";
+
+            // depot
+            $this->depot->LinkCustomAttributes = "";
+            $this->depot->HrefValue = "";
+            $this->depot->TooltipValue = "";
+
             // total_buses
             $this->total_buses->LinkCustomAttributes = "";
             $this->total_buses->HrefValue = "";
             $this->total_buses->TooltipValue = "";
+
+            // bus_codes
+            $this->bus_codes->LinkCustomAttributes = "";
+            $this->bus_codes->HrefValue = "";
+            $this->bus_codes->TooltipValue = "";
+
+            // good_bus_codes
+            $this->good_bus_codes->LinkCustomAttributes = "";
+            $this->good_bus_codes->HrefValue = "";
+            $this->good_bus_codes->TooltipValue = "";
+
+            // bad_bus_codes
+            $this->bad_bus_codes->LinkCustomAttributes = "";
+            $this->bad_bus_codes->HrefValue = "";
+            $this->bad_bus_codes->TooltipValue = "";
         }
 
         // Call Row Rendered event
@@ -1373,6 +1738,17 @@ class ViewBusDepotSummaryList extends ViewBusDepotSummary
         $pageUrl = $this->pageUrl();
         $this->SearchOptions = new ListOptions("div");
         $this->SearchOptions->TagClassName = "ew-search-option";
+
+        // Search button
+        $item = &$this->SearchOptions->add("searchtoggle");
+        $searchToggleClass = ($this->SearchWhere != "") ? " active" : " active";
+        $item->Body = "<a class=\"btn btn-default ew-search-toggle" . $searchToggleClass . "\" href=\"#\" role=\"button\" title=\"" . $Language->phrase("SearchPanel") . "\" data-caption=\"" . $Language->phrase("SearchPanel") . "\" data-toggle=\"button\" data-form=\"fview_bus_depot_summarylistsrch\" aria-pressed=\"" . ($searchToggleClass == " active" ? "true" : "false") . "\">" . $Language->phrase("SearchLink") . "</a>";
+        $item->Visible = true;
+
+        // Show all button
+        $item = &$this->SearchOptions->add("showall");
+        $item->Body = "<a class=\"btn btn-default ew-show-all\" title=\"" . $Language->phrase("ShowAll") . "\" data-caption=\"" . $Language->phrase("ShowAll") . "\" href=\"" . $pageUrl . "cmd=reset\">" . $Language->phrase("ShowAllBtn") . "</a>";
+        $item->Visible = ($this->SearchWhere != $this->DefaultSearchWhere && $this->SearchWhere != "0=101");
 
         // Button group for search
         $this->SearchOptions->UseDropDownButton = false;

@@ -17,6 +17,18 @@ loadjs.ready("head", function () {
     fview_bus_depot_summarylist.formKeyCountName = '<?= $Page->FormKeyCountName ?>';
     loadjs.done("fview_bus_depot_summarylist");
 });
+var fview_bus_depot_summarylistsrch, currentSearchForm, currentAdvancedSearchForm;
+loadjs.ready("head", function () {
+    var $ = jQuery;
+    // Form object for search
+    fview_bus_depot_summarylistsrch = currentSearchForm = new ew.Form("fview_bus_depot_summarylistsrch");
+
+    // Dynamic selection lists
+
+    // Filters
+    fview_bus_depot_summarylistsrch.filterList = <?= $Page->getFilterList() ?>;
+    loadjs.done("fview_bus_depot_summarylistsrch");
+});
 </script>
 <script>
 loadjs.ready("head", function () {
@@ -32,12 +44,46 @@ loadjs.ready("head", function () {
 <?php if ($Page->ImportOptions->visible()) { ?>
 <?php $Page->ImportOptions->render("body") ?>
 <?php } ?>
+<?php if ($Page->SearchOptions->visible()) { ?>
+<?php $Page->SearchOptions->render("body") ?>
+<?php } ?>
+<?php if ($Page->FilterOptions->visible()) { ?>
+<?php $Page->FilterOptions->render("body") ?>
+<?php } ?>
 <div class="clearfix"></div>
 </div>
 <?php } ?>
 <?php
 $Page->renderOtherOptions();
 ?>
+<?php if ($Security->canSearch()) { ?>
+<?php if (!$Page->isExport() && !$Page->CurrentAction) { ?>
+<form name="fview_bus_depot_summarylistsrch" id="fview_bus_depot_summarylistsrch" class="form-inline ew-form ew-ext-search-form" action="<?= CurrentPageUrl() ?>">
+<div id="fview_bus_depot_summarylistsrch-search-panel" class="<?= $Page->SearchPanelClass ?>">
+<input type="hidden" name="cmd" value="search">
+<input type="hidden" name="t" value="view_bus_depot_summary">
+    <div class="ew-extended-search">
+<div id="xsr_<?= $Page->SearchRowCount + 1 ?>" class="ew-row d-sm-flex">
+    <div class="ew-quick-search input-group">
+        <input type="text" name="<?= Config("TABLE_BASIC_SEARCH") ?>" id="<?= Config("TABLE_BASIC_SEARCH") ?>" class="form-control" value="<?= HtmlEncode($Page->BasicSearch->getKeyword()) ?>" placeholder="<?= HtmlEncode($Language->phrase("Search")) ?>">
+        <input type="hidden" name="<?= Config("TABLE_BASIC_SEARCH_TYPE") ?>" id="<?= Config("TABLE_BASIC_SEARCH_TYPE") ?>" value="<?= HtmlEncode($Page->BasicSearch->getType()) ?>">
+        <div class="input-group-append">
+            <button class="btn btn-primary" name="btn-submit" id="btn-submit" type="submit"><?= $Language->phrase("SearchBtn") ?></button>
+            <button type="button" data-toggle="dropdown" class="btn btn-primary dropdown-toggle dropdown-toggle-split" aria-haspopup="true" aria-expanded="false"><span id="searchtype"><?= $Page->BasicSearch->getTypeNameShort() ?></span></button>
+            <div class="dropdown-menu dropdown-menu-right">
+                <a class="dropdown-item<?php if ($Page->BasicSearch->getType() == "") { ?> active<?php } ?>" href="#" onclick="return ew.setSearchType(this);"><?= $Language->phrase("QuickSearchAuto") ?></a>
+                <a class="dropdown-item<?php if ($Page->BasicSearch->getType() == "=") { ?> active<?php } ?>" href="#" onclick="return ew.setSearchType(this, '=');"><?= $Language->phrase("QuickSearchExact") ?></a>
+                <a class="dropdown-item<?php if ($Page->BasicSearch->getType() == "AND") { ?> active<?php } ?>" href="#" onclick="return ew.setSearchType(this, 'AND');"><?= $Language->phrase("QuickSearchAll") ?></a>
+                <a class="dropdown-item<?php if ($Page->BasicSearch->getType() == "OR") { ?> active<?php } ?>" href="#" onclick="return ew.setSearchType(this, 'OR');"><?= $Language->phrase("QuickSearchAny") ?></a>
+            </div>
+        </div>
+    </div>
+</div>
+    </div><!-- /.ew-extended-search -->
+</div><!-- /.ew-search-panel -->
+</form>
+<?php } ?>
+<?php } ?>
 <?php $Page->showPageHeader(); ?>
 <?php
 $Page->showMessage();
@@ -78,8 +124,20 @@ $Page->renderListOptions();
 // Render list options (header, left)
 $Page->ListOptions->render("header", "left");
 ?>
+<?php if ($Page->depot->Visible) { // depot ?>
+        <th data-name="depot" class="<?= $Page->depot->headerCellClass() ?>" style="white-space: nowrap;"><div id="elh_view_bus_depot_summary_depot" class="view_bus_depot_summary_depot"><?= $Page->renderSort($Page->depot) ?></div></th>
+<?php } ?>
 <?php if ($Page->total_buses->Visible) { // total_buses ?>
         <th data-name="total_buses" class="<?= $Page->total_buses->headerCellClass() ?>"><div id="elh_view_bus_depot_summary_total_buses" class="view_bus_depot_summary_total_buses"><?= $Page->renderSort($Page->total_buses) ?></div></th>
+<?php } ?>
+<?php if ($Page->bus_codes->Visible) { // bus_codes ?>
+        <th data-name="bus_codes" class="<?= $Page->bus_codes->headerCellClass() ?>"><div id="elh_view_bus_depot_summary_bus_codes" class="view_bus_depot_summary_bus_codes"><?= $Page->renderSort($Page->bus_codes) ?></div></th>
+<?php } ?>
+<?php if ($Page->good_bus_codes->Visible) { // good_bus_codes ?>
+        <th data-name="good_bus_codes" class="<?= $Page->good_bus_codes->headerCellClass() ?>"><div id="elh_view_bus_depot_summary_good_bus_codes" class="view_bus_depot_summary_good_bus_codes"><?= $Page->renderSort($Page->good_bus_codes) ?></div></th>
+<?php } ?>
+<?php if ($Page->bad_bus_codes->Visible) { // bad_bus_codes ?>
+        <th data-name="bad_bus_codes" class="<?= $Page->bad_bus_codes->headerCellClass() ?>"><div id="elh_view_bus_depot_summary_bad_bus_codes" class="view_bus_depot_summary_bad_bus_codes"><?= $Page->renderSort($Page->bad_bus_codes) ?></div></th>
 <?php } ?>
 <?php
 // Render list options (header, right)
@@ -148,11 +206,43 @@ while ($Page->RecordCount < $Page->StopRecord) {
 // Render list options (body, left)
 $Page->ListOptions->render("body", "left", $Page->RowCount);
 ?>
+    <?php if ($Page->depot->Visible) { // depot ?>
+        <td data-name="depot" <?= $Page->depot->cellAttributes() ?>>
+<span id="el<?= $Page->RowCount ?>_view_bus_depot_summary_depot">
+<span<?= $Page->depot->viewAttributes() ?>>
+<?= $Page->depot->getViewValue() ?></span>
+</span>
+</td>
+    <?php } ?>
     <?php if ($Page->total_buses->Visible) { // total_buses ?>
         <td data-name="total_buses" <?= $Page->total_buses->cellAttributes() ?>>
 <span id="el<?= $Page->RowCount ?>_view_bus_depot_summary_total_buses">
 <span<?= $Page->total_buses->viewAttributes() ?>>
 <?= $Page->total_buses->getViewValue() ?></span>
+</span>
+</td>
+    <?php } ?>
+    <?php if ($Page->bus_codes->Visible) { // bus_codes ?>
+        <td data-name="bus_codes" <?= $Page->bus_codes->cellAttributes() ?>>
+<span id="el<?= $Page->RowCount ?>_view_bus_depot_summary_bus_codes">
+<span<?= $Page->bus_codes->viewAttributes() ?>>
+<?= $Page->bus_codes->getViewValue() ?></span>
+</span>
+</td>
+    <?php } ?>
+    <?php if ($Page->good_bus_codes->Visible) { // good_bus_codes ?>
+        <td data-name="good_bus_codes" <?= $Page->good_bus_codes->cellAttributes() ?>>
+<span id="el<?= $Page->RowCount ?>_view_bus_depot_summary_good_bus_codes">
+<span<?= $Page->good_bus_codes->viewAttributes() ?>>
+<?= $Page->good_bus_codes->getViewValue() ?></span>
+</span>
+</td>
+    <?php } ?>
+    <?php if ($Page->bad_bus_codes->Visible) { // bad_bus_codes ?>
+        <td data-name="bad_bus_codes" <?= $Page->bad_bus_codes->cellAttributes() ?>>
+<span id="el<?= $Page->RowCount ?>_view_bus_depot_summary_bad_bus_codes">
+<span<?= $Page->bad_bus_codes->viewAttributes() ?>>
+<?= $Page->bad_bus_codes->getViewValue() ?></span>
 </span>
 </td>
     <?php } ?>

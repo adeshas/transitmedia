@@ -356,7 +356,7 @@ class MainBusesDelete extends MainBuses
         $this->bus_size_id->setVisibility();
         $this->bus_depot_id->setVisibility();
         $this->ts_created->Visible = false;
-        $this->ts_last_update->Visible = false;
+        $this->ts_last_update->setVisibility();
         $this->hideFieldsForAddEdit();
 
         // Do not use lookup cache
@@ -378,6 +378,9 @@ class MainBusesDelete extends MainBuses
         $this->setupLookupOptions($this->bus_status_id);
         $this->setupLookupOptions($this->bus_size_id);
         $this->setupLookupOptions($this->bus_depot_id);
+
+        // Set up master/detail parameters
+        $this->setupMasterParms();
 
         // Set up Breadcrumb
         $this->setupBreadcrumb();
@@ -810,6 +813,11 @@ class MainBusesDelete extends MainBuses
             $this->bus_depot_id->LinkCustomAttributes = "";
             $this->bus_depot_id->HrefValue = "";
             $this->bus_depot_id->TooltipValue = "";
+
+            // ts_last_update
+            $this->ts_last_update->LinkCustomAttributes = "";
+            $this->ts_last_update->HrefValue = "";
+            $this->ts_last_update->TooltipValue = "";
         }
 
         // Call Row Rendered event
@@ -899,6 +907,141 @@ class MainBusesDelete extends MainBuses
             WriteJson(["success" => true, $this->TableVar => $row]);
         }
         return $deleteRows;
+    }
+
+    // Set up master/detail based on QueryString
+    protected function setupMasterParms()
+    {
+        $validMaster = false;
+        // Get the keys for master table
+        if (($master = Get(Config("TABLE_SHOW_MASTER"), Get(Config("TABLE_MASTER")))) !== null) {
+            $masterTblVar = $master;
+            if ($masterTblVar == "") {
+                $validMaster = true;
+                $this->DbMasterFilter = "";
+                $this->DbDetailFilter = "";
+            }
+            if ($masterTblVar == "x_bus_status") {
+                $validMaster = true;
+                $masterTbl = Container("x_bus_status");
+                if (($parm = Get("fk_id", Get("bus_status_id"))) !== null) {
+                    $masterTbl->id->setQueryStringValue($parm);
+                    $this->bus_status_id->setQueryStringValue($masterTbl->id->QueryStringValue);
+                    $this->bus_status_id->setSessionValue($this->bus_status_id->QueryStringValue);
+                    if (!is_numeric($masterTbl->id->QueryStringValue)) {
+                        $validMaster = false;
+                    }
+                } else {
+                    $validMaster = false;
+                }
+            }
+            if ($masterTblVar == "x_bus_sizes") {
+                $validMaster = true;
+                $masterTbl = Container("x_bus_sizes");
+                if (($parm = Get("fk_id", Get("bus_size_id"))) !== null) {
+                    $masterTbl->id->setQueryStringValue($parm);
+                    $this->bus_size_id->setQueryStringValue($masterTbl->id->QueryStringValue);
+                    $this->bus_size_id->setSessionValue($this->bus_size_id->QueryStringValue);
+                    if (!is_numeric($masterTbl->id->QueryStringValue)) {
+                        $validMaster = false;
+                    }
+                } else {
+                    $validMaster = false;
+                }
+            }
+            if ($masterTblVar == "x_bus_depot") {
+                $validMaster = true;
+                $masterTbl = Container("x_bus_depot");
+                if (($parm = Get("fk_id", Get("bus_depot_id"))) !== null) {
+                    $masterTbl->id->setQueryStringValue($parm);
+                    $this->bus_depot_id->setQueryStringValue($masterTbl->id->QueryStringValue);
+                    $this->bus_depot_id->setSessionValue($this->bus_depot_id->QueryStringValue);
+                    if (!is_numeric($masterTbl->id->QueryStringValue)) {
+                        $validMaster = false;
+                    }
+                } else {
+                    $validMaster = false;
+                }
+            }
+        } elseif (($master = Post(Config("TABLE_SHOW_MASTER"), Post(Config("TABLE_MASTER")))) !== null) {
+            $masterTblVar = $master;
+            if ($masterTblVar == "") {
+                    $validMaster = true;
+                    $this->DbMasterFilter = "";
+                    $this->DbDetailFilter = "";
+            }
+            if ($masterTblVar == "x_bus_status") {
+                $validMaster = true;
+                $masterTbl = Container("x_bus_status");
+                if (($parm = Post("fk_id", Post("bus_status_id"))) !== null) {
+                    $masterTbl->id->setFormValue($parm);
+                    $this->bus_status_id->setFormValue($masterTbl->id->FormValue);
+                    $this->bus_status_id->setSessionValue($this->bus_status_id->FormValue);
+                    if (!is_numeric($masterTbl->id->FormValue)) {
+                        $validMaster = false;
+                    }
+                } else {
+                    $validMaster = false;
+                }
+            }
+            if ($masterTblVar == "x_bus_sizes") {
+                $validMaster = true;
+                $masterTbl = Container("x_bus_sizes");
+                if (($parm = Post("fk_id", Post("bus_size_id"))) !== null) {
+                    $masterTbl->id->setFormValue($parm);
+                    $this->bus_size_id->setFormValue($masterTbl->id->FormValue);
+                    $this->bus_size_id->setSessionValue($this->bus_size_id->FormValue);
+                    if (!is_numeric($masterTbl->id->FormValue)) {
+                        $validMaster = false;
+                    }
+                } else {
+                    $validMaster = false;
+                }
+            }
+            if ($masterTblVar == "x_bus_depot") {
+                $validMaster = true;
+                $masterTbl = Container("x_bus_depot");
+                if (($parm = Post("fk_id", Post("bus_depot_id"))) !== null) {
+                    $masterTbl->id->setFormValue($parm);
+                    $this->bus_depot_id->setFormValue($masterTbl->id->FormValue);
+                    $this->bus_depot_id->setSessionValue($this->bus_depot_id->FormValue);
+                    if (!is_numeric($masterTbl->id->FormValue)) {
+                        $validMaster = false;
+                    }
+                } else {
+                    $validMaster = false;
+                }
+            }
+        }
+        if ($validMaster) {
+            // Save current master table
+            $this->setCurrentMasterTable($masterTblVar);
+
+            // Reset start record counter (new master key)
+            if (!$this->isAddOrEdit()) {
+                $this->StartRecord = 1;
+                $this->setStartRecordNumber($this->StartRecord);
+            }
+
+            // Clear previous master key from Session
+            if ($masterTblVar != "x_bus_status") {
+                if ($this->bus_status_id->CurrentValue == "") {
+                    $this->bus_status_id->setSessionValue("");
+                }
+            }
+            if ($masterTblVar != "x_bus_sizes") {
+                if ($this->bus_size_id->CurrentValue == "") {
+                    $this->bus_size_id->setSessionValue("");
+                }
+            }
+            if ($masterTblVar != "x_bus_depot") {
+                if ($this->bus_depot_id->CurrentValue == "") {
+                    $this->bus_depot_id->setSessionValue("");
+                }
+            }
+        }
+        $this->DbMasterFilter = $this->getMasterFilter(); // Get master filter
+        $this->DbDetailFilter = $this->getDetailFilter(); // Get detail filter
     }
 
     // Set up Breadcrumb

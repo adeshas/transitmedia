@@ -633,6 +633,23 @@ return function (App $app) {
         }
     );
 
+    // w_managers_platform
+    $app->any('/wmanagersplatformlist[/{id}]', WManagersPlatformController::class . ':list')->add(PermissionMiddleware::class)->setName('wmanagersplatformlist-w_managers_platform-list'); // list
+    $app->any('/wmanagersplatformadd[/{id}]', WManagersPlatformController::class . ':add')->add(PermissionMiddleware::class)->setName('wmanagersplatformadd-w_managers_platform-add'); // add
+    $app->any('/wmanagersplatformview[/{id}]', WManagersPlatformController::class . ':view')->add(PermissionMiddleware::class)->setName('wmanagersplatformview-w_managers_platform-view'); // view
+    $app->any('/wmanagersplatformedit[/{id}]', WManagersPlatformController::class . ':edit')->add(PermissionMiddleware::class)->setName('wmanagersplatformedit-w_managers_platform-edit'); // edit
+    $app->any('/wmanagersplatformdelete[/{id}]', WManagersPlatformController::class . ':delete')->add(PermissionMiddleware::class)->setName('wmanagersplatformdelete-w_managers_platform-delete'); // delete
+    $app->group(
+        '/w_managers_platform',
+        function (RouteCollectorProxy $group) {
+            $group->any('/' . Config("LIST_ACTION") . '[/{id}]', WManagersPlatformController::class . ':list')->add(PermissionMiddleware::class)->setName('w_managers_platform/list-w_managers_platform-list-2'); // list
+            $group->any('/' . Config("ADD_ACTION") . '[/{id}]', WManagersPlatformController::class . ':add')->add(PermissionMiddleware::class)->setName('w_managers_platform/add-w_managers_platform-add-2'); // add
+            $group->any('/' . Config("VIEW_ACTION") . '[/{id}]', WManagersPlatformController::class . ':view')->add(PermissionMiddleware::class)->setName('w_managers_platform/view-w_managers_platform-view-2'); // view
+            $group->any('/' . Config("EDIT_ACTION") . '[/{id}]', WManagersPlatformController::class . ':edit')->add(PermissionMiddleware::class)->setName('w_managers_platform/edit-w_managers_platform-edit-2'); // edit
+            $group->any('/' . Config("DELETE_ACTION") . '[/{id}]', WManagersPlatformController::class . ':delete')->add(PermissionMiddleware::class)->setName('w_managers_platform/delete-w_managers_platform-delete-2'); // delete
+        }
+    );
+
     // error
     $app->any('/error', OthersController::class . ':error')->add(PermissionMiddleware::class)->setName('error');
 

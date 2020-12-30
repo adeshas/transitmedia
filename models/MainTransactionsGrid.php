@@ -3592,6 +3592,10 @@ class MainTransactionsGrid extends MainTransactions
     // Page Load event
     public function pageLoad()
     {
+        global $Language;
+        $Language->setPhraseClass("addlink", ""); // remove icon to remove <span> element
+        $Language->setPhrase("addlink", "<span class='btn btn-block bg-gradient-primary btn-lg'>CREATE NEW TRANSACTION</span>"); // re-draw <span> element yourself
+
         //Log("Page Load");
         $this->total->ReadOnly = TRUE;
         $levelid = CurrentUserLevel();

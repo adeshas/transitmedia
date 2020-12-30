@@ -23,7 +23,6 @@ loadjs.ready("head", function () {
         ["payment_date", [fields.payment_date.required ? ew.Validators.required(fields.payment_date.caption) : null, ew.Validators.datetime(5)], fields.payment_date.isInvalid],
         ["price_id", [fields.price_id.required ? ew.Validators.required(fields.price_id.caption) : null], fields.price_id.isInvalid],
         ["quantity", [fields.quantity.required ? ew.Validators.required(fields.quantity.caption) : null, ew.Validators.integer], fields.quantity.isInvalid],
-        ["assigned_buses", [fields.assigned_buses.required ? ew.Validators.required(fields.assigned_buses.caption) : null, ew.Validators.integer], fields.assigned_buses.isInvalid],
         ["start_date", [fields.start_date.required ? ew.Validators.required(fields.start_date.caption) : null, ew.Validators.datetime(5)], fields.start_date.isInvalid],
         ["end_date", [fields.end_date.required ? ew.Validators.required(fields.end_date.caption) : null, ew.Validators.datetime(5)], fields.end_date.isInvalid],
         ["visible_status_id", [fields.visible_status_id.required ? ew.Validators.required(fields.visible_status_id.caption) : null], fields.visible_status_id.isInvalid],
@@ -322,26 +321,6 @@ loadjs.ready("head", function() {
 <input type="text" readonly class="form-control-plaintext" value="<?= HtmlEncode(RemoveHtml($Page->quantity->getDisplayValue($Page->quantity->ViewValue))) ?>"></span>
 </span>
 <input type="hidden" data-table="main_transactions" data-field="x_quantity" data-hidden="1" name="x_quantity" id="x_quantity" value="<?= HtmlEncode($Page->quantity->FormValue) ?>">
-<?php } ?>
-</div></div>
-    </div>
-<?php } ?>
-<?php if ($Page->assigned_buses->Visible) { // assigned_buses ?>
-    <div id="r_assigned_buses" class="form-group row">
-        <label id="elh_main_transactions_assigned_buses" for="x_assigned_buses" class="<?= $Page->LeftColumnClass ?>"><?= $Page->assigned_buses->caption() ?><?= $Page->assigned_buses->Required ? $Language->phrase("FieldRequiredIndicator") : "" ?></label>
-        <div class="<?= $Page->RightColumnClass ?>"><div <?= $Page->assigned_buses->cellAttributes() ?>>
-<?php if (!$Page->isConfirm()) { ?>
-<span id="el_main_transactions_assigned_buses">
-<input type="<?= $Page->assigned_buses->getInputTextType() ?>" data-table="main_transactions" data-field="x_assigned_buses" name="x_assigned_buses" id="x_assigned_buses" size="30" placeholder="<?= HtmlEncode($Page->assigned_buses->getPlaceHolder()) ?>" value="<?= $Page->assigned_buses->EditValue ?>"<?= $Page->assigned_buses->editAttributes() ?> aria-describedby="x_assigned_buses_help">
-<?= $Page->assigned_buses->getCustomMessage() ?>
-<div class="invalid-feedback"><?= $Page->assigned_buses->getErrorMessage() ?></div>
-</span>
-<?php } else { ?>
-<span id="el_main_transactions_assigned_buses">
-<span<?= $Page->assigned_buses->viewAttributes() ?>>
-<input type="text" readonly class="form-control-plaintext" value="<?= HtmlEncode(RemoveHtml($Page->assigned_buses->getDisplayValue($Page->assigned_buses->ViewValue))) ?>"></span>
-</span>
-<input type="hidden" data-table="main_transactions" data-field="x_assigned_buses" data-hidden="1" name="x_assigned_buses" id="x_assigned_buses" value="<?= HtmlEncode($Page->assigned_buses->FormValue) ?>">
 <?php } ?>
 </div></div>
     </div>

@@ -68,6 +68,9 @@ $Page->showMessage();
 <?php if ($Page->bus_depot_id->Visible) { // bus_depot_id ?>
         <th class="<?= $Page->bus_depot_id->headerCellClass() ?>"><span id="elh_main_buses_bus_depot_id" class="main_buses_bus_depot_id"><?= $Page->bus_depot_id->caption() ?></span></th>
 <?php } ?>
+<?php if ($Page->ts_last_update->Visible) { // ts_last_update ?>
+        <th class="<?= $Page->ts_last_update->headerCellClass() ?>"><span id="elh_main_buses_ts_last_update" class="main_buses_ts_last_update"><?= $Page->ts_last_update->caption() ?></span></th>
+<?php } ?>
     </tr>
     </thead>
     <tbody>
@@ -158,6 +161,14 @@ while (!$Page->Recordset->EOF) {
 <span id="el<?= $Page->RowCount ?>_main_buses_bus_depot_id" class="main_buses_bus_depot_id">
 <span<?= $Page->bus_depot_id->viewAttributes() ?>>
 <?= $Page->bus_depot_id->getViewValue() ?></span>
+</span>
+</td>
+<?php } ?>
+<?php if ($Page->ts_last_update->Visible) { // ts_last_update ?>
+        <td <?= $Page->ts_last_update->cellAttributes() ?>>
+<span id="el<?= $Page->RowCount ?>_main_buses_ts_last_update" class="main_buses_ts_last_update">
+<span<?= $Page->ts_last_update->viewAttributes() ?>>
+<?= $Page->ts_last_update->getViewValue() ?></span>
 </span>
 </td>
 <?php } ?>

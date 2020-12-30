@@ -107,6 +107,7 @@ return [
     "z_price_settings" => \DI\create(ZPriceSettings::class),
     "w_vendors_operators" => \DI\create(WVendorsOperators::class),
     "view_all_buses" => \DI\create(ViewAllBuses::class),
+    "w_managers_platform" => \DI\create(WManagersPlatform::class),
 
     // User table
     "usertable" => \DI\get("main_users"),

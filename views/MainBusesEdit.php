@@ -126,6 +126,18 @@ $Page->showMessage();
 <?php } ?>
 <input type="hidden" name="modal" value="<?= (int)$Page->IsModal ?>">
 <input type="hidden" name="<?= $Page->OldKeyName ?>" value="<?= $Page->OldKey ?>">
+<?php if ($Page->getCurrentMasterTable() == "x_bus_status") { ?>
+<input type="hidden" name="<?= Config("TABLE_SHOW_MASTER") ?>" value="x_bus_status">
+<input type="hidden" name="fk_id" value="<?= HtmlEncode($Page->bus_status_id->getSessionValue()) ?>">
+<?php } ?>
+<?php if ($Page->getCurrentMasterTable() == "x_bus_sizes") { ?>
+<input type="hidden" name="<?= Config("TABLE_SHOW_MASTER") ?>" value="x_bus_sizes">
+<input type="hidden" name="fk_id" value="<?= HtmlEncode($Page->bus_size_id->getSessionValue()) ?>">
+<?php } ?>
+<?php if ($Page->getCurrentMasterTable() == "x_bus_depot") { ?>
+<input type="hidden" name="<?= Config("TABLE_SHOW_MASTER") ?>" value="x_bus_depot">
+<input type="hidden" name="fk_id" value="<?= HtmlEncode($Page->bus_depot_id->getSessionValue()) ?>">
+<?php } ?>
 <div class="ew-edit-div"><!-- page* -->
 <?php if ($Page->id->Visible) { // id ?>
     <div id="r_id" class="form-group row">
@@ -337,6 +349,13 @@ loadjs.ready("head", function() {
         <label id="elh_main_buses_bus_status_id" for="x_bus_status_id" class="<?= $Page->LeftColumnClass ?>"><?= $Page->bus_status_id->caption() ?><?= $Page->bus_status_id->Required ? $Language->phrase("FieldRequiredIndicator") : "" ?></label>
         <div class="<?= $Page->RightColumnClass ?>"><div <?= $Page->bus_status_id->cellAttributes() ?>>
 <?php if (!$Page->isConfirm()) { ?>
+<?php if ($Page->bus_status_id->getSessionValue() != "") { ?>
+<span id="el_main_buses_bus_status_id">
+<span<?= $Page->bus_status_id->viewAttributes() ?>>
+<input type="text" readonly class="form-control-plaintext" value="<?= HtmlEncode(RemoveHtml($Page->bus_status_id->getDisplayValue($Page->bus_status_id->ViewValue))) ?>"></span>
+</span>
+<input type="hidden" id="x_bus_status_id" name="x_bus_status_id" value="<?= HtmlEncode($Page->bus_status_id->CurrentValue) ?>" data-hidden="1">
+<?php } else { ?>
 <span id="el_main_buses_bus_status_id">
     <select
         id="x_bus_status_id"
@@ -363,6 +382,7 @@ loadjs.ready("head", function() {
 });
 </script>
 </span>
+<?php } ?>
 <?php } else { ?>
 <span id="el_main_buses_bus_status_id">
 <span<?= $Page->bus_status_id->viewAttributes() ?>>
@@ -378,6 +398,13 @@ loadjs.ready("head", function() {
         <label id="elh_main_buses_bus_size_id" for="x_bus_size_id" class="<?= $Page->LeftColumnClass ?>"><?= $Page->bus_size_id->caption() ?><?= $Page->bus_size_id->Required ? $Language->phrase("FieldRequiredIndicator") : "" ?></label>
         <div class="<?= $Page->RightColumnClass ?>"><div <?= $Page->bus_size_id->cellAttributes() ?>>
 <?php if (!$Page->isConfirm()) { ?>
+<?php if ($Page->bus_size_id->getSessionValue() != "") { ?>
+<span id="el_main_buses_bus_size_id">
+<span<?= $Page->bus_size_id->viewAttributes() ?>>
+<input type="text" readonly class="form-control-plaintext" value="<?= HtmlEncode(RemoveHtml($Page->bus_size_id->getDisplayValue($Page->bus_size_id->ViewValue))) ?>"></span>
+</span>
+<input type="hidden" id="x_bus_size_id" name="x_bus_size_id" value="<?= HtmlEncode($Page->bus_size_id->CurrentValue) ?>" data-hidden="1">
+<?php } else { ?>
 <span id="el_main_buses_bus_size_id">
     <select
         id="x_bus_size_id"
@@ -404,6 +431,7 @@ loadjs.ready("head", function() {
 });
 </script>
 </span>
+<?php } ?>
 <?php } else { ?>
 <span id="el_main_buses_bus_size_id">
 <span<?= $Page->bus_size_id->viewAttributes() ?>>
@@ -419,6 +447,13 @@ loadjs.ready("head", function() {
         <label id="elh_main_buses_bus_depot_id" for="x_bus_depot_id" class="<?= $Page->LeftColumnClass ?>"><?= $Page->bus_depot_id->caption() ?><?= $Page->bus_depot_id->Required ? $Language->phrase("FieldRequiredIndicator") : "" ?></label>
         <div class="<?= $Page->RightColumnClass ?>"><div <?= $Page->bus_depot_id->cellAttributes() ?>>
 <?php if (!$Page->isConfirm()) { ?>
+<?php if ($Page->bus_depot_id->getSessionValue() != "") { ?>
+<span id="el_main_buses_bus_depot_id">
+<span<?= $Page->bus_depot_id->viewAttributes() ?>>
+<input type="text" readonly class="form-control-plaintext" value="<?= HtmlEncode(RemoveHtml($Page->bus_depot_id->getDisplayValue($Page->bus_depot_id->ViewValue))) ?>"></span>
+</span>
+<input type="hidden" id="x_bus_depot_id" name="x_bus_depot_id" value="<?= HtmlEncode($Page->bus_depot_id->CurrentValue) ?>" data-hidden="1">
+<?php } else { ?>
 <span id="el_main_buses_bus_depot_id">
     <select
         id="x_bus_depot_id"
@@ -445,6 +480,7 @@ loadjs.ready("head", function() {
 });
 </script>
 </span>
+<?php } ?>
 <?php } else { ?>
 <span id="el_main_buses_bus_depot_id">
 <span<?= $Page->bus_depot_id->viewAttributes() ?>>

@@ -23,8 +23,7 @@ loadjs.ready("head", function () {
         ["bus_id", [fields.bus_id.required ? ew.Validators.required(fields.bus_id.caption) : null], fields.bus_id.isInvalid],
         ["created_by", [fields.created_by.required ? ew.Validators.required(fields.created_by.caption) : null], fields.created_by.isInvalid],
         ["ts_created", [fields.ts_created.required ? ew.Validators.required(fields.ts_created.caption) : null, ew.Validators.datetime(0)], fields.ts_created.isInvalid],
-        ["ts_last_update", [fields.ts_last_update.required ? ew.Validators.required(fields.ts_last_update.caption) : null, ew.Validators.datetime(0)], fields.ts_last_update.isInvalid],
-        ["vendor_id", [fields.vendor_id.required ? ew.Validators.required(fields.vendor_id.caption) : null, ew.Validators.integer], fields.vendor_id.isInvalid]
+        ["ts_last_update", [fields.ts_last_update.required ? ew.Validators.required(fields.ts_last_update.caption) : null, ew.Validators.datetime(0)], fields.ts_last_update.isInvalid]
     ]);
 
     // Set invalid fields
@@ -93,7 +92,6 @@ loadjs.ready("head", function () {
     // Dynamic selection lists
     fsub_transaction_detailsedit.lists.transaction_id = <?= $Page->transaction_id->toClientList($Page) ?>;
     fsub_transaction_detailsedit.lists.bus_id = <?= $Page->bus_id->toClientList($Page) ?>;
-    fsub_transaction_detailsedit.lists.vendor_id = <?= $Page->vendor_id->toClientList($Page) ?>;
     loadjs.done("fsub_transaction_detailsedit");
 });
 </script>
@@ -286,69 +284,6 @@ loadjs.ready(["fsub_transaction_detailsedit", "datetimepicker"], function() {
 <input type="text" readonly class="form-control-plaintext" value="<?= HtmlEncode(RemoveHtml($Page->ts_last_update->getDisplayValue($Page->ts_last_update->ViewValue))) ?>"></span>
 </span>
 <input type="hidden" data-table="sub_transaction_details" data-field="x_ts_last_update" data-hidden="1" name="x_ts_last_update" id="x_ts_last_update" value="<?= HtmlEncode($Page->ts_last_update->FormValue) ?>">
-<?php } ?>
-</div></div>
-    </div>
-<?php } ?>
-<?php if ($Page->vendor_id->Visible) { // vendor_id ?>
-    <div id="r_vendor_id" class="form-group row">
-        <label id="elh_sub_transaction_details_vendor_id" class="<?= $Page->LeftColumnClass ?>"><?= $Page->vendor_id->caption() ?><?= $Page->vendor_id->Required ? $Language->phrase("FieldRequiredIndicator") : "" ?></label>
-        <div class="<?= $Page->RightColumnClass ?>"><div <?= $Page->vendor_id->cellAttributes() ?>>
-<?php if (!$Page->isConfirm()) { ?>
-<?php if (!$Security->isAdmin() && $Security->isLoggedIn() && !$Page->userIDAllow("edit")) { // Non system admin ?>
-<span id="el_sub_transaction_details_vendor_id">
-    <select
-        id="x_vendor_id"
-        name="x_vendor_id"
-        class="form-control ew-select<?= $Page->vendor_id->isInvalidClass() ?>"
-        data-select2-id="sub_transaction_details_x_vendor_id"
-        data-table="sub_transaction_details"
-        data-field="x_vendor_id"
-        data-value-separator="<?= $Page->vendor_id->displayValueSeparatorAttribute() ?>"
-        data-placeholder="<?= HtmlEncode($Page->vendor_id->getPlaceHolder()) ?>"
-        <?= $Page->vendor_id->editAttributes() ?>>
-        <?= $Page->vendor_id->selectOptionListHtml("x_vendor_id") ?>
-    </select>
-    <?= $Page->vendor_id->getCustomMessage() ?>
-    <div class="invalid-feedback"><?= $Page->vendor_id->getErrorMessage() ?></div>
-<?= $Page->vendor_id->Lookup->getParamTag($Page, "p_x_vendor_id") ?>
-<script>
-loadjs.ready("head", function() {
-    var el = document.querySelector("select[data-select2-id='sub_transaction_details_x_vendor_id']"),
-        options = { name: "x_vendor_id", selectId: "sub_transaction_details_x_vendor_id", language: ew.LANGUAGE_ID, dir: ew.IS_RTL ? "rtl" : "ltr" };
-    options.dropdownParent = $(el).closest("#ew-modal-dialog, #ew-add-opt-dialog")[0];
-    Object.assign(options, ew.vars.tables.sub_transaction_details.fields.vendor_id.selectOptions);
-    ew.createSelect(options);
-});
-</script>
-</span>
-<?php } else { ?>
-<span id="el_sub_transaction_details_vendor_id">
-<?php
-$onchange = $Page->vendor_id->EditAttrs->prepend("onchange", "");
-$onchange = ($onchange) ? ' onchange="' . JsEncode($onchange) . '"' : '';
-$Page->vendor_id->EditAttrs["onchange"] = "";
-?>
-<span id="as_x_vendor_id" class="ew-auto-suggest">
-    <input type="<?= $Page->vendor_id->getInputTextType() ?>" class="form-control" name="sv_x_vendor_id" id="sv_x_vendor_id" value="<?= RemoveHtml($Page->vendor_id->EditValue) ?>" size="30" placeholder="<?= HtmlEncode($Page->vendor_id->getPlaceHolder()) ?>" data-placeholder="<?= HtmlEncode($Page->vendor_id->getPlaceHolder()) ?>"<?= $Page->vendor_id->editAttributes() ?> aria-describedby="x_vendor_id_help">
-</span>
-<input type="hidden" is="selection-list" class="form-control" data-table="sub_transaction_details" data-field="x_vendor_id" data-input="sv_x_vendor_id" data-value-separator="<?= $Page->vendor_id->displayValueSeparatorAttribute() ?>" name="x_vendor_id" id="x_vendor_id" value="<?= HtmlEncode($Page->vendor_id->CurrentValue) ?>"<?= $onchange ?>>
-<?= $Page->vendor_id->getCustomMessage() ?>
-<div class="invalid-feedback"><?= $Page->vendor_id->getErrorMessage() ?></div>
-<script>
-loadjs.ready(["fsub_transaction_detailsedit"], function() {
-    fsub_transaction_detailsedit.createAutoSuggest(Object.assign({"id":"x_vendor_id","forceSelect":false}, ew.vars.tables.sub_transaction_details.fields.vendor_id.autoSuggestOptions));
-});
-</script>
-<?= $Page->vendor_id->Lookup->getParamTag($Page, "p_x_vendor_id") ?>
-</span>
-<?php } ?>
-<?php } else { ?>
-<span id="el_sub_transaction_details_vendor_id">
-<span<?= $Page->vendor_id->viewAttributes() ?>>
-<input type="text" readonly class="form-control-plaintext" value="<?= HtmlEncode(RemoveHtml($Page->vendor_id->getDisplayValue($Page->vendor_id->ViewValue))) ?>"></span>
-</span>
-<input type="hidden" data-table="sub_transaction_details" data-field="x_vendor_id" data-hidden="1" name="x_vendor_id" id="x_vendor_id" value="<?= HtmlEncode($Page->vendor_id->FormValue) ?>">
 <?php } ?>
 </div></div>
     </div>

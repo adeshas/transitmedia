@@ -79,6 +79,14 @@ $Page->showMessage();
     </tr>
 <?php } ?>
 </table>
+<?php
+    if (in_array("main_buses", explode(",", $Page->getCurrentDetailTable())) && $main_buses->DetailView) {
+?>
+<?php if ($Page->getCurrentDetailTable() != "") { ?>
+<h4 class="ew-detail-caption"><?= $Language->tablePhrase("main_buses", "TblCaption") ?></h4>
+<?php } ?>
+<?php include_once "MainBusesGrid.php" ?>
+<?php } ?>
 </form>
 <?php
 $Page->showPageFooter();

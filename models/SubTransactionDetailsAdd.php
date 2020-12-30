@@ -442,7 +442,7 @@ class SubTransactionDetailsAdd extends SubTransactionDetails
         $this->created_by->Visible = false;
         $this->ts_created->Visible = false;
         $this->ts_last_update->Visible = false;
-        $this->vendor_id->setVisibility();
+        $this->vendor_id->Visible = false;
         $this->hideFieldsForAddEdit();
 
         // Do not use lookup cache
@@ -641,16 +641,6 @@ class SubTransactionDetailsAdd extends SubTransactionDetails
             }
         }
 
-        // Check field name 'vendor_id' first before field var 'x_vendor_id'
-        $val = $CurrentForm->hasValue("vendor_id") ? $CurrentForm->getValue("vendor_id") : $CurrentForm->getValue("x_vendor_id");
-        if (!$this->vendor_id->IsDetailKey) {
-            if (IsApi() && $val === null) {
-                $this->vendor_id->Visible = false; // Disable update for API request
-            } else {
-                $this->vendor_id->setFormValue($val);
-            }
-        }
-
         // Check field name 'id' first before field var 'x_id'
         $val = $CurrentForm->hasValue("id") ? $CurrentForm->getValue("id") : $CurrentForm->getValue("x_id");
     }
@@ -661,7 +651,6 @@ class SubTransactionDetailsAdd extends SubTransactionDetails
         global $CurrentForm;
         $this->transaction_id->CurrentValue = $this->transaction_id->FormValue;
         $this->bus_id->CurrentValue = $this->bus_id->FormValue;
-        $this->vendor_id->CurrentValue = $this->vendor_id->FormValue;
     }
 
     /**
@@ -888,11 +877,6 @@ class SubTransactionDetailsAdd extends SubTransactionDetails
             $this->bus_id->LinkCustomAttributes = "";
             $this->bus_id->HrefValue = "";
             $this->bus_id->TooltipValue = "";
-
-            // vendor_id
-            $this->vendor_id->LinkCustomAttributes = "";
-            $this->vendor_id->HrefValue = "";
-            $this->vendor_id->TooltipValue = "";
         } elseif ($this->RowType == ROWTYPE_ADD) {
             // transaction_id
             $this->transaction_id->EditAttrs["class"] = "form-control";
@@ -969,42 +953,6 @@ class SubTransactionDetailsAdd extends SubTransactionDetails
             }
             $this->bus_id->PlaceHolder = RemoveHtml($this->bus_id->caption());
 
-            // vendor_id
-            $this->vendor_id->EditAttrs["class"] = "form-control";
-            $this->vendor_id->EditCustomAttributes = "";
-            if (!$Security->isAdmin() && $Security->isLoggedIn() && !$this->userIDAllow("add")) { // Non system admin
-                if (trim(strval($this->vendor_id->CurrentValue)) == "") {
-                    $filterWrk = "0=1";
-                } else {
-                    $filterWrk = "\"id\"" . SearchString("=", $this->vendor_id->CurrentValue, DATATYPE_NUMBER, "");
-                }
-                $sqlWrk = $this->vendor_id->Lookup->getSql(true, $filterWrk, '', $this, false, true);
-                $rswrk = Conn()->executeQuery($sqlWrk)->fetchAll(\PDO::FETCH_BOTH);
-                $arwrk = $rswrk;
-                $this->vendor_id->EditValue = $arwrk;
-            } else {
-                $this->vendor_id->EditValue = HtmlEncode($this->vendor_id->CurrentValue);
-                $curVal = strval($this->vendor_id->CurrentValue);
-                if ($curVal != "") {
-                    $this->vendor_id->EditValue = $this->vendor_id->lookupCacheOption($curVal);
-                    if ($this->vendor_id->EditValue === null) { // Lookup from database
-                        $filterWrk = "\"id\"" . SearchString("=", $curVal, DATATYPE_NUMBER, "");
-                        $sqlWrk = $this->vendor_id->Lookup->getSql(false, $filterWrk, '', $this, true, true);
-                        $rswrk = Conn()->executeQuery($sqlWrk)->fetchAll(\PDO::FETCH_BOTH);
-                        $ari = count($rswrk);
-                        if ($ari > 0) { // Lookup values found
-                            $arwrk = $this->vendor_id->Lookup->renderViewRow($rswrk[0]);
-                            $this->vendor_id->EditValue = $this->vendor_id->displayValue($arwrk);
-                        } else {
-                            $this->vendor_id->EditValue = HtmlEncode($this->vendor_id->CurrentValue);
-                        }
-                    }
-                } else {
-                    $this->vendor_id->EditValue = null;
-                }
-                $this->vendor_id->PlaceHolder = RemoveHtml($this->vendor_id->caption());
-            }
-
             // Add refer script
 
             // transaction_id
@@ -1014,10 +962,6 @@ class SubTransactionDetailsAdd extends SubTransactionDetails
             // bus_id
             $this->bus_id->LinkCustomAttributes = "";
             $this->bus_id->HrefValue = "";
-
-            // vendor_id
-            $this->vendor_id->LinkCustomAttributes = "";
-            $this->vendor_id->HrefValue = "";
         }
         if ($this->RowType == ROWTYPE_ADD || $this->RowType == ROWTYPE_EDIT || $this->RowType == ROWTYPE_SEARCH) { // Add/Edit/Search row
             $this->setupFieldTitles();
@@ -1047,14 +991,6 @@ class SubTransactionDetailsAdd extends SubTransactionDetails
             if (!$this->bus_id->IsDetailKey && EmptyValue($this->bus_id->FormValue)) {
                 $this->bus_id->addErrorMessage(str_replace("%s", $this->bus_id->caption(), $this->bus_id->RequiredErrorMessage));
             }
-        }
-        if ($this->vendor_id->Required) {
-            if (!$this->vendor_id->IsDetailKey && EmptyValue($this->vendor_id->FormValue)) {
-                $this->vendor_id->addErrorMessage(str_replace("%s", $this->vendor_id->caption(), $this->vendor_id->RequiredErrorMessage));
-            }
-        }
-        if (!CheckInteger($this->vendor_id->FormValue)) {
-            $this->vendor_id->addErrorMessage($this->vendor_id->getErrorMessage(false));
         }
 
         // Return validate result
@@ -1144,7 +1080,9 @@ class SubTransactionDetailsAdd extends SubTransactionDetails
         $this->bus_id->setDbValueDef($rsnew, $this->bus_id->CurrentValue, 0, false);
 
         // vendor_id
-        $this->vendor_id->setDbValueDef($rsnew, $this->vendor_id->CurrentValue, null, false);
+        if (!$Security->isAdmin() && $Security->isLoggedIn()) { // Non system admin
+            $rsnew['vendor_id'] = CurrentUserID();
+        }
 
         // Call Row Inserting event
         $insertRow = $this->rowInserting($rsold, $rsnew);

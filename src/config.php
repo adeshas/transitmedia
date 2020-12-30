@@ -171,7 +171,7 @@ $CONFIG = [
 
     // General
     "UNFORMAT_YEAR" => 50, // Unformat year
-    "RANDOM_KEY" => '7Xzy10wxvNG3BfqV', // Random key for encryption
+    "RANDOM_KEY" => 'j8IieUjAl31h4cdN', // Random key for encryption
     "ENCRYPTION_KEY" => '', // Encryption key for data protection
     "PROJECT_STYLESHEET_FILENAME" => "css/test.css", // Project stylesheet file name
     "PROJECT_CHARSET" => "utf-8", // Project charset
@@ -183,8 +183,8 @@ $CONFIG = [
     "CACHE" => false, // Cache
     "LAZY_LOAD" => true, // Lazy loading of images
     "BODY_CLASS" => "hold-transition layout-fixed",
-    "SIDEBAR_CLASS" => "main-sidebar sidebar-light-primary",
-    "NAVBAR_CLASS" => "main-header navbar navbar-expand navbar-white navbar-light border-bottom",
+    "SIDEBAR_CLASS" => "main-sidebar sidebar-dark-primary",
+    "NAVBAR_CLASS" => "main-header navbar navbar-expand navbar-primary navbar-dark",
 
     // Check Token
     "CHECK_TOKEN" => true,

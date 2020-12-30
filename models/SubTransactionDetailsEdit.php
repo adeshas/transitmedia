@@ -438,7 +438,7 @@ class SubTransactionDetailsEdit extends SubTransactionDetails
         $this->created_by->setVisibility();
         $this->ts_created->setVisibility();
         $this->ts_last_update->setVisibility();
-        $this->vendor_id->setVisibility();
+        $this->vendor_id->Visible = false;
         $this->hideFieldsForAddEdit();
 
         // Do not use lookup cache
@@ -686,16 +686,6 @@ class SubTransactionDetailsEdit extends SubTransactionDetails
             }
             $this->ts_last_update->CurrentValue = UnFormatDateTime($this->ts_last_update->CurrentValue, 0);
         }
-
-        // Check field name 'vendor_id' first before field var 'x_vendor_id'
-        $val = $CurrentForm->hasValue("vendor_id") ? $CurrentForm->getValue("vendor_id") : $CurrentForm->getValue("x_vendor_id");
-        if (!$this->vendor_id->IsDetailKey) {
-            if (IsApi() && $val === null) {
-                $this->vendor_id->Visible = false; // Disable update for API request
-            } else {
-                $this->vendor_id->setFormValue($val);
-            }
-        }
     }
 
     // Restore form values
@@ -710,7 +700,6 @@ class SubTransactionDetailsEdit extends SubTransactionDetails
         $this->ts_created->CurrentValue = UnFormatDateTime($this->ts_created->CurrentValue, 0);
         $this->ts_last_update->CurrentValue = $this->ts_last_update->FormValue;
         $this->ts_last_update->CurrentValue = UnFormatDateTime($this->ts_last_update->CurrentValue, 0);
-        $this->vendor_id->CurrentValue = $this->vendor_id->FormValue;
     }
 
     /**
@@ -956,11 +945,6 @@ class SubTransactionDetailsEdit extends SubTransactionDetails
             $this->ts_last_update->LinkCustomAttributes = "";
             $this->ts_last_update->HrefValue = "";
             $this->ts_last_update->TooltipValue = "";
-
-            // vendor_id
-            $this->vendor_id->LinkCustomAttributes = "";
-            $this->vendor_id->HrefValue = "";
-            $this->vendor_id->TooltipValue = "";
         } elseif ($this->RowType == ROWTYPE_EDIT) {
             // id
             $this->id->EditAttrs["class"] = "form-control";
@@ -1060,42 +1044,6 @@ class SubTransactionDetailsEdit extends SubTransactionDetails
             $this->ts_last_update->EditValue = HtmlEncode(FormatDateTime($this->ts_last_update->CurrentValue, 8));
             $this->ts_last_update->PlaceHolder = RemoveHtml($this->ts_last_update->caption());
 
-            // vendor_id
-            $this->vendor_id->EditAttrs["class"] = "form-control";
-            $this->vendor_id->EditCustomAttributes = "";
-            if (!$Security->isAdmin() && $Security->isLoggedIn() && !$this->userIDAllow("edit")) { // Non system admin
-                if (trim(strval($this->vendor_id->CurrentValue)) == "") {
-                    $filterWrk = "0=1";
-                } else {
-                    $filterWrk = "\"id\"" . SearchString("=", $this->vendor_id->CurrentValue, DATATYPE_NUMBER, "");
-                }
-                $sqlWrk = $this->vendor_id->Lookup->getSql(true, $filterWrk, '', $this, false, true);
-                $rswrk = Conn()->executeQuery($sqlWrk)->fetchAll(\PDO::FETCH_BOTH);
-                $arwrk = $rswrk;
-                $this->vendor_id->EditValue = $arwrk;
-            } else {
-                $this->vendor_id->EditValue = HtmlEncode($this->vendor_id->CurrentValue);
-                $curVal = strval($this->vendor_id->CurrentValue);
-                if ($curVal != "") {
-                    $this->vendor_id->EditValue = $this->vendor_id->lookupCacheOption($curVal);
-                    if ($this->vendor_id->EditValue === null) { // Lookup from database
-                        $filterWrk = "\"id\"" . SearchString("=", $curVal, DATATYPE_NUMBER, "");
-                        $sqlWrk = $this->vendor_id->Lookup->getSql(false, $filterWrk, '', $this, true, true);
-                        $rswrk = Conn()->executeQuery($sqlWrk)->fetchAll(\PDO::FETCH_BOTH);
-                        $ari = count($rswrk);
-                        if ($ari > 0) { // Lookup values found
-                            $arwrk = $this->vendor_id->Lookup->renderViewRow($rswrk[0]);
-                            $this->vendor_id->EditValue = $this->vendor_id->displayValue($arwrk);
-                        } else {
-                            $this->vendor_id->EditValue = HtmlEncode($this->vendor_id->CurrentValue);
-                        }
-                    }
-                } else {
-                    $this->vendor_id->EditValue = null;
-                }
-                $this->vendor_id->PlaceHolder = RemoveHtml($this->vendor_id->caption());
-            }
-
             // Edit refer script
 
             // id
@@ -1121,10 +1069,6 @@ class SubTransactionDetailsEdit extends SubTransactionDetails
             // ts_last_update
             $this->ts_last_update->LinkCustomAttributes = "";
             $this->ts_last_update->HrefValue = "";
-
-            // vendor_id
-            $this->vendor_id->LinkCustomAttributes = "";
-            $this->vendor_id->HrefValue = "";
         }
         if ($this->RowType == ROWTYPE_ADD || $this->RowType == ROWTYPE_EDIT || $this->RowType == ROWTYPE_SEARCH) { // Add/Edit/Search row
             $this->setupFieldTitles();
@@ -1181,14 +1125,6 @@ class SubTransactionDetailsEdit extends SubTransactionDetails
         if (!CheckDate($this->ts_last_update->FormValue)) {
             $this->ts_last_update->addErrorMessage($this->ts_last_update->getErrorMessage(false));
         }
-        if ($this->vendor_id->Required) {
-            if (!$this->vendor_id->IsDetailKey && EmptyValue($this->vendor_id->FormValue)) {
-                $this->vendor_id->addErrorMessage(str_replace("%s", $this->vendor_id->caption(), $this->vendor_id->RequiredErrorMessage));
-            }
-        }
-        if (!CheckInteger($this->vendor_id->FormValue)) {
-            $this->vendor_id->addErrorMessage($this->vendor_id->getErrorMessage(false));
-        }
 
         // Return validate result
         $validateForm = !$this->hasInvalidFields();
@@ -1237,9 +1173,6 @@ class SubTransactionDetailsEdit extends SubTransactionDetails
 
             // ts_last_update
             $this->ts_last_update->setDbValueDef($rsnew, UnFormatDateTime($this->ts_last_update->CurrentValue, 0), CurrentDate(), $this->ts_last_update->ReadOnly);
-
-            // vendor_id
-            $this->vendor_id->setDbValueDef($rsnew, $this->vendor_id->CurrentValue, null, $this->vendor_id->ReadOnly);
 
             // Check referential integrity for master table 'main_transactions'
             $validMasterRecord = true;

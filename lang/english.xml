@@ -1,5 +1,5 @@
 ﻿<?xml version="1.0" encoding="utf-8" standalone="yes"?>
-<ew-language date="2020/12/9" version="17.0.5" id="en" name="English" desc="English" author="e.World Technology Limited">
+<ew-language date="2020/12/30" version="17.0.5" id="en" name="English" desc="English" author="e.World Technology Limited">
   <!--
     *** Important Notes:
     1. Language ID should follow: https://developers.google.com/recaptcha/docs/language,
@@ -1028,7 +1028,7 @@
       <phrase id="menutext" value="Reports" />
     </menu>
     <menu id="182">
-      <phrase id="menutext" value="Bus Summary" />
+      <phrase id="menutext" value="Bus Summary Ext" />
     </menu>
     <menu id="181">
       <phrase id="menutext" value="Bus Summary (Ext)" />
@@ -1062,6 +1062,9 @@
     </menu>
     <menu id="194">
       <phrase id="menutext" value="Vendors/Operators" />
+    </menu>
+    <menu id="206">
+      <phrase id="menutext" value="Managers/Platform" />
     </menu>
     <menu id="56">
       <phrase id="menutext" value="Settings" />
@@ -1162,7 +1165,7 @@
         <phrase id="fldcaption" value="Bus Status" />
       </field>
       <field id="bus_size_id">
-        <phrase id="fldcaption" value="bus size id" />
+        <phrase id="fldcaption" value="Bus Size" />
       </field>
       <field id="bus_depot_id">
         <phrase id="fldcaption" value="Bus Depot" />
@@ -1951,91 +1954,109 @@
     <table id="view_bus_depot_summary">
       <phrase id="tblcaption" value="view bus depot summary" />
       <field id="depot">
-        <phrase id="fldcaption" value="depot" />
+        <phrase id="fldcaption" value="Depot" />
       </field>
       <field id="total_buses">
-        <phrase id="fldcaption" value="total buses" />
+        <phrase id="fldcaption" value="Total Buses" />
       </field>
       <field id="bus_codes">
-        <phrase id="fldcaption" value="bus codes" />
+        <phrase id="fldcaption" value="Bus Codes" />
       </field>
       <field id="good_bus_codes">
-        <phrase id="fldcaption" value="good bus codes" />
+        <phrase id="fldcaption" value="Good Bus Codes" />
       </field>
       <field id="bad_bus_codes">
-        <phrase id="fldcaption" value="bad bus codes" />
+        <phrase id="fldcaption" value="Bad Bus Codes" />
       </field>
     </table>
     <table id="view_bus_int_summary_at_a_glance">
-      <phrase id="tblcaption" value="view bus int summary at a glance" />
+      <phrase id="tblcaption" value="Int. Summary (Glance)" />
       <field id="brand_status">
-        <phrase id="fldcaption" value="brand status" />
+        <phrase id="fldcaption" value="Brand Status" />
       </field>
       <field id="active">
-        <phrase id="fldcaption" value="active" />
+        <phrase id="fldcaption" value="Active" />
       </field>
       <field id="maintenance">
-        <phrase id="fldcaption" value="maintenance" />
+        <phrase id="fldcaption" value="Maintenance" />
       </field>
       <field id="total">
-        <phrase id="fldcaption" value="total" />
+        <phrase id="fldcaption" value="Total" />
       </field>
       <field id="last_updated_at">
-        <phrase id="fldcaption" value="last updated at" />
+        <phrase id="fldcaption" value="Last Update" />
+      </field>
+      <field id="platform_id">
+        <phrase id="fldcaption" value="Platform" />
+      </field>
+      <field id="operator_id">
+        <phrase id="fldcaption" value="Operator" />
       </field>
     </table>
     <table id="view_bus_ext_summary_at_a_glance">
-      <phrase id="tblcaption" value="view bus ext summary at a glance" />
+      <phrase id="tblcaption" value="Ext. Summary (Glance)" />
       <field id="brand_status">
-        <phrase id="fldcaption" value="brand status" />
+        <phrase id="fldcaption" value="Brand Status" />
       </field>
       <field id="active">
-        <phrase id="fldcaption" value="active" />
+        <phrase id="fldcaption" value="Active" />
       </field>
       <field id="maintenance">
-        <phrase id="fldcaption" value="maintenance" />
+        <phrase id="fldcaption" value="Maintenance" />
       </field>
       <field id="total">
-        <phrase id="fldcaption" value="total" />
+        <phrase id="fldcaption" value="Total" />
       </field>
       <field id="last_updated_at">
-        <phrase id="fldcaption" value="last updated at" />
+        <phrase id="fldcaption" value="Last Updated" />
+      </field>
+      <field id="platform_id">
+        <phrase id="fldcaption" value="Platform" />
+      </field>
+      <field id="operator_id">
+        <phrase id="fldcaption" value="Operator" />
       </field>
     </table>
     <table id="view_bus_summary">
-      <phrase id="tblcaption" value="view bus summary" />
+      <phrase id="tblcaption" value="Bus Summary Ext" />
       <field id="exterior_campaign_id">
-        <phrase id="fldcaption" value="exterior campaign id" />
+        <phrase id="fldcaption" value="Exterior Campaign id" />
       </field>
       <field id="campaign_name">
-        <phrase id="fldcaption" value="campaign name" />
+        <phrase id="fldcaption" value="Campaign Name" />
       </field>
       <field id="period">
-        <phrase id="fldcaption" value="period" />
+        <phrase id="fldcaption" value="Period" />
       </field>
       <field id="buses">
-        <phrase id="fldcaption" value="buses" />
+        <phrase id="fldcaption" value="Buses" />
       </field>
       <field id="active_working">
-        <phrase id="fldcaption" value="active working" />
+        <phrase id="fldcaption" value="Active Working" />
       </field>
       <field id="requires_maintenance">
-        <phrase id="fldcaption" value="requires maintenance" />
+        <phrase id="fldcaption" value="Requires Maintenance" />
       </field>
       <field id="issues">
-        <phrase id="fldcaption" value="issues" />
+        <phrase id="fldcaption" value="Issues" />
       </field>
       <field id="good_bus_codes">
-        <phrase id="fldcaption" value="good bus codes" />
+        <phrase id="fldcaption" value="Good Bus Codes" />
       </field>
       <field id="bad_bus_codes">
-        <phrase id="fldcaption" value="bad bus codes" />
+        <phrase id="fldcaption" value="Bad Bus Codes" />
       </field>
       <field id="bus_codes">
-        <phrase id="fldcaption" value="bus codes" />
+        <phrase id="fldcaption" value="Bus Codes" />
       </field>
       <field id="last_updated_at">
-        <phrase id="fldcaption" value="last updated at" />
+        <phrase id="fldcaption" value="Last Updated" />
+      </field>
+      <field id="platform_id">
+        <phrase id="fldcaption" value="Platform" />
+      </field>
+      <field id="operator_id">
+        <phrase id="fldcaption" value="Operator" />
       </field>
     </table>
     <table id="private_functions">
@@ -2662,6 +2683,18 @@
     </table>
     <table id="downloadbp">
       <phrase id="tblcaption" value="Download Branders Pass" />
+    </table>
+    <table id="w_managers_platform">
+      <phrase id="tblcaption" value="Managers/Platform" />
+      <field id="id">
+        <phrase id="fldcaption" value="id" />
+      </field>
+      <field id="platform_id">
+        <phrase id="fldcaption" value="Platform" />
+      </field>
+      <field id="user_id">
+        <phrase id="fldcaption" value="User" />
+      </field>
     </table>
   </project>
 </ew-language>

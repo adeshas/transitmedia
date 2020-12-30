@@ -17,6 +17,18 @@ loadjs.ready("head", function () {
     fview_bus_summarylist.formKeyCountName = '<?= $Page->FormKeyCountName ?>';
     loadjs.done("fview_bus_summarylist");
 });
+var fview_bus_summarylistsrch, currentSearchForm, currentAdvancedSearchForm;
+loadjs.ready("head", function () {
+    var $ = jQuery;
+    // Form object for search
+    fview_bus_summarylistsrch = currentSearchForm = new ew.Form("fview_bus_summarylistsrch");
+
+    // Dynamic selection lists
+
+    // Filters
+    fview_bus_summarylistsrch.filterList = <?= $Page->getFilterList() ?>;
+    loadjs.done("fview_bus_summarylistsrch");
+});
 </script>
 <script>
 loadjs.ready("head", function () {
@@ -32,12 +44,46 @@ loadjs.ready("head", function () {
 <?php if ($Page->ImportOptions->visible()) { ?>
 <?php $Page->ImportOptions->render("body") ?>
 <?php } ?>
+<?php if ($Page->SearchOptions->visible()) { ?>
+<?php $Page->SearchOptions->render("body") ?>
+<?php } ?>
+<?php if ($Page->FilterOptions->visible()) { ?>
+<?php $Page->FilterOptions->render("body") ?>
+<?php } ?>
 <div class="clearfix"></div>
 </div>
 <?php } ?>
 <?php
 $Page->renderOtherOptions();
 ?>
+<?php if ($Security->canSearch()) { ?>
+<?php if (!$Page->isExport() && !$Page->CurrentAction) { ?>
+<form name="fview_bus_summarylistsrch" id="fview_bus_summarylistsrch" class="form-inline ew-form ew-ext-search-form" action="<?= CurrentPageUrl() ?>">
+<div id="fview_bus_summarylistsrch-search-panel" class="<?= $Page->SearchPanelClass ?>">
+<input type="hidden" name="cmd" value="search">
+<input type="hidden" name="t" value="view_bus_summary">
+    <div class="ew-extended-search">
+<div id="xsr_<?= $Page->SearchRowCount + 1 ?>" class="ew-row d-sm-flex">
+    <div class="ew-quick-search input-group">
+        <input type="text" name="<?= Config("TABLE_BASIC_SEARCH") ?>" id="<?= Config("TABLE_BASIC_SEARCH") ?>" class="form-control" value="<?= HtmlEncode($Page->BasicSearch->getKeyword()) ?>" placeholder="<?= HtmlEncode($Language->phrase("Search")) ?>">
+        <input type="hidden" name="<?= Config("TABLE_BASIC_SEARCH_TYPE") ?>" id="<?= Config("TABLE_BASIC_SEARCH_TYPE") ?>" value="<?= HtmlEncode($Page->BasicSearch->getType()) ?>">
+        <div class="input-group-append">
+            <button class="btn btn-primary" name="btn-submit" id="btn-submit" type="submit"><?= $Language->phrase("SearchBtn") ?></button>
+            <button type="button" data-toggle="dropdown" class="btn btn-primary dropdown-toggle dropdown-toggle-split" aria-haspopup="true" aria-expanded="false"><span id="searchtype"><?= $Page->BasicSearch->getTypeNameShort() ?></span></button>
+            <div class="dropdown-menu dropdown-menu-right">
+                <a class="dropdown-item<?php if ($Page->BasicSearch->getType() == "") { ?> active<?php } ?>" href="#" onclick="return ew.setSearchType(this);"><?= $Language->phrase("QuickSearchAuto") ?></a>
+                <a class="dropdown-item<?php if ($Page->BasicSearch->getType() == "=") { ?> active<?php } ?>" href="#" onclick="return ew.setSearchType(this, '=');"><?= $Language->phrase("QuickSearchExact") ?></a>
+                <a class="dropdown-item<?php if ($Page->BasicSearch->getType() == "AND") { ?> active<?php } ?>" href="#" onclick="return ew.setSearchType(this, 'AND');"><?= $Language->phrase("QuickSearchAll") ?></a>
+                <a class="dropdown-item<?php if ($Page->BasicSearch->getType() == "OR") { ?> active<?php } ?>" href="#" onclick="return ew.setSearchType(this, 'OR');"><?= $Language->phrase("QuickSearchAny") ?></a>
+            </div>
+        </div>
+    </div>
+</div>
+    </div><!-- /.ew-extended-search -->
+</div><!-- /.ew-search-panel -->
+</form>
+<?php } ?>
+<?php } ?>
 <?php $Page->showPageHeader(); ?>
 <?php
 $Page->showMessage();
@@ -81,6 +127,12 @@ $Page->ListOptions->render("header", "left");
 <?php if ($Page->exterior_campaign_id->Visible) { // exterior_campaign_id ?>
         <th data-name="exterior_campaign_id" class="<?= $Page->exterior_campaign_id->headerCellClass() ?>"><div id="elh_view_bus_summary_exterior_campaign_id" class="view_bus_summary_exterior_campaign_id"><?= $Page->renderSort($Page->exterior_campaign_id) ?></div></th>
 <?php } ?>
+<?php if ($Page->campaign_name->Visible) { // campaign_name ?>
+        <th data-name="campaign_name" class="<?= $Page->campaign_name->headerCellClass() ?>"><div id="elh_view_bus_summary_campaign_name" class="view_bus_summary_campaign_name"><?= $Page->renderSort($Page->campaign_name) ?></div></th>
+<?php } ?>
+<?php if ($Page->period->Visible) { // period ?>
+        <th data-name="period" class="<?= $Page->period->headerCellClass() ?>" style="white-space: nowrap;"><div id="elh_view_bus_summary_period" class="view_bus_summary_period"><?= $Page->renderSort($Page->period) ?></div></th>
+<?php } ?>
 <?php if ($Page->buses->Visible) { // buses ?>
         <th data-name="buses" class="<?= $Page->buses->headerCellClass() ?>"><div id="elh_view_bus_summary_buses" class="view_bus_summary_buses"><?= $Page->renderSort($Page->buses) ?></div></th>
 <?php } ?>
@@ -89,6 +141,27 @@ $Page->ListOptions->render("header", "left");
 <?php } ?>
 <?php if ($Page->requires_maintenance->Visible) { // requires_maintenance ?>
         <th data-name="requires_maintenance" class="<?= $Page->requires_maintenance->headerCellClass() ?>"><div id="elh_view_bus_summary_requires_maintenance" class="view_bus_summary_requires_maintenance"><?= $Page->renderSort($Page->requires_maintenance) ?></div></th>
+<?php } ?>
+<?php if ($Page->issues->Visible) { // issues ?>
+        <th data-name="issues" class="<?= $Page->issues->headerCellClass() ?>"><div id="elh_view_bus_summary_issues" class="view_bus_summary_issues"><?= $Page->renderSort($Page->issues) ?></div></th>
+<?php } ?>
+<?php if ($Page->good_bus_codes->Visible) { // good_bus_codes ?>
+        <th data-name="good_bus_codes" class="<?= $Page->good_bus_codes->headerCellClass() ?>"><div id="elh_view_bus_summary_good_bus_codes" class="view_bus_summary_good_bus_codes"><?= $Page->renderSort($Page->good_bus_codes) ?></div></th>
+<?php } ?>
+<?php if ($Page->bad_bus_codes->Visible) { // bad_bus_codes ?>
+        <th data-name="bad_bus_codes" class="<?= $Page->bad_bus_codes->headerCellClass() ?>"><div id="elh_view_bus_summary_bad_bus_codes" class="view_bus_summary_bad_bus_codes"><?= $Page->renderSort($Page->bad_bus_codes) ?></div></th>
+<?php } ?>
+<?php if ($Page->bus_codes->Visible) { // bus_codes ?>
+        <th data-name="bus_codes" class="<?= $Page->bus_codes->headerCellClass() ?>"><div id="elh_view_bus_summary_bus_codes" class="view_bus_summary_bus_codes"><?= $Page->renderSort($Page->bus_codes) ?></div></th>
+<?php } ?>
+<?php if ($Page->last_updated_at->Visible) { // last_updated_at ?>
+        <th data-name="last_updated_at" class="<?= $Page->last_updated_at->headerCellClass() ?>"><div id="elh_view_bus_summary_last_updated_at" class="view_bus_summary_last_updated_at"><?= $Page->renderSort($Page->last_updated_at) ?></div></th>
+<?php } ?>
+<?php if ($Page->platform_id->Visible) { // platform_id ?>
+        <th data-name="platform_id" class="<?= $Page->platform_id->headerCellClass() ?>"><div id="elh_view_bus_summary_platform_id" class="view_bus_summary_platform_id"><?= $Page->renderSort($Page->platform_id) ?></div></th>
+<?php } ?>
+<?php if ($Page->operator_id->Visible) { // operator_id ?>
+        <th data-name="operator_id" class="<?= $Page->operator_id->headerCellClass() ?>"><div id="elh_view_bus_summary_operator_id" class="view_bus_summary_operator_id"><?= $Page->renderSort($Page->operator_id) ?></div></th>
 <?php } ?>
 <?php
 // Render list options (header, right)
@@ -165,6 +238,22 @@ $Page->ListOptions->render("body", "left", $Page->RowCount);
 </span>
 </td>
     <?php } ?>
+    <?php if ($Page->campaign_name->Visible) { // campaign_name ?>
+        <td data-name="campaign_name" <?= $Page->campaign_name->cellAttributes() ?>>
+<span id="el<?= $Page->RowCount ?>_view_bus_summary_campaign_name">
+<span<?= $Page->campaign_name->viewAttributes() ?>>
+<?= $Page->campaign_name->getViewValue() ?></span>
+</span>
+</td>
+    <?php } ?>
+    <?php if ($Page->period->Visible) { // period ?>
+        <td data-name="period" <?= $Page->period->cellAttributes() ?>>
+<span id="el<?= $Page->RowCount ?>_view_bus_summary_period">
+<span<?= $Page->period->viewAttributes() ?>>
+<?= $Page->period->getViewValue() ?></span>
+</span>
+</td>
+    <?php } ?>
     <?php if ($Page->buses->Visible) { // buses ?>
         <td data-name="buses" <?= $Page->buses->cellAttributes() ?>>
 <span id="el<?= $Page->RowCount ?>_view_bus_summary_buses">
@@ -186,6 +275,62 @@ $Page->ListOptions->render("body", "left", $Page->RowCount);
 <span id="el<?= $Page->RowCount ?>_view_bus_summary_requires_maintenance">
 <span<?= $Page->requires_maintenance->viewAttributes() ?>>
 <?= $Page->requires_maintenance->getViewValue() ?></span>
+</span>
+</td>
+    <?php } ?>
+    <?php if ($Page->issues->Visible) { // issues ?>
+        <td data-name="issues" <?= $Page->issues->cellAttributes() ?>>
+<span id="el<?= $Page->RowCount ?>_view_bus_summary_issues">
+<span<?= $Page->issues->viewAttributes() ?>>
+<?= $Page->issues->getViewValue() ?></span>
+</span>
+</td>
+    <?php } ?>
+    <?php if ($Page->good_bus_codes->Visible) { // good_bus_codes ?>
+        <td data-name="good_bus_codes" <?= $Page->good_bus_codes->cellAttributes() ?>>
+<span id="el<?= $Page->RowCount ?>_view_bus_summary_good_bus_codes">
+<span<?= $Page->good_bus_codes->viewAttributes() ?>>
+<?= $Page->good_bus_codes->getViewValue() ?></span>
+</span>
+</td>
+    <?php } ?>
+    <?php if ($Page->bad_bus_codes->Visible) { // bad_bus_codes ?>
+        <td data-name="bad_bus_codes" <?= $Page->bad_bus_codes->cellAttributes() ?>>
+<span id="el<?= $Page->RowCount ?>_view_bus_summary_bad_bus_codes">
+<span<?= $Page->bad_bus_codes->viewAttributes() ?>>
+<?= $Page->bad_bus_codes->getViewValue() ?></span>
+</span>
+</td>
+    <?php } ?>
+    <?php if ($Page->bus_codes->Visible) { // bus_codes ?>
+        <td data-name="bus_codes" <?= $Page->bus_codes->cellAttributes() ?>>
+<span id="el<?= $Page->RowCount ?>_view_bus_summary_bus_codes">
+<span<?= $Page->bus_codes->viewAttributes() ?>>
+<?= $Page->bus_codes->getViewValue() ?></span>
+</span>
+</td>
+    <?php } ?>
+    <?php if ($Page->last_updated_at->Visible) { // last_updated_at ?>
+        <td data-name="last_updated_at" <?= $Page->last_updated_at->cellAttributes() ?>>
+<span id="el<?= $Page->RowCount ?>_view_bus_summary_last_updated_at">
+<span<?= $Page->last_updated_at->viewAttributes() ?>>
+<?= $Page->last_updated_at->getViewValue() ?></span>
+</span>
+</td>
+    <?php } ?>
+    <?php if ($Page->platform_id->Visible) { // platform_id ?>
+        <td data-name="platform_id" <?= $Page->platform_id->cellAttributes() ?>>
+<span id="el<?= $Page->RowCount ?>_view_bus_summary_platform_id">
+<span<?= $Page->platform_id->viewAttributes() ?>>
+<?= $Page->platform_id->getViewValue() ?></span>
+</span>
+</td>
+    <?php } ?>
+    <?php if ($Page->operator_id->Visible) { // operator_id ?>
+        <td data-name="operator_id" <?= $Page->operator_id->cellAttributes() ?>>
+<span id="el<?= $Page->RowCount ?>_view_bus_summary_operator_id">
+<span<?= $Page->operator_id->viewAttributes() ?>>
+<?= $Page->operator_id->getViewValue() ?></span>
 </span>
 </td>
     <?php } ?>

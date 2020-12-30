@@ -391,6 +391,13 @@ $Page->showMessage();
         <div class="<?= $Page->RightColumnClass ?>">
             <div <?= $Page->bus_status_id->cellAttributes() ?>>
                 <?php if (!$Page->isConfirm()) { ?>
+                <?php if ($Page->bus_status_id->getSessionValue() != "") { ?>
+                <span id="el_main_buses_bus_status_id">
+                <span<?= $Page->bus_status_id->viewAttributes() ?>>
+                <input type="text" readonly class="form-control-plaintext" value="<?= HtmlEncode(RemoveHtml($Page->bus_status_id->getDisplayValue($Page->bus_status_id->ViewValue))) ?>"></span>
+                </span>
+                <input type="hidden" id="x_bus_status_id" name="x_bus_status_id" value="<?= HtmlEncode($Page->bus_status_id->CurrentValue) ?>" data-hidden="1">
+                <?php } else { ?>
                 <span id="el_main_buses_bus_status_id">
                     <select
                         id="x_bus_status_id"
@@ -417,6 +424,7 @@ $Page->showMessage();
                 });
                 </script>
                 </span>
+                <?php } ?>
                 <?php } else { ?>
                 <span id="el_main_buses_bus_status_id">
                 <span<?= $Page->bus_status_id->viewAttributes() ?>>
@@ -444,6 +452,13 @@ $Page->showMessage();
         <div class="<?= $Page->RightColumnClass ?>">
             <div <?= $Page->bus_size_id->cellAttributes() ?>>
                 <?php if (!$Page->isConfirm()) { ?>
+                <?php if ($Page->bus_size_id->getSessionValue() != "") { ?>
+                <span id="el_main_buses_bus_size_id">
+                <span<?= $Page->bus_size_id->viewAttributes() ?>>
+                <input type="text" readonly class="form-control-plaintext" value="<?= HtmlEncode(RemoveHtml($Page->bus_size_id->getDisplayValue($Page->bus_size_id->ViewValue))) ?>"></span>
+                </span>
+                <input type="hidden" id="x_bus_size_id" name="x_bus_size_id" value="<?= HtmlEncode($Page->bus_size_id->CurrentValue) ?>" data-hidden="1">
+                <?php } else { ?>
                 <span id="el_main_buses_bus_size_id">
                     <select
                         id="x_bus_size_id"
@@ -470,6 +485,7 @@ $Page->showMessage();
                 });
                 </script>
                 </span>
+                <?php } ?>
                 <?php } else { ?>
                 <span id="el_main_buses_bus_size_id">
                 <span<?= $Page->bus_size_id->viewAttributes() ?>>
@@ -497,6 +513,13 @@ $Page->showMessage();
         <div class="<?= $Page->RightColumnClass ?>">
             <div <?= $Page->bus_depot_id->cellAttributes() ?>>
                 <?php if (!$Page->isConfirm()) { ?>
+                <?php if ($Page->bus_depot_id->getSessionValue() != "") { ?>
+                <span id="el_main_buses_bus_depot_id">
+                <span<?= $Page->bus_depot_id->viewAttributes() ?>>
+                <input type="text" readonly class="form-control-plaintext" value="<?= HtmlEncode(RemoveHtml($Page->bus_depot_id->getDisplayValue($Page->bus_depot_id->ViewValue))) ?>"></span>
+                </span>
+                <input type="hidden" id="x_bus_depot_id" name="x_bus_depot_id" value="<?= HtmlEncode($Page->bus_depot_id->CurrentValue) ?>" data-hidden="1">
+                <?php } else { ?>
                 <span id="el_main_buses_bus_depot_id">
                     <select
                         id="x_bus_depot_id"
@@ -523,6 +546,7 @@ $Page->showMessage();
                 });
                 </script>
                 </span>
+                <?php } ?>
                 <?php } else { ?>
                 <span id="el_main_buses_bus_depot_id">
                 <span<?= $Page->bus_depot_id->viewAttributes() ?>>

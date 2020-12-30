@@ -70,6 +70,7 @@ class XBusDepot extends DbTable
         $this->id = new DbField('x_bus_depot', 'x_bus_depot', 'x_id', 'id', '"id"', 'CAST("id" AS varchar(255))', 3, 4, -1, false, '"id"', false, false, false, 'FORMATTED TEXT', 'NO');
         $this->id->IsAutoIncrement = true; // Autoincrement field
         $this->id->IsPrimaryKey = true; // Primary key field
+        $this->id->IsForeignKey = true; // Foreign key field
         $this->id->Nullable = false; // NOT NULL field
         $this->id->Sortable = true; // Allow sort
         $this->id->DefaultErrorMessage = $Language->phrase("IncorrectInteger");
@@ -118,6 +119,32 @@ class XBusDepot extends DbTable
         } else {
             $fld->setSort("");
         }
+    }
+
+    // Current detail table name
+    public function getCurrentDetailTable()
+    {
+        return Session(PROJECT_NAME . "_" . $this->TableVar . "_" . Config("TABLE_DETAIL_TABLE"));
+    }
+
+    public function setCurrentDetailTable($v)
+    {
+        $_SESSION[PROJECT_NAME . "_" . $this->TableVar . "_" . Config("TABLE_DETAIL_TABLE")] = $v;
+    }
+
+    // Get detail url
+    public function getDetailUrl()
+    {
+        // Detail url
+        $detailUrl = "";
+        if ($this->getCurrentDetailTable() == "main_buses") {
+            $detailUrl = Container("main_buses")->getListUrl() . "?" . Config("TABLE_SHOW_MASTER") . "=" . $this->TableVar;
+            $detailUrl .= "&" . GetForeignKeyUrl("fk_id", $this->id->CurrentValue);
+        }
+        if ($detailUrl == "") {
+            $detailUrl = "xbusdepotlist";
+        }
+        return $detailUrl;
     }
 
     // Table level SQL
@@ -638,7 +665,11 @@ class XBusDepot extends DbTable
     // Edit URL
     public function getEditUrl($parm = "")
     {
-        $url = $this->keyUrl("xbusdepotedit", $this->getUrlParm($parm));
+        if ($parm != "") {
+            $url = $this->keyUrl("xbusdepotedit", $this->getUrlParm($parm));
+        } else {
+            $url = $this->keyUrl("xbusdepotedit", $this->getUrlParm(Config("TABLE_SHOW_DETAIL") . "="));
+        }
         return $this->addMasterUrl($url);
     }
 
@@ -652,7 +683,11 @@ class XBusDepot extends DbTable
     // Copy URL
     public function getCopyUrl($parm = "")
     {
-        $url = $this->keyUrl("xbusdepotadd", $this->getUrlParm($parm));
+        if ($parm != "") {
+            $url = $this->keyUrl("xbusdepotadd", $this->getUrlParm($parm));
+        } else {
+            $url = $this->keyUrl("xbusdepotadd", $this->getUrlParm(Config("TABLE_SHOW_DETAIL") . "="));
+        }
         return $this->addMasterUrl($url);
     }
 

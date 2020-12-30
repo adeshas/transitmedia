@@ -108,6 +108,17 @@ $main_buses = Container("main_buses");
 </td>
         </tr>
 <?php } ?>
+<?php if ($main_buses->ts_last_update->Visible) { // ts_last_update ?>
+        <tr id="r_ts_last_update">
+            <td class="<?= $main_buses->TableLeftColumnClass ?>"><?= $main_buses->ts_last_update->caption() ?></td>
+            <td <?= $main_buses->ts_last_update->cellAttributes() ?>>
+<span id="el_main_buses_ts_last_update">
+<span<?= $main_buses->ts_last_update->viewAttributes() ?>>
+<?= $main_buses->ts_last_update->getViewValue() ?></span>
+</span>
+</td>
+        </tr>
+<?php } ?>
     </tbody>
 </table>
 </div>

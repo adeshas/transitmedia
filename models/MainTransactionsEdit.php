@@ -439,7 +439,7 @@ class MainTransactionsEdit extends MainTransactions
         $this->vendor_id->Visible = false;
         $this->price_id->setVisibility();
         $this->quantity->setVisibility();
-        $this->assigned_buses->setVisibility();
+        $this->assigned_buses->Visible = false;
         $this->start_date->setVisibility();
         $this->end_date->setVisibility();
         $this->visible_status_id->setVisibility();
@@ -710,16 +710,6 @@ class MainTransactionsEdit extends MainTransactions
             }
         }
 
-        // Check field name 'assigned_buses' first before field var 'x_assigned_buses'
-        $val = $CurrentForm->hasValue("assigned_buses") ? $CurrentForm->getValue("assigned_buses") : $CurrentForm->getValue("x_assigned_buses");
-        if (!$this->assigned_buses->IsDetailKey) {
-            if (IsApi() && $val === null) {
-                $this->assigned_buses->Visible = false; // Disable update for API request
-            } else {
-                $this->assigned_buses->setFormValue($val);
-            }
-        }
-
         // Check field name 'start_date' first before field var 'x_start_date'
         $val = $CurrentForm->hasValue("start_date") ? $CurrentForm->getValue("start_date") : $CurrentForm->getValue("x_start_date");
         if (!$this->start_date->IsDetailKey) {
@@ -810,7 +800,6 @@ class MainTransactionsEdit extends MainTransactions
         $this->payment_date->CurrentValue = UnFormatDateTime($this->payment_date->CurrentValue, 5);
         $this->price_id->CurrentValue = $this->price_id->FormValue;
         $this->quantity->CurrentValue = $this->quantity->FormValue;
-        $this->assigned_buses->CurrentValue = $this->assigned_buses->FormValue;
         $this->start_date->CurrentValue = $this->start_date->FormValue;
         $this->start_date->CurrentValue = UnFormatDateTime($this->start_date->CurrentValue, 5);
         $this->end_date->CurrentValue = $this->end_date->FormValue;
@@ -1303,11 +1292,6 @@ class MainTransactionsEdit extends MainTransactions
             $this->quantity->HrefValue = "";
             $this->quantity->TooltipValue = "";
 
-            // assigned_buses
-            $this->assigned_buses->LinkCustomAttributes = "";
-            $this->assigned_buses->HrefValue = "";
-            $this->assigned_buses->TooltipValue = "";
-
             // start_date
             $this->start_date->LinkCustomAttributes = "";
             $this->start_date->HrefValue = "";
@@ -1515,12 +1499,6 @@ class MainTransactionsEdit extends MainTransactions
             $this->quantity->EditValue = HtmlEncode($this->quantity->CurrentValue);
             $this->quantity->PlaceHolder = RemoveHtml($this->quantity->caption());
 
-            // assigned_buses
-            $this->assigned_buses->EditAttrs["class"] = "form-control";
-            $this->assigned_buses->EditCustomAttributes = "";
-            $this->assigned_buses->EditValue = HtmlEncode($this->assigned_buses->CurrentValue);
-            $this->assigned_buses->PlaceHolder = RemoveHtml($this->assigned_buses->caption());
-
             // start_date
             $this->start_date->EditAttrs["class"] = "form-control";
             $this->start_date->EditCustomAttributes = 'readonly="readonly"';
@@ -1661,10 +1639,6 @@ class MainTransactionsEdit extends MainTransactions
             $this->quantity->LinkCustomAttributes = "";
             $this->quantity->HrefValue = "";
 
-            // assigned_buses
-            $this->assigned_buses->LinkCustomAttributes = "";
-            $this->assigned_buses->HrefValue = "";
-
             // start_date
             $this->start_date->LinkCustomAttributes = "";
             $this->start_date->HrefValue = "";
@@ -1775,14 +1749,6 @@ class MainTransactionsEdit extends MainTransactions
         if (!CheckInteger($this->quantity->FormValue)) {
             $this->quantity->addErrorMessage($this->quantity->getErrorMessage(false));
         }
-        if ($this->assigned_buses->Required) {
-            if (!$this->assigned_buses->IsDetailKey && EmptyValue($this->assigned_buses->FormValue)) {
-                $this->assigned_buses->addErrorMessage(str_replace("%s", $this->assigned_buses->caption(), $this->assigned_buses->RequiredErrorMessage));
-            }
-        }
-        if (!CheckInteger($this->assigned_buses->FormValue)) {
-            $this->assigned_buses->addErrorMessage($this->assigned_buses->getErrorMessage(false));
-        }
         if ($this->start_date->Required) {
             if (!$this->start_date->IsDetailKey && EmptyValue($this->start_date->FormValue)) {
                 $this->start_date->addErrorMessage(str_replace("%s", $this->start_date->caption(), $this->start_date->RequiredErrorMessage));
@@ -1887,9 +1853,6 @@ class MainTransactionsEdit extends MainTransactions
 
             // quantity
             $this->quantity->setDbValueDef($rsnew, $this->quantity->CurrentValue, 0, $this->quantity->ReadOnly);
-
-            // assigned_buses
-            $this->assigned_buses->setDbValueDef($rsnew, $this->assigned_buses->CurrentValue, null, $this->assigned_buses->ReadOnly);
 
             // start_date
             $this->start_date->setDbValueDef($rsnew, UnFormatDateTime($this->start_date->CurrentValue, 5), null, $this->start_date->ReadOnly);
