@@ -2565,6 +2565,7 @@ class ViewTransactionsPerPlatformList extends ViewTransactionsPerPlatform
             // price
             $this->price->ViewValue = $this->price->CurrentValue;
             $this->price->ViewValue = FormatNumber($this->price->ViewValue, 0, -2, -2, -2);
+            $this->price->CellCssStyle .= "text-align: right;";
             $this->price->ViewCustomAttributes = "";
 
             // quantity
@@ -2576,26 +2577,31 @@ class ViewTransactionsPerPlatformList extends ViewTransactionsPerPlatform
             // amount_paid
             $this->amount_paid->ViewValue = $this->amount_paid->CurrentValue;
             $this->amount_paid->ViewValue = FormatNumber($this->amount_paid->ViewValue, 0, -2, -2, -2);
+            $this->amount_paid->CellCssStyle .= "text-align: right;";
             $this->amount_paid->ViewCustomAttributes = "";
 
             // transitmedia_fee
             $this->transitmedia_fee->ViewValue = $this->transitmedia_fee->CurrentValue;
             $this->transitmedia_fee->ViewValue = FormatNumber($this->transitmedia_fee->ViewValue, 0, -2, -2, -2);
+            $this->transitmedia_fee->CellCssStyle .= "text-align: right;";
             $this->transitmedia_fee->ViewCustomAttributes = "";
 
             // lasaa_fee
             $this->lasaa_fee->ViewValue = $this->lasaa_fee->CurrentValue;
             $this->lasaa_fee->ViewValue = FormatNumber($this->lasaa_fee->ViewValue, 0, -2, -2, -2);
+            $this->lasaa_fee->CellCssStyle .= "text-align: right;";
             $this->lasaa_fee->ViewCustomAttributes = "";
 
             // operator_fee
             $this->operator_fee->ViewValue = $this->operator_fee->CurrentValue;
             $this->operator_fee->ViewValue = FormatNumber($this->operator_fee->ViewValue, 0, -2, -2, -2);
+            $this->operator_fee->CellCssStyle .= "text-align: right;";
             $this->operator_fee->ViewCustomAttributes = "";
 
             // lamata_fee
             $this->lamata_fee->ViewValue = $this->lamata_fee->CurrentValue;
             $this->lamata_fee->ViewValue = FormatNumber($this->lamata_fee->ViewValue, 0, -2, -2, -2);
+            $this->lamata_fee->CssClass = "font-weight-bold";
             $this->lamata_fee->CellCssStyle .= "text-align: right;";
             $this->lamata_fee->ViewCustomAttributes = "";
 
@@ -2694,6 +2700,7 @@ class ViewTransactionsPerPlatformList extends ViewTransactionsPerPlatform
             $this->lamata_fee->CurrentValue = $this->lamata_fee->Total;
             $this->lamata_fee->ViewValue = $this->lamata_fee->CurrentValue;
             $this->lamata_fee->ViewValue = FormatNumber($this->lamata_fee->ViewValue, 0, -2, -2, -2);
+            $this->lamata_fee->CssClass = "font-weight-bold";
             $this->lamata_fee->CellCssStyle .= "text-align: right;";
             $this->lamata_fee->ViewCustomAttributes = "";
             $this->lamata_fee->HrefValue = ""; // Clear href value
