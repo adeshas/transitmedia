@@ -166,9 +166,6 @@ $Page->ListOptions->render("header", "left");
 <?php if ($Page->lamata_fee->Visible) { // lamata_fee ?>
         <th data-name="lamata_fee" class="<?= $Page->lamata_fee->headerCellClass() ?>" style="white-space: nowrap;"><div id="elh_view_transactions_per_platform_lamata_fee" class="view_transactions_per_platform_lamata_fee"><?= $Page->renderSort($Page->lamata_fee) ?></div></th>
 <?php } ?>
-<?php if ($Page->total->Visible) { // total ?>
-        <th data-name="total" class="<?= $Page->total->headerCellClass() ?>" style="white-space: nowrap;"><div id="elh_view_transactions_per_platform_total" class="view_transactions_per_platform_total"><?= $Page->renderSort($Page->total) ?></div></th>
-<?php } ?>
 <?php
 // Render list options (header, right)
 $Page->ListOptions->render("header", "right");
@@ -348,14 +345,6 @@ $Page->ListOptions->render("body", "left", $Page->RowCount);
 </span>
 </td>
     <?php } ?>
-    <?php if ($Page->total->Visible) { // total ?>
-        <td data-name="total" <?= $Page->total->cellAttributes() ?>>
-<span id="el<?= $Page->RowCount ?>_view_transactions_per_platform_total">
-<span<?= $Page->total->viewAttributes() ?>>
-<?= $Page->total->getViewValue() ?></span>
-</span>
-</td>
-    <?php } ?>
 <?php
 // Render list options (body, right)
 $Page->ListOptions->render("body", "right", $Page->RowCount);
@@ -455,12 +444,6 @@ $Page->ListOptions->render("footer", "left");
         <td data-name="lamata_fee" class="<?= $Page->lamata_fee->footerCellClass() ?>"><span id="elf_view_transactions_per_platform_lamata_fee" class="view_transactions_per_platform_lamata_fee">
         <span class="ew-aggregate"><?= $Language->phrase("TOTAL") ?></span><span class="ew-aggregate-value">
         <?= $Page->lamata_fee->ViewValue ?></span>
-        </span></td>
-    <?php } ?>
-    <?php if ($Page->total->Visible) { // total ?>
-        <td data-name="total" class="<?= $Page->total->footerCellClass() ?>"><span id="elf_view_transactions_per_platform_total" class="view_transactions_per_platform_total">
-        <span class="ew-aggregate"><?= $Language->phrase("TOTAL") ?></span><span class="ew-aggregate-value">
-        <?= $Page->total->ViewValue ?></span>
         </span></td>
     <?php } ?>
 <?php

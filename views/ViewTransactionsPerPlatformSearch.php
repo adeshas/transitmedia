@@ -48,8 +48,7 @@ loadjs.ready("head", function () {
         ["transitmedia_fee", [ew.Validators.integer], fields.transitmedia_fee.isInvalid],
         ["lasaa_fee", [ew.Validators.integer], fields.lasaa_fee.isInvalid],
         ["operator_fee", [ew.Validators.integer], fields.operator_fee.isInvalid],
-        ["lamata_fee", [ew.Validators.integer], fields.lamata_fee.isInvalid],
-        ["total", [ew.Validators.integer], fields.total.isInvalid]
+        ["lamata_fee", [ew.Validators.integer], fields.lamata_fee.isInvalid]
     ]);
 
     // Set invalid fields
@@ -558,22 +557,6 @@ loadjs.ready(["fview_transactions_per_platformsearch", "datetimepicker"], functi
             <span id="el_view_transactions_per_platform_lamata_fee" class="ew-search-field">
 <input type="<?= $Page->lamata_fee->getInputTextType() ?>" data-table="view_transactions_per_platform" data-field="x_lamata_fee" name="x_lamata_fee" id="x_lamata_fee" size="30" placeholder="<?= HtmlEncode($Page->lamata_fee->getPlaceHolder()) ?>" value="<?= $Page->lamata_fee->EditValue ?>"<?= $Page->lamata_fee->editAttributes() ?>>
 <div class="invalid-feedback"><?= $Page->lamata_fee->getErrorMessage(false) ?></div>
-</span>
-        </div></div>
-    </div>
-<?php } ?>
-<?php if ($Page->total->Visible) { // total ?>
-    <div id="r_total" class="form-group row">
-        <label for="x_total" class="<?= $Page->LeftColumnClass ?>"><span id="elh_view_transactions_per_platform_total"><?= $Page->total->caption() ?></span>
-        <span class="ew-search-operator">
-<?= $Language->phrase("=") ?>
-<input type="hidden" name="z_total" id="z_total" value="=">
-</span>
-        </label>
-        <div class="<?= $Page->RightColumnClass ?>"><div <?= $Page->total->cellAttributes() ?>>
-            <span id="el_view_transactions_per_platform_total" class="ew-search-field">
-<input type="<?= $Page->total->getInputTextType() ?>" data-table="view_transactions_per_platform" data-field="x_total" name="x_total" id="x_total" size="30" placeholder="<?= HtmlEncode($Page->total->getPlaceHolder()) ?>" value="<?= $Page->total->EditValue ?>"<?= $Page->total->editAttributes() ?>>
-<div class="invalid-feedback"><?= $Page->total->getErrorMessage(false) ?></div>
 </span>
         </div></div>
     </div>

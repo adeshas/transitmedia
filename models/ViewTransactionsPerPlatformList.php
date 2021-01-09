@@ -607,7 +607,6 @@ class ViewTransactionsPerPlatformList extends ViewTransactionsPerPlatform
         $this->lasaa_fee->setVisibility();
         $this->operator_fee->setVisibility();
         $this->lamata_fee->setVisibility();
-        $this->total->setVisibility();
         $this->hideFieldsForAddEdit();
 
         // Global Page Loading event (in userfn*.php)
@@ -954,7 +953,6 @@ class ViewTransactionsPerPlatformList extends ViewTransactionsPerPlatform
         $filterList = Concat($filterList, $this->lasaa_fee->AdvancedSearch->toJson(), ","); // Field lasaa_fee
         $filterList = Concat($filterList, $this->operator_fee->AdvancedSearch->toJson(), ","); // Field operator_fee
         $filterList = Concat($filterList, $this->lamata_fee->AdvancedSearch->toJson(), ","); // Field lamata_fee
-        $filterList = Concat($filterList, $this->total->AdvancedSearch->toJson(), ","); // Field total
         if ($this->BasicSearch->Keyword != "") {
             $wrk = "\"" . Config("TABLE_BASIC_SEARCH") . "\":\"" . JsEncode($this->BasicSearch->Keyword) . "\",\"" . Config("TABLE_BASIC_SEARCH_TYPE") . "\":\"" . JsEncode($this->BasicSearch->Type) . "\"";
             $filterList = Concat($filterList, $wrk, ",");
@@ -1210,14 +1208,6 @@ class ViewTransactionsPerPlatformList extends ViewTransactionsPerPlatform
         $this->lamata_fee->AdvancedSearch->SearchValue2 = @$filter["y_lamata_fee"];
         $this->lamata_fee->AdvancedSearch->SearchOperator2 = @$filter["w_lamata_fee"];
         $this->lamata_fee->AdvancedSearch->save();
-
-        // Field total
-        $this->total->AdvancedSearch->SearchValue = @$filter["x_total"];
-        $this->total->AdvancedSearch->SearchOperator = @$filter["z_total"];
-        $this->total->AdvancedSearch->SearchCondition = @$filter["v_total"];
-        $this->total->AdvancedSearch->SearchValue2 = @$filter["y_total"];
-        $this->total->AdvancedSearch->SearchOperator2 = @$filter["w_total"];
-        $this->total->AdvancedSearch->save();
         $this->BasicSearch->setKeyword(@$filter[Config("TABLE_BASIC_SEARCH")]);
         $this->BasicSearch->setType(@$filter[Config("TABLE_BASIC_SEARCH_TYPE")]);
     }
@@ -1257,7 +1247,6 @@ class ViewTransactionsPerPlatformList extends ViewTransactionsPerPlatform
         $this->buildSearchSql($where, $this->lasaa_fee, $default, false); // lasaa_fee
         $this->buildSearchSql($where, $this->operator_fee, $default, false); // operator_fee
         $this->buildSearchSql($where, $this->lamata_fee, $default, false); // lamata_fee
-        $this->buildSearchSql($where, $this->total, $default, false); // total
 
         // Set up search parm
         if (!$default && $where != "" && in_array($this->Command, ["", "reset", "resetall"])) {
@@ -1291,7 +1280,6 @@ class ViewTransactionsPerPlatformList extends ViewTransactionsPerPlatform
             $this->lasaa_fee->AdvancedSearch->save(); // lasaa_fee
             $this->operator_fee->AdvancedSearch->save(); // operator_fee
             $this->lamata_fee->AdvancedSearch->save(); // lamata_fee
-            $this->total->AdvancedSearch->save(); // total
         }
         return $where;
     }
@@ -1571,9 +1559,6 @@ class ViewTransactionsPerPlatformList extends ViewTransactionsPerPlatform
         if ($this->lamata_fee->AdvancedSearch->issetSession()) {
             return true;
         }
-        if ($this->total->AdvancedSearch->issetSession()) {
-            return true;
-        }
         return false;
     }
 
@@ -1633,7 +1618,6 @@ class ViewTransactionsPerPlatformList extends ViewTransactionsPerPlatform
                 $this->lasaa_fee->AdvancedSearch->unsetSession();
                 $this->operator_fee->AdvancedSearch->unsetSession();
                 $this->lamata_fee->AdvancedSearch->unsetSession();
-                $this->total->AdvancedSearch->unsetSession();
     }
 
     // Restore all search parameters
@@ -1672,7 +1656,6 @@ class ViewTransactionsPerPlatformList extends ViewTransactionsPerPlatform
                 $this->lasaa_fee->AdvancedSearch->load();
                 $this->operator_fee->AdvancedSearch->load();
                 $this->lamata_fee->AdvancedSearch->load();
-                $this->total->AdvancedSearch->load();
     }
 
     // Set up sort parameters
@@ -1696,7 +1679,6 @@ class ViewTransactionsPerPlatformList extends ViewTransactionsPerPlatform
             $this->updateSort($this->lasaa_fee); // lasaa_fee
             $this->updateSort($this->operator_fee); // operator_fee
             $this->updateSort($this->lamata_fee); // lamata_fee
-            $this->updateSort($this->total); // total
             $this->setStartRecordNumber(1); // Reset start position
         }
     }
@@ -1767,7 +1749,6 @@ class ViewTransactionsPerPlatformList extends ViewTransactionsPerPlatform
                 $this->lasaa_fee->setSort("");
                 $this->operator_fee->setSort("");
                 $this->lamata_fee->setSort("");
-                $this->total->setSort("");
             }
 
             // Reset start position
@@ -2260,14 +2241,6 @@ class ViewTransactionsPerPlatformList extends ViewTransactionsPerPlatform
                 $this->Command = "search";
             }
         }
-
-        // total
-        if (!$this->isAddOrEdit() && $this->total->AdvancedSearch->get()) {
-            $hasValue = true;
-            if (($this->total->AdvancedSearch->SearchValue != "" || $this->total->AdvancedSearch->SearchValue2 != "") && $this->Command == "") {
-                $this->Command = "search";
-            }
-        }
         return $hasValue;
     }
 
@@ -2366,7 +2339,6 @@ class ViewTransactionsPerPlatformList extends ViewTransactionsPerPlatform
         $this->lasaa_fee->setDbValue($row['lasaa_fee']);
         $this->operator_fee->setDbValue($row['operator_fee']);
         $this->lamata_fee->setDbValue($row['lamata_fee']);
-        $this->total->setDbValue($row['total']);
     }
 
     // Return a row with default values
@@ -2400,7 +2372,6 @@ class ViewTransactionsPerPlatformList extends ViewTransactionsPerPlatform
         $row['lasaa_fee'] = null;
         $row['operator_fee'] = null;
         $row['lamata_fee'] = null;
-        $row['total'] = null;
         return $row;
     }
 
@@ -2501,9 +2472,6 @@ class ViewTransactionsPerPlatformList extends ViewTransactionsPerPlatform
         // lamata_fee
         $this->lamata_fee->CellCssStyle = "white-space: nowrap;";
 
-        // total
-        $this->total->CellCssStyle = "white-space: nowrap;";
-
         // Accumulate aggregate value
         if ($this->RowType != ROWTYPE_AGGREGATEINIT && $this->RowType != ROWTYPE_AGGREGATE) {
             if (is_numeric($this->quantity->CurrentValue)) {
@@ -2511,9 +2479,6 @@ class ViewTransactionsPerPlatformList extends ViewTransactionsPerPlatform
             }
             if (is_numeric($this->lamata_fee->CurrentValue)) {
                 $this->lamata_fee->Total += $this->lamata_fee->CurrentValue; // Accumulate total
-            }
-            if (is_numeric($this->total->CurrentValue)) {
-                $this->total->Total += $this->total->CurrentValue; // Accumulate total
             }
         }
         if ($this->RowType == ROWTYPE_VIEW) {
@@ -2605,13 +2570,6 @@ class ViewTransactionsPerPlatformList extends ViewTransactionsPerPlatform
             $this->lamata_fee->CellCssStyle .= "text-align: right;";
             $this->lamata_fee->ViewCustomAttributes = "";
 
-            // total
-            $this->total->ViewValue = $this->total->CurrentValue;
-            $this->total->ViewValue = FormatNumber($this->total->ViewValue, 0, -2, -2, -2);
-            $this->total->CssClass = "font-weight-bold";
-            $this->total->CellCssStyle .= "text-align: right;";
-            $this->total->ViewCustomAttributes = "";
-
             // transaction_id
             $this->transaction_id->LinkCustomAttributes = "";
             $this->transaction_id->HrefValue = "";
@@ -2681,15 +2639,9 @@ class ViewTransactionsPerPlatformList extends ViewTransactionsPerPlatform
             $this->lamata_fee->LinkCustomAttributes = "";
             $this->lamata_fee->HrefValue = "";
             $this->lamata_fee->TooltipValue = "";
-
-            // total
-            $this->total->LinkCustomAttributes = "";
-            $this->total->HrefValue = "";
-            $this->total->TooltipValue = "";
         } elseif ($this->RowType == ROWTYPE_AGGREGATEINIT) { // Initialize aggregate row
                     $this->quantity->Total = 0; // Initialize total
                     $this->lamata_fee->Total = 0; // Initialize total
-                    $this->total->Total = 0; // Initialize total
         } elseif ($this->RowType == ROWTYPE_AGGREGATE) { // Aggregate row
             $this->quantity->CurrentValue = $this->quantity->Total;
             $this->quantity->ViewValue = $this->quantity->CurrentValue;
@@ -2704,13 +2656,6 @@ class ViewTransactionsPerPlatformList extends ViewTransactionsPerPlatform
             $this->lamata_fee->CellCssStyle .= "text-align: right;";
             $this->lamata_fee->ViewCustomAttributes = "";
             $this->lamata_fee->HrefValue = ""; // Clear href value
-            $this->total->CurrentValue = $this->total->Total;
-            $this->total->ViewValue = $this->total->CurrentValue;
-            $this->total->ViewValue = FormatNumber($this->total->ViewValue, 0, -2, -2, -2);
-            $this->total->CssClass = "font-weight-bold";
-            $this->total->CellCssStyle .= "text-align: right;";
-            $this->total->ViewCustomAttributes = "";
-            $this->total->HrefValue = ""; // Clear href value
         }
 
         // Call Row Rendered event
@@ -2769,7 +2714,6 @@ class ViewTransactionsPerPlatformList extends ViewTransactionsPerPlatform
         $this->lasaa_fee->AdvancedSearch->load();
         $this->operator_fee->AdvancedSearch->load();
         $this->lamata_fee->AdvancedSearch->load();
-        $this->total->AdvancedSearch->load();
     }
 
     // Get export HTML tag

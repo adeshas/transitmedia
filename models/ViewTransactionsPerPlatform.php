@@ -55,7 +55,6 @@ class ViewTransactionsPerPlatform extends DbTable
     public $lasaa_fee;
     public $operator_fee;
     public $lamata_fee;
-    public $total;
 
     // Page ID
     public $PageID = ""; // To be overridden by subclass
@@ -244,13 +243,6 @@ class ViewTransactionsPerPlatform extends DbTable
         $this->lamata_fee->Sortable = true; // Allow sort
         $this->lamata_fee->DefaultErrorMessage = $Language->phrase("IncorrectInteger");
         $this->Fields['lamata_fee'] = &$this->lamata_fee;
-
-        // total
-        $this->total = new DbField('view_transactions_per_platform', 'view_transactions_per_platform', 'x_total', 'total', 'quantity * lamata_fee', 'CAST(quantity * lamata_fee AS varchar(255))', 20, 8, -1, false, 'quantity * lamata_fee', false, false, false, 'FORMATTED TEXT', 'TEXT');
-        $this->total->IsCustom = true; // Custom field
-        $this->total->Sortable = true; // Allow sort
-        $this->total->DefaultErrorMessage = $Language->phrase("IncorrectInteger");
-        $this->Fields['total'] = &$this->total;
     }
 
     // Field Visibility
@@ -308,7 +300,7 @@ class ViewTransactionsPerPlatform extends DbTable
 
     public function getSqlSelect() // Select
     {
-        return $this->SqlSelect ?? $this->getQueryBuilder()->select("*, quantity * lamata_fee AS \"total\"");
+        return $this->SqlSelect ?? $this->getQueryBuilder()->select("*");
     }
 
     public function sqlSelect() // For backward compatibility
@@ -682,7 +674,6 @@ class ViewTransactionsPerPlatform extends DbTable
         $this->lasaa_fee->DbValue = $row['lasaa_fee'];
         $this->operator_fee->DbValue = $row['operator_fee'];
         $this->lamata_fee->DbValue = $row['lamata_fee'];
-        $this->total->DbValue = $row['total'];
     }
 
     // Delete uploaded files
@@ -984,7 +975,6 @@ SORTHTML;
         $this->lasaa_fee->setDbValue($row['lasaa_fee']);
         $this->operator_fee->setDbValue($row['operator_fee']);
         $this->lamata_fee->setDbValue($row['lamata_fee']);
-        $this->total->setDbValue($row['total']);
     }
 
     // Render list row values
@@ -1069,9 +1059,6 @@ SORTHTML;
 
         // lamata_fee
         $this->lamata_fee->CellCssStyle = "white-space: nowrap;";
-
-        // total
-        $this->total->CellCssStyle = "white-space: nowrap;";
 
         // transaction_id
         $this->transaction_id->ViewValue = $this->transaction_id->CurrentValue;
@@ -1208,13 +1195,6 @@ SORTHTML;
         $this->lamata_fee->CellCssStyle .= "text-align: right;";
         $this->lamata_fee->ViewCustomAttributes = "";
 
-        // total
-        $this->total->ViewValue = $this->total->CurrentValue;
-        $this->total->ViewValue = FormatNumber($this->total->ViewValue, 0, -2, -2, -2);
-        $this->total->CssClass = "font-weight-bold";
-        $this->total->CellCssStyle .= "text-align: right;";
-        $this->total->ViewCustomAttributes = "";
-
         // transaction_id
         $this->transaction_id->LinkCustomAttributes = "";
         $this->transaction_id->HrefValue = "";
@@ -1349,11 +1329,6 @@ SORTHTML;
         $this->lamata_fee->LinkCustomAttributes = "";
         $this->lamata_fee->HrefValue = "";
         $this->lamata_fee->TooltipValue = "";
-
-        // total
-        $this->total->LinkCustomAttributes = "";
-        $this->total->HrefValue = "";
-        $this->total->TooltipValue = "";
 
         // Call Row Rendered event
         $this->rowRendered();
@@ -1547,12 +1522,6 @@ SORTHTML;
         $this->lamata_fee->EditValue = $this->lamata_fee->CurrentValue;
         $this->lamata_fee->PlaceHolder = RemoveHtml($this->lamata_fee->caption());
 
-        // total
-        $this->total->EditAttrs["class"] = "form-control";
-        $this->total->EditCustomAttributes = "";
-        $this->total->EditValue = $this->total->CurrentValue;
-        $this->total->PlaceHolder = RemoveHtml($this->total->caption());
-
         // Call Row Rendered event
         $this->rowRendered();
     }
@@ -1565,9 +1534,6 @@ SORTHTML;
             }
             if (is_numeric($this->lamata_fee->CurrentValue)) {
                 $this->lamata_fee->Total += $this->lamata_fee->CurrentValue; // Accumulate total
-            }
-            if (is_numeric($this->total->CurrentValue)) {
-                $this->total->Total += $this->total->CurrentValue; // Accumulate total
             }
     }
 
@@ -1587,13 +1553,6 @@ SORTHTML;
             $this->lamata_fee->CellCssStyle .= "text-align: right;";
             $this->lamata_fee->ViewCustomAttributes = "";
             $this->lamata_fee->HrefValue = ""; // Clear href value
-            $this->total->CurrentValue = $this->total->Total;
-            $this->total->ViewValue = $this->total->CurrentValue;
-            $this->total->ViewValue = FormatNumber($this->total->ViewValue, 0, -2, -2, -2);
-            $this->total->CssClass = "font-weight-bold";
-            $this->total->CellCssStyle .= "text-align: right;";
-            $this->total->ViewCustomAttributes = "";
-            $this->total->HrefValue = ""; // Clear href value
 
         // Call Row Rendered event
         $this->rowRendered();
@@ -1630,7 +1589,6 @@ SORTHTML;
                     $doc->exportCaption($this->lasaa_fee);
                     $doc->exportCaption($this->operator_fee);
                     $doc->exportCaption($this->lamata_fee);
-                    $doc->exportCaption($this->total);
                 } else {
                     $doc->exportCaption($this->transaction_id);
                     $doc->exportCaption($this->payment_date);
@@ -1647,7 +1605,6 @@ SORTHTML;
                     $doc->exportCaption($this->lasaa_fee);
                     $doc->exportCaption($this->operator_fee);
                     $doc->exportCaption($this->lamata_fee);
-                    $doc->exportCaption($this->total);
                 }
                 $doc->endExportRow();
             }
@@ -1697,7 +1654,6 @@ SORTHTML;
                         $doc->exportField($this->lasaa_fee);
                         $doc->exportField($this->operator_fee);
                         $doc->exportField($this->lamata_fee);
-                        $doc->exportField($this->total);
                     } else {
                         $doc->exportField($this->transaction_id);
                         $doc->exportField($this->payment_date);
@@ -1714,7 +1670,6 @@ SORTHTML;
                         $doc->exportField($this->lasaa_fee);
                         $doc->exportField($this->operator_fee);
                         $doc->exportField($this->lamata_fee);
-                        $doc->exportField($this->total);
                     }
                     $doc->endExportRow($rowCnt);
                 }
@@ -1749,7 +1704,6 @@ SORTHTML;
                 $doc->exportAggregate($this->lasaa_fee, '');
                 $doc->exportAggregate($this->operator_fee, '');
                 $doc->exportAggregate($this->lamata_fee, 'TOTAL');
-                $doc->exportAggregate($this->total, 'TOTAL');
                 $doc->endExportRow();
             }
         }

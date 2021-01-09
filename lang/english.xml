@@ -2445,9 +2445,6 @@
       <field id="lamata_fee">
         <phrase id="fldcaption" value="LAMATA Fee" />
       </field>
-      <field id="total">
-        <phrase id="fldcaption" value="Total" />
-      </field>
     </table>
     <table id="view_vendors_operators">
       <phrase id="tblcaption" value="view vendors operators" />
