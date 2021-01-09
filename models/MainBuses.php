@@ -1616,9 +1616,11 @@ SORTHTML;
     public function recordsetSelecting(&$filter)
     {
         // Enter your code here
-        $number_of_records_found_in_manager_platform_table = ExecuteScalar("SELECT count(*) FROM public.w_managers_platform where user_id = ".Profile()->id);
-        if(in_array(Profile()->user_type,[1,2,3,4,7]) && $number_of_records_found_in_manager_platform_table > 0){
-           AddFilter($filter, " platform_id in (SELECT platform_id FROM public.w_managers_platform where user_id = ".Profile()->id.") "); // Add your own filter expression  
+        if(Profile()->id){
+        	$number_of_records_found_in_manager_platform_table = ExecuteScalar("SELECT count(*) FROM public.w_managers_platform where user_id = ".Profile()->id);
+        	if(in_array(Profile()->user_type,[1,2,3,4,7]) && $number_of_records_found_in_manager_platform_table > 0){
+           		AddFilter($filter, " platform_id in (SELECT platform_id FROM public.w_managers_platform where user_id = ".Profile()->id.") "); // Add your own filter expression  
+           	}
         }
             // var_dump("Manager", Profile()->id, Profile()->user_type,$number_of_records_found_in_manager_platform_table);
     }
