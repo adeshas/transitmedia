@@ -2434,16 +2434,16 @@
         <phrase id="fldcaption" value="Amount Paid" />
       </field>
       <field id="transitmedia_fee">
-        <phrase id="fldcaption" value="Transit Media Fee" />
+        <phrase id="fldcaption" value="Transit Media Total" />
       </field>
       <field id="lasaa_fee">
-        <phrase id="fldcaption" value="LASAA Fee" />
+        <phrase id="fldcaption" value="LASAA Total" />
       </field>
       <field id="operator_fee">
-        <phrase id="fldcaption" value="Operator Fee" />
+        <phrase id="fldcaption" value="Operator Total" />
       </field>
       <field id="lamata_fee">
-        <phrase id="fldcaption" value="LAMATA Fee" />
+        <phrase id="fldcaption" value="LAMATA Total" />
       </field>
     </table>
     <table id="view_vendors_operators">
