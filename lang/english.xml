@@ -1267,7 +1267,7 @@
         <phrase id="fldcaption" value="ID" />
       </field>
       <field id="campaign_id">
-        <phrase id="fldcaption" value="Campaign Order" />
+        <phrase id="fldcaption" value="Campaign Ordered" />
       </field>
       <field id="operator_id">
         <phrase id="fldcaption" value="Operator" />
@@ -2425,25 +2425,25 @@
         <phrase id="fldcaption" value="Stage" />
       </field>
       <field id="price">
-        <phrase id="fldcaption" value="price" />
+        <phrase id="fldcaption" value="Unit Price" />
       </field>
       <field id="quantity">
         <phrase id="fldcaption" value="Quantity" />
       </field>
       <field id="amount_paid">
-        <phrase id="fldcaption" value="amount paid" />
+        <phrase id="fldcaption" value="Amount Paid" />
       </field>
       <field id="transitmedia_fee">
-        <phrase id="fldcaption" value="transitmedia fee" />
+        <phrase id="fldcaption" value="Transit Media Fee" />
       </field>
       <field id="lasaa_fee">
-        <phrase id="fldcaption" value="lasaa fee" />
+        <phrase id="fldcaption" value="LASAA Fee" />
       </field>
       <field id="operator_fee">
-        <phrase id="fldcaption" value="operator fee" />
+        <phrase id="fldcaption" value="Operator Fee" />
       </field>
       <field id="lamata_fee">
-        <phrase id="fldcaption" value="Amount" />
+        <phrase id="fldcaption" value="LAMATA Fee" />
       </field>
       <field id="total">
         <phrase id="fldcaption" value="Total" />
