@@ -74,6 +74,7 @@ class MainBuses extends DbTable
         $this->AllowAddDeleteRow = true; // Allow add/delete row
         $this->UserIDAllowSecurity = Config("DEFAULT_USER_ID_ALLOW_SECURITY"); // Default User ID allowed permissions
         $this->BasicSearch = new BasicSearch($this->TableVar);
+        $this->BasicSearch->TypeDefault = "OR";
 
         // id
         $this->id = new DbField('main_buses', 'main_buses', 'x_id', 'id', '"id"', 'CAST("id" AS varchar(255))', 3, 4, -1, false, '"id"', false, false, false, 'FORMATTED TEXT', 'NO');
@@ -168,7 +169,7 @@ class MainBuses extends DbTable
         $this->Fields['ts_created'] = &$this->ts_created;
 
         // ts_last_update
-        $this->ts_last_update = new DbField('main_buses', 'main_buses', 'x_ts_last_update', 'ts_last_update', '"ts_last_update"', CastDateFieldForLike("\"ts_last_update\"", 0, "DB"), 135, 8, 0, false, '"ts_last_update"', false, false, false, 'FORMATTED TEXT', 'TEXT');
+        $this->ts_last_update = new DbField('main_buses', 'main_buses', 'x_ts_last_update', 'ts_last_update', '"ts_last_update"', CastDateFieldForLike("\"ts_last_update\"", 1, "DB"), 135, 8, 1, false, '"ts_last_update"', false, false, false, 'FORMATTED TEXT', 'TEXT');
         $this->ts_last_update->Nullable = false; // NOT NULL field
         $this->ts_last_update->Required = true; // Required field
         $this->ts_last_update->Sortable = true; // Allow sort
@@ -1280,7 +1281,7 @@ SORTHTML;
 
         // ts_last_update
         $this->ts_last_update->ViewValue = $this->ts_last_update->CurrentValue;
-        $this->ts_last_update->ViewValue = FormatDateTime($this->ts_last_update->ViewValue, 0);
+        $this->ts_last_update->ViewValue = FormatDateTime($this->ts_last_update->ViewValue, 1);
         $this->ts_last_update->ViewCustomAttributes = "";
 
         // id
@@ -1672,6 +1673,8 @@ SORTHTML;
     {
         // Enter your code here
         // To cancel, set return value to false
+        date_default_timezone_set('Africa/Lagos');
+        $rsnew['ts_last_update'] = date("Y-m-d H:i:s O");
         return true;
     }
 
@@ -1762,9 +1765,11 @@ SORTHTML;
         // Change the table cell color
     	if ($this->PageID == "list" || $this->PageID == "view") { // List/View page only
     		if ($this->bus_size_id->CurrentValue == 1) {
-    			$this->bus_size_id->CellAttrs["style"] = "background-color: #cce0ff";
+    			//$this->bus_size_id->CellAttrs["style"] = "background-color: #cce0ff";
+    			$this->bus_size_id->CellAttrs["style"] = "background-color: red; color: white;";
     		} else {
-    			$this->bus_size_id->CellAttrs["style"] = "background-color: #feffcc";
+    			//$this->bus_size_id->CellAttrs["style"] = "background-color: #feffcc";
+    			$this->bus_size_id->CellAttrs["style"] = "background-color: yellow";
     		}
     	}
     }

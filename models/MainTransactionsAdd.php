@@ -2257,6 +2257,7 @@ class MainTransactionsAdd extends MainTransactions
     	if(CurrentUserLevel() == 1){
     		$this->status_id->Visible = FALSE;
     		$this->payment_status_id->Visible = FALSE;
+    		$this->payment_date->Visible = FALSE;
     		$this->print_status_id->Visible = FALSE;
     	}
     }

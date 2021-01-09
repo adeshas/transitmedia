@@ -106,7 +106,7 @@ function MenuItem_Adding($item)
     if(CurrentUserLevel() >= 1 && CurrentUserLevel() <= 4 || CurrentUserLevel() == 7){
         if(CurrentUserLevel() >= 1 && CurrentUserLevel() <= 4){
             if( in_array($item->id, [195,197,198,133,201])){
-                //return false;
+                return false;
             }
         }
         if(CurrentUserLevel() == 1){
@@ -117,7 +117,7 @@ function MenuItem_Adding($item)
         }
         if(CurrentUserLevel() == 2){
         	//ACCOUNTS MAN
-        	if( in_array($item->id, [198,133])){
+        	if( in_array($item->id, [198,133,32,33,95,132,174])){
             	return false;
             }
         }
@@ -131,7 +131,8 @@ function MenuItem_Adding($item)
         	//34, // Reports
         	95, // Others
         	//56, // Settings
-        	133 // Campaigns / Platform
+        	133, // Campaigns / Platform
+        	203 //view_all_buses
         	])){
             	return false;
             }

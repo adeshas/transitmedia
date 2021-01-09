@@ -29,7 +29,7 @@ loadjs.ready("head", function () {
         ["bus_status_id", [fields.bus_status_id.required ? ew.Validators.required(fields.bus_status_id.caption) : null], fields.bus_status_id.isInvalid],
         ["bus_size_id", [fields.bus_size_id.required ? ew.Validators.required(fields.bus_size_id.caption) : null], fields.bus_size_id.isInvalid],
         ["bus_depot_id", [fields.bus_depot_id.required ? ew.Validators.required(fields.bus_depot_id.caption) : null], fields.bus_depot_id.isInvalid],
-        ["ts_last_update", [fields.ts_last_update.required ? ew.Validators.required(fields.ts_last_update.caption) : null, ew.Validators.datetime(0)], fields.ts_last_update.isInvalid]
+        ["ts_last_update", [fields.ts_last_update.required ? ew.Validators.required(fields.ts_last_update.caption) : null, ew.Validators.datetime(1)], fields.ts_last_update.isInvalid]
     ]);
 
     // Set invalid fields
@@ -885,12 +885,12 @@ loadjs.ready("head", function() {
         <td data-name="ts_last_update" <?= $Grid->ts_last_update->cellAttributes() ?>>
 <?php if ($Grid->RowType == ROWTYPE_ADD) { // Add record ?>
 <span id="el<?= $Grid->RowCount ?>_main_buses_ts_last_update" class="form-group">
-<input type="<?= $Grid->ts_last_update->getInputTextType() ?>" data-table="main_buses" data-field="x_ts_last_update" name="x<?= $Grid->RowIndex ?>_ts_last_update" id="x<?= $Grid->RowIndex ?>_ts_last_update" placeholder="<?= HtmlEncode($Grid->ts_last_update->getPlaceHolder()) ?>" value="<?= $Grid->ts_last_update->EditValue ?>"<?= $Grid->ts_last_update->editAttributes() ?>>
+<input type="<?= $Grid->ts_last_update->getInputTextType() ?>" data-table="main_buses" data-field="x_ts_last_update" data-format="1" name="x<?= $Grid->RowIndex ?>_ts_last_update" id="x<?= $Grid->RowIndex ?>_ts_last_update" placeholder="<?= HtmlEncode($Grid->ts_last_update->getPlaceHolder()) ?>" value="<?= $Grid->ts_last_update->EditValue ?>"<?= $Grid->ts_last_update->editAttributes() ?>>
 <div class="invalid-feedback"><?= $Grid->ts_last_update->getErrorMessage() ?></div>
 <?php if (!$Grid->ts_last_update->ReadOnly && !$Grid->ts_last_update->Disabled && !isset($Grid->ts_last_update->EditAttrs["readonly"]) && !isset($Grid->ts_last_update->EditAttrs["disabled"])) { ?>
 <script>
 loadjs.ready(["fmain_busesgrid", "datetimepicker"], function() {
-    ew.createDateTimePicker("fmain_busesgrid", "x<?= $Grid->RowIndex ?>_ts_last_update", {"ignoreReadonly":true,"useCurrent":false,"format":0});
+    ew.createDateTimePicker("fmain_busesgrid", "x<?= $Grid->RowIndex ?>_ts_last_update", {"ignoreReadonly":true,"useCurrent":false,"format":1});
 });
 </script>
 <?php } ?>
@@ -899,12 +899,12 @@ loadjs.ready(["fmain_busesgrid", "datetimepicker"], function() {
 <?php } ?>
 <?php if ($Grid->RowType == ROWTYPE_EDIT) { // Edit record ?>
 <span id="el<?= $Grid->RowCount ?>_main_buses_ts_last_update" class="form-group">
-<input type="<?= $Grid->ts_last_update->getInputTextType() ?>" data-table="main_buses" data-field="x_ts_last_update" name="x<?= $Grid->RowIndex ?>_ts_last_update" id="x<?= $Grid->RowIndex ?>_ts_last_update" placeholder="<?= HtmlEncode($Grid->ts_last_update->getPlaceHolder()) ?>" value="<?= $Grid->ts_last_update->EditValue ?>"<?= $Grid->ts_last_update->editAttributes() ?>>
+<input type="<?= $Grid->ts_last_update->getInputTextType() ?>" data-table="main_buses" data-field="x_ts_last_update" data-format="1" name="x<?= $Grid->RowIndex ?>_ts_last_update" id="x<?= $Grid->RowIndex ?>_ts_last_update" placeholder="<?= HtmlEncode($Grid->ts_last_update->getPlaceHolder()) ?>" value="<?= $Grid->ts_last_update->EditValue ?>"<?= $Grid->ts_last_update->editAttributes() ?>>
 <div class="invalid-feedback"><?= $Grid->ts_last_update->getErrorMessage() ?></div>
 <?php if (!$Grid->ts_last_update->ReadOnly && !$Grid->ts_last_update->Disabled && !isset($Grid->ts_last_update->EditAttrs["readonly"]) && !isset($Grid->ts_last_update->EditAttrs["disabled"])) { ?>
 <script>
 loadjs.ready(["fmain_busesgrid", "datetimepicker"], function() {
-    ew.createDateTimePicker("fmain_busesgrid", "x<?= $Grid->RowIndex ?>_ts_last_update", {"ignoreReadonly":true,"useCurrent":false,"format":0});
+    ew.createDateTimePicker("fmain_busesgrid", "x<?= $Grid->RowIndex ?>_ts_last_update", {"ignoreReadonly":true,"useCurrent":false,"format":1});
 });
 </script>
 <?php } ?>
@@ -1292,12 +1292,12 @@ loadjs.ready("head", function() {
         <td data-name="ts_last_update">
 <?php if (!$Grid->isConfirm()) { ?>
 <span id="el$rowindex$_main_buses_ts_last_update" class="form-group main_buses_ts_last_update">
-<input type="<?= $Grid->ts_last_update->getInputTextType() ?>" data-table="main_buses" data-field="x_ts_last_update" name="x<?= $Grid->RowIndex ?>_ts_last_update" id="x<?= $Grid->RowIndex ?>_ts_last_update" placeholder="<?= HtmlEncode($Grid->ts_last_update->getPlaceHolder()) ?>" value="<?= $Grid->ts_last_update->EditValue ?>"<?= $Grid->ts_last_update->editAttributes() ?>>
+<input type="<?= $Grid->ts_last_update->getInputTextType() ?>" data-table="main_buses" data-field="x_ts_last_update" data-format="1" name="x<?= $Grid->RowIndex ?>_ts_last_update" id="x<?= $Grid->RowIndex ?>_ts_last_update" placeholder="<?= HtmlEncode($Grid->ts_last_update->getPlaceHolder()) ?>" value="<?= $Grid->ts_last_update->EditValue ?>"<?= $Grid->ts_last_update->editAttributes() ?>>
 <div class="invalid-feedback"><?= $Grid->ts_last_update->getErrorMessage() ?></div>
 <?php if (!$Grid->ts_last_update->ReadOnly && !$Grid->ts_last_update->Disabled && !isset($Grid->ts_last_update->EditAttrs["readonly"]) && !isset($Grid->ts_last_update->EditAttrs["disabled"])) { ?>
 <script>
 loadjs.ready(["fmain_busesgrid", "datetimepicker"], function() {
-    ew.createDateTimePicker("fmain_busesgrid", "x<?= $Grid->RowIndex ?>_ts_last_update", {"ignoreReadonly":true,"useCurrent":false,"format":0});
+    ew.createDateTimePicker("fmain_busesgrid", "x<?= $Grid->RowIndex ?>_ts_last_update", {"ignoreReadonly":true,"useCurrent":false,"format":1});
 });
 </script>
 <?php } ?>

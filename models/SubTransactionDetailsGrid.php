@@ -2247,6 +2247,9 @@ class SubTransactionDetailsGrid extends SubTransactionDetails
     public function pageLoad()
     {
         //Log("Page Load");
+        global $Language;
+        $Language->setPhraseClass("addlink", ""); // remove icon to remove <span> element
+        $Language->setPhrase("addlink", "<span class='btn btn-block bg-gradient-primary btn-sm'>ADD / ASSIGN BUSES</span>"); // re-draw <span> element yourself
     }
 
     // Page Unload event

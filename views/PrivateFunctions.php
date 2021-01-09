@@ -248,10 +248,11 @@ function sendTMmail($from, $to, $subject, $msg, $msgtxt="", $attach = null, $cc 
 		$email->Cc = 'ademola.shasanya@valuemedia.com.ng'; 
 		$email->Bcc = ''; 
 		$email->Subject = 'Test Trial'; 
-		$email->Content = $msg; 
+		$email->Content = $msg;
+		*/
 		$email->Format = 'HTML'; 
 		$email->Charset = '';
-		*/
+		
 
 		//Attachments
         if (isset($attach)) {
@@ -271,7 +272,10 @@ function sendTMmail($from, $to, $subject, $msg, $msgtxt="", $attach = null, $cc 
         $msg = html_entity_decode($msg);
 		
 		$email->Content = $msg;
-		//$debugme = deubgEmail($email,TRUE);
+
+		//COMMENT FOR LIVE EMAIL 
+		$debugme = deubgEmail($email,TRUE);
+
         $email->Content = beautify_email($msg);
         $email->AltBody = $msgtxt;
 
@@ -281,7 +285,9 @@ function sendTMmail($from, $to, $subject, $msg, $msgtxt="", $attach = null, $cc 
 		
 		// var_dump($email->Recipient);		
 		// exit;
-        $email->send();
+
+		//COMMENT FOR DEBUG EMAIL
+        //$email->send();
 
 
 }

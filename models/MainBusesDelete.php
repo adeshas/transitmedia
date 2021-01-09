@@ -766,7 +766,7 @@ class MainBusesDelete extends MainBuses
 
             // ts_last_update
             $this->ts_last_update->ViewValue = $this->ts_last_update->CurrentValue;
-            $this->ts_last_update->ViewValue = FormatDateTime($this->ts_last_update->ViewValue, 0);
+            $this->ts_last_update->ViewValue = FormatDateTime($this->ts_last_update->ViewValue, 1);
             $this->ts_last_update->ViewCustomAttributes = "";
 
             // id

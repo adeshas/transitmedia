@@ -775,7 +775,7 @@ class MainBusesUpdate extends MainBuses
             } else {
                 $this->ts_last_update->setFormValue($val);
             }
-            $this->ts_last_update->CurrentValue = UnFormatDateTime($this->ts_last_update->CurrentValue, 0);
+            $this->ts_last_update->CurrentValue = UnFormatDateTime($this->ts_last_update->CurrentValue, 1);
         }
         $this->ts_last_update->MultiUpdate = $CurrentForm->getValue("u_ts_last_update");
 
@@ -802,7 +802,7 @@ class MainBusesUpdate extends MainBuses
         $this->ts_created->CurrentValue = $this->ts_created->FormValue;
         $this->ts_created->CurrentValue = UnFormatDateTime($this->ts_created->CurrentValue, 0);
         $this->ts_last_update->CurrentValue = $this->ts_last_update->FormValue;
-        $this->ts_last_update->CurrentValue = UnFormatDateTime($this->ts_last_update->CurrentValue, 0);
+        $this->ts_last_update->CurrentValue = UnFormatDateTime($this->ts_last_update->CurrentValue, 1);
     }
 
     // Load recordset
@@ -1108,7 +1108,7 @@ class MainBusesUpdate extends MainBuses
 
             // ts_last_update
             $this->ts_last_update->ViewValue = $this->ts_last_update->CurrentValue;
-            $this->ts_last_update->ViewValue = FormatDateTime($this->ts_last_update->ViewValue, 0);
+            $this->ts_last_update->ViewValue = FormatDateTime($this->ts_last_update->ViewValue, 1);
             $this->ts_last_update->ViewCustomAttributes = "";
 
             // number
@@ -1680,7 +1680,7 @@ class MainBusesUpdate extends MainBuses
             $this->ts_created->setDbValueDef($rsnew, UnFormatDateTime($this->ts_created->CurrentValue, 0), CurrentDate(), $this->ts_created->ReadOnly || $this->ts_created->MultiUpdate != "1");
 
             // ts_last_update
-            $this->ts_last_update->setDbValueDef($rsnew, UnFormatDateTime($this->ts_last_update->CurrentValue, 0), CurrentDate(), $this->ts_last_update->ReadOnly || $this->ts_last_update->MultiUpdate != "1");
+            $this->ts_last_update->setDbValueDef($rsnew, UnFormatDateTime($this->ts_last_update->CurrentValue, 1), CurrentDate(), $this->ts_last_update->ReadOnly || $this->ts_last_update->MultiUpdate != "1");
 
             // Call Row Updating event
             $updateRow = $this->rowUpdating($rsold, $rsnew);

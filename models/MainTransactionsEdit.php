@@ -2255,8 +2255,10 @@ class MainTransactionsEdit extends MainTransactions
     	// CAMPAIGN MANAGER
     	if(CurrentUserLevel() == 1){
     		$this->status_id->Visible = FALSE;
-    		$this->payment_status_id->Visible = FALSE;
+    		//$this->payment_status_id->Visible = FALSE;
     		//$this->print_status_id->Visible = FALSE;
+    		$this->payment_date->ReadOnly = TRUE;
+    		$this->payment_status_id->ReadOnly = TRUE;
     	}else
 
     	// ACCOUNTS / FINANCE

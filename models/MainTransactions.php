@@ -2223,7 +2223,59 @@ SORTHTML;
         // To cancel, set return value to false
         $rsnew["created_by"] = IsAdmin() ? CurrentUserID():Profile()->id;
         //Log(IsAdmin() ? CurrentUserID():Profile()->id);
-        return true;
+            require_once 'views/PrivateFunctions.php';
+            // Enter your code here
+            // To cancel, set return value to false
+            $rsnew["created_by"] = IsAdmin() ? CurrentUserID():Profile()->id;
+            //Log(IsAdmin() ? CurrentUserID():Profile()->id);
+            $sql = "select *,(select name from y_vendors v where v.id = vendor_id) as vendor from main_campaigns where id = {$rsnew['campaign_id']};";
+            $camp_details = ExecuteRow($sql);
+            $rowssql = "select email from main_users where vendor_id in ";
+            $rowssql .= "(select vendor_id from main_campaigns where id in (select campaign_id from main_transactions where id = " . $rsnew['campaign_id'] . "));";
+            $rows = ExecuteRows($rowssql);
+            $emailslist_array = [];
+            foreach ($rows as $v) {
+                if(strlen($v['email']) > 2 ){
+                    $emailslist_array[] = $v['email'];
+                }
+            }
+            $emailslist = implode(',', $emailslist_array);
+            $email = $emailslist;
+            $vendor = $camp_details['vendor'];
+            $username = $vendor;
+            $search_replace = [
+                '[x_campaign]' => $camp_details['name'],
+                '[x_quantity]' => $camp_details['quantity'],
+                '[x_vendor]' => $vendor,
+                '[x_supportemail] ' => 'info@transitmedia.com.ng',
+            ];
+            $search = array_keys($search_replace);
+            $replace = array_values($search_replace);
+
+            // $x_camp_name = $camp_details['name'];
+            $sql_msg = "select value from z_core_settings where name = 'new_transaction_created';";
+    		$editmsg = ExecuteScalar($sql_msg);
+    		$msg = str_replace($search, $replace, $editmsg);
+    		$msgtxt = strip_tags($msg);
+    		$subject = "NEW TRANSACTION CREATED ({$vendor}) - TRANSIT MEDIA ADMIN";
+    		$subject = $camp_details['name']." - ({$vendor}) - TRANSIT MEDIA ADMIN";
+    		#===============================================================
+    		$emailpayload = getEmailPayload('new_transaction_created');
+    		$exposed_emails = get_emails($emailpayload, $email);
+    		extract($exposed_emails);
+    		$email = $final_to;
+    		$cc = $final_cc;
+    		$bcc = $final_bcc;
+            #===============================================================
+    		if (strpos($_SERVER['SERVER_NAME'], 'localhost') === false) {
+    			sendTMmail('admin@transitmedia.com.ng', $email, $subject, $msg, $msgtxt, null, $cc, $bcc);
+    		} else {
+    			sendTMmail('admin@transitmedia.com.ng', $email, $subject, $msg, $msgtxt, null, $cc, $bcc);
+    			echo "\n<br>====================================<br>\n";
+    			echo "sendTMmail('admin@transitmedia.com.ng', $email, $subject, $msg, $msgtxt,NULL,$cc,$bcc);";
+    			echo "\n<br>====================================<br>\n";
+            }
+            return true;
     }
 
     // Row Inserted event

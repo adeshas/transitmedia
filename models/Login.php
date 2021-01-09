@@ -476,7 +476,8 @@ class Login extends MainUsers
                 }
                 if(CurrentUserLevel() == 3){
                     //FLEET MANAGER
-                    $url = "mainbuseslist";
+                    $url = "xbusstatuslist";
+                    //$url = "mainbuseslist";
                 }
                 if(CurrentUserLevel() == 4){
                     //REPORTS MANAGER

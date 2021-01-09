@@ -589,7 +589,7 @@ $USER_LEVEL_TABLES = [["main_buses","main_buses","Buses",true,"{7CA6B0F7-61EF-4D
     ["test.php","test","Test",true,"{7CA6B0F7-61EF-4DB7-A152-ED7AD2382C98}"],
     ["paymentshandler.php","paymentshandler","Confirm Payment",true,"{7CA6B0F7-61EF-4DB7-A152-ED7AD2382C98}"],
     ["view_campaign_status","view_campaign_status","View Campaign Status",true,"{7CA6B0F7-61EF-4DB7-A152-ED7AD2382C98}"],
-    ["view_payments_pending","view_payments_pending","view payments pending",true,"{7CA6B0F7-61EF-4DB7-A152-ED7AD2382C98}"],
+    ["view_payments_pending","view_payments_pending","Pending Payments",true,"{7CA6B0F7-61EF-4DB7-A152-ED7AD2382C98}"],
     ["renewalhandler.php","renewalhandler","Confirm Renewal",true,"{7CA6B0F7-61EF-4DB7-A152-ED7AD2382C98}"],
     ["view_transactions_all","view_transactions_all","view transactions all",true,"{7CA6B0F7-61EF-4DB7-A152-ED7AD2382C98}"],
     ["view_operators","view_operators","view operators",true,"{7CA6B0F7-61EF-4DB7-A152-ED7AD2382C98}"],

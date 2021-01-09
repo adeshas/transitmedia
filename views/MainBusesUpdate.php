@@ -27,7 +27,7 @@ loadjs.ready("head", function () {
         ["bus_size_id", [fields.bus_size_id.required ? ew.Validators.required(fields.bus_size_id.caption) : null], fields.bus_size_id.isInvalid],
         ["bus_depot_id", [fields.bus_depot_id.required ? ew.Validators.required(fields.bus_depot_id.caption) : null], fields.bus_depot_id.isInvalid],
         ["ts_created", [fields.ts_created.required ? ew.Validators.required(fields.ts_created.caption) : null, ew.Validators.datetime(0), ew.Validators.selected], fields.ts_created.isInvalid],
-        ["ts_last_update", [fields.ts_last_update.required ? ew.Validators.required(fields.ts_last_update.caption) : null, ew.Validators.datetime(0), ew.Validators.selected], fields.ts_last_update.isInvalid]
+        ["ts_last_update", [fields.ts_last_update.required ? ew.Validators.required(fields.ts_last_update.caption) : null, ew.Validators.datetime(1), ew.Validators.selected], fields.ts_last_update.isInvalid]
     ]);
 
     // Set invalid fields
@@ -614,13 +614,13 @@ $Page->showMessage();
             <div <?= $Page->ts_last_update->cellAttributes() ?>>
                 <?php if (!$Page->isConfirm()) { ?>
                 <span id="el_main_buses_ts_last_update">
-                <input type="<?= $Page->ts_last_update->getInputTextType() ?>" data-table="main_buses" data-field="x_ts_last_update" name="x_ts_last_update" id="x_ts_last_update" placeholder="<?= HtmlEncode($Page->ts_last_update->getPlaceHolder()) ?>" value="<?= $Page->ts_last_update->EditValue ?>"<?= $Page->ts_last_update->editAttributes() ?> aria-describedby="x_ts_last_update_help">
+                <input type="<?= $Page->ts_last_update->getInputTextType() ?>" data-table="main_buses" data-field="x_ts_last_update" data-format="1" name="x_ts_last_update" id="x_ts_last_update" placeholder="<?= HtmlEncode($Page->ts_last_update->getPlaceHolder()) ?>" value="<?= $Page->ts_last_update->EditValue ?>"<?= $Page->ts_last_update->editAttributes() ?> aria-describedby="x_ts_last_update_help">
                 <?= $Page->ts_last_update->getCustomMessage() ?>
                 <div class="invalid-feedback"><?= $Page->ts_last_update->getErrorMessage() ?></div>
                 <?php if (!$Page->ts_last_update->ReadOnly && !$Page->ts_last_update->Disabled && !isset($Page->ts_last_update->EditAttrs["readonly"]) && !isset($Page->ts_last_update->EditAttrs["disabled"])) { ?>
                 <script>
                 loadjs.ready(["fmain_busesupdate", "datetimepicker"], function() {
-                    ew.createDateTimePicker("fmain_busesupdate", "x_ts_last_update", {"ignoreReadonly":true,"useCurrent":false,"format":0});
+                    ew.createDateTimePicker("fmain_busesupdate", "x_ts_last_update", {"ignoreReadonly":true,"useCurrent":false,"format":1});
                 });
                 </script>
                 <?php } ?>

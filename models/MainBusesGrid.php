@@ -1084,14 +1084,18 @@ class MainBusesGrid extends MainBuses
     {
         $orderBy = $this->getSessionOrderBy(); // Get ORDER BY from Session
         if ($orderBy == "") {
-            $this->DefaultSort = "\"id\" DESC";
+            $this->DefaultSort = "\"number\" ASC,\"id\" ASC";
             if ($this->getSqlOrderBy() != "") {
                 $useDefaultSort = true;
+                if ($this->number->getSort() != "") {
+                    $useDefaultSort = false;
+                }
                 if ($this->id->getSort() != "") {
                     $useDefaultSort = false;
                 }
                 if ($useDefaultSort) {
-                    $this->id->setSort("DESC");
+                    $this->number->setSort("ASC");
+                    $this->id->setSort("ASC");
                     $orderBy = $this->getSqlOrderBy();
                     $this->setSessionOrderBy($orderBy);
                 } else {
@@ -1470,7 +1474,7 @@ class MainBusesGrid extends MainBuses
             } else {
                 $this->ts_last_update->setFormValue($val);
             }
-            $this->ts_last_update->CurrentValue = UnFormatDateTime($this->ts_last_update->CurrentValue, 0);
+            $this->ts_last_update->CurrentValue = UnFormatDateTime($this->ts_last_update->CurrentValue, 1);
         }
         if ($CurrentForm->hasValue("o_ts_last_update")) {
             $this->ts_last_update->setOldValue($CurrentForm->getValue("o_ts_last_update"));
@@ -1493,7 +1497,7 @@ class MainBusesGrid extends MainBuses
         $this->bus_size_id->CurrentValue = $this->bus_size_id->FormValue;
         $this->bus_depot_id->CurrentValue = $this->bus_depot_id->FormValue;
         $this->ts_last_update->CurrentValue = $this->ts_last_update->FormValue;
-        $this->ts_last_update->CurrentValue = UnFormatDateTime($this->ts_last_update->CurrentValue, 0);
+        $this->ts_last_update->CurrentValue = UnFormatDateTime($this->ts_last_update->CurrentValue, 1);
     }
 
     // Load recordset
@@ -1822,7 +1826,7 @@ class MainBusesGrid extends MainBuses
 
             // ts_last_update
             $this->ts_last_update->ViewValue = $this->ts_last_update->CurrentValue;
-            $this->ts_last_update->ViewValue = FormatDateTime($this->ts_last_update->ViewValue, 0);
+            $this->ts_last_update->ViewValue = FormatDateTime($this->ts_last_update->ViewValue, 1);
             $this->ts_last_update->ViewCustomAttributes = "";
 
             // id
@@ -2753,7 +2757,7 @@ class MainBusesGrid extends MainBuses
             $this->bus_depot_id->setDbValueDef($rsnew, $this->bus_depot_id->CurrentValue, null, $this->bus_depot_id->ReadOnly);
 
             // ts_last_update
-            $this->ts_last_update->setDbValueDef($rsnew, UnFormatDateTime($this->ts_last_update->CurrentValue, 0), CurrentDate(), $this->ts_last_update->ReadOnly);
+            $this->ts_last_update->setDbValueDef($rsnew, UnFormatDateTime($this->ts_last_update->CurrentValue, 1), CurrentDate(), $this->ts_last_update->ReadOnly);
 
             // Call Row Updating event
             $updateRow = $this->rowUpdating($rsold, $rsnew);
@@ -2853,7 +2857,7 @@ class MainBusesGrid extends MainBuses
         $this->bus_depot_id->setDbValueDef($rsnew, $this->bus_depot_id->CurrentValue, null, false);
 
         // ts_last_update
-        $this->ts_last_update->setDbValueDef($rsnew, UnFormatDateTime($this->ts_last_update->CurrentValue, 0), CurrentDate(), false);
+        $this->ts_last_update->setDbValueDef($rsnew, UnFormatDateTime($this->ts_last_update->CurrentValue, 1), CurrentDate(), false);
 
         // Call Row Inserting event
         $insertRow = $this->rowInserting($rsold, $rsnew);
