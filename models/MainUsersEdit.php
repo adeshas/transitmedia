@@ -440,6 +440,7 @@ class MainUsersEdit extends MainUsers
         $this->user_type->setVisibility();
         $this->vendor_id->setVisibility();
         $this->reportsto->setVisibility();
+        $this->ts->Visible = false;
         $this->hideFieldsForAddEdit();
 
         // Do not use lookup cache
@@ -500,7 +501,7 @@ class MainUsersEdit extends MainUsers
                 }
 
                 // Get key from Form
-                $this->setKey(Post($this->OldKeyName));
+                $this->setKey(Post($this->OldKeyName), $this->isShow());
             } else {
                 $this->CurrentAction = "show"; // Default action is display
 
@@ -793,6 +794,7 @@ class MainUsersEdit extends MainUsers
         $this->user_type->setDbValue($row['user_type']);
         $this->vendor_id->setDbValue($row['vendor_id']);
         $this->reportsto->setDbValue($row['reportsto']);
+        $this->ts->setDbValue($row['ts']);
     }
 
     // Return a row with default values
@@ -807,6 +809,7 @@ class MainUsersEdit extends MainUsers
         $row['user_type'] = null;
         $row['vendor_id'] = null;
         $row['reportsto'] = null;
+        $row['ts'] = null;
         return $row;
     }
 
@@ -853,6 +856,8 @@ class MainUsersEdit extends MainUsers
         // vendor_id
 
         // reportsto
+
+        // ts
         if ($this->RowType == ROWTYPE_VIEW) {
             // id
             $this->id->ViewValue = $this->id->CurrentValue;
@@ -892,7 +897,7 @@ class MainUsersEdit extends MainUsers
                 $this->vendor_id->ViewValue = $this->vendor_id->lookupCacheOption($curVal);
                 if ($this->vendor_id->ViewValue === null) { // Lookup from database
                     $filterWrk = "\"id\"" . SearchString("=", $curVal, DATATYPE_NUMBER, "");
-                    $sqlWrk = $this->vendor_id->Lookup->getSql(false, $filterWrk, '', $this, true);
+                    $sqlWrk = $this->vendor_id->Lookup->getSql(false, $filterWrk, '', $this, true, true);
                     $rswrk = Conn()->executeQuery($sqlWrk)->fetchAll(\PDO::FETCH_BOTH);
                     $ari = count($rswrk);
                     if ($ari > 0) { // Lookup values found
@@ -913,7 +918,7 @@ class MainUsersEdit extends MainUsers
                 $this->reportsto->ViewValue = $this->reportsto->lookupCacheOption($curVal);
                 if ($this->reportsto->ViewValue === null) { // Lookup from database
                     $filterWrk = "\"id\"" . SearchString("=", $curVal, DATATYPE_NUMBER, "");
-                    $sqlWrk = $this->reportsto->Lookup->getSql(false, $filterWrk, '', $this, true);
+                    $sqlWrk = $this->reportsto->Lookup->getSql(false, $filterWrk, '', $this, true, true);
                     $rswrk = Conn()->executeQuery($sqlWrk)->fetchAll(\PDO::FETCH_BOTH);
                     $ari = count($rswrk);
                     if ($ari > 0) { // Lookup values found
@@ -927,6 +932,11 @@ class MainUsersEdit extends MainUsers
                 $this->reportsto->ViewValue = null;
             }
             $this->reportsto->ViewCustomAttributes = "";
+
+            // ts
+            $this->ts->ViewValue = $this->ts->CurrentValue;
+            $this->ts->ViewValue = FormatDateTime($this->ts->ViewValue, 0);
+            $this->ts->ViewCustomAttributes = "";
 
             // id
             $this->id->LinkCustomAttributes = "";
@@ -1021,7 +1031,7 @@ class MainUsersEdit extends MainUsers
                     $this->vendor_id->ViewValue = $this->vendor_id->lookupCacheOption($curVal);
                     if ($this->vendor_id->ViewValue === null) { // Lookup from database
                         $filterWrk = "\"id\"" . SearchString("=", $curVal, DATATYPE_NUMBER, "");
-                        $sqlWrk = $this->vendor_id->Lookup->getSql(false, $filterWrk, '', $this, true);
+                        $sqlWrk = $this->vendor_id->Lookup->getSql(false, $filterWrk, '', $this, true, true);
                         $rswrk = Conn()->executeQuery($sqlWrk)->fetchAll(\PDO::FETCH_BOTH);
                         $ari = count($rswrk);
                         if ($ari > 0) { // Lookup values found
@@ -1051,7 +1061,7 @@ class MainUsersEdit extends MainUsers
                     } else {
                         $filterWrk = "\"id\"" . SearchString("=", $this->vendor_id->CurrentValue, DATATYPE_NUMBER, "");
                     }
-                    $sqlWrk = $this->vendor_id->Lookup->getSql(true, $filterWrk, '', $this);
+                    $sqlWrk = $this->vendor_id->Lookup->getSql(true, $filterWrk, '', $this, false, true);
                     $rswrk = Conn()->executeQuery($sqlWrk)->fetchAll(\PDO::FETCH_BOTH);
                     $ari = count($rswrk);
                     $arwrk = $rswrk;
@@ -1070,7 +1080,7 @@ class MainUsersEdit extends MainUsers
                         $this->reportsto->EditValue = $this->reportsto->lookupCacheOption($curVal);
                         if ($this->reportsto->EditValue === null) { // Lookup from database
                             $filterWrk = "\"id\"" . SearchString("=", $curVal, DATATYPE_NUMBER, "");
-                            $sqlWrk = $this->reportsto->Lookup->getSql(false, $filterWrk, '', $this, true);
+                            $sqlWrk = $this->reportsto->Lookup->getSql(false, $filterWrk, '', $this, true, true);
                             $rswrk = Conn()->executeQuery($sqlWrk)->fetchAll(\PDO::FETCH_BOTH);
                             $ari = count($rswrk);
                             if ($ari > 0) { // Lookup values found
@@ -1090,7 +1100,7 @@ class MainUsersEdit extends MainUsers
                 } else {
                     $filterWrk = "\"id\"" . SearchString("=", $this->reportsto->CurrentValue, DATATYPE_NUMBER, "");
                 }
-                $sqlWrk = $this->reportsto->Lookup->getSql(true, $filterWrk, '', $this);
+                $sqlWrk = $this->reportsto->Lookup->getSql(true, $filterWrk, '', $this, false, true);
                 $rswrk = Conn()->executeQuery($sqlWrk)->fetchAll(\PDO::FETCH_BOTH);
                 $arwrk = $rswrk;
                 $this->reportsto->EditValue = $arwrk;
@@ -1110,7 +1120,7 @@ class MainUsersEdit extends MainUsers
                     } else {
                         $filterWrk = "\"id\"" . SearchString("=", $this->reportsto->CurrentValue, DATATYPE_NUMBER, "");
                     }
-                    $sqlWrk = $this->reportsto->Lookup->getSql(true, $filterWrk, '', $this);
+                    $sqlWrk = $this->reportsto->Lookup->getSql(true, $filterWrk, '', $this, false, true);
                     $rswrk = Conn()->executeQuery($sqlWrk)->fetchAll(\PDO::FETCH_BOTH);
                     $ari = count($rswrk);
                     $arwrk = $rswrk;
@@ -1281,6 +1291,9 @@ class MainUsersEdit extends MainUsers
             }
 
             // vendor_id
+            if ($this->vendor_id->getSessionValue() != "") {
+                $this->vendor_id->ReadOnly = true;
+            }
             $this->vendor_id->setDbValueDef($rsnew, $this->vendor_id->CurrentValue, null, $this->vendor_id->ReadOnly);
 
             // reportsto

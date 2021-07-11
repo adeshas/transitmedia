@@ -32,6 +32,12 @@ class MainBusesController extends ControllerBase
         return $this->runPage($request, $response, $args, "MainBusesEdit");
     }
 
+    // update
+    public function update(Request $request, Response $response, array $args): Response
+    {
+        return $this->runPage($request, $response, $args, "MainBusesUpdate");
+    }
+
     // delete
     public function delete(Request $request, Response $response, array $args): Response
     {

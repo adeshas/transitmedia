@@ -307,6 +307,8 @@ $Page->ListOptions->render("body", "left", $Page->RowCount);
 </span>
 <?php } ?>
 </td>
+    <?php } else { ?>
+            <input type="hidden" data-table="w_vendors_operators" data-field="x_id" data-hidden="1" name="x<?= $Page->RowIndex ?>_id" id="x<?= $Page->RowIndex ?>_id" value="<?= HtmlEncode($Page->id->CurrentValue) ?>">
     <?php } ?>
     <?php if ($Page->vendor_id->Visible) { // vendor_id ?>
         <td data-name="vendor_id" <?= $Page->vendor_id->cellAttributes() ?>>

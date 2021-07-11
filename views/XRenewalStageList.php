@@ -321,6 +321,8 @@ $Page->ListOptions->render("body", "left", $Page->RowCount);
 </span>
 <?php } ?>
 </td>
+    <?php } else { ?>
+            <input type="hidden" data-table="x_renewal_stage" data-field="x_id" data-hidden="1" name="x<?= $Page->RowIndex ?>_id" id="x<?= $Page->RowIndex ?>_id" value="<?= HtmlEncode($Page->id->CurrentValue) ?>">
     <?php } ?>
     <?php if ($Page->name->Visible) { // name ?>
         <td data-name="name" <?= $Page->name->cellAttributes() ?>>

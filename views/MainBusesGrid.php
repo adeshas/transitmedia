@@ -27,7 +27,9 @@ loadjs.ready("head", function () {
         ["exterior_campaign_id", [fields.exterior_campaign_id.required ? ew.Validators.required(fields.exterior_campaign_id.caption) : null], fields.exterior_campaign_id.isInvalid],
         ["interior_campaign_id", [fields.interior_campaign_id.required ? ew.Validators.required(fields.interior_campaign_id.caption) : null], fields.interior_campaign_id.isInvalid],
         ["bus_status_id", [fields.bus_status_id.required ? ew.Validators.required(fields.bus_status_id.caption) : null], fields.bus_status_id.isInvalid],
-        ["bus_depot_id", [fields.bus_depot_id.required ? ew.Validators.required(fields.bus_depot_id.caption) : null], fields.bus_depot_id.isInvalid]
+        ["bus_size_id", [fields.bus_size_id.required ? ew.Validators.required(fields.bus_size_id.caption) : null], fields.bus_size_id.isInvalid],
+        ["bus_depot_id", [fields.bus_depot_id.required ? ew.Validators.required(fields.bus_depot_id.caption) : null], fields.bus_depot_id.isInvalid],
+        ["ts_last_update", [fields.ts_last_update.required ? ew.Validators.required(fields.ts_last_update.caption) : null, ew.Validators.datetime(1)], fields.ts_last_update.isInvalid]
     ]);
 
     // Set invalid fields
@@ -93,7 +95,11 @@ loadjs.ready("head", function () {
             return false;
         if (ew.valueChanged(fobj, rowIndex, "bus_status_id", false))
             return false;
+        if (ew.valueChanged(fobj, rowIndex, "bus_size_id", false))
+            return false;
         if (ew.valueChanged(fobj, rowIndex, "bus_depot_id", false))
+            return false;
+        if (ew.valueChanged(fobj, rowIndex, "ts_last_update", false))
             return false;
         return true;
     }
@@ -113,6 +119,7 @@ loadjs.ready("head", function () {
     fmain_busesgrid.lists.exterior_campaign_id = <?= $Grid->exterior_campaign_id->toClientList($Grid) ?>;
     fmain_busesgrid.lists.interior_campaign_id = <?= $Grid->interior_campaign_id->toClientList($Grid) ?>;
     fmain_busesgrid.lists.bus_status_id = <?= $Grid->bus_status_id->toClientList($Grid) ?>;
+    fmain_busesgrid.lists.bus_size_id = <?= $Grid->bus_size_id->toClientList($Grid) ?>;
     fmain_busesgrid.lists.bus_depot_id = <?= $Grid->bus_depot_id->toClientList($Grid) ?>;
     loadjs.done("fmain_busesgrid");
 });
@@ -151,10 +158,10 @@ $Grid->ListOptions->render("header", "left");
         <th data-name="number" class="<?= $Grid->number->headerCellClass() ?>"><div id="elh_main_buses_number" class="main_buses_number"><?= $Grid->renderSort($Grid->number) ?></div></th>
 <?php } ?>
 <?php if ($Grid->platform_id->Visible) { // platform_id ?>
-        <th data-name="platform_id" class="<?= $Grid->platform_id->headerCellClass() ?>"><div id="elh_main_buses_platform_id" class="main_buses_platform_id"><?= $Grid->renderSort($Grid->platform_id) ?></div></th>
+        <th data-name="platform_id" class="<?= $Grid->platform_id->headerCellClass() ?>" style="white-space: nowrap;"><div id="elh_main_buses_platform_id" class="main_buses_platform_id"><?= $Grid->renderSort($Grid->platform_id) ?></div></th>
 <?php } ?>
 <?php if ($Grid->operator_id->Visible) { // operator_id ?>
-        <th data-name="operator_id" class="<?= $Grid->operator_id->headerCellClass() ?>"><div id="elh_main_buses_operator_id" class="main_buses_operator_id"><?= $Grid->renderSort($Grid->operator_id) ?></div></th>
+        <th data-name="operator_id" class="<?= $Grid->operator_id->headerCellClass() ?>" style="white-space: nowrap;"><div id="elh_main_buses_operator_id" class="main_buses_operator_id"><?= $Grid->renderSort($Grid->operator_id) ?></div></th>
 <?php } ?>
 <?php if ($Grid->exterior_campaign_id->Visible) { // exterior_campaign_id ?>
         <th data-name="exterior_campaign_id" class="<?= $Grid->exterior_campaign_id->headerCellClass() ?>"><div id="elh_main_buses_exterior_campaign_id" class="main_buses_exterior_campaign_id"><?= $Grid->renderSort($Grid->exterior_campaign_id) ?></div></th>
@@ -165,8 +172,14 @@ $Grid->ListOptions->render("header", "left");
 <?php if ($Grid->bus_status_id->Visible) { // bus_status_id ?>
         <th data-name="bus_status_id" class="<?= $Grid->bus_status_id->headerCellClass() ?>"><div id="elh_main_buses_bus_status_id" class="main_buses_bus_status_id"><?= $Grid->renderSort($Grid->bus_status_id) ?></div></th>
 <?php } ?>
+<?php if ($Grid->bus_size_id->Visible) { // bus_size_id ?>
+        <th data-name="bus_size_id" class="<?= $Grid->bus_size_id->headerCellClass() ?>"><div id="elh_main_buses_bus_size_id" class="main_buses_bus_size_id"><?= $Grid->renderSort($Grid->bus_size_id) ?></div></th>
+<?php } ?>
 <?php if ($Grid->bus_depot_id->Visible) { // bus_depot_id ?>
         <th data-name="bus_depot_id" class="<?= $Grid->bus_depot_id->headerCellClass() ?>"><div id="elh_main_buses_bus_depot_id" class="main_buses_bus_depot_id"><?= $Grid->renderSort($Grid->bus_depot_id) ?></div></th>
+<?php } ?>
+<?php if ($Grid->ts_last_update->Visible) { // ts_last_update ?>
+        <th data-name="ts_last_update" class="<?= $Grid->ts_last_update->headerCellClass() ?>"><div id="elh_main_buses_ts_last_update" class="main_buses_ts_last_update"><?= $Grid->renderSort($Grid->ts_last_update) ?></div></th>
 <?php } ?>
 <?php
 // Render list options (header, right)
@@ -305,6 +318,8 @@ $Grid->ListOptions->render("body", "left", $Grid->RowCount);
 <?php } ?>
 <?php } ?>
 </td>
+    <?php } else { ?>
+            <input type="hidden" data-table="main_buses" data-field="x_id" data-hidden="1" name="x<?= $Grid->RowIndex ?>_id" id="x<?= $Grid->RowIndex ?>_id" value="<?= HtmlEncode($Grid->id->CurrentValue) ?>">
     <?php } ?>
     <?php if ($Grid->number->Visible) { // number ?>
         <td data-name="number" <?= $Grid->number->cellAttributes() ?>>
@@ -476,13 +491,6 @@ loadjs.ready("head", function() {
     <?php if ($Grid->exterior_campaign_id->Visible) { // exterior_campaign_id ?>
         <td data-name="exterior_campaign_id" <?= $Grid->exterior_campaign_id->cellAttributes() ?>>
 <?php if ($Grid->RowType == ROWTYPE_ADD) { // Add record ?>
-<?php if ($Grid->exterior_campaign_id->getSessionValue() != "") { ?>
-<span id="el<?= $Grid->RowCount ?>_main_buses_exterior_campaign_id" class="form-group">
-<span<?= $Grid->exterior_campaign_id->viewAttributes() ?>>
-<input type="text" readonly class="form-control-plaintext" value="<?= HtmlEncode(RemoveHtml($Grid->exterior_campaign_id->getDisplayValue($Grid->exterior_campaign_id->ViewValue))) ?>"></span>
-</span>
-<input type="hidden" id="x<?= $Grid->RowIndex ?>_exterior_campaign_id" name="x<?= $Grid->RowIndex ?>_exterior_campaign_id" value="<?= HtmlEncode($Grid->exterior_campaign_id->CurrentValue) ?>" data-hidden="1">
-<?php } else { ?>
 <span id="el<?= $Grid->RowCount ?>_main_buses_exterior_campaign_id" class="form-group">
     <select
         id="x<?= $Grid->RowIndex ?>_exterior_campaign_id"
@@ -508,17 +516,9 @@ loadjs.ready("head", function() {
 });
 </script>
 </span>
-<?php } ?>
 <input type="hidden" data-table="main_buses" data-field="x_exterior_campaign_id" data-hidden="1" name="o<?= $Grid->RowIndex ?>_exterior_campaign_id" id="o<?= $Grid->RowIndex ?>_exterior_campaign_id" value="<?= HtmlEncode($Grid->exterior_campaign_id->OldValue) ?>">
 <?php } ?>
 <?php if ($Grid->RowType == ROWTYPE_EDIT) { // Edit record ?>
-<?php if ($Grid->exterior_campaign_id->getSessionValue() != "") { ?>
-<span id="el<?= $Grid->RowCount ?>_main_buses_exterior_campaign_id" class="form-group">
-<span<?= $Grid->exterior_campaign_id->viewAttributes() ?>>
-<input type="text" readonly class="form-control-plaintext" value="<?= HtmlEncode(RemoveHtml($Grid->exterior_campaign_id->getDisplayValue($Grid->exterior_campaign_id->ViewValue))) ?>"></span>
-</span>
-<input type="hidden" id="x<?= $Grid->RowIndex ?>_exterior_campaign_id" name="x<?= $Grid->RowIndex ?>_exterior_campaign_id" value="<?= HtmlEncode($Grid->exterior_campaign_id->CurrentValue) ?>" data-hidden="1">
-<?php } else { ?>
 <span id="el<?= $Grid->RowCount ?>_main_buses_exterior_campaign_id" class="form-group">
     <select
         id="x<?= $Grid->RowIndex ?>_exterior_campaign_id"
@@ -544,7 +544,6 @@ loadjs.ready("head", function() {
 });
 </script>
 </span>
-<?php } ?>
 <?php } ?>
 <?php if ($Grid->RowType == ROWTYPE_VIEW) { // View record ?>
 <span id="el<?= $Grid->RowCount ?>_main_buses_exterior_campaign_id">
@@ -561,13 +560,6 @@ loadjs.ready("head", function() {
     <?php if ($Grid->interior_campaign_id->Visible) { // interior_campaign_id ?>
         <td data-name="interior_campaign_id" <?= $Grid->interior_campaign_id->cellAttributes() ?>>
 <?php if ($Grid->RowType == ROWTYPE_ADD) { // Add record ?>
-<?php if ($Grid->interior_campaign_id->getSessionValue() != "") { ?>
-<span id="el<?= $Grid->RowCount ?>_main_buses_interior_campaign_id" class="form-group">
-<span<?= $Grid->interior_campaign_id->viewAttributes() ?>>
-<input type="text" readonly class="form-control-plaintext" value="<?= HtmlEncode(RemoveHtml($Grid->interior_campaign_id->getDisplayValue($Grid->interior_campaign_id->ViewValue))) ?>"></span>
-</span>
-<input type="hidden" id="x<?= $Grid->RowIndex ?>_interior_campaign_id" name="x<?= $Grid->RowIndex ?>_interior_campaign_id" value="<?= HtmlEncode($Grid->interior_campaign_id->CurrentValue) ?>" data-hidden="1">
-<?php } else { ?>
 <span id="el<?= $Grid->RowCount ?>_main_buses_interior_campaign_id" class="form-group">
     <select
         id="x<?= $Grid->RowIndex ?>_interior_campaign_id"
@@ -593,17 +585,9 @@ loadjs.ready("head", function() {
 });
 </script>
 </span>
-<?php } ?>
 <input type="hidden" data-table="main_buses" data-field="x_interior_campaign_id" data-hidden="1" name="o<?= $Grid->RowIndex ?>_interior_campaign_id" id="o<?= $Grid->RowIndex ?>_interior_campaign_id" value="<?= HtmlEncode($Grid->interior_campaign_id->OldValue) ?>">
 <?php } ?>
 <?php if ($Grid->RowType == ROWTYPE_EDIT) { // Edit record ?>
-<?php if ($Grid->interior_campaign_id->getSessionValue() != "") { ?>
-<span id="el<?= $Grid->RowCount ?>_main_buses_interior_campaign_id" class="form-group">
-<span<?= $Grid->interior_campaign_id->viewAttributes() ?>>
-<input type="text" readonly class="form-control-plaintext" value="<?= HtmlEncode(RemoveHtml($Grid->interior_campaign_id->getDisplayValue($Grid->interior_campaign_id->ViewValue))) ?>"></span>
-</span>
-<input type="hidden" id="x<?= $Grid->RowIndex ?>_interior_campaign_id" name="x<?= $Grid->RowIndex ?>_interior_campaign_id" value="<?= HtmlEncode($Grid->interior_campaign_id->CurrentValue) ?>" data-hidden="1">
-<?php } else { ?>
 <span id="el<?= $Grid->RowCount ?>_main_buses_interior_campaign_id" class="form-group">
     <select
         id="x<?= $Grid->RowIndex ?>_interior_campaign_id"
@@ -629,7 +613,6 @@ loadjs.ready("head", function() {
 });
 </script>
 </span>
-<?php } ?>
 <?php } ?>
 <?php if ($Grid->RowType == ROWTYPE_VIEW) { // View record ?>
 <span id="el<?= $Grid->RowCount ?>_main_buses_interior_campaign_id">
@@ -646,6 +629,13 @@ loadjs.ready("head", function() {
     <?php if ($Grid->bus_status_id->Visible) { // bus_status_id ?>
         <td data-name="bus_status_id" <?= $Grid->bus_status_id->cellAttributes() ?>>
 <?php if ($Grid->RowType == ROWTYPE_ADD) { // Add record ?>
+<?php if ($Grid->bus_status_id->getSessionValue() != "") { ?>
+<span id="el<?= $Grid->RowCount ?>_main_buses_bus_status_id" class="form-group">
+<span<?= $Grid->bus_status_id->viewAttributes() ?>>
+<input type="text" readonly class="form-control-plaintext" value="<?= HtmlEncode(RemoveHtml($Grid->bus_status_id->getDisplayValue($Grid->bus_status_id->ViewValue))) ?>"></span>
+</span>
+<input type="hidden" id="x<?= $Grid->RowIndex ?>_bus_status_id" name="x<?= $Grid->RowIndex ?>_bus_status_id" value="<?= HtmlEncode($Grid->bus_status_id->CurrentValue) ?>" data-hidden="1">
+<?php } else { ?>
 <span id="el<?= $Grid->RowCount ?>_main_buses_bus_status_id" class="form-group">
     <select
         id="x<?= $Grid->RowIndex ?>_bus_status_id"
@@ -671,9 +661,17 @@ loadjs.ready("head", function() {
 });
 </script>
 </span>
+<?php } ?>
 <input type="hidden" data-table="main_buses" data-field="x_bus_status_id" data-hidden="1" name="o<?= $Grid->RowIndex ?>_bus_status_id" id="o<?= $Grid->RowIndex ?>_bus_status_id" value="<?= HtmlEncode($Grid->bus_status_id->OldValue) ?>">
 <?php } ?>
 <?php if ($Grid->RowType == ROWTYPE_EDIT) { // Edit record ?>
+<?php if ($Grid->bus_status_id->getSessionValue() != "") { ?>
+<span id="el<?= $Grid->RowCount ?>_main_buses_bus_status_id" class="form-group">
+<span<?= $Grid->bus_status_id->viewAttributes() ?>>
+<input type="text" readonly class="form-control-plaintext" value="<?= HtmlEncode(RemoveHtml($Grid->bus_status_id->getDisplayValue($Grid->bus_status_id->ViewValue))) ?>"></span>
+</span>
+<input type="hidden" id="x<?= $Grid->RowIndex ?>_bus_status_id" name="x<?= $Grid->RowIndex ?>_bus_status_id" value="<?= HtmlEncode($Grid->bus_status_id->CurrentValue) ?>" data-hidden="1">
+<?php } else { ?>
 <span id="el<?= $Grid->RowCount ?>_main_buses_bus_status_id" class="form-group">
     <select
         id="x<?= $Grid->RowIndex ?>_bus_status_id"
@@ -699,6 +697,7 @@ loadjs.ready("head", function() {
 });
 </script>
 </span>
+<?php } ?>
 <?php } ?>
 <?php if ($Grid->RowType == ROWTYPE_VIEW) { // View record ?>
 <span id="el<?= $Grid->RowCount ?>_main_buses_bus_status_id">
@@ -712,9 +711,101 @@ loadjs.ready("head", function() {
 <?php } ?>
 </td>
     <?php } ?>
+    <?php if ($Grid->bus_size_id->Visible) { // bus_size_id ?>
+        <td data-name="bus_size_id" <?= $Grid->bus_size_id->cellAttributes() ?>>
+<?php if ($Grid->RowType == ROWTYPE_ADD) { // Add record ?>
+<?php if ($Grid->bus_size_id->getSessionValue() != "") { ?>
+<span id="el<?= $Grid->RowCount ?>_main_buses_bus_size_id" class="form-group">
+<span<?= $Grid->bus_size_id->viewAttributes() ?>>
+<input type="text" readonly class="form-control-plaintext" value="<?= HtmlEncode(RemoveHtml($Grid->bus_size_id->getDisplayValue($Grid->bus_size_id->ViewValue))) ?>"></span>
+</span>
+<input type="hidden" id="x<?= $Grid->RowIndex ?>_bus_size_id" name="x<?= $Grid->RowIndex ?>_bus_size_id" value="<?= HtmlEncode($Grid->bus_size_id->CurrentValue) ?>" data-hidden="1">
+<?php } else { ?>
+<span id="el<?= $Grid->RowCount ?>_main_buses_bus_size_id" class="form-group">
+    <select
+        id="x<?= $Grid->RowIndex ?>_bus_size_id"
+        name="x<?= $Grid->RowIndex ?>_bus_size_id"
+        class="form-control ew-select<?= $Grid->bus_size_id->isInvalidClass() ?>"
+        data-select2-id="main_buses_x<?= $Grid->RowIndex ?>_bus_size_id"
+        data-table="main_buses"
+        data-field="x_bus_size_id"
+        data-value-separator="<?= $Grid->bus_size_id->displayValueSeparatorAttribute() ?>"
+        data-placeholder="<?= HtmlEncode($Grid->bus_size_id->getPlaceHolder()) ?>"
+        <?= $Grid->bus_size_id->editAttributes() ?>>
+        <?= $Grid->bus_size_id->selectOptionListHtml("x{$Grid->RowIndex}_bus_size_id") ?>
+    </select>
+    <div class="invalid-feedback"><?= $Grid->bus_size_id->getErrorMessage() ?></div>
+<?= $Grid->bus_size_id->Lookup->getParamTag($Grid, "p_x" . $Grid->RowIndex . "_bus_size_id") ?>
+<script>
+loadjs.ready("head", function() {
+    var el = document.querySelector("select[data-select2-id='main_buses_x<?= $Grid->RowIndex ?>_bus_size_id']"),
+        options = { name: "x<?= $Grid->RowIndex ?>_bus_size_id", selectId: "main_buses_x<?= $Grid->RowIndex ?>_bus_size_id", language: ew.LANGUAGE_ID, dir: ew.IS_RTL ? "rtl" : "ltr" };
+    options.dropdownParent = $(el).closest("#ew-modal-dialog, #ew-add-opt-dialog")[0];
+    Object.assign(options, ew.vars.tables.main_buses.fields.bus_size_id.selectOptions);
+    ew.createSelect(options);
+});
+</script>
+</span>
+<?php } ?>
+<input type="hidden" data-table="main_buses" data-field="x_bus_size_id" data-hidden="1" name="o<?= $Grid->RowIndex ?>_bus_size_id" id="o<?= $Grid->RowIndex ?>_bus_size_id" value="<?= HtmlEncode($Grid->bus_size_id->OldValue) ?>">
+<?php } ?>
+<?php if ($Grid->RowType == ROWTYPE_EDIT) { // Edit record ?>
+<?php if ($Grid->bus_size_id->getSessionValue() != "") { ?>
+<span id="el<?= $Grid->RowCount ?>_main_buses_bus_size_id" class="form-group">
+<span<?= $Grid->bus_size_id->viewAttributes() ?>>
+<input type="text" readonly class="form-control-plaintext" value="<?= HtmlEncode(RemoveHtml($Grid->bus_size_id->getDisplayValue($Grid->bus_size_id->ViewValue))) ?>"></span>
+</span>
+<input type="hidden" id="x<?= $Grid->RowIndex ?>_bus_size_id" name="x<?= $Grid->RowIndex ?>_bus_size_id" value="<?= HtmlEncode($Grid->bus_size_id->CurrentValue) ?>" data-hidden="1">
+<?php } else { ?>
+<span id="el<?= $Grid->RowCount ?>_main_buses_bus_size_id" class="form-group">
+    <select
+        id="x<?= $Grid->RowIndex ?>_bus_size_id"
+        name="x<?= $Grid->RowIndex ?>_bus_size_id"
+        class="form-control ew-select<?= $Grid->bus_size_id->isInvalidClass() ?>"
+        data-select2-id="main_buses_x<?= $Grid->RowIndex ?>_bus_size_id"
+        data-table="main_buses"
+        data-field="x_bus_size_id"
+        data-value-separator="<?= $Grid->bus_size_id->displayValueSeparatorAttribute() ?>"
+        data-placeholder="<?= HtmlEncode($Grid->bus_size_id->getPlaceHolder()) ?>"
+        <?= $Grid->bus_size_id->editAttributes() ?>>
+        <?= $Grid->bus_size_id->selectOptionListHtml("x{$Grid->RowIndex}_bus_size_id") ?>
+    </select>
+    <div class="invalid-feedback"><?= $Grid->bus_size_id->getErrorMessage() ?></div>
+<?= $Grid->bus_size_id->Lookup->getParamTag($Grid, "p_x" . $Grid->RowIndex . "_bus_size_id") ?>
+<script>
+loadjs.ready("head", function() {
+    var el = document.querySelector("select[data-select2-id='main_buses_x<?= $Grid->RowIndex ?>_bus_size_id']"),
+        options = { name: "x<?= $Grid->RowIndex ?>_bus_size_id", selectId: "main_buses_x<?= $Grid->RowIndex ?>_bus_size_id", language: ew.LANGUAGE_ID, dir: ew.IS_RTL ? "rtl" : "ltr" };
+    options.dropdownParent = $(el).closest("#ew-modal-dialog, #ew-add-opt-dialog")[0];
+    Object.assign(options, ew.vars.tables.main_buses.fields.bus_size_id.selectOptions);
+    ew.createSelect(options);
+});
+</script>
+</span>
+<?php } ?>
+<?php } ?>
+<?php if ($Grid->RowType == ROWTYPE_VIEW) { // View record ?>
+<span id="el<?= $Grid->RowCount ?>_main_buses_bus_size_id">
+<span<?= $Grid->bus_size_id->viewAttributes() ?>>
+<?= $Grid->bus_size_id->getViewValue() ?></span>
+</span>
+<?php if ($Grid->isConfirm()) { ?>
+<input type="hidden" data-table="main_buses" data-field="x_bus_size_id" data-hidden="1" name="fmain_busesgrid$x<?= $Grid->RowIndex ?>_bus_size_id" id="fmain_busesgrid$x<?= $Grid->RowIndex ?>_bus_size_id" value="<?= HtmlEncode($Grid->bus_size_id->FormValue) ?>">
+<input type="hidden" data-table="main_buses" data-field="x_bus_size_id" data-hidden="1" name="fmain_busesgrid$o<?= $Grid->RowIndex ?>_bus_size_id" id="fmain_busesgrid$o<?= $Grid->RowIndex ?>_bus_size_id" value="<?= HtmlEncode($Grid->bus_size_id->OldValue) ?>">
+<?php } ?>
+<?php } ?>
+</td>
+    <?php } ?>
     <?php if ($Grid->bus_depot_id->Visible) { // bus_depot_id ?>
         <td data-name="bus_depot_id" <?= $Grid->bus_depot_id->cellAttributes() ?>>
 <?php if ($Grid->RowType == ROWTYPE_ADD) { // Add record ?>
+<?php if ($Grid->bus_depot_id->getSessionValue() != "") { ?>
+<span id="el<?= $Grid->RowCount ?>_main_buses_bus_depot_id" class="form-group">
+<span<?= $Grid->bus_depot_id->viewAttributes() ?>>
+<input type="text" readonly class="form-control-plaintext" value="<?= HtmlEncode(RemoveHtml($Grid->bus_depot_id->getDisplayValue($Grid->bus_depot_id->ViewValue))) ?>"></span>
+</span>
+<input type="hidden" id="x<?= $Grid->RowIndex ?>_bus_depot_id" name="x<?= $Grid->RowIndex ?>_bus_depot_id" value="<?= HtmlEncode($Grid->bus_depot_id->CurrentValue) ?>" data-hidden="1">
+<?php } else { ?>
 <span id="el<?= $Grid->RowCount ?>_main_buses_bus_depot_id" class="form-group">
     <select
         id="x<?= $Grid->RowIndex ?>_bus_depot_id"
@@ -740,9 +831,17 @@ loadjs.ready("head", function() {
 });
 </script>
 </span>
+<?php } ?>
 <input type="hidden" data-table="main_buses" data-field="x_bus_depot_id" data-hidden="1" name="o<?= $Grid->RowIndex ?>_bus_depot_id" id="o<?= $Grid->RowIndex ?>_bus_depot_id" value="<?= HtmlEncode($Grid->bus_depot_id->OldValue) ?>">
 <?php } ?>
 <?php if ($Grid->RowType == ROWTYPE_EDIT) { // Edit record ?>
+<?php if ($Grid->bus_depot_id->getSessionValue() != "") { ?>
+<span id="el<?= $Grid->RowCount ?>_main_buses_bus_depot_id" class="form-group">
+<span<?= $Grid->bus_depot_id->viewAttributes() ?>>
+<input type="text" readonly class="form-control-plaintext" value="<?= HtmlEncode(RemoveHtml($Grid->bus_depot_id->getDisplayValue($Grid->bus_depot_id->ViewValue))) ?>"></span>
+</span>
+<input type="hidden" id="x<?= $Grid->RowIndex ?>_bus_depot_id" name="x<?= $Grid->RowIndex ?>_bus_depot_id" value="<?= HtmlEncode($Grid->bus_depot_id->CurrentValue) ?>" data-hidden="1">
+<?php } else { ?>
 <span id="el<?= $Grid->RowCount ?>_main_buses_bus_depot_id" class="form-group">
     <select
         id="x<?= $Grid->RowIndex ?>_bus_depot_id"
@@ -768,6 +867,7 @@ loadjs.ready("head", function() {
 });
 </script>
 </span>
+<?php } ?>
 <?php } ?>
 <?php if ($Grid->RowType == ROWTYPE_VIEW) { // View record ?>
 <span id="el<?= $Grid->RowCount ?>_main_buses_bus_depot_id">
@@ -777,6 +877,47 @@ loadjs.ready("head", function() {
 <?php if ($Grid->isConfirm()) { ?>
 <input type="hidden" data-table="main_buses" data-field="x_bus_depot_id" data-hidden="1" name="fmain_busesgrid$x<?= $Grid->RowIndex ?>_bus_depot_id" id="fmain_busesgrid$x<?= $Grid->RowIndex ?>_bus_depot_id" value="<?= HtmlEncode($Grid->bus_depot_id->FormValue) ?>">
 <input type="hidden" data-table="main_buses" data-field="x_bus_depot_id" data-hidden="1" name="fmain_busesgrid$o<?= $Grid->RowIndex ?>_bus_depot_id" id="fmain_busesgrid$o<?= $Grid->RowIndex ?>_bus_depot_id" value="<?= HtmlEncode($Grid->bus_depot_id->OldValue) ?>">
+<?php } ?>
+<?php } ?>
+</td>
+    <?php } ?>
+    <?php if ($Grid->ts_last_update->Visible) { // ts_last_update ?>
+        <td data-name="ts_last_update" <?= $Grid->ts_last_update->cellAttributes() ?>>
+<?php if ($Grid->RowType == ROWTYPE_ADD) { // Add record ?>
+<span id="el<?= $Grid->RowCount ?>_main_buses_ts_last_update" class="form-group">
+<input type="<?= $Grid->ts_last_update->getInputTextType() ?>" data-table="main_buses" data-field="x_ts_last_update" data-format="1" name="x<?= $Grid->RowIndex ?>_ts_last_update" id="x<?= $Grid->RowIndex ?>_ts_last_update" placeholder="<?= HtmlEncode($Grid->ts_last_update->getPlaceHolder()) ?>" value="<?= $Grid->ts_last_update->EditValue ?>"<?= $Grid->ts_last_update->editAttributes() ?>>
+<div class="invalid-feedback"><?= $Grid->ts_last_update->getErrorMessage() ?></div>
+<?php if (!$Grid->ts_last_update->ReadOnly && !$Grid->ts_last_update->Disabled && !isset($Grid->ts_last_update->EditAttrs["readonly"]) && !isset($Grid->ts_last_update->EditAttrs["disabled"])) { ?>
+<script>
+loadjs.ready(["fmain_busesgrid", "datetimepicker"], function() {
+    ew.createDateTimePicker("fmain_busesgrid", "x<?= $Grid->RowIndex ?>_ts_last_update", {"ignoreReadonly":true,"useCurrent":false,"format":1});
+});
+</script>
+<?php } ?>
+</span>
+<input type="hidden" data-table="main_buses" data-field="x_ts_last_update" data-hidden="1" name="o<?= $Grid->RowIndex ?>_ts_last_update" id="o<?= $Grid->RowIndex ?>_ts_last_update" value="<?= HtmlEncode($Grid->ts_last_update->OldValue) ?>">
+<?php } ?>
+<?php if ($Grid->RowType == ROWTYPE_EDIT) { // Edit record ?>
+<span id="el<?= $Grid->RowCount ?>_main_buses_ts_last_update" class="form-group">
+<input type="<?= $Grid->ts_last_update->getInputTextType() ?>" data-table="main_buses" data-field="x_ts_last_update" data-format="1" name="x<?= $Grid->RowIndex ?>_ts_last_update" id="x<?= $Grid->RowIndex ?>_ts_last_update" placeholder="<?= HtmlEncode($Grid->ts_last_update->getPlaceHolder()) ?>" value="<?= $Grid->ts_last_update->EditValue ?>"<?= $Grid->ts_last_update->editAttributes() ?>>
+<div class="invalid-feedback"><?= $Grid->ts_last_update->getErrorMessage() ?></div>
+<?php if (!$Grid->ts_last_update->ReadOnly && !$Grid->ts_last_update->Disabled && !isset($Grid->ts_last_update->EditAttrs["readonly"]) && !isset($Grid->ts_last_update->EditAttrs["disabled"])) { ?>
+<script>
+loadjs.ready(["fmain_busesgrid", "datetimepicker"], function() {
+    ew.createDateTimePicker("fmain_busesgrid", "x<?= $Grid->RowIndex ?>_ts_last_update", {"ignoreReadonly":true,"useCurrent":false,"format":1});
+});
+</script>
+<?php } ?>
+</span>
+<?php } ?>
+<?php if ($Grid->RowType == ROWTYPE_VIEW) { // View record ?>
+<span id="el<?= $Grid->RowCount ?>_main_buses_ts_last_update">
+<span<?= $Grid->ts_last_update->viewAttributes() ?>>
+<?= $Grid->ts_last_update->getViewValue() ?></span>
+</span>
+<?php if ($Grid->isConfirm()) { ?>
+<input type="hidden" data-table="main_buses" data-field="x_ts_last_update" data-hidden="1" name="fmain_busesgrid$x<?= $Grid->RowIndex ?>_ts_last_update" id="fmain_busesgrid$x<?= $Grid->RowIndex ?>_ts_last_update" value="<?= HtmlEncode($Grid->ts_last_update->FormValue) ?>">
+<input type="hidden" data-table="main_buses" data-field="x_ts_last_update" data-hidden="1" name="fmain_busesgrid$o<?= $Grid->RowIndex ?>_ts_last_update" id="fmain_busesgrid$o<?= $Grid->RowIndex ?>_ts_last_update" value="<?= HtmlEncode($Grid->ts_last_update->OldValue) ?>">
 <?php } ?>
 <?php } ?>
 </td>
@@ -936,13 +1077,6 @@ loadjs.ready("head", function() {
     <?php if ($Grid->exterior_campaign_id->Visible) { // exterior_campaign_id ?>
         <td data-name="exterior_campaign_id">
 <?php if (!$Grid->isConfirm()) { ?>
-<?php if ($Grid->exterior_campaign_id->getSessionValue() != "") { ?>
-<span id="el$rowindex$_main_buses_exterior_campaign_id" class="form-group main_buses_exterior_campaign_id">
-<span<?= $Grid->exterior_campaign_id->viewAttributes() ?>>
-<input type="text" readonly class="form-control-plaintext" value="<?= HtmlEncode(RemoveHtml($Grid->exterior_campaign_id->getDisplayValue($Grid->exterior_campaign_id->ViewValue))) ?>"></span>
-</span>
-<input type="hidden" id="x<?= $Grid->RowIndex ?>_exterior_campaign_id" name="x<?= $Grid->RowIndex ?>_exterior_campaign_id" value="<?= HtmlEncode($Grid->exterior_campaign_id->CurrentValue) ?>" data-hidden="1">
-<?php } else { ?>
 <span id="el$rowindex$_main_buses_exterior_campaign_id" class="form-group main_buses_exterior_campaign_id">
     <select
         id="x<?= $Grid->RowIndex ?>_exterior_campaign_id"
@@ -968,7 +1102,6 @@ loadjs.ready("head", function() {
 });
 </script>
 </span>
-<?php } ?>
 <?php } else { ?>
 <span id="el$rowindex$_main_buses_exterior_campaign_id" class="form-group main_buses_exterior_campaign_id">
 <span<?= $Grid->exterior_campaign_id->viewAttributes() ?>>
@@ -982,13 +1115,6 @@ loadjs.ready("head", function() {
     <?php if ($Grid->interior_campaign_id->Visible) { // interior_campaign_id ?>
         <td data-name="interior_campaign_id">
 <?php if (!$Grid->isConfirm()) { ?>
-<?php if ($Grid->interior_campaign_id->getSessionValue() != "") { ?>
-<span id="el$rowindex$_main_buses_interior_campaign_id" class="form-group main_buses_interior_campaign_id">
-<span<?= $Grid->interior_campaign_id->viewAttributes() ?>>
-<input type="text" readonly class="form-control-plaintext" value="<?= HtmlEncode(RemoveHtml($Grid->interior_campaign_id->getDisplayValue($Grid->interior_campaign_id->ViewValue))) ?>"></span>
-</span>
-<input type="hidden" id="x<?= $Grid->RowIndex ?>_interior_campaign_id" name="x<?= $Grid->RowIndex ?>_interior_campaign_id" value="<?= HtmlEncode($Grid->interior_campaign_id->CurrentValue) ?>" data-hidden="1">
-<?php } else { ?>
 <span id="el$rowindex$_main_buses_interior_campaign_id" class="form-group main_buses_interior_campaign_id">
     <select
         id="x<?= $Grid->RowIndex ?>_interior_campaign_id"
@@ -1014,7 +1140,6 @@ loadjs.ready("head", function() {
 });
 </script>
 </span>
-<?php } ?>
 <?php } else { ?>
 <span id="el$rowindex$_main_buses_interior_campaign_id" class="form-group main_buses_interior_campaign_id">
 <span<?= $Grid->interior_campaign_id->viewAttributes() ?>>
@@ -1028,6 +1153,13 @@ loadjs.ready("head", function() {
     <?php if ($Grid->bus_status_id->Visible) { // bus_status_id ?>
         <td data-name="bus_status_id">
 <?php if (!$Grid->isConfirm()) { ?>
+<?php if ($Grid->bus_status_id->getSessionValue() != "") { ?>
+<span id="el$rowindex$_main_buses_bus_status_id" class="form-group main_buses_bus_status_id">
+<span<?= $Grid->bus_status_id->viewAttributes() ?>>
+<input type="text" readonly class="form-control-plaintext" value="<?= HtmlEncode(RemoveHtml($Grid->bus_status_id->getDisplayValue($Grid->bus_status_id->ViewValue))) ?>"></span>
+</span>
+<input type="hidden" id="x<?= $Grid->RowIndex ?>_bus_status_id" name="x<?= $Grid->RowIndex ?>_bus_status_id" value="<?= HtmlEncode($Grid->bus_status_id->CurrentValue) ?>" data-hidden="1">
+<?php } else { ?>
 <span id="el$rowindex$_main_buses_bus_status_id" class="form-group main_buses_bus_status_id">
     <select
         id="x<?= $Grid->RowIndex ?>_bus_status_id"
@@ -1053,6 +1185,7 @@ loadjs.ready("head", function() {
 });
 </script>
 </span>
+<?php } ?>
 <?php } else { ?>
 <span id="el$rowindex$_main_buses_bus_status_id" class="form-group main_buses_bus_status_id">
 <span<?= $Grid->bus_status_id->viewAttributes() ?>>
@@ -1063,9 +1196,62 @@ loadjs.ready("head", function() {
 <input type="hidden" data-table="main_buses" data-field="x_bus_status_id" data-hidden="1" name="o<?= $Grid->RowIndex ?>_bus_status_id" id="o<?= $Grid->RowIndex ?>_bus_status_id" value="<?= HtmlEncode($Grid->bus_status_id->OldValue) ?>">
 </td>
     <?php } ?>
+    <?php if ($Grid->bus_size_id->Visible) { // bus_size_id ?>
+        <td data-name="bus_size_id">
+<?php if (!$Grid->isConfirm()) { ?>
+<?php if ($Grid->bus_size_id->getSessionValue() != "") { ?>
+<span id="el$rowindex$_main_buses_bus_size_id" class="form-group main_buses_bus_size_id">
+<span<?= $Grid->bus_size_id->viewAttributes() ?>>
+<input type="text" readonly class="form-control-plaintext" value="<?= HtmlEncode(RemoveHtml($Grid->bus_size_id->getDisplayValue($Grid->bus_size_id->ViewValue))) ?>"></span>
+</span>
+<input type="hidden" id="x<?= $Grid->RowIndex ?>_bus_size_id" name="x<?= $Grid->RowIndex ?>_bus_size_id" value="<?= HtmlEncode($Grid->bus_size_id->CurrentValue) ?>" data-hidden="1">
+<?php } else { ?>
+<span id="el$rowindex$_main_buses_bus_size_id" class="form-group main_buses_bus_size_id">
+    <select
+        id="x<?= $Grid->RowIndex ?>_bus_size_id"
+        name="x<?= $Grid->RowIndex ?>_bus_size_id"
+        class="form-control ew-select<?= $Grid->bus_size_id->isInvalidClass() ?>"
+        data-select2-id="main_buses_x<?= $Grid->RowIndex ?>_bus_size_id"
+        data-table="main_buses"
+        data-field="x_bus_size_id"
+        data-value-separator="<?= $Grid->bus_size_id->displayValueSeparatorAttribute() ?>"
+        data-placeholder="<?= HtmlEncode($Grid->bus_size_id->getPlaceHolder()) ?>"
+        <?= $Grid->bus_size_id->editAttributes() ?>>
+        <?= $Grid->bus_size_id->selectOptionListHtml("x{$Grid->RowIndex}_bus_size_id") ?>
+    </select>
+    <div class="invalid-feedback"><?= $Grid->bus_size_id->getErrorMessage() ?></div>
+<?= $Grid->bus_size_id->Lookup->getParamTag($Grid, "p_x" . $Grid->RowIndex . "_bus_size_id") ?>
+<script>
+loadjs.ready("head", function() {
+    var el = document.querySelector("select[data-select2-id='main_buses_x<?= $Grid->RowIndex ?>_bus_size_id']"),
+        options = { name: "x<?= $Grid->RowIndex ?>_bus_size_id", selectId: "main_buses_x<?= $Grid->RowIndex ?>_bus_size_id", language: ew.LANGUAGE_ID, dir: ew.IS_RTL ? "rtl" : "ltr" };
+    options.dropdownParent = $(el).closest("#ew-modal-dialog, #ew-add-opt-dialog")[0];
+    Object.assign(options, ew.vars.tables.main_buses.fields.bus_size_id.selectOptions);
+    ew.createSelect(options);
+});
+</script>
+</span>
+<?php } ?>
+<?php } else { ?>
+<span id="el$rowindex$_main_buses_bus_size_id" class="form-group main_buses_bus_size_id">
+<span<?= $Grid->bus_size_id->viewAttributes() ?>>
+<input type="text" readonly class="form-control-plaintext" value="<?= HtmlEncode(RemoveHtml($Grid->bus_size_id->getDisplayValue($Grid->bus_size_id->ViewValue))) ?>"></span>
+</span>
+<input type="hidden" data-table="main_buses" data-field="x_bus_size_id" data-hidden="1" name="x<?= $Grid->RowIndex ?>_bus_size_id" id="x<?= $Grid->RowIndex ?>_bus_size_id" value="<?= HtmlEncode($Grid->bus_size_id->FormValue) ?>">
+<?php } ?>
+<input type="hidden" data-table="main_buses" data-field="x_bus_size_id" data-hidden="1" name="o<?= $Grid->RowIndex ?>_bus_size_id" id="o<?= $Grid->RowIndex ?>_bus_size_id" value="<?= HtmlEncode($Grid->bus_size_id->OldValue) ?>">
+</td>
+    <?php } ?>
     <?php if ($Grid->bus_depot_id->Visible) { // bus_depot_id ?>
         <td data-name="bus_depot_id">
 <?php if (!$Grid->isConfirm()) { ?>
+<?php if ($Grid->bus_depot_id->getSessionValue() != "") { ?>
+<span id="el$rowindex$_main_buses_bus_depot_id" class="form-group main_buses_bus_depot_id">
+<span<?= $Grid->bus_depot_id->viewAttributes() ?>>
+<input type="text" readonly class="form-control-plaintext" value="<?= HtmlEncode(RemoveHtml($Grid->bus_depot_id->getDisplayValue($Grid->bus_depot_id->ViewValue))) ?>"></span>
+</span>
+<input type="hidden" id="x<?= $Grid->RowIndex ?>_bus_depot_id" name="x<?= $Grid->RowIndex ?>_bus_depot_id" value="<?= HtmlEncode($Grid->bus_depot_id->CurrentValue) ?>" data-hidden="1">
+<?php } else { ?>
 <span id="el$rowindex$_main_buses_bus_depot_id" class="form-group main_buses_bus_depot_id">
     <select
         id="x<?= $Grid->RowIndex ?>_bus_depot_id"
@@ -1091,6 +1277,7 @@ loadjs.ready("head", function() {
 });
 </script>
 </span>
+<?php } ?>
 <?php } else { ?>
 <span id="el$rowindex$_main_buses_bus_depot_id" class="form-group main_buses_bus_depot_id">
 <span<?= $Grid->bus_depot_id->viewAttributes() ?>>
@@ -1099,6 +1286,30 @@ loadjs.ready("head", function() {
 <input type="hidden" data-table="main_buses" data-field="x_bus_depot_id" data-hidden="1" name="x<?= $Grid->RowIndex ?>_bus_depot_id" id="x<?= $Grid->RowIndex ?>_bus_depot_id" value="<?= HtmlEncode($Grid->bus_depot_id->FormValue) ?>">
 <?php } ?>
 <input type="hidden" data-table="main_buses" data-field="x_bus_depot_id" data-hidden="1" name="o<?= $Grid->RowIndex ?>_bus_depot_id" id="o<?= $Grid->RowIndex ?>_bus_depot_id" value="<?= HtmlEncode($Grid->bus_depot_id->OldValue) ?>">
+</td>
+    <?php } ?>
+    <?php if ($Grid->ts_last_update->Visible) { // ts_last_update ?>
+        <td data-name="ts_last_update">
+<?php if (!$Grid->isConfirm()) { ?>
+<span id="el$rowindex$_main_buses_ts_last_update" class="form-group main_buses_ts_last_update">
+<input type="<?= $Grid->ts_last_update->getInputTextType() ?>" data-table="main_buses" data-field="x_ts_last_update" data-format="1" name="x<?= $Grid->RowIndex ?>_ts_last_update" id="x<?= $Grid->RowIndex ?>_ts_last_update" placeholder="<?= HtmlEncode($Grid->ts_last_update->getPlaceHolder()) ?>" value="<?= $Grid->ts_last_update->EditValue ?>"<?= $Grid->ts_last_update->editAttributes() ?>>
+<div class="invalid-feedback"><?= $Grid->ts_last_update->getErrorMessage() ?></div>
+<?php if (!$Grid->ts_last_update->ReadOnly && !$Grid->ts_last_update->Disabled && !isset($Grid->ts_last_update->EditAttrs["readonly"]) && !isset($Grid->ts_last_update->EditAttrs["disabled"])) { ?>
+<script>
+loadjs.ready(["fmain_busesgrid", "datetimepicker"], function() {
+    ew.createDateTimePicker("fmain_busesgrid", "x<?= $Grid->RowIndex ?>_ts_last_update", {"ignoreReadonly":true,"useCurrent":false,"format":1});
+});
+</script>
+<?php } ?>
+</span>
+<?php } else { ?>
+<span id="el$rowindex$_main_buses_ts_last_update" class="form-group main_buses_ts_last_update">
+<span<?= $Grid->ts_last_update->viewAttributes() ?>>
+<input type="text" readonly class="form-control-plaintext" value="<?= HtmlEncode(RemoveHtml($Grid->ts_last_update->getDisplayValue($Grid->ts_last_update->ViewValue))) ?>"></span>
+</span>
+<input type="hidden" data-table="main_buses" data-field="x_ts_last_update" data-hidden="1" name="x<?= $Grid->RowIndex ?>_ts_last_update" id="x<?= $Grid->RowIndex ?>_ts_last_update" value="<?= HtmlEncode($Grid->ts_last_update->FormValue) ?>">
+<?php } ?>
+<input type="hidden" data-table="main_buses" data-field="x_ts_last_update" data-hidden="1" name="o<?= $Grid->RowIndex ?>_ts_last_update" id="o<?= $Grid->RowIndex ?>_ts_last_update" value="<?= HtmlEncode($Grid->ts_last_update->OldValue) ?>">
 </td>
     <?php } ?>
 <?php

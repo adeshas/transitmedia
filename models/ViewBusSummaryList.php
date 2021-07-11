@@ -525,6 +525,48 @@ class ViewBusSummaryList extends ViewBusSummary
     public function run()
     {
         global $ExportType, $CustomExportType, $ExportFileName, $UserProfile, $Language, $Security, $CurrentForm;
+
+        // Get export parameters
+        $custom = "";
+        if (Param("export") !== null) {
+            $this->Export = Param("export");
+            $custom = Param("custom", "");
+        } elseif (IsPost()) {
+            if (Post("exporttype") !== null) {
+                $this->Export = Post("exporttype");
+            }
+            $custom = Post("custom", "");
+        } elseif (Get("cmd") == "json") {
+            $this->Export = Get("cmd");
+        } else {
+            $this->setExportReturnUrl(CurrentUrl());
+        }
+        $ExportFileName = $this->TableVar; // Get export file, used in header
+
+        // Get custom export parameters
+        if ($this->isExport() && $custom != "") {
+            $this->CustomExport = $this->Export;
+            $this->Export = "print";
+        }
+        $CustomExportType = $this->CustomExport;
+        $ExportType = $this->Export; // Get export parameter, used in header
+
+        // Update Export URLs
+        if (Config("USE_PHPEXCEL")) {
+            $this->ExportExcelCustom = false;
+        }
+        if (Config("USE_PHPWORD")) {
+            $this->ExportWordCustom = false;
+        }
+        if ($this->ExportExcelCustom) {
+            $this->ExportExcelUrl .= "&amp;custom=1";
+        }
+        if ($this->ExportWordCustom) {
+            $this->ExportWordUrl .= "&amp;custom=1";
+        }
+        if ($this->ExportPdfCustom) {
+            $this->ExportPdfUrl .= "&amp;custom=1";
+        }
         $this->CurrentAction = Param("action"); // Set up current action
 
         // Get grid add count
@@ -535,17 +577,22 @@ class ViewBusSummaryList extends ViewBusSummary
 
         // Set up list options
         $this->setupListOptions();
+
+        // Setup export options
+        $this->setupExportOptions();
         $this->exterior_campaign_id->setVisibility();
-        $this->campaign_name->Visible = false;
-        $this->period->Visible = false;
+        $this->campaign_name->setVisibility();
+        $this->period->setVisibility();
         $this->buses->setVisibility();
         $this->active_working->setVisibility();
         $this->requires_maintenance->setVisibility();
-        $this->issues->Visible = false;
-        $this->good_bus_codes->Visible = false;
-        $this->bad_bus_codes->Visible = false;
-        $this->bus_codes->Visible = false;
-        $this->last_updated_at->Visible = false;
+        $this->issues->setVisibility();
+        $this->good_bus_codes->setVisibility();
+        $this->bad_bus_codes->setVisibility();
+        $this->bus_codes->setVisibility();
+        $this->last_updated_at->setVisibility();
+        $this->platform_id->setVisibility();
+        $this->operator_id->setVisibility();
         $this->hideFieldsForAddEdit();
 
         // Global Page Loading event (in userfn*.php)
@@ -573,6 +620,8 @@ class ViewBusSummaryList extends ViewBusSummary
         }
 
         // Set up lookup cache
+        $this->setupLookupOptions($this->platform_id);
+        $this->setupLookupOptions($this->operator_id);
 
         // Search filters
         $srchAdvanced = ""; // Advanced search filter
@@ -622,8 +671,33 @@ class ViewBusSummaryList extends ViewBusSummary
                 $this->OtherOptions->hideAllOptions();
             }
 
+            // Get default search criteria
+            AddFilter($this->DefaultSearchWhere, $this->basicSearchWhere(true));
+
+            // Get basic search values
+            $this->loadBasicSearchValues();
+
+            // Process filter list
+            if ($this->processFilterList()) {
+                $this->terminate();
+                return;
+            }
+
+            // Restore search parms from Session if not searching / reset / export
+            if (($this->isExport() || $this->Command != "search" && $this->Command != "reset" && $this->Command != "resetall") && $this->Command != "json" && $this->checkSearchParms()) {
+                $this->restoreSearchParms();
+            }
+
+            // Call Recordset SearchValidated event
+            $this->recordsetSearchValidated();
+
             // Set up sorting order
             $this->setupSortOrder();
+
+            // Get basic search criteria
+            if (!$this->hasInvalidFields()) {
+                $srchBasic = $this->basicSearchWhere();
+            }
         }
 
         // Restore display records
@@ -637,6 +711,31 @@ class ViewBusSummaryList extends ViewBusSummary
         // Load Sorting Order
         if ($this->Command != "json") {
             $this->loadSortOrder();
+        }
+
+        // Load search default if no existing search criteria
+        if (!$this->checkSearchParms()) {
+            // Load basic search from default
+            $this->BasicSearch->loadDefault();
+            if ($this->BasicSearch->Keyword != "") {
+                $srchBasic = $this->basicSearchWhere();
+            }
+        }
+
+        // Build search criteria
+        AddFilter($this->SearchWhere, $srchAdvanced);
+        AddFilter($this->SearchWhere, $srchBasic);
+
+        // Call Recordset_Searching event
+        $this->recordsetSearching($this->SearchWhere);
+
+        // Save search criteria
+        if ($this->Command == "search" && !$this->RestoreSearch) {
+            $this->setSearchWhere($this->SearchWhere); // Save to Session
+            $this->StartRecord = 1; // Reset start record counter
+            $this->setStartRecordNumber($this->StartRecord);
+        } elseif ($this->Command != "json") {
+            $this->SearchWhere = $this->getSearchWhere();
         }
 
         // Build filter
@@ -654,6 +753,13 @@ class ViewBusSummaryList extends ViewBusSummary
         } else {
             $this->setSessionWhere($filter);
             $this->CurrentFilter = "";
+        }
+
+        // Export data only
+        if (!$this->CustomExport && in_array($this->Export, array_keys(Config("EXPORT_CLASSES")))) {
+            $this->exportData();
+            $this->terminate();
+            return;
         }
         if ($this->isGridAdd()) {
             $this->CurrentFilter = "0=1";
@@ -778,6 +884,340 @@ class ViewBusSummaryList extends ViewBusSummary
         return $wrkFilter;
     }
 
+    // Get list of filters
+    public function getFilterList()
+    {
+        global $UserProfile;
+
+        // Initialize
+        $filterList = "";
+        $savedFilterList = "";
+        $filterList = Concat($filterList, $this->exterior_campaign_id->AdvancedSearch->toJson(), ","); // Field exterior_campaign_id
+        $filterList = Concat($filterList, $this->campaign_name->AdvancedSearch->toJson(), ","); // Field campaign_name
+        $filterList = Concat($filterList, $this->period->AdvancedSearch->toJson(), ","); // Field period
+        $filterList = Concat($filterList, $this->buses->AdvancedSearch->toJson(), ","); // Field buses
+        $filterList = Concat($filterList, $this->active_working->AdvancedSearch->toJson(), ","); // Field active_working
+        $filterList = Concat($filterList, $this->requires_maintenance->AdvancedSearch->toJson(), ","); // Field requires_maintenance
+        $filterList = Concat($filterList, $this->issues->AdvancedSearch->toJson(), ","); // Field issues
+        $filterList = Concat($filterList, $this->good_bus_codes->AdvancedSearch->toJson(), ","); // Field good_bus_codes
+        $filterList = Concat($filterList, $this->bad_bus_codes->AdvancedSearch->toJson(), ","); // Field bad_bus_codes
+        $filterList = Concat($filterList, $this->bus_codes->AdvancedSearch->toJson(), ","); // Field bus_codes
+        $filterList = Concat($filterList, $this->last_updated_at->AdvancedSearch->toJson(), ","); // Field last_updated_at
+        $filterList = Concat($filterList, $this->platform_id->AdvancedSearch->toJson(), ","); // Field platform_id
+        $filterList = Concat($filterList, $this->operator_id->AdvancedSearch->toJson(), ","); // Field operator_id
+        if ($this->BasicSearch->Keyword != "") {
+            $wrk = "\"" . Config("TABLE_BASIC_SEARCH") . "\":\"" . JsEncode($this->BasicSearch->Keyword) . "\",\"" . Config("TABLE_BASIC_SEARCH_TYPE") . "\":\"" . JsEncode($this->BasicSearch->Type) . "\"";
+            $filterList = Concat($filterList, $wrk, ",");
+        }
+
+        // Return filter list in JSON
+        if ($filterList != "") {
+            $filterList = "\"data\":{" . $filterList . "}";
+        }
+        if ($savedFilterList != "") {
+            $filterList = Concat($filterList, "\"filters\":" . $savedFilterList, ",");
+        }
+        return ($filterList != "") ? "{" . $filterList . "}" : "null";
+    }
+
+    // Process filter list
+    protected function processFilterList()
+    {
+        global $UserProfile;
+        if (Post("ajax") == "savefilters") { // Save filter request (Ajax)
+            $filters = Post("filters");
+            $UserProfile->setSearchFilters(CurrentUserName(), "fview_bus_summarylistsrch", $filters);
+            WriteJson([["success" => true]]); // Success
+            return true;
+        } elseif (Post("cmd") == "resetfilter") {
+            $this->restoreFilterList();
+        }
+        return false;
+    }
+
+    // Restore list of filters
+    protected function restoreFilterList()
+    {
+        // Return if not reset filter
+        if (Post("cmd") !== "resetfilter") {
+            return false;
+        }
+        $filter = json_decode(Post("filter"), true);
+        $this->Command = "search";
+
+        // Field exterior_campaign_id
+        $this->exterior_campaign_id->AdvancedSearch->SearchValue = @$filter["x_exterior_campaign_id"];
+        $this->exterior_campaign_id->AdvancedSearch->SearchOperator = @$filter["z_exterior_campaign_id"];
+        $this->exterior_campaign_id->AdvancedSearch->SearchCondition = @$filter["v_exterior_campaign_id"];
+        $this->exterior_campaign_id->AdvancedSearch->SearchValue2 = @$filter["y_exterior_campaign_id"];
+        $this->exterior_campaign_id->AdvancedSearch->SearchOperator2 = @$filter["w_exterior_campaign_id"];
+        $this->exterior_campaign_id->AdvancedSearch->save();
+
+        // Field campaign_name
+        $this->campaign_name->AdvancedSearch->SearchValue = @$filter["x_campaign_name"];
+        $this->campaign_name->AdvancedSearch->SearchOperator = @$filter["z_campaign_name"];
+        $this->campaign_name->AdvancedSearch->SearchCondition = @$filter["v_campaign_name"];
+        $this->campaign_name->AdvancedSearch->SearchValue2 = @$filter["y_campaign_name"];
+        $this->campaign_name->AdvancedSearch->SearchOperator2 = @$filter["w_campaign_name"];
+        $this->campaign_name->AdvancedSearch->save();
+
+        // Field period
+        $this->period->AdvancedSearch->SearchValue = @$filter["x_period"];
+        $this->period->AdvancedSearch->SearchOperator = @$filter["z_period"];
+        $this->period->AdvancedSearch->SearchCondition = @$filter["v_period"];
+        $this->period->AdvancedSearch->SearchValue2 = @$filter["y_period"];
+        $this->period->AdvancedSearch->SearchOperator2 = @$filter["w_period"];
+        $this->period->AdvancedSearch->save();
+
+        // Field buses
+        $this->buses->AdvancedSearch->SearchValue = @$filter["x_buses"];
+        $this->buses->AdvancedSearch->SearchOperator = @$filter["z_buses"];
+        $this->buses->AdvancedSearch->SearchCondition = @$filter["v_buses"];
+        $this->buses->AdvancedSearch->SearchValue2 = @$filter["y_buses"];
+        $this->buses->AdvancedSearch->SearchOperator2 = @$filter["w_buses"];
+        $this->buses->AdvancedSearch->save();
+
+        // Field active_working
+        $this->active_working->AdvancedSearch->SearchValue = @$filter["x_active_working"];
+        $this->active_working->AdvancedSearch->SearchOperator = @$filter["z_active_working"];
+        $this->active_working->AdvancedSearch->SearchCondition = @$filter["v_active_working"];
+        $this->active_working->AdvancedSearch->SearchValue2 = @$filter["y_active_working"];
+        $this->active_working->AdvancedSearch->SearchOperator2 = @$filter["w_active_working"];
+        $this->active_working->AdvancedSearch->save();
+
+        // Field requires_maintenance
+        $this->requires_maintenance->AdvancedSearch->SearchValue = @$filter["x_requires_maintenance"];
+        $this->requires_maintenance->AdvancedSearch->SearchOperator = @$filter["z_requires_maintenance"];
+        $this->requires_maintenance->AdvancedSearch->SearchCondition = @$filter["v_requires_maintenance"];
+        $this->requires_maintenance->AdvancedSearch->SearchValue2 = @$filter["y_requires_maintenance"];
+        $this->requires_maintenance->AdvancedSearch->SearchOperator2 = @$filter["w_requires_maintenance"];
+        $this->requires_maintenance->AdvancedSearch->save();
+
+        // Field issues
+        $this->issues->AdvancedSearch->SearchValue = @$filter["x_issues"];
+        $this->issues->AdvancedSearch->SearchOperator = @$filter["z_issues"];
+        $this->issues->AdvancedSearch->SearchCondition = @$filter["v_issues"];
+        $this->issues->AdvancedSearch->SearchValue2 = @$filter["y_issues"];
+        $this->issues->AdvancedSearch->SearchOperator2 = @$filter["w_issues"];
+        $this->issues->AdvancedSearch->save();
+
+        // Field good_bus_codes
+        $this->good_bus_codes->AdvancedSearch->SearchValue = @$filter["x_good_bus_codes"];
+        $this->good_bus_codes->AdvancedSearch->SearchOperator = @$filter["z_good_bus_codes"];
+        $this->good_bus_codes->AdvancedSearch->SearchCondition = @$filter["v_good_bus_codes"];
+        $this->good_bus_codes->AdvancedSearch->SearchValue2 = @$filter["y_good_bus_codes"];
+        $this->good_bus_codes->AdvancedSearch->SearchOperator2 = @$filter["w_good_bus_codes"];
+        $this->good_bus_codes->AdvancedSearch->save();
+
+        // Field bad_bus_codes
+        $this->bad_bus_codes->AdvancedSearch->SearchValue = @$filter["x_bad_bus_codes"];
+        $this->bad_bus_codes->AdvancedSearch->SearchOperator = @$filter["z_bad_bus_codes"];
+        $this->bad_bus_codes->AdvancedSearch->SearchCondition = @$filter["v_bad_bus_codes"];
+        $this->bad_bus_codes->AdvancedSearch->SearchValue2 = @$filter["y_bad_bus_codes"];
+        $this->bad_bus_codes->AdvancedSearch->SearchOperator2 = @$filter["w_bad_bus_codes"];
+        $this->bad_bus_codes->AdvancedSearch->save();
+
+        // Field bus_codes
+        $this->bus_codes->AdvancedSearch->SearchValue = @$filter["x_bus_codes"];
+        $this->bus_codes->AdvancedSearch->SearchOperator = @$filter["z_bus_codes"];
+        $this->bus_codes->AdvancedSearch->SearchCondition = @$filter["v_bus_codes"];
+        $this->bus_codes->AdvancedSearch->SearchValue2 = @$filter["y_bus_codes"];
+        $this->bus_codes->AdvancedSearch->SearchOperator2 = @$filter["w_bus_codes"];
+        $this->bus_codes->AdvancedSearch->save();
+
+        // Field last_updated_at
+        $this->last_updated_at->AdvancedSearch->SearchValue = @$filter["x_last_updated_at"];
+        $this->last_updated_at->AdvancedSearch->SearchOperator = @$filter["z_last_updated_at"];
+        $this->last_updated_at->AdvancedSearch->SearchCondition = @$filter["v_last_updated_at"];
+        $this->last_updated_at->AdvancedSearch->SearchValue2 = @$filter["y_last_updated_at"];
+        $this->last_updated_at->AdvancedSearch->SearchOperator2 = @$filter["w_last_updated_at"];
+        $this->last_updated_at->AdvancedSearch->save();
+
+        // Field platform_id
+        $this->platform_id->AdvancedSearch->SearchValue = @$filter["x_platform_id"];
+        $this->platform_id->AdvancedSearch->SearchOperator = @$filter["z_platform_id"];
+        $this->platform_id->AdvancedSearch->SearchCondition = @$filter["v_platform_id"];
+        $this->platform_id->AdvancedSearch->SearchValue2 = @$filter["y_platform_id"];
+        $this->platform_id->AdvancedSearch->SearchOperator2 = @$filter["w_platform_id"];
+        $this->platform_id->AdvancedSearch->save();
+
+        // Field operator_id
+        $this->operator_id->AdvancedSearch->SearchValue = @$filter["x_operator_id"];
+        $this->operator_id->AdvancedSearch->SearchOperator = @$filter["z_operator_id"];
+        $this->operator_id->AdvancedSearch->SearchCondition = @$filter["v_operator_id"];
+        $this->operator_id->AdvancedSearch->SearchValue2 = @$filter["y_operator_id"];
+        $this->operator_id->AdvancedSearch->SearchOperator2 = @$filter["w_operator_id"];
+        $this->operator_id->AdvancedSearch->save();
+        $this->BasicSearch->setKeyword(@$filter[Config("TABLE_BASIC_SEARCH")]);
+        $this->BasicSearch->setType(@$filter[Config("TABLE_BASIC_SEARCH_TYPE")]);
+    }
+
+    // Return basic search SQL
+    protected function basicSearchSql($arKeywords, $type)
+    {
+        $where = "";
+        $this->buildBasicSearchSql($where, $this->campaign_name, $arKeywords, $type);
+        $this->buildBasicSearchSql($where, $this->period, $arKeywords, $type);
+        $this->buildBasicSearchSql($where, $this->issues, $arKeywords, $type);
+        $this->buildBasicSearchSql($where, $this->good_bus_codes, $arKeywords, $type);
+        $this->buildBasicSearchSql($where, $this->bad_bus_codes, $arKeywords, $type);
+        $this->buildBasicSearchSql($where, $this->bus_codes, $arKeywords, $type);
+        $this->buildBasicSearchSql($where, $this->last_updated_at, $arKeywords, $type);
+        return $where;
+    }
+
+    // Build basic search SQL
+    protected function buildBasicSearchSql(&$where, &$fld, $arKeywords, $type)
+    {
+        $defCond = ($type == "OR") ? "OR" : "AND";
+        $arSql = []; // Array for SQL parts
+        $arCond = []; // Array for search conditions
+        $cnt = count($arKeywords);
+        $j = 0; // Number of SQL parts
+        for ($i = 0; $i < $cnt; $i++) {
+            $keyword = $arKeywords[$i];
+            $keyword = trim($keyword);
+            if (Config("BASIC_SEARCH_IGNORE_PATTERN") != "") {
+                $keyword = preg_replace(Config("BASIC_SEARCH_IGNORE_PATTERN"), "\\", $keyword);
+                $ar = explode("\\", $keyword);
+            } else {
+                $ar = [$keyword];
+            }
+            foreach ($ar as $keyword) {
+                if ($keyword != "") {
+                    $wrk = "";
+                    if ($keyword == "OR" && $type == "") {
+                        if ($j > 0) {
+                            $arCond[$j - 1] = "OR";
+                        }
+                    } elseif ($keyword == Config("NULL_VALUE")) {
+                        $wrk = $fld->Expression . " IS NULL";
+                    } elseif ($keyword == Config("NOT_NULL_VALUE")) {
+                        $wrk = $fld->Expression . " IS NOT NULL";
+                    } elseif ($fld->IsVirtual && $fld->Visible) {
+                        $wrk = $fld->VirtualExpression . Like(QuotedValue("%" . $keyword . "%", DATATYPE_STRING, $this->Dbid), $this->Dbid);
+                    } elseif ($fld->DataType != DATATYPE_NUMBER || is_numeric($keyword)) {
+                        $wrk = $fld->BasicSearchExpression . Like(QuotedValue("%" . $keyword . "%", DATATYPE_STRING, $this->Dbid), $this->Dbid);
+                    }
+                    if ($wrk != "") {
+                        $arSql[$j] = $wrk;
+                        $arCond[$j] = $defCond;
+                        $j += 1;
+                    }
+                }
+            }
+        }
+        $cnt = count($arSql);
+        $quoted = false;
+        $sql = "";
+        if ($cnt > 0) {
+            for ($i = 0; $i < $cnt - 1; $i++) {
+                if ($arCond[$i] == "OR") {
+                    if (!$quoted) {
+                        $sql .= "(";
+                    }
+                    $quoted = true;
+                }
+                $sql .= $arSql[$i];
+                if ($quoted && $arCond[$i] != "OR") {
+                    $sql .= ")";
+                    $quoted = false;
+                }
+                $sql .= " " . $arCond[$i] . " ";
+            }
+            $sql .= $arSql[$cnt - 1];
+            if ($quoted) {
+                $sql .= ")";
+            }
+        }
+        if ($sql != "") {
+            if ($where != "") {
+                $where .= " OR ";
+            }
+            $where .= "(" . $sql . ")";
+        }
+    }
+
+    // Return basic search WHERE clause based on search keyword and type
+    protected function basicSearchWhere($default = false)
+    {
+        global $Security;
+        $searchStr = "";
+        if (!$Security->canSearch()) {
+            return "";
+        }
+        $searchKeyword = ($default) ? $this->BasicSearch->KeywordDefault : $this->BasicSearch->Keyword;
+        $searchType = ($default) ? $this->BasicSearch->TypeDefault : $this->BasicSearch->Type;
+
+        // Get search SQL
+        if ($searchKeyword != "") {
+            $ar = $this->BasicSearch->keywordList($default);
+            // Search keyword in any fields
+            if (($searchType == "OR" || $searchType == "AND") && $this->BasicSearch->BasicSearchAnyFields) {
+                foreach ($ar as $keyword) {
+                    if ($keyword != "") {
+                        if ($searchStr != "") {
+                            $searchStr .= " " . $searchType . " ";
+                        }
+                        $searchStr .= "(" . $this->basicSearchSql([$keyword], $searchType) . ")";
+                    }
+                }
+            } else {
+                $searchStr = $this->basicSearchSql($ar, $searchType);
+            }
+            if (!$default && in_array($this->Command, ["", "reset", "resetall"])) {
+                $this->Command = "search";
+            }
+        }
+        if (!$default && $this->Command == "search") {
+            $this->BasicSearch->setKeyword($searchKeyword);
+            $this->BasicSearch->setType($searchType);
+        }
+        return $searchStr;
+    }
+
+    // Check if search parm exists
+    protected function checkSearchParms()
+    {
+        // Check basic search
+        if ($this->BasicSearch->issetSession()) {
+            return true;
+        }
+        return false;
+    }
+
+    // Clear all search parameters
+    protected function resetSearchParms()
+    {
+        // Clear search WHERE clause
+        $this->SearchWhere = "";
+        $this->setSearchWhere($this->SearchWhere);
+
+        // Clear basic search parameters
+        $this->resetBasicSearchParms();
+    }
+
+    // Load advanced search default values
+    protected function loadAdvancedSearchDefault()
+    {
+        return false;
+    }
+
+    // Clear all basic search parameters
+    protected function resetBasicSearchParms()
+    {
+        $this->BasicSearch->unsetSession();
+    }
+
+    // Restore all search parameters
+    protected function restoreSearchParms()
+    {
+        $this->RestoreSearch = true;
+
+        // Restore basic search values
+        $this->BasicSearch->load();
+    }
+
     // Set up sort parameters
     protected function setupSortOrder()
     {
@@ -786,9 +1226,18 @@ class ViewBusSummaryList extends ViewBusSummary
             $this->CurrentOrder = Get("order");
             $this->CurrentOrderType = Get("ordertype", "");
             $this->updateSort($this->exterior_campaign_id); // exterior_campaign_id
+            $this->updateSort($this->campaign_name); // campaign_name
+            $this->updateSort($this->period); // period
             $this->updateSort($this->buses); // buses
             $this->updateSort($this->active_working); // active_working
             $this->updateSort($this->requires_maintenance); // requires_maintenance
+            $this->updateSort($this->issues); // issues
+            $this->updateSort($this->good_bus_codes); // good_bus_codes
+            $this->updateSort($this->bad_bus_codes); // bad_bus_codes
+            $this->updateSort($this->bus_codes); // bus_codes
+            $this->updateSort($this->last_updated_at); // last_updated_at
+            $this->updateSort($this->platform_id); // platform_id
+            $this->updateSort($this->operator_id); // operator_id
             $this->setStartRecordNumber(1); // Reset start position
         }
     }
@@ -819,6 +1268,11 @@ class ViewBusSummaryList extends ViewBusSummary
     {
         // Check if reset command
         if (StartsString("reset", $this->Command)) {
+            // Reset search criteria
+            if ($this->Command == "reset" || $this->Command == "resetall") {
+                $this->resetSearchParms();
+            }
+
             // Reset (clear) sorting order
             if ($this->Command == "resetsort") {
                 $orderBy = "";
@@ -834,6 +1288,8 @@ class ViewBusSummaryList extends ViewBusSummary
                 $this->bad_bus_codes->setSort("");
                 $this->bus_codes->setSort("");
                 $this->last_updated_at->setSort("");
+                $this->platform_id->setSort("");
+                $this->operator_id->setSort("");
             }
 
             // Reset start position
@@ -960,10 +1416,10 @@ class ViewBusSummaryList extends ViewBusSummary
         // Filter button
         $item = &$this->FilterOptions->add("savecurrentfilter");
         $item->Body = "<a class=\"ew-save-filter\" data-form=\"fview_bus_summarylistsrch\" href=\"#\" onclick=\"return false;\">" . $Language->phrase("SaveCurrentFilter") . "</a>";
-        $item->Visible = false;
+        $item->Visible = true;
         $item = &$this->FilterOptions->add("deletefilter");
         $item->Body = "<a class=\"ew-delete-filter\" data-form=\"fview_bus_summarylistsrch\" href=\"#\" onclick=\"return false;\">" . $Language->phrase("DeleteFilter") . "</a>";
-        $item->Visible = false;
+        $item->Visible = true;
         $this->FilterOptions->UseDropDownButton = true;
         $this->FilterOptions->UseButtonGroup = !$this->FilterOptions->UseDropDownButton;
         $this->FilterOptions->DropDownButtonPhrase = $Language->phrase("Filters");
@@ -1095,6 +1551,16 @@ class ViewBusSummaryList extends ViewBusSummary
     {
     }
 
+    // Load basic search values
+    protected function loadBasicSearchValues()
+    {
+        $this->BasicSearch->setKeyword(Get(Config("TABLE_BASIC_SEARCH"), ""), false);
+        if ($this->BasicSearch->Keyword != "" && $this->Command == "") {
+            $this->Command = "search";
+        }
+        $this->BasicSearch->setType(Get(Config("TABLE_BASIC_SEARCH_TYPE"), ""), false);
+    }
+
     // Load recordset
     public function loadRecordset($offset = -1, $rowcnt = -1)
     {
@@ -1174,6 +1640,8 @@ class ViewBusSummaryList extends ViewBusSummary
         $this->bad_bus_codes->setDbValue($row['bad_bus_codes']);
         $this->bus_codes->setDbValue($row['bus_codes']);
         $this->last_updated_at->setDbValue($row['last_updated_at']);
+        $this->platform_id->setDbValue($row['platform_id']);
+        $this->operator_id->setDbValue($row['operator_id']);
     }
 
     // Return a row with default values
@@ -1191,6 +1659,8 @@ class ViewBusSummaryList extends ViewBusSummary
         $row['bad_bus_codes'] = null;
         $row['bus_codes'] = null;
         $row['last_updated_at'] = null;
+        $row['platform_id'] = null;
+        $row['operator_id'] = null;
         return $row;
     }
 
@@ -1223,6 +1693,7 @@ class ViewBusSummaryList extends ViewBusSummary
         // campaign_name
 
         // period
+        $this->period->CellCssStyle = "white-space: nowrap;";
 
         // buses
 
@@ -1239,11 +1710,23 @@ class ViewBusSummaryList extends ViewBusSummary
         // bus_codes
 
         // last_updated_at
+
+        // platform_id
+
+        // operator_id
         if ($this->RowType == ROWTYPE_VIEW) {
             // exterior_campaign_id
             $this->exterior_campaign_id->ViewValue = $this->exterior_campaign_id->CurrentValue;
             $this->exterior_campaign_id->ViewValue = FormatNumber($this->exterior_campaign_id->ViewValue, 0, -2, -2, -2);
             $this->exterior_campaign_id->ViewCustomAttributes = "";
+
+            // campaign_name
+            $this->campaign_name->ViewValue = $this->campaign_name->CurrentValue;
+            $this->campaign_name->ViewCustomAttributes = "";
+
+            // period
+            $this->period->ViewValue = $this->period->CurrentValue;
+            $this->period->ViewCustomAttributes = "";
 
             // buses
             $this->buses->ViewValue = $this->buses->CurrentValue;
@@ -1260,10 +1743,82 @@ class ViewBusSummaryList extends ViewBusSummary
             $this->requires_maintenance->ViewValue = FormatNumber($this->requires_maintenance->ViewValue, 0, -2, -2, -2);
             $this->requires_maintenance->ViewCustomAttributes = "";
 
+            // issues
+            $this->issues->ViewValue = $this->issues->CurrentValue;
+            $this->issues->ViewCustomAttributes = "";
+
+            // good_bus_codes
+            $this->good_bus_codes->ViewValue = $this->good_bus_codes->CurrentValue;
+            $this->good_bus_codes->ViewCustomAttributes = "";
+
+            // bad_bus_codes
+            $this->bad_bus_codes->ViewValue = $this->bad_bus_codes->CurrentValue;
+            $this->bad_bus_codes->ViewCustomAttributes = "";
+
+            // bus_codes
+            $this->bus_codes->ViewValue = $this->bus_codes->CurrentValue;
+            $this->bus_codes->ViewCustomAttributes = "";
+
+            // last_updated_at
+            $this->last_updated_at->ViewValue = $this->last_updated_at->CurrentValue;
+            $this->last_updated_at->ViewCustomAttributes = "";
+
+            // platform_id
+            $curVal = strval($this->platform_id->CurrentValue);
+            if ($curVal != "") {
+                $this->platform_id->ViewValue = $this->platform_id->lookupCacheOption($curVal);
+                if ($this->platform_id->ViewValue === null) { // Lookup from database
+                    $filterWrk = "\"id\"" . SearchString("=", $curVal, DATATYPE_NUMBER, "");
+                    $sqlWrk = $this->platform_id->Lookup->getSql(false, $filterWrk, '', $this, true, true);
+                    $rswrk = Conn()->executeQuery($sqlWrk)->fetchAll(\PDO::FETCH_BOTH);
+                    $ari = count($rswrk);
+                    if ($ari > 0) { // Lookup values found
+                        $arwrk = $this->platform_id->Lookup->renderViewRow($rswrk[0]);
+                        $this->platform_id->ViewValue = $this->platform_id->displayValue($arwrk);
+                    } else {
+                        $this->platform_id->ViewValue = $this->platform_id->CurrentValue;
+                    }
+                }
+            } else {
+                $this->platform_id->ViewValue = null;
+            }
+            $this->platform_id->ViewCustomAttributes = "";
+
+            // operator_id
+            $curVal = strval($this->operator_id->CurrentValue);
+            if ($curVal != "") {
+                $this->operator_id->ViewValue = $this->operator_id->lookupCacheOption($curVal);
+                if ($this->operator_id->ViewValue === null) { // Lookup from database
+                    $filterWrk = "\"id\"" . SearchString("=", $curVal, DATATYPE_NUMBER, "");
+                    $sqlWrk = $this->operator_id->Lookup->getSql(false, $filterWrk, '', $this, true, true);
+                    $rswrk = Conn()->executeQuery($sqlWrk)->fetchAll(\PDO::FETCH_BOTH);
+                    $ari = count($rswrk);
+                    if ($ari > 0) { // Lookup values found
+                        $arwrk = $this->operator_id->Lookup->renderViewRow($rswrk[0]);
+                        $this->operator_id->ViewValue = $this->operator_id->displayValue($arwrk);
+                    } else {
+                        $this->operator_id->ViewValue = $this->operator_id->CurrentValue;
+                    }
+                }
+            } else {
+                $this->operator_id->ViewValue = null;
+            }
+            $this->operator_id->ViewCustomAttributes = "";
+
             // exterior_campaign_id
             $this->exterior_campaign_id->LinkCustomAttributes = "";
             $this->exterior_campaign_id->HrefValue = "";
             $this->exterior_campaign_id->TooltipValue = "";
+
+            // campaign_name
+            $this->campaign_name->LinkCustomAttributes = "";
+            $this->campaign_name->HrefValue = "";
+            $this->campaign_name->TooltipValue = "";
+
+            // period
+            $this->period->LinkCustomAttributes = "";
+            $this->period->HrefValue = "";
+            $this->period->TooltipValue = "";
 
             // buses
             $this->buses->LinkCustomAttributes = "";
@@ -1279,12 +1834,143 @@ class ViewBusSummaryList extends ViewBusSummary
             $this->requires_maintenance->LinkCustomAttributes = "";
             $this->requires_maintenance->HrefValue = "";
             $this->requires_maintenance->TooltipValue = "";
+
+            // issues
+            $this->issues->LinkCustomAttributes = "";
+            $this->issues->HrefValue = "";
+            $this->issues->TooltipValue = "";
+
+            // good_bus_codes
+            $this->good_bus_codes->LinkCustomAttributes = "";
+            $this->good_bus_codes->HrefValue = "";
+            $this->good_bus_codes->TooltipValue = "";
+
+            // bad_bus_codes
+            $this->bad_bus_codes->LinkCustomAttributes = "";
+            $this->bad_bus_codes->HrefValue = "";
+            $this->bad_bus_codes->TooltipValue = "";
+
+            // bus_codes
+            $this->bus_codes->LinkCustomAttributes = "";
+            $this->bus_codes->HrefValue = "";
+            $this->bus_codes->TooltipValue = "";
+
+            // last_updated_at
+            $this->last_updated_at->LinkCustomAttributes = "";
+            $this->last_updated_at->HrefValue = "";
+            $this->last_updated_at->TooltipValue = "";
+
+            // platform_id
+            $this->platform_id->LinkCustomAttributes = "";
+            $this->platform_id->HrefValue = "";
+            $this->platform_id->TooltipValue = "";
+
+            // operator_id
+            $this->operator_id->LinkCustomAttributes = "";
+            $this->operator_id->HrefValue = "";
+            $this->operator_id->TooltipValue = "";
         }
 
         // Call Row Rendered event
         if ($this->RowType != ROWTYPE_AGGREGATEINIT) {
             $this->rowRendered();
         }
+    }
+
+    // Get export HTML tag
+    protected function getExportTag($type, $custom = false)
+    {
+        global $Language;
+        $pageUrl = $this->pageUrl();
+        if (SameText($type, "excel")) {
+            if ($custom) {
+                return "<a href=\"#\" class=\"ew-export-link ew-excel\" title=\"" . HtmlEncode($Language->phrase("ExportToExcelText")) . "\" data-caption=\"" . HtmlEncode($Language->phrase("ExportToExcelText")) . "\" onclick=\"return ew.export(document.fview_bus_summarylist, '" . $this->ExportExcelUrl . "', 'excel', true);\">" . $Language->phrase("ExportToExcel") . "</a>";
+            } else {
+                return "<a href=\"" . $this->ExportExcelUrl . "\" class=\"ew-export-link ew-excel\" title=\"" . HtmlEncode($Language->phrase("ExportToExcelText")) . "\" data-caption=\"" . HtmlEncode($Language->phrase("ExportToExcelText")) . "\">" . $Language->phrase("ExportToExcel") . "</a>";
+            }
+        } elseif (SameText($type, "word")) {
+            if ($custom) {
+                return "<a href=\"#\" class=\"ew-export-link ew-word\" title=\"" . HtmlEncode($Language->phrase("ExportToWordText")) . "\" data-caption=\"" . HtmlEncode($Language->phrase("ExportToWordText")) . "\" onclick=\"return ew.export(document.fview_bus_summarylist, '" . $this->ExportWordUrl . "', 'word', true);\">" . $Language->phrase("ExportToWord") . "</a>";
+            } else {
+                return "<a href=\"" . $this->ExportWordUrl . "\" class=\"ew-export-link ew-word\" title=\"" . HtmlEncode($Language->phrase("ExportToWordText")) . "\" data-caption=\"" . HtmlEncode($Language->phrase("ExportToWordText")) . "\">" . $Language->phrase("ExportToWord") . "</a>";
+            }
+        } elseif (SameText($type, "pdf")) {
+            if ($custom) {
+                return "<a href=\"#\" class=\"ew-export-link ew-pdf\" title=\"" . HtmlEncode($Language->phrase("ExportToPDFText")) . "\" data-caption=\"" . HtmlEncode($Language->phrase("ExportToPDFText")) . "\" onclick=\"return ew.export(document.fview_bus_summarylist, '" . $this->ExportPdfUrl . "', 'pdf', true);\">" . $Language->phrase("ExportToPDF") . "</a>";
+            } else {
+                return "<a href=\"" . $this->ExportPdfUrl . "\" class=\"ew-export-link ew-pdf\" title=\"" . HtmlEncode($Language->phrase("ExportToPDFText")) . "\" data-caption=\"" . HtmlEncode($Language->phrase("ExportToPDFText")) . "\">" . $Language->phrase("ExportToPDF") . "</a>";
+            }
+        } elseif (SameText($type, "html")) {
+            return "<a href=\"" . $this->ExportHtmlUrl . "\" class=\"ew-export-link ew-html\" title=\"" . HtmlEncode($Language->phrase("ExportToHtmlText")) . "\" data-caption=\"" . HtmlEncode($Language->phrase("ExportToHtmlText")) . "\">" . $Language->phrase("ExportToHtml") . "</a>";
+        } elseif (SameText($type, "xml")) {
+            return "<a href=\"" . $this->ExportXmlUrl . "\" class=\"ew-export-link ew-xml\" title=\"" . HtmlEncode($Language->phrase("ExportToXmlText")) . "\" data-caption=\"" . HtmlEncode($Language->phrase("ExportToXmlText")) . "\">" . $Language->phrase("ExportToXml") . "</a>";
+        } elseif (SameText($type, "csv")) {
+            return "<a href=\"" . $this->ExportCsvUrl . "\" class=\"ew-export-link ew-csv\" title=\"" . HtmlEncode($Language->phrase("ExportToCsvText")) . "\" data-caption=\"" . HtmlEncode($Language->phrase("ExportToCsvText")) . "\">" . $Language->phrase("ExportToCsv") . "</a>";
+        } elseif (SameText($type, "email")) {
+            $url = $custom ? ",url:'" . $pageUrl . "export=email&amp;custom=1'" : "";
+            return '<button id="emf_view_bus_summary" class="ew-export-link ew-email" title="' . $Language->phrase("ExportToEmailText") . '" data-caption="' . $Language->phrase("ExportToEmailText") . '" onclick="ew.emailDialogShow({lnk:\'emf_view_bus_summary\', hdr:ew.language.phrase(\'ExportToEmailText\'), f:document.fview_bus_summarylist, sel:false' . $url . '});">' . $Language->phrase("ExportToEmail") . '</button>';
+        } elseif (SameText($type, "print")) {
+            return "<a href=\"" . $this->ExportPrintUrl . "\" class=\"ew-export-link ew-print\" title=\"" . HtmlEncode($Language->phrase("PrinterFriendlyText")) . "\" data-caption=\"" . HtmlEncode($Language->phrase("PrinterFriendlyText")) . "\">" . $Language->phrase("PrinterFriendly") . "</a>";
+        }
+    }
+
+    // Set up export options
+    protected function setupExportOptions()
+    {
+        global $Language;
+
+        // Printer friendly
+        $item = &$this->ExportOptions->add("print");
+        $item->Body = $this->getExportTag("print");
+        $item->Visible = true;
+
+        // Export to Excel
+        $item = &$this->ExportOptions->add("excel");
+        $item->Body = $this->getExportTag("excel");
+        $item->Visible = true;
+
+        // Export to Word
+        $item = &$this->ExportOptions->add("word");
+        $item->Body = $this->getExportTag("word");
+        $item->Visible = true;
+
+        // Export to Html
+        $item = &$this->ExportOptions->add("html");
+        $item->Body = $this->getExportTag("html");
+        $item->Visible = true;
+
+        // Export to Xml
+        $item = &$this->ExportOptions->add("xml");
+        $item->Body = $this->getExportTag("xml");
+        $item->Visible = false;
+
+        // Export to Csv
+        $item = &$this->ExportOptions->add("csv");
+        $item->Body = $this->getExportTag("csv");
+        $item->Visible = true;
+
+        // Export to Pdf
+        $item = &$this->ExportOptions->add("pdf");
+        $item->Body = $this->getExportTag("pdf");
+        $item->Visible = false;
+
+        // Export to Email
+        $item = &$this->ExportOptions->add("email");
+        $item->Body = $this->getExportTag("email");
+        $item->Visible = false;
+
+        // Drop down button for export
+        $this->ExportOptions->UseButtonGroup = true;
+        $this->ExportOptions->UseDropDownButton = true;
+        if ($this->ExportOptions->UseButtonGroup && IsMobile()) {
+            $this->ExportOptions->UseDropDownButton = true;
+        }
+        $this->ExportOptions->DropDownButtonPhrase = $Language->phrase("ButtonExport");
+
+        // Add group option item
+        $item = &$this->ExportOptions->add($this->ExportOptions->GroupOptionName);
+        $item->Body = "";
+        $item->Visible = false;
     }
 
     // Set up search/sort options
@@ -1294,6 +1980,17 @@ class ViewBusSummaryList extends ViewBusSummary
         $pageUrl = $this->pageUrl();
         $this->SearchOptions = new ListOptions("div");
         $this->SearchOptions->TagClassName = "ew-search-option";
+
+        // Search button
+        $item = &$this->SearchOptions->add("searchtoggle");
+        $searchToggleClass = ($this->SearchWhere != "") ? " active" : " active";
+        $item->Body = "<a class=\"btn btn-default ew-search-toggle" . $searchToggleClass . "\" href=\"#\" role=\"button\" title=\"" . $Language->phrase("SearchPanel") . "\" data-caption=\"" . $Language->phrase("SearchPanel") . "\" data-toggle=\"button\" data-form=\"fview_bus_summarylistsrch\" aria-pressed=\"" . ($searchToggleClass == " active" ? "true" : "false") . "\">" . $Language->phrase("SearchLink") . "</a>";
+        $item->Visible = true;
+
+        // Show all button
+        $item = &$this->SearchOptions->add("showall");
+        $item->Body = "<a class=\"btn btn-default ew-show-all\" title=\"" . $Language->phrase("ShowAll") . "\" data-caption=\"" . $Language->phrase("ShowAll") . "\" href=\"" . $pageUrl . "cmd=reset\">" . $Language->phrase("ShowAllBtn") . "</a>";
+        $item->Visible = ($this->SearchWhere != $this->DefaultSearchWhere && $this->SearchWhere != "0=101");
 
         // Button group for search
         $this->SearchOptions->UseDropDownButton = false;
@@ -1312,6 +2009,100 @@ class ViewBusSummaryList extends ViewBusSummary
         if (!$Security->canSearch()) {
             $this->SearchOptions->hideAllOptions();
             $this->FilterOptions->hideAllOptions();
+        }
+    }
+
+    /**
+    * Export data in HTML/CSV/Word/Excel/XML/Email/PDF format
+    *
+    * @param boolean $return Return the data rather than output it
+    * @return mixed
+    */
+    public function exportData($return = false)
+    {
+        global $Language;
+        $utf8 = SameText(Config("PROJECT_CHARSET"), "utf-8");
+
+        // Load recordset
+        $this->TotalRecords = $this->listRecordCount();
+        $this->StartRecord = 1;
+
+        // Export all
+        if ($this->ExportAll) {
+            set_time_limit(Config("EXPORT_ALL_TIME_LIMIT"));
+            $this->DisplayRecords = $this->TotalRecords;
+            $this->StopRecord = $this->TotalRecords;
+        } else { // Export one page only
+            $this->setupStartRecord(); // Set up start record position
+            // Set the last record to display
+            if ($this->DisplayRecords <= 0) {
+                $this->StopRecord = $this->TotalRecords;
+            } else {
+                $this->StopRecord = $this->StartRecord + $this->DisplayRecords - 1;
+            }
+        }
+        $rs = $this->loadRecordset($this->StartRecord - 1, $this->DisplayRecords <= 0 ? $this->TotalRecords : $this->DisplayRecords);
+        $this->ExportDoc = GetExportDocument($this, "h");
+        $doc = &$this->ExportDoc;
+        if (!$doc) {
+            $this->setFailureMessage($Language->phrase("ExportClassNotFound")); // Export class not found
+        }
+        if (!$rs || !$doc) {
+            RemoveHeader("Content-Type"); // Remove header
+            RemoveHeader("Content-Disposition");
+            $this->showMessage();
+            return;
+        }
+        $this->StartRecord = 1;
+        $this->StopRecord = $this->DisplayRecords <= 0 ? $this->TotalRecords : $this->DisplayRecords;
+
+        // Call Page Exporting server event
+        $this->ExportDoc->ExportCustom = !$this->pageExporting();
+        $header = $this->PageHeader;
+        $this->pageDataRendering($header);
+        $doc->Text .= $header;
+        $this->exportDocument($doc, $rs, $this->StartRecord, $this->StopRecord, "");
+        $footer = $this->PageFooter;
+        $this->pageDataRendered($footer);
+        $doc->Text .= $footer;
+
+        // Close recordset
+        $rs->close();
+
+        // Call Page Exported server event
+        $this->pageExported();
+
+        // Export header and footer
+        $doc->exportHeaderAndFooter();
+
+        // Clean output buffer (without destroying output buffer)
+        $buffer = ob_get_contents(); // Save the output buffer
+        if (!Config("DEBUG") && $buffer) {
+            ob_clean();
+        }
+
+        // Write debug message if enabled
+        if (Config("DEBUG") && !$this->isExport("pdf")) {
+            echo GetDebugMessage();
+        }
+
+        // Output data
+        if ($this->isExport("email")) {
+            // Export-to-email disabled
+        } else {
+            $doc->export();
+            if ($return) {
+                RemoveHeader("Content-Type"); // Remove header
+                RemoveHeader("Content-Disposition");
+                $content = ob_get_contents();
+                if ($content) {
+                    ob_clean();
+                }
+                if ($buffer) {
+                    echo $buffer; // Resume the output buffer
+                }
+                return $content;
+            }
         }
     }
 
@@ -1338,6 +2129,10 @@ class ViewBusSummaryList extends ViewBusSummary
 
             // Set up lookup SQL and connection
             switch ($fld->FieldVar) {
+                case "x_platform_id":
+                    break;
+                case "x_operator_id":
+                    break;
                 default:
                     $lookupFilter = "";
                     break;

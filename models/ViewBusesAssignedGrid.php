@@ -1086,7 +1086,6 @@ class ViewBusesAssignedGrid extends ViewBusesAssigned
         $this->listOptionsRendering();
 
         // Set up row action and key
-        $keyName = "";
         if ($CurrentForm && is_numeric($this->RowIndex) && $this->RowType != "view") {
             $CurrentForm->Index = $this->RowIndex;
             $actionName = str_replace("k_", "k" . $this->RowIndex . "_", $this->FormActionName);
@@ -1119,8 +1118,6 @@ class ViewBusesAssignedGrid extends ViewBusesAssigned
         }
         if ($this->CurrentMode == "view") { // View mode
         } // End View mode
-        if ($this->CurrentMode == "edit" && is_numeric($this->RowIndex) && $this->RowAction != "delete") {
-        }
         $this->renderListOptionsExt();
 
         // Call ListOptions_Rendered event
@@ -1362,7 +1359,7 @@ class ViewBusesAssignedGrid extends ViewBusesAssigned
                 $this->transaction_id->ViewValue = $this->transaction_id->lookupCacheOption($curVal);
                 if ($this->transaction_id->ViewValue === null) { // Lookup from database
                     $filterWrk = "\"transaction_id\"" . SearchString("=", $curVal, DATATYPE_NUMBER, "");
-                    $sqlWrk = $this->transaction_id->Lookup->getSql(false, $filterWrk, '', $this, true);
+                    $sqlWrk = $this->transaction_id->Lookup->getSql(false, $filterWrk, '', $this, true, true);
                     $rswrk = Conn()->executeQuery($sqlWrk)->fetchAll(\PDO::FETCH_BOTH);
                     $ari = count($rswrk);
                     if ($ari > 0) { // Lookup values found
@@ -1404,7 +1401,7 @@ class ViewBusesAssignedGrid extends ViewBusesAssigned
                     $this->transaction_id->ViewValue = $this->transaction_id->lookupCacheOption($curVal);
                     if ($this->transaction_id->ViewValue === null) { // Lookup from database
                         $filterWrk = "\"transaction_id\"" . SearchString("=", $curVal, DATATYPE_NUMBER, "");
-                        $sqlWrk = $this->transaction_id->Lookup->getSql(false, $filterWrk, '', $this, true);
+                        $sqlWrk = $this->transaction_id->Lookup->getSql(false, $filterWrk, '', $this, true, true);
                         $rswrk = Conn()->executeQuery($sqlWrk)->fetchAll(\PDO::FETCH_BOTH);
                         $ari = count($rswrk);
                         if ($ari > 0) { // Lookup values found
@@ -1433,7 +1430,7 @@ class ViewBusesAssignedGrid extends ViewBusesAssigned
                     } else {
                         $filterWrk = "\"transaction_id\"" . SearchString("=", $this->transaction_id->CurrentValue, DATATYPE_NUMBER, "");
                     }
-                    $sqlWrk = $this->transaction_id->Lookup->getSql(true, $filterWrk, '', $this);
+                    $sqlWrk = $this->transaction_id->Lookup->getSql(true, $filterWrk, '', $this, false, true);
                     $rswrk = Conn()->executeQuery($sqlWrk)->fetchAll(\PDO::FETCH_BOTH);
                     $ari = count($rswrk);
                     $arwrk = $rswrk;
@@ -1469,7 +1466,7 @@ class ViewBusesAssignedGrid extends ViewBusesAssigned
                     $this->transaction_id->ViewValue = $this->transaction_id->lookupCacheOption($curVal);
                     if ($this->transaction_id->ViewValue === null) { // Lookup from database
                         $filterWrk = "\"transaction_id\"" . SearchString("=", $curVal, DATATYPE_NUMBER, "");
-                        $sqlWrk = $this->transaction_id->Lookup->getSql(false, $filterWrk, '', $this, true);
+                        $sqlWrk = $this->transaction_id->Lookup->getSql(false, $filterWrk, '', $this, true, true);
                         $rswrk = Conn()->executeQuery($sqlWrk)->fetchAll(\PDO::FETCH_BOTH);
                         $ari = count($rswrk);
                         if ($ari > 0) { // Lookup values found
@@ -1498,7 +1495,7 @@ class ViewBusesAssignedGrid extends ViewBusesAssigned
                     } else {
                         $filterWrk = "\"transaction_id\"" . SearchString("=", $this->transaction_id->CurrentValue, DATATYPE_NUMBER, "");
                     }
-                    $sqlWrk = $this->transaction_id->Lookup->getSql(true, $filterWrk, '', $this);
+                    $sqlWrk = $this->transaction_id->Lookup->getSql(true, $filterWrk, '', $this, false, true);
                     $rswrk = Conn()->executeQuery($sqlWrk)->fetchAll(\PDO::FETCH_BOTH);
                     $ari = count($rswrk);
                     $arwrk = $rswrk;
@@ -1654,6 +1651,9 @@ class ViewBusesAssignedGrid extends ViewBusesAssigned
             $this->bus->setDbValueDef($rsnew, $this->bus->CurrentValue, null, $this->bus->ReadOnly);
 
             // transaction_id
+            if ($this->transaction_id->getSessionValue() != "") {
+                $this->transaction_id->ReadOnly = true;
+            }
             $this->transaction_id->setDbValueDef($rsnew, $this->transaction_id->CurrentValue, null, $this->transaction_id->ReadOnly);
 
             // Call Row Updating event

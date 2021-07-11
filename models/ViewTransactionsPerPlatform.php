@@ -37,9 +37,6 @@ class ViewTransactionsPerPlatform extends DbTable
     public $vendor;
     public $operator;
     public $transaction_status;
-    public $quantity;
-    public $lamata_fee;
-    public $total;
     public $start_date;
     public $end_date;
     public $platform;
@@ -51,6 +48,13 @@ class ViewTransactionsPerPlatform extends DbTable
     public $bus_size_id;
     public $vendor_search_id;
     public $vendor_search_name;
+    public $price;
+    public $quantity;
+    public $amount_paid;
+    public $transitmedia_fee;
+    public $lasaa_fee;
+    public $operator_fee;
+    public $lamata_fee;
 
     // Page ID
     public $PageID = ""; // To be overridden by subclass
@@ -72,7 +76,7 @@ class ViewTransactionsPerPlatform extends DbTable
         $this->Dbid = 'DB';
         $this->ExportAll = true;
         $this->ExportPageBreakCount = 0; // Page break per every n record (PDF only)
-        $this->ExportPageOrientation = "portrait"; // Page orientation (PDF only)
+        $this->ExportPageOrientation = "landscape"; // Page orientation (PDF only)
         $this->ExportPageSize = "a4"; // Page size (PDF only)
         $this->ExportExcelPageOrientation = ""; // Page orientation (PhpSpreadsheet only)
         $this->ExportExcelPageSize = ""; // Page size (PhpSpreadsheet only)
@@ -133,25 +137,6 @@ class ViewTransactionsPerPlatform extends DbTable
         $this->transaction_status = new DbField('view_transactions_per_platform', 'view_transactions_per_platform', 'x_transaction_status', 'transaction_status', '"transaction_status"', '"transaction_status"', 200, 0, -1, false, '"transaction_status"', false, false, false, 'FORMATTED TEXT', 'TEXT');
         $this->transaction_status->Sortable = true; // Allow sort
         $this->Fields['transaction_status'] = &$this->transaction_status;
-
-        // quantity
-        $this->quantity = new DbField('view_transactions_per_platform', 'view_transactions_per_platform', 'x_quantity', 'quantity', '"quantity"', 'CAST("quantity" AS varchar(255))', 3, 4, -1, false, '"quantity"', false, false, false, 'FORMATTED TEXT', 'TEXT');
-        $this->quantity->Sortable = true; // Allow sort
-        $this->quantity->DefaultErrorMessage = $Language->phrase("IncorrectInteger");
-        $this->Fields['quantity'] = &$this->quantity;
-
-        // lamata_fee
-        $this->lamata_fee = new DbField('view_transactions_per_platform', 'view_transactions_per_platform', 'x_lamata_fee', 'lamata_fee', '"lamata_fee"', 'CAST("lamata_fee" AS varchar(255))', 20, 8, -1, false, '"lamata_fee"', false, false, false, 'FORMATTED TEXT', 'TEXT');
-        $this->lamata_fee->Sortable = true; // Allow sort
-        $this->lamata_fee->DefaultErrorMessage = $Language->phrase("IncorrectInteger");
-        $this->Fields['lamata_fee'] = &$this->lamata_fee;
-
-        // total
-        $this->total = new DbField('view_transactions_per_platform', 'view_transactions_per_platform', 'x_total', 'total', 'quantity * lamata_fee', 'CAST(quantity * lamata_fee AS varchar(255))', 20, 8, -1, false, 'quantity * lamata_fee', false, false, false, 'FORMATTED TEXT', 'TEXT');
-        $this->total->IsCustom = true; // Custom field
-        $this->total->Sortable = true; // Allow sort
-        $this->total->DefaultErrorMessage = $Language->phrase("IncorrectInteger");
-        $this->Fields['total'] = &$this->total;
 
         // start_date
         $this->start_date = new DbField('view_transactions_per_platform', 'view_transactions_per_platform', 'x_start_date', 'start_date', '"start_date"', CastDateFieldForLike("\"start_date\"", 0, "DB"), 133, 4, 0, false, '"start_date"', false, false, false, 'FORMATTED TEXT', 'TEXT');
@@ -216,6 +201,48 @@ class ViewTransactionsPerPlatform extends DbTable
         $this->vendor_search_name = new DbField('view_transactions_per_platform', 'view_transactions_per_platform', 'x_vendor_search_name', 'vendor_search_name', '"vendor_search_name"', '"vendor_search_name"', 200, 0, -1, false, '"vendor_search_name"', false, false, false, 'FORMATTED TEXT', 'TEXT');
         $this->vendor_search_name->Sortable = false; // Allow sort
         $this->Fields['vendor_search_name'] = &$this->vendor_search_name;
+
+        // price
+        $this->price = new DbField('view_transactions_per_platform', 'view_transactions_per_platform', 'x_price', 'price', '"price"', 'CAST("price" AS varchar(255))', 20, 8, -1, false, '"price"', false, false, false, 'FORMATTED TEXT', 'TEXT');
+        $this->price->Sortable = true; // Allow sort
+        $this->price->DefaultErrorMessage = $Language->phrase("IncorrectInteger");
+        $this->Fields['price'] = &$this->price;
+
+        // quantity
+        $this->quantity = new DbField('view_transactions_per_platform', 'view_transactions_per_platform', 'x_quantity', 'quantity', '"quantity"', 'CAST("quantity" AS varchar(255))', 3, 4, -1, false, '"quantity"', false, false, false, 'FORMATTED TEXT', 'TEXT');
+        $this->quantity->Sortable = true; // Allow sort
+        $this->quantity->DefaultErrorMessage = $Language->phrase("IncorrectInteger");
+        $this->Fields['quantity'] = &$this->quantity;
+
+        // amount_paid
+        $this->amount_paid = new DbField('view_transactions_per_platform', 'view_transactions_per_platform', 'x_amount_paid', 'amount_paid', '"amount_paid"', 'CAST("amount_paid" AS varchar(255))', 20, 8, -1, false, '"amount_paid"', false, false, false, 'FORMATTED TEXT', 'TEXT');
+        $this->amount_paid->Sortable = true; // Allow sort
+        $this->amount_paid->DefaultErrorMessage = $Language->phrase("IncorrectInteger");
+        $this->Fields['amount_paid'] = &$this->amount_paid;
+
+        // transitmedia_fee
+        $this->transitmedia_fee = new DbField('view_transactions_per_platform', 'view_transactions_per_platform', 'x_transitmedia_fee', 'transitmedia_fee', '"transitmedia_fee"', 'CAST("transitmedia_fee" AS varchar(255))', 20, 8, -1, false, '"transitmedia_fee"', false, false, false, 'FORMATTED TEXT', 'TEXT');
+        $this->transitmedia_fee->Sortable = true; // Allow sort
+        $this->transitmedia_fee->DefaultErrorMessage = $Language->phrase("IncorrectInteger");
+        $this->Fields['transitmedia_fee'] = &$this->transitmedia_fee;
+
+        // lasaa_fee
+        $this->lasaa_fee = new DbField('view_transactions_per_platform', 'view_transactions_per_platform', 'x_lasaa_fee', 'lasaa_fee', '"lasaa_fee"', 'CAST("lasaa_fee" AS varchar(255))', 20, 8, -1, false, '"lasaa_fee"', false, false, false, 'FORMATTED TEXT', 'TEXT');
+        $this->lasaa_fee->Sortable = true; // Allow sort
+        $this->lasaa_fee->DefaultErrorMessage = $Language->phrase("IncorrectInteger");
+        $this->Fields['lasaa_fee'] = &$this->lasaa_fee;
+
+        // operator_fee
+        $this->operator_fee = new DbField('view_transactions_per_platform', 'view_transactions_per_platform', 'x_operator_fee', 'operator_fee', '"operator_fee"', 'CAST("operator_fee" AS varchar(255))', 20, 8, -1, false, '"operator_fee"', false, false, false, 'FORMATTED TEXT', 'TEXT');
+        $this->operator_fee->Sortable = true; // Allow sort
+        $this->operator_fee->DefaultErrorMessage = $Language->phrase("IncorrectInteger");
+        $this->Fields['operator_fee'] = &$this->operator_fee;
+
+        // lamata_fee
+        $this->lamata_fee = new DbField('view_transactions_per_platform', 'view_transactions_per_platform', 'x_lamata_fee', 'lamata_fee', '"lamata_fee"', 'CAST("lamata_fee" AS varchar(255))', 20, 8, -1, false, '"lamata_fee"', false, false, false, 'FORMATTED TEXT', 'TEXT');
+        $this->lamata_fee->Sortable = true; // Allow sort
+        $this->lamata_fee->DefaultErrorMessage = $Language->phrase("IncorrectInteger");
+        $this->Fields['lamata_fee'] = &$this->lamata_fee;
     }
 
     // Field Visibility
@@ -273,7 +300,7 @@ class ViewTransactionsPerPlatform extends DbTable
 
     public function getSqlSelect() // Select
     {
-        return $this->SqlSelect ?? $this->getQueryBuilder()->select("*, quantity * lamata_fee AS \"total\"");
+        return $this->SqlSelect ?? $this->getQueryBuilder()->select("*");
     }
 
     public function sqlSelect() // For backward compatibility
@@ -629,9 +656,6 @@ class ViewTransactionsPerPlatform extends DbTable
         $this->vendor->DbValue = $row['vendor'];
         $this->operator->DbValue = $row['operator'];
         $this->transaction_status->DbValue = $row['transaction_status'];
-        $this->quantity->DbValue = $row['quantity'];
-        $this->lamata_fee->DbValue = $row['lamata_fee'];
-        $this->total->DbValue = $row['total'];
         $this->start_date->DbValue = $row['start_date'];
         $this->end_date->DbValue = $row['end_date'];
         $this->platform->DbValue = $row['platform'];
@@ -643,6 +667,13 @@ class ViewTransactionsPerPlatform extends DbTable
         $this->bus_size_id->DbValue = $row['bus_size_id'];
         $this->vendor_search_id->DbValue = $row['vendor_search_id'];
         $this->vendor_search_name->DbValue = $row['vendor_search_name'];
+        $this->price->DbValue = $row['price'];
+        $this->quantity->DbValue = $row['quantity'];
+        $this->amount_paid->DbValue = $row['amount_paid'];
+        $this->transitmedia_fee->DbValue = $row['transitmedia_fee'];
+        $this->lasaa_fee->DbValue = $row['lasaa_fee'];
+        $this->operator_fee->DbValue = $row['operator_fee'];
+        $this->lamata_fee->DbValue = $row['lamata_fee'];
     }
 
     // Delete uploaded files
@@ -683,18 +714,17 @@ class ViewTransactionsPerPlatform extends DbTable
     // Return page URL
     public function getReturnUrl()
     {
+        $referUrl = ReferUrl();
+        $referPageName = ReferPageName();
         $name = PROJECT_NAME . "_" . $this->TableVar . "_" . Config("TABLE_RETURN_URL");
         // Get referer URL automatically
-        if (ReferUrl() != "" && ReferPageName() != CurrentPageName() && ReferPageName() != "login") { // Referer not same page or login page
-            $_SESSION[$name] = ReferUrl(); // Save to Session
+        if ($referUrl != "" && $referPageName != CurrentPageName() && $referPageName != "login") { // Referer not same page or login page
+            $_SESSION[$name] = $referUrl; // Save to Session
         }
-        if (@$_SESSION[$name] != "") {
-            return $_SESSION[$name];
-        } else {
-            return GetUrl("viewtransactionsperplatformlist");
-        }
+        return $_SESSION[$name] ?? GetUrl("viewtransactionsperplatformlist");
     }
 
+    // Set return page URL
     public function setReturnUrl($v)
     {
         $_SESSION[PROJECT_NAME . "_" . $this->TableVar . "_" . Config("TABLE_RETURN_URL")] = $v;
@@ -927,9 +957,6 @@ SORTHTML;
         $this->vendor->setDbValue($row['vendor']);
         $this->operator->setDbValue($row['operator']);
         $this->transaction_status->setDbValue($row['transaction_status']);
-        $this->quantity->setDbValue($row['quantity']);
-        $this->lamata_fee->setDbValue($row['lamata_fee']);
-        $this->total->setDbValue($row['total']);
         $this->start_date->setDbValue($row['start_date']);
         $this->end_date->setDbValue($row['end_date']);
         $this->platform->setDbValue($row['platform']);
@@ -941,6 +968,13 @@ SORTHTML;
         $this->bus_size_id->setDbValue($row['bus_size_id']);
         $this->vendor_search_id->setDbValue($row['vendor_search_id']);
         $this->vendor_search_name->setDbValue($row['vendor_search_name']);
+        $this->price->setDbValue($row['price']);
+        $this->quantity->setDbValue($row['quantity']);
+        $this->amount_paid->setDbValue($row['amount_paid']);
+        $this->transitmedia_fee->setDbValue($row['transitmedia_fee']);
+        $this->lasaa_fee->setDbValue($row['lasaa_fee']);
+        $this->operator_fee->setDbValue($row['operator_fee']);
+        $this->lamata_fee->setDbValue($row['lamata_fee']);
     }
 
     // Render list row values
@@ -979,15 +1013,6 @@ SORTHTML;
         // transaction_status
         $this->transaction_status->CellCssStyle = "white-space: nowrap;";
 
-        // quantity
-        $this->quantity->CellCssStyle = "white-space: nowrap;";
-
-        // lamata_fee
-        $this->lamata_fee->CellCssStyle = "white-space: nowrap;";
-
-        // total
-        $this->total->CellCssStyle = "white-space: nowrap;";
-
         // start_date
         $this->start_date->CellCssStyle = "white-space: nowrap;";
 
@@ -1018,6 +1043,22 @@ SORTHTML;
 
         // vendor_search_name
         $this->vendor_search_name->CellCssStyle = "white-space: nowrap;";
+
+        // price
+
+        // quantity
+        $this->quantity->CellCssStyle = "white-space: nowrap;";
+
+        // amount_paid
+
+        // transitmedia_fee
+
+        // lasaa_fee
+
+        // operator_fee
+
+        // lamata_fee
+        $this->lamata_fee->CellCssStyle = "white-space: nowrap;";
 
         // transaction_id
         $this->transaction_id->ViewValue = $this->transaction_id->CurrentValue;
@@ -1057,25 +1098,6 @@ SORTHTML;
         // transaction_status
         $this->transaction_status->ViewValue = $this->transaction_status->CurrentValue;
         $this->transaction_status->ViewCustomAttributes = 'class="badge bg-success"';
-
-        // quantity
-        $this->quantity->ViewValue = $this->quantity->CurrentValue;
-        $this->quantity->ViewValue = FormatNumber($this->quantity->ViewValue, 0, -2, -2, -2);
-        $this->quantity->CellCssStyle .= "text-align: right;";
-        $this->quantity->ViewCustomAttributes = "";
-
-        // lamata_fee
-        $this->lamata_fee->ViewValue = $this->lamata_fee->CurrentValue;
-        $this->lamata_fee->ViewValue = FormatNumber($this->lamata_fee->ViewValue, 0, -2, -2, -2);
-        $this->lamata_fee->CellCssStyle .= "text-align: right;";
-        $this->lamata_fee->ViewCustomAttributes = "";
-
-        // total
-        $this->total->ViewValue = $this->total->CurrentValue;
-        $this->total->ViewValue = FormatNumber($this->total->ViewValue, 0, -2, -2, -2);
-        $this->total->CssClass = "font-weight-bold";
-        $this->total->CellCssStyle .= "text-align: right;";
-        $this->total->ViewCustomAttributes = "";
 
         // start_date
         $this->start_date->ViewValue = $this->start_date->CurrentValue;
@@ -1130,6 +1152,49 @@ SORTHTML;
         $this->vendor_search_name->ViewValue = $this->vendor_search_name->CurrentValue;
         $this->vendor_search_name->ViewCustomAttributes = "";
 
+        // price
+        $this->price->ViewValue = $this->price->CurrentValue;
+        $this->price->ViewValue = FormatNumber($this->price->ViewValue, 0, -2, -2, -2);
+        $this->price->CellCssStyle .= "text-align: right;";
+        $this->price->ViewCustomAttributes = "";
+
+        // quantity
+        $this->quantity->ViewValue = $this->quantity->CurrentValue;
+        $this->quantity->ViewValue = FormatNumber($this->quantity->ViewValue, 0, -2, -2, -2);
+        $this->quantity->CellCssStyle .= "text-align: right;";
+        $this->quantity->ViewCustomAttributes = "";
+
+        // amount_paid
+        $this->amount_paid->ViewValue = $this->amount_paid->CurrentValue;
+        $this->amount_paid->ViewValue = FormatNumber($this->amount_paid->ViewValue, 0, -2, -2, -2);
+        $this->amount_paid->CellCssStyle .= "text-align: right;";
+        $this->amount_paid->ViewCustomAttributes = "";
+
+        // transitmedia_fee
+        $this->transitmedia_fee->ViewValue = $this->transitmedia_fee->CurrentValue;
+        $this->transitmedia_fee->ViewValue = FormatNumber($this->transitmedia_fee->ViewValue, 0, -2, -2, -2);
+        $this->transitmedia_fee->CellCssStyle .= "text-align: right;";
+        $this->transitmedia_fee->ViewCustomAttributes = "";
+
+        // lasaa_fee
+        $this->lasaa_fee->ViewValue = $this->lasaa_fee->CurrentValue;
+        $this->lasaa_fee->ViewValue = FormatNumber($this->lasaa_fee->ViewValue, 0, -2, -2, -2);
+        $this->lasaa_fee->CellCssStyle .= "text-align: right;";
+        $this->lasaa_fee->ViewCustomAttributes = "";
+
+        // operator_fee
+        $this->operator_fee->ViewValue = $this->operator_fee->CurrentValue;
+        $this->operator_fee->ViewValue = FormatNumber($this->operator_fee->ViewValue, 0, -2, -2, -2);
+        $this->operator_fee->CellCssStyle .= "text-align: right;";
+        $this->operator_fee->ViewCustomAttributes = "";
+
+        // lamata_fee
+        $this->lamata_fee->ViewValue = $this->lamata_fee->CurrentValue;
+        $this->lamata_fee->ViewValue = FormatNumber($this->lamata_fee->ViewValue, 0, -2, -2, -2);
+        $this->lamata_fee->CssClass = "font-weight-bold";
+        $this->lamata_fee->CellCssStyle .= "text-align: right;";
+        $this->lamata_fee->ViewCustomAttributes = "";
+
         // transaction_id
         $this->transaction_id->LinkCustomAttributes = "";
         $this->transaction_id->HrefValue = "";
@@ -1174,21 +1239,6 @@ SORTHTML;
         $this->transaction_status->LinkCustomAttributes = "";
         $this->transaction_status->HrefValue = "";
         $this->transaction_status->TooltipValue = "";
-
-        // quantity
-        $this->quantity->LinkCustomAttributes = "";
-        $this->quantity->HrefValue = "";
-        $this->quantity->TooltipValue = "";
-
-        // lamata_fee
-        $this->lamata_fee->LinkCustomAttributes = "";
-        $this->lamata_fee->HrefValue = "";
-        $this->lamata_fee->TooltipValue = "";
-
-        // total
-        $this->total->LinkCustomAttributes = "";
-        $this->total->HrefValue = "";
-        $this->total->TooltipValue = "";
 
         // start_date
         $this->start_date->LinkCustomAttributes = "";
@@ -1244,6 +1294,41 @@ SORTHTML;
         $this->vendor_search_name->LinkCustomAttributes = "";
         $this->vendor_search_name->HrefValue = "";
         $this->vendor_search_name->TooltipValue = "";
+
+        // price
+        $this->price->LinkCustomAttributes = "";
+        $this->price->HrefValue = "";
+        $this->price->TooltipValue = "";
+
+        // quantity
+        $this->quantity->LinkCustomAttributes = "";
+        $this->quantity->HrefValue = "";
+        $this->quantity->TooltipValue = "";
+
+        // amount_paid
+        $this->amount_paid->LinkCustomAttributes = "";
+        $this->amount_paid->HrefValue = "";
+        $this->amount_paid->TooltipValue = "";
+
+        // transitmedia_fee
+        $this->transitmedia_fee->LinkCustomAttributes = "";
+        $this->transitmedia_fee->HrefValue = "";
+        $this->transitmedia_fee->TooltipValue = "";
+
+        // lasaa_fee
+        $this->lasaa_fee->LinkCustomAttributes = "";
+        $this->lasaa_fee->HrefValue = "";
+        $this->lasaa_fee->TooltipValue = "";
+
+        // operator_fee
+        $this->operator_fee->LinkCustomAttributes = "";
+        $this->operator_fee->HrefValue = "";
+        $this->operator_fee->TooltipValue = "";
+
+        // lamata_fee
+        $this->lamata_fee->LinkCustomAttributes = "";
+        $this->lamata_fee->HrefValue = "";
+        $this->lamata_fee->TooltipValue = "";
 
         // Call Row Rendered event
         $this->rowRendered();
@@ -1323,24 +1408,6 @@ SORTHTML;
         $this->transaction_status->EditValue = $this->transaction_status->CurrentValue;
         $this->transaction_status->PlaceHolder = RemoveHtml($this->transaction_status->caption());
 
-        // quantity
-        $this->quantity->EditAttrs["class"] = "form-control";
-        $this->quantity->EditCustomAttributes = "";
-        $this->quantity->EditValue = $this->quantity->CurrentValue;
-        $this->quantity->PlaceHolder = RemoveHtml($this->quantity->caption());
-
-        // lamata_fee
-        $this->lamata_fee->EditAttrs["class"] = "form-control";
-        $this->lamata_fee->EditCustomAttributes = "";
-        $this->lamata_fee->EditValue = $this->lamata_fee->CurrentValue;
-        $this->lamata_fee->PlaceHolder = RemoveHtml($this->lamata_fee->caption());
-
-        // total
-        $this->total->EditAttrs["class"] = "form-control";
-        $this->total->EditCustomAttributes = "";
-        $this->total->EditValue = $this->total->CurrentValue;
-        $this->total->PlaceHolder = RemoveHtml($this->total->caption());
-
         // start_date
         $this->start_date->EditAttrs["class"] = "form-control";
         $this->start_date->EditCustomAttributes = "";
@@ -1413,6 +1480,48 @@ SORTHTML;
         $this->vendor_search_name->EditValue = $this->vendor_search_name->CurrentValue;
         $this->vendor_search_name->PlaceHolder = RemoveHtml($this->vendor_search_name->caption());
 
+        // price
+        $this->price->EditAttrs["class"] = "form-control";
+        $this->price->EditCustomAttributes = "";
+        $this->price->EditValue = $this->price->CurrentValue;
+        $this->price->PlaceHolder = RemoveHtml($this->price->caption());
+
+        // quantity
+        $this->quantity->EditAttrs["class"] = "form-control";
+        $this->quantity->EditCustomAttributes = "";
+        $this->quantity->EditValue = $this->quantity->CurrentValue;
+        $this->quantity->PlaceHolder = RemoveHtml($this->quantity->caption());
+
+        // amount_paid
+        $this->amount_paid->EditAttrs["class"] = "form-control";
+        $this->amount_paid->EditCustomAttributes = "";
+        $this->amount_paid->EditValue = $this->amount_paid->CurrentValue;
+        $this->amount_paid->PlaceHolder = RemoveHtml($this->amount_paid->caption());
+
+        // transitmedia_fee
+        $this->transitmedia_fee->EditAttrs["class"] = "form-control";
+        $this->transitmedia_fee->EditCustomAttributes = "";
+        $this->transitmedia_fee->EditValue = $this->transitmedia_fee->CurrentValue;
+        $this->transitmedia_fee->PlaceHolder = RemoveHtml($this->transitmedia_fee->caption());
+
+        // lasaa_fee
+        $this->lasaa_fee->EditAttrs["class"] = "form-control";
+        $this->lasaa_fee->EditCustomAttributes = "";
+        $this->lasaa_fee->EditValue = $this->lasaa_fee->CurrentValue;
+        $this->lasaa_fee->PlaceHolder = RemoveHtml($this->lasaa_fee->caption());
+
+        // operator_fee
+        $this->operator_fee->EditAttrs["class"] = "form-control";
+        $this->operator_fee->EditCustomAttributes = "";
+        $this->operator_fee->EditValue = $this->operator_fee->CurrentValue;
+        $this->operator_fee->PlaceHolder = RemoveHtml($this->operator_fee->caption());
+
+        // lamata_fee
+        $this->lamata_fee->EditAttrs["class"] = "form-control";
+        $this->lamata_fee->EditCustomAttributes = "";
+        $this->lamata_fee->EditValue = $this->lamata_fee->CurrentValue;
+        $this->lamata_fee->PlaceHolder = RemoveHtml($this->lamata_fee->caption());
+
         // Call Row Rendered event
         $this->rowRendered();
     }
@@ -1425,9 +1534,6 @@ SORTHTML;
             }
             if (is_numeric($this->lamata_fee->CurrentValue)) {
                 $this->lamata_fee->Total += $this->lamata_fee->CurrentValue; // Accumulate total
-            }
-            if (is_numeric($this->total->CurrentValue)) {
-                $this->total->Total += $this->total->CurrentValue; // Accumulate total
             }
     }
 
@@ -1443,16 +1549,10 @@ SORTHTML;
             $this->lamata_fee->CurrentValue = $this->lamata_fee->Total;
             $this->lamata_fee->ViewValue = $this->lamata_fee->CurrentValue;
             $this->lamata_fee->ViewValue = FormatNumber($this->lamata_fee->ViewValue, 0, -2, -2, -2);
+            $this->lamata_fee->CssClass = "font-weight-bold";
             $this->lamata_fee->CellCssStyle .= "text-align: right;";
             $this->lamata_fee->ViewCustomAttributes = "";
             $this->lamata_fee->HrefValue = ""; // Clear href value
-            $this->total->CurrentValue = $this->total->Total;
-            $this->total->ViewValue = $this->total->CurrentValue;
-            $this->total->ViewValue = FormatNumber($this->total->ViewValue, 0, -2, -2, -2);
-            $this->total->CssClass = "font-weight-bold";
-            $this->total->CellCssStyle .= "text-align: right;";
-            $this->total->ViewCustomAttributes = "";
-            $this->total->HrefValue = ""; // Clear href value
 
         // Call Row Rendered event
         $this->rowRendered();
@@ -1479,24 +1579,32 @@ SORTHTML;
                     $doc->exportCaption($this->vendor);
                     $doc->exportCaption($this->operator);
                     $doc->exportCaption($this->transaction_status);
-                    $doc->exportCaption($this->quantity);
-                    $doc->exportCaption($this->lamata_fee);
-                    $doc->exportCaption($this->total);
                     $doc->exportCaption($this->start_date);
                     $doc->exportCaption($this->end_date);
                     $doc->exportCaption($this->platform);
+                    $doc->exportCaption($this->price);
+                    $doc->exportCaption($this->quantity);
+                    $doc->exportCaption($this->amount_paid);
+                    $doc->exportCaption($this->transitmedia_fee);
+                    $doc->exportCaption($this->lasaa_fee);
+                    $doc->exportCaption($this->operator_fee);
+                    $doc->exportCaption($this->lamata_fee);
                 } else {
                     $doc->exportCaption($this->transaction_id);
                     $doc->exportCaption($this->payment_date);
                     $doc->exportCaption($this->vendor);
                     $doc->exportCaption($this->operator);
                     $doc->exportCaption($this->transaction_status);
-                    $doc->exportCaption($this->quantity);
-                    $doc->exportCaption($this->lamata_fee);
-                    $doc->exportCaption($this->total);
                     $doc->exportCaption($this->start_date);
                     $doc->exportCaption($this->end_date);
                     $doc->exportCaption($this->platform);
+                    $doc->exportCaption($this->price);
+                    $doc->exportCaption($this->quantity);
+                    $doc->exportCaption($this->amount_paid);
+                    $doc->exportCaption($this->transitmedia_fee);
+                    $doc->exportCaption($this->lasaa_fee);
+                    $doc->exportCaption($this->operator_fee);
+                    $doc->exportCaption($this->lamata_fee);
                 }
                 $doc->endExportRow();
             }
@@ -1536,24 +1644,32 @@ SORTHTML;
                         $doc->exportField($this->vendor);
                         $doc->exportField($this->operator);
                         $doc->exportField($this->transaction_status);
-                        $doc->exportField($this->quantity);
-                        $doc->exportField($this->lamata_fee);
-                        $doc->exportField($this->total);
                         $doc->exportField($this->start_date);
                         $doc->exportField($this->end_date);
                         $doc->exportField($this->platform);
+                        $doc->exportField($this->price);
+                        $doc->exportField($this->quantity);
+                        $doc->exportField($this->amount_paid);
+                        $doc->exportField($this->transitmedia_fee);
+                        $doc->exportField($this->lasaa_fee);
+                        $doc->exportField($this->operator_fee);
+                        $doc->exportField($this->lamata_fee);
                     } else {
                         $doc->exportField($this->transaction_id);
                         $doc->exportField($this->payment_date);
                         $doc->exportField($this->vendor);
                         $doc->exportField($this->operator);
                         $doc->exportField($this->transaction_status);
-                        $doc->exportField($this->quantity);
-                        $doc->exportField($this->lamata_fee);
-                        $doc->exportField($this->total);
                         $doc->exportField($this->start_date);
                         $doc->exportField($this->end_date);
                         $doc->exportField($this->platform);
+                        $doc->exportField($this->price);
+                        $doc->exportField($this->quantity);
+                        $doc->exportField($this->amount_paid);
+                        $doc->exportField($this->transitmedia_fee);
+                        $doc->exportField($this->lasaa_fee);
+                        $doc->exportField($this->operator_fee);
+                        $doc->exportField($this->lamata_fee);
                     }
                     $doc->endExportRow($rowCnt);
                 }
@@ -1578,12 +1694,16 @@ SORTHTML;
                 $doc->exportAggregate($this->vendor, '');
                 $doc->exportAggregate($this->operator, '');
                 $doc->exportAggregate($this->transaction_status, '');
-                $doc->exportAggregate($this->quantity, 'TOTAL');
-                $doc->exportAggregate($this->lamata_fee, 'TOTAL');
-                $doc->exportAggregate($this->total, 'TOTAL');
                 $doc->exportAggregate($this->start_date, '');
                 $doc->exportAggregate($this->end_date, '');
                 $doc->exportAggregate($this->platform, '');
+                $doc->exportAggregate($this->price, '');
+                $doc->exportAggregate($this->quantity, 'TOTAL');
+                $doc->exportAggregate($this->amount_paid, '');
+                $doc->exportAggregate($this->transitmedia_fee, '');
+                $doc->exportAggregate($this->lasaa_fee, '');
+                $doc->exportAggregate($this->operator_fee, '');
+                $doc->exportAggregate($this->lamata_fee, 'TOTAL');
                 $doc->endExportRow();
             }
         }

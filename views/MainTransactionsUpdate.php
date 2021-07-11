@@ -21,8 +21,10 @@ loadjs.ready("head", function () {
         ["campaign_id", [fields.campaign_id.required ? ew.Validators.required(fields.campaign_id.caption) : null], fields.campaign_id.isInvalid],
         ["operator_id", [fields.operator_id.required ? ew.Validators.required(fields.operator_id.caption) : null], fields.operator_id.isInvalid],
         ["payment_date", [fields.payment_date.required ? ew.Validators.required(fields.payment_date.caption) : null, ew.Validators.datetime(5), ew.Validators.selected], fields.payment_date.isInvalid],
+        ["vendor_id", [fields.vendor_id.required ? ew.Validators.required(fields.vendor_id.caption) : null, ew.Validators.integer, ew.Validators.selected], fields.vendor_id.isInvalid],
         ["price_id", [fields.price_id.required ? ew.Validators.required(fields.price_id.caption) : null], fields.price_id.isInvalid],
         ["quantity", [fields.quantity.required ? ew.Validators.required(fields.quantity.caption) : null, ew.Validators.integer, ew.Validators.selected], fields.quantity.isInvalid],
+        ["assigned_buses", [fields.assigned_buses.required ? ew.Validators.required(fields.assigned_buses.caption) : null, ew.Validators.integer, ew.Validators.selected], fields.assigned_buses.isInvalid],
         ["start_date", [fields.start_date.required ? ew.Validators.required(fields.start_date.caption) : null, ew.Validators.datetime(5), ew.Validators.selected], fields.start_date.isInvalid],
         ["end_date", [fields.end_date.required ? ew.Validators.required(fields.end_date.caption) : null, ew.Validators.datetime(5), ew.Validators.selected], fields.end_date.isInvalid],
         ["visible_status_id", [fields.visible_status_id.required ? ew.Validators.required(fields.visible_status_id.caption) : null], fields.visible_status_id.isInvalid],
@@ -95,6 +97,7 @@ loadjs.ready("head", function () {
     // Dynamic selection lists
     fmain_transactionsupdate.lists.campaign_id = <?= $Page->campaign_id->toClientList($Page) ?>;
     fmain_transactionsupdate.lists.operator_id = <?= $Page->operator_id->toClientList($Page) ?>;
+    fmain_transactionsupdate.lists.vendor_id = <?= $Page->vendor_id->toClientList($Page) ?>;
     fmain_transactionsupdate.lists.price_id = <?= $Page->price_id->toClientList($Page) ?>;
     fmain_transactionsupdate.lists.visible_status_id = <?= $Page->visible_status_id->toClientList($Page) ?>;
     fmain_transactionsupdate.lists.status_id = <?= $Page->status_id->toClientList($Page) ?>;
@@ -298,6 +301,81 @@ $Page->showMessage();
         </div>
     </div>
 <?php } ?>
+<?php if ($Page->vendor_id->Visible && (!$Page->isConfirm() || $Page->vendor_id->multiUpdateSelected())) { // vendor_id ?>
+    <div id="r_vendor_id" class="form-group row">
+        <label class="<?= $Page->LeftColumnClass ?>">
+            <?php if (!$Page->isConfirm()) { ?>
+            <div class="custom-control custom-checkbox">
+                <input type="checkbox" name="u_vendor_id" id="u_vendor_id" class="custom-control-input ew-multi-select" value="1"<?= $Page->vendor_id->multiUpdateSelected() ? " checked" : "" ?>>
+                <label class="custom-control-label" for="u_vendor_id"><?= $Page->vendor_id->caption() ?></label>
+            </div>
+            <?php } else { ?>
+            <input type="hidden" name="u_vendor_id" id="u_vendor_id" value="<?= $Page->vendor_id->MultiUpdate ?>">
+            <?= $Page->vendor_id->caption() ?>
+            <?php } ?>
+        </label>
+        <div class="<?= $Page->RightColumnClass ?>">
+            <div <?= $Page->vendor_id->cellAttributes() ?>>
+                <?php if (!$Page->isConfirm()) { ?>
+                <?php if (!$Security->isAdmin() && $Security->isLoggedIn() && !$Page->userIDAllow("update")) { // Non system admin ?>
+                <span id="el_main_transactions_vendor_id">
+                    <select
+                        id="x_vendor_id"
+                        name="x_vendor_id"
+                        class="form-control ew-select<?= $Page->vendor_id->isInvalidClass() ?>"
+                        data-select2-id="main_transactions_x_vendor_id"
+                        data-table="main_transactions"
+                        data-field="x_vendor_id"
+                        data-value-separator="<?= $Page->vendor_id->displayValueSeparatorAttribute() ?>"
+                        data-placeholder="<?= HtmlEncode($Page->vendor_id->getPlaceHolder()) ?>"
+                        <?= $Page->vendor_id->editAttributes() ?>>
+                        <?= $Page->vendor_id->selectOptionListHtml("x_vendor_id") ?>
+                    </select>
+                    <?= $Page->vendor_id->getCustomMessage() ?>
+                    <div class="invalid-feedback"><?= $Page->vendor_id->getErrorMessage() ?></div>
+                <?= $Page->vendor_id->Lookup->getParamTag($Page, "p_x_vendor_id") ?>
+                <script>
+                loadjs.ready("head", function() {
+                    var el = document.querySelector("select[data-select2-id='main_transactions_x_vendor_id']"),
+                        options = { name: "x_vendor_id", selectId: "main_transactions_x_vendor_id", language: ew.LANGUAGE_ID, dir: ew.IS_RTL ? "rtl" : "ltr" };
+                    options.dropdownParent = $(el).closest("#ew-modal-dialog, #ew-add-opt-dialog")[0];
+                    Object.assign(options, ew.vars.tables.main_transactions.fields.vendor_id.selectOptions);
+                    ew.createSelect(options);
+                });
+                </script>
+                </span>
+                <?php } else { ?>
+                <span id="el_main_transactions_vendor_id">
+                <?php
+                $onchange = $Page->vendor_id->EditAttrs->prepend("onchange", "");
+                $onchange = ($onchange) ? ' onchange="' . JsEncode($onchange) . '"' : '';
+                $Page->vendor_id->EditAttrs["onchange"] = "";
+                ?>
+                <span id="as_x_vendor_id" class="ew-auto-suggest">
+                    <input type="<?= $Page->vendor_id->getInputTextType() ?>" class="form-control" name="sv_x_vendor_id" id="sv_x_vendor_id" value="<?= RemoveHtml($Page->vendor_id->EditValue) ?>" size="30" placeholder="<?= HtmlEncode($Page->vendor_id->getPlaceHolder()) ?>" data-placeholder="<?= HtmlEncode($Page->vendor_id->getPlaceHolder()) ?>"<?= $Page->vendor_id->editAttributes() ?> aria-describedby="x_vendor_id_help">
+                </span>
+                <input type="hidden" is="selection-list" class="form-control" data-table="main_transactions" data-field="x_vendor_id" data-input="sv_x_vendor_id" data-value-separator="<?= $Page->vendor_id->displayValueSeparatorAttribute() ?>" name="x_vendor_id" id="x_vendor_id" value="<?= HtmlEncode($Page->vendor_id->CurrentValue) ?>"<?= $onchange ?>>
+                <?= $Page->vendor_id->getCustomMessage() ?>
+                <div class="invalid-feedback"><?= $Page->vendor_id->getErrorMessage() ?></div>
+                <script>
+                loadjs.ready(["fmain_transactionsupdate"], function() {
+                    fmain_transactionsupdate.createAutoSuggest(Object.assign({"id":"x_vendor_id","forceSelect":false}, ew.vars.tables.main_transactions.fields.vendor_id.autoSuggestOptions));
+                });
+                </script>
+                <?= $Page->vendor_id->Lookup->getParamTag($Page, "p_x_vendor_id") ?>
+                </span>
+                <?php } ?>
+                <?php } else { ?>
+                <span id="el_main_transactions_vendor_id">
+                <span<?= $Page->vendor_id->viewAttributes() ?>>
+                <input type="text" readonly class="form-control-plaintext" value="<?= HtmlEncode(RemoveHtml($Page->vendor_id->getDisplayValue($Page->vendor_id->ViewValue))) ?>"></span>
+                </span>
+                <input type="hidden" data-table="main_transactions" data-field="x_vendor_id" data-hidden="1" name="x_vendor_id" id="x_vendor_id" value="<?= HtmlEncode($Page->vendor_id->FormValue) ?>">
+                <?php } ?>
+            </div>
+        </div>
+    </div>
+<?php } ?>
 <?php if ($Page->price_id->Visible && (!$Page->isConfirm() || $Page->price_id->multiUpdateSelected())) { // price_id ?>
     <div id="r_price_id" class="form-group row">
         <label for="x_price_id" class="<?= $Page->LeftColumnClass ?>">
@@ -378,6 +456,38 @@ $Page->showMessage();
                 <input type="text" readonly class="form-control-plaintext" value="<?= HtmlEncode(RemoveHtml($Page->quantity->getDisplayValue($Page->quantity->ViewValue))) ?>"></span>
                 </span>
                 <input type="hidden" data-table="main_transactions" data-field="x_quantity" data-hidden="1" name="x_quantity" id="x_quantity" value="<?= HtmlEncode($Page->quantity->FormValue) ?>">
+                <?php } ?>
+            </div>
+        </div>
+    </div>
+<?php } ?>
+<?php if ($Page->assigned_buses->Visible && (!$Page->isConfirm() || $Page->assigned_buses->multiUpdateSelected())) { // assigned_buses ?>
+    <div id="r_assigned_buses" class="form-group row">
+        <label for="x_assigned_buses" class="<?= $Page->LeftColumnClass ?>">
+            <?php if (!$Page->isConfirm()) { ?>
+            <div class="custom-control custom-checkbox">
+                <input type="checkbox" name="u_assigned_buses" id="u_assigned_buses" class="custom-control-input ew-multi-select" value="1"<?= $Page->assigned_buses->multiUpdateSelected() ? " checked" : "" ?>>
+                <label class="custom-control-label" for="u_assigned_buses"><?= $Page->assigned_buses->caption() ?></label>
+            </div>
+            <?php } else { ?>
+            <input type="hidden" name="u_assigned_buses" id="u_assigned_buses" value="<?= $Page->assigned_buses->MultiUpdate ?>">
+            <?= $Page->assigned_buses->caption() ?>
+            <?php } ?>
+        </label>
+        <div class="<?= $Page->RightColumnClass ?>">
+            <div <?= $Page->assigned_buses->cellAttributes() ?>>
+                <?php if (!$Page->isConfirm()) { ?>
+                <span id="el_main_transactions_assigned_buses">
+                <input type="<?= $Page->assigned_buses->getInputTextType() ?>" data-table="main_transactions" data-field="x_assigned_buses" name="x_assigned_buses" id="x_assigned_buses" size="30" placeholder="<?= HtmlEncode($Page->assigned_buses->getPlaceHolder()) ?>" value="<?= $Page->assigned_buses->EditValue ?>"<?= $Page->assigned_buses->editAttributes() ?> aria-describedby="x_assigned_buses_help">
+                <?= $Page->assigned_buses->getCustomMessage() ?>
+                <div class="invalid-feedback"><?= $Page->assigned_buses->getErrorMessage() ?></div>
+                </span>
+                <?php } else { ?>
+                <span id="el_main_transactions_assigned_buses">
+                <span<?= $Page->assigned_buses->viewAttributes() ?>>
+                <input type="text" readonly class="form-control-plaintext" value="<?= HtmlEncode(RemoveHtml($Page->assigned_buses->getDisplayValue($Page->assigned_buses->ViewValue))) ?>"></span>
+                </span>
+                <input type="hidden" data-table="main_transactions" data-field="x_assigned_buses" data-hidden="1" name="x_assigned_buses" id="x_assigned_buses" value="<?= HtmlEncode($Page->assigned_buses->FormValue) ?>">
                 <?php } ?>
             </div>
         </div>
@@ -506,7 +616,12 @@ $Page->showMessage();
                 <?php } else { ?>
                 <span id="el_main_transactions_visible_status_id">
                 <span<?= $Page->visible_status_id->viewAttributes() ?>>
-                <input type="text" readonly class="form-control-plaintext" value="<?= HtmlEncode(RemoveHtml($Page->visible_status_id->getDisplayValue($Page->visible_status_id->ViewValue))) ?>"></span>
+                <?php if (!EmptyString($Page->visible_status_id->ViewValue) && $Page->visible_status_id->linkAttributes() != "") { ?>
+                <a<?= $Page->visible_status_id->linkAttributes() ?>><input type="text" readonly class="form-control-plaintext" value="<?= HtmlEncode(RemoveHtml($Page->visible_status_id->getDisplayValue($Page->visible_status_id->ViewValue))) ?>"></a>
+                <?php } else { ?>
+                <input type="text" readonly class="form-control-plaintext" value="<?= HtmlEncode(RemoveHtml($Page->visible_status_id->getDisplayValue($Page->visible_status_id->ViewValue))) ?>">
+                <?php } ?>
+                </span>
                 </span>
                 <input type="hidden" data-table="main_transactions" data-field="x_visible_status_id" data-hidden="1" name="x_visible_status_id" id="x_visible_status_id" value="<?= HtmlEncode($Page->visible_status_id->FormValue) ?>">
                 <?php } ?>
@@ -559,7 +674,12 @@ $Page->showMessage();
                 <?php } else { ?>
                 <span id="el_main_transactions_status_id">
                 <span<?= $Page->status_id->viewAttributes() ?>>
-                <input type="text" readonly class="form-control-plaintext" value="<?= HtmlEncode(RemoveHtml($Page->status_id->getDisplayValue($Page->status_id->ViewValue))) ?>"></span>
+                <?php if (!EmptyString($Page->status_id->ViewValue) && $Page->status_id->linkAttributes() != "") { ?>
+                <a<?= $Page->status_id->linkAttributes() ?>><input type="text" readonly class="form-control-plaintext" value="<?= HtmlEncode(RemoveHtml($Page->status_id->getDisplayValue($Page->status_id->ViewValue))) ?>"></a>
+                <?php } else { ?>
+                <input type="text" readonly class="form-control-plaintext" value="<?= HtmlEncode(RemoveHtml($Page->status_id->getDisplayValue($Page->status_id->ViewValue))) ?>">
+                <?php } ?>
+                </span>
                 </span>
                 <input type="hidden" data-table="main_transactions" data-field="x_status_id" data-hidden="1" name="x_status_id" id="x_status_id" value="<?= HtmlEncode($Page->status_id->FormValue) ?>">
                 <?php } ?>
@@ -612,7 +732,12 @@ $Page->showMessage();
                 <?php } else { ?>
                 <span id="el_main_transactions_print_status_id">
                 <span<?= $Page->print_status_id->viewAttributes() ?>>
-                <input type="text" readonly class="form-control-plaintext" value="<?= HtmlEncode(RemoveHtml($Page->print_status_id->getDisplayValue($Page->print_status_id->ViewValue))) ?>"></span>
+                <?php if (!EmptyString($Page->print_status_id->ViewValue) && $Page->print_status_id->linkAttributes() != "") { ?>
+                <a<?= $Page->print_status_id->linkAttributes() ?>><input type="text" readonly class="form-control-plaintext" value="<?= HtmlEncode(RemoveHtml($Page->print_status_id->getDisplayValue($Page->print_status_id->ViewValue))) ?>"></a>
+                <?php } else { ?>
+                <input type="text" readonly class="form-control-plaintext" value="<?= HtmlEncode(RemoveHtml($Page->print_status_id->getDisplayValue($Page->print_status_id->ViewValue))) ?>">
+                <?php } ?>
+                </span>
                 </span>
                 <input type="hidden" data-table="main_transactions" data-field="x_print_status_id" data-hidden="1" name="x_print_status_id" id="x_print_status_id" value="<?= HtmlEncode($Page->print_status_id->FormValue) ?>">
                 <?php } ?>
@@ -665,7 +790,12 @@ $Page->showMessage();
                 <?php } else { ?>
                 <span id="el_main_transactions_payment_status_id">
                 <span<?= $Page->payment_status_id->viewAttributes() ?>>
-                <input type="text" readonly class="form-control-plaintext" value="<?= HtmlEncode(RemoveHtml($Page->payment_status_id->getDisplayValue($Page->payment_status_id->ViewValue))) ?>"></span>
+                <?php if (!EmptyString($Page->payment_status_id->ViewValue) && $Page->payment_status_id->linkAttributes() != "") { ?>
+                <a<?= $Page->payment_status_id->linkAttributes() ?>><input type="text" readonly class="form-control-plaintext" value="<?= HtmlEncode(RemoveHtml($Page->payment_status_id->getDisplayValue($Page->payment_status_id->ViewValue))) ?>"></a>
+                <?php } else { ?>
+                <input type="text" readonly class="form-control-plaintext" value="<?= HtmlEncode(RemoveHtml($Page->payment_status_id->getDisplayValue($Page->payment_status_id->ViewValue))) ?>">
+                <?php } ?>
+                </span>
                 </span>
                 <input type="hidden" data-table="main_transactions" data-field="x_payment_status_id" data-hidden="1" name="x_payment_status_id" id="x_payment_status_id" value="<?= HtmlEncode($Page->payment_status_id->FormValue) ?>">
                 <?php } ?>
@@ -842,7 +972,7 @@ $Page->showMessage();
         <div class="<?= $Page->OffsetColumnClass ?>"><!-- buttons offset -->
 <?php if (!$Page->isConfirm()) { // Confirm page ?>
 <button class="btn btn-primary ew-btn" name="btn-action" id="btn-action" type="submit" onclick="this.form.action.value='confirm';"><?= $Language->phrase("UpdateBtn") ?></button>
-<button class="btn btn-default ew-btn" name="btn-cancel" id="btn-cancel" type="button" data-href="<?= GetUrl($Page->getReturnUrl()) ?>"><?= $Language->phrase("CancelBtn") ?></button>
+<button class="btn btn-default ew-btn" name="btn-cancel" id="btn-cancel" type="button" data-href="<?= HtmlEncode(GetUrl($Page->getReturnUrl())) ?>"><?= $Language->phrase("CancelBtn") ?></button>
 <?php } else { ?>
 <button class="btn btn-primary ew-btn" name="btn-action" id="btn-action" type="submit"><?= $Language->phrase("ConfirmBtn") ?></button>
 <button class="btn btn-default ew-btn" name="btn-cancel" id="btn-cancel" type="submit" onclick="this.form.action.value='cancel';"><?= $Language->phrase("CancelBtn") ?></button>

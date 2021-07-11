@@ -39,6 +39,8 @@ class ViewBusSummary extends DbTable
     public $bad_bus_codes;
     public $bus_codes;
     public $last_updated_at;
+    public $platform_id;
+    public $operator_id;
 
     // Page ID
     public $PageID = ""; // To be overridden by subclass
@@ -133,6 +135,24 @@ class ViewBusSummary extends DbTable
         $this->last_updated_at = new DbField('view_bus_summary', 'view_bus_summary', 'x_last_updated_at', 'last_updated_at', '"last_updated_at"', '"last_updated_at"', 201, 0, -1, false, '"last_updated_at"', false, false, false, 'FORMATTED TEXT', 'TEXTAREA');
         $this->last_updated_at->Sortable = true; // Allow sort
         $this->Fields['last_updated_at'] = &$this->last_updated_at;
+
+        // platform_id
+        $this->platform_id = new DbField('view_bus_summary', 'view_bus_summary', 'x_platform_id', 'platform_id', '"platform_id"', 'CAST("platform_id" AS varchar(255))', 3, 4, -1, false, '"platform_id"', false, false, false, 'FORMATTED TEXT', 'SELECT');
+        $this->platform_id->Sortable = true; // Allow sort
+        $this->platform_id->UsePleaseSelect = true; // Use PleaseSelect by default
+        $this->platform_id->PleaseSelectText = $Language->phrase("PleaseSelect"); // "PleaseSelect" text
+        $this->platform_id->Lookup = new Lookup('platform_id', 'y_platforms', false, 'id', ["name","","",""], [], [], [], [], [], [], '', '');
+        $this->platform_id->DefaultErrorMessage = $Language->phrase("IncorrectInteger");
+        $this->Fields['platform_id'] = &$this->platform_id;
+
+        // operator_id
+        $this->operator_id = new DbField('view_bus_summary', 'view_bus_summary', 'x_operator_id', 'operator_id', '"operator_id"', 'CAST("operator_id" AS varchar(255))', 3, 4, -1, false, '"operator_id"', false, false, false, 'FORMATTED TEXT', 'SELECT');
+        $this->operator_id->Sortable = true; // Allow sort
+        $this->operator_id->UsePleaseSelect = true; // Use PleaseSelect by default
+        $this->operator_id->PleaseSelectText = $Language->phrase("PleaseSelect"); // "PleaseSelect" text
+        $this->operator_id->Lookup = new Lookup('operator_id', 'y_operators', false, 'id', ["name","","",""], [], [], [], [], [], [], '', '');
+        $this->operator_id->DefaultErrorMessage = $Language->phrase("IncorrectInteger");
+        $this->Fields['operator_id'] = &$this->operator_id;
     }
 
     // Field Visibility
@@ -548,6 +568,8 @@ class ViewBusSummary extends DbTable
         $this->bad_bus_codes->DbValue = $row['bad_bus_codes'];
         $this->bus_codes->DbValue = $row['bus_codes'];
         $this->last_updated_at->DbValue = $row['last_updated_at'];
+        $this->platform_id->DbValue = $row['platform_id'];
+        $this->operator_id->DbValue = $row['operator_id'];
     }
 
     // Delete uploaded files
@@ -588,18 +610,17 @@ class ViewBusSummary extends DbTable
     // Return page URL
     public function getReturnUrl()
     {
+        $referUrl = ReferUrl();
+        $referPageName = ReferPageName();
         $name = PROJECT_NAME . "_" . $this->TableVar . "_" . Config("TABLE_RETURN_URL");
         // Get referer URL automatically
-        if (ReferUrl() != "" && ReferPageName() != CurrentPageName() && ReferPageName() != "login") { // Referer not same page or login page
-            $_SESSION[$name] = ReferUrl(); // Save to Session
+        if ($referUrl != "" && $referPageName != CurrentPageName() && $referPageName != "login") { // Referer not same page or login page
+            $_SESSION[$name] = $referUrl; // Save to Session
         }
-        if (@$_SESSION[$name] != "") {
-            return $_SESSION[$name];
-        } else {
-            return GetUrl("viewbussummarylist");
-        }
+        return $_SESSION[$name] ?? GetUrl("viewbussummarylist");
     }
 
+    // Set return page URL
     public function setReturnUrl($v)
     {
         $_SESSION[PROJECT_NAME . "_" . $this->TableVar . "_" . Config("TABLE_RETURN_URL")] = $v;
@@ -834,6 +855,8 @@ SORTHTML;
         $this->bad_bus_codes->setDbValue($row['bad_bus_codes']);
         $this->bus_codes->setDbValue($row['bus_codes']);
         $this->last_updated_at->setDbValue($row['last_updated_at']);
+        $this->platform_id->setDbValue($row['platform_id']);
+        $this->operator_id->setDbValue($row['operator_id']);
     }
 
     // Render list row values
@@ -851,6 +874,7 @@ SORTHTML;
         // campaign_name
 
         // period
+        $this->period->CellCssStyle = "white-space: nowrap;";
 
         // buses
 
@@ -867,6 +891,10 @@ SORTHTML;
         // bus_codes
 
         // last_updated_at
+
+        // platform_id
+
+        // operator_id
 
         // exterior_campaign_id
         $this->exterior_campaign_id->ViewValue = $this->exterior_campaign_id->CurrentValue;
@@ -915,6 +943,48 @@ SORTHTML;
         // last_updated_at
         $this->last_updated_at->ViewValue = $this->last_updated_at->CurrentValue;
         $this->last_updated_at->ViewCustomAttributes = "";
+
+        // platform_id
+        $curVal = strval($this->platform_id->CurrentValue);
+        if ($curVal != "") {
+            $this->platform_id->ViewValue = $this->platform_id->lookupCacheOption($curVal);
+            if ($this->platform_id->ViewValue === null) { // Lookup from database
+                $filterWrk = "\"id\"" . SearchString("=", $curVal, DATATYPE_NUMBER, "");
+                $sqlWrk = $this->platform_id->Lookup->getSql(false, $filterWrk, '', $this, true, true);
+                $rswrk = Conn()->executeQuery($sqlWrk)->fetchAll(\PDO::FETCH_BOTH);
+                $ari = count($rswrk);
+                if ($ari > 0) { // Lookup values found
+                    $arwrk = $this->platform_id->Lookup->renderViewRow($rswrk[0]);
+                    $this->platform_id->ViewValue = $this->platform_id->displayValue($arwrk);
+                } else {
+                    $this->platform_id->ViewValue = $this->platform_id->CurrentValue;
+                }
+            }
+        } else {
+            $this->platform_id->ViewValue = null;
+        }
+        $this->platform_id->ViewCustomAttributes = "";
+
+        // operator_id
+        $curVal = strval($this->operator_id->CurrentValue);
+        if ($curVal != "") {
+            $this->operator_id->ViewValue = $this->operator_id->lookupCacheOption($curVal);
+            if ($this->operator_id->ViewValue === null) { // Lookup from database
+                $filterWrk = "\"id\"" . SearchString("=", $curVal, DATATYPE_NUMBER, "");
+                $sqlWrk = $this->operator_id->Lookup->getSql(false, $filterWrk, '', $this, true, true);
+                $rswrk = Conn()->executeQuery($sqlWrk)->fetchAll(\PDO::FETCH_BOTH);
+                $ari = count($rswrk);
+                if ($ari > 0) { // Lookup values found
+                    $arwrk = $this->operator_id->Lookup->renderViewRow($rswrk[0]);
+                    $this->operator_id->ViewValue = $this->operator_id->displayValue($arwrk);
+                } else {
+                    $this->operator_id->ViewValue = $this->operator_id->CurrentValue;
+                }
+            }
+        } else {
+            $this->operator_id->ViewValue = null;
+        }
+        $this->operator_id->ViewCustomAttributes = "";
 
         // exterior_campaign_id
         $this->exterior_campaign_id->LinkCustomAttributes = "";
@@ -970,6 +1040,16 @@ SORTHTML;
         $this->last_updated_at->LinkCustomAttributes = "";
         $this->last_updated_at->HrefValue = "";
         $this->last_updated_at->TooltipValue = "";
+
+        // platform_id
+        $this->platform_id->LinkCustomAttributes = "";
+        $this->platform_id->HrefValue = "";
+        $this->platform_id->TooltipValue = "";
+
+        // operator_id
+        $this->operator_id->LinkCustomAttributes = "";
+        $this->operator_id->HrefValue = "";
+        $this->operator_id->TooltipValue = "";
 
         // Call Row Rendered event
         $this->rowRendered();
@@ -1052,6 +1132,16 @@ SORTHTML;
         $this->last_updated_at->EditValue = $this->last_updated_at->CurrentValue;
         $this->last_updated_at->PlaceHolder = RemoveHtml($this->last_updated_at->caption());
 
+        // platform_id
+        $this->platform_id->EditAttrs["class"] = "form-control";
+        $this->platform_id->EditCustomAttributes = "";
+        $this->platform_id->PlaceHolder = RemoveHtml($this->platform_id->caption());
+
+        // operator_id
+        $this->operator_id->EditAttrs["class"] = "form-control";
+        $this->operator_id->EditCustomAttributes = "";
+        $this->operator_id->PlaceHolder = RemoveHtml($this->operator_id->caption());
+
         // Call Row Rendered event
         $this->rowRendered();
     }
@@ -1091,11 +1181,22 @@ SORTHTML;
                     $doc->exportCaption($this->bad_bus_codes);
                     $doc->exportCaption($this->bus_codes);
                     $doc->exportCaption($this->last_updated_at);
+                    $doc->exportCaption($this->platform_id);
+                    $doc->exportCaption($this->operator_id);
                 } else {
                     $doc->exportCaption($this->exterior_campaign_id);
+                    $doc->exportCaption($this->campaign_name);
+                    $doc->exportCaption($this->period);
                     $doc->exportCaption($this->buses);
                     $doc->exportCaption($this->active_working);
                     $doc->exportCaption($this->requires_maintenance);
+                    $doc->exportCaption($this->issues);
+                    $doc->exportCaption($this->good_bus_codes);
+                    $doc->exportCaption($this->bad_bus_codes);
+                    $doc->exportCaption($this->bus_codes);
+                    $doc->exportCaption($this->last_updated_at);
+                    $doc->exportCaption($this->platform_id);
+                    $doc->exportCaption($this->operator_id);
                 }
                 $doc->endExportRow();
             }
@@ -1136,11 +1237,22 @@ SORTHTML;
                         $doc->exportField($this->bad_bus_codes);
                         $doc->exportField($this->bus_codes);
                         $doc->exportField($this->last_updated_at);
+                        $doc->exportField($this->platform_id);
+                        $doc->exportField($this->operator_id);
                     } else {
                         $doc->exportField($this->exterior_campaign_id);
+                        $doc->exportField($this->campaign_name);
+                        $doc->exportField($this->period);
                         $doc->exportField($this->buses);
                         $doc->exportField($this->active_working);
                         $doc->exportField($this->requires_maintenance);
+                        $doc->exportField($this->issues);
+                        $doc->exportField($this->good_bus_codes);
+                        $doc->exportField($this->bad_bus_codes);
+                        $doc->exportField($this->bus_codes);
+                        $doc->exportField($this->last_updated_at);
+                        $doc->exportField($this->platform_id);
+                        $doc->exportField($this->operator_id);
                     }
                     $doc->endExportRow($rowCnt);
                 }
@@ -1165,11 +1277,16 @@ SORTHTML;
     }
 
     // Table level events
-
     // Recordset Selecting event
     public function recordsetSelecting(&$filter)
     {
         // Enter your code here
+        if(Profile()->id){
+        	$number_of_records_found_in_manager_platform_table = ExecuteScalar("SELECT count(*) FROM public.w_managers_platform where user_id = ".Profile()->id);
+        	if(in_array(Profile()->user_type,[1,2,3,4,7]) && $number_of_records_found_in_manager_platform_table > 0){
+           		AddFilter($filter, " platform_id in (SELECT platform_id FROM public.w_managers_platform where user_id = ".Profile()->id.") "); // Add your own filter expression  
+           }
+        }
     }
 
     // Recordset Selected event

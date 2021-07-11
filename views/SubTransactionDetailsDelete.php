@@ -47,6 +47,9 @@ $Page->showMessage();
 <?php if ($Page->bus_id->Visible) { // bus_id ?>
         <th class="<?= $Page->bus_id->headerCellClass() ?>"><span id="elh_sub_transaction_details_bus_id" class="sub_transaction_details_bus_id"><?= $Page->bus_id->caption() ?></span></th>
 <?php } ?>
+<?php if ($Page->vendor_id->Visible) { // vendor_id ?>
+        <th class="<?= $Page->vendor_id->headerCellClass() ?>"><span id="elh_sub_transaction_details_vendor_id" class="sub_transaction_details_vendor_id"><?= $Page->vendor_id->caption() ?></span></th>
+<?php } ?>
     </tr>
     </thead>
     <tbody>
@@ -84,6 +87,14 @@ while (!$Page->Recordset->EOF) {
 </span>
 </td>
 <?php } ?>
+<?php if ($Page->vendor_id->Visible) { // vendor_id ?>
+        <td <?= $Page->vendor_id->cellAttributes() ?>>
+<span id="el<?= $Page->RowCount ?>_sub_transaction_details_vendor_id" class="sub_transaction_details_vendor_id">
+<span<?= $Page->vendor_id->viewAttributes() ?>>
+<?= $Page->vendor_id->getViewValue() ?></span>
+</span>
+</td>
+<?php } ?>
     </tr>
 <?php
     $Page->Recordset->moveNext();
@@ -96,7 +107,7 @@ $Page->Recordset->close();
 </div>
 <div>
 <button class="btn btn-primary ew-btn" name="btn-action" id="btn-action" type="submit"><?= $Language->phrase("DeleteBtn") ?></button>
-<button class="btn btn-default ew-btn" name="btn-cancel" id="btn-cancel" type="button" data-href="<?= GetUrl($Page->getReturnUrl()) ?>"><?= $Language->phrase("CancelBtn") ?></button>
+<button class="btn btn-default ew-btn" name="btn-cancel" id="btn-cancel" type="button" data-href="<?= HtmlEncode(GetUrl($Page->getReturnUrl())) ?>"><?= $Language->phrase("CancelBtn") ?></button>
 </div>
 </form>
 <?php

@@ -350,8 +350,10 @@ class MainTransactionsDelete extends MainTransactions
         $this->campaign_id->setVisibility();
         $this->operator_id->setVisibility();
         $this->payment_date->setVisibility();
+        $this->vendor_id->setVisibility();
         $this->price_id->setVisibility();
         $this->quantity->setVisibility();
+        $this->assigned_buses->setVisibility();
         $this->start_date->setVisibility();
         $this->end_date->setVisibility();
         $this->visible_status_id->setVisibility();
@@ -378,6 +380,7 @@ class MainTransactionsDelete extends MainTransactions
         // Set up lookup cache
         $this->setupLookupOptions($this->campaign_id);
         $this->setupLookupOptions($this->operator_id);
+        $this->setupLookupOptions($this->vendor_id);
         $this->setupLookupOptions($this->price_id);
         $this->setupLookupOptions($this->visible_status_id);
         $this->setupLookupOptions($this->status_id);
@@ -401,6 +404,25 @@ class MainTransactionsDelete extends MainTransactions
 
         // Set up filter (WHERE Clause)
         $this->CurrentFilter = $filter;
+
+        // Check if valid User ID
+        $conn = $this->getConnection();
+        $sql = $this->getSql($this->CurrentFilter);
+        $rows = $conn->fetchAll($sql);
+        $res = true;
+        foreach ($rows as $row) {
+            $this->loadRowValues($row);
+            if (!$this->showOptionLink("delete")) {
+                $userIdMsg = $Language->phrase("NoDeletePermission");
+                $this->setFailureMessage($userIdMsg);
+                $res = false;
+                break;
+            }
+        }
+        if (!$res) {
+            $this->terminate("maintransactionslist"); // Return to list
+            return;
+        }
 
         // Get action
         if (IsApi()) {
@@ -544,6 +566,7 @@ class MainTransactionsDelete extends MainTransactions
         }
         $this->operator_id->setDbValue($row['operator_id']);
         $this->payment_date->setDbValue($row['payment_date']);
+        $this->vendor_id->setDbValue($row['vendor_id']);
         $this->price_id->setDbValue($row['price_id']);
         if (array_key_exists('EV__price_id', $row)) {
             $this->price_id->VirtualValue = $row['EV__price_id']; // Set up virtual field value
@@ -551,6 +574,7 @@ class MainTransactionsDelete extends MainTransactions
             $this->price_id->VirtualValue = ""; // Clear value
         }
         $this->quantity->setDbValue($row['quantity']);
+        $this->assigned_buses->setDbValue($row['assigned_buses']);
         $this->start_date->setDbValue($row['start_date']);
         $this->end_date->setDbValue($row['end_date']);
         $this->visible_status_id->setDbValue($row['visible_status_id']);
@@ -586,8 +610,10 @@ class MainTransactionsDelete extends MainTransactions
         $row['campaign_id'] = null;
         $row['operator_id'] = null;
         $row['payment_date'] = null;
+        $row['vendor_id'] = null;
         $row['price_id'] = null;
         $row['quantity'] = null;
+        $row['assigned_buses'] = null;
         $row['start_date'] = null;
         $row['end_date'] = null;
         $row['visible_status_id'] = null;
@@ -616,14 +642,23 @@ class MainTransactionsDelete extends MainTransactions
         // id
 
         // campaign_id
+        $this->campaign_id->CellCssStyle = "white-space: nowrap;";
 
         // operator_id
 
         // payment_date
 
+        // vendor_id
+        $this->vendor_id->CellCssStyle = "white-space: nowrap;";
+
         // price_id
+        $this->price_id->CellCssStyle = "white-space: nowrap;";
 
         // quantity
+        $this->quantity->CellCssStyle = "white-space: nowrap;";
+
+        // assigned_buses
+        $this->assigned_buses->CellCssStyle = "white-space: nowrap;";
 
         // start_date
 
@@ -644,6 +679,7 @@ class MainTransactionsDelete extends MainTransactions
         // ts_last_update
 
         // total
+        $this->total->CellCssStyle = "white-space: nowrap;";
         if ($this->RowType == ROWTYPE_VIEW) {
             // id
             $this->id->ViewValue = $this->id->CurrentValue;
@@ -659,7 +695,7 @@ class MainTransactionsDelete extends MainTransactions
                     $this->campaign_id->ViewValue = $this->campaign_id->lookupCacheOption($curVal);
                     if ($this->campaign_id->ViewValue === null) { // Lookup from database
                         $filterWrk = "\"id\"" . SearchString("=", $curVal, DATATYPE_NUMBER, "");
-                        $sqlWrk = $this->campaign_id->Lookup->getSql(false, $filterWrk, '', $this, true);
+                        $sqlWrk = $this->campaign_id->Lookup->getSql(false, $filterWrk, '', $this, true, true);
                         $rswrk = Conn()->executeQuery($sqlWrk)->fetchAll(\PDO::FETCH_BOTH);
                         $ari = count($rswrk);
                         if ($ari > 0) { // Lookup values found
@@ -673,6 +709,7 @@ class MainTransactionsDelete extends MainTransactions
                     $this->campaign_id->ViewValue = null;
                 }
             }
+            $this->campaign_id->CssClass = "font-weight-bold";
             $this->campaign_id->ViewCustomAttributes = "";
 
             // operator_id
@@ -681,7 +718,7 @@ class MainTransactionsDelete extends MainTransactions
                 $this->operator_id->ViewValue = $this->operator_id->lookupCacheOption($curVal);
                 if ($this->operator_id->ViewValue === null) { // Lookup from database
                     $filterWrk = "\"operator_id\"" . SearchString("=", $curVal, DATATYPE_NUMBER, "");
-                    $sqlWrk = $this->operator_id->Lookup->getSql(false, $filterWrk, '', $this, true);
+                    $sqlWrk = $this->operator_id->Lookup->getSql(false, $filterWrk, '', $this, true, true);
                     $rswrk = Conn()->executeQuery($sqlWrk)->fetchAll(\PDO::FETCH_BOTH);
                     $ari = count($rswrk);
                     if ($ari > 0) { // Lookup values found
@@ -701,6 +738,28 @@ class MainTransactionsDelete extends MainTransactions
             $this->payment_date->ViewValue = FormatDateTime($this->payment_date->ViewValue, 5);
             $this->payment_date->ViewCustomAttributes = "";
 
+            // vendor_id
+            $this->vendor_id->ViewValue = $this->vendor_id->CurrentValue;
+            $curVal = strval($this->vendor_id->CurrentValue);
+            if ($curVal != "") {
+                $this->vendor_id->ViewValue = $this->vendor_id->lookupCacheOption($curVal);
+                if ($this->vendor_id->ViewValue === null) { // Lookup from database
+                    $filterWrk = "\"id\"" . SearchString("=", $curVal, DATATYPE_NUMBER, "");
+                    $sqlWrk = $this->vendor_id->Lookup->getSql(false, $filterWrk, '', $this, true, true);
+                    $rswrk = Conn()->executeQuery($sqlWrk)->fetchAll(\PDO::FETCH_BOTH);
+                    $ari = count($rswrk);
+                    if ($ari > 0) { // Lookup values found
+                        $arwrk = $this->vendor_id->Lookup->renderViewRow($rswrk[0]);
+                        $this->vendor_id->ViewValue = $this->vendor_id->displayValue($arwrk);
+                    } else {
+                        $this->vendor_id->ViewValue = $this->vendor_id->CurrentValue;
+                    }
+                }
+            } else {
+                $this->vendor_id->ViewValue = null;
+            }
+            $this->vendor_id->ViewCustomAttributes = "";
+
             // price_id
             if ($this->price_id->VirtualValue != "") {
                 $this->price_id->ViewValue = $this->price_id->VirtualValue;
@@ -710,7 +769,7 @@ class MainTransactionsDelete extends MainTransactions
                     $this->price_id->ViewValue = $this->price_id->lookupCacheOption($curVal);
                     if ($this->price_id->ViewValue === null) { // Lookup from database
                         $filterWrk = "\"price_id\"" . SearchString("=", $curVal, DATATYPE_NUMBER, "");
-                        $sqlWrk = $this->price_id->Lookup->getSql(false, $filterWrk, '', $this, true);
+                        $sqlWrk = $this->price_id->Lookup->getSql(false, $filterWrk, '', $this, true, true);
                         $rswrk = Conn()->executeQuery($sqlWrk)->fetchAll(\PDO::FETCH_BOTH);
                         $ari = count($rswrk);
                         if ($ari > 0) { // Lookup values found
@@ -729,7 +788,16 @@ class MainTransactionsDelete extends MainTransactions
             // quantity
             $this->quantity->ViewValue = $this->quantity->CurrentValue;
             $this->quantity->ViewValue = FormatNumber($this->quantity->ViewValue, 0, -2, -2, -2);
+            $this->quantity->CssClass = "font-weight-bold";
+            $this->quantity->CellCssStyle .= "text-align: right;";
             $this->quantity->ViewCustomAttributes = "";
+
+            // assigned_buses
+            $this->assigned_buses->ViewValue = $this->assigned_buses->CurrentValue;
+            $this->assigned_buses->ViewValue = FormatNumber($this->assigned_buses->ViewValue, 0, -2, -2, -2);
+            $this->assigned_buses->CssClass = "font-weight-bold";
+            $this->assigned_buses->CellCssStyle .= "text-align: right;";
+            $this->assigned_buses->ViewCustomAttributes = "";
 
             // start_date
             $this->start_date->ViewValue = $this->start_date->CurrentValue;
@@ -747,7 +815,7 @@ class MainTransactionsDelete extends MainTransactions
                 $this->visible_status_id->ViewValue = $this->visible_status_id->lookupCacheOption($curVal);
                 if ($this->visible_status_id->ViewValue === null) { // Lookup from database
                     $filterWrk = "\"id\"" . SearchString("=", $curVal, DATATYPE_NUMBER, "");
-                    $sqlWrk = $this->visible_status_id->Lookup->getSql(false, $filterWrk, '', $this, true);
+                    $sqlWrk = $this->visible_status_id->Lookup->getSql(false, $filterWrk, '', $this, true, true);
                     $rswrk = Conn()->executeQuery($sqlWrk)->fetchAll(\PDO::FETCH_BOTH);
                     $ari = count($rswrk);
                     if ($ari > 0) { // Lookup values found
@@ -771,7 +839,7 @@ class MainTransactionsDelete extends MainTransactions
                     $this->status_id->ViewValue = $this->status_id->lookupCacheOption($curVal);
                     if ($this->status_id->ViewValue === null) { // Lookup from database
                         $filterWrk = "\"id\"" . SearchString("=", $curVal, DATATYPE_NUMBER, "");
-                        $sqlWrk = $this->status_id->Lookup->getSql(false, $filterWrk, '', $this, true);
+                        $sqlWrk = $this->status_id->Lookup->getSql(false, $filterWrk, '', $this, true, true);
                         $rswrk = Conn()->executeQuery($sqlWrk)->fetchAll(\PDO::FETCH_BOTH);
                         $ari = count($rswrk);
                         if ($ari > 0) { // Lookup values found
@@ -785,6 +853,7 @@ class MainTransactionsDelete extends MainTransactions
                     $this->status_id->ViewValue = null;
                 }
             }
+            $this->status_id->CellCssStyle .= "text-align: center;";
             $this->status_id->ViewCustomAttributes = "";
 
             // print_status_id
@@ -796,7 +865,7 @@ class MainTransactionsDelete extends MainTransactions
                     $this->print_status_id->ViewValue = $this->print_status_id->lookupCacheOption($curVal);
                     if ($this->print_status_id->ViewValue === null) { // Lookup from database
                         $filterWrk = "\"id\"" . SearchString("=", $curVal, DATATYPE_NUMBER, "");
-                        $sqlWrk = $this->print_status_id->Lookup->getSql(false, $filterWrk, '', $this, true);
+                        $sqlWrk = $this->print_status_id->Lookup->getSql(false, $filterWrk, '', $this, true, true);
                         $rswrk = Conn()->executeQuery($sqlWrk)->fetchAll(\PDO::FETCH_BOTH);
                         $ari = count($rswrk);
                         if ($ari > 0) { // Lookup values found
@@ -810,6 +879,7 @@ class MainTransactionsDelete extends MainTransactions
                     $this->print_status_id->ViewValue = null;
                 }
             }
+            $this->print_status_id->CellCssStyle .= "text-align: center;";
             $this->print_status_id->ViewCustomAttributes = "";
 
             // payment_status_id
@@ -821,7 +891,7 @@ class MainTransactionsDelete extends MainTransactions
                     $this->payment_status_id->ViewValue = $this->payment_status_id->lookupCacheOption($curVal);
                     if ($this->payment_status_id->ViewValue === null) { // Lookup from database
                         $filterWrk = "\"id\"" . SearchString("=", $curVal, DATATYPE_NUMBER, "");
-                        $sqlWrk = $this->payment_status_id->Lookup->getSql(false, $filterWrk, '', $this, true);
+                        $sqlWrk = $this->payment_status_id->Lookup->getSql(false, $filterWrk, '', $this, true, true);
                         $rswrk = Conn()->executeQuery($sqlWrk)->fetchAll(\PDO::FETCH_BOTH);
                         $ari = count($rswrk);
                         if ($ari > 0) { // Lookup values found
@@ -835,6 +905,7 @@ class MainTransactionsDelete extends MainTransactions
                     $this->payment_status_id->ViewValue = null;
                 }
             }
+            $this->payment_status_id->CellCssStyle .= "text-align: center;";
             $this->payment_status_id->ViewCustomAttributes = "";
 
             // created_by
@@ -843,7 +914,7 @@ class MainTransactionsDelete extends MainTransactions
                 $this->created_by->ViewValue = $this->created_by->lookupCacheOption($curVal);
                 if ($this->created_by->ViewValue === null) { // Lookup from database
                     $filterWrk = "\"id\"" . SearchString("=", $curVal, DATATYPE_NUMBER, "");
-                    $sqlWrk = $this->created_by->Lookup->getSql(false, $filterWrk, '', $this, true);
+                    $sqlWrk = $this->created_by->Lookup->getSql(false, $filterWrk, '', $this, true, true);
                     $rswrk = Conn()->executeQuery($sqlWrk)->fetchAll(\PDO::FETCH_BOTH);
                     $ari = count($rswrk);
                     if ($ari > 0) { // Lookup values found
@@ -871,6 +942,8 @@ class MainTransactionsDelete extends MainTransactions
             // total
             $this->total->ViewValue = $this->total->CurrentValue;
             $this->total->ViewValue = FormatNumber($this->total->ViewValue, 0, -2, -2, -2);
+            $this->total->CssClass = "font-weight-bold";
+            $this->total->CellCssStyle .= "text-align: right;";
             $this->total->ViewCustomAttributes = "";
 
             // id
@@ -893,6 +966,11 @@ class MainTransactionsDelete extends MainTransactions
             $this->payment_date->HrefValue = "";
             $this->payment_date->TooltipValue = "";
 
+            // vendor_id
+            $this->vendor_id->LinkCustomAttributes = "";
+            $this->vendor_id->HrefValue = "";
+            $this->vendor_id->TooltipValue = "";
+
             // price_id
             $this->price_id->LinkCustomAttributes = "";
             $this->price_id->HrefValue = "";
@@ -902,6 +980,11 @@ class MainTransactionsDelete extends MainTransactions
             $this->quantity->LinkCustomAttributes = "";
             $this->quantity->HrefValue = "";
             $this->quantity->TooltipValue = "";
+
+            // assigned_buses
+            $this->assigned_buses->LinkCustomAttributes = "";
+            $this->assigned_buses->HrefValue = "";
+            $this->assigned_buses->TooltipValue = "";
 
             // start_date
             $this->start_date->LinkCustomAttributes = "";
@@ -915,22 +998,54 @@ class MainTransactionsDelete extends MainTransactions
 
             // visible_status_id
             $this->visible_status_id->LinkCustomAttributes = "";
-            $this->visible_status_id->HrefValue = "";
+            if (!EmptyValue($this->visible_status_id->CurrentValue)) {
+                $this->visible_status_id->HrefValue = "#" . (!empty($this->visible_status_id->ViewValue) && !is_array($this->visible_status_id->ViewValue) ? RemoveHtml($this->visible_status_id->ViewValue) : $this->visible_status_id->CurrentValue); // Add prefix/suffix
+                $this->visible_status_id->LinkAttrs["target"] = ""; // Add target
+                if ($this->isExport()) {
+                    $this->visible_status_id->HrefValue = FullUrl($this->visible_status_id->HrefValue, "href");
+                }
+            } else {
+                $this->visible_status_id->HrefValue = "";
+            }
             $this->visible_status_id->TooltipValue = "";
 
             // status_id
             $this->status_id->LinkCustomAttributes = "";
-            $this->status_id->HrefValue = "";
+            if (!EmptyValue($this->status_id->CurrentValue)) {
+                $this->status_id->HrefValue = "#" . (!empty($this->status_id->ViewValue) && !is_array($this->status_id->ViewValue) ? RemoveHtml($this->status_id->ViewValue) : $this->status_id->CurrentValue); // Add prefix/suffix
+                $this->status_id->LinkAttrs["target"] = ""; // Add target
+                if ($this->isExport()) {
+                    $this->status_id->HrefValue = FullUrl($this->status_id->HrefValue, "href");
+                }
+            } else {
+                $this->status_id->HrefValue = "";
+            }
             $this->status_id->TooltipValue = "";
 
             // print_status_id
             $this->print_status_id->LinkCustomAttributes = "";
-            $this->print_status_id->HrefValue = "";
+            if (!EmptyValue($this->print_status_id->CurrentValue)) {
+                $this->print_status_id->HrefValue = "#" . (!empty($this->print_status_id->ViewValue) && !is_array($this->print_status_id->ViewValue) ? RemoveHtml($this->print_status_id->ViewValue) : $this->print_status_id->CurrentValue); // Add prefix/suffix
+                $this->print_status_id->LinkAttrs["target"] = ""; // Add target
+                if ($this->isExport()) {
+                    $this->print_status_id->HrefValue = FullUrl($this->print_status_id->HrefValue, "href");
+                }
+            } else {
+                $this->print_status_id->HrefValue = "";
+            }
             $this->print_status_id->TooltipValue = "";
 
             // payment_status_id
             $this->payment_status_id->LinkCustomAttributes = "";
-            $this->payment_status_id->HrefValue = "";
+            if (!EmptyValue($this->payment_status_id->CurrentValue)) {
+                $this->payment_status_id->HrefValue = "#" . (!empty($this->payment_status_id->ViewValue) && !is_array($this->payment_status_id->ViewValue) ? RemoveHtml($this->payment_status_id->ViewValue) : $this->payment_status_id->CurrentValue); // Add prefix/suffix
+                $this->payment_status_id->LinkAttrs["target"] = ""; // Add target
+                if ($this->isExport()) {
+                    $this->payment_status_id->HrefValue = FullUrl($this->payment_status_id->HrefValue, "href");
+                }
+            } else {
+                $this->payment_status_id->HrefValue = "";
+            }
             $this->payment_status_id->TooltipValue = "";
 
             // total
@@ -1026,6 +1141,16 @@ class MainTransactionsDelete extends MainTransactions
             WriteJson(["success" => true, $this->TableVar => $row]);
         }
         return $deleteRows;
+    }
+
+    // Show link optionally based on User ID
+    protected function showOptionLink($id = "")
+    {
+        global $Security;
+        if ($Security->isLoggedIn() && !$Security->isAdmin() && !$this->userIDAllow($id)) {
+            return $Security->isValidUserID($this->vendor_id->CurrentValue);
+        }
+        return true;
     }
 
     // Set up master/detail based on QueryString
@@ -1157,6 +1282,8 @@ class MainTransactionsDelete extends MainTransactions
                 case "x_campaign_id":
                     break;
                 case "x_operator_id":
+                    break;
+                case "x_vendor_id":
                     break;
                 case "x_price_id":
                     break;

@@ -18,9 +18,6 @@ class ApiPermissionMiddleware
     {
         global $UserProfile, $Security, $Language, $ResponseFactory;
 
-        // API call
-        $GLOBALS["IsApi"] = true;
-
         // Create Response
         $response = $ResponseFactory->createResponse();
         $routeContext = RouteContext::fromRequest($request);
@@ -97,10 +94,8 @@ class ApiPermissionMiddleware
                 $action == Config("API_FILE_ACTION") && ($Security->canList() || $Security->canView());
         } elseif ($action == Config("API_LOOKUP_ACTION")) { // Lookup
             $object = $request->getParam(Config("API_LOOKUP_PAGE")); // Get lookup page
-            $class = PROJECT_NAMESPACE . $object;
-            if (class_exists($class)) {
-                $page = new $class();
-                Container($object, $page);
+            $page = Container($object);
+            if ($page !== null) {
                 $fieldName = $request->getParam(Config("API_FIELD_NAME")); // Get field name
                 $lookupField = $page->Fields[$fieldName] ?? null;
                 if ($lookupField) {
@@ -108,7 +103,8 @@ class ApiPermissionMiddleware
                     if ($lookup) {
                         $tbl = $lookup->getTable();
                         if ($tbl) {
-                            $authorised = $Security->allowLookup(PROJECT_ID . $tbl->TableName);
+                            $Security->loadTablePermissions($tbl->TableVar);
+                            $authorised = $Security->canLookup();
                         }
                     }
                 }

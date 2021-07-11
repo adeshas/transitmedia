@@ -414,7 +414,12 @@ loadjs.ready("head", function() {
 <?php } else { ?>
 <span id="el_main_transactions_visible_status_id">
 <span<?= $Page->visible_status_id->viewAttributes() ?>>
-<input type="text" readonly class="form-control-plaintext" value="<?= HtmlEncode(RemoveHtml($Page->visible_status_id->getDisplayValue($Page->visible_status_id->ViewValue))) ?>"></span>
+<?php if (!EmptyString($Page->visible_status_id->ViewValue) && $Page->visible_status_id->linkAttributes() != "") { ?>
+<a<?= $Page->visible_status_id->linkAttributes() ?>><input type="text" readonly class="form-control-plaintext" value="<?= HtmlEncode(RemoveHtml($Page->visible_status_id->getDisplayValue($Page->visible_status_id->ViewValue))) ?>"></a>
+<?php } else { ?>
+<input type="text" readonly class="form-control-plaintext" value="<?= HtmlEncode(RemoveHtml($Page->visible_status_id->getDisplayValue($Page->visible_status_id->ViewValue))) ?>">
+<?php } ?>
+</span>
 </span>
 <input type="hidden" data-table="main_transactions" data-field="x_visible_status_id" data-hidden="1" name="x_visible_status_id" id="x_visible_status_id" value="<?= HtmlEncode($Page->visible_status_id->FormValue) ?>">
 <?php } ?>
@@ -455,7 +460,12 @@ loadjs.ready("head", function() {
 <?php } else { ?>
 <span id="el_main_transactions_status_id">
 <span<?= $Page->status_id->viewAttributes() ?>>
-<input type="text" readonly class="form-control-plaintext" value="<?= HtmlEncode(RemoveHtml($Page->status_id->getDisplayValue($Page->status_id->ViewValue))) ?>"></span>
+<?php if (!EmptyString($Page->status_id->ViewValue) && $Page->status_id->linkAttributes() != "") { ?>
+<a<?= $Page->status_id->linkAttributes() ?>><input type="text" readonly class="form-control-plaintext" value="<?= HtmlEncode(RemoveHtml($Page->status_id->getDisplayValue($Page->status_id->ViewValue))) ?>"></a>
+<?php } else { ?>
+<input type="text" readonly class="form-control-plaintext" value="<?= HtmlEncode(RemoveHtml($Page->status_id->getDisplayValue($Page->status_id->ViewValue))) ?>">
+<?php } ?>
+</span>
 </span>
 <input type="hidden" data-table="main_transactions" data-field="x_status_id" data-hidden="1" name="x_status_id" id="x_status_id" value="<?= HtmlEncode($Page->status_id->FormValue) ?>">
 <?php } ?>
@@ -496,7 +506,12 @@ loadjs.ready("head", function() {
 <?php } else { ?>
 <span id="el_main_transactions_print_status_id">
 <span<?= $Page->print_status_id->viewAttributes() ?>>
-<input type="text" readonly class="form-control-plaintext" value="<?= HtmlEncode(RemoveHtml($Page->print_status_id->getDisplayValue($Page->print_status_id->ViewValue))) ?>"></span>
+<?php if (!EmptyString($Page->print_status_id->ViewValue) && $Page->print_status_id->linkAttributes() != "") { ?>
+<a<?= $Page->print_status_id->linkAttributes() ?>><input type="text" readonly class="form-control-plaintext" value="<?= HtmlEncode(RemoveHtml($Page->print_status_id->getDisplayValue($Page->print_status_id->ViewValue))) ?>"></a>
+<?php } else { ?>
+<input type="text" readonly class="form-control-plaintext" value="<?= HtmlEncode(RemoveHtml($Page->print_status_id->getDisplayValue($Page->print_status_id->ViewValue))) ?>">
+<?php } ?>
+</span>
 </span>
 <input type="hidden" data-table="main_transactions" data-field="x_print_status_id" data-hidden="1" name="x_print_status_id" id="x_print_status_id" value="<?= HtmlEncode($Page->print_status_id->FormValue) ?>">
 <?php } ?>
@@ -537,7 +552,12 @@ loadjs.ready("head", function() {
 <?php } else { ?>
 <span id="el_main_transactions_payment_status_id">
 <span<?= $Page->payment_status_id->viewAttributes() ?>>
-<input type="text" readonly class="form-control-plaintext" value="<?= HtmlEncode(RemoveHtml($Page->payment_status_id->getDisplayValue($Page->payment_status_id->ViewValue))) ?>"></span>
+<?php if (!EmptyString($Page->payment_status_id->ViewValue) && $Page->payment_status_id->linkAttributes() != "") { ?>
+<a<?= $Page->payment_status_id->linkAttributes() ?>><input type="text" readonly class="form-control-plaintext" value="<?= HtmlEncode(RemoveHtml($Page->payment_status_id->getDisplayValue($Page->payment_status_id->ViewValue))) ?>"></a>
+<?php } else { ?>
+<input type="text" readonly class="form-control-plaintext" value="<?= HtmlEncode(RemoveHtml($Page->payment_status_id->getDisplayValue($Page->payment_status_id->ViewValue))) ?>">
+<?php } ?>
+</span>
 </span>
 <input type="hidden" data-table="main_transactions" data-field="x_payment_status_id" data-hidden="1" name="x_payment_status_id" id="x_payment_status_id" value="<?= HtmlEncode($Page->payment_status_id->FormValue) ?>">
 <?php } ?>
@@ -578,7 +598,7 @@ loadjs.ready("head", function() {
     <div class="<?= $Page->OffsetColumnClass ?>"><!-- buttons offset -->
 <?php if (!$Page->isConfirm()) { // Confirm page ?>
 <button class="btn btn-primary ew-btn" name="btn-action" id="btn-action" type="submit" onclick="this.form.action.value='confirm';"><?= $Language->phrase("AddBtn") ?></button>
-<button class="btn btn-default ew-btn" name="btn-cancel" id="btn-cancel" type="button" data-href="<?= GetUrl($Page->getReturnUrl()) ?>"><?= $Language->phrase("CancelBtn") ?></button>
+<button class="btn btn-default ew-btn" name="btn-cancel" id="btn-cancel" type="button" data-href="<?= HtmlEncode(GetUrl($Page->getReturnUrl())) ?>"><?= $Language->phrase("CancelBtn") ?></button>
 <?php } else { ?>
 <button class="btn btn-primary ew-btn" name="btn-action" id="btn-action" type="submit"><?= $Language->phrase("ConfirmBtn") ?></button>
 <button class="btn btn-default ew-btn" name="btn-cancel" id="btn-cancel" type="submit" onclick="this.form.action.value='cancel';"><?= $Language->phrase("CancelBtn") ?></button>

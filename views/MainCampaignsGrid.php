@@ -157,7 +157,7 @@ $Grid->ListOptions->render("header", "left");
         <th data-name="id" class="<?= $Grid->id->headerCellClass() ?>"><div id="elh_main_campaigns_id" class="main_campaigns_id"><?= $Grid->renderSort($Grid->id) ?></div></th>
 <?php } ?>
 <?php if ($Grid->name->Visible) { // name ?>
-        <th data-name="name" class="<?= $Grid->name->headerCellClass() ?>"><div id="elh_main_campaigns_name" class="main_campaigns_name"><?= $Grid->renderSort($Grid->name) ?></div></th>
+        <th data-name="name" class="<?= $Grid->name->headerCellClass() ?>" style="white-space: nowrap;"><div id="elh_main_campaigns_name" class="main_campaigns_name"><?= $Grid->renderSort($Grid->name) ?></div></th>
 <?php } ?>
 <?php if ($Grid->inventory_id->Visible) { // inventory_id ?>
         <th data-name="inventory_id" class="<?= $Grid->inventory_id->headerCellClass() ?>"><div id="elh_main_campaigns_inventory_id" class="main_campaigns_inventory_id"><?= $Grid->renderSort($Grid->inventory_id) ?></div></th>
@@ -323,6 +323,8 @@ $Grid->ListOptions->render("body", "left", $Grid->RowCount);
 <?php } ?>
 <?php } ?>
 </td>
+    <?php } else { ?>
+            <input type="hidden" data-table="main_campaigns" data-field="x_id" data-hidden="1" name="x<?= $Grid->RowIndex ?>_id" id="x<?= $Grid->RowIndex ?>_id" value="<?= HtmlEncode($Grid->id->CurrentValue) ?>">
     <?php } ?>
     <?php if ($Grid->name->Visible) { // name ?>
         <td data-name="name" <?= $Grid->name->cellAttributes() ?>>

@@ -525,6 +525,48 @@ class ViewTransactionsPerPlatformList extends ViewTransactionsPerPlatform
     public function run()
     {
         global $ExportType, $CustomExportType, $ExportFileName, $UserProfile, $Language, $Security, $CurrentForm;
+
+        // Get export parameters
+        $custom = "";
+        if (Param("export") !== null) {
+            $this->Export = Param("export");
+            $custom = Param("custom", "");
+        } elseif (IsPost()) {
+            if (Post("exporttype") !== null) {
+                $this->Export = Post("exporttype");
+            }
+            $custom = Post("custom", "");
+        } elseif (Get("cmd") == "json") {
+            $this->Export = Get("cmd");
+        } else {
+            $this->setExportReturnUrl(CurrentUrl());
+        }
+        $ExportFileName = $this->TableVar; // Get export file, used in header
+
+        // Get custom export parameters
+        if ($this->isExport() && $custom != "") {
+            $this->CustomExport = $this->Export;
+            $this->Export = "print";
+        }
+        $CustomExportType = $this->CustomExport;
+        $ExportType = $this->Export; // Get export parameter, used in header
+
+        // Update Export URLs
+        if (Config("USE_PHPEXCEL")) {
+            $this->ExportExcelCustom = false;
+        }
+        if (Config("USE_PHPWORD")) {
+            $this->ExportWordCustom = false;
+        }
+        if ($this->ExportExcelCustom) {
+            $this->ExportExcelUrl .= "&amp;custom=1";
+        }
+        if ($this->ExportWordCustom) {
+            $this->ExportWordUrl .= "&amp;custom=1";
+        }
+        if ($this->ExportPdfCustom) {
+            $this->ExportPdfUrl .= "&amp;custom=1";
+        }
         $this->CurrentAction = Param("action"); // Set up current action
 
         // Get grid add count
@@ -535,6 +577,9 @@ class ViewTransactionsPerPlatformList extends ViewTransactionsPerPlatform
 
         // Set up list options
         $this->setupListOptions();
+
+        // Setup export options
+        $this->setupExportOptions();
         $this->transaction_id->setVisibility();
         $this->campaign->setVisibility();
         $this->payment_date->setVisibility();
@@ -544,9 +589,6 @@ class ViewTransactionsPerPlatformList extends ViewTransactionsPerPlatform
         $this->vendor->setVisibility();
         $this->operator->setVisibility();
         $this->transaction_status->setVisibility();
-        $this->quantity->setVisibility();
-        $this->lamata_fee->setVisibility();
-        $this->total->setVisibility();
         $this->start_date->Visible = false;
         $this->end_date->Visible = false;
         $this->platform->Visible = false;
@@ -558,6 +600,13 @@ class ViewTransactionsPerPlatformList extends ViewTransactionsPerPlatform
         $this->bus_size_id->Visible = false;
         $this->vendor_search_id->Visible = false;
         $this->vendor_search_name->Visible = false;
+        $this->price->setVisibility();
+        $this->quantity->setVisibility();
+        $this->amount_paid->setVisibility();
+        $this->transitmedia_fee->setVisibility();
+        $this->lasaa_fee->setVisibility();
+        $this->operator_fee->setVisibility();
+        $this->lamata_fee->setVisibility();
         $this->hideFieldsForAddEdit();
 
         // Global Page Loading event (in userfn*.php)
@@ -739,6 +788,13 @@ class ViewTransactionsPerPlatformList extends ViewTransactionsPerPlatform
             $this->setSessionWhere($filter);
             $this->CurrentFilter = "";
         }
+
+        // Export data only
+        if (!$this->CustomExport && in_array($this->Export, array_keys(Config("EXPORT_CLASSES")))) {
+            $this->exportData();
+            $this->terminate();
+            return;
+        }
         if ($this->isGridAdd()) {
             $this->CurrentFilter = "0=1";
             $this->StartRecord = 1;
@@ -879,9 +935,6 @@ class ViewTransactionsPerPlatformList extends ViewTransactionsPerPlatform
         $filterList = Concat($filterList, $this->vendor->AdvancedSearch->toJson(), ","); // Field vendor
         $filterList = Concat($filterList, $this->operator->AdvancedSearch->toJson(), ","); // Field operator
         $filterList = Concat($filterList, $this->transaction_status->AdvancedSearch->toJson(), ","); // Field transaction_status
-        $filterList = Concat($filterList, $this->quantity->AdvancedSearch->toJson(), ","); // Field quantity
-        $filterList = Concat($filterList, $this->lamata_fee->AdvancedSearch->toJson(), ","); // Field lamata_fee
-        $filterList = Concat($filterList, $this->total->AdvancedSearch->toJson(), ","); // Field total
         $filterList = Concat($filterList, $this->start_date->AdvancedSearch->toJson(), ","); // Field start_date
         $filterList = Concat($filterList, $this->end_date->AdvancedSearch->toJson(), ","); // Field end_date
         $filterList = Concat($filterList, $this->platform->AdvancedSearch->toJson(), ","); // Field platform
@@ -893,6 +946,13 @@ class ViewTransactionsPerPlatformList extends ViewTransactionsPerPlatform
         $filterList = Concat($filterList, $this->bus_size_id->AdvancedSearch->toJson(), ","); // Field bus_size_id
         $filterList = Concat($filterList, $this->vendor_search_id->AdvancedSearch->toJson(), ","); // Field vendor_search_id
         $filterList = Concat($filterList, $this->vendor_search_name->AdvancedSearch->toJson(), ","); // Field vendor_search_name
+        $filterList = Concat($filterList, $this->price->AdvancedSearch->toJson(), ","); // Field price
+        $filterList = Concat($filterList, $this->quantity->AdvancedSearch->toJson(), ","); // Field quantity
+        $filterList = Concat($filterList, $this->amount_paid->AdvancedSearch->toJson(), ","); // Field amount_paid
+        $filterList = Concat($filterList, $this->transitmedia_fee->AdvancedSearch->toJson(), ","); // Field transitmedia_fee
+        $filterList = Concat($filterList, $this->lasaa_fee->AdvancedSearch->toJson(), ","); // Field lasaa_fee
+        $filterList = Concat($filterList, $this->operator_fee->AdvancedSearch->toJson(), ","); // Field operator_fee
+        $filterList = Concat($filterList, $this->lamata_fee->AdvancedSearch->toJson(), ","); // Field lamata_fee
         if ($this->BasicSearch->Keyword != "") {
             $wrk = "\"" . Config("TABLE_BASIC_SEARCH") . "\":\"" . JsEncode($this->BasicSearch->Keyword) . "\",\"" . Config("TABLE_BASIC_SEARCH_TYPE") . "\":\"" . JsEncode($this->BasicSearch->Type) . "\"";
             $filterList = Concat($filterList, $wrk, ",");
@@ -1005,30 +1065,6 @@ class ViewTransactionsPerPlatformList extends ViewTransactionsPerPlatform
         $this->transaction_status->AdvancedSearch->SearchOperator2 = @$filter["w_transaction_status"];
         $this->transaction_status->AdvancedSearch->save();
 
-        // Field quantity
-        $this->quantity->AdvancedSearch->SearchValue = @$filter["x_quantity"];
-        $this->quantity->AdvancedSearch->SearchOperator = @$filter["z_quantity"];
-        $this->quantity->AdvancedSearch->SearchCondition = @$filter["v_quantity"];
-        $this->quantity->AdvancedSearch->SearchValue2 = @$filter["y_quantity"];
-        $this->quantity->AdvancedSearch->SearchOperator2 = @$filter["w_quantity"];
-        $this->quantity->AdvancedSearch->save();
-
-        // Field lamata_fee
-        $this->lamata_fee->AdvancedSearch->SearchValue = @$filter["x_lamata_fee"];
-        $this->lamata_fee->AdvancedSearch->SearchOperator = @$filter["z_lamata_fee"];
-        $this->lamata_fee->AdvancedSearch->SearchCondition = @$filter["v_lamata_fee"];
-        $this->lamata_fee->AdvancedSearch->SearchValue2 = @$filter["y_lamata_fee"];
-        $this->lamata_fee->AdvancedSearch->SearchOperator2 = @$filter["w_lamata_fee"];
-        $this->lamata_fee->AdvancedSearch->save();
-
-        // Field total
-        $this->total->AdvancedSearch->SearchValue = @$filter["x_total"];
-        $this->total->AdvancedSearch->SearchOperator = @$filter["z_total"];
-        $this->total->AdvancedSearch->SearchCondition = @$filter["v_total"];
-        $this->total->AdvancedSearch->SearchValue2 = @$filter["y_total"];
-        $this->total->AdvancedSearch->SearchOperator2 = @$filter["w_total"];
-        $this->total->AdvancedSearch->save();
-
         // Field start_date
         $this->start_date->AdvancedSearch->SearchValue = @$filter["x_start_date"];
         $this->start_date->AdvancedSearch->SearchOperator = @$filter["z_start_date"];
@@ -1116,6 +1152,62 @@ class ViewTransactionsPerPlatformList extends ViewTransactionsPerPlatform
         $this->vendor_search_name->AdvancedSearch->SearchValue2 = @$filter["y_vendor_search_name"];
         $this->vendor_search_name->AdvancedSearch->SearchOperator2 = @$filter["w_vendor_search_name"];
         $this->vendor_search_name->AdvancedSearch->save();
+
+        // Field price
+        $this->price->AdvancedSearch->SearchValue = @$filter["x_price"];
+        $this->price->AdvancedSearch->SearchOperator = @$filter["z_price"];
+        $this->price->AdvancedSearch->SearchCondition = @$filter["v_price"];
+        $this->price->AdvancedSearch->SearchValue2 = @$filter["y_price"];
+        $this->price->AdvancedSearch->SearchOperator2 = @$filter["w_price"];
+        $this->price->AdvancedSearch->save();
+
+        // Field quantity
+        $this->quantity->AdvancedSearch->SearchValue = @$filter["x_quantity"];
+        $this->quantity->AdvancedSearch->SearchOperator = @$filter["z_quantity"];
+        $this->quantity->AdvancedSearch->SearchCondition = @$filter["v_quantity"];
+        $this->quantity->AdvancedSearch->SearchValue2 = @$filter["y_quantity"];
+        $this->quantity->AdvancedSearch->SearchOperator2 = @$filter["w_quantity"];
+        $this->quantity->AdvancedSearch->save();
+
+        // Field amount_paid
+        $this->amount_paid->AdvancedSearch->SearchValue = @$filter["x_amount_paid"];
+        $this->amount_paid->AdvancedSearch->SearchOperator = @$filter["z_amount_paid"];
+        $this->amount_paid->AdvancedSearch->SearchCondition = @$filter["v_amount_paid"];
+        $this->amount_paid->AdvancedSearch->SearchValue2 = @$filter["y_amount_paid"];
+        $this->amount_paid->AdvancedSearch->SearchOperator2 = @$filter["w_amount_paid"];
+        $this->amount_paid->AdvancedSearch->save();
+
+        // Field transitmedia_fee
+        $this->transitmedia_fee->AdvancedSearch->SearchValue = @$filter["x_transitmedia_fee"];
+        $this->transitmedia_fee->AdvancedSearch->SearchOperator = @$filter["z_transitmedia_fee"];
+        $this->transitmedia_fee->AdvancedSearch->SearchCondition = @$filter["v_transitmedia_fee"];
+        $this->transitmedia_fee->AdvancedSearch->SearchValue2 = @$filter["y_transitmedia_fee"];
+        $this->transitmedia_fee->AdvancedSearch->SearchOperator2 = @$filter["w_transitmedia_fee"];
+        $this->transitmedia_fee->AdvancedSearch->save();
+
+        // Field lasaa_fee
+        $this->lasaa_fee->AdvancedSearch->SearchValue = @$filter["x_lasaa_fee"];
+        $this->lasaa_fee->AdvancedSearch->SearchOperator = @$filter["z_lasaa_fee"];
+        $this->lasaa_fee->AdvancedSearch->SearchCondition = @$filter["v_lasaa_fee"];
+        $this->lasaa_fee->AdvancedSearch->SearchValue2 = @$filter["y_lasaa_fee"];
+        $this->lasaa_fee->AdvancedSearch->SearchOperator2 = @$filter["w_lasaa_fee"];
+        $this->lasaa_fee->AdvancedSearch->save();
+
+        // Field operator_fee
+        $this->operator_fee->AdvancedSearch->SearchValue = @$filter["x_operator_fee"];
+        $this->operator_fee->AdvancedSearch->SearchOperator = @$filter["z_operator_fee"];
+        $this->operator_fee->AdvancedSearch->SearchCondition = @$filter["v_operator_fee"];
+        $this->operator_fee->AdvancedSearch->SearchValue2 = @$filter["y_operator_fee"];
+        $this->operator_fee->AdvancedSearch->SearchOperator2 = @$filter["w_operator_fee"];
+        $this->operator_fee->AdvancedSearch->save();
+
+        // Field lamata_fee
+        $this->lamata_fee->AdvancedSearch->SearchValue = @$filter["x_lamata_fee"];
+        $this->lamata_fee->AdvancedSearch->SearchOperator = @$filter["z_lamata_fee"];
+        $this->lamata_fee->AdvancedSearch->SearchCondition = @$filter["v_lamata_fee"];
+        $this->lamata_fee->AdvancedSearch->SearchValue2 = @$filter["y_lamata_fee"];
+        $this->lamata_fee->AdvancedSearch->SearchOperator2 = @$filter["w_lamata_fee"];
+        $this->lamata_fee->AdvancedSearch->save();
         $this->BasicSearch->setKeyword(@$filter[Config("TABLE_BASIC_SEARCH")]);
         $this->BasicSearch->setType(@$filter[Config("TABLE_BASIC_SEARCH_TYPE")]);
     }
@@ -1137,9 +1229,6 @@ class ViewTransactionsPerPlatformList extends ViewTransactionsPerPlatform
         $this->buildSearchSql($where, $this->vendor, $default, false); // vendor
         $this->buildSearchSql($where, $this->operator, $default, false); // operator
         $this->buildSearchSql($where, $this->transaction_status, $default, false); // transaction_status
-        $this->buildSearchSql($where, $this->quantity, $default, false); // quantity
-        $this->buildSearchSql($where, $this->lamata_fee, $default, false); // lamata_fee
-        $this->buildSearchSql($where, $this->total, $default, false); // total
         $this->buildSearchSql($where, $this->start_date, $default, false); // start_date
         $this->buildSearchSql($where, $this->end_date, $default, false); // end_date
         $this->buildSearchSql($where, $this->platform, $default, false); // platform
@@ -1151,6 +1240,13 @@ class ViewTransactionsPerPlatformList extends ViewTransactionsPerPlatform
         $this->buildSearchSql($where, $this->bus_size_id, $default, false); // bus_size_id
         $this->buildSearchSql($where, $this->vendor_search_id, $default, false); // vendor_search_id
         $this->buildSearchSql($where, $this->vendor_search_name, $default, false); // vendor_search_name
+        $this->buildSearchSql($where, $this->price, $default, false); // price
+        $this->buildSearchSql($where, $this->quantity, $default, false); // quantity
+        $this->buildSearchSql($where, $this->amount_paid, $default, false); // amount_paid
+        $this->buildSearchSql($where, $this->transitmedia_fee, $default, false); // transitmedia_fee
+        $this->buildSearchSql($where, $this->lasaa_fee, $default, false); // lasaa_fee
+        $this->buildSearchSql($where, $this->operator_fee, $default, false); // operator_fee
+        $this->buildSearchSql($where, $this->lamata_fee, $default, false); // lamata_fee
 
         // Set up search parm
         if (!$default && $where != "" && in_array($this->Command, ["", "reset", "resetall"])) {
@@ -1166,9 +1262,6 @@ class ViewTransactionsPerPlatformList extends ViewTransactionsPerPlatform
             $this->vendor->AdvancedSearch->save(); // vendor
             $this->operator->AdvancedSearch->save(); // operator
             $this->transaction_status->AdvancedSearch->save(); // transaction_status
-            $this->quantity->AdvancedSearch->save(); // quantity
-            $this->lamata_fee->AdvancedSearch->save(); // lamata_fee
-            $this->total->AdvancedSearch->save(); // total
             $this->start_date->AdvancedSearch->save(); // start_date
             $this->end_date->AdvancedSearch->save(); // end_date
             $this->platform->AdvancedSearch->save(); // platform
@@ -1180,6 +1273,13 @@ class ViewTransactionsPerPlatformList extends ViewTransactionsPerPlatform
             $this->bus_size_id->AdvancedSearch->save(); // bus_size_id
             $this->vendor_search_id->AdvancedSearch->save(); // vendor_search_id
             $this->vendor_search_name->AdvancedSearch->save(); // vendor_search_name
+            $this->price->AdvancedSearch->save(); // price
+            $this->quantity->AdvancedSearch->save(); // quantity
+            $this->amount_paid->AdvancedSearch->save(); // amount_paid
+            $this->transitmedia_fee->AdvancedSearch->save(); // transitmedia_fee
+            $this->lasaa_fee->AdvancedSearch->save(); // lasaa_fee
+            $this->operator_fee->AdvancedSearch->save(); // operator_fee
+            $this->lamata_fee->AdvancedSearch->save(); // lamata_fee
         }
         return $where;
     }
@@ -1405,15 +1505,6 @@ class ViewTransactionsPerPlatformList extends ViewTransactionsPerPlatform
         if ($this->transaction_status->AdvancedSearch->issetSession()) {
             return true;
         }
-        if ($this->quantity->AdvancedSearch->issetSession()) {
-            return true;
-        }
-        if ($this->lamata_fee->AdvancedSearch->issetSession()) {
-            return true;
-        }
-        if ($this->total->AdvancedSearch->issetSession()) {
-            return true;
-        }
         if ($this->start_date->AdvancedSearch->issetSession()) {
             return true;
         }
@@ -1445,6 +1536,27 @@ class ViewTransactionsPerPlatformList extends ViewTransactionsPerPlatform
             return true;
         }
         if ($this->vendor_search_name->AdvancedSearch->issetSession()) {
+            return true;
+        }
+        if ($this->price->AdvancedSearch->issetSession()) {
+            return true;
+        }
+        if ($this->quantity->AdvancedSearch->issetSession()) {
+            return true;
+        }
+        if ($this->amount_paid->AdvancedSearch->issetSession()) {
+            return true;
+        }
+        if ($this->transitmedia_fee->AdvancedSearch->issetSession()) {
+            return true;
+        }
+        if ($this->lasaa_fee->AdvancedSearch->issetSession()) {
+            return true;
+        }
+        if ($this->operator_fee->AdvancedSearch->issetSession()) {
+            return true;
+        }
+        if ($this->lamata_fee->AdvancedSearch->issetSession()) {
             return true;
         }
         return false;
@@ -1488,9 +1600,6 @@ class ViewTransactionsPerPlatformList extends ViewTransactionsPerPlatform
                 $this->vendor->AdvancedSearch->unsetSession();
                 $this->operator->AdvancedSearch->unsetSession();
                 $this->transaction_status->AdvancedSearch->unsetSession();
-                $this->quantity->AdvancedSearch->unsetSession();
-                $this->lamata_fee->AdvancedSearch->unsetSession();
-                $this->total->AdvancedSearch->unsetSession();
                 $this->start_date->AdvancedSearch->unsetSession();
                 $this->end_date->AdvancedSearch->unsetSession();
                 $this->platform->AdvancedSearch->unsetSession();
@@ -1502,6 +1611,13 @@ class ViewTransactionsPerPlatformList extends ViewTransactionsPerPlatform
                 $this->bus_size_id->AdvancedSearch->unsetSession();
                 $this->vendor_search_id->AdvancedSearch->unsetSession();
                 $this->vendor_search_name->AdvancedSearch->unsetSession();
+                $this->price->AdvancedSearch->unsetSession();
+                $this->quantity->AdvancedSearch->unsetSession();
+                $this->amount_paid->AdvancedSearch->unsetSession();
+                $this->transitmedia_fee->AdvancedSearch->unsetSession();
+                $this->lasaa_fee->AdvancedSearch->unsetSession();
+                $this->operator_fee->AdvancedSearch->unsetSession();
+                $this->lamata_fee->AdvancedSearch->unsetSession();
     }
 
     // Restore all search parameters
@@ -1522,9 +1638,6 @@ class ViewTransactionsPerPlatformList extends ViewTransactionsPerPlatform
                 $this->vendor->AdvancedSearch->load();
                 $this->operator->AdvancedSearch->load();
                 $this->transaction_status->AdvancedSearch->load();
-                $this->quantity->AdvancedSearch->load();
-                $this->lamata_fee->AdvancedSearch->load();
-                $this->total->AdvancedSearch->load();
                 $this->start_date->AdvancedSearch->load();
                 $this->end_date->AdvancedSearch->load();
                 $this->platform->AdvancedSearch->load();
@@ -1536,6 +1649,13 @@ class ViewTransactionsPerPlatformList extends ViewTransactionsPerPlatform
                 $this->bus_size_id->AdvancedSearch->load();
                 $this->vendor_search_id->AdvancedSearch->load();
                 $this->vendor_search_name->AdvancedSearch->load();
+                $this->price->AdvancedSearch->load();
+                $this->quantity->AdvancedSearch->load();
+                $this->amount_paid->AdvancedSearch->load();
+                $this->transitmedia_fee->AdvancedSearch->load();
+                $this->lasaa_fee->AdvancedSearch->load();
+                $this->operator_fee->AdvancedSearch->load();
+                $this->lamata_fee->AdvancedSearch->load();
     }
 
     // Set up sort parameters
@@ -1552,9 +1672,13 @@ class ViewTransactionsPerPlatformList extends ViewTransactionsPerPlatform
             $this->updateSort($this->vendor); // vendor
             $this->updateSort($this->operator); // operator
             $this->updateSort($this->transaction_status); // transaction_status
+            $this->updateSort($this->price); // price
             $this->updateSort($this->quantity); // quantity
+            $this->updateSort($this->amount_paid); // amount_paid
+            $this->updateSort($this->transitmedia_fee); // transitmedia_fee
+            $this->updateSort($this->lasaa_fee); // lasaa_fee
+            $this->updateSort($this->operator_fee); // operator_fee
             $this->updateSort($this->lamata_fee); // lamata_fee
-            $this->updateSort($this->total); // total
             $this->setStartRecordNumber(1); // Reset start position
         }
     }
@@ -1607,9 +1731,6 @@ class ViewTransactionsPerPlatformList extends ViewTransactionsPerPlatform
                 $this->vendor->setSort("");
                 $this->operator->setSort("");
                 $this->transaction_status->setSort("");
-                $this->quantity->setSort("");
-                $this->lamata_fee->setSort("");
-                $this->total->setSort("");
                 $this->start_date->setSort("");
                 $this->end_date->setSort("");
                 $this->platform->setSort("");
@@ -1621,6 +1742,13 @@ class ViewTransactionsPerPlatformList extends ViewTransactionsPerPlatform
                 $this->bus_size_id->setSort("");
                 $this->vendor_search_id->setSort("");
                 $this->vendor_search_name->setSort("");
+                $this->price->setSort("");
+                $this->quantity->setSort("");
+                $this->amount_paid->setSort("");
+                $this->transitmedia_fee->setSort("");
+                $this->lasaa_fee->setSort("");
+                $this->operator_fee->setSort("");
+                $this->lamata_fee->setSort("");
             }
 
             // Reset start position
@@ -1970,30 +2098,6 @@ class ViewTransactionsPerPlatformList extends ViewTransactionsPerPlatform
             }
         }
 
-        // quantity
-        if (!$this->isAddOrEdit() && $this->quantity->AdvancedSearch->get()) {
-            $hasValue = true;
-            if (($this->quantity->AdvancedSearch->SearchValue != "" || $this->quantity->AdvancedSearch->SearchValue2 != "") && $this->Command == "") {
-                $this->Command = "search";
-            }
-        }
-
-        // lamata_fee
-        if (!$this->isAddOrEdit() && $this->lamata_fee->AdvancedSearch->get()) {
-            $hasValue = true;
-            if (($this->lamata_fee->AdvancedSearch->SearchValue != "" || $this->lamata_fee->AdvancedSearch->SearchValue2 != "") && $this->Command == "") {
-                $this->Command = "search";
-            }
-        }
-
-        // total
-        if (!$this->isAddOrEdit() && $this->total->AdvancedSearch->get()) {
-            $hasValue = true;
-            if (($this->total->AdvancedSearch->SearchValue != "" || $this->total->AdvancedSearch->SearchValue2 != "") && $this->Command == "") {
-                $this->Command = "search";
-            }
-        }
-
         // start_date
         if (!$this->isAddOrEdit() && $this->start_date->AdvancedSearch->get()) {
             $hasValue = true;
@@ -2081,6 +2185,62 @@ class ViewTransactionsPerPlatformList extends ViewTransactionsPerPlatform
                 $this->Command = "search";
             }
         }
+
+        // price
+        if (!$this->isAddOrEdit() && $this->price->AdvancedSearch->get()) {
+            $hasValue = true;
+            if (($this->price->AdvancedSearch->SearchValue != "" || $this->price->AdvancedSearch->SearchValue2 != "") && $this->Command == "") {
+                $this->Command = "search";
+            }
+        }
+
+        // quantity
+        if (!$this->isAddOrEdit() && $this->quantity->AdvancedSearch->get()) {
+            $hasValue = true;
+            if (($this->quantity->AdvancedSearch->SearchValue != "" || $this->quantity->AdvancedSearch->SearchValue2 != "") && $this->Command == "") {
+                $this->Command = "search";
+            }
+        }
+
+        // amount_paid
+        if (!$this->isAddOrEdit() && $this->amount_paid->AdvancedSearch->get()) {
+            $hasValue = true;
+            if (($this->amount_paid->AdvancedSearch->SearchValue != "" || $this->amount_paid->AdvancedSearch->SearchValue2 != "") && $this->Command == "") {
+                $this->Command = "search";
+            }
+        }
+
+        // transitmedia_fee
+        if (!$this->isAddOrEdit() && $this->transitmedia_fee->AdvancedSearch->get()) {
+            $hasValue = true;
+            if (($this->transitmedia_fee->AdvancedSearch->SearchValue != "" || $this->transitmedia_fee->AdvancedSearch->SearchValue2 != "") && $this->Command == "") {
+                $this->Command = "search";
+            }
+        }
+
+        // lasaa_fee
+        if (!$this->isAddOrEdit() && $this->lasaa_fee->AdvancedSearch->get()) {
+            $hasValue = true;
+            if (($this->lasaa_fee->AdvancedSearch->SearchValue != "" || $this->lasaa_fee->AdvancedSearch->SearchValue2 != "") && $this->Command == "") {
+                $this->Command = "search";
+            }
+        }
+
+        // operator_fee
+        if (!$this->isAddOrEdit() && $this->operator_fee->AdvancedSearch->get()) {
+            $hasValue = true;
+            if (($this->operator_fee->AdvancedSearch->SearchValue != "" || $this->operator_fee->AdvancedSearch->SearchValue2 != "") && $this->Command == "") {
+                $this->Command = "search";
+            }
+        }
+
+        // lamata_fee
+        if (!$this->isAddOrEdit() && $this->lamata_fee->AdvancedSearch->get()) {
+            $hasValue = true;
+            if (($this->lamata_fee->AdvancedSearch->SearchValue != "" || $this->lamata_fee->AdvancedSearch->SearchValue2 != "") && $this->Command == "") {
+                $this->Command = "search";
+            }
+        }
         return $hasValue;
     }
 
@@ -2161,9 +2321,6 @@ class ViewTransactionsPerPlatformList extends ViewTransactionsPerPlatform
         $this->vendor->setDbValue($row['vendor']);
         $this->operator->setDbValue($row['operator']);
         $this->transaction_status->setDbValue($row['transaction_status']);
-        $this->quantity->setDbValue($row['quantity']);
-        $this->lamata_fee->setDbValue($row['lamata_fee']);
-        $this->total->setDbValue($row['total']);
         $this->start_date->setDbValue($row['start_date']);
         $this->end_date->setDbValue($row['end_date']);
         $this->platform->setDbValue($row['platform']);
@@ -2175,6 +2332,13 @@ class ViewTransactionsPerPlatformList extends ViewTransactionsPerPlatform
         $this->bus_size_id->setDbValue($row['bus_size_id']);
         $this->vendor_search_id->setDbValue($row['vendor_search_id']);
         $this->vendor_search_name->setDbValue($row['vendor_search_name']);
+        $this->price->setDbValue($row['price']);
+        $this->quantity->setDbValue($row['quantity']);
+        $this->amount_paid->setDbValue($row['amount_paid']);
+        $this->transitmedia_fee->setDbValue($row['transitmedia_fee']);
+        $this->lasaa_fee->setDbValue($row['lasaa_fee']);
+        $this->operator_fee->setDbValue($row['operator_fee']);
+        $this->lamata_fee->setDbValue($row['lamata_fee']);
     }
 
     // Return a row with default values
@@ -2190,9 +2354,6 @@ class ViewTransactionsPerPlatformList extends ViewTransactionsPerPlatform
         $row['vendor'] = null;
         $row['operator'] = null;
         $row['transaction_status'] = null;
-        $row['quantity'] = null;
-        $row['lamata_fee'] = null;
-        $row['total'] = null;
         $row['start_date'] = null;
         $row['end_date'] = null;
         $row['platform'] = null;
@@ -2204,6 +2365,13 @@ class ViewTransactionsPerPlatformList extends ViewTransactionsPerPlatform
         $row['bus_size_id'] = null;
         $row['vendor_search_id'] = null;
         $row['vendor_search_name'] = null;
+        $row['price'] = null;
+        $row['quantity'] = null;
+        $row['amount_paid'] = null;
+        $row['transitmedia_fee'] = null;
+        $row['lasaa_fee'] = null;
+        $row['operator_fee'] = null;
+        $row['lamata_fee'] = null;
         return $row;
     }
 
@@ -2257,15 +2425,6 @@ class ViewTransactionsPerPlatformList extends ViewTransactionsPerPlatform
         // transaction_status
         $this->transaction_status->CellCssStyle = "white-space: nowrap;";
 
-        // quantity
-        $this->quantity->CellCssStyle = "white-space: nowrap;";
-
-        // lamata_fee
-        $this->lamata_fee->CellCssStyle = "white-space: nowrap;";
-
-        // total
-        $this->total->CellCssStyle = "white-space: nowrap;";
-
         // start_date
         $this->start_date->CellCssStyle = "white-space: nowrap;";
 
@@ -2297,6 +2456,22 @@ class ViewTransactionsPerPlatformList extends ViewTransactionsPerPlatform
         // vendor_search_name
         $this->vendor_search_name->CellCssStyle = "white-space: nowrap;";
 
+        // price
+
+        // quantity
+        $this->quantity->CellCssStyle = "white-space: nowrap;";
+
+        // amount_paid
+
+        // transitmedia_fee
+
+        // lasaa_fee
+
+        // operator_fee
+
+        // lamata_fee
+        $this->lamata_fee->CellCssStyle = "white-space: nowrap;";
+
         // Accumulate aggregate value
         if ($this->RowType != ROWTYPE_AGGREGATEINIT && $this->RowType != ROWTYPE_AGGREGATE) {
             if (is_numeric($this->quantity->CurrentValue)) {
@@ -2304,9 +2479,6 @@ class ViewTransactionsPerPlatformList extends ViewTransactionsPerPlatform
             }
             if (is_numeric($this->lamata_fee->CurrentValue)) {
                 $this->lamata_fee->Total += $this->lamata_fee->CurrentValue; // Accumulate total
-            }
-            if (is_numeric($this->total->CurrentValue)) {
-                $this->total->Total += $this->total->CurrentValue; // Accumulate total
             }
         }
         if ($this->RowType == ROWTYPE_VIEW) {
@@ -2341,25 +2513,6 @@ class ViewTransactionsPerPlatformList extends ViewTransactionsPerPlatform
             $this->transaction_status->ViewValue = $this->transaction_status->CurrentValue;
             $this->transaction_status->ViewCustomAttributes = 'class="badge bg-success"';
 
-            // quantity
-            $this->quantity->ViewValue = $this->quantity->CurrentValue;
-            $this->quantity->ViewValue = FormatNumber($this->quantity->ViewValue, 0, -2, -2, -2);
-            $this->quantity->CellCssStyle .= "text-align: right;";
-            $this->quantity->ViewCustomAttributes = "";
-
-            // lamata_fee
-            $this->lamata_fee->ViewValue = $this->lamata_fee->CurrentValue;
-            $this->lamata_fee->ViewValue = FormatNumber($this->lamata_fee->ViewValue, 0, -2, -2, -2);
-            $this->lamata_fee->CellCssStyle .= "text-align: right;";
-            $this->lamata_fee->ViewCustomAttributes = "";
-
-            // total
-            $this->total->ViewValue = $this->total->CurrentValue;
-            $this->total->ViewValue = FormatNumber($this->total->ViewValue, 0, -2, -2, -2);
-            $this->total->CssClass = "font-weight-bold";
-            $this->total->CellCssStyle .= "text-align: right;";
-            $this->total->ViewCustomAttributes = "";
-
             // start_date
             $this->start_date->ViewValue = $this->start_date->CurrentValue;
             $this->start_date->ViewValue = FormatDateTime($this->start_date->ViewValue, 0);
@@ -2373,6 +2526,49 @@ class ViewTransactionsPerPlatformList extends ViewTransactionsPerPlatform
             // platform
             $this->platform->ViewValue = $this->platform->CurrentValue;
             $this->platform->ViewCustomAttributes = "";
+
+            // price
+            $this->price->ViewValue = $this->price->CurrentValue;
+            $this->price->ViewValue = FormatNumber($this->price->ViewValue, 0, -2, -2, -2);
+            $this->price->CellCssStyle .= "text-align: right;";
+            $this->price->ViewCustomAttributes = "";
+
+            // quantity
+            $this->quantity->ViewValue = $this->quantity->CurrentValue;
+            $this->quantity->ViewValue = FormatNumber($this->quantity->ViewValue, 0, -2, -2, -2);
+            $this->quantity->CellCssStyle .= "text-align: right;";
+            $this->quantity->ViewCustomAttributes = "";
+
+            // amount_paid
+            $this->amount_paid->ViewValue = $this->amount_paid->CurrentValue;
+            $this->amount_paid->ViewValue = FormatNumber($this->amount_paid->ViewValue, 0, -2, -2, -2);
+            $this->amount_paid->CellCssStyle .= "text-align: right;";
+            $this->amount_paid->ViewCustomAttributes = "";
+
+            // transitmedia_fee
+            $this->transitmedia_fee->ViewValue = $this->transitmedia_fee->CurrentValue;
+            $this->transitmedia_fee->ViewValue = FormatNumber($this->transitmedia_fee->ViewValue, 0, -2, -2, -2);
+            $this->transitmedia_fee->CellCssStyle .= "text-align: right;";
+            $this->transitmedia_fee->ViewCustomAttributes = "";
+
+            // lasaa_fee
+            $this->lasaa_fee->ViewValue = $this->lasaa_fee->CurrentValue;
+            $this->lasaa_fee->ViewValue = FormatNumber($this->lasaa_fee->ViewValue, 0, -2, -2, -2);
+            $this->lasaa_fee->CellCssStyle .= "text-align: right;";
+            $this->lasaa_fee->ViewCustomAttributes = "";
+
+            // operator_fee
+            $this->operator_fee->ViewValue = $this->operator_fee->CurrentValue;
+            $this->operator_fee->ViewValue = FormatNumber($this->operator_fee->ViewValue, 0, -2, -2, -2);
+            $this->operator_fee->CellCssStyle .= "text-align: right;";
+            $this->operator_fee->ViewCustomAttributes = "";
+
+            // lamata_fee
+            $this->lamata_fee->ViewValue = $this->lamata_fee->CurrentValue;
+            $this->lamata_fee->ViewValue = FormatNumber($this->lamata_fee->ViewValue, 0, -2, -2, -2);
+            $this->lamata_fee->CssClass = "font-weight-bold";
+            $this->lamata_fee->CellCssStyle .= "text-align: right;";
+            $this->lamata_fee->ViewCustomAttributes = "";
 
             // transaction_id
             $this->transaction_id->LinkCustomAttributes = "";
@@ -2409,24 +2605,43 @@ class ViewTransactionsPerPlatformList extends ViewTransactionsPerPlatform
             $this->transaction_status->HrefValue = "";
             $this->transaction_status->TooltipValue = "";
 
+            // price
+            $this->price->LinkCustomAttributes = "";
+            $this->price->HrefValue = "";
+            $this->price->TooltipValue = "";
+
             // quantity
             $this->quantity->LinkCustomAttributes = "";
             $this->quantity->HrefValue = "";
             $this->quantity->TooltipValue = "";
 
+            // amount_paid
+            $this->amount_paid->LinkCustomAttributes = "";
+            $this->amount_paid->HrefValue = "";
+            $this->amount_paid->TooltipValue = "";
+
+            // transitmedia_fee
+            $this->transitmedia_fee->LinkCustomAttributes = "";
+            $this->transitmedia_fee->HrefValue = "";
+            $this->transitmedia_fee->TooltipValue = "";
+
+            // lasaa_fee
+            $this->lasaa_fee->LinkCustomAttributes = "";
+            $this->lasaa_fee->HrefValue = "";
+            $this->lasaa_fee->TooltipValue = "";
+
+            // operator_fee
+            $this->operator_fee->LinkCustomAttributes = "";
+            $this->operator_fee->HrefValue = "";
+            $this->operator_fee->TooltipValue = "";
+
             // lamata_fee
             $this->lamata_fee->LinkCustomAttributes = "";
             $this->lamata_fee->HrefValue = "";
             $this->lamata_fee->TooltipValue = "";
-
-            // total
-            $this->total->LinkCustomAttributes = "";
-            $this->total->HrefValue = "";
-            $this->total->TooltipValue = "";
         } elseif ($this->RowType == ROWTYPE_AGGREGATEINIT) { // Initialize aggregate row
                     $this->quantity->Total = 0; // Initialize total
                     $this->lamata_fee->Total = 0; // Initialize total
-                    $this->total->Total = 0; // Initialize total
         } elseif ($this->RowType == ROWTYPE_AGGREGATE) { // Aggregate row
             $this->quantity->CurrentValue = $this->quantity->Total;
             $this->quantity->ViewValue = $this->quantity->CurrentValue;
@@ -2437,16 +2652,10 @@ class ViewTransactionsPerPlatformList extends ViewTransactionsPerPlatform
             $this->lamata_fee->CurrentValue = $this->lamata_fee->Total;
             $this->lamata_fee->ViewValue = $this->lamata_fee->CurrentValue;
             $this->lamata_fee->ViewValue = FormatNumber($this->lamata_fee->ViewValue, 0, -2, -2, -2);
+            $this->lamata_fee->CssClass = "font-weight-bold";
             $this->lamata_fee->CellCssStyle .= "text-align: right;";
             $this->lamata_fee->ViewCustomAttributes = "";
             $this->lamata_fee->HrefValue = ""; // Clear href value
-            $this->total->CurrentValue = $this->total->Total;
-            $this->total->ViewValue = $this->total->CurrentValue;
-            $this->total->ViewValue = FormatNumber($this->total->ViewValue, 0, -2, -2, -2);
-            $this->total->CssClass = "font-weight-bold";
-            $this->total->CellCssStyle .= "text-align: right;";
-            $this->total->ViewCustomAttributes = "";
-            $this->total->HrefValue = ""; // Clear href value
         }
 
         // Call Row Rendered event
@@ -2487,9 +2696,6 @@ class ViewTransactionsPerPlatformList extends ViewTransactionsPerPlatform
         $this->vendor->AdvancedSearch->load();
         $this->operator->AdvancedSearch->load();
         $this->transaction_status->AdvancedSearch->load();
-        $this->quantity->AdvancedSearch->load();
-        $this->lamata_fee->AdvancedSearch->load();
-        $this->total->AdvancedSearch->load();
         $this->start_date->AdvancedSearch->load();
         $this->end_date->AdvancedSearch->load();
         $this->platform->AdvancedSearch->load();
@@ -2501,6 +2707,109 @@ class ViewTransactionsPerPlatformList extends ViewTransactionsPerPlatform
         $this->bus_size_id->AdvancedSearch->load();
         $this->vendor_search_id->AdvancedSearch->load();
         $this->vendor_search_name->AdvancedSearch->load();
+        $this->price->AdvancedSearch->load();
+        $this->quantity->AdvancedSearch->load();
+        $this->amount_paid->AdvancedSearch->load();
+        $this->transitmedia_fee->AdvancedSearch->load();
+        $this->lasaa_fee->AdvancedSearch->load();
+        $this->operator_fee->AdvancedSearch->load();
+        $this->lamata_fee->AdvancedSearch->load();
+    }
+
+    // Get export HTML tag
+    protected function getExportTag($type, $custom = false)
+    {
+        global $Language;
+        $pageUrl = $this->pageUrl();
+        if (SameText($type, "excel")) {
+            if ($custom) {
+                return "<a href=\"#\" class=\"ew-export-link ew-excel\" title=\"" . HtmlEncode($Language->phrase("ExportToExcelText")) . "\" data-caption=\"" . HtmlEncode($Language->phrase("ExportToExcelText")) . "\" onclick=\"return ew.export(document.fview_transactions_per_platformlist, '" . $this->ExportExcelUrl . "', 'excel', true);\">" . $Language->phrase("ExportToExcel") . "</a>";
+            } else {
+                return "<a href=\"" . $this->ExportExcelUrl . "\" class=\"ew-export-link ew-excel\" title=\"" . HtmlEncode($Language->phrase("ExportToExcelText")) . "\" data-caption=\"" . HtmlEncode($Language->phrase("ExportToExcelText")) . "\">" . $Language->phrase("ExportToExcel") . "</a>";
+            }
+        } elseif (SameText($type, "word")) {
+            if ($custom) {
+                return "<a href=\"#\" class=\"ew-export-link ew-word\" title=\"" . HtmlEncode($Language->phrase("ExportToWordText")) . "\" data-caption=\"" . HtmlEncode($Language->phrase("ExportToWordText")) . "\" onclick=\"return ew.export(document.fview_transactions_per_platformlist, '" . $this->ExportWordUrl . "', 'word', true);\">" . $Language->phrase("ExportToWord") . "</a>";
+            } else {
+                return "<a href=\"" . $this->ExportWordUrl . "\" class=\"ew-export-link ew-word\" title=\"" . HtmlEncode($Language->phrase("ExportToWordText")) . "\" data-caption=\"" . HtmlEncode($Language->phrase("ExportToWordText")) . "\">" . $Language->phrase("ExportToWord") . "</a>";
+            }
+        } elseif (SameText($type, "pdf")) {
+            if ($custom) {
+                return "<a href=\"#\" class=\"ew-export-link ew-pdf\" title=\"" . HtmlEncode($Language->phrase("ExportToPDFText")) . "\" data-caption=\"" . HtmlEncode($Language->phrase("ExportToPDFText")) . "\" onclick=\"return ew.export(document.fview_transactions_per_platformlist, '" . $this->ExportPdfUrl . "', 'pdf', true);\">" . $Language->phrase("ExportToPDF") . "</a>";
+            } else {
+                return "<a href=\"" . $this->ExportPdfUrl . "\" class=\"ew-export-link ew-pdf\" title=\"" . HtmlEncode($Language->phrase("ExportToPDFText")) . "\" data-caption=\"" . HtmlEncode($Language->phrase("ExportToPDFText")) . "\">" . $Language->phrase("ExportToPDF") . "</a>";
+            }
+        } elseif (SameText($type, "html")) {
+            return "<a href=\"" . $this->ExportHtmlUrl . "\" class=\"ew-export-link ew-html\" title=\"" . HtmlEncode($Language->phrase("ExportToHtmlText")) . "\" data-caption=\"" . HtmlEncode($Language->phrase("ExportToHtmlText")) . "\">" . $Language->phrase("ExportToHtml") . "</a>";
+        } elseif (SameText($type, "xml")) {
+            return "<a href=\"" . $this->ExportXmlUrl . "\" class=\"ew-export-link ew-xml\" title=\"" . HtmlEncode($Language->phrase("ExportToXmlText")) . "\" data-caption=\"" . HtmlEncode($Language->phrase("ExportToXmlText")) . "\">" . $Language->phrase("ExportToXml") . "</a>";
+        } elseif (SameText($type, "csv")) {
+            return "<a href=\"" . $this->ExportCsvUrl . "\" class=\"ew-export-link ew-csv\" title=\"" . HtmlEncode($Language->phrase("ExportToCsvText")) . "\" data-caption=\"" . HtmlEncode($Language->phrase("ExportToCsvText")) . "\">" . $Language->phrase("ExportToCsv") . "</a>";
+        } elseif (SameText($type, "email")) {
+            $url = $custom ? ",url:'" . $pageUrl . "export=email&amp;custom=1'" : "";
+            return '<button id="emf_view_transactions_per_platform" class="ew-export-link ew-email" title="' . $Language->phrase("ExportToEmailText") . '" data-caption="' . $Language->phrase("ExportToEmailText") . '" onclick="ew.emailDialogShow({lnk:\'emf_view_transactions_per_platform\', hdr:ew.language.phrase(\'ExportToEmailText\'), f:document.fview_transactions_per_platformlist, sel:false' . $url . '});">' . $Language->phrase("ExportToEmail") . '</button>';
+        } elseif (SameText($type, "print")) {
+            return "<a href=\"" . $this->ExportPrintUrl . "\" class=\"ew-export-link ew-print\" title=\"" . HtmlEncode($Language->phrase("PrinterFriendlyText")) . "\" data-caption=\"" . HtmlEncode($Language->phrase("PrinterFriendlyText")) . "\">" . $Language->phrase("PrinterFriendly") . "</a>";
+        }
+    }
+
+    // Set up export options
+    protected function setupExportOptions()
+    {
+        global $Language;
+
+        // Printer friendly
+        $item = &$this->ExportOptions->add("print");
+        $item->Body = $this->getExportTag("print");
+        $item->Visible = true;
+
+        // Export to Excel
+        $item = &$this->ExportOptions->add("excel");
+        $item->Body = $this->getExportTag("excel");
+        $item->Visible = true;
+
+        // Export to Word
+        $item = &$this->ExportOptions->add("word");
+        $item->Body = $this->getExportTag("word");
+        $item->Visible = true;
+
+        // Export to Html
+        $item = &$this->ExportOptions->add("html");
+        $item->Body = $this->getExportTag("html");
+        $item->Visible = true;
+
+        // Export to Xml
+        $item = &$this->ExportOptions->add("xml");
+        $item->Body = $this->getExportTag("xml");
+        $item->Visible = false;
+
+        // Export to Csv
+        $item = &$this->ExportOptions->add("csv");
+        $item->Body = $this->getExportTag("csv");
+        $item->Visible = true;
+
+        // Export to Pdf
+        $item = &$this->ExportOptions->add("pdf");
+        $item->Body = $this->getExportTag("pdf");
+        $item->Visible = false;
+
+        // Export to Email
+        $item = &$this->ExportOptions->add("email");
+        $item->Body = $this->getExportTag("email");
+        $item->Visible = false;
+
+        // Drop down button for export
+        $this->ExportOptions->UseButtonGroup = true;
+        $this->ExportOptions->UseDropDownButton = true;
+        if ($this->ExportOptions->UseButtonGroup && IsMobile()) {
+            $this->ExportOptions->UseDropDownButton = true;
+        }
+        $this->ExportOptions->DropDownButtonPhrase = $Language->phrase("ButtonExport");
+
+        // Add group option item
+        $item = &$this->ExportOptions->add($this->ExportOptions->GroupOptionName);
+        $item->Body = "";
+        $item->Visible = false;
     }
 
     // Set up search/sort options
@@ -2544,6 +2853,100 @@ class ViewTransactionsPerPlatformList extends ViewTransactionsPerPlatform
         if (!$Security->canSearch()) {
             $this->SearchOptions->hideAllOptions();
             $this->FilterOptions->hideAllOptions();
+        }
+    }
+
+    /**
+    * Export data in HTML/CSV/Word/Excel/XML/Email/PDF format
+    *
+    * @param boolean $return Return the data rather than output it
+    * @return mixed
+    */
+    public function exportData($return = false)
+    {
+        global $Language;
+        $utf8 = SameText(Config("PROJECT_CHARSET"), "utf-8");
+
+        // Load recordset
+        $this->TotalRecords = $this->listRecordCount();
+        $this->StartRecord = 1;
+
+        // Export all
+        if ($this->ExportAll) {
+            set_time_limit(Config("EXPORT_ALL_TIME_LIMIT"));
+            $this->DisplayRecords = $this->TotalRecords;
+            $this->StopRecord = $this->TotalRecords;
+        } else { // Export one page only
+            $this->setupStartRecord(); // Set up start record position
+            // Set the last record to display
+            if ($this->DisplayRecords <= 0) {
+                $this->StopRecord = $this->TotalRecords;
+            } else {
+                $this->StopRecord = $this->StartRecord + $this->DisplayRecords - 1;
+            }
+        }
+        $rs = $this->loadRecordset($this->StartRecord - 1, $this->DisplayRecords <= 0 ? $this->TotalRecords : $this->DisplayRecords);
+        $this->ExportDoc = GetExportDocument($this, "h");
+        $doc = &$this->ExportDoc;
+        if (!$doc) {
+            $this->setFailureMessage($Language->phrase("ExportClassNotFound")); // Export class not found
+        }
+        if (!$rs || !$doc) {
+            RemoveHeader("Content-Type"); // Remove header
+            RemoveHeader("Content-Disposition");
+            $this->showMessage();
+            return;
+        }
+        $this->StartRecord = 1;
+        $this->StopRecord = $this->DisplayRecords <= 0 ? $this->TotalRecords : $this->DisplayRecords;
+
+        // Call Page Exporting server event
+        $this->ExportDoc->ExportCustom = !$this->pageExporting();
+        $header = $this->PageHeader;
+        $this->pageDataRendering($header);
+        $doc->Text .= $header;
+        $this->exportDocument($doc, $rs, $this->StartRecord, $this->StopRecord, "");
+        $footer = $this->PageFooter;
+        $this->pageDataRendered($footer);
+        $doc->Text .= $footer;
+
+        // Close recordset
+        $rs->close();
+
+        // Call Page Exported server event
+        $this->pageExported();
+
+        // Export header and footer
+        $doc->exportHeaderAndFooter();
+
+        // Clean output buffer (without destroying output buffer)
+        $buffer = ob_get_contents(); // Save the output buffer
+        if (!Config("DEBUG") && $buffer) {
+            ob_clean();
+        }
+
+        // Write debug message if enabled
+        if (Config("DEBUG") && !$this->isExport("pdf")) {
+            echo GetDebugMessage();
+        }
+
+        // Output data
+        if ($this->isExport("email")) {
+            // Export-to-email disabled
+        } else {
+            $doc->export();
+            if ($return) {
+                RemoveHeader("Content-Type"); // Remove header
+                RemoveHeader("Content-Disposition");
+                $content = ob_get_contents();
+                if ($content) {
+                    ob_clean();
+                }
+                if ($buffer) {
+                    echo $buffer; // Resume the output buffer
+                }
+                return $content;
+            }
         }
     }
 

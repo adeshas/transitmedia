@@ -535,6 +535,8 @@ class Register extends MainUsers
         $this->vendor_id->OldValue = $this->vendor_id->CurrentValue;
         $this->reportsto->CurrentValue = null;
         $this->reportsto->OldValue = $this->reportsto->CurrentValue;
+        $this->ts->CurrentValue = null;
+        $this->ts->OldValue = $this->ts->CurrentValue;
     }
 
     // Load form values
@@ -659,6 +661,7 @@ class Register extends MainUsers
         $this->user_type->setDbValue($row['user_type']);
         $this->vendor_id->setDbValue($row['vendor_id']);
         $this->reportsto->setDbValue($row['reportsto']);
+        $this->ts->setDbValue($row['ts']);
     }
 
     // Return a row with default values
@@ -674,6 +677,7 @@ class Register extends MainUsers
         $row['user_type'] = $this->user_type->CurrentValue;
         $row['vendor_id'] = $this->vendor_id->CurrentValue;
         $row['reportsto'] = $this->reportsto->CurrentValue;
+        $row['ts'] = $this->ts->CurrentValue;
         return $row;
     }
 
@@ -704,6 +708,8 @@ class Register extends MainUsers
         // vendor_id
 
         // reportsto
+
+        // ts
         if ($this->RowType == ROWTYPE_VIEW) {
             // id
             $this->id->ViewValue = $this->id->CurrentValue;
@@ -743,7 +749,7 @@ class Register extends MainUsers
                 $this->vendor_id->ViewValue = $this->vendor_id->lookupCacheOption($curVal);
                 if ($this->vendor_id->ViewValue === null) { // Lookup from database
                     $filterWrk = "\"id\"" . SearchString("=", $curVal, DATATYPE_NUMBER, "");
-                    $sqlWrk = $this->vendor_id->Lookup->getSql(false, $filterWrk, '', $this, true);
+                    $sqlWrk = $this->vendor_id->Lookup->getSql(false, $filterWrk, '', $this, true, true);
                     $rswrk = Conn()->executeQuery($sqlWrk)->fetchAll(\PDO::FETCH_BOTH);
                     $ari = count($rswrk);
                     if ($ari > 0) { // Lookup values found
@@ -764,7 +770,7 @@ class Register extends MainUsers
                 $this->reportsto->ViewValue = $this->reportsto->lookupCacheOption($curVal);
                 if ($this->reportsto->ViewValue === null) { // Lookup from database
                     $filterWrk = "\"id\"" . SearchString("=", $curVal, DATATYPE_NUMBER, "");
-                    $sqlWrk = $this->reportsto->Lookup->getSql(false, $filterWrk, '', $this, true);
+                    $sqlWrk = $this->reportsto->Lookup->getSql(false, $filterWrk, '', $this, true, true);
                     $rswrk = Conn()->executeQuery($sqlWrk)->fetchAll(\PDO::FETCH_BOTH);
                     $ari = count($rswrk);
                     if ($ari > 0) { // Lookup values found
@@ -778,6 +784,11 @@ class Register extends MainUsers
                 $this->reportsto->ViewValue = null;
             }
             $this->reportsto->ViewCustomAttributes = "";
+
+            // ts
+            $this->ts->ViewValue = $this->ts->CurrentValue;
+            $this->ts->ViewValue = FormatDateTime($this->ts->ViewValue, 0);
+            $this->ts->ViewCustomAttributes = "";
 
             // name
             $this->name->LinkCustomAttributes = "";
@@ -949,7 +960,7 @@ class Register extends MainUsers
                 }
                 if (!$validMasterKey) {
                     $masterUserIdMsg = str_replace("%c", CurrentUserID(), $Language->phrase("UnAuthorizedMasterUserID"));
-                    $masterUserIdMsg = str_replace("%f", $sMasterFilter, $masterUserIdMsg);
+                    $masterUserIdMsg = str_replace("%f", $masterFilter, $masterUserIdMsg);
                     $this->setFailureMessage($masterUserIdMsg);
                     return false;
                 }

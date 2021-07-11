@@ -435,9 +435,6 @@ class ViewTransactionsPerPlatformSearch extends ViewTransactionsPerPlatform
         $this->vendor->setVisibility();
         $this->operator->setVisibility();
         $this->transaction_status->setVisibility();
-        $this->quantity->setVisibility();
-        $this->lamata_fee->setVisibility();
-        $this->total->setVisibility();
         $this->start_date->setVisibility();
         $this->end_date->setVisibility();
         $this->platform->setVisibility();
@@ -449,6 +446,13 @@ class ViewTransactionsPerPlatformSearch extends ViewTransactionsPerPlatform
         $this->bus_size_id->setVisibility();
         $this->vendor_search_id->setVisibility();
         $this->vendor_search_name->setVisibility();
+        $this->price->setVisibility();
+        $this->quantity->setVisibility();
+        $this->amount_paid->setVisibility();
+        $this->transitmedia_fee->setVisibility();
+        $this->lasaa_fee->setVisibility();
+        $this->operator_fee->setVisibility();
+        $this->lamata_fee->setVisibility();
         $this->hideFieldsForAddEdit();
 
         // Do not use lookup cache
@@ -536,9 +540,6 @@ class ViewTransactionsPerPlatformSearch extends ViewTransactionsPerPlatform
         $this->buildSearchUrl($srchUrl, $this->vendor); // vendor
         $this->buildSearchUrl($srchUrl, $this->operator); // operator
         $this->buildSearchUrl($srchUrl, $this->transaction_status); // transaction_status
-        $this->buildSearchUrl($srchUrl, $this->quantity); // quantity
-        $this->buildSearchUrl($srchUrl, $this->lamata_fee); // lamata_fee
-        $this->buildSearchUrl($srchUrl, $this->total); // total
         $this->buildSearchUrl($srchUrl, $this->start_date); // start_date
         $this->buildSearchUrl($srchUrl, $this->end_date); // end_date
         $this->buildSearchUrl($srchUrl, $this->platform); // platform
@@ -550,6 +551,13 @@ class ViewTransactionsPerPlatformSearch extends ViewTransactionsPerPlatform
         $this->buildSearchUrl($srchUrl, $this->bus_size_id); // bus_size_id
         $this->buildSearchUrl($srchUrl, $this->vendor_search_id); // vendor_search_id
         $this->buildSearchUrl($srchUrl, $this->vendor_search_name); // vendor_search_name
+        $this->buildSearchUrl($srchUrl, $this->price); // price
+        $this->buildSearchUrl($srchUrl, $this->quantity); // quantity
+        $this->buildSearchUrl($srchUrl, $this->amount_paid); // amount_paid
+        $this->buildSearchUrl($srchUrl, $this->transitmedia_fee); // transitmedia_fee
+        $this->buildSearchUrl($srchUrl, $this->lasaa_fee); // lasaa_fee
+        $this->buildSearchUrl($srchUrl, $this->operator_fee); // operator_fee
+        $this->buildSearchUrl($srchUrl, $this->lamata_fee); // lamata_fee
         if ($srchUrl != "") {
             $srchUrl .= "&";
         }
@@ -657,15 +665,6 @@ class ViewTransactionsPerPlatformSearch extends ViewTransactionsPerPlatform
         if ($this->transaction_status->AdvancedSearch->post()) {
             $hasValue = true;
         }
-        if ($this->quantity->AdvancedSearch->post()) {
-            $hasValue = true;
-        }
-        if ($this->lamata_fee->AdvancedSearch->post()) {
-            $hasValue = true;
-        }
-        if ($this->total->AdvancedSearch->post()) {
-            $hasValue = true;
-        }
         if ($this->start_date->AdvancedSearch->post()) {
             $hasValue = true;
         }
@@ -697,6 +696,27 @@ class ViewTransactionsPerPlatformSearch extends ViewTransactionsPerPlatform
             $hasValue = true;
         }
         if ($this->vendor_search_name->AdvancedSearch->post()) {
+            $hasValue = true;
+        }
+        if ($this->price->AdvancedSearch->post()) {
+            $hasValue = true;
+        }
+        if ($this->quantity->AdvancedSearch->post()) {
+            $hasValue = true;
+        }
+        if ($this->amount_paid->AdvancedSearch->post()) {
+            $hasValue = true;
+        }
+        if ($this->transitmedia_fee->AdvancedSearch->post()) {
+            $hasValue = true;
+        }
+        if ($this->lasaa_fee->AdvancedSearch->post()) {
+            $hasValue = true;
+        }
+        if ($this->operator_fee->AdvancedSearch->post()) {
+            $hasValue = true;
+        }
+        if ($this->lamata_fee->AdvancedSearch->post()) {
             $hasValue = true;
         }
         return $hasValue;
@@ -732,12 +752,6 @@ class ViewTransactionsPerPlatformSearch extends ViewTransactionsPerPlatform
 
         // transaction_status
 
-        // quantity
-
-        // lamata_fee
-
-        // total
-
         // start_date
 
         // end_date
@@ -759,6 +773,20 @@ class ViewTransactionsPerPlatformSearch extends ViewTransactionsPerPlatform
         // vendor_search_id
 
         // vendor_search_name
+
+        // price
+
+        // quantity
+
+        // amount_paid
+
+        // transitmedia_fee
+
+        // lasaa_fee
+
+        // operator_fee
+
+        // lamata_fee
         if ($this->RowType == ROWTYPE_VIEW) {
             // transaction_id
             $this->transaction_id->ViewValue = $this->transaction_id->CurrentValue;
@@ -798,25 +826,6 @@ class ViewTransactionsPerPlatformSearch extends ViewTransactionsPerPlatform
             // transaction_status
             $this->transaction_status->ViewValue = $this->transaction_status->CurrentValue;
             $this->transaction_status->ViewCustomAttributes = 'class="badge bg-success"';
-
-            // quantity
-            $this->quantity->ViewValue = $this->quantity->CurrentValue;
-            $this->quantity->ViewValue = FormatNumber($this->quantity->ViewValue, 0, -2, -2, -2);
-            $this->quantity->CellCssStyle .= "text-align: right;";
-            $this->quantity->ViewCustomAttributes = "";
-
-            // lamata_fee
-            $this->lamata_fee->ViewValue = $this->lamata_fee->CurrentValue;
-            $this->lamata_fee->ViewValue = FormatNumber($this->lamata_fee->ViewValue, 0, -2, -2, -2);
-            $this->lamata_fee->CellCssStyle .= "text-align: right;";
-            $this->lamata_fee->ViewCustomAttributes = "";
-
-            // total
-            $this->total->ViewValue = $this->total->CurrentValue;
-            $this->total->ViewValue = FormatNumber($this->total->ViewValue, 0, -2, -2, -2);
-            $this->total->CssClass = "font-weight-bold";
-            $this->total->CellCssStyle .= "text-align: right;";
-            $this->total->ViewCustomAttributes = "";
 
             // start_date
             $this->start_date->ViewValue = $this->start_date->CurrentValue;
@@ -871,6 +880,49 @@ class ViewTransactionsPerPlatformSearch extends ViewTransactionsPerPlatform
             $this->vendor_search_name->ViewValue = $this->vendor_search_name->CurrentValue;
             $this->vendor_search_name->ViewCustomAttributes = "";
 
+            // price
+            $this->price->ViewValue = $this->price->CurrentValue;
+            $this->price->ViewValue = FormatNumber($this->price->ViewValue, 0, -2, -2, -2);
+            $this->price->CellCssStyle .= "text-align: right;";
+            $this->price->ViewCustomAttributes = "";
+
+            // quantity
+            $this->quantity->ViewValue = $this->quantity->CurrentValue;
+            $this->quantity->ViewValue = FormatNumber($this->quantity->ViewValue, 0, -2, -2, -2);
+            $this->quantity->CellCssStyle .= "text-align: right;";
+            $this->quantity->ViewCustomAttributes = "";
+
+            // amount_paid
+            $this->amount_paid->ViewValue = $this->amount_paid->CurrentValue;
+            $this->amount_paid->ViewValue = FormatNumber($this->amount_paid->ViewValue, 0, -2, -2, -2);
+            $this->amount_paid->CellCssStyle .= "text-align: right;";
+            $this->amount_paid->ViewCustomAttributes = "";
+
+            // transitmedia_fee
+            $this->transitmedia_fee->ViewValue = $this->transitmedia_fee->CurrentValue;
+            $this->transitmedia_fee->ViewValue = FormatNumber($this->transitmedia_fee->ViewValue, 0, -2, -2, -2);
+            $this->transitmedia_fee->CellCssStyle .= "text-align: right;";
+            $this->transitmedia_fee->ViewCustomAttributes = "";
+
+            // lasaa_fee
+            $this->lasaa_fee->ViewValue = $this->lasaa_fee->CurrentValue;
+            $this->lasaa_fee->ViewValue = FormatNumber($this->lasaa_fee->ViewValue, 0, -2, -2, -2);
+            $this->lasaa_fee->CellCssStyle .= "text-align: right;";
+            $this->lasaa_fee->ViewCustomAttributes = "";
+
+            // operator_fee
+            $this->operator_fee->ViewValue = $this->operator_fee->CurrentValue;
+            $this->operator_fee->ViewValue = FormatNumber($this->operator_fee->ViewValue, 0, -2, -2, -2);
+            $this->operator_fee->CellCssStyle .= "text-align: right;";
+            $this->operator_fee->ViewCustomAttributes = "";
+
+            // lamata_fee
+            $this->lamata_fee->ViewValue = $this->lamata_fee->CurrentValue;
+            $this->lamata_fee->ViewValue = FormatNumber($this->lamata_fee->ViewValue, 0, -2, -2, -2);
+            $this->lamata_fee->CssClass = "font-weight-bold";
+            $this->lamata_fee->CellCssStyle .= "text-align: right;";
+            $this->lamata_fee->ViewCustomAttributes = "";
+
             // transaction_id
             $this->transaction_id->LinkCustomAttributes = "";
             $this->transaction_id->HrefValue = "";
@@ -915,21 +967,6 @@ class ViewTransactionsPerPlatformSearch extends ViewTransactionsPerPlatform
             $this->transaction_status->LinkCustomAttributes = "";
             $this->transaction_status->HrefValue = "";
             $this->transaction_status->TooltipValue = "";
-
-            // quantity
-            $this->quantity->LinkCustomAttributes = "";
-            $this->quantity->HrefValue = "";
-            $this->quantity->TooltipValue = "";
-
-            // lamata_fee
-            $this->lamata_fee->LinkCustomAttributes = "";
-            $this->lamata_fee->HrefValue = "";
-            $this->lamata_fee->TooltipValue = "";
-
-            // total
-            $this->total->LinkCustomAttributes = "";
-            $this->total->HrefValue = "";
-            $this->total->TooltipValue = "";
 
             // start_date
             $this->start_date->LinkCustomAttributes = "";
@@ -985,6 +1022,41 @@ class ViewTransactionsPerPlatformSearch extends ViewTransactionsPerPlatform
             $this->vendor_search_name->LinkCustomAttributes = "";
             $this->vendor_search_name->HrefValue = "";
             $this->vendor_search_name->TooltipValue = "";
+
+            // price
+            $this->price->LinkCustomAttributes = "";
+            $this->price->HrefValue = "";
+            $this->price->TooltipValue = "";
+
+            // quantity
+            $this->quantity->LinkCustomAttributes = "";
+            $this->quantity->HrefValue = "";
+            $this->quantity->TooltipValue = "";
+
+            // amount_paid
+            $this->amount_paid->LinkCustomAttributes = "";
+            $this->amount_paid->HrefValue = "";
+            $this->amount_paid->TooltipValue = "";
+
+            // transitmedia_fee
+            $this->transitmedia_fee->LinkCustomAttributes = "";
+            $this->transitmedia_fee->HrefValue = "";
+            $this->transitmedia_fee->TooltipValue = "";
+
+            // lasaa_fee
+            $this->lasaa_fee->LinkCustomAttributes = "";
+            $this->lasaa_fee->HrefValue = "";
+            $this->lasaa_fee->TooltipValue = "";
+
+            // operator_fee
+            $this->operator_fee->LinkCustomAttributes = "";
+            $this->operator_fee->HrefValue = "";
+            $this->operator_fee->TooltipValue = "";
+
+            // lamata_fee
+            $this->lamata_fee->LinkCustomAttributes = "";
+            $this->lamata_fee->HrefValue = "";
+            $this->lamata_fee->TooltipValue = "";
         } elseif ($this->RowType == ROWTYPE_SEARCH) {
             // transaction_id
             $this->transaction_id->EditAttrs["class"] = "form-control";
@@ -1048,24 +1120,6 @@ class ViewTransactionsPerPlatformSearch extends ViewTransactionsPerPlatform
             }
             $this->transaction_status->EditValue = HtmlEncode($this->transaction_status->AdvancedSearch->SearchValue);
             $this->transaction_status->PlaceHolder = RemoveHtml($this->transaction_status->caption());
-
-            // quantity
-            $this->quantity->EditAttrs["class"] = "form-control";
-            $this->quantity->EditCustomAttributes = "";
-            $this->quantity->EditValue = HtmlEncode($this->quantity->AdvancedSearch->SearchValue);
-            $this->quantity->PlaceHolder = RemoveHtml($this->quantity->caption());
-
-            // lamata_fee
-            $this->lamata_fee->EditAttrs["class"] = "form-control";
-            $this->lamata_fee->EditCustomAttributes = "";
-            $this->lamata_fee->EditValue = HtmlEncode($this->lamata_fee->AdvancedSearch->SearchValue);
-            $this->lamata_fee->PlaceHolder = RemoveHtml($this->lamata_fee->caption());
-
-            // total
-            $this->total->EditAttrs["class"] = "form-control";
-            $this->total->EditCustomAttributes = "";
-            $this->total->EditValue = HtmlEncode($this->total->AdvancedSearch->SearchValue);
-            $this->total->PlaceHolder = RemoveHtml($this->total->caption());
 
             // start_date
             $this->start_date->EditAttrs["class"] = "form-control";
@@ -1138,6 +1192,48 @@ class ViewTransactionsPerPlatformSearch extends ViewTransactionsPerPlatform
             }
             $this->vendor_search_name->EditValue = HtmlEncode($this->vendor_search_name->AdvancedSearch->SearchValue);
             $this->vendor_search_name->PlaceHolder = RemoveHtml($this->vendor_search_name->caption());
+
+            // price
+            $this->price->EditAttrs["class"] = "form-control";
+            $this->price->EditCustomAttributes = "";
+            $this->price->EditValue = HtmlEncode($this->price->AdvancedSearch->SearchValue);
+            $this->price->PlaceHolder = RemoveHtml($this->price->caption());
+
+            // quantity
+            $this->quantity->EditAttrs["class"] = "form-control";
+            $this->quantity->EditCustomAttributes = "";
+            $this->quantity->EditValue = HtmlEncode($this->quantity->AdvancedSearch->SearchValue);
+            $this->quantity->PlaceHolder = RemoveHtml($this->quantity->caption());
+
+            // amount_paid
+            $this->amount_paid->EditAttrs["class"] = "form-control";
+            $this->amount_paid->EditCustomAttributes = "";
+            $this->amount_paid->EditValue = HtmlEncode($this->amount_paid->AdvancedSearch->SearchValue);
+            $this->amount_paid->PlaceHolder = RemoveHtml($this->amount_paid->caption());
+
+            // transitmedia_fee
+            $this->transitmedia_fee->EditAttrs["class"] = "form-control";
+            $this->transitmedia_fee->EditCustomAttributes = "";
+            $this->transitmedia_fee->EditValue = HtmlEncode($this->transitmedia_fee->AdvancedSearch->SearchValue);
+            $this->transitmedia_fee->PlaceHolder = RemoveHtml($this->transitmedia_fee->caption());
+
+            // lasaa_fee
+            $this->lasaa_fee->EditAttrs["class"] = "form-control";
+            $this->lasaa_fee->EditCustomAttributes = "";
+            $this->lasaa_fee->EditValue = HtmlEncode($this->lasaa_fee->AdvancedSearch->SearchValue);
+            $this->lasaa_fee->PlaceHolder = RemoveHtml($this->lasaa_fee->caption());
+
+            // operator_fee
+            $this->operator_fee->EditAttrs["class"] = "form-control";
+            $this->operator_fee->EditCustomAttributes = "";
+            $this->operator_fee->EditValue = HtmlEncode($this->operator_fee->AdvancedSearch->SearchValue);
+            $this->operator_fee->PlaceHolder = RemoveHtml($this->operator_fee->caption());
+
+            // lamata_fee
+            $this->lamata_fee->EditAttrs["class"] = "form-control";
+            $this->lamata_fee->EditCustomAttributes = "";
+            $this->lamata_fee->EditValue = HtmlEncode($this->lamata_fee->AdvancedSearch->SearchValue);
+            $this->lamata_fee->PlaceHolder = RemoveHtml($this->lamata_fee->caption());
         }
         if ($this->RowType == ROWTYPE_ADD || $this->RowType == ROWTYPE_EDIT || $this->RowType == ROWTYPE_SEARCH) { // Add/Edit/Search row
             $this->setupFieldTitles();
@@ -1161,15 +1257,6 @@ class ViewTransactionsPerPlatformSearch extends ViewTransactionsPerPlatform
         }
         if (!CheckDate($this->payment_date->AdvancedSearch->SearchValue)) {
             $this->payment_date->addErrorMessage($this->payment_date->getErrorMessage(false));
-        }
-        if (!CheckInteger($this->quantity->AdvancedSearch->SearchValue)) {
-            $this->quantity->addErrorMessage($this->quantity->getErrorMessage(false));
-        }
-        if (!CheckInteger($this->lamata_fee->AdvancedSearch->SearchValue)) {
-            $this->lamata_fee->addErrorMessage($this->lamata_fee->getErrorMessage(false));
-        }
-        if (!CheckInteger($this->total->AdvancedSearch->SearchValue)) {
-            $this->total->addErrorMessage($this->total->getErrorMessage(false));
         }
         if (!CheckDate($this->start_date->AdvancedSearch->SearchValue)) {
             $this->start_date->addErrorMessage($this->start_date->getErrorMessage(false));
@@ -1198,6 +1285,27 @@ class ViewTransactionsPerPlatformSearch extends ViewTransactionsPerPlatform
         if (!CheckInteger($this->vendor_search_id->AdvancedSearch->SearchValue)) {
             $this->vendor_search_id->addErrorMessage($this->vendor_search_id->getErrorMessage(false));
         }
+        if (!CheckInteger($this->price->AdvancedSearch->SearchValue)) {
+            $this->price->addErrorMessage($this->price->getErrorMessage(false));
+        }
+        if (!CheckInteger($this->quantity->AdvancedSearch->SearchValue)) {
+            $this->quantity->addErrorMessage($this->quantity->getErrorMessage(false));
+        }
+        if (!CheckInteger($this->amount_paid->AdvancedSearch->SearchValue)) {
+            $this->amount_paid->addErrorMessage($this->amount_paid->getErrorMessage(false));
+        }
+        if (!CheckInteger($this->transitmedia_fee->AdvancedSearch->SearchValue)) {
+            $this->transitmedia_fee->addErrorMessage($this->transitmedia_fee->getErrorMessage(false));
+        }
+        if (!CheckInteger($this->lasaa_fee->AdvancedSearch->SearchValue)) {
+            $this->lasaa_fee->addErrorMessage($this->lasaa_fee->getErrorMessage(false));
+        }
+        if (!CheckInteger($this->operator_fee->AdvancedSearch->SearchValue)) {
+            $this->operator_fee->addErrorMessage($this->operator_fee->getErrorMessage(false));
+        }
+        if (!CheckInteger($this->lamata_fee->AdvancedSearch->SearchValue)) {
+            $this->lamata_fee->addErrorMessage($this->lamata_fee->getErrorMessage(false));
+        }
 
         // Return validate result
         $validateSearch = !$this->hasInvalidFields();
@@ -1223,9 +1331,6 @@ class ViewTransactionsPerPlatformSearch extends ViewTransactionsPerPlatform
         $this->vendor->AdvancedSearch->load();
         $this->operator->AdvancedSearch->load();
         $this->transaction_status->AdvancedSearch->load();
-        $this->quantity->AdvancedSearch->load();
-        $this->lamata_fee->AdvancedSearch->load();
-        $this->total->AdvancedSearch->load();
         $this->start_date->AdvancedSearch->load();
         $this->end_date->AdvancedSearch->load();
         $this->platform->AdvancedSearch->load();
@@ -1237,6 +1342,13 @@ class ViewTransactionsPerPlatformSearch extends ViewTransactionsPerPlatform
         $this->bus_size_id->AdvancedSearch->load();
         $this->vendor_search_id->AdvancedSearch->load();
         $this->vendor_search_name->AdvancedSearch->load();
+        $this->price->AdvancedSearch->load();
+        $this->quantity->AdvancedSearch->load();
+        $this->amount_paid->AdvancedSearch->load();
+        $this->transitmedia_fee->AdvancedSearch->load();
+        $this->lasaa_fee->AdvancedSearch->load();
+        $this->operator_fee->AdvancedSearch->load();
+        $this->lamata_fee->AdvancedSearch->load();
     }
 
     // Set up Breadcrumb

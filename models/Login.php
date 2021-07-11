@@ -268,9 +268,9 @@ class Login extends MainUsers
 
         // Login
         if (IsLoggingIn()) { // After changing password
-            $this->Username->setFormValue(@$_SESSION[SESSION_USER_PROFILE_USER_NAME]);
-            $this->Password->setFormValue(@$_SESSION[SESSION_USER_PROFILE_PASSWORD]);
-            $this->LoginType->setFormValue(@$_SESSION[SESSION_USER_PROFILE_LOGIN_TYPE]);
+            $this->Username->setFormValue(Session(SESSION_USER_PROFILE_USER_NAME));
+            $this->Password->setFormValue(Session(SESSION_USER_PROFILE_PASSWORD));
+            $this->LoginType->setFormValue(Session(SESSION_USER_PROFILE_LOGIN_TYPE));
             $validPwd = $Security->validateUser($this->Username->CurrentValue, $this->Password->CurrentValue, false);
             if ($validPwd) {
                 $_SESSION[SESSION_USER_PROFILE_USER_NAME] = "";
@@ -368,7 +368,6 @@ class Login extends MainUsers
             } else {
                 WriteCookie("AutoLogin", ""); // Clear auto login cookie
             }
-            $this->writeAuditTrailOnLogin($this->Username->CurrentValue);
 
             // Call loggedin event
             $this->userLoggedIn($this->Username->CurrentValue);
@@ -436,13 +435,6 @@ class Login extends MainUsers
         return $validateForm;
     }
 
-    // Write audit trail on login
-    protected function writeAuditTrailOnLogin($usr)
-    {
-        global $Language;
-        WriteAuditLog($usr, $Language->phrase("AuditTrailLogin"), CurrentUserIP(), "", "", "", "");
-    }
-
     // Page Load event
     public function pageLoad()
     {
@@ -469,6 +461,31 @@ class Login extends MainUsers
                 if(CurrentUserLevel() == 6){
                     //PLATFORM
                     $url = "viewtransactionsperplatformlist";
+                }
+                if(CurrentUserLevel() == 0){
+                    //PLATFORM
+                    $url = "welcome";
+                }
+                if(CurrentUserLevel() == 1){
+                    //CAMPAIGN MANAGER
+                    $url = "maincampaignslist";
+                }
+                if(CurrentUserLevel() == 2){
+                    //ACCOUNTS MANAGER
+                    $url = "maintransactionslist";
+                }
+                if(CurrentUserLevel() == 3){
+                    //FLEET MANAGER
+                    $url = "xbusstatuslist";
+                    //$url = "mainbuseslist";
+                }
+                if(CurrentUserLevel() == 4){
+                    //REPORTS MANAGER
+                    $url = "mainreportslist";
+                }
+                if(CurrentUserLevel() == 7){
+                    //PRINT MANAGER
+                    $url = "mainprintorderslist";
                 }
             }
     }

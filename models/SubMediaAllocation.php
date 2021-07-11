@@ -170,7 +170,7 @@ class SubMediaAllocation extends DbTable
     // Current master table name
     public function getCurrentMasterTable()
     {
-        return @$_SESSION[PROJECT_NAME . "_" . $this->TableVar . "_" . Config("TABLE_MASTER_TABLE")];
+        return Session(PROJECT_NAME . "_" . $this->TableVar . "_" . Config("TABLE_MASTER_TABLE"));
     }
 
     public function setCurrentMasterTable($v)
@@ -183,16 +183,16 @@ class SubMediaAllocation extends DbTable
     {
         // Master filter
         $masterFilter = "";
-        if ($this->getCurrentMasterTable() == "main_buses") {
-            if ($this->bus_id->getSessionValue() != "") {
-                $masterFilter .= "" . GetForeignKeySql("\"id\"", $this->bus_id->getSessionValue(), DATATYPE_NUMBER, "DB");
+        if ($this->getCurrentMasterTable() == "main_campaigns") {
+            if ($this->campaign_id->getSessionValue() != "") {
+                $masterFilter .= "" . GetForeignKeySql("\"id\"", $this->campaign_id->getSessionValue(), DATATYPE_NUMBER, "DB");
             } else {
                 return "";
             }
         }
-        if ($this->getCurrentMasterTable() == "main_campaigns") {
-            if ($this->campaign_id->getSessionValue() != "") {
-                $masterFilter .= "" . GetForeignKeySql("\"id\"", $this->campaign_id->getSessionValue(), DATATYPE_NUMBER, "DB");
+        if ($this->getCurrentMasterTable() == "main_buses") {
+            if ($this->bus_id->getSessionValue() != "") {
+                $masterFilter .= "" . GetForeignKeySql("\"id\"", $this->bus_id->getSessionValue(), DATATYPE_NUMBER, "DB");
             } else {
                 return "";
             }
@@ -205,13 +205,6 @@ class SubMediaAllocation extends DbTable
     {
         // Detail filter
         $detailFilter = "";
-        if ($this->getCurrentMasterTable() == "main_buses") {
-            if ($this->bus_id->getSessionValue() != "") {
-                $detailFilter .= "" . GetForeignKeySql("\"bus_id\"", $this->bus_id->getSessionValue(), DATATYPE_NUMBER, "DB");
-            } else {
-                return "";
-            }
-        }
         if ($this->getCurrentMasterTable() == "main_campaigns") {
             if ($this->campaign_id->getSessionValue() != "") {
                 $detailFilter .= "" . GetForeignKeySql("\"campaign_id\"", $this->campaign_id->getSessionValue(), DATATYPE_NUMBER, "DB");
@@ -219,18 +212,14 @@ class SubMediaAllocation extends DbTable
                 return "";
             }
         }
+        if ($this->getCurrentMasterTable() == "main_buses") {
+            if ($this->bus_id->getSessionValue() != "") {
+                $detailFilter .= "" . GetForeignKeySql("\"bus_id\"", $this->bus_id->getSessionValue(), DATATYPE_NUMBER, "DB");
+            } else {
+                return "";
+            }
+        }
         return $detailFilter;
-    }
-
-    // Master filter
-    public function sqlMasterFilter_main_buses()
-    {
-        return "\"id\"=@id@";
-    }
-    // Detail filter
-    public function sqlDetailFilter_main_buses()
-    {
-        return "\"bus_id\"=@bus_id@";
     }
 
     // Master filter
@@ -242,6 +231,17 @@ class SubMediaAllocation extends DbTable
     public function sqlDetailFilter_main_campaigns()
     {
         return "\"campaign_id\"=@campaign_id@";
+    }
+
+    // Master filter
+    public function sqlMasterFilter_main_buses()
+    {
+        return "\"id\"=@id@";
+    }
+    // Detail filter
+    public function sqlDetailFilter_main_buses()
+    {
+        return "\"bus_id\"=@bus_id@";
     }
 
     // Table level SQL
@@ -344,11 +344,11 @@ class SubMediaAllocation extends DbTable
         global $Security;
         // Add User ID filter
         if ($Security->currentUserID() != "" && !$Security->isAdmin()) { // Non system admin
-            if ($this->getCurrentMasterTable() == "main_buses" || $this->getCurrentMasterTable() == "") {
-                $filter = $this->addDetailUserIDFilter($filter, "main_buses"); // Add detail User ID filter
-            }
             if ($this->getCurrentMasterTable() == "main_campaigns" || $this->getCurrentMasterTable() == "") {
                 $filter = $this->addDetailUserIDFilter($filter, "main_campaigns"); // Add detail User ID filter
+            }
+            if ($this->getCurrentMasterTable() == "main_buses" || $this->getCurrentMasterTable() == "") {
+                $filter = $this->addDetailUserIDFilter($filter, "main_buses"); // Add detail User ID filter
             }
         }
         return $filter;
@@ -539,7 +539,7 @@ class SubMediaAllocation extends DbTable
         $success = $this->insertSql($rs)->execute();
         if ($success) {
             // Get insert id if necessary
-            $this->id->setDbValue($conn->fetchColumn("SELECT currval('allocation_id_seq'::regclass)"));
+            $this->id->setDbValue($conn->fetchColumn("SELECT currval('public.sub_media_allocation_id_seq'::regclass)"));
             $rs['id'] = $this->id->DbValue;
         }
         return $success;
@@ -696,18 +696,17 @@ class SubMediaAllocation extends DbTable
     // Return page URL
     public function getReturnUrl()
     {
+        $referUrl = ReferUrl();
+        $referPageName = ReferPageName();
         $name = PROJECT_NAME . "_" . $this->TableVar . "_" . Config("TABLE_RETURN_URL");
         // Get referer URL automatically
-        if (ReferUrl() != "" && ReferPageName() != CurrentPageName() && ReferPageName() != "login") { // Referer not same page or login page
-            $_SESSION[$name] = ReferUrl(); // Save to Session
+        if ($referUrl != "" && $referPageName != CurrentPageName() && $referPageName != "login") { // Referer not same page or login page
+            $_SESSION[$name] = $referUrl; // Save to Session
         }
-        if (@$_SESSION[$name] != "") {
-            return $_SESSION[$name];
-        } else {
-            return GetUrl("submediaallocationlist");
-        }
+        return $_SESSION[$name] ?? GetUrl("submediaallocationlist");
     }
 
+    // Set return page URL
     public function setReturnUrl($v)
     {
         $_SESSION[PROJECT_NAME . "_" . $this->TableVar . "_" . Config("TABLE_RETURN_URL")] = $v;
@@ -812,13 +811,13 @@ class SubMediaAllocation extends DbTable
     // Add master url
     public function addMasterUrl($url)
     {
-        if ($this->getCurrentMasterTable() == "main_buses" && !ContainsString($url, Config("TABLE_SHOW_MASTER") . "=")) {
-            $url .= (ContainsString($url, "?") ? "&" : "?") . Config("TABLE_SHOW_MASTER") . "=" . $this->getCurrentMasterTable();
-            $url .= "&" . GetForeignKeyUrl("fk_id", $this->bus_id->CurrentValue);
-        }
         if ($this->getCurrentMasterTable() == "main_campaigns" && !ContainsString($url, Config("TABLE_SHOW_MASTER") . "=")) {
             $url .= (ContainsString($url, "?") ? "&" : "?") . Config("TABLE_SHOW_MASTER") . "=" . $this->getCurrentMasterTable();
             $url .= "&" . GetForeignKeyUrl("fk_id", $this->campaign_id->CurrentValue);
+        }
+        if ($this->getCurrentMasterTable() == "main_buses" && !ContainsString($url, Config("TABLE_SHOW_MASTER") . "=")) {
+            $url .= (ContainsString($url, "?") ? "&" : "?") . Config("TABLE_SHOW_MASTER") . "=" . $this->getCurrentMasterTable();
+            $url .= "&" . GetForeignKeyUrl("fk_id", $this->bus_id->CurrentValue);
         }
         return $url;
     }
@@ -1004,7 +1003,7 @@ SORTHTML;
             $this->bus_id->ViewValue = $this->bus_id->lookupCacheOption($curVal);
             if ($this->bus_id->ViewValue === null) { // Lookup from database
                 $filterWrk = "\"id\"" . SearchString("=", $curVal, DATATYPE_NUMBER, "");
-                $sqlWrk = $this->bus_id->Lookup->getSql(false, $filterWrk, '', $this, true);
+                $sqlWrk = $this->bus_id->Lookup->getSql(false, $filterWrk, '', $this, true, true);
                 $rswrk = Conn()->executeQuery($sqlWrk)->fetchAll(\PDO::FETCH_BOTH);
                 $ari = count($rswrk);
                 if ($ari > 0) { // Lookup values found
@@ -1029,7 +1028,7 @@ SORTHTML;
                     return "inventory_id = 3";
                 };
                 $lookupFilter = $lookupFilter->bindTo($this);
-                $sqlWrk = $this->campaign_id->Lookup->getSql(false, $filterWrk, $lookupFilter, $this, true);
+                $sqlWrk = $this->campaign_id->Lookup->getSql(false, $filterWrk, $lookupFilter, $this, true, true);
                 $rswrk = Conn()->executeQuery($sqlWrk)->fetchAll(\PDO::FETCH_BOTH);
                 $ari = count($rswrk);
                 if ($ari > 0) { // Lookup values found
@@ -1132,7 +1131,7 @@ SORTHTML;
                 $this->bus_id->ViewValue = $this->bus_id->lookupCacheOption($curVal);
                 if ($this->bus_id->ViewValue === null) { // Lookup from database
                     $filterWrk = "\"id\"" . SearchString("=", $curVal, DATATYPE_NUMBER, "");
-                    $sqlWrk = $this->bus_id->Lookup->getSql(false, $filterWrk, '', $this, true);
+                    $sqlWrk = $this->bus_id->Lookup->getSql(false, $filterWrk, '', $this, true, true);
                     $rswrk = Conn()->executeQuery($sqlWrk)->fetchAll(\PDO::FETCH_BOTH);
                     $ari = count($rswrk);
                     if ($ari > 0) { // Lookup values found
@@ -1164,7 +1163,7 @@ SORTHTML;
                         return "inventory_id = 3";
                     };
                     $lookupFilter = $lookupFilter->bindTo($this);
-                    $sqlWrk = $this->campaign_id->Lookup->getSql(false, $filterWrk, $lookupFilter, $this, true);
+                    $sqlWrk = $this->campaign_id->Lookup->getSql(false, $filterWrk, $lookupFilter, $this, true, true);
                     $rswrk = Conn()->executeQuery($sqlWrk)->fetchAll(\PDO::FETCH_BOTH);
                     $ari = count($rswrk);
                     if ($ari > 0) { // Lookup values found

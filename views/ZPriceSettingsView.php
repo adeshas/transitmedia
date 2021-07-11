@@ -196,6 +196,31 @@ $Page->showMessage();
 </td>
     </tr>
 <?php } ?>
+<?php if ($Page->active->Visible) { // active ?>
+    <tr id="r_active">
+        <td class="<?= $Page->TableLeftColumnClass ?>"><span id="elh_z_price_settings_active"><?= $Page->active->caption() ?></span></td>
+        <td data-name="active" <?= $Page->active->cellAttributes() ?>>
+<span id="el_z_price_settings_active">
+<span<?= $Page->active->viewAttributes() ?>>
+<div class="custom-control custom-checkbox d-inline-block">
+    <input type="checkbox" id="x_active_<?= $Page->RowCount ?>" class="custom-control-input" value="<?= $Page->active->getViewValue() ?>" disabled<?php if (ConvertToBool($Page->active->CurrentValue)) { ?> checked<?php } ?>>
+    <label class="custom-control-label" for="x_active_<?= $Page->RowCount ?>"></label>
+</div></span>
+</span>
+</td>
+    </tr>
+<?php } ?>
+<?php if ($Page->ts_created->Visible) { // ts_created ?>
+    <tr id="r_ts_created">
+        <td class="<?= $Page->TableLeftColumnClass ?>"><span id="elh_z_price_settings_ts_created"><?= $Page->ts_created->caption() ?></span></td>
+        <td data-name="ts_created" <?= $Page->ts_created->cellAttributes() ?>>
+<span id="el_z_price_settings_ts_created">
+<span<?= $Page->ts_created->viewAttributes() ?>>
+<?= $Page->ts_created->getViewValue() ?></span>
+</span>
+</td>
+    </tr>
+<?php } ?>
 </table>
 </form>
 <?php

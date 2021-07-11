@@ -7,6 +7,7 @@ $ViewTransactionsPerOperatorList = &$Page;
 ?>
 <?php if (!$Page->isExport()) { ?>
 <script>
+if (!ew.vars.tables.view_transactions_per_operator) ew.vars.tables.view_transactions_per_operator = <?= JsonEncode(GetClientVar("tables", "view_transactions_per_operator")) ?>;
 var currentForm, currentPageID;
 var fview_transactions_per_operatorlist;
 loadjs.ready("head", function () {
@@ -22,6 +23,59 @@ loadjs.ready("head", function () {
     var $ = jQuery;
     // Form object for search
     fview_transactions_per_operatorlistsrch = currentSearchForm = new ew.Form("fview_transactions_per_operatorlistsrch");
+
+    // Add fields
+    var fields = ew.vars.tables.view_transactions_per_operator.fields;
+    fview_transactions_per_operatorlistsrch.addFields([
+        ["transaction_id", [], fields.transaction_id.isInvalid],
+        ["campaign", [], fields.campaign.isInvalid],
+        ["payment_date", [ew.Validators.datetime(0)], fields.payment_date.isInvalid],
+        ["inventory", [], fields.inventory.isInvalid],
+        ["bus_size", [], fields.bus_size.isInvalid],
+        ["vendor", [], fields.vendor.isInvalid],
+        ["operator", [], fields.operator.isInvalid],
+        ["platform", [], fields.platform.isInvalid],
+        ["transaction_status", [], fields.transaction_status.isInvalid],
+        ["quantity", [ew.Validators.integer], fields.quantity.isInvalid],
+        ["operator_fee", [], fields.operator_fee.isInvalid],
+        ["total", [], fields.total.isInvalid],
+        ["download", [], fields.download.isInvalid]
+    ]);
+
+    // Set invalid fields
+    $(function() {
+        fview_transactions_per_operatorlistsrch.setInvalid();
+    });
+
+    // Validate form
+    fview_transactions_per_operatorlistsrch.validate = function () {
+        if (!this.validateRequired)
+            return true; // Ignore validation
+        var fobj = this.getForm(),
+            $fobj = $(fobj),
+            rowIndex = "";
+        $fobj.data("rowindex", rowIndex);
+
+        // Validate fields
+        if (!this.validateFields(rowIndex))
+            return false;
+
+        // Call Form_CustomValidate event
+        if (!this.customValidate(fobj)) {
+            this.focus();
+            return false;
+        }
+        return true;
+    }
+
+    // Form_CustomValidate
+    fview_transactions_per_operatorlistsrch.customValidate = function(fobj) { // DO NOT CHANGE THIS LINE!
+        // Your custom validation code here, return false if invalid.
+        return true;
+    }
+
+    // Use JavaScript validation or not
+    fview_transactions_per_operatorlistsrch.validateRequired = <?= Config("CLIENT_VALIDATE") ? "true" : "false" ?>;
 
     // Dynamic selection lists
 
@@ -63,6 +117,147 @@ $Page->renderOtherOptions();
 <input type="hidden" name="cmd" value="search">
 <input type="hidden" name="t" value="view_transactions_per_operator">
     <div class="ew-extended-search">
+<?php
+// Render search row
+$Page->RowType = ROWTYPE_SEARCH;
+$Page->resetAttributes();
+$Page->renderRow();
+?>
+<?php if ($Page->campaign->Visible) { // campaign ?>
+    <?php
+        $Page->SearchColumnCount++;
+        if (($Page->SearchColumnCount - 1) % $Page->SearchFieldsPerRow == 0) {
+            $Page->SearchRowCount++;
+    ?>
+<div id="xsr_<?= $Page->SearchRowCount ?>" class="ew-row d-sm-flex">
+    <?php
+        }
+     ?>
+    <div id="xsc_campaign" class="ew-cell form-group">
+        <label for="x_campaign" class="ew-search-caption ew-label"><?= $Page->campaign->caption() ?></label>
+        <span class="ew-search-operator">
+<?= $Language->phrase("LIKE") ?>
+<input type="hidden" name="z_campaign" id="z_campaign" value="LIKE">
+</span>
+        <span id="el_view_transactions_per_operator_campaign" class="ew-search-field">
+<input type="<?= $Page->campaign->getInputTextType() ?>" data-table="view_transactions_per_operator" data-field="x_campaign" name="x_campaign" id="x_campaign" size="35" placeholder="<?= HtmlEncode($Page->campaign->getPlaceHolder()) ?>" value="<?= $Page->campaign->EditValue ?>"<?= $Page->campaign->editAttributes() ?>>
+<div class="invalid-feedback"><?= $Page->campaign->getErrorMessage(false) ?></div>
+</span>
+    </div>
+    <?php if ($Page->SearchColumnCount % $Page->SearchFieldsPerRow == 0) { ?>
+</div>
+    <?php } ?>
+<?php } ?>
+<?php if ($Page->payment_date->Visible) { // payment_date ?>
+    <?php
+        $Page->SearchColumnCount++;
+        if (($Page->SearchColumnCount - 1) % $Page->SearchFieldsPerRow == 0) {
+            $Page->SearchRowCount++;
+    ?>
+<div id="xsr_<?= $Page->SearchRowCount ?>" class="ew-row d-sm-flex">
+    <?php
+        }
+     ?>
+    <div id="xsc_payment_date" class="ew-cell form-group">
+        <label for="x_payment_date" class="ew-search-caption ew-label"><?= $Page->payment_date->caption() ?></label>
+        <span class="ew-search-operator">
+<?= $Language->phrase("=") ?>
+<input type="hidden" name="z_payment_date" id="z_payment_date" value="=">
+</span>
+        <span id="el_view_transactions_per_operator_payment_date" class="ew-search-field">
+<input type="<?= $Page->payment_date->getInputTextType() ?>" data-table="view_transactions_per_operator" data-field="x_payment_date" name="x_payment_date" id="x_payment_date" placeholder="<?= HtmlEncode($Page->payment_date->getPlaceHolder()) ?>" value="<?= $Page->payment_date->EditValue ?>"<?= $Page->payment_date->editAttributes() ?>>
+<div class="invalid-feedback"><?= $Page->payment_date->getErrorMessage(false) ?></div>
+<?php if (!$Page->payment_date->ReadOnly && !$Page->payment_date->Disabled && !isset($Page->payment_date->EditAttrs["readonly"]) && !isset($Page->payment_date->EditAttrs["disabled"])) { ?>
+<script>
+loadjs.ready(["fview_transactions_per_operatorlistsrch", "datetimepicker"], function() {
+    ew.createDateTimePicker("fview_transactions_per_operatorlistsrch", "x_payment_date", {"ignoreReadonly":true,"useCurrent":false,"format":0});
+});
+</script>
+<?php } ?>
+</span>
+    </div>
+    <?php if ($Page->SearchColumnCount % $Page->SearchFieldsPerRow == 0) { ?>
+</div>
+    <?php } ?>
+<?php } ?>
+<?php if ($Page->inventory->Visible) { // inventory ?>
+    <?php
+        $Page->SearchColumnCount++;
+        if (($Page->SearchColumnCount - 1) % $Page->SearchFieldsPerRow == 0) {
+            $Page->SearchRowCount++;
+    ?>
+<div id="xsr_<?= $Page->SearchRowCount ?>" class="ew-row d-sm-flex">
+    <?php
+        }
+     ?>
+    <div id="xsc_inventory" class="ew-cell form-group">
+        <label for="x_inventory" class="ew-search-caption ew-label"><?= $Page->inventory->caption() ?></label>
+        <span class="ew-search-operator">
+<?= $Language->phrase("LIKE") ?>
+<input type="hidden" name="z_inventory" id="z_inventory" value="LIKE">
+</span>
+        <span id="el_view_transactions_per_operator_inventory" class="ew-search-field">
+<input type="<?= $Page->inventory->getInputTextType() ?>" data-table="view_transactions_per_operator" data-field="x_inventory" name="x_inventory" id="x_inventory" size="35" placeholder="<?= HtmlEncode($Page->inventory->getPlaceHolder()) ?>" value="<?= $Page->inventory->EditValue ?>"<?= $Page->inventory->editAttributes() ?>>
+<div class="invalid-feedback"><?= $Page->inventory->getErrorMessage(false) ?></div>
+</span>
+    </div>
+    <?php if ($Page->SearchColumnCount % $Page->SearchFieldsPerRow == 0) { ?>
+</div>
+    <?php } ?>
+<?php } ?>
+<?php if ($Page->vendor->Visible) { // vendor ?>
+    <?php
+        $Page->SearchColumnCount++;
+        if (($Page->SearchColumnCount - 1) % $Page->SearchFieldsPerRow == 0) {
+            $Page->SearchRowCount++;
+    ?>
+<div id="xsr_<?= $Page->SearchRowCount ?>" class="ew-row d-sm-flex">
+    <?php
+        }
+     ?>
+    <div id="xsc_vendor" class="ew-cell form-group">
+        <label for="x_vendor" class="ew-search-caption ew-label"><?= $Page->vendor->caption() ?></label>
+        <span class="ew-search-operator">
+<?= $Language->phrase("LIKE") ?>
+<input type="hidden" name="z_vendor" id="z_vendor" value="LIKE">
+</span>
+        <span id="el_view_transactions_per_operator_vendor" class="ew-search-field">
+<input type="<?= $Page->vendor->getInputTextType() ?>" data-table="view_transactions_per_operator" data-field="x_vendor" name="x_vendor" id="x_vendor" size="30" placeholder="<?= HtmlEncode($Page->vendor->getPlaceHolder()) ?>" value="<?= $Page->vendor->EditValue ?>"<?= $Page->vendor->editAttributes() ?>>
+<div class="invalid-feedback"><?= $Page->vendor->getErrorMessage(false) ?></div>
+</span>
+    </div>
+    <?php if ($Page->SearchColumnCount % $Page->SearchFieldsPerRow == 0) { ?>
+</div>
+    <?php } ?>
+<?php } ?>
+<?php if ($Page->quantity->Visible) { // quantity ?>
+    <?php
+        $Page->SearchColumnCount++;
+        if (($Page->SearchColumnCount - 1) % $Page->SearchFieldsPerRow == 0) {
+            $Page->SearchRowCount++;
+    ?>
+<div id="xsr_<?= $Page->SearchRowCount ?>" class="ew-row d-sm-flex">
+    <?php
+        }
+     ?>
+    <div id="xsc_quantity" class="ew-cell form-group">
+        <label for="x_quantity" class="ew-search-caption ew-label"><?= $Page->quantity->caption() ?></label>
+        <span class="ew-search-operator">
+<?= $Language->phrase("=") ?>
+<input type="hidden" name="z_quantity" id="z_quantity" value="=">
+</span>
+        <span id="el_view_transactions_per_operator_quantity" class="ew-search-field">
+<input type="<?= $Page->quantity->getInputTextType() ?>" data-table="view_transactions_per_operator" data-field="x_quantity" name="x_quantity" id="x_quantity" size="30" placeholder="<?= HtmlEncode($Page->quantity->getPlaceHolder()) ?>" value="<?= $Page->quantity->EditValue ?>"<?= $Page->quantity->editAttributes() ?>>
+<div class="invalid-feedback"><?= $Page->quantity->getErrorMessage(false) ?></div>
+</span>
+    </div>
+    <?php if ($Page->SearchColumnCount % $Page->SearchFieldsPerRow == 0) { ?>
+</div>
+    <?php } ?>
+<?php } ?>
+    <?php if ($Page->SearchColumnCount % $Page->SearchFieldsPerRow > 0) { ?>
+</div>
+    <?php } ?>
 <div id="xsr_<?= $Page->SearchRowCount + 1 ?>" class="ew-row d-sm-flex">
     <div class="ew-quick-search input-group">
         <input type="text" name="<?= Config("TABLE_BASIC_SEARCH") ?>" id="<?= Config("TABLE_BASIC_SEARCH") ?>" class="form-control" value="<?= HtmlEncode($Page->BasicSearch->getKeyword()) ?>" placeholder="<?= HtmlEncode($Language->phrase("Search")) ?>">
@@ -159,6 +354,9 @@ $Page->ListOptions->render("header", "left");
 <?php } ?>
 <?php if ($Page->total->Visible) { // total ?>
         <th data-name="total" class="<?= $Page->total->headerCellClass() ?>" style="white-space: nowrap;"><div id="elh_view_transactions_per_operator_total" class="view_transactions_per_operator_total"><?= $Page->renderSort($Page->total) ?></div></th>
+<?php } ?>
+<?php if ($Page->download->Visible) { // download ?>
+        <th data-name="download" class="<?= $Page->download->headerCellClass() ?>" style="white-space: nowrap;"><div id="elh_view_transactions_per_operator_download" class="view_transactions_per_operator_download"><?= $Page->renderSort($Page->download) ?></div></th>
 <?php } ?>
 <?php
 // Render list options (header, right)
@@ -330,6 +528,19 @@ $Page->ListOptions->render("body", "left", $Page->RowCount);
 </span>
 </td>
     <?php } ?>
+    <?php if ($Page->download->Visible) { // download ?>
+        <td data-name="download" <?= $Page->download->cellAttributes() ?>>
+<span id="el<?= $Page->RowCount ?>_view_transactions_per_operator_download">
+<span<?= $Page->download->viewAttributes() ?>>
+<?php if (!EmptyString($Page->download->getViewValue()) && $Page->download->linkAttributes() != "") { ?>
+<a<?= $Page->download->linkAttributes() ?>><?= $Page->download->getViewValue() ?></a>
+<?php } else { ?>
+<?= $Page->download->getViewValue() ?>
+<?php } ?>
+</span>
+</span>
+</td>
+    <?php } ?>
 <?php
 // Render list options (body, right)
 $Page->ListOptions->render("body", "right", $Page->RowCount);
@@ -420,6 +631,11 @@ $Page->ListOptions->render("footer", "left");
         <td data-name="total" class="<?= $Page->total->footerCellClass() ?>"><span id="elf_view_transactions_per_operator_total" class="view_transactions_per_operator_total">
         <span class="ew-aggregate"><?= $Language->phrase("TOTAL") ?></span><span class="ew-aggregate-value">
         <?= $Page->total->ViewValue ?></span>
+        </span></td>
+    <?php } ?>
+    <?php if ($Page->download->Visible) { // download ?>
+        <td data-name="download" class="<?= $Page->download->footerCellClass() ?>"><span id="elf_view_transactions_per_operator_download" class="view_transactions_per_operator_download">
+        &nbsp;
         </span></td>
     <?php } ?>
 <?php

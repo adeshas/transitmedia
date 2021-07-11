@@ -145,14 +145,26 @@ $Page->ListOptions->render("header", "left");
 <?php if ($Page->transaction_status->Visible) { // transaction_status ?>
         <th data-name="transaction_status" class="<?= $Page->transaction_status->headerCellClass() ?>" style="white-space: nowrap;"><div id="elh_view_transactions_per_platform_transaction_status" class="view_transactions_per_platform_transaction_status"><?= $Page->renderSort($Page->transaction_status) ?></div></th>
 <?php } ?>
+<?php if ($Page->price->Visible) { // price ?>
+        <th data-name="price" class="<?= $Page->price->headerCellClass() ?>"><div id="elh_view_transactions_per_platform_price" class="view_transactions_per_platform_price"><?= $Page->renderSort($Page->price) ?></div></th>
+<?php } ?>
 <?php if ($Page->quantity->Visible) { // quantity ?>
         <th data-name="quantity" class="<?= $Page->quantity->headerCellClass() ?>" style="white-space: nowrap;"><div id="elh_view_transactions_per_platform_quantity" class="view_transactions_per_platform_quantity"><?= $Page->renderSort($Page->quantity) ?></div></th>
 <?php } ?>
+<?php if ($Page->amount_paid->Visible) { // amount_paid ?>
+        <th data-name="amount_paid" class="<?= $Page->amount_paid->headerCellClass() ?>"><div id="elh_view_transactions_per_platform_amount_paid" class="view_transactions_per_platform_amount_paid"><?= $Page->renderSort($Page->amount_paid) ?></div></th>
+<?php } ?>
+<?php if ($Page->transitmedia_fee->Visible) { // transitmedia_fee ?>
+        <th data-name="transitmedia_fee" class="<?= $Page->transitmedia_fee->headerCellClass() ?>"><div id="elh_view_transactions_per_platform_transitmedia_fee" class="view_transactions_per_platform_transitmedia_fee"><?= $Page->renderSort($Page->transitmedia_fee) ?></div></th>
+<?php } ?>
+<?php if ($Page->lasaa_fee->Visible) { // lasaa_fee ?>
+        <th data-name="lasaa_fee" class="<?= $Page->lasaa_fee->headerCellClass() ?>"><div id="elh_view_transactions_per_platform_lasaa_fee" class="view_transactions_per_platform_lasaa_fee"><?= $Page->renderSort($Page->lasaa_fee) ?></div></th>
+<?php } ?>
+<?php if ($Page->operator_fee->Visible) { // operator_fee ?>
+        <th data-name="operator_fee" class="<?= $Page->operator_fee->headerCellClass() ?>"><div id="elh_view_transactions_per_platform_operator_fee" class="view_transactions_per_platform_operator_fee"><?= $Page->renderSort($Page->operator_fee) ?></div></th>
+<?php } ?>
 <?php if ($Page->lamata_fee->Visible) { // lamata_fee ?>
         <th data-name="lamata_fee" class="<?= $Page->lamata_fee->headerCellClass() ?>" style="white-space: nowrap;"><div id="elh_view_transactions_per_platform_lamata_fee" class="view_transactions_per_platform_lamata_fee"><?= $Page->renderSort($Page->lamata_fee) ?></div></th>
-<?php } ?>
-<?php if ($Page->total->Visible) { // total ?>
-        <th data-name="total" class="<?= $Page->total->headerCellClass() ?>" style="white-space: nowrap;"><div id="elh_view_transactions_per_platform_total" class="view_transactions_per_platform_total"><?= $Page->renderSort($Page->total) ?></div></th>
 <?php } ?>
 <?php
 // Render list options (header, right)
@@ -277,6 +289,14 @@ $Page->ListOptions->render("body", "left", $Page->RowCount);
 </span>
 </td>
     <?php } ?>
+    <?php if ($Page->price->Visible) { // price ?>
+        <td data-name="price" <?= $Page->price->cellAttributes() ?>>
+<span id="el<?= $Page->RowCount ?>_view_transactions_per_platform_price">
+<span<?= $Page->price->viewAttributes() ?>>
+<?= $Page->price->getViewValue() ?></span>
+</span>
+</td>
+    <?php } ?>
     <?php if ($Page->quantity->Visible) { // quantity ?>
         <td data-name="quantity" <?= $Page->quantity->cellAttributes() ?>>
 <span id="el<?= $Page->RowCount ?>_view_transactions_per_platform_quantity">
@@ -285,19 +305,43 @@ $Page->ListOptions->render("body", "left", $Page->RowCount);
 </span>
 </td>
     <?php } ?>
+    <?php if ($Page->amount_paid->Visible) { // amount_paid ?>
+        <td data-name="amount_paid" <?= $Page->amount_paid->cellAttributes() ?>>
+<span id="el<?= $Page->RowCount ?>_view_transactions_per_platform_amount_paid">
+<span<?= $Page->amount_paid->viewAttributes() ?>>
+<?= $Page->amount_paid->getViewValue() ?></span>
+</span>
+</td>
+    <?php } ?>
+    <?php if ($Page->transitmedia_fee->Visible) { // transitmedia_fee ?>
+        <td data-name="transitmedia_fee" <?= $Page->transitmedia_fee->cellAttributes() ?>>
+<span id="el<?= $Page->RowCount ?>_view_transactions_per_platform_transitmedia_fee">
+<span<?= $Page->transitmedia_fee->viewAttributes() ?>>
+<?= $Page->transitmedia_fee->getViewValue() ?></span>
+</span>
+</td>
+    <?php } ?>
+    <?php if ($Page->lasaa_fee->Visible) { // lasaa_fee ?>
+        <td data-name="lasaa_fee" <?= $Page->lasaa_fee->cellAttributes() ?>>
+<span id="el<?= $Page->RowCount ?>_view_transactions_per_platform_lasaa_fee">
+<span<?= $Page->lasaa_fee->viewAttributes() ?>>
+<?= $Page->lasaa_fee->getViewValue() ?></span>
+</span>
+</td>
+    <?php } ?>
+    <?php if ($Page->operator_fee->Visible) { // operator_fee ?>
+        <td data-name="operator_fee" <?= $Page->operator_fee->cellAttributes() ?>>
+<span id="el<?= $Page->RowCount ?>_view_transactions_per_platform_operator_fee">
+<span<?= $Page->operator_fee->viewAttributes() ?>>
+<?= $Page->operator_fee->getViewValue() ?></span>
+</span>
+</td>
+    <?php } ?>
     <?php if ($Page->lamata_fee->Visible) { // lamata_fee ?>
         <td data-name="lamata_fee" <?= $Page->lamata_fee->cellAttributes() ?>>
 <span id="el<?= $Page->RowCount ?>_view_transactions_per_platform_lamata_fee">
 <span<?= $Page->lamata_fee->viewAttributes() ?>>
 <?= $Page->lamata_fee->getViewValue() ?></span>
-</span>
-</td>
-    <?php } ?>
-    <?php if ($Page->total->Visible) { // total ?>
-        <td data-name="total" <?= $Page->total->cellAttributes() ?>>
-<span id="el<?= $Page->RowCount ?>_view_transactions_per_platform_total">
-<span<?= $Page->total->viewAttributes() ?>>
-<?= $Page->total->getViewValue() ?></span>
 </span>
 </td>
     <?php } ?>
@@ -365,22 +409,41 @@ $Page->ListOptions->render("footer", "left");
         &nbsp;
         </span></td>
     <?php } ?>
+    <?php if ($Page->price->Visible) { // price ?>
+        <td data-name="price" class="<?= $Page->price->footerCellClass() ?>"><span id="elf_view_transactions_per_platform_price" class="view_transactions_per_platform_price">
+        &nbsp;
+        </span></td>
+    <?php } ?>
     <?php if ($Page->quantity->Visible) { // quantity ?>
         <td data-name="quantity" class="<?= $Page->quantity->footerCellClass() ?>"><span id="elf_view_transactions_per_platform_quantity" class="view_transactions_per_platform_quantity">
         <span class="ew-aggregate"><?= $Language->phrase("TOTAL") ?></span><span class="ew-aggregate-value">
         <?= $Page->quantity->ViewValue ?></span>
         </span></td>
     <?php } ?>
+    <?php if ($Page->amount_paid->Visible) { // amount_paid ?>
+        <td data-name="amount_paid" class="<?= $Page->amount_paid->footerCellClass() ?>"><span id="elf_view_transactions_per_platform_amount_paid" class="view_transactions_per_platform_amount_paid">
+        &nbsp;
+        </span></td>
+    <?php } ?>
+    <?php if ($Page->transitmedia_fee->Visible) { // transitmedia_fee ?>
+        <td data-name="transitmedia_fee" class="<?= $Page->transitmedia_fee->footerCellClass() ?>"><span id="elf_view_transactions_per_platform_transitmedia_fee" class="view_transactions_per_platform_transitmedia_fee">
+        &nbsp;
+        </span></td>
+    <?php } ?>
+    <?php if ($Page->lasaa_fee->Visible) { // lasaa_fee ?>
+        <td data-name="lasaa_fee" class="<?= $Page->lasaa_fee->footerCellClass() ?>"><span id="elf_view_transactions_per_platform_lasaa_fee" class="view_transactions_per_platform_lasaa_fee">
+        &nbsp;
+        </span></td>
+    <?php } ?>
+    <?php if ($Page->operator_fee->Visible) { // operator_fee ?>
+        <td data-name="operator_fee" class="<?= $Page->operator_fee->footerCellClass() ?>"><span id="elf_view_transactions_per_platform_operator_fee" class="view_transactions_per_platform_operator_fee">
+        &nbsp;
+        </span></td>
+    <?php } ?>
     <?php if ($Page->lamata_fee->Visible) { // lamata_fee ?>
         <td data-name="lamata_fee" class="<?= $Page->lamata_fee->footerCellClass() ?>"><span id="elf_view_transactions_per_platform_lamata_fee" class="view_transactions_per_platform_lamata_fee">
         <span class="ew-aggregate"><?= $Language->phrase("TOTAL") ?></span><span class="ew-aggregate-value">
         <?= $Page->lamata_fee->ViewValue ?></span>
-        </span></td>
-    <?php } ?>
-    <?php if ($Page->total->Visible) { // total ?>
-        <td data-name="total" class="<?= $Page->total->footerCellClass() ?>"><span id="elf_view_transactions_per_platform_total" class="view_transactions_per_platform_total">
-        <span class="ew-aggregate"><?= $Language->phrase("TOTAL") ?></span><span class="ew-aggregate-value">
-        <?= $Page->total->ViewValue ?></span>
         </span></td>
     <?php } ?>
 <?php

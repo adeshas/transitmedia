@@ -43,7 +43,7 @@ class AdvancedSecurity
     // Get session User ID
     protected function sessionUserID()
     {
-        return isset($_SESSION[SESSION_USER_ID]) ? strval($_SESSION[SESSION_USER_ID]) : $this->CurrentUserID;
+        return isset($_SESSION[SESSION_USER_ID]) ? strval(Session(SESSION_USER_ID)) : $this->CurrentUserID;
     }
 
     // Set session User ID
@@ -56,7 +56,7 @@ class AdvancedSecurity
     // Get session Parent User ID
     protected function sessionParentUserID()
     {
-        return isset($_SESSION[SESSION_PARENT_USER_ID]) ? strval($_SESSION[SESSION_PARENT_USER_ID]) : $this->CurrentParentUserID;
+        return isset($_SESSION[SESSION_PARENT_USER_ID]) ? strval(Session(SESSION_PARENT_USER_ID)) : $this->CurrentParentUserID;
     }
 
     // Set session Parent User ID
@@ -158,6 +158,12 @@ class AdvancedSecurity
     public function currentUserLevel()
     {
         return $this->CurrentUserLevel;
+    }
+
+    // Get JWT Token
+    public function createJwt($minExpiry = 0)
+    {
+        return CreateJwt($this->currentUserName(), $this->sessionUserID(), $this->sessionParentUserID(), $this->sessionUserLevelID(), $minExpiry);
     }
 
     // Can add
@@ -347,7 +353,9 @@ class AdvancedSecurity
         if (!$autologin && ReadCookie("AutoLogin") == "autologin") {
             $usr = Decrypt(ReadCookie("Username"));
             $pwd = Decrypt(ReadCookie("Password"));
-            $autologin = $this->validateUser($usr, $pwd, true);
+            if ($usr !== false && $pwd !== false) {
+                $autologin = $this->validateUser($usr, $pwd, true);
+            }
         }
         if (!$autologin && Config("ALLOW_LOGIN_BY_URL") && Get("username") !== null) {
             $usr = RemoveXss(Get("username"));
@@ -355,12 +363,9 @@ class AdvancedSecurity
             $autologin = $this->validateUser($usr, $pwd, true);
         }
         if (!$autologin && Config("ALLOW_LOGIN_BY_SESSION") && isset($_SESSION[PROJECT_NAME . "_Username"])) {
-            $usr = $_SESSION[PROJECT_NAME . "_Username"];
-            $pwd = @$_SESSION[PROJECT_NAME . "_Password"];
+            $usr = Session(PROJECT_NAME . "_Username");
+            $pwd = Session(PROJECT_NAME . "_Password");
             $autologin = $this->validateUser($usr, $pwd, true);
-        }
-        if ($autologin) {
-            WriteAuditLog($usr, $GLOBALS["Language"]->phrase("AuditTrailAutoLogin"), CurrentUserIP(), "", "", "", "");
         }
         return $autologin;
     }
@@ -685,7 +690,7 @@ class AdvancedSecurity
     public function loadCurrentUserLevel($table)
     {
         // Load again if user level list changed
-        if (@$_SESSION[SESSION_USER_LEVEL_LIST_LOADED] != "" && @$_SESSION[SESSION_USER_LEVEL_LIST_LOADED] != @$_SESSION[SESSION_USER_LEVEL_LIST]) {
+        if (Session(SESSION_USER_LEVEL_LIST_LOADED) != "" && Session(SESSION_USER_LEVEL_LIST_LOADED) != Session(SESSION_USER_LEVEL_LIST)) {
             $_SESSION[SESSION_AR_USER_LEVEL_PRIV] = "";
         }
         $this->loadUserLevel();
@@ -923,7 +928,7 @@ class AdvancedSecurity
     // Check if user password expired
     public function isPasswordExpired()
     {
-        return (@$_SESSION[SESSION_STATUS] == "passwordexpired");
+        return (Session(SESSION_STATUS) == "passwordexpired");
     }
 
     // Set session password expired
@@ -941,25 +946,25 @@ class AdvancedSecurity
     // Check if user password reset
     public function isPasswordReset()
     {
-        return (@$_SESSION[SESSION_STATUS] == "passwordreset");
+        return (Session(SESSION_STATUS) == "passwordreset");
     }
 
     // Check if user is logging in (after changing password)
     public function isLoggingIn()
     {
-        return (@$_SESSION[SESSION_STATUS] == "loggingin");
+        return (Session(SESSION_STATUS) == "loggingin");
     }
 
     // Check if user is logged in
     public function isLoggedIn()
     {
-        return ($this->isLoggedIn || @$_SESSION[SESSION_STATUS] == "login");
+        return ($this->isLoggedIn || Session(SESSION_STATUS) == "login");
     }
 
     // Check if user is system administrator
     public function isSysAdmin()
     {
-        return ($this->isSysAdmin || @$_SESSION[SESSION_SYS_ADMIN] == 1);
+        return ($this->isSysAdmin || Session(SESSION_SYS_ADMIN) == 1);
     }
 
     // Check if user is administrator
@@ -985,12 +990,12 @@ class AdvancedSecurity
     // Load User Level from Session
     public function loadUserLevel()
     {
-        if (empty(@$_SESSION[SESSION_AR_USER_LEVEL]) || empty(@$_SESSION[SESSION_AR_USER_LEVEL_PRIV])) {
+        if (empty(Session(SESSION_AR_USER_LEVEL)) || empty(Session(SESSION_AR_USER_LEVEL_PRIV))) {
             $this->setupUserLevel();
             $this->saveUserLevel();
         } else {
-            $this->UserLevel = $_SESSION[SESSION_AR_USER_LEVEL];
-            $this->UserLevelPriv = $_SESSION[SESSION_AR_USER_LEVEL_PRIV];
+            $this->UserLevel = Session(SESSION_AR_USER_LEVEL);
+            $this->UserLevelPriv = Session(SESSION_AR_USER_LEVEL_PRIV);
         }
     }
 

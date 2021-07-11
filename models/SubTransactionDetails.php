@@ -34,6 +34,7 @@ class SubTransactionDetails extends DbTable
     public $created_by;
     public $ts_created;
     public $ts_last_update;
+    public $vendor_id;
 
     // Page ID
     public $PageID = ""; // To be overridden by subclass
@@ -67,7 +68,6 @@ class SubTransactionDetails extends DbTable
         $this->ShowMultipleDetails = false; // Show multiple details
         $this->GridAddRowCount = 5;
         $this->AllowAddDeleteRow = true; // Allow add/delete row
-        $this->UserIDAllowSecurity = Config("DEFAULT_USER_ID_ALLOW_SECURITY"); // Default User ID allowed permissions
         $this->BasicSearch = new BasicSearch($this->TableVar);
 
         // id
@@ -93,7 +93,6 @@ class SubTransactionDetails extends DbTable
 
         // bus_id
         $this->bus_id = new DbField('sub_transaction_details', 'sub_transaction_details', 'x_bus_id', 'bus_id', '"bus_id"', 'CAST("bus_id" AS varchar(255))', 3, 4, -1, false, '"EV__bus_id"', true, true, true, 'FORMATTED TEXT', 'SELECT');
-        $this->bus_id->IsForeignKey = true; // Foreign key field
         $this->bus_id->Nullable = false; // NOT NULL field
         $this->bus_id->Required = true; // Required field
         $this->bus_id->Sortable = true; // Allow sort
@@ -125,6 +124,32 @@ class SubTransactionDetails extends DbTable
         $this->ts_last_update->Sortable = true; // Allow sort
         $this->ts_last_update->DefaultErrorMessage = str_replace("%s", $GLOBALS["DATE_FORMAT"], $Language->phrase("IncorrectDate"));
         $this->Fields['ts_last_update'] = &$this->ts_last_update;
+
+        // vendor_id
+        $this->vendor_id = new DbField('sub_transaction_details', 'sub_transaction_details', 'x_vendor_id', 'vendor_id', '(select 
+ (select 
+  main_campaigns.vendor_id 
+  from main_campaigns where main_transactions.campaign_id = main_campaigns.id
+ ) as vendor_id
+ from main_transactions where sub_transaction_details.transaction_id = main_transactions.id
+)', 'CAST((select 
+ (select 
+  main_campaigns.vendor_id 
+  from main_campaigns where main_transactions.campaign_id = main_campaigns.id
+ ) as vendor_id
+ from main_transactions where sub_transaction_details.transaction_id = main_transactions.id
+) AS varchar(255))', 3, 4, -1, false, '(select 
+ (select 
+  main_campaigns.vendor_id 
+  from main_campaigns where main_transactions.campaign_id = main_campaigns.id
+ ) as vendor_id
+ from main_transactions where sub_transaction_details.transaction_id = main_transactions.id
+)', false, false, false, 'FORMATTED TEXT', 'TEXT');
+        $this->vendor_id->IsCustom = true; // Custom field
+        $this->vendor_id->Sortable = true; // Allow sort
+        $this->vendor_id->Lookup = new Lookup('vendor_id', 'y_vendors', false, 'id', ["name","","",""], [], [], [], [], [], [], '', '');
+        $this->vendor_id->DefaultErrorMessage = $Language->phrase("IncorrectInteger");
+        $this->Fields['vendor_id'] = &$this->vendor_id;
     }
 
     // Field Visibility
@@ -170,7 +195,7 @@ class SubTransactionDetails extends DbTable
     // Session ORDER BY for List page
     public function getSessionOrderByList()
     {
-        return @$_SESSION[PROJECT_NAME . "_" . $this->TableVar . "_" . Config("TABLE_ORDER_BY_LIST")];
+        return Session(PROJECT_NAME . "_" . $this->TableVar . "_" . Config("TABLE_ORDER_BY_LIST"));
     }
 
     public function setSessionOrderByList($v)
@@ -181,7 +206,7 @@ class SubTransactionDetails extends DbTable
     // Current master table name
     public function getCurrentMasterTable()
     {
-        return @$_SESSION[PROJECT_NAME . "_" . $this->TableVar . "_" . Config("TABLE_MASTER_TABLE")];
+        return Session(PROJECT_NAME . "_" . $this->TableVar . "_" . Config("TABLE_MASTER_TABLE"));
     }
 
     public function setCurrentMasterTable($v)
@@ -194,13 +219,6 @@ class SubTransactionDetails extends DbTable
     {
         // Master filter
         $masterFilter = "";
-        if ($this->getCurrentMasterTable() == "main_buses") {
-            if ($this->bus_id->getSessionValue() != "") {
-                $masterFilter .= "" . GetForeignKeySql("\"id\"", $this->bus_id->getSessionValue(), DATATYPE_NUMBER, "DB");
-            } else {
-                return "";
-            }
-        }
         if ($this->getCurrentMasterTable() == "main_transactions") {
             if ($this->transaction_id->getSessionValue() != "") {
                 $masterFilter .= "" . GetForeignKeySql("\"id\"", $this->transaction_id->getSessionValue(), DATATYPE_NUMBER, "DB");
@@ -216,13 +234,6 @@ class SubTransactionDetails extends DbTable
     {
         // Detail filter
         $detailFilter = "";
-        if ($this->getCurrentMasterTable() == "main_buses") {
-            if ($this->bus_id->getSessionValue() != "") {
-                $detailFilter .= "" . GetForeignKeySql("\"bus_id\"", $this->bus_id->getSessionValue(), DATATYPE_NUMBER, "DB");
-            } else {
-                return "";
-            }
-        }
         if ($this->getCurrentMasterTable() == "main_transactions") {
             if ($this->transaction_id->getSessionValue() != "") {
                 $detailFilter .= "" . GetForeignKeySql("\"transaction_id\"", $this->transaction_id->getSessionValue(), DATATYPE_NUMBER, "DB");
@@ -231,17 +242,6 @@ class SubTransactionDetails extends DbTable
             }
         }
         return $detailFilter;
-    }
-
-    // Master filter
-    public function sqlMasterFilter_main_buses()
-    {
-        return "\"id\"=@id@";
-    }
-    // Detail filter
-    public function sqlDetailFilter_main_buses()
-    {
-        return "\"bus_id\"=@bus_id@";
     }
 
     // Master filter
@@ -273,7 +273,13 @@ class SubTransactionDetails extends DbTable
 
     public function getSqlSelect() // Select
     {
-        return $this->SqlSelect ?? $this->getQueryBuilder()->select("*");
+        return $this->SqlSelect ?? $this->getQueryBuilder()->select("*, (select 
+ (select 
+  main_campaigns.vendor_id 
+  from main_campaigns where main_transactions.campaign_id = main_campaigns.id
+ ) as vendor_id
+ from main_transactions where sub_transaction_details.transaction_id = main_transactions.id
+) AS \"vendor_id\"");
     }
 
     public function sqlSelect() // For backward compatibility
@@ -291,7 +297,13 @@ class SubTransactionDetails extends DbTable
         if ($this->SqlSelectList) {
             return $this->SqlSelectList;
         }
-        $from = "(SELECT *, (SELECT \"number\" || '" . ValueSeparator(1, $this->bus_id) . "' || \"operator\" || '" . ValueSeparator(2, $this->bus_id) . "' || \"exterior_campaign\" || '" . ValueSeparator(3, $this->bus_id) . "' || \"interior_campaign\" FROM \"view_bus_trans_options\" \"TMP_LOOKUPTABLE\" WHERE \"TMP_LOOKUPTABLE\".\"bus_id\" = \"sub_transaction_details\".\"bus_id\" LIMIT 1) AS \"EV__bus_id\" FROM \"sub_transaction_details\")";
+        $from = "(SELECT *, (select 
+ (select 
+  main_campaigns.vendor_id 
+  from main_campaigns where main_transactions.campaign_id = main_campaigns.id
+ ) as vendor_id
+ from main_transactions where sub_transaction_details.transaction_id = main_transactions.id
+) AS \"vendor_id\", (SELECT \"number\" || '" . ValueSeparator(1, $this->bus_id) . "' || \"operator\" || '" . ValueSeparator(2, $this->bus_id) . "' || \"exterior_campaign\" || '" . ValueSeparator(3, $this->bus_id) . "' || \"interior_campaign\" FROM \"view_bus_trans_options\" \"TMP_LOOKUPTABLE\" WHERE \"TMP_LOOKUPTABLE\".\"bus_id\" = \"sub_transaction_details\".\"bus_id\" LIMIT 1) AS \"EV__bus_id\" FROM \"sub_transaction_details\")";
         return $from . " \"TMP_TABLE\"";
     }
 
@@ -371,6 +383,11 @@ class SubTransactionDetails extends DbTable
     // Apply User ID filters
     public function applyUserIDFilters($filter)
     {
+        global $Security;
+        // Add User ID filter
+        if ($Security->currentUserID() != "" && !$Security->isAdmin()) { // Non system admin
+            $filter = $this->addUserIDFilter($filter);
+        }
         return $filter;
     }
 
@@ -519,6 +536,9 @@ class SubTransactionDetails extends DbTable
         if ($orderBy != "") {
             $orderBy = " " . str_replace(["(", ")"], ["", ""], $orderBy) . " ";
         }
+        if ($this->BasicSearch->getKeyword() != "") {
+            return true;
+        }
         if (
             $this->bus_id->AdvancedSearch->SearchValue != "" ||
             $this->bus_id->AdvancedSearch->SearchValue2 != "" ||
@@ -593,7 +613,7 @@ class SubTransactionDetails extends DbTable
         $success = $this->insertSql($rs)->execute();
         if ($success) {
             // Get insert id if necessary
-            $this->id->setDbValue($conn->fetchColumn("SELECT currval('transaction_details_id_seq'::regclass)"));
+            $this->id->setDbValue($conn->fetchColumn("SELECT currval('public.sub_transaction_details_id_seq'::regclass)"));
             $rs['id'] = $this->id->DbValue;
         }
         return $success;
@@ -685,6 +705,7 @@ class SubTransactionDetails extends DbTable
         $this->created_by->DbValue = $row['created_by'];
         $this->ts_created->DbValue = $row['ts_created'];
         $this->ts_last_update->DbValue = $row['ts_last_update'];
+        $this->vendor_id->DbValue = $row['vendor_id'];
     }
 
     // Delete uploaded files
@@ -749,18 +770,17 @@ class SubTransactionDetails extends DbTable
     // Return page URL
     public function getReturnUrl()
     {
+        $referUrl = ReferUrl();
+        $referPageName = ReferPageName();
         $name = PROJECT_NAME . "_" . $this->TableVar . "_" . Config("TABLE_RETURN_URL");
         // Get referer URL automatically
-        if (ReferUrl() != "" && ReferPageName() != CurrentPageName() && ReferPageName() != "login") { // Referer not same page or login page
-            $_SESSION[$name] = ReferUrl(); // Save to Session
+        if ($referUrl != "" && $referPageName != CurrentPageName() && $referPageName != "login") { // Referer not same page or login page
+            $_SESSION[$name] = $referUrl; // Save to Session
         }
-        if (@$_SESSION[$name] != "") {
-            return $_SESSION[$name];
-        } else {
-            return GetUrl("subtransactiondetailslist");
-        }
+        return $_SESSION[$name] ?? GetUrl("subtransactiondetailslist");
     }
 
+    // Set return page URL
     public function setReturnUrl($v)
     {
         $_SESSION[PROJECT_NAME . "_" . $this->TableVar . "_" . Config("TABLE_RETURN_URL")] = $v;
@@ -865,10 +885,6 @@ class SubTransactionDetails extends DbTable
     // Add master url
     public function addMasterUrl($url)
     {
-        if ($this->getCurrentMasterTable() == "main_buses" && !ContainsString($url, Config("TABLE_SHOW_MASTER") . "=")) {
-            $url .= (ContainsString($url, "?") ? "&" : "?") . Config("TABLE_SHOW_MASTER") . "=" . $this->getCurrentMasterTable();
-            $url .= "&" . GetForeignKeyUrl("fk_id", $this->bus_id->CurrentValue);
-        }
         if ($this->getCurrentMasterTable() == "main_transactions" && !ContainsString($url, Config("TABLE_SHOW_MASTER") . "=")) {
             $url .= (ContainsString($url, "?") ? "&" : "?") . Config("TABLE_SHOW_MASTER") . "=" . $this->getCurrentMasterTable();
             $url .= "&" . GetForeignKeyUrl("fk_id", $this->transaction_id->CurrentValue);
@@ -1020,6 +1036,7 @@ SORTHTML;
         $this->created_by->setDbValue($row['created_by']);
         $this->ts_created->setDbValue($row['ts_created']);
         $this->ts_last_update->setDbValue($row['ts_last_update']);
+        $this->vendor_id->setDbValue($row['vendor_id']);
     }
 
     // Render list row values
@@ -1044,6 +1061,8 @@ SORTHTML;
 
         // ts_last_update
 
+        // vendor_id
+
         // id
         $this->id->ViewValue = $this->id->CurrentValue;
         $this->id->ViewValue = FormatNumber($this->id->ViewValue, 0, -2, -2, -2);
@@ -1055,7 +1074,7 @@ SORTHTML;
             $this->transaction_id->ViewValue = $this->transaction_id->lookupCacheOption($curVal);
             if ($this->transaction_id->ViewValue === null) { // Lookup from database
                 $filterWrk = "\"id\"" . SearchString("=", $curVal, DATATYPE_NUMBER, "");
-                $sqlWrk = $this->transaction_id->Lookup->getSql(false, $filterWrk, '', $this, true);
+                $sqlWrk = $this->transaction_id->Lookup->getSql(false, $filterWrk, '', $this, true, true);
                 $rswrk = Conn()->executeQuery($sqlWrk)->fetchAll(\PDO::FETCH_BOTH);
                 $ari = count($rswrk);
                 if ($ari > 0) { // Lookup values found
@@ -1079,7 +1098,7 @@ SORTHTML;
                 $this->bus_id->ViewValue = $this->bus_id->lookupCacheOption($curVal);
                 if ($this->bus_id->ViewValue === null) { // Lookup from database
                     $filterWrk = "\"bus_id\"" . SearchString("=", $curVal, DATATYPE_NUMBER, "");
-                    $sqlWrk = $this->bus_id->Lookup->getSql(false, $filterWrk, '', $this, true);
+                    $sqlWrk = $this->bus_id->Lookup->getSql(false, $filterWrk, '', $this, true, true);
                     $rswrk = Conn()->executeQuery($sqlWrk)->fetchAll(\PDO::FETCH_BOTH);
                     $ari = count($rswrk);
                     if ($ari > 0) { // Lookup values found
@@ -1110,6 +1129,28 @@ SORTHTML;
         $this->ts_last_update->ViewValue = FormatDateTime($this->ts_last_update->ViewValue, 0);
         $this->ts_last_update->ViewCustomAttributes = "";
 
+        // vendor_id
+        $this->vendor_id->ViewValue = $this->vendor_id->CurrentValue;
+        $curVal = strval($this->vendor_id->CurrentValue);
+        if ($curVal != "") {
+            $this->vendor_id->ViewValue = $this->vendor_id->lookupCacheOption($curVal);
+            if ($this->vendor_id->ViewValue === null) { // Lookup from database
+                $filterWrk = "\"id\"" . SearchString("=", $curVal, DATATYPE_NUMBER, "");
+                $sqlWrk = $this->vendor_id->Lookup->getSql(false, $filterWrk, '', $this, true, true);
+                $rswrk = Conn()->executeQuery($sqlWrk)->fetchAll(\PDO::FETCH_BOTH);
+                $ari = count($rswrk);
+                if ($ari > 0) { // Lookup values found
+                    $arwrk = $this->vendor_id->Lookup->renderViewRow($rswrk[0]);
+                    $this->vendor_id->ViewValue = $this->vendor_id->displayValue($arwrk);
+                } else {
+                    $this->vendor_id->ViewValue = $this->vendor_id->CurrentValue;
+                }
+            }
+        } else {
+            $this->vendor_id->ViewValue = null;
+        }
+        $this->vendor_id->ViewCustomAttributes = "";
+
         // id
         $this->id->LinkCustomAttributes = "";
         $this->id->HrefValue = "";
@@ -1139,6 +1180,11 @@ SORTHTML;
         $this->ts_last_update->LinkCustomAttributes = "";
         $this->ts_last_update->HrefValue = "";
         $this->ts_last_update->TooltipValue = "";
+
+        // vendor_id
+        $this->vendor_id->LinkCustomAttributes = "";
+        $this->vendor_id->HrefValue = "";
+        $this->vendor_id->TooltipValue = "";
 
         // Call Row Rendered event
         $this->rowRendered();
@@ -1172,7 +1218,7 @@ SORTHTML;
                 $this->transaction_id->ViewValue = $this->transaction_id->lookupCacheOption($curVal);
                 if ($this->transaction_id->ViewValue === null) { // Lookup from database
                     $filterWrk = "\"id\"" . SearchString("=", $curVal, DATATYPE_NUMBER, "");
-                    $sqlWrk = $this->transaction_id->Lookup->getSql(false, $filterWrk, '', $this, true);
+                    $sqlWrk = $this->transaction_id->Lookup->getSql(false, $filterWrk, '', $this, true, true);
                     $rswrk = Conn()->executeQuery($sqlWrk)->fetchAll(\PDO::FETCH_BOTH);
                     $ari = count($rswrk);
                     if ($ari > 0) { // Lookup values found
@@ -1193,34 +1239,7 @@ SORTHTML;
         // bus_id
         $this->bus_id->EditAttrs["class"] = "form-control";
         $this->bus_id->EditCustomAttributes = "";
-        if ($this->bus_id->getSessionValue() != "") {
-            $this->bus_id->CurrentValue = GetForeignKeyValue($this->bus_id->getSessionValue());
-            if ($this->bus_id->VirtualValue != "") {
-                $this->bus_id->ViewValue = $this->bus_id->VirtualValue;
-            } else {
-                $curVal = strval($this->bus_id->CurrentValue);
-                if ($curVal != "") {
-                    $this->bus_id->ViewValue = $this->bus_id->lookupCacheOption($curVal);
-                    if ($this->bus_id->ViewValue === null) { // Lookup from database
-                        $filterWrk = "\"bus_id\"" . SearchString("=", $curVal, DATATYPE_NUMBER, "");
-                        $sqlWrk = $this->bus_id->Lookup->getSql(false, $filterWrk, '', $this, true);
-                        $rswrk = Conn()->executeQuery($sqlWrk)->fetchAll(\PDO::FETCH_BOTH);
-                        $ari = count($rswrk);
-                        if ($ari > 0) { // Lookup values found
-                            $arwrk = $this->bus_id->Lookup->renderViewRow($rswrk[0]);
-                            $this->bus_id->ViewValue = $this->bus_id->displayValue($arwrk);
-                        } else {
-                            $this->bus_id->ViewValue = $this->bus_id->CurrentValue;
-                        }
-                    }
-                } else {
-                    $this->bus_id->ViewValue = null;
-                }
-            }
-            $this->bus_id->ViewCustomAttributes = "";
-        } else {
-            $this->bus_id->PlaceHolder = RemoveHtml($this->bus_id->caption());
-        }
+        $this->bus_id->PlaceHolder = RemoveHtml($this->bus_id->caption());
 
         // created_by
         $this->created_by->EditAttrs["class"] = "form-control";
@@ -1237,6 +1256,15 @@ SORTHTML;
         $this->ts_last_update->EditCustomAttributes = "";
         $this->ts_last_update->EditValue = FormatDateTime($this->ts_last_update->CurrentValue, 8);
         $this->ts_last_update->PlaceHolder = RemoveHtml($this->ts_last_update->caption());
+
+        // vendor_id
+        $this->vendor_id->EditAttrs["class"] = "form-control";
+        $this->vendor_id->EditCustomAttributes = "";
+        if (!$Security->isAdmin() && $Security->isLoggedIn() && !$this->userIDAllow("info")) { // Non system admin
+        } else {
+            $this->vendor_id->EditValue = $this->vendor_id->CurrentValue;
+            $this->vendor_id->PlaceHolder = RemoveHtml($this->vendor_id->caption());
+        }
 
         // Call Row Rendered event
         $this->rowRendered();
@@ -1268,6 +1296,7 @@ SORTHTML;
                 if ($exportPageType == "view") {
                     $doc->exportCaption($this->transaction_id);
                     $doc->exportCaption($this->bus_id);
+                    $doc->exportCaption($this->vendor_id);
                 } else {
                     $doc->exportCaption($this->id);
                     $doc->exportCaption($this->transaction_id);
@@ -1275,6 +1304,7 @@ SORTHTML;
                     $doc->exportCaption($this->created_by);
                     $doc->exportCaption($this->ts_created);
                     $doc->exportCaption($this->ts_last_update);
+                    $doc->exportCaption($this->vendor_id);
                 }
                 $doc->endExportRow();
             }
@@ -1306,6 +1336,7 @@ SORTHTML;
                     if ($exportPageType == "view") {
                         $doc->exportField($this->transaction_id);
                         $doc->exportField($this->bus_id);
+                        $doc->exportField($this->vendor_id);
                     } else {
                         $doc->exportField($this->id);
                         $doc->exportField($this->transaction_id);
@@ -1313,6 +1344,7 @@ SORTHTML;
                         $doc->exportField($this->created_by);
                         $doc->exportField($this->ts_created);
                         $doc->exportField($this->ts_last_update);
+                        $doc->exportField($this->vendor_id);
                     }
                     $doc->endExportRow($rowCnt);
                 }
@@ -1327,6 +1359,83 @@ SORTHTML;
         if (!$doc->ExportCustom) {
             $doc->exportTableFooter();
         }
+    }
+
+    // Add User ID filter
+    public function addUserIDFilter($filter = "")
+    {
+        global $Security;
+        $filterWrk = "";
+        $id = (CurrentPageID() == "list") ? $this->CurrentAction : CurrentPageID();
+        if (!$this->userIDAllow($id) && !$Security->isAdmin()) {
+            $filterWrk = $Security->userIdList();
+            if ($filterWrk != "") {
+                $filterWrk = '(select 
+ (select 
+  main_campaigns.vendor_id 
+  from main_campaigns where main_transactions.campaign_id = main_campaigns.id
+ ) as vendor_id
+ from main_transactions where sub_transaction_details.transaction_id = main_transactions.id
+) IN (' . $filterWrk . ')';
+            }
+        }
+
+        // Call User ID Filtering event
+        $this->userIdFiltering($filterWrk);
+        AddFilter($filter, $filterWrk);
+        return $filter;
+    }
+
+    // User ID subquery
+    public function getUserIDSubquery(&$fld, &$masterfld)
+    {
+        global $UserTable;
+        $wrk = "";
+        $sql = "SELECT " . $masterfld->Expression . " FROM \"sub_transaction_details\"";
+        $filter = $this->addUserIDFilter("");
+        if ($filter != "") {
+            $sql .= " WHERE " . $filter;
+        }
+
+        // List all values
+        if ($rs = Conn($UserTable->Dbid)->executeQuery($sql)->fetchAll(\PDO::FETCH_NUM)) {
+            foreach ($rs as $row) {
+                if ($wrk != "") {
+                    $wrk .= ",";
+                }
+                $wrk .= QuotedValue($row[0], $masterfld->DataType, Config("USER_TABLE_DBID"));
+            }
+        }
+        if ($wrk != "") {
+            $wrk = $fld->Expression . " IN (" . $wrk . ")";
+        } else { // No User ID value found
+            $wrk = "0=1";
+        }
+        return $wrk;
+    }
+
+    // Add master User ID filter
+    public function addMasterUserIDFilter($filter, $currentMasterTable)
+    {
+        $filterWrk = $filter;
+        if ($currentMasterTable == "main_transactions") {
+            $filterWrk = Container("main_transactions")->addUserIDFilter($filterWrk);
+        }
+        return $filterWrk;
+    }
+
+    // Add detail User ID filter
+    public function addDetailUserIDFilter($filter, $currentMasterTable)
+    {
+        $filterWrk = $filter;
+        if ($currentMasterTable == "main_transactions") {
+            $mastertable = Container("main_transactions");
+            if (!$mastertable->userIdAllow()) {
+                $subqueryWrk = $mastertable->getUserIDSubquery($this->transaction_id, $mastertable->id);
+                AddFilter($filterWrk, $subqueryWrk);
+            }
+        }
+        return $filterWrk;
     }
 
     // Get file data

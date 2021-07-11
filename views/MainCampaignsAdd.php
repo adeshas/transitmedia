@@ -106,7 +106,7 @@ loadjs.ready("head", function () {
 <script>
 loadjs.ready("head", function () {
     // Client script
-    var ext;$("#x_end_date").parent().on("change.datetimepicker",(function({date:e,oldDate:t}){var a=$("#x_start_date").parent().datetimepicker("date"),i=e;if(moment.isMoment(a)&&moment.isMoment(i)&&i.isAfter(a)){var r=i.diff(a,"days");$("#x_end_date_help").text(r+" days")}else $("#x_end_date_help").text("Please correct the dates")})),$("#x_start_date").parent().on("change.datetimepicker",(function({date:e,oldDate:t}){ext=e,console.log(e,ext),moment.isMoment(e)&&$("#x_end_date").parent().datetimepicker("date",e.add(30,"days"))})),$("#x_quantity").on("keyup keypress blur change",(function(){var e=parseInt($("#x_quantity").val()),t=parseInt($("#x_price_id").val());if(e&&t){var a="<iframe id='price-preview2' title='price-preview2' width='300' height='250' frameborder='0' hspace='0' vspace='0' marginheight='0' marginwidth='0' scrolling='no' height='230' src='"+("spook?price_id="+t+"&quantity="+e+"&html=1")+"'></iframe>";$(".price-preview").html(a)}else $(".price-preview").html("<div></div>")}));
+    var ext;$("#x_end_date").parent().on("change.datetimepicker",(function({date:e,oldDate:t}){var a=$("#x_start_date").parent().datetimepicker("date"),i=e;if(moment.isMoment(a)&&moment.isMoment(i)&&i.isAfter(a)){var r=i.diff(a,"days");$("#x_end_date_help").text(r+" days")}else $("#x_end_date_help").text("Please correct the dates")})),$("#x_start_date").parent().on("change.datetimepicker",(function({date:e,oldDate:t}){ext=e,console.log(e,ext),moment.isMoment(e)&&$("#x_end_date").parent().datetimepicker("date",e.add(30,"days"))})),$("#x_quantity").on("keyup keypress blur change",(function(){var e=parseInt($("#x_quantity").val()),t=parseInt($("#x_price_id").val());if(e&&t){var a="<iframe id='price-preview2' title='price-preview2' width='300' height='300' frameborder='0' hspace='0' vspace='0' marginheight='0' marginwidth='0' scrolling='no' height='230' src='"+("spook?price_id="+t+"&quantity="+e+"&html=1")+"'></iframe>";$(".price-preview").html(a)}else $(".price-preview").html("<div></div>")}));
 });
 </script>
 <?php $Page->showPageHeader(); ?>
@@ -511,86 +511,28 @@ loadjs.ready("head", function() {
     </div>
 <?php } ?>
 </div><!-- /page* -->
+<?php
+    if (in_array("sub_media_allocation", explode(",", $Page->getCurrentDetailTable())) && $sub_media_allocation->DetailAdd) {
+?>
 <?php if ($Page->getCurrentDetailTable() != "") { ?>
-<?php
-    $Page->DetailPages->ValidKeys = explode(",", $Page->getCurrentDetailTable());
-    $firstActiveDetailTable = $Page->DetailPages->activePageIndex();
-?>
-<div class="ew-detail-pages"><!-- detail-pages -->
-<div class="ew-nav-tabs" id="Page_details"><!-- tabs -->
-    <ul class="<?= $Page->DetailPages->navStyle() ?>"><!-- .nav -->
-<?php
-    if (in_array("sub_media_allocation", explode(",", $Page->getCurrentDetailTable())) && $sub_media_allocation->DetailAdd) {
-        if ($firstActiveDetailTable == "" || $firstActiveDetailTable == "sub_media_allocation") {
-            $firstActiveDetailTable = "sub_media_allocation";
-        }
-?>
-        <li class="nav-item"><a class="nav-link <?= $Page->DetailPages->pageStyle("sub_media_allocation") ?>" href="#tab_sub_media_allocation" data-toggle="tab"><?= $Language->tablePhrase("sub_media_allocation", "TblCaption") ?></a></li>
-<?php
-    }
-?>
-<?php
-    if (in_array("main_buses", explode(",", $Page->getCurrentDetailTable())) && $main_buses->DetailAdd) {
-        if ($firstActiveDetailTable == "" || $firstActiveDetailTable == "main_buses") {
-            $firstActiveDetailTable = "main_buses";
-        }
-?>
-        <li class="nav-item"><a class="nav-link <?= $Page->DetailPages->pageStyle("main_buses") ?>" href="#tab_main_buses" data-toggle="tab"><?= $Language->tablePhrase("main_buses", "TblCaption") ?></a></li>
-<?php
-    }
-?>
-<?php
-    if (in_array("main_transactions", explode(",", $Page->getCurrentDetailTable())) && $main_transactions->DetailAdd) {
-        if ($firstActiveDetailTable == "" || $firstActiveDetailTable == "main_transactions") {
-            $firstActiveDetailTable = "main_transactions";
-        }
-?>
-        <li class="nav-item"><a class="nav-link <?= $Page->DetailPages->pageStyle("main_transactions") ?>" href="#tab_main_transactions" data-toggle="tab"><?= $Language->tablePhrase("main_transactions", "TblCaption") ?></a></li>
-<?php
-    }
-?>
-    </ul><!-- /.nav -->
-    <div class="tab-content"><!-- .tab-content -->
-<?php
-    if (in_array("sub_media_allocation", explode(",", $Page->getCurrentDetailTable())) && $sub_media_allocation->DetailAdd) {
-        if ($firstActiveDetailTable == "" || $firstActiveDetailTable == "sub_media_allocation") {
-            $firstActiveDetailTable = "sub_media_allocation";
-        }
-?>
-        <div class="tab-pane <?= $Page->DetailPages->pageStyle("sub_media_allocation") ?>" id="tab_sub_media_allocation"><!-- page* -->
+<h4 class="ew-detail-caption"><?= $Language->tablePhrase("sub_media_allocation", "TblCaption") ?></h4>
+<?php } ?>
 <?php include_once "SubMediaAllocationGrid.php" ?>
-        </div><!-- /page* -->
-<?php } ?>
-<?php
-    if (in_array("main_buses", explode(",", $Page->getCurrentDetailTable())) && $main_buses->DetailAdd) {
-        if ($firstActiveDetailTable == "" || $firstActiveDetailTable == "main_buses") {
-            $firstActiveDetailTable = "main_buses";
-        }
-?>
-        <div class="tab-pane <?= $Page->DetailPages->pageStyle("main_buses") ?>" id="tab_main_buses"><!-- page* -->
-<?php include_once "MainBusesGrid.php" ?>
-        </div><!-- /page* -->
 <?php } ?>
 <?php
     if (in_array("main_transactions", explode(",", $Page->getCurrentDetailTable())) && $main_transactions->DetailAdd) {
-        if ($firstActiveDetailTable == "" || $firstActiveDetailTable == "main_transactions") {
-            $firstActiveDetailTable = "main_transactions";
-        }
 ?>
-        <div class="tab-pane <?= $Page->DetailPages->pageStyle("main_transactions") ?>" id="tab_main_transactions"><!-- page* -->
-<?php include_once "MainTransactionsGrid.php" ?>
-        </div><!-- /page* -->
+<?php if ($Page->getCurrentDetailTable() != "") { ?>
+<h4 class="ew-detail-caption"><?= $Language->tablePhrase("main_transactions", "TblCaption") ?></h4>
 <?php } ?>
-    </div><!-- /.tab-content -->
-</div><!-- /tabs -->
-</div><!-- /detail-pages -->
+<?php include_once "MainTransactionsGrid.php" ?>
 <?php } ?>
 <?php if (!$Page->IsModal) { ?>
 <div class="form-group row"><!-- buttons .form-group -->
     <div class="<?= $Page->OffsetColumnClass ?>"><!-- buttons offset -->
 <?php if (!$Page->isConfirm()) { // Confirm page ?>
 <button class="btn btn-primary ew-btn" name="btn-action" id="btn-action" type="submit" onclick="this.form.action.value='confirm';"><?= $Language->phrase("AddBtn") ?></button>
-<button class="btn btn-default ew-btn" name="btn-cancel" id="btn-cancel" type="button" data-href="<?= GetUrl($Page->getReturnUrl()) ?>"><?= $Language->phrase("CancelBtn") ?></button>
+<button class="btn btn-default ew-btn" name="btn-cancel" id="btn-cancel" type="button" data-href="<?= HtmlEncode(GetUrl($Page->getReturnUrl())) ?>"><?= $Language->phrase("CancelBtn") ?></button>
 <?php } else { ?>
 <button class="btn btn-primary ew-btn" name="btn-action" id="btn-action" type="submit"><?= $Language->phrase("ConfirmBtn") ?></button>
 <button class="btn btn-default ew-btn" name="btn-cancel" id="btn-cancel" type="submit" onclick="this.form.action.value='cancel';"><?= $Language->phrase("CancelBtn") ?></button>

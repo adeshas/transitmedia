@@ -24,8 +24,10 @@ loadjs.ready("head", function () {
         ["campaign_id", [fields.campaign_id.required ? ew.Validators.required(fields.campaign_id.caption) : null], fields.campaign_id.isInvalid],
         ["operator_id", [fields.operator_id.required ? ew.Validators.required(fields.operator_id.caption) : null], fields.operator_id.isInvalid],
         ["payment_date", [fields.payment_date.required ? ew.Validators.required(fields.payment_date.caption) : null, ew.Validators.datetime(5)], fields.payment_date.isInvalid],
+        ["vendor_id", [fields.vendor_id.required ? ew.Validators.required(fields.vendor_id.caption) : null, ew.Validators.integer], fields.vendor_id.isInvalid],
         ["price_id", [fields.price_id.required ? ew.Validators.required(fields.price_id.caption) : null], fields.price_id.isInvalid],
         ["quantity", [fields.quantity.required ? ew.Validators.required(fields.quantity.caption) : null, ew.Validators.integer], fields.quantity.isInvalid],
+        ["assigned_buses", [fields.assigned_buses.required ? ew.Validators.required(fields.assigned_buses.caption) : null, ew.Validators.integer], fields.assigned_buses.isInvalid],
         ["start_date", [fields.start_date.required ? ew.Validators.required(fields.start_date.caption) : null, ew.Validators.datetime(5)], fields.start_date.isInvalid],
         ["end_date", [fields.end_date.required ? ew.Validators.required(fields.end_date.caption) : null, ew.Validators.datetime(5)], fields.end_date.isInvalid],
         ["visible_status_id", [fields.visible_status_id.required ? ew.Validators.required(fields.visible_status_id.caption) : null], fields.visible_status_id.isInvalid],
@@ -92,9 +94,13 @@ loadjs.ready("head", function () {
             return false;
         if (ew.valueChanged(fobj, rowIndex, "payment_date", false))
             return false;
+        if (ew.valueChanged(fobj, rowIndex, "vendor_id", false))
+            return false;
         if (ew.valueChanged(fobj, rowIndex, "price_id", false))
             return false;
         if (ew.valueChanged(fobj, rowIndex, "quantity", false))
+            return false;
+        if (ew.valueChanged(fobj, rowIndex, "assigned_buses", false))
             return false;
         if (ew.valueChanged(fobj, rowIndex, "start_date", false))
             return false;
@@ -125,6 +131,7 @@ loadjs.ready("head", function () {
     // Dynamic selection lists
     fmain_transactionsgrid.lists.campaign_id = <?= $Grid->campaign_id->toClientList($Grid) ?>;
     fmain_transactionsgrid.lists.operator_id = <?= $Grid->operator_id->toClientList($Grid) ?>;
+    fmain_transactionsgrid.lists.vendor_id = <?= $Grid->vendor_id->toClientList($Grid) ?>;
     fmain_transactionsgrid.lists.price_id = <?= $Grid->price_id->toClientList($Grid) ?>;
     fmain_transactionsgrid.lists.visible_status_id = <?= $Grid->visible_status_id->toClientList($Grid) ?>;
     fmain_transactionsgrid.lists.status_id = <?= $Grid->status_id->toClientList($Grid) ?>;
@@ -164,7 +171,7 @@ $Grid->ListOptions->render("header", "left");
         <th data-name="id" class="<?= $Grid->id->headerCellClass() ?>"><div id="elh_main_transactions_id" class="main_transactions_id"><?= $Grid->renderSort($Grid->id) ?></div></th>
 <?php } ?>
 <?php if ($Grid->campaign_id->Visible) { // campaign_id ?>
-        <th data-name="campaign_id" class="<?= $Grid->campaign_id->headerCellClass() ?>"><div id="elh_main_transactions_campaign_id" class="main_transactions_campaign_id"><?= $Grid->renderSort($Grid->campaign_id) ?></div></th>
+        <th data-name="campaign_id" class="<?= $Grid->campaign_id->headerCellClass() ?>" style="white-space: nowrap;"><div id="elh_main_transactions_campaign_id" class="main_transactions_campaign_id"><?= $Grid->renderSort($Grid->campaign_id) ?></div></th>
 <?php } ?>
 <?php if ($Grid->operator_id->Visible) { // operator_id ?>
         <th data-name="operator_id" class="<?= $Grid->operator_id->headerCellClass() ?>"><div id="elh_main_transactions_operator_id" class="main_transactions_operator_id"><?= $Grid->renderSort($Grid->operator_id) ?></div></th>
@@ -172,11 +179,17 @@ $Grid->ListOptions->render("header", "left");
 <?php if ($Grid->payment_date->Visible) { // payment_date ?>
         <th data-name="payment_date" class="<?= $Grid->payment_date->headerCellClass() ?>"><div id="elh_main_transactions_payment_date" class="main_transactions_payment_date"><?= $Grid->renderSort($Grid->payment_date) ?></div></th>
 <?php } ?>
+<?php if ($Grid->vendor_id->Visible) { // vendor_id ?>
+        <th data-name="vendor_id" class="<?= $Grid->vendor_id->headerCellClass() ?>" style="white-space: nowrap;"><div id="elh_main_transactions_vendor_id" class="main_transactions_vendor_id"><?= $Grid->renderSort($Grid->vendor_id) ?></div></th>
+<?php } ?>
 <?php if ($Grid->price_id->Visible) { // price_id ?>
-        <th data-name="price_id" class="<?= $Grid->price_id->headerCellClass() ?>"><div id="elh_main_transactions_price_id" class="main_transactions_price_id"><?= $Grid->renderSort($Grid->price_id) ?></div></th>
+        <th data-name="price_id" class="<?= $Grid->price_id->headerCellClass() ?>" style="white-space: nowrap;"><div id="elh_main_transactions_price_id" class="main_transactions_price_id"><?= $Grid->renderSort($Grid->price_id) ?></div></th>
 <?php } ?>
 <?php if ($Grid->quantity->Visible) { // quantity ?>
-        <th data-name="quantity" class="<?= $Grid->quantity->headerCellClass() ?>"><div id="elh_main_transactions_quantity" class="main_transactions_quantity"><?= $Grid->renderSort($Grid->quantity) ?></div></th>
+        <th data-name="quantity" class="<?= $Grid->quantity->headerCellClass() ?>" style="white-space: nowrap;"><div id="elh_main_transactions_quantity" class="main_transactions_quantity"><?= $Grid->renderSort($Grid->quantity) ?></div></th>
+<?php } ?>
+<?php if ($Grid->assigned_buses->Visible) { // assigned_buses ?>
+        <th data-name="assigned_buses" class="<?= $Grid->assigned_buses->headerCellClass() ?>" style="white-space: nowrap;"><div id="elh_main_transactions_assigned_buses" class="main_transactions_assigned_buses"><?= $Grid->renderSort($Grid->assigned_buses) ?></div></th>
 <?php } ?>
 <?php if ($Grid->start_date->Visible) { // start_date ?>
         <th data-name="start_date" class="<?= $Grid->start_date->headerCellClass() ?>"><div id="elh_main_transactions_start_date" class="main_transactions_start_date"><?= $Grid->renderSort($Grid->start_date) ?></div></th>
@@ -197,7 +210,7 @@ $Grid->ListOptions->render("header", "left");
         <th data-name="payment_status_id" class="<?= $Grid->payment_status_id->headerCellClass() ?>"><div id="elh_main_transactions_payment_status_id" class="main_transactions_payment_status_id"><?= $Grid->renderSort($Grid->payment_status_id) ?></div></th>
 <?php } ?>
 <?php if ($Grid->total->Visible) { // total ?>
-        <th data-name="total" class="<?= $Grid->total->headerCellClass() ?>"><div id="elh_main_transactions_total" class="main_transactions_total"><?= $Grid->renderSort($Grid->total) ?></div></th>
+        <th data-name="total" class="<?= $Grid->total->headerCellClass() ?>" style="white-space: nowrap;"><div id="elh_main_transactions_total" class="main_transactions_total"><?= $Grid->renderSort($Grid->total) ?></div></th>
 <?php } ?>
 <?php
 // Render list options (header, right)
@@ -336,6 +349,8 @@ $Grid->ListOptions->render("body", "left", $Grid->RowCount);
 <?php } ?>
 <?php } ?>
 </td>
+    <?php } else { ?>
+            <input type="hidden" data-table="main_transactions" data-field="x_id" data-hidden="1" name="x<?= $Grid->RowIndex ?>_id" id="x<?= $Grid->RowIndex ?>_id" value="<?= HtmlEncode($Grid->id->CurrentValue) ?>">
     <?php } ?>
     <?php if ($Grid->campaign_id->Visible) { // campaign_id ?>
         <td data-name="campaign_id" <?= $Grid->campaign_id->cellAttributes() ?>>
@@ -550,6 +565,117 @@ loadjs.ready(["fmain_transactionsgrid", "datetimepicker"], function() {
 <?php } ?>
 </td>
     <?php } ?>
+    <?php if ($Grid->vendor_id->Visible) { // vendor_id ?>
+        <td data-name="vendor_id" <?= $Grid->vendor_id->cellAttributes() ?>>
+<?php if ($Grid->RowType == ROWTYPE_ADD) { // Add record ?>
+<?php if (!$Security->isAdmin() && $Security->isLoggedIn() && !$Grid->userIDAllow("grid")) { // Non system admin ?>
+<span id="el<?= $Grid->RowCount ?>_main_transactions_vendor_id" class="form-group">
+    <select
+        id="x<?= $Grid->RowIndex ?>_vendor_id"
+        name="x<?= $Grid->RowIndex ?>_vendor_id"
+        class="form-control ew-select<?= $Grid->vendor_id->isInvalidClass() ?>"
+        data-select2-id="main_transactions_x<?= $Grid->RowIndex ?>_vendor_id"
+        data-table="main_transactions"
+        data-field="x_vendor_id"
+        data-value-separator="<?= $Grid->vendor_id->displayValueSeparatorAttribute() ?>"
+        data-placeholder="<?= HtmlEncode($Grid->vendor_id->getPlaceHolder()) ?>"
+        <?= $Grid->vendor_id->editAttributes() ?>>
+        <?= $Grid->vendor_id->selectOptionListHtml("x{$Grid->RowIndex}_vendor_id") ?>
+    </select>
+    <div class="invalid-feedback"><?= $Grid->vendor_id->getErrorMessage() ?></div>
+<?= $Grid->vendor_id->Lookup->getParamTag($Grid, "p_x" . $Grid->RowIndex . "_vendor_id") ?>
+<script>
+loadjs.ready("head", function() {
+    var el = document.querySelector("select[data-select2-id='main_transactions_x<?= $Grid->RowIndex ?>_vendor_id']"),
+        options = { name: "x<?= $Grid->RowIndex ?>_vendor_id", selectId: "main_transactions_x<?= $Grid->RowIndex ?>_vendor_id", language: ew.LANGUAGE_ID, dir: ew.IS_RTL ? "rtl" : "ltr" };
+    options.dropdownParent = $(el).closest("#ew-modal-dialog, #ew-add-opt-dialog")[0];
+    Object.assign(options, ew.vars.tables.main_transactions.fields.vendor_id.selectOptions);
+    ew.createSelect(options);
+});
+</script>
+</span>
+<?php } else { ?>
+<span id="el<?= $Grid->RowCount ?>_main_transactions_vendor_id" class="form-group">
+<?php
+$onchange = $Grid->vendor_id->EditAttrs->prepend("onchange", "");
+$onchange = ($onchange) ? ' onchange="' . JsEncode($onchange) . '"' : '';
+$Grid->vendor_id->EditAttrs["onchange"] = "";
+?>
+<span id="as_x<?= $Grid->RowIndex ?>_vendor_id" class="ew-auto-suggest">
+    <input type="<?= $Grid->vendor_id->getInputTextType() ?>" class="form-control" name="sv_x<?= $Grid->RowIndex ?>_vendor_id" id="sv_x<?= $Grid->RowIndex ?>_vendor_id" value="<?= RemoveHtml($Grid->vendor_id->EditValue) ?>" size="30" placeholder="<?= HtmlEncode($Grid->vendor_id->getPlaceHolder()) ?>" data-placeholder="<?= HtmlEncode($Grid->vendor_id->getPlaceHolder()) ?>"<?= $Grid->vendor_id->editAttributes() ?>>
+</span>
+<input type="hidden" is="selection-list" class="form-control" data-table="main_transactions" data-field="x_vendor_id" data-input="sv_x<?= $Grid->RowIndex ?>_vendor_id" data-value-separator="<?= $Grid->vendor_id->displayValueSeparatorAttribute() ?>" name="x<?= $Grid->RowIndex ?>_vendor_id" id="x<?= $Grid->RowIndex ?>_vendor_id" value="<?= HtmlEncode($Grid->vendor_id->CurrentValue) ?>"<?= $onchange ?>>
+<div class="invalid-feedback"><?= $Grid->vendor_id->getErrorMessage() ?></div>
+<script>
+loadjs.ready(["fmain_transactionsgrid"], function() {
+    fmain_transactionsgrid.createAutoSuggest(Object.assign({"id":"x<?= $Grid->RowIndex ?>_vendor_id","forceSelect":false}, ew.vars.tables.main_transactions.fields.vendor_id.autoSuggestOptions));
+});
+</script>
+<?= $Grid->vendor_id->Lookup->getParamTag($Grid, "p_x" . $Grid->RowIndex . "_vendor_id") ?>
+</span>
+<?php } ?>
+<input type="hidden" data-table="main_transactions" data-field="x_vendor_id" data-hidden="1" name="o<?= $Grid->RowIndex ?>_vendor_id" id="o<?= $Grid->RowIndex ?>_vendor_id" value="<?= HtmlEncode($Grid->vendor_id->OldValue) ?>">
+<?php } ?>
+<?php if ($Grid->RowType == ROWTYPE_EDIT) { // Edit record ?>
+<?php if (!$Security->isAdmin() && $Security->isLoggedIn() && !$Grid->userIDAllow("grid")) { // Non system admin ?>
+<span id="el<?= $Grid->RowCount ?>_main_transactions_vendor_id" class="form-group">
+    <select
+        id="x<?= $Grid->RowIndex ?>_vendor_id"
+        name="x<?= $Grid->RowIndex ?>_vendor_id"
+        class="form-control ew-select<?= $Grid->vendor_id->isInvalidClass() ?>"
+        data-select2-id="main_transactions_x<?= $Grid->RowIndex ?>_vendor_id"
+        data-table="main_transactions"
+        data-field="x_vendor_id"
+        data-value-separator="<?= $Grid->vendor_id->displayValueSeparatorAttribute() ?>"
+        data-placeholder="<?= HtmlEncode($Grid->vendor_id->getPlaceHolder()) ?>"
+        <?= $Grid->vendor_id->editAttributes() ?>>
+        <?= $Grid->vendor_id->selectOptionListHtml("x{$Grid->RowIndex}_vendor_id") ?>
+    </select>
+    <div class="invalid-feedback"><?= $Grid->vendor_id->getErrorMessage() ?></div>
+<?= $Grid->vendor_id->Lookup->getParamTag($Grid, "p_x" . $Grid->RowIndex . "_vendor_id") ?>
+<script>
+loadjs.ready("head", function() {
+    var el = document.querySelector("select[data-select2-id='main_transactions_x<?= $Grid->RowIndex ?>_vendor_id']"),
+        options = { name: "x<?= $Grid->RowIndex ?>_vendor_id", selectId: "main_transactions_x<?= $Grid->RowIndex ?>_vendor_id", language: ew.LANGUAGE_ID, dir: ew.IS_RTL ? "rtl" : "ltr" };
+    options.dropdownParent = $(el).closest("#ew-modal-dialog, #ew-add-opt-dialog")[0];
+    Object.assign(options, ew.vars.tables.main_transactions.fields.vendor_id.selectOptions);
+    ew.createSelect(options);
+});
+</script>
+</span>
+<?php } else { ?>
+<span id="el<?= $Grid->RowCount ?>_main_transactions_vendor_id" class="form-group">
+<?php
+$onchange = $Grid->vendor_id->EditAttrs->prepend("onchange", "");
+$onchange = ($onchange) ? ' onchange="' . JsEncode($onchange) . '"' : '';
+$Grid->vendor_id->EditAttrs["onchange"] = "";
+?>
+<span id="as_x<?= $Grid->RowIndex ?>_vendor_id" class="ew-auto-suggest">
+    <input type="<?= $Grid->vendor_id->getInputTextType() ?>" class="form-control" name="sv_x<?= $Grid->RowIndex ?>_vendor_id" id="sv_x<?= $Grid->RowIndex ?>_vendor_id" value="<?= RemoveHtml($Grid->vendor_id->EditValue) ?>" size="30" placeholder="<?= HtmlEncode($Grid->vendor_id->getPlaceHolder()) ?>" data-placeholder="<?= HtmlEncode($Grid->vendor_id->getPlaceHolder()) ?>"<?= $Grid->vendor_id->editAttributes() ?>>
+</span>
+<input type="hidden" is="selection-list" class="form-control" data-table="main_transactions" data-field="x_vendor_id" data-input="sv_x<?= $Grid->RowIndex ?>_vendor_id" data-value-separator="<?= $Grid->vendor_id->displayValueSeparatorAttribute() ?>" name="x<?= $Grid->RowIndex ?>_vendor_id" id="x<?= $Grid->RowIndex ?>_vendor_id" value="<?= HtmlEncode($Grid->vendor_id->CurrentValue) ?>"<?= $onchange ?>>
+<div class="invalid-feedback"><?= $Grid->vendor_id->getErrorMessage() ?></div>
+<script>
+loadjs.ready(["fmain_transactionsgrid"], function() {
+    fmain_transactionsgrid.createAutoSuggest(Object.assign({"id":"x<?= $Grid->RowIndex ?>_vendor_id","forceSelect":false}, ew.vars.tables.main_transactions.fields.vendor_id.autoSuggestOptions));
+});
+</script>
+<?= $Grid->vendor_id->Lookup->getParamTag($Grid, "p_x" . $Grid->RowIndex . "_vendor_id") ?>
+</span>
+<?php } ?>
+<?php } ?>
+<?php if ($Grid->RowType == ROWTYPE_VIEW) { // View record ?>
+<span id="el<?= $Grid->RowCount ?>_main_transactions_vendor_id">
+<span<?= $Grid->vendor_id->viewAttributes() ?>>
+<?= $Grid->vendor_id->getViewValue() ?></span>
+</span>
+<?php if ($Grid->isConfirm()) { ?>
+<input type="hidden" data-table="main_transactions" data-field="x_vendor_id" data-hidden="1" name="fmain_transactionsgrid$x<?= $Grid->RowIndex ?>_vendor_id" id="fmain_transactionsgrid$x<?= $Grid->RowIndex ?>_vendor_id" value="<?= HtmlEncode($Grid->vendor_id->FormValue) ?>">
+<input type="hidden" data-table="main_transactions" data-field="x_vendor_id" data-hidden="1" name="fmain_transactionsgrid$o<?= $Grid->RowIndex ?>_vendor_id" id="fmain_transactionsgrid$o<?= $Grid->RowIndex ?>_vendor_id" value="<?= HtmlEncode($Grid->vendor_id->OldValue) ?>">
+<?php } ?>
+<?php } ?>
+</td>
+    <?php } ?>
     <?php if ($Grid->price_id->Visible) { // price_id ?>
         <td data-name="price_id" <?= $Grid->price_id->cellAttributes() ?>>
 <?php if ($Grid->RowType == ROWTYPE_ADD) { // Add record ?>
@@ -642,6 +768,33 @@ loadjs.ready("head", function() {
 <?php if ($Grid->isConfirm()) { ?>
 <input type="hidden" data-table="main_transactions" data-field="x_quantity" data-hidden="1" name="fmain_transactionsgrid$x<?= $Grid->RowIndex ?>_quantity" id="fmain_transactionsgrid$x<?= $Grid->RowIndex ?>_quantity" value="<?= HtmlEncode($Grid->quantity->FormValue) ?>">
 <input type="hidden" data-table="main_transactions" data-field="x_quantity" data-hidden="1" name="fmain_transactionsgrid$o<?= $Grid->RowIndex ?>_quantity" id="fmain_transactionsgrid$o<?= $Grid->RowIndex ?>_quantity" value="<?= HtmlEncode($Grid->quantity->OldValue) ?>">
+<?php } ?>
+<?php } ?>
+</td>
+    <?php } ?>
+    <?php if ($Grid->assigned_buses->Visible) { // assigned_buses ?>
+        <td data-name="assigned_buses" <?= $Grid->assigned_buses->cellAttributes() ?>>
+<?php if ($Grid->RowType == ROWTYPE_ADD) { // Add record ?>
+<span id="el<?= $Grid->RowCount ?>_main_transactions_assigned_buses" class="form-group">
+<input type="<?= $Grid->assigned_buses->getInputTextType() ?>" data-table="main_transactions" data-field="x_assigned_buses" name="x<?= $Grid->RowIndex ?>_assigned_buses" id="x<?= $Grid->RowIndex ?>_assigned_buses" size="30" placeholder="<?= HtmlEncode($Grid->assigned_buses->getPlaceHolder()) ?>" value="<?= $Grid->assigned_buses->EditValue ?>"<?= $Grid->assigned_buses->editAttributes() ?>>
+<div class="invalid-feedback"><?= $Grid->assigned_buses->getErrorMessage() ?></div>
+</span>
+<input type="hidden" data-table="main_transactions" data-field="x_assigned_buses" data-hidden="1" name="o<?= $Grid->RowIndex ?>_assigned_buses" id="o<?= $Grid->RowIndex ?>_assigned_buses" value="<?= HtmlEncode($Grid->assigned_buses->OldValue) ?>">
+<?php } ?>
+<?php if ($Grid->RowType == ROWTYPE_EDIT) { // Edit record ?>
+<span id="el<?= $Grid->RowCount ?>_main_transactions_assigned_buses" class="form-group">
+<input type="<?= $Grid->assigned_buses->getInputTextType() ?>" data-table="main_transactions" data-field="x_assigned_buses" name="x<?= $Grid->RowIndex ?>_assigned_buses" id="x<?= $Grid->RowIndex ?>_assigned_buses" size="30" placeholder="<?= HtmlEncode($Grid->assigned_buses->getPlaceHolder()) ?>" value="<?= $Grid->assigned_buses->EditValue ?>"<?= $Grid->assigned_buses->editAttributes() ?>>
+<div class="invalid-feedback"><?= $Grid->assigned_buses->getErrorMessage() ?></div>
+</span>
+<?php } ?>
+<?php if ($Grid->RowType == ROWTYPE_VIEW) { // View record ?>
+<span id="el<?= $Grid->RowCount ?>_main_transactions_assigned_buses">
+<span<?= $Grid->assigned_buses->viewAttributes() ?>>
+<?= $Grid->assigned_buses->getViewValue() ?></span>
+</span>
+<?php if ($Grid->isConfirm()) { ?>
+<input type="hidden" data-table="main_transactions" data-field="x_assigned_buses" data-hidden="1" name="fmain_transactionsgrid$x<?= $Grid->RowIndex ?>_assigned_buses" id="fmain_transactionsgrid$x<?= $Grid->RowIndex ?>_assigned_buses" value="<?= HtmlEncode($Grid->assigned_buses->FormValue) ?>">
+<input type="hidden" data-table="main_transactions" data-field="x_assigned_buses" data-hidden="1" name="fmain_transactionsgrid$o<?= $Grid->RowIndex ?>_assigned_buses" id="fmain_transactionsgrid$o<?= $Grid->RowIndex ?>_assigned_buses" value="<?= HtmlEncode($Grid->assigned_buses->OldValue) ?>">
 <?php } ?>
 <?php } ?>
 </td>
@@ -788,7 +941,12 @@ loadjs.ready("head", function() {
 <?php if ($Grid->RowType == ROWTYPE_VIEW) { // View record ?>
 <span id="el<?= $Grid->RowCount ?>_main_transactions_visible_status_id">
 <span<?= $Grid->visible_status_id->viewAttributes() ?>>
-<?= $Grid->visible_status_id->getViewValue() ?></span>
+<?php if (!EmptyString($Grid->visible_status_id->getViewValue()) && $Grid->visible_status_id->linkAttributes() != "") { ?>
+<a<?= $Grid->visible_status_id->linkAttributes() ?>><?= $Grid->visible_status_id->getViewValue() ?></a>
+<?php } else { ?>
+<?= $Grid->visible_status_id->getViewValue() ?>
+<?php } ?>
+</span>
 </span>
 <?php if ($Grid->isConfirm()) { ?>
 <input type="hidden" data-table="main_transactions" data-field="x_visible_status_id" data-hidden="1" name="fmain_transactionsgrid$x<?= $Grid->RowIndex ?>_visible_status_id" id="fmain_transactionsgrid$x<?= $Grid->RowIndex ?>_visible_status_id" value="<?= HtmlEncode($Grid->visible_status_id->FormValue) ?>">
@@ -857,7 +1015,12 @@ loadjs.ready("head", function() {
 <?php if ($Grid->RowType == ROWTYPE_VIEW) { // View record ?>
 <span id="el<?= $Grid->RowCount ?>_main_transactions_status_id">
 <span<?= $Grid->status_id->viewAttributes() ?>>
-<?= $Grid->status_id->getViewValue() ?></span>
+<?php if (!EmptyString($Grid->status_id->getViewValue()) && $Grid->status_id->linkAttributes() != "") { ?>
+<a<?= $Grid->status_id->linkAttributes() ?>><?= $Grid->status_id->getViewValue() ?></a>
+<?php } else { ?>
+<?= $Grid->status_id->getViewValue() ?>
+<?php } ?>
+</span>
 </span>
 <?php if ($Grid->isConfirm()) { ?>
 <input type="hidden" data-table="main_transactions" data-field="x_status_id" data-hidden="1" name="fmain_transactionsgrid$x<?= $Grid->RowIndex ?>_status_id" id="fmain_transactionsgrid$x<?= $Grid->RowIndex ?>_status_id" value="<?= HtmlEncode($Grid->status_id->FormValue) ?>">
@@ -926,7 +1089,12 @@ loadjs.ready("head", function() {
 <?php if ($Grid->RowType == ROWTYPE_VIEW) { // View record ?>
 <span id="el<?= $Grid->RowCount ?>_main_transactions_print_status_id">
 <span<?= $Grid->print_status_id->viewAttributes() ?>>
-<?= $Grid->print_status_id->getViewValue() ?></span>
+<?php if (!EmptyString($Grid->print_status_id->getViewValue()) && $Grid->print_status_id->linkAttributes() != "") { ?>
+<a<?= $Grid->print_status_id->linkAttributes() ?>><?= $Grid->print_status_id->getViewValue() ?></a>
+<?php } else { ?>
+<?= $Grid->print_status_id->getViewValue() ?>
+<?php } ?>
+</span>
 </span>
 <?php if ($Grid->isConfirm()) { ?>
 <input type="hidden" data-table="main_transactions" data-field="x_print_status_id" data-hidden="1" name="fmain_transactionsgrid$x<?= $Grid->RowIndex ?>_print_status_id" id="fmain_transactionsgrid$x<?= $Grid->RowIndex ?>_print_status_id" value="<?= HtmlEncode($Grid->print_status_id->FormValue) ?>">
@@ -995,7 +1163,12 @@ loadjs.ready("head", function() {
 <?php if ($Grid->RowType == ROWTYPE_VIEW) { // View record ?>
 <span id="el<?= $Grid->RowCount ?>_main_transactions_payment_status_id">
 <span<?= $Grid->payment_status_id->viewAttributes() ?>>
-<?= $Grid->payment_status_id->getViewValue() ?></span>
+<?php if (!EmptyString($Grid->payment_status_id->getViewValue()) && $Grid->payment_status_id->linkAttributes() != "") { ?>
+<a<?= $Grid->payment_status_id->linkAttributes() ?>><?= $Grid->payment_status_id->getViewValue() ?></a>
+<?php } else { ?>
+<?= $Grid->payment_status_id->getViewValue() ?>
+<?php } ?>
+</span>
 </span>
 <?php if ($Grid->isConfirm()) { ?>
 <input type="hidden" data-table="main_transactions" data-field="x_payment_status_id" data-hidden="1" name="fmain_transactionsgrid$x<?= $Grid->RowIndex ?>_payment_status_id" id="fmain_transactionsgrid$x<?= $Grid->RowIndex ?>_payment_status_id" value="<?= HtmlEncode($Grid->payment_status_id->FormValue) ?>">
@@ -1206,6 +1379,65 @@ loadjs.ready(["fmain_transactionsgrid", "datetimepicker"], function() {
 <input type="hidden" data-table="main_transactions" data-field="x_payment_date" data-hidden="1" name="o<?= $Grid->RowIndex ?>_payment_date" id="o<?= $Grid->RowIndex ?>_payment_date" value="<?= HtmlEncode($Grid->payment_date->OldValue) ?>">
 </td>
     <?php } ?>
+    <?php if ($Grid->vendor_id->Visible) { // vendor_id ?>
+        <td data-name="vendor_id">
+<?php if (!$Grid->isConfirm()) { ?>
+<?php if (!$Security->isAdmin() && $Security->isLoggedIn() && !$Grid->userIDAllow("grid")) { // Non system admin ?>
+<span id="el$rowindex$_main_transactions_vendor_id" class="form-group main_transactions_vendor_id">
+    <select
+        id="x<?= $Grid->RowIndex ?>_vendor_id"
+        name="x<?= $Grid->RowIndex ?>_vendor_id"
+        class="form-control ew-select<?= $Grid->vendor_id->isInvalidClass() ?>"
+        data-select2-id="main_transactions_x<?= $Grid->RowIndex ?>_vendor_id"
+        data-table="main_transactions"
+        data-field="x_vendor_id"
+        data-value-separator="<?= $Grid->vendor_id->displayValueSeparatorAttribute() ?>"
+        data-placeholder="<?= HtmlEncode($Grid->vendor_id->getPlaceHolder()) ?>"
+        <?= $Grid->vendor_id->editAttributes() ?>>
+        <?= $Grid->vendor_id->selectOptionListHtml("x{$Grid->RowIndex}_vendor_id") ?>
+    </select>
+    <div class="invalid-feedback"><?= $Grid->vendor_id->getErrorMessage() ?></div>
+<?= $Grid->vendor_id->Lookup->getParamTag($Grid, "p_x" . $Grid->RowIndex . "_vendor_id") ?>
+<script>
+loadjs.ready("head", function() {
+    var el = document.querySelector("select[data-select2-id='main_transactions_x<?= $Grid->RowIndex ?>_vendor_id']"),
+        options = { name: "x<?= $Grid->RowIndex ?>_vendor_id", selectId: "main_transactions_x<?= $Grid->RowIndex ?>_vendor_id", language: ew.LANGUAGE_ID, dir: ew.IS_RTL ? "rtl" : "ltr" };
+    options.dropdownParent = $(el).closest("#ew-modal-dialog, #ew-add-opt-dialog")[0];
+    Object.assign(options, ew.vars.tables.main_transactions.fields.vendor_id.selectOptions);
+    ew.createSelect(options);
+});
+</script>
+</span>
+<?php } else { ?>
+<span id="el$rowindex$_main_transactions_vendor_id" class="form-group main_transactions_vendor_id">
+<?php
+$onchange = $Grid->vendor_id->EditAttrs->prepend("onchange", "");
+$onchange = ($onchange) ? ' onchange="' . JsEncode($onchange) . '"' : '';
+$Grid->vendor_id->EditAttrs["onchange"] = "";
+?>
+<span id="as_x<?= $Grid->RowIndex ?>_vendor_id" class="ew-auto-suggest">
+    <input type="<?= $Grid->vendor_id->getInputTextType() ?>" class="form-control" name="sv_x<?= $Grid->RowIndex ?>_vendor_id" id="sv_x<?= $Grid->RowIndex ?>_vendor_id" value="<?= RemoveHtml($Grid->vendor_id->EditValue) ?>" size="30" placeholder="<?= HtmlEncode($Grid->vendor_id->getPlaceHolder()) ?>" data-placeholder="<?= HtmlEncode($Grid->vendor_id->getPlaceHolder()) ?>"<?= $Grid->vendor_id->editAttributes() ?>>
+</span>
+<input type="hidden" is="selection-list" class="form-control" data-table="main_transactions" data-field="x_vendor_id" data-input="sv_x<?= $Grid->RowIndex ?>_vendor_id" data-value-separator="<?= $Grid->vendor_id->displayValueSeparatorAttribute() ?>" name="x<?= $Grid->RowIndex ?>_vendor_id" id="x<?= $Grid->RowIndex ?>_vendor_id" value="<?= HtmlEncode($Grid->vendor_id->CurrentValue) ?>"<?= $onchange ?>>
+<div class="invalid-feedback"><?= $Grid->vendor_id->getErrorMessage() ?></div>
+<script>
+loadjs.ready(["fmain_transactionsgrid"], function() {
+    fmain_transactionsgrid.createAutoSuggest(Object.assign({"id":"x<?= $Grid->RowIndex ?>_vendor_id","forceSelect":false}, ew.vars.tables.main_transactions.fields.vendor_id.autoSuggestOptions));
+});
+</script>
+<?= $Grid->vendor_id->Lookup->getParamTag($Grid, "p_x" . $Grid->RowIndex . "_vendor_id") ?>
+</span>
+<?php } ?>
+<?php } else { ?>
+<span id="el$rowindex$_main_transactions_vendor_id" class="form-group main_transactions_vendor_id">
+<span<?= $Grid->vendor_id->viewAttributes() ?>>
+<input type="text" readonly class="form-control-plaintext" value="<?= HtmlEncode(RemoveHtml($Grid->vendor_id->getDisplayValue($Grid->vendor_id->ViewValue))) ?>"></span>
+</span>
+<input type="hidden" data-table="main_transactions" data-field="x_vendor_id" data-hidden="1" name="x<?= $Grid->RowIndex ?>_vendor_id" id="x<?= $Grid->RowIndex ?>_vendor_id" value="<?= HtmlEncode($Grid->vendor_id->FormValue) ?>">
+<?php } ?>
+<input type="hidden" data-table="main_transactions" data-field="x_vendor_id" data-hidden="1" name="o<?= $Grid->RowIndex ?>_vendor_id" id="o<?= $Grid->RowIndex ?>_vendor_id" value="<?= HtmlEncode($Grid->vendor_id->OldValue) ?>">
+</td>
+    <?php } ?>
     <?php if ($Grid->price_id->Visible) { // price_id ?>
         <td data-name="price_id">
 <?php if (!$Grid->isConfirm()) { ?>
@@ -1259,6 +1491,23 @@ loadjs.ready("head", function() {
 <input type="hidden" data-table="main_transactions" data-field="x_quantity" data-hidden="1" name="x<?= $Grid->RowIndex ?>_quantity" id="x<?= $Grid->RowIndex ?>_quantity" value="<?= HtmlEncode($Grid->quantity->FormValue) ?>">
 <?php } ?>
 <input type="hidden" data-table="main_transactions" data-field="x_quantity" data-hidden="1" name="o<?= $Grid->RowIndex ?>_quantity" id="o<?= $Grid->RowIndex ?>_quantity" value="<?= HtmlEncode($Grid->quantity->OldValue) ?>">
+</td>
+    <?php } ?>
+    <?php if ($Grid->assigned_buses->Visible) { // assigned_buses ?>
+        <td data-name="assigned_buses">
+<?php if (!$Grid->isConfirm()) { ?>
+<span id="el$rowindex$_main_transactions_assigned_buses" class="form-group main_transactions_assigned_buses">
+<input type="<?= $Grid->assigned_buses->getInputTextType() ?>" data-table="main_transactions" data-field="x_assigned_buses" name="x<?= $Grid->RowIndex ?>_assigned_buses" id="x<?= $Grid->RowIndex ?>_assigned_buses" size="30" placeholder="<?= HtmlEncode($Grid->assigned_buses->getPlaceHolder()) ?>" value="<?= $Grid->assigned_buses->EditValue ?>"<?= $Grid->assigned_buses->editAttributes() ?>>
+<div class="invalid-feedback"><?= $Grid->assigned_buses->getErrorMessage() ?></div>
+</span>
+<?php } else { ?>
+<span id="el$rowindex$_main_transactions_assigned_buses" class="form-group main_transactions_assigned_buses">
+<span<?= $Grid->assigned_buses->viewAttributes() ?>>
+<input type="text" readonly class="form-control-plaintext" value="<?= HtmlEncode(RemoveHtml($Grid->assigned_buses->getDisplayValue($Grid->assigned_buses->ViewValue))) ?>"></span>
+</span>
+<input type="hidden" data-table="main_transactions" data-field="x_assigned_buses" data-hidden="1" name="x<?= $Grid->RowIndex ?>_assigned_buses" id="x<?= $Grid->RowIndex ?>_assigned_buses" value="<?= HtmlEncode($Grid->assigned_buses->FormValue) ?>">
+<?php } ?>
+<input type="hidden" data-table="main_transactions" data-field="x_assigned_buses" data-hidden="1" name="o<?= $Grid->RowIndex ?>_assigned_buses" id="o<?= $Grid->RowIndex ?>_assigned_buses" value="<?= HtmlEncode($Grid->assigned_buses->OldValue) ?>">
 </td>
     <?php } ?>
     <?php if ($Grid->start_date->Visible) { // start_date ?>
@@ -1340,7 +1589,12 @@ loadjs.ready("head", function() {
 <?php } else { ?>
 <span id="el$rowindex$_main_transactions_visible_status_id" class="form-group main_transactions_visible_status_id">
 <span<?= $Grid->visible_status_id->viewAttributes() ?>>
-<input type="text" readonly class="form-control-plaintext" value="<?= HtmlEncode(RemoveHtml($Grid->visible_status_id->getDisplayValue($Grid->visible_status_id->ViewValue))) ?>"></span>
+<?php if (!EmptyString($Grid->visible_status_id->ViewValue) && $Grid->visible_status_id->linkAttributes() != "") { ?>
+<a<?= $Grid->visible_status_id->linkAttributes() ?>><input type="text" readonly class="form-control-plaintext" value="<?= HtmlEncode(RemoveHtml($Grid->visible_status_id->getDisplayValue($Grid->visible_status_id->ViewValue))) ?>"></a>
+<?php } else { ?>
+<input type="text" readonly class="form-control-plaintext" value="<?= HtmlEncode(RemoveHtml($Grid->visible_status_id->getDisplayValue($Grid->visible_status_id->ViewValue))) ?>">
+<?php } ?>
+</span>
 </span>
 <input type="hidden" data-table="main_transactions" data-field="x_visible_status_id" data-hidden="1" name="x<?= $Grid->RowIndex ?>_visible_status_id" id="x<?= $Grid->RowIndex ?>_visible_status_id" value="<?= HtmlEncode($Grid->visible_status_id->FormValue) ?>">
 <?php } ?>
@@ -1378,7 +1632,12 @@ loadjs.ready("head", function() {
 <?php } else { ?>
 <span id="el$rowindex$_main_transactions_status_id" class="form-group main_transactions_status_id">
 <span<?= $Grid->status_id->viewAttributes() ?>>
-<input type="text" readonly class="form-control-plaintext" value="<?= HtmlEncode(RemoveHtml($Grid->status_id->getDisplayValue($Grid->status_id->ViewValue))) ?>"></span>
+<?php if (!EmptyString($Grid->status_id->ViewValue) && $Grid->status_id->linkAttributes() != "") { ?>
+<a<?= $Grid->status_id->linkAttributes() ?>><input type="text" readonly class="form-control-plaintext" value="<?= HtmlEncode(RemoveHtml($Grid->status_id->getDisplayValue($Grid->status_id->ViewValue))) ?>"></a>
+<?php } else { ?>
+<input type="text" readonly class="form-control-plaintext" value="<?= HtmlEncode(RemoveHtml($Grid->status_id->getDisplayValue($Grid->status_id->ViewValue))) ?>">
+<?php } ?>
+</span>
 </span>
 <input type="hidden" data-table="main_transactions" data-field="x_status_id" data-hidden="1" name="x<?= $Grid->RowIndex ?>_status_id" id="x<?= $Grid->RowIndex ?>_status_id" value="<?= HtmlEncode($Grid->status_id->FormValue) ?>">
 <?php } ?>
@@ -1416,7 +1675,12 @@ loadjs.ready("head", function() {
 <?php } else { ?>
 <span id="el$rowindex$_main_transactions_print_status_id" class="form-group main_transactions_print_status_id">
 <span<?= $Grid->print_status_id->viewAttributes() ?>>
-<input type="text" readonly class="form-control-plaintext" value="<?= HtmlEncode(RemoveHtml($Grid->print_status_id->getDisplayValue($Grid->print_status_id->ViewValue))) ?>"></span>
+<?php if (!EmptyString($Grid->print_status_id->ViewValue) && $Grid->print_status_id->linkAttributes() != "") { ?>
+<a<?= $Grid->print_status_id->linkAttributes() ?>><input type="text" readonly class="form-control-plaintext" value="<?= HtmlEncode(RemoveHtml($Grid->print_status_id->getDisplayValue($Grid->print_status_id->ViewValue))) ?>"></a>
+<?php } else { ?>
+<input type="text" readonly class="form-control-plaintext" value="<?= HtmlEncode(RemoveHtml($Grid->print_status_id->getDisplayValue($Grid->print_status_id->ViewValue))) ?>">
+<?php } ?>
+</span>
 </span>
 <input type="hidden" data-table="main_transactions" data-field="x_print_status_id" data-hidden="1" name="x<?= $Grid->RowIndex ?>_print_status_id" id="x<?= $Grid->RowIndex ?>_print_status_id" value="<?= HtmlEncode($Grid->print_status_id->FormValue) ?>">
 <?php } ?>
@@ -1454,7 +1718,12 @@ loadjs.ready("head", function() {
 <?php } else { ?>
 <span id="el$rowindex$_main_transactions_payment_status_id" class="form-group main_transactions_payment_status_id">
 <span<?= $Grid->payment_status_id->viewAttributes() ?>>
-<input type="text" readonly class="form-control-plaintext" value="<?= HtmlEncode(RemoveHtml($Grid->payment_status_id->getDisplayValue($Grid->payment_status_id->ViewValue))) ?>"></span>
+<?php if (!EmptyString($Grid->payment_status_id->ViewValue) && $Grid->payment_status_id->linkAttributes() != "") { ?>
+<a<?= $Grid->payment_status_id->linkAttributes() ?>><input type="text" readonly class="form-control-plaintext" value="<?= HtmlEncode(RemoveHtml($Grid->payment_status_id->getDisplayValue($Grid->payment_status_id->ViewValue))) ?>"></a>
+<?php } else { ?>
+<input type="text" readonly class="form-control-plaintext" value="<?= HtmlEncode(RemoveHtml($Grid->payment_status_id->getDisplayValue($Grid->payment_status_id->ViewValue))) ?>">
+<?php } ?>
+</span>
 </span>
 <input type="hidden" data-table="main_transactions" data-field="x_payment_status_id" data-hidden="1" name="x<?= $Grid->RowIndex ?>_payment_status_id" id="x<?= $Grid->RowIndex ?>_payment_status_id" value="<?= HtmlEncode($Grid->payment_status_id->FormValue) ?>">
 <?php } ?>
@@ -1528,6 +1797,11 @@ $Grid->ListOptions->render("footer", "left");
         &nbsp;
         </span></td>
     <?php } ?>
+    <?php if ($Grid->vendor_id->Visible) { // vendor_id ?>
+        <td data-name="vendor_id" class="<?= $Grid->vendor_id->footerCellClass() ?>"><span id="elf_main_transactions_vendor_id" class="main_transactions_vendor_id">
+        &nbsp;
+        </span></td>
+    <?php } ?>
     <?php if ($Grid->price_id->Visible) { // price_id ?>
         <td data-name="price_id" class="<?= $Grid->price_id->footerCellClass() ?>"><span id="elf_main_transactions_price_id" class="main_transactions_price_id">
         &nbsp;
@@ -1537,6 +1811,11 @@ $Grid->ListOptions->render("footer", "left");
         <td data-name="quantity" class="<?= $Grid->quantity->footerCellClass() ?>"><span id="elf_main_transactions_quantity" class="main_transactions_quantity">
         <span class="ew-aggregate"><?= $Language->phrase("TOTAL") ?></span><span class="ew-aggregate-value">
         <?= $Grid->quantity->ViewValue ?></span>
+        </span></td>
+    <?php } ?>
+    <?php if ($Grid->assigned_buses->Visible) { // assigned_buses ?>
+        <td data-name="assigned_buses" class="<?= $Grid->assigned_buses->footerCellClass() ?>"><span id="elf_main_transactions_assigned_buses" class="main_transactions_assigned_buses">
+        &nbsp;
         </span></td>
     <?php } ?>
     <?php if ($Grid->start_date->Visible) { // start_date ?>

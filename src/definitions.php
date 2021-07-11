@@ -22,12 +22,13 @@ return [
     },
     "audit" => function (ContainerInterface $c) {
         $logger = new Logger("audit"); // For audit trail
-        $logger->pushHandler(new AuditTrailHandler("log/audit.log"));
+        $logger->pushHandler(new AuditTrailHandler("audit.log"));
         return $logger;
     },
     "log" => function (ContainerInterface $c) {
+        global $RELATIVE_PATH;
         $logger = new Logger("log");
-        $logger->pushHandler(new RotatingFileHandler("log/log.log"));
+        $logger->pushHandler(new RotatingFileHandler($RELATIVE_PATH . "log.log"));
         return $logger;
     },
     "sqllogger" => function (ContainerInterface $c) {
@@ -48,6 +49,7 @@ return [
     "profile" => \DI\create(UserProfile::class),
     "language" => \DI\create(Language::class),
     "timer" => \DI\create(Timer::class),
+    "session" => \DI\create(HttpSession::class),
 
     // Tables
     "main_buses" => \DI\create(MainBuses::class),
@@ -56,11 +58,12 @@ return [
     "main_transactions" => \DI\create(MainTransactions::class),
     "main_users" => \DI\create(MainUsers::class),
     "spook" => \DI\create(Spook::class),
+    "main_print_orders" => \DI\create(MainPrintOrders::class),
     "sub_media_allocation" => \DI\create(SubMediaAllocation::class),
     "sub_renewal_requests" => \DI\create(SubRenewalRequests::class),
-    "sub_transaction_details" => \DI\create(SubTransactionDetails::class),
     "view_pricing_initial" => \DI\create(ViewPricingInitial::class),
     "welcome" => \DI\create(Welcome::class),
+    "sub_transaction_details" => \DI\create(SubTransactionDetails::class),
     "x_bus_depot" => \DI\create(XBusDepot::class),
     "x_bus_sizes" => \DI\create(XBusSizes::class),
     "x_bus_status" => \DI\create(XBusStatus::class),
@@ -73,11 +76,10 @@ return [
     "x_user_types" => \DI\create(XUserTypes::class),
     "y_inventory" => \DI\create(YInventory::class),
     "y_operators" => \DI\create(YOperators::class),
+    "y_printers" => \DI\create(YPrinters::class),
     "y_platforms" => \DI\create(YPlatforms::class),
     "y_vendors" => \DI\create(YVendors::class),
     "z_core_settings" => \DI\create(ZCoreSettings::class),
-    "z_email_settings" => \DI\create(ZEmailSettings::class),
-    "z_price_settings" => \DI\create(ZPriceSettings::class),
     "view_pricing_all" => \DI\create(ViewPricingAll::class),
     "view_operators_platforms" => \DI\create(ViewOperatorsPlatforms::class),
     "view_pricing_options" => \DI\create(ViewPricingOptions::class),
@@ -96,25 +98,17 @@ return [
     "renewalhandler" => \DI\create(Renewalhandler::class),
     "view_transactions_all" => \DI\create(ViewTransactionsAll::class),
     "view_operators" => \DI\create(ViewOperators::class),
-    "w_vendors_operators" => \DI\create(WVendorsOperators::class),
+    "z_email_settings" => \DI\create(ZEmailSettings::class),
     "view_transactions_per_operator" => \DI\create(ViewTransactionsPerOperator::class),
     "view_transactions_per_platform" => \DI\create(ViewTransactionsPerPlatform::class),
     "view_vendors_operators" => \DI\create(ViewVendorsOperators::class),
     "view_campaigns_pending" => \DI\create(ViewCampaignsPending::class),
     "view_buses_assigned" => \DI\create(ViewBusesAssigned::class),
-    "printers" => \DI\create(Printers::class),
-    "print_orders" => \DI\create(PrintOrders::class),
+    "z_price_settings" => \DI\create(ZPriceSettings::class),
+    "w_vendors_operators" => \DI\create(WVendorsOperators::class),
+    "view_all_buses" => \DI\create(ViewAllBuses::class),
+    "w_managers_platform" => \DI\create(WManagersPlatform::class),
 
     // User table
     "usertable" => \DI\get("main_users"),
-
-    // Detail table pages
-    "SubMediaAllocationGrid" => \DI\create(SubMediaAllocationGrid::class),
-    "MainUsersGrid" => \DI\create(MainUsersGrid::class),
-    "MainBusesGrid" => \DI\create(MainBusesGrid::class),
-    "MainCampaignsGrid" => \DI\create(MainCampaignsGrid::class),
-    "SubTransactionDetailsGrid" => \DI\create(SubTransactionDetailsGrid::class),
-    "YOperatorsGrid" => \DI\create(YOperatorsGrid::class),
-    "MainTransactionsGrid" => \DI\create(MainTransactionsGrid::class),
-    "ViewBusesAssignedGrid" => \DI\create(ViewBusesAssignedGrid::class),
 ];

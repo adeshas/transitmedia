@@ -352,6 +352,7 @@ class SubTransactionDetailsDelete extends SubTransactionDetails
         $this->created_by->Visible = false;
         $this->ts_created->Visible = false;
         $this->ts_last_update->Visible = false;
+        $this->vendor_id->setVisibility();
         $this->hideFieldsForAddEdit();
 
         // Do not use lookup cache
@@ -368,6 +369,7 @@ class SubTransactionDetailsDelete extends SubTransactionDetails
         // Set up lookup cache
         $this->setupLookupOptions($this->transaction_id);
         $this->setupLookupOptions($this->bus_id);
+        $this->setupLookupOptions($this->vendor_id);
 
         // Set up master/detail parameters
         $this->setupMasterParms();
@@ -385,6 +387,25 @@ class SubTransactionDetailsDelete extends SubTransactionDetails
 
         // Set up filter (WHERE Clause)
         $this->CurrentFilter = $filter;
+
+        // Check if valid User ID
+        $conn = $this->getConnection();
+        $sql = $this->getSql($this->CurrentFilter);
+        $rows = $conn->fetchAll($sql);
+        $res = true;
+        foreach ($rows as $row) {
+            $this->loadRowValues($row);
+            if (!$this->showOptionLink("delete")) {
+                $userIdMsg = $Language->phrase("NoDeletePermission");
+                $this->setFailureMessage($userIdMsg);
+                $res = false;
+                break;
+            }
+        }
+        if (!$res) {
+            $this->terminate("subtransactiondetailslist"); // Return to list
+            return;
+        }
 
         // Get action
         if (IsApi()) {
@@ -530,6 +551,7 @@ class SubTransactionDetailsDelete extends SubTransactionDetails
         $this->created_by->setDbValue($row['created_by']);
         $this->ts_created->setDbValue($row['ts_created']);
         $this->ts_last_update->setDbValue($row['ts_last_update']);
+        $this->vendor_id->setDbValue($row['vendor_id']);
     }
 
     // Return a row with default values
@@ -542,6 +564,7 @@ class SubTransactionDetailsDelete extends SubTransactionDetails
         $row['created_by'] = null;
         $row['ts_created'] = null;
         $row['ts_last_update'] = null;
+        $row['vendor_id'] = null;
         return $row;
     }
 
@@ -568,6 +591,8 @@ class SubTransactionDetailsDelete extends SubTransactionDetails
         // ts_created
 
         // ts_last_update
+
+        // vendor_id
         if ($this->RowType == ROWTYPE_VIEW) {
             // id
             $this->id->ViewValue = $this->id->CurrentValue;
@@ -580,7 +605,7 @@ class SubTransactionDetailsDelete extends SubTransactionDetails
                 $this->transaction_id->ViewValue = $this->transaction_id->lookupCacheOption($curVal);
                 if ($this->transaction_id->ViewValue === null) { // Lookup from database
                     $filterWrk = "\"id\"" . SearchString("=", $curVal, DATATYPE_NUMBER, "");
-                    $sqlWrk = $this->transaction_id->Lookup->getSql(false, $filterWrk, '', $this, true);
+                    $sqlWrk = $this->transaction_id->Lookup->getSql(false, $filterWrk, '', $this, true, true);
                     $rswrk = Conn()->executeQuery($sqlWrk)->fetchAll(\PDO::FETCH_BOTH);
                     $ari = count($rswrk);
                     if ($ari > 0) { // Lookup values found
@@ -604,7 +629,7 @@ class SubTransactionDetailsDelete extends SubTransactionDetails
                     $this->bus_id->ViewValue = $this->bus_id->lookupCacheOption($curVal);
                     if ($this->bus_id->ViewValue === null) { // Lookup from database
                         $filterWrk = "\"bus_id\"" . SearchString("=", $curVal, DATATYPE_NUMBER, "");
-                        $sqlWrk = $this->bus_id->Lookup->getSql(false, $filterWrk, '', $this, true);
+                        $sqlWrk = $this->bus_id->Lookup->getSql(false, $filterWrk, '', $this, true, true);
                         $rswrk = Conn()->executeQuery($sqlWrk)->fetchAll(\PDO::FETCH_BOTH);
                         $ari = count($rswrk);
                         if ($ari > 0) { // Lookup values found
@@ -635,6 +660,28 @@ class SubTransactionDetailsDelete extends SubTransactionDetails
             $this->ts_last_update->ViewValue = FormatDateTime($this->ts_last_update->ViewValue, 0);
             $this->ts_last_update->ViewCustomAttributes = "";
 
+            // vendor_id
+            $this->vendor_id->ViewValue = $this->vendor_id->CurrentValue;
+            $curVal = strval($this->vendor_id->CurrentValue);
+            if ($curVal != "") {
+                $this->vendor_id->ViewValue = $this->vendor_id->lookupCacheOption($curVal);
+                if ($this->vendor_id->ViewValue === null) { // Lookup from database
+                    $filterWrk = "\"id\"" . SearchString("=", $curVal, DATATYPE_NUMBER, "");
+                    $sqlWrk = $this->vendor_id->Lookup->getSql(false, $filterWrk, '', $this, true, true);
+                    $rswrk = Conn()->executeQuery($sqlWrk)->fetchAll(\PDO::FETCH_BOTH);
+                    $ari = count($rswrk);
+                    if ($ari > 0) { // Lookup values found
+                        $arwrk = $this->vendor_id->Lookup->renderViewRow($rswrk[0]);
+                        $this->vendor_id->ViewValue = $this->vendor_id->displayValue($arwrk);
+                    } else {
+                        $this->vendor_id->ViewValue = $this->vendor_id->CurrentValue;
+                    }
+                }
+            } else {
+                $this->vendor_id->ViewValue = null;
+            }
+            $this->vendor_id->ViewCustomAttributes = "";
+
             // transaction_id
             $this->transaction_id->LinkCustomAttributes = "";
             $this->transaction_id->HrefValue = "";
@@ -644,6 +691,11 @@ class SubTransactionDetailsDelete extends SubTransactionDetails
             $this->bus_id->LinkCustomAttributes = "";
             $this->bus_id->HrefValue = "";
             $this->bus_id->TooltipValue = "";
+
+            // vendor_id
+            $this->vendor_id->LinkCustomAttributes = "";
+            $this->vendor_id->HrefValue = "";
+            $this->vendor_id->TooltipValue = "";
         }
 
         // Call Row Rendered event
@@ -735,6 +787,16 @@ class SubTransactionDetailsDelete extends SubTransactionDetails
         return $deleteRows;
     }
 
+    // Show link optionally based on User ID
+    protected function showOptionLink($id = "")
+    {
+        global $Security;
+        if ($Security->isLoggedIn() && !$Security->isAdmin() && !$this->userIDAllow($id)) {
+            return $Security->isValidUserID($this->vendor_id->CurrentValue);
+        }
+        return true;
+    }
+
     // Set up master/detail based on QueryString
     protected function setupMasterParms()
     {
@@ -746,20 +808,6 @@ class SubTransactionDetailsDelete extends SubTransactionDetails
                 $validMaster = true;
                 $this->DbMasterFilter = "";
                 $this->DbDetailFilter = "";
-            }
-            if ($masterTblVar == "main_buses") {
-                $validMaster = true;
-                $masterTbl = Container("main_buses");
-                if (($parm = Get("fk_id", Get("bus_id"))) !== null) {
-                    $masterTbl->id->setQueryStringValue($parm);
-                    $this->bus_id->setQueryStringValue($masterTbl->id->QueryStringValue);
-                    $this->bus_id->setSessionValue($this->bus_id->QueryStringValue);
-                    if (!is_numeric($masterTbl->id->QueryStringValue)) {
-                        $validMaster = false;
-                    }
-                } else {
-                    $validMaster = false;
-                }
             }
             if ($masterTblVar == "main_transactions") {
                 $validMaster = true;
@@ -781,20 +829,6 @@ class SubTransactionDetailsDelete extends SubTransactionDetails
                     $validMaster = true;
                     $this->DbMasterFilter = "";
                     $this->DbDetailFilter = "";
-            }
-            if ($masterTblVar == "main_buses") {
-                $validMaster = true;
-                $masterTbl = Container("main_buses");
-                if (($parm = Post("fk_id", Post("bus_id"))) !== null) {
-                    $masterTbl->id->setFormValue($parm);
-                    $this->bus_id->setFormValue($masterTbl->id->FormValue);
-                    $this->bus_id->setSessionValue($this->bus_id->FormValue);
-                    if (!is_numeric($masterTbl->id->FormValue)) {
-                        $validMaster = false;
-                    }
-                } else {
-                    $validMaster = false;
-                }
             }
             if ($masterTblVar == "main_transactions") {
                 $validMaster = true;
@@ -822,11 +856,6 @@ class SubTransactionDetailsDelete extends SubTransactionDetails
             }
 
             // Clear previous master key from Session
-            if ($masterTblVar != "main_buses") {
-                if ($this->bus_id->CurrentValue == "") {
-                    $this->bus_id->setSessionValue("");
-                }
-            }
             if ($masterTblVar != "main_transactions") {
                 if ($this->transaction_id->CurrentValue == "") {
                     $this->transaction_id->setSessionValue("");
@@ -864,6 +893,8 @@ class SubTransactionDetailsDelete extends SubTransactionDetails
                 case "x_transaction_id":
                     break;
                 case "x_bus_id":
+                    break;
+                case "x_vendor_id":
                     break;
                 default:
                     $lookupFilter = "";

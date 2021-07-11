@@ -525,6 +525,48 @@ class ViewTransactionsPerOperatorList extends ViewTransactionsPerOperator
     public function run()
     {
         global $ExportType, $CustomExportType, $ExportFileName, $UserProfile, $Language, $Security, $CurrentForm;
+
+        // Get export parameters
+        $custom = "";
+        if (Param("export") !== null) {
+            $this->Export = Param("export");
+            $custom = Param("custom", "");
+        } elseif (IsPost()) {
+            if (Post("exporttype") !== null) {
+                $this->Export = Post("exporttype");
+            }
+            $custom = Post("custom", "");
+        } elseif (Get("cmd") == "json") {
+            $this->Export = Get("cmd");
+        } else {
+            $this->setExportReturnUrl(CurrentUrl());
+        }
+        $ExportFileName = $this->TableVar; // Get export file, used in header
+
+        // Get custom export parameters
+        if ($this->isExport() && $custom != "") {
+            $this->CustomExport = $this->Export;
+            $this->Export = "print";
+        }
+        $CustomExportType = $this->CustomExport;
+        $ExportType = $this->Export; // Get export parameter, used in header
+
+        // Update Export URLs
+        if (Config("USE_PHPEXCEL")) {
+            $this->ExportExcelCustom = false;
+        }
+        if (Config("USE_PHPWORD")) {
+            $this->ExportWordCustom = false;
+        }
+        if ($this->ExportExcelCustom) {
+            $this->ExportExcelUrl .= "&amp;custom=1";
+        }
+        if ($this->ExportWordCustom) {
+            $this->ExportWordUrl .= "&amp;custom=1";
+        }
+        if ($this->ExportPdfCustom) {
+            $this->ExportPdfUrl .= "&amp;custom=1";
+        }
         $this->CurrentAction = Param("action"); // Set up current action
 
         // Get grid add count
@@ -535,6 +577,9 @@ class ViewTransactionsPerOperatorList extends ViewTransactionsPerOperator
 
         // Set up list options
         $this->setupListOptions();
+
+        // Setup export options
+        $this->setupExportOptions();
         $this->transaction_id->setVisibility();
         $this->campaign->setVisibility();
         $this->payment_date->setVisibility();
@@ -558,6 +603,7 @@ class ViewTransactionsPerOperatorList extends ViewTransactionsPerOperator
         $this->bus_size_id->Visible = false;
         $this->vendor_search_id->Visible = false;
         $this->vendor_search_name->Visible = false;
+        $this->download->setVisibility();
         $this->hideFieldsForAddEdit();
 
         // Global Page Loading event (in userfn*.php)
@@ -739,6 +785,13 @@ class ViewTransactionsPerOperatorList extends ViewTransactionsPerOperator
             $this->setSessionWhere($filter);
             $this->CurrentFilter = "";
         }
+
+        // Export data only
+        if (!$this->CustomExport && in_array($this->Export, array_keys(Config("EXPORT_CLASSES")))) {
+            $this->exportData();
+            $this->terminate();
+            return;
+        }
         if ($this->isGridAdd()) {
             $this->CurrentFilter = "0=1";
             $this->StartRecord = 1;
@@ -893,6 +946,7 @@ class ViewTransactionsPerOperatorList extends ViewTransactionsPerOperator
         $filterList = Concat($filterList, $this->bus_size_id->AdvancedSearch->toJson(), ","); // Field bus_size_id
         $filterList = Concat($filterList, $this->vendor_search_id->AdvancedSearch->toJson(), ","); // Field vendor_search_id
         $filterList = Concat($filterList, $this->vendor_search_name->AdvancedSearch->toJson(), ","); // Field vendor_search_name
+        $filterList = Concat($filterList, $this->download->AdvancedSearch->toJson(), ","); // Field download
         if ($this->BasicSearch->Keyword != "") {
             $wrk = "\"" . Config("TABLE_BASIC_SEARCH") . "\":\"" . JsEncode($this->BasicSearch->Keyword) . "\",\"" . Config("TABLE_BASIC_SEARCH_TYPE") . "\":\"" . JsEncode($this->BasicSearch->Type) . "\"";
             $filterList = Concat($filterList, $wrk, ",");
@@ -1116,6 +1170,14 @@ class ViewTransactionsPerOperatorList extends ViewTransactionsPerOperator
         $this->vendor_search_name->AdvancedSearch->SearchValue2 = @$filter["y_vendor_search_name"];
         $this->vendor_search_name->AdvancedSearch->SearchOperator2 = @$filter["w_vendor_search_name"];
         $this->vendor_search_name->AdvancedSearch->save();
+
+        // Field download
+        $this->download->AdvancedSearch->SearchValue = @$filter["x_download"];
+        $this->download->AdvancedSearch->SearchOperator = @$filter["z_download"];
+        $this->download->AdvancedSearch->SearchCondition = @$filter["v_download"];
+        $this->download->AdvancedSearch->SearchValue2 = @$filter["y_download"];
+        $this->download->AdvancedSearch->SearchOperator2 = @$filter["w_download"];
+        $this->download->AdvancedSearch->save();
         $this->BasicSearch->setKeyword(@$filter[Config("TABLE_BASIC_SEARCH")]);
         $this->BasicSearch->setType(@$filter[Config("TABLE_BASIC_SEARCH_TYPE")]);
     }
@@ -1151,6 +1213,7 @@ class ViewTransactionsPerOperatorList extends ViewTransactionsPerOperator
         $this->buildSearchSql($where, $this->bus_size_id, $default, false); // bus_size_id
         $this->buildSearchSql($where, $this->vendor_search_id, $default, false); // vendor_search_id
         $this->buildSearchSql($where, $this->vendor_search_name, $default, false); // vendor_search_name
+        $this->buildSearchSql($where, $this->download, $default, false); // download
 
         // Set up search parm
         if (!$default && $where != "" && in_array($this->Command, ["", "reset", "resetall"])) {
@@ -1180,6 +1243,7 @@ class ViewTransactionsPerOperatorList extends ViewTransactionsPerOperator
             $this->bus_size_id->AdvancedSearch->save(); // bus_size_id
             $this->vendor_search_id->AdvancedSearch->save(); // vendor_search_id
             $this->vendor_search_name->AdvancedSearch->save(); // vendor_search_name
+            $this->download->AdvancedSearch->save(); // download
         }
         return $where;
     }
@@ -1446,6 +1510,9 @@ class ViewTransactionsPerOperatorList extends ViewTransactionsPerOperator
         if ($this->vendor_search_name->AdvancedSearch->issetSession()) {
             return true;
         }
+        if ($this->download->AdvancedSearch->issetSession()) {
+            return true;
+        }
         return false;
     }
 
@@ -1501,6 +1568,7 @@ class ViewTransactionsPerOperatorList extends ViewTransactionsPerOperator
                 $this->bus_size_id->AdvancedSearch->unsetSession();
                 $this->vendor_search_id->AdvancedSearch->unsetSession();
                 $this->vendor_search_name->AdvancedSearch->unsetSession();
+                $this->download->AdvancedSearch->unsetSession();
     }
 
     // Restore all search parameters
@@ -1535,6 +1603,7 @@ class ViewTransactionsPerOperatorList extends ViewTransactionsPerOperator
                 $this->bus_size_id->AdvancedSearch->load();
                 $this->vendor_search_id->AdvancedSearch->load();
                 $this->vendor_search_name->AdvancedSearch->load();
+                $this->download->AdvancedSearch->load();
     }
 
     // Set up sort parameters
@@ -1556,6 +1625,7 @@ class ViewTransactionsPerOperatorList extends ViewTransactionsPerOperator
             $this->updateSort($this->quantity); // quantity
             $this->updateSort($this->operator_fee); // operator_fee
             $this->updateSort($this->total); // total
+            $this->updateSort($this->download); // download
             $this->setStartRecordNumber(1); // Reset start position
         }
     }
@@ -1622,6 +1692,7 @@ class ViewTransactionsPerOperatorList extends ViewTransactionsPerOperator
                 $this->bus_size_id->setSort("");
                 $this->vendor_search_id->setSort("");
                 $this->vendor_search_name->setSort("");
+                $this->download->setSort("");
             }
 
             // Reset start position
@@ -2082,6 +2153,14 @@ class ViewTransactionsPerOperatorList extends ViewTransactionsPerOperator
                 $this->Command = "search";
             }
         }
+
+        // download
+        if (!$this->isAddOrEdit() && $this->download->AdvancedSearch->get()) {
+            $hasValue = true;
+            if (($this->download->AdvancedSearch->SearchValue != "" || $this->download->AdvancedSearch->SearchValue2 != "") && $this->Command == "") {
+                $this->Command = "search";
+            }
+        }
         return $hasValue;
     }
 
@@ -2176,6 +2255,7 @@ class ViewTransactionsPerOperatorList extends ViewTransactionsPerOperator
         $this->bus_size_id->setDbValue($row['bus_size_id']);
         $this->vendor_search_id->setDbValue($row['vendor_search_id']);
         $this->vendor_search_name->setDbValue($row['vendor_search_name']);
+        $this->download->setDbValue($row['download']);
     }
 
     // Return a row with default values
@@ -2205,6 +2285,7 @@ class ViewTransactionsPerOperatorList extends ViewTransactionsPerOperator
         $row['bus_size_id'] = null;
         $row['vendor_search_id'] = null;
         $row['vendor_search_name'] = null;
+        $row['download'] = null;
         return $row;
     }
 
@@ -2301,6 +2382,9 @@ class ViewTransactionsPerOperatorList extends ViewTransactionsPerOperator
         // vendor_search_name
         $this->vendor_search_name->CellCssStyle = "white-space: nowrap;";
 
+        // download
+        $this->download->CellCssStyle = "white-space: nowrap;";
+
         // Accumulate aggregate value
         if ($this->RowType != ROWTYPE_AGGREGATEINIT && $this->RowType != ROWTYPE_AGGREGATE) {
             if (is_numeric($this->quantity->CurrentValue)) {
@@ -2337,6 +2421,10 @@ class ViewTransactionsPerOperatorList extends ViewTransactionsPerOperator
             $this->bus_size->ViewValue = $this->bus_size->CurrentValue;
             $this->bus_size->ViewCustomAttributes = "";
 
+            // print_stage
+            $this->print_stage->ViewValue = $this->print_stage->CurrentValue;
+            $this->print_stage->ViewCustomAttributes = "";
+
             // vendor
             $this->vendor->ViewValue = $this->vendor->CurrentValue;
             $this->vendor->ViewCustomAttributes = "";
@@ -2351,6 +2439,7 @@ class ViewTransactionsPerOperatorList extends ViewTransactionsPerOperator
 
             // transaction_status
             $this->transaction_status->ViewValue = $this->transaction_status->CurrentValue;
+            $this->transaction_status->CellCssStyle .= "text-align: center;";
             $this->transaction_status->ViewCustomAttributes = 'class="badge bg-success"';
 
             // quantity
@@ -2372,15 +2461,9 @@ class ViewTransactionsPerOperatorList extends ViewTransactionsPerOperator
             $this->total->CellCssStyle .= "text-align: right;";
             $this->total->ViewCustomAttributes = "";
 
-            // start_date
-            $this->start_date->ViewValue = $this->start_date->CurrentValue;
-            $this->start_date->ViewValue = FormatDateTime($this->start_date->ViewValue, 0);
-            $this->start_date->ViewCustomAttributes = "";
-
-            // end_date
-            $this->end_date->ViewValue = $this->end_date->CurrentValue;
-            $this->end_date->ViewValue = FormatDateTime($this->end_date->ViewValue, 0);
-            $this->end_date->ViewCustomAttributes = "";
+            // download
+            $this->download->ViewValue = $this->download->CurrentValue;
+            $this->download->ViewCustomAttributes = "";
 
             // transaction_id
             $this->transaction_id->LinkCustomAttributes = "";
@@ -2450,6 +2533,109 @@ class ViewTransactionsPerOperatorList extends ViewTransactionsPerOperator
             $this->total->LinkCustomAttributes = "";
             $this->total->HrefValue = "";
             $this->total->TooltipValue = "";
+
+            // download
+            $this->download->LinkCustomAttributes = "class='btn btn-block btn-info'";
+            if (!EmptyValue($this->transaction_id->CurrentValue)) {
+                $this->download->HrefValue = "download.php?v=v3.2&id=" . $this->transaction_id->CurrentValue; // Add prefix/suffix
+                $this->download->LinkAttrs["target"] = "_blank"; // Add target
+                if ($this->isExport()) {
+                    $this->download->HrefValue = FullUrl($this->download->HrefValue, "href");
+                }
+            } else {
+                $this->download->HrefValue = "";
+            }
+            $this->download->TooltipValue = "";
+        } elseif ($this->RowType == ROWTYPE_SEARCH) {
+            // transaction_id
+            $this->transaction_id->EditAttrs["class"] = "form-control";
+            $this->transaction_id->EditCustomAttributes = "";
+            $this->transaction_id->EditValue = HtmlEncode($this->transaction_id->AdvancedSearch->SearchValue);
+            $this->transaction_id->PlaceHolder = RemoveHtml($this->transaction_id->caption());
+
+            // campaign
+            $this->campaign->EditAttrs["class"] = "form-control";
+            $this->campaign->EditCustomAttributes = "";
+            $this->campaign->EditValue = HtmlEncode($this->campaign->AdvancedSearch->SearchValue);
+            $this->campaign->PlaceHolder = RemoveHtml($this->campaign->caption());
+
+            // payment_date
+            $this->payment_date->EditAttrs["class"] = "form-control";
+            $this->payment_date->EditCustomAttributes = "";
+            $this->payment_date->EditValue = HtmlEncode(FormatDateTime(UnFormatDateTime($this->payment_date->AdvancedSearch->SearchValue, 0), 8));
+            $this->payment_date->PlaceHolder = RemoveHtml($this->payment_date->caption());
+
+            // inventory
+            $this->inventory->EditAttrs["class"] = "form-control";
+            $this->inventory->EditCustomAttributes = "";
+            $this->inventory->EditValue = HtmlEncode($this->inventory->AdvancedSearch->SearchValue);
+            $this->inventory->PlaceHolder = RemoveHtml($this->inventory->caption());
+
+            // bus_size
+            $this->bus_size->EditAttrs["class"] = "form-control";
+            $this->bus_size->EditCustomAttributes = "";
+            $this->bus_size->EditValue = HtmlEncode($this->bus_size->AdvancedSearch->SearchValue);
+            $this->bus_size->PlaceHolder = RemoveHtml($this->bus_size->caption());
+
+            // vendor
+            $this->vendor->EditAttrs["class"] = "form-control";
+            $this->vendor->EditCustomAttributes = "";
+            if (!$this->vendor->Raw) {
+                $this->vendor->AdvancedSearch->SearchValue = HtmlDecode($this->vendor->AdvancedSearch->SearchValue);
+            }
+            $this->vendor->EditValue = HtmlEncode($this->vendor->AdvancedSearch->SearchValue);
+            $this->vendor->PlaceHolder = RemoveHtml($this->vendor->caption());
+
+            // operator
+            $this->operator->EditAttrs["class"] = "form-control";
+            $this->operator->EditCustomAttributes = "";
+            if (!$this->operator->Raw) {
+                $this->operator->AdvancedSearch->SearchValue = HtmlDecode($this->operator->AdvancedSearch->SearchValue);
+            }
+            $this->operator->EditValue = HtmlEncode($this->operator->AdvancedSearch->SearchValue);
+            $this->operator->PlaceHolder = RemoveHtml($this->operator->caption());
+
+            // platform
+            $this->platform->EditAttrs["class"] = "form-control";
+            $this->platform->EditCustomAttributes = "";
+            if (!$this->platform->Raw) {
+                $this->platform->AdvancedSearch->SearchValue = HtmlDecode($this->platform->AdvancedSearch->SearchValue);
+            }
+            $this->platform->EditValue = HtmlEncode($this->platform->AdvancedSearch->SearchValue);
+            $this->platform->PlaceHolder = RemoveHtml($this->platform->caption());
+
+            // transaction_status
+            $this->transaction_status->EditAttrs["class"] = "form-control";
+            $this->transaction_status->EditCustomAttributes = "";
+            if (!$this->transaction_status->Raw) {
+                $this->transaction_status->AdvancedSearch->SearchValue = HtmlDecode($this->transaction_status->AdvancedSearch->SearchValue);
+            }
+            $this->transaction_status->EditValue = HtmlEncode($this->transaction_status->AdvancedSearch->SearchValue);
+            $this->transaction_status->PlaceHolder = RemoveHtml($this->transaction_status->caption());
+
+            // quantity
+            $this->quantity->EditAttrs["class"] = "form-control";
+            $this->quantity->EditCustomAttributes = "";
+            $this->quantity->EditValue = HtmlEncode($this->quantity->AdvancedSearch->SearchValue);
+            $this->quantity->PlaceHolder = RemoveHtml($this->quantity->caption());
+
+            // operator_fee
+            $this->operator_fee->EditAttrs["class"] = "form-control";
+            $this->operator_fee->EditCustomAttributes = "";
+            $this->operator_fee->EditValue = HtmlEncode($this->operator_fee->AdvancedSearch->SearchValue);
+            $this->operator_fee->PlaceHolder = RemoveHtml($this->operator_fee->caption());
+
+            // total
+            $this->total->EditAttrs["class"] = "form-control";
+            $this->total->EditCustomAttributes = "";
+            $this->total->EditValue = HtmlEncode($this->total->AdvancedSearch->SearchValue);
+            $this->total->PlaceHolder = RemoveHtml($this->total->caption());
+
+            // download
+            $this->download->EditAttrs["class"] = "form-control";
+            $this->download->EditCustomAttributes = "";
+            $this->download->EditValue = HtmlEncode($this->download->AdvancedSearch->SearchValue);
+            $this->download->PlaceHolder = RemoveHtml($this->download->caption());
         } elseif ($this->RowType == ROWTYPE_AGGREGATEINIT) { // Initialize aggregate row
                     $this->quantity->Total = 0; // Initialize total
                     $this->operator_fee->Total = 0; // Initialize total
@@ -2475,6 +2661,9 @@ class ViewTransactionsPerOperatorList extends ViewTransactionsPerOperator
             $this->total->ViewCustomAttributes = "";
             $this->total->HrefValue = ""; // Clear href value
         }
+        if ($this->RowType == ROWTYPE_ADD || $this->RowType == ROWTYPE_EDIT || $this->RowType == ROWTYPE_SEARCH) { // Add/Edit/Search row
+            $this->setupFieldTitles();
+        }
 
         // Call Row Rendered event
         if ($this->RowType != ROWTYPE_AGGREGATEINIT) {
@@ -2488,6 +2677,12 @@ class ViewTransactionsPerOperatorList extends ViewTransactionsPerOperator
         // Check if validation required
         if (!Config("SERVER_VALIDATE")) {
             return true;
+        }
+        if (!CheckDate($this->payment_date->AdvancedSearch->SearchValue)) {
+            $this->payment_date->addErrorMessage($this->payment_date->getErrorMessage(false));
+        }
+        if (!CheckInteger($this->quantity->AdvancedSearch->SearchValue)) {
+            $this->quantity->addErrorMessage($this->quantity->getErrorMessage(false));
         }
 
         // Return validate result
@@ -2528,6 +2723,103 @@ class ViewTransactionsPerOperatorList extends ViewTransactionsPerOperator
         $this->bus_size_id->AdvancedSearch->load();
         $this->vendor_search_id->AdvancedSearch->load();
         $this->vendor_search_name->AdvancedSearch->load();
+        $this->download->AdvancedSearch->load();
+    }
+
+    // Get export HTML tag
+    protected function getExportTag($type, $custom = false)
+    {
+        global $Language;
+        $pageUrl = $this->pageUrl();
+        if (SameText($type, "excel")) {
+            if ($custom) {
+                return "<a href=\"#\" class=\"ew-export-link ew-excel\" title=\"" . HtmlEncode($Language->phrase("ExportToExcelText")) . "\" data-caption=\"" . HtmlEncode($Language->phrase("ExportToExcelText")) . "\" onclick=\"return ew.export(document.fview_transactions_per_operatorlist, '" . $this->ExportExcelUrl . "', 'excel', true);\">" . $Language->phrase("ExportToExcel") . "</a>";
+            } else {
+                return "<a href=\"" . $this->ExportExcelUrl . "\" class=\"ew-export-link ew-excel\" title=\"" . HtmlEncode($Language->phrase("ExportToExcelText")) . "\" data-caption=\"" . HtmlEncode($Language->phrase("ExportToExcelText")) . "\">" . $Language->phrase("ExportToExcel") . "</a>";
+            }
+        } elseif (SameText($type, "word")) {
+            if ($custom) {
+                return "<a href=\"#\" class=\"ew-export-link ew-word\" title=\"" . HtmlEncode($Language->phrase("ExportToWordText")) . "\" data-caption=\"" . HtmlEncode($Language->phrase("ExportToWordText")) . "\" onclick=\"return ew.export(document.fview_transactions_per_operatorlist, '" . $this->ExportWordUrl . "', 'word', true);\">" . $Language->phrase("ExportToWord") . "</a>";
+            } else {
+                return "<a href=\"" . $this->ExportWordUrl . "\" class=\"ew-export-link ew-word\" title=\"" . HtmlEncode($Language->phrase("ExportToWordText")) . "\" data-caption=\"" . HtmlEncode($Language->phrase("ExportToWordText")) . "\">" . $Language->phrase("ExportToWord") . "</a>";
+            }
+        } elseif (SameText($type, "pdf")) {
+            if ($custom) {
+                return "<a href=\"#\" class=\"ew-export-link ew-pdf\" title=\"" . HtmlEncode($Language->phrase("ExportToPDFText")) . "\" data-caption=\"" . HtmlEncode($Language->phrase("ExportToPDFText")) . "\" onclick=\"return ew.export(document.fview_transactions_per_operatorlist, '" . $this->ExportPdfUrl . "', 'pdf', true);\">" . $Language->phrase("ExportToPDF") . "</a>";
+            } else {
+                return "<a href=\"" . $this->ExportPdfUrl . "\" class=\"ew-export-link ew-pdf\" title=\"" . HtmlEncode($Language->phrase("ExportToPDFText")) . "\" data-caption=\"" . HtmlEncode($Language->phrase("ExportToPDFText")) . "\">" . $Language->phrase("ExportToPDF") . "</a>";
+            }
+        } elseif (SameText($type, "html")) {
+            return "<a href=\"" . $this->ExportHtmlUrl . "\" class=\"ew-export-link ew-html\" title=\"" . HtmlEncode($Language->phrase("ExportToHtmlText")) . "\" data-caption=\"" . HtmlEncode($Language->phrase("ExportToHtmlText")) . "\">" . $Language->phrase("ExportToHtml") . "</a>";
+        } elseif (SameText($type, "xml")) {
+            return "<a href=\"" . $this->ExportXmlUrl . "\" class=\"ew-export-link ew-xml\" title=\"" . HtmlEncode($Language->phrase("ExportToXmlText")) . "\" data-caption=\"" . HtmlEncode($Language->phrase("ExportToXmlText")) . "\">" . $Language->phrase("ExportToXml") . "</a>";
+        } elseif (SameText($type, "csv")) {
+            return "<a href=\"" . $this->ExportCsvUrl . "\" class=\"ew-export-link ew-csv\" title=\"" . HtmlEncode($Language->phrase("ExportToCsvText")) . "\" data-caption=\"" . HtmlEncode($Language->phrase("ExportToCsvText")) . "\">" . $Language->phrase("ExportToCsv") . "</a>";
+        } elseif (SameText($type, "email")) {
+            $url = $custom ? ",url:'" . $pageUrl . "export=email&amp;custom=1'" : "";
+            return '<button id="emf_view_transactions_per_operator" class="ew-export-link ew-email" title="' . $Language->phrase("ExportToEmailText") . '" data-caption="' . $Language->phrase("ExportToEmailText") . '" onclick="ew.emailDialogShow({lnk:\'emf_view_transactions_per_operator\', hdr:ew.language.phrase(\'ExportToEmailText\'), f:document.fview_transactions_per_operatorlist, sel:false' . $url . '});">' . $Language->phrase("ExportToEmail") . '</button>';
+        } elseif (SameText($type, "print")) {
+            return "<a href=\"" . $this->ExportPrintUrl . "\" class=\"ew-export-link ew-print\" title=\"" . HtmlEncode($Language->phrase("PrinterFriendlyText")) . "\" data-caption=\"" . HtmlEncode($Language->phrase("PrinterFriendlyText")) . "\">" . $Language->phrase("PrinterFriendly") . "</a>";
+        }
+    }
+
+    // Set up export options
+    protected function setupExportOptions()
+    {
+        global $Language;
+
+        // Printer friendly
+        $item = &$this->ExportOptions->add("print");
+        $item->Body = $this->getExportTag("print");
+        $item->Visible = true;
+
+        // Export to Excel
+        $item = &$this->ExportOptions->add("excel");
+        $item->Body = $this->getExportTag("excel");
+        $item->Visible = true;
+
+        // Export to Word
+        $item = &$this->ExportOptions->add("word");
+        $item->Body = $this->getExportTag("word");
+        $item->Visible = true;
+
+        // Export to Html
+        $item = &$this->ExportOptions->add("html");
+        $item->Body = $this->getExportTag("html");
+        $item->Visible = true;
+
+        // Export to Xml
+        $item = &$this->ExportOptions->add("xml");
+        $item->Body = $this->getExportTag("xml");
+        $item->Visible = false;
+
+        // Export to Csv
+        $item = &$this->ExportOptions->add("csv");
+        $item->Body = $this->getExportTag("csv");
+        $item->Visible = true;
+
+        // Export to Pdf
+        $item = &$this->ExportOptions->add("pdf");
+        $item->Body = $this->getExportTag("pdf");
+        $item->Visible = false;
+
+        // Export to Email
+        $item = &$this->ExportOptions->add("email");
+        $item->Body = $this->getExportTag("email");
+        $item->Visible = false;
+
+        // Drop down button for export
+        $this->ExportOptions->UseButtonGroup = true;
+        $this->ExportOptions->UseDropDownButton = true;
+        if ($this->ExportOptions->UseButtonGroup && IsMobile()) {
+            $this->ExportOptions->UseDropDownButton = true;
+        }
+        $this->ExportOptions->DropDownButtonPhrase = $Language->phrase("ButtonExport");
+
+        // Add group option item
+        $item = &$this->ExportOptions->add($this->ExportOptions->GroupOptionName);
+        $item->Body = "";
+        $item->Visible = false;
     }
 
     // Set up search/sort options
@@ -2571,6 +2863,100 @@ class ViewTransactionsPerOperatorList extends ViewTransactionsPerOperator
         if (!$Security->canSearch()) {
             $this->SearchOptions->hideAllOptions();
             $this->FilterOptions->hideAllOptions();
+        }
+    }
+
+    /**
+    * Export data in HTML/CSV/Word/Excel/XML/Email/PDF format
+    *
+    * @param boolean $return Return the data rather than output it
+    * @return mixed
+    */
+    public function exportData($return = false)
+    {
+        global $Language;
+        $utf8 = SameText(Config("PROJECT_CHARSET"), "utf-8");
+
+        // Load recordset
+        $this->TotalRecords = $this->listRecordCount();
+        $this->StartRecord = 1;
+
+        // Export all
+        if ($this->ExportAll) {
+            set_time_limit(Config("EXPORT_ALL_TIME_LIMIT"));
+            $this->DisplayRecords = $this->TotalRecords;
+            $this->StopRecord = $this->TotalRecords;
+        } else { // Export one page only
+            $this->setupStartRecord(); // Set up start record position
+            // Set the last record to display
+            if ($this->DisplayRecords <= 0) {
+                $this->StopRecord = $this->TotalRecords;
+            } else {
+                $this->StopRecord = $this->StartRecord + $this->DisplayRecords - 1;
+            }
+        }
+        $rs = $this->loadRecordset($this->StartRecord - 1, $this->DisplayRecords <= 0 ? $this->TotalRecords : $this->DisplayRecords);
+        $this->ExportDoc = GetExportDocument($this, "h");
+        $doc = &$this->ExportDoc;
+        if (!$doc) {
+            $this->setFailureMessage($Language->phrase("ExportClassNotFound")); // Export class not found
+        }
+        if (!$rs || !$doc) {
+            RemoveHeader("Content-Type"); // Remove header
+            RemoveHeader("Content-Disposition");
+            $this->showMessage();
+            return;
+        }
+        $this->StartRecord = 1;
+        $this->StopRecord = $this->DisplayRecords <= 0 ? $this->TotalRecords : $this->DisplayRecords;
+
+        // Call Page Exporting server event
+        $this->ExportDoc->ExportCustom = !$this->pageExporting();
+        $header = $this->PageHeader;
+        $this->pageDataRendering($header);
+        $doc->Text .= $header;
+        $this->exportDocument($doc, $rs, $this->StartRecord, $this->StopRecord, "");
+        $footer = $this->PageFooter;
+        $this->pageDataRendered($footer);
+        $doc->Text .= $footer;
+
+        // Close recordset
+        $rs->close();
+
+        // Call Page Exported server event
+        $this->pageExported();
+
+        // Export header and footer
+        $doc->exportHeaderAndFooter();
+
+        // Clean output buffer (without destroying output buffer)
+        $buffer = ob_get_contents(); // Save the output buffer
+        if (!Config("DEBUG") && $buffer) {
+            ob_clean();
+        }
+
+        // Write debug message if enabled
+        if (Config("DEBUG") && !$this->isExport("pdf")) {
+            echo GetDebugMessage();
+        }
+
+        // Output data
+        if ($this->isExport("email")) {
+            // Export-to-email disabled
+        } else {
+            $doc->export();
+            if ($return) {
+                RemoveHeader("Content-Type"); // Remove header
+                RemoveHeader("Content-Disposition");
+                $content = ob_get_contents();
+                if ($content) {
+                    ob_clean();
+                }
+                if ($buffer) {
+                    echo $buffer; // Resume the output buffer
+                }
+                return $content;
+            }
         }
     }
 

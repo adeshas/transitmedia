@@ -7,7 +7,7 @@ $Spook = &$Page;
 ?>
 <?php
 
-require_once 'PrivateFunctions.php';
+require_once 'views/PrivateFunctions.php';
 
 $qty = $_GET["quantity"];
 $price = $_GET["price_id"];

@@ -62,8 +62,14 @@ $Page->showMessage();
 <?php if ($Page->bus_status_id->Visible) { // bus_status_id ?>
         <th class="<?= $Page->bus_status_id->headerCellClass() ?>"><span id="elh_main_buses_bus_status_id" class="main_buses_bus_status_id"><?= $Page->bus_status_id->caption() ?></span></th>
 <?php } ?>
+<?php if ($Page->bus_size_id->Visible) { // bus_size_id ?>
+        <th class="<?= $Page->bus_size_id->headerCellClass() ?>"><span id="elh_main_buses_bus_size_id" class="main_buses_bus_size_id"><?= $Page->bus_size_id->caption() ?></span></th>
+<?php } ?>
 <?php if ($Page->bus_depot_id->Visible) { // bus_depot_id ?>
         <th class="<?= $Page->bus_depot_id->headerCellClass() ?>"><span id="elh_main_buses_bus_depot_id" class="main_buses_bus_depot_id"><?= $Page->bus_depot_id->caption() ?></span></th>
+<?php } ?>
+<?php if ($Page->ts_last_update->Visible) { // ts_last_update ?>
+        <th class="<?= $Page->ts_last_update->headerCellClass() ?>"><span id="elh_main_buses_ts_last_update" class="main_buses_ts_last_update"><?= $Page->ts_last_update->caption() ?></span></th>
 <?php } ?>
     </tr>
     </thead>
@@ -142,11 +148,27 @@ while (!$Page->Recordset->EOF) {
 </span>
 </td>
 <?php } ?>
+<?php if ($Page->bus_size_id->Visible) { // bus_size_id ?>
+        <td <?= $Page->bus_size_id->cellAttributes() ?>>
+<span id="el<?= $Page->RowCount ?>_main_buses_bus_size_id" class="main_buses_bus_size_id">
+<span<?= $Page->bus_size_id->viewAttributes() ?>>
+<?= $Page->bus_size_id->getViewValue() ?></span>
+</span>
+</td>
+<?php } ?>
 <?php if ($Page->bus_depot_id->Visible) { // bus_depot_id ?>
         <td <?= $Page->bus_depot_id->cellAttributes() ?>>
 <span id="el<?= $Page->RowCount ?>_main_buses_bus_depot_id" class="main_buses_bus_depot_id">
 <span<?= $Page->bus_depot_id->viewAttributes() ?>>
 <?= $Page->bus_depot_id->getViewValue() ?></span>
+</span>
+</td>
+<?php } ?>
+<?php if ($Page->ts_last_update->Visible) { // ts_last_update ?>
+        <td <?= $Page->ts_last_update->cellAttributes() ?>>
+<span id="el<?= $Page->RowCount ?>_main_buses_ts_last_update" class="main_buses_ts_last_update">
+<span<?= $Page->ts_last_update->viewAttributes() ?>>
+<?= $Page->ts_last_update->getViewValue() ?></span>
 </span>
 </td>
 <?php } ?>
@@ -162,7 +184,7 @@ $Page->Recordset->close();
 </div>
 <div>
 <button class="btn btn-primary ew-btn" name="btn-action" id="btn-action" type="submit"><?= $Language->phrase("DeleteBtn") ?></button>
-<button class="btn btn-default ew-btn" name="btn-cancel" id="btn-cancel" type="button" data-href="<?= GetUrl($Page->getReturnUrl()) ?>"><?= $Language->phrase("CancelBtn") ?></button>
+<button class="btn btn-default ew-btn" name="btn-cancel" id="btn-cancel" type="button" data-href="<?= HtmlEncode(GetUrl($Page->getReturnUrl())) ?>"><?= $Language->phrase("CancelBtn") ?></button>
 </div>
 </form>
 <?php

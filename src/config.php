@@ -69,6 +69,7 @@ $Language = null; // Language
 $Security = null; // Security
 $UserProfile = null; // User profile
 $CurrentForm = null; // Form
+$Session = null; // Session
 
 // Current language
 $CurrentLanguage = "";
@@ -154,18 +155,23 @@ include_once $RELATIVE_PATH . "src/userlevelsettings.php";
 $CONFIG = [
 
     // Debug
-    "DEBUG" => true, // true to debug
+    "DEBUG" => false, // Enabled
+    "REPORT_ALL_ERRORS" => false, // Treat PHP warnings and notices as errors
+    "LOG_ERROR_TO_FILE" => true, // Log error to file
     "DEBUG_MESSAGE_TEMPLATE" => '<div class="card card-danger ew-debug"><div class="card-header">' .
         '<h3 class="card-title">%t</h3>' .
         '<div class="card-tools"><button type="button" class="btn btn-tool" data-card-widget="collapse"><i class="fas fa-minus"></i></button></div>' .
-        '</div><div class="card-body">%s</div></div>',
+        '</div><div class="card-body">%s</div></div>', // Debug message template
 
     // Environment
     "ENVIRONMENT" => "production",
 
+    // Container
+    "COMPILE_CONTAINER" => false,
+
     // General
     "UNFORMAT_YEAR" => 50, // Unformat year
-    "RANDOM_KEY" => '86y8i89Kyq6e91Y0', // Random key for encryption
+    "RANDOM_KEY" => '08OgxoeJigD361yJ', // Random key for encryption
     "ENCRYPTION_KEY" => '', // Encryption key for data protection
     "PROJECT_STYLESHEET_FILENAME" => "css/test.css", // Project stylesheet file name
     "PROJECT_CHARSET" => "utf-8", // Project charset
@@ -177,8 +183,8 @@ $CONFIG = [
     "CACHE" => false, // Cache
     "LAZY_LOAD" => true, // Lazy loading of images
     "BODY_CLASS" => "hold-transition layout-fixed",
-    "SIDEBAR_CLASS" => "main-sidebar sidebar-light-primary",
-    "NAVBAR_CLASS" => "main-header navbar navbar-expand navbar-white navbar-light border-bottom",
+    "SIDEBAR_CLASS" => "main-sidebar sidebar-dark-primary",
+    "NAVBAR_CLASS" => "main-header navbar navbar-expand navbar-primary navbar-dark",
 
     // Check Token
     "CHECK_TOKEN" => true,
@@ -319,7 +325,7 @@ $CONFIG = [
     "CSRF_PREFIX" => "csrf",
     "ENCRYPTION_ENABLED" => false, // Encryption enabled
     "ADMIN_USER_NAME" => "admin", // Administrator user name
-    "ADMIN_PASSWORD" => "admin", // Administrator password
+    "ADMIN_PASSWORD" => "adminqwerty12345", // Administrator password
     "USE_CUSTOM_LOGIN" => true, // Use custom login
     "ALLOW_LOGIN_BY_URL" => false, // Allow login by URL
     "ALLOW_LOGIN_BY_SESSION" => false, // Allow login by session variables
@@ -376,7 +382,7 @@ $CONFIG = [
     "EMAIL_TEMPLATE_PATH" => "html", // Template path
 
     // Remote file
-    "REMOTE_FILE_PATTERN" => '/^((https?\:)?|ftps?\:|s3:)\/\//i',
+    "REMOTE_FILE_PATTERN" => '/^((https?\:)?|s3:)\/\//i',
 
     // File upload
     "UPLOAD_TEMP_PATH" => "", // Upload temp path (absolute local physical path)
@@ -452,15 +458,15 @@ $CONFIG = [
     "API_EXPORT_CHART_ACTION" => "chart", // API export chart action
     "API_PERMISSIONS_ACTION" => "permissions", // API permissions action
 
-    // URL rewrite // PHP
-    "USE_URL_REWRITE" => true, // Always use URL rewrite
+    // Session-less API actions
+    "SESSIONLESS_API_ACTIONS" => ["file"],
 
     // Image resize
     "THUMBNAIL_CLASS" => "\PHPThumb\GD",
     "RESIZE_OPTIONS" => ["keepAspectRatio" => false, "resizeUp" => !true, "jpegQuality" => 100],
 
     // Audit trail
-    "AUDIT_TRAIL_PATH" => "log/", // Audit trail path (relative to app root)
+    "AUDIT_TRAIL_PATH" => "", // Audit trail path (relative to app root)
 
     // Import records
     "IMPORT_CSV_DELIMITER" => ",", // Import to CSV delimiter
@@ -1009,7 +1015,7 @@ $CONFIG = [
     "COOKIE_CONSENT_BUTTON_CLASS" => "btn btn-dark btn-sm", // CSS class name for cookie consent buttons
 
     // Cookies
-    "COOKIE_EXPIRY_TIME" => time() + 365 * 24 * 60 * 60, // Change cookie expiry time here
+    "COOKIE_EXPIRY_TIME" => time() + 365 * 24 * 60 * 60,
     "COOKIE_HTTP_ONLY" => true,
     "COOKIE_SECURE" => false,
     "COOKIE_SAMESITE" => "Lax",

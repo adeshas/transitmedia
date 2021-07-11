@@ -86,6 +86,17 @@ $main_buses = Container("main_buses");
 </td>
         </tr>
 <?php } ?>
+<?php if ($main_buses->bus_size_id->Visible) { // bus_size_id ?>
+        <tr id="r_bus_size_id">
+            <td class="<?= $main_buses->TableLeftColumnClass ?>"><?= $main_buses->bus_size_id->caption() ?></td>
+            <td <?= $main_buses->bus_size_id->cellAttributes() ?>>
+<span id="el_main_buses_bus_size_id">
+<span<?= $main_buses->bus_size_id->viewAttributes() ?>>
+<?= $main_buses->bus_size_id->getViewValue() ?></span>
+</span>
+</td>
+        </tr>
+<?php } ?>
 <?php if ($main_buses->bus_depot_id->Visible) { // bus_depot_id ?>
         <tr id="r_bus_depot_id">
             <td class="<?= $main_buses->TableLeftColumnClass ?>"><?= $main_buses->bus_depot_id->caption() ?></td>
@@ -93,6 +104,17 @@ $main_buses = Container("main_buses");
 <span id="el_main_buses_bus_depot_id">
 <span<?= $main_buses->bus_depot_id->viewAttributes() ?>>
 <?= $main_buses->bus_depot_id->getViewValue() ?></span>
+</span>
+</td>
+        </tr>
+<?php } ?>
+<?php if ($main_buses->ts_last_update->Visible) { // ts_last_update ?>
+        <tr id="r_ts_last_update">
+            <td class="<?= $main_buses->TableLeftColumnClass ?>"><?= $main_buses->ts_last_update->caption() ?></td>
+            <td <?= $main_buses->ts_last_update->cellAttributes() ?>>
+<span id="el_main_buses_ts_last_update">
+<span<?= $main_buses->ts_last_update->viewAttributes() ?>>
+<?= $main_buses->ts_last_update->getViewValue() ?></span>
 </span>
 </td>
         </tr>

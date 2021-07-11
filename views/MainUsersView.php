@@ -130,6 +130,17 @@ $Page->showMessage();
 </td>
     </tr>
 <?php } ?>
+<?php if ($Page->ts->Visible) { // ts ?>
+    <tr id="r_ts">
+        <td class="<?= $Page->TableLeftColumnClass ?>"><span id="elh_main_users_ts"><?= $Page->ts->caption() ?></span></td>
+        <td data-name="ts" <?= $Page->ts->cellAttributes() ?>>
+<span id="el_main_users_ts">
+<span<?= $Page->ts->viewAttributes() ?>>
+<?= $Page->ts->getViewValue() ?></span>
+</span>
+</td>
+    </tr>
+<?php } ?>
 </table>
 <?php
     if (in_array("main_campaigns", explode(",", $Page->getCurrentDetailTable())) && $main_campaigns->DetailView) {

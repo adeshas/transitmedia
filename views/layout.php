@@ -16,6 +16,7 @@ $basePath = BasePath(true);
 <link rel="stylesheet" type="text/css" href="<?= $basePath ?><?= CssFile(Config("PDF_STYLESHEET_FILENAME")) ?>">
 <?php } ?>
 <?php } ?>
+<?php if (!IsExport() || IsExport("print")) { ?>
 <meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no">
 <link rel="stylesheet" type="text/css" href="<?= $basePath ?>plugins/select2/css/select2.min.css">
 <link rel="stylesheet" type="text/css" href="<?= $basePath ?>plugins/select2-bootstrap4-theme/select2-bootstrap4.min.css">
@@ -67,8 +68,7 @@ Object.assign(ew, {
     API_PROGRESS_ACTION: "<?= Config("API_PROGRESS_ACTION") ?>", // API progress action
     API_EXPORT_CHART_ACTION: "<?= Config("API_EXPORT_CHART_ACTION") ?>", // API export chart action
     API_JWT_AUTHORIZATION_HEADER: "X-Authorization", // API JWT authorization header
-    API_JWT_TOKEN: "", // API JWT token
-    USE_URL_REWRITE: <?= Config("USE_URL_REWRITE") ? "true" : "false" ?>, // URL rewrite
+    API_JWT_TOKEN: "<?= GetJwtToken() ?>", // API JWT token
     MULTIPLE_OPTION_SEPARATOR: "<?= Config("MULTIPLE_OPTION_SEPARATOR") ?>", // Multiple option separator
     AUTO_SUGGEST_MAX_ENTRIES: <?= Config("AUTO_SUGGEST_MAX_ENTRIES") ?>, // Auto-Suggest max entries
     IMAGE_FOLDER: "images/", // Image folder
@@ -283,12 +283,14 @@ ew.ready("head", [ew.PATH_BASE + "ckeditor/ckeditor.js", ew.PATH_BASE + "js/ewed
     {{/if}}
 {{/if}}
 </script>
+<?php } ?>
 <link rel="shortcut icon" type="image/x-icon" href="<?= BasePath() ?>/favicon.ico">
 <link rel="icon" type="image/x-icon" href="<?= BasePath() ?>/favicon.ico">
-<meta name="generator" content="PHPMaker 2021.0.4">
+<meta name="generator" content="PHPMaker 2021.0.6">
 </head>
 <body class="<?= Config("BODY_CLASS") ?>" dir="<?= IsRTL() ? "rtl" : "ltr" ?>">
 <?php if (@!$SkipHeaderFooter) { ?>
+<?php if (!IsExport()) { ?>
 <div class="wrapper ew-layout">
     <!-- Main Header -->
     <!-- Navbar -->
@@ -342,7 +344,9 @@ ew.ready("head", [ew.PATH_BASE + "ckeditor/ckeditor.js", ew.PATH_BASE + "js/ewed
         <section class="content">
         <div class="container-fluid">
 <?php } ?>
+<?php } ?>
 <?= $content ?>
+<?php if (!IsExport()) { ?>
 <?php if (@!$SkipHeaderFooter) { ?>
 <?php
 if (isset($DebugTimer)) {
@@ -463,6 +467,7 @@ if (isset($DebugTimer)) {
 <div id="ew-tooltip"></div>
 <!-- drill down -->
 <div id="ew-drilldown-panel"></div>
+<?php } ?>
 <script>
 loadjs.ready(ew.bundleIds, function() {
     if (!loadjs.isDefined("foot"))

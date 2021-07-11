@@ -761,7 +761,7 @@ class SubMediaAllocationView extends SubMediaAllocation
                 $this->bus_id->ViewValue = $this->bus_id->lookupCacheOption($curVal);
                 if ($this->bus_id->ViewValue === null) { // Lookup from database
                     $filterWrk = "\"id\"" . SearchString("=", $curVal, DATATYPE_NUMBER, "");
-                    $sqlWrk = $this->bus_id->Lookup->getSql(false, $filterWrk, '', $this, true);
+                    $sqlWrk = $this->bus_id->Lookup->getSql(false, $filterWrk, '', $this, true, true);
                     $rswrk = Conn()->executeQuery($sqlWrk)->fetchAll(\PDO::FETCH_BOTH);
                     $ari = count($rswrk);
                     if ($ari > 0) { // Lookup values found
@@ -786,7 +786,7 @@ class SubMediaAllocationView extends SubMediaAllocation
                         return "inventory_id = 3";
                     };
                     $lookupFilter = $lookupFilter->bindTo($this);
-                    $sqlWrk = $this->campaign_id->Lookup->getSql(false, $filterWrk, $lookupFilter, $this, true);
+                    $sqlWrk = $this->campaign_id->Lookup->getSql(false, $filterWrk, $lookupFilter, $this, true, true);
                     $rswrk = Conn()->executeQuery($sqlWrk)->fetchAll(\PDO::FETCH_BOTH);
                     $ari = count($rswrk);
                     if ($ari > 0) { // Lookup values found
@@ -877,20 +877,6 @@ class SubMediaAllocationView extends SubMediaAllocation
                 $this->DbMasterFilter = "";
                 $this->DbDetailFilter = "";
             }
-            if ($masterTblVar == "main_buses") {
-                $validMaster = true;
-                $masterTbl = Container("main_buses");
-                if (($parm = Get("fk_id", Get("bus_id"))) !== null) {
-                    $masterTbl->id->setQueryStringValue($parm);
-                    $this->bus_id->setQueryStringValue($masterTbl->id->QueryStringValue);
-                    $this->bus_id->setSessionValue($this->bus_id->QueryStringValue);
-                    if (!is_numeric($masterTbl->id->QueryStringValue)) {
-                        $validMaster = false;
-                    }
-                } else {
-                    $validMaster = false;
-                }
-            }
             if ($masterTblVar == "main_campaigns") {
                 $validMaster = true;
                 $masterTbl = Container("main_campaigns");
@@ -905,26 +891,26 @@ class SubMediaAllocationView extends SubMediaAllocation
                     $validMaster = false;
                 }
             }
+            if ($masterTblVar == "main_buses") {
+                $validMaster = true;
+                $masterTbl = Container("main_buses");
+                if (($parm = Get("fk_id", Get("bus_id"))) !== null) {
+                    $masterTbl->id->setQueryStringValue($parm);
+                    $this->bus_id->setQueryStringValue($masterTbl->id->QueryStringValue);
+                    $this->bus_id->setSessionValue($this->bus_id->QueryStringValue);
+                    if (!is_numeric($masterTbl->id->QueryStringValue)) {
+                        $validMaster = false;
+                    }
+                } else {
+                    $validMaster = false;
+                }
+            }
         } elseif (($master = Post(Config("TABLE_SHOW_MASTER"), Post(Config("TABLE_MASTER")))) !== null) {
             $masterTblVar = $master;
             if ($masterTblVar == "") {
                     $validMaster = true;
                     $this->DbMasterFilter = "";
                     $this->DbDetailFilter = "";
-            }
-            if ($masterTblVar == "main_buses") {
-                $validMaster = true;
-                $masterTbl = Container("main_buses");
-                if (($parm = Post("fk_id", Post("bus_id"))) !== null) {
-                    $masterTbl->id->setFormValue($parm);
-                    $this->bus_id->setFormValue($masterTbl->id->FormValue);
-                    $this->bus_id->setSessionValue($this->bus_id->FormValue);
-                    if (!is_numeric($masterTbl->id->FormValue)) {
-                        $validMaster = false;
-                    }
-                } else {
-                    $validMaster = false;
-                }
             }
             if ($masterTblVar == "main_campaigns") {
                 $validMaster = true;
@@ -933,6 +919,20 @@ class SubMediaAllocationView extends SubMediaAllocation
                     $masterTbl->id->setFormValue($parm);
                     $this->campaign_id->setFormValue($masterTbl->id->FormValue);
                     $this->campaign_id->setSessionValue($this->campaign_id->FormValue);
+                    if (!is_numeric($masterTbl->id->FormValue)) {
+                        $validMaster = false;
+                    }
+                } else {
+                    $validMaster = false;
+                }
+            }
+            if ($masterTblVar == "main_buses") {
+                $validMaster = true;
+                $masterTbl = Container("main_buses");
+                if (($parm = Post("fk_id", Post("bus_id"))) !== null) {
+                    $masterTbl->id->setFormValue($parm);
+                    $this->bus_id->setFormValue($masterTbl->id->FormValue);
+                    $this->bus_id->setSessionValue($this->bus_id->FormValue);
                     if (!is_numeric($masterTbl->id->FormValue)) {
                         $validMaster = false;
                     }
@@ -953,14 +953,14 @@ class SubMediaAllocationView extends SubMediaAllocation
             }
 
             // Clear previous master key from Session
-            if ($masterTblVar != "main_buses") {
-                if ($this->bus_id->CurrentValue == "") {
-                    $this->bus_id->setSessionValue("");
-                }
-            }
             if ($masterTblVar != "main_campaigns") {
                 if ($this->campaign_id->CurrentValue == "") {
                     $this->campaign_id->setSessionValue("");
+                }
+            }
+            if ($masterTblVar != "main_buses") {
+                if ($this->bus_id->CurrentValue == "") {
+                    $this->bus_id->setSessionValue("");
                 }
             }
         }

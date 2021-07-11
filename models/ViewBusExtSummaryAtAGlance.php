@@ -33,6 +33,8 @@ class ViewBusExtSummaryAtAGlance extends DbTable
     public $maintenance;
     public $total;
     public $last_updated_at;
+    public $platform_id;
+    public $operator_id;
 
     // Page ID
     public $PageID = ""; // To be overridden by subclass
@@ -96,6 +98,24 @@ class ViewBusExtSummaryAtAGlance extends DbTable
         $this->last_updated_at = new DbField('view_bus_ext_summary_at_a_glance', 'view_bus_ext_summary_at_a_glance', 'x_last_updated_at', 'last_updated_at', '"last_updated_at"', '"last_updated_at"', 201, 0, -1, false, '"last_updated_at"', false, false, false, 'FORMATTED TEXT', 'TEXTAREA');
         $this->last_updated_at->Sortable = true; // Allow sort
         $this->Fields['last_updated_at'] = &$this->last_updated_at;
+
+        // platform_id
+        $this->platform_id = new DbField('view_bus_ext_summary_at_a_glance', 'view_bus_ext_summary_at_a_glance', 'x_platform_id', 'platform_id', '"platform_id"', 'CAST("platform_id" AS varchar(255))', 3, 4, -1, false, '"platform_id"', false, false, false, 'FORMATTED TEXT', 'SELECT');
+        $this->platform_id->Sortable = true; // Allow sort
+        $this->platform_id->UsePleaseSelect = true; // Use PleaseSelect by default
+        $this->platform_id->PleaseSelectText = $Language->phrase("PleaseSelect"); // "PleaseSelect" text
+        $this->platform_id->Lookup = new Lookup('platform_id', 'y_platforms', false, 'id', ["name","","",""], [], [], [], [], [], [], '', '');
+        $this->platform_id->DefaultErrorMessage = $Language->phrase("IncorrectInteger");
+        $this->Fields['platform_id'] = &$this->platform_id;
+
+        // operator_id
+        $this->operator_id = new DbField('view_bus_ext_summary_at_a_glance', 'view_bus_ext_summary_at_a_glance', 'x_operator_id', 'operator_id', '"operator_id"', 'CAST("operator_id" AS varchar(255))', 3, 4, -1, false, '"operator_id"', false, false, false, 'FORMATTED TEXT', 'SELECT');
+        $this->operator_id->Sortable = true; // Allow sort
+        $this->operator_id->UsePleaseSelect = true; // Use PleaseSelect by default
+        $this->operator_id->PleaseSelectText = $Language->phrase("PleaseSelect"); // "PleaseSelect" text
+        $this->operator_id->Lookup = new Lookup('operator_id', 'y_operators', false, 'id', ["name","","",""], [], [], [], [], [], [], '', '');
+        $this->operator_id->DefaultErrorMessage = $Language->phrase("IncorrectInteger");
+        $this->Fields['operator_id'] = &$this->operator_id;
     }
 
     // Field Visibility
@@ -505,6 +525,8 @@ class ViewBusExtSummaryAtAGlance extends DbTable
         $this->maintenance->DbValue = $row['maintenance'];
         $this->total->DbValue = $row['total'];
         $this->last_updated_at->DbValue = $row['last_updated_at'];
+        $this->platform_id->DbValue = $row['platform_id'];
+        $this->operator_id->DbValue = $row['operator_id'];
     }
 
     // Delete uploaded files
@@ -545,18 +567,17 @@ class ViewBusExtSummaryAtAGlance extends DbTable
     // Return page URL
     public function getReturnUrl()
     {
+        $referUrl = ReferUrl();
+        $referPageName = ReferPageName();
         $name = PROJECT_NAME . "_" . $this->TableVar . "_" . Config("TABLE_RETURN_URL");
         // Get referer URL automatically
-        if (ReferUrl() != "" && ReferPageName() != CurrentPageName() && ReferPageName() != "login") { // Referer not same page or login page
-            $_SESSION[$name] = ReferUrl(); // Save to Session
+        if ($referUrl != "" && $referPageName != CurrentPageName() && $referPageName != "login") { // Referer not same page or login page
+            $_SESSION[$name] = $referUrl; // Save to Session
         }
-        if (@$_SESSION[$name] != "") {
-            return $_SESSION[$name];
-        } else {
-            return GetUrl("viewbusextsummaryataglancelist");
-        }
+        return $_SESSION[$name] ?? GetUrl("viewbusextsummaryataglancelist");
     }
 
+    // Set return page URL
     public function setReturnUrl($v)
     {
         $_SESSION[PROJECT_NAME . "_" . $this->TableVar . "_" . Config("TABLE_RETURN_URL")] = $v;
@@ -785,6 +806,8 @@ SORTHTML;
         $this->maintenance->setDbValue($row['maintenance']);
         $this->total->setDbValue($row['total']);
         $this->last_updated_at->setDbValue($row['last_updated_at']);
+        $this->platform_id->setDbValue($row['platform_id']);
+        $this->operator_id->setDbValue($row['operator_id']);
     }
 
     // Render list row values
@@ -807,8 +830,14 @@ SORTHTML;
 
         // last_updated_at
 
+        // platform_id
+
+        // operator_id
+
         // brand_status
         $this->brand_status->ViewValue = $this->brand_status->CurrentValue;
+        $this->brand_status->CssClass = "font-weight-bold";
+        $this->brand_status->CellCssStyle .= "text-align: left;";
         $this->brand_status->ViewCustomAttributes = "";
 
         // active
@@ -829,6 +858,48 @@ SORTHTML;
         // last_updated_at
         $this->last_updated_at->ViewValue = $this->last_updated_at->CurrentValue;
         $this->last_updated_at->ViewCustomAttributes = "";
+
+        // platform_id
+        $curVal = strval($this->platform_id->CurrentValue);
+        if ($curVal != "") {
+            $this->platform_id->ViewValue = $this->platform_id->lookupCacheOption($curVal);
+            if ($this->platform_id->ViewValue === null) { // Lookup from database
+                $filterWrk = "\"id\"" . SearchString("=", $curVal, DATATYPE_NUMBER, "");
+                $sqlWrk = $this->platform_id->Lookup->getSql(false, $filterWrk, '', $this, true, true);
+                $rswrk = Conn()->executeQuery($sqlWrk)->fetchAll(\PDO::FETCH_BOTH);
+                $ari = count($rswrk);
+                if ($ari > 0) { // Lookup values found
+                    $arwrk = $this->platform_id->Lookup->renderViewRow($rswrk[0]);
+                    $this->platform_id->ViewValue = $this->platform_id->displayValue($arwrk);
+                } else {
+                    $this->platform_id->ViewValue = $this->platform_id->CurrentValue;
+                }
+            }
+        } else {
+            $this->platform_id->ViewValue = null;
+        }
+        $this->platform_id->ViewCustomAttributes = "";
+
+        // operator_id
+        $curVal = strval($this->operator_id->CurrentValue);
+        if ($curVal != "") {
+            $this->operator_id->ViewValue = $this->operator_id->lookupCacheOption($curVal);
+            if ($this->operator_id->ViewValue === null) { // Lookup from database
+                $filterWrk = "\"id\"" . SearchString("=", $curVal, DATATYPE_NUMBER, "");
+                $sqlWrk = $this->operator_id->Lookup->getSql(false, $filterWrk, '', $this, true, true);
+                $rswrk = Conn()->executeQuery($sqlWrk)->fetchAll(\PDO::FETCH_BOTH);
+                $ari = count($rswrk);
+                if ($ari > 0) { // Lookup values found
+                    $arwrk = $this->operator_id->Lookup->renderViewRow($rswrk[0]);
+                    $this->operator_id->ViewValue = $this->operator_id->displayValue($arwrk);
+                } else {
+                    $this->operator_id->ViewValue = $this->operator_id->CurrentValue;
+                }
+            }
+        } else {
+            $this->operator_id->ViewValue = null;
+        }
+        $this->operator_id->ViewCustomAttributes = "";
 
         // brand_status
         $this->brand_status->LinkCustomAttributes = "";
@@ -854,6 +925,16 @@ SORTHTML;
         $this->last_updated_at->LinkCustomAttributes = "";
         $this->last_updated_at->HrefValue = "";
         $this->last_updated_at->TooltipValue = "";
+
+        // platform_id
+        $this->platform_id->LinkCustomAttributes = "";
+        $this->platform_id->HrefValue = "";
+        $this->platform_id->TooltipValue = "";
+
+        // operator_id
+        $this->operator_id->LinkCustomAttributes = "";
+        $this->operator_id->HrefValue = "";
+        $this->operator_id->TooltipValue = "";
 
         // Call Row Rendered event
         $this->rowRendered();
@@ -900,6 +981,16 @@ SORTHTML;
         $this->last_updated_at->EditValue = $this->last_updated_at->CurrentValue;
         $this->last_updated_at->PlaceHolder = RemoveHtml($this->last_updated_at->caption());
 
+        // platform_id
+        $this->platform_id->EditAttrs["class"] = "form-control";
+        $this->platform_id->EditCustomAttributes = "";
+        $this->platform_id->PlaceHolder = RemoveHtml($this->platform_id->caption());
+
+        // operator_id
+        $this->operator_id->EditAttrs["class"] = "form-control";
+        $this->operator_id->EditCustomAttributes = "";
+        $this->operator_id->PlaceHolder = RemoveHtml($this->operator_id->caption());
+
         // Call Row Rendered event
         $this->rowRendered();
     }
@@ -907,11 +998,36 @@ SORTHTML;
     // Aggregate list row values
     public function aggregateListRowValues()
     {
+            if (is_numeric($this->active->CurrentValue)) {
+                $this->active->Total += $this->active->CurrentValue; // Accumulate total
+            }
+            if (is_numeric($this->maintenance->CurrentValue)) {
+                $this->maintenance->Total += $this->maintenance->CurrentValue; // Accumulate total
+            }
+            if (is_numeric($this->total->CurrentValue)) {
+                $this->total->Total += $this->total->CurrentValue; // Accumulate total
+            }
     }
 
     // Aggregate list row (for rendering)
     public function aggregateListRow()
     {
+            $this->active->CurrentValue = $this->active->Total;
+            $this->active->ViewValue = $this->active->CurrentValue;
+            $this->active->ViewValue = FormatNumber($this->active->ViewValue, 0, -2, -2, -2);
+            $this->active->ViewCustomAttributes = "";
+            $this->active->HrefValue = ""; // Clear href value
+            $this->maintenance->CurrentValue = $this->maintenance->Total;
+            $this->maintenance->ViewValue = $this->maintenance->CurrentValue;
+            $this->maintenance->ViewValue = FormatNumber($this->maintenance->ViewValue, 0, -2, -2, -2);
+            $this->maintenance->ViewCustomAttributes = "";
+            $this->maintenance->HrefValue = ""; // Clear href value
+            $this->total->CurrentValue = $this->total->Total;
+            $this->total->ViewValue = $this->total->CurrentValue;
+            $this->total->ViewValue = FormatNumber($this->total->ViewValue, 0, -2, -2, -2);
+            $this->total->ViewCustomAttributes = "";
+            $this->total->HrefValue = ""; // Clear href value
+
         // Call Row Rendered event
         $this->rowRendered();
     }
@@ -933,10 +1049,16 @@ SORTHTML;
                     $doc->exportCaption($this->maintenance);
                     $doc->exportCaption($this->total);
                     $doc->exportCaption($this->last_updated_at);
+                    $doc->exportCaption($this->platform_id);
+                    $doc->exportCaption($this->operator_id);
                 } else {
+                    $doc->exportCaption($this->brand_status);
                     $doc->exportCaption($this->active);
                     $doc->exportCaption($this->maintenance);
                     $doc->exportCaption($this->total);
+                    $doc->exportCaption($this->last_updated_at);
+                    $doc->exportCaption($this->platform_id);
+                    $doc->exportCaption($this->operator_id);
                 }
                 $doc->endExportRow();
             }
@@ -958,6 +1080,7 @@ SORTHTML;
                     }
                 }
                 $this->loadListRowValues($row);
+                $this->aggregateListRowValues(); // Aggregate row values
 
                 // Render row
                 $this->RowType = ROWTYPE_VIEW; // Render view
@@ -971,10 +1094,16 @@ SORTHTML;
                         $doc->exportField($this->maintenance);
                         $doc->exportField($this->total);
                         $doc->exportField($this->last_updated_at);
+                        $doc->exportField($this->platform_id);
+                        $doc->exportField($this->operator_id);
                     } else {
+                        $doc->exportField($this->brand_status);
                         $doc->exportField($this->active);
                         $doc->exportField($this->maintenance);
                         $doc->exportField($this->total);
+                        $doc->exportField($this->last_updated_at);
+                        $doc->exportField($this->platform_id);
+                        $doc->exportField($this->operator_id);
                     }
                     $doc->endExportRow($rowCnt);
                 }
@@ -985,6 +1114,24 @@ SORTHTML;
                 $this->rowExport($row);
             }
             $recordset->moveNext();
+        }
+
+        // Export aggregates (horizontal format only)
+        if ($doc->Horizontal) {
+            $this->RowType = ROWTYPE_AGGREGATE;
+            $this->resetAttributes();
+            $this->aggregateListRow();
+            if (!$doc->ExportCustom) {
+                $doc->beginExportRow(-1);
+                $doc->exportAggregate($this->brand_status, '');
+                $doc->exportAggregate($this->active, 'TOTAL');
+                $doc->exportAggregate($this->maintenance, 'TOTAL');
+                $doc->exportAggregate($this->total, 'TOTAL');
+                $doc->exportAggregate($this->last_updated_at, '');
+                $doc->exportAggregate($this->platform_id, '');
+                $doc->exportAggregate($this->operator_id, '');
+                $doc->endExportRow();
+            }
         }
         if (!$doc->ExportCustom) {
             $doc->exportTableFooter();
@@ -999,11 +1146,16 @@ SORTHTML;
     }
 
     // Table level events
-
     // Recordset Selecting event
     public function recordsetSelecting(&$filter)
     {
         // Enter your code here
+        if(Profile()->id){
+        	$number_of_records_found_in_manager_platform_table = ExecuteScalar("SELECT count(*) FROM public.w_managers_platform where user_id = ".Profile()->id);
+        	if(in_array(Profile()->user_type,[1,2,3,4,7]) && $number_of_records_found_in_manager_platform_table > 0){
+           		AddFilter($filter, " platform_id in (SELECT platform_id FROM public.w_managers_platform where user_id = ".Profile()->id.") "); // Add your own filter expression  
+           }
+        }
     }
 
     // Recordset Selected event

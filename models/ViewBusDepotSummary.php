@@ -543,18 +543,17 @@ class ViewBusDepotSummary extends DbTable
     // Return page URL
     public function getReturnUrl()
     {
+        $referUrl = ReferUrl();
+        $referPageName = ReferPageName();
         $name = PROJECT_NAME . "_" . $this->TableVar . "_" . Config("TABLE_RETURN_URL");
         // Get referer URL automatically
-        if (ReferUrl() != "" && ReferPageName() != CurrentPageName() && ReferPageName() != "login") { // Referer not same page or login page
-            $_SESSION[$name] = ReferUrl(); // Save to Session
+        if ($referUrl != "" && $referPageName != CurrentPageName() && $referPageName != "login") { // Referer not same page or login page
+            $_SESSION[$name] = $referUrl; // Save to Session
         }
-        if (@$_SESSION[$name] != "") {
-            return $_SESSION[$name];
-        } else {
-            return GetUrl("viewbusdepotsummarylist");
-        }
+        return $_SESSION[$name] ?? GetUrl("viewbusdepotsummarylist");
     }
 
+    // Set return page URL
     public function setReturnUrl($v)
     {
         $_SESSION[PROJECT_NAME . "_" . $this->TableVar . "_" . Config("TABLE_RETURN_URL")] = $v;
@@ -796,6 +795,7 @@ SORTHTML;
         // Common render codes
 
         // depot
+        $this->depot->CellCssStyle = "white-space: nowrap;";
 
         // total_buses
 
@@ -930,7 +930,11 @@ SORTHTML;
                     $doc->exportCaption($this->good_bus_codes);
                     $doc->exportCaption($this->bad_bus_codes);
                 } else {
+                    $doc->exportCaption($this->depot);
                     $doc->exportCaption($this->total_buses);
+                    $doc->exportCaption($this->bus_codes);
+                    $doc->exportCaption($this->good_bus_codes);
+                    $doc->exportCaption($this->bad_bus_codes);
                 }
                 $doc->endExportRow();
             }
@@ -966,7 +970,11 @@ SORTHTML;
                         $doc->exportField($this->good_bus_codes);
                         $doc->exportField($this->bad_bus_codes);
                     } else {
+                        $doc->exportField($this->depot);
                         $doc->exportField($this->total_buses);
+                        $doc->exportField($this->bus_codes);
+                        $doc->exportField($this->good_bus_codes);
+                        $doc->exportField($this->bad_bus_codes);
                     }
                     $doc->endExportRow($rowCnt);
                 }
@@ -991,11 +999,14 @@ SORTHTML;
     }
 
     // Table level events
-
     // Recordset Selecting event
     public function recordsetSelecting(&$filter)
     {
         // Enter your code here
+        //$number_of_records_found_in_manager_platform_table = ExecuteScalar("SELECT count(*) FROM public.w_managers_platform where user_id = ".Profile()->id);
+        //if(in_array(Profile()->user_type,[1,2,3,4,7]) && $number_of_records_found_in_manager_platform_table > 0){
+        //   AddFilter($filter, " platform_id in (SELECT platform_id FROM public.w_managers_platform where user_id = ".Profile()->id.") "); // Add your own filter expression  
+        //}
     }
 
     // Recordset Selected event

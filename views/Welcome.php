@@ -59,6 +59,62 @@ $Welcome = &$Page;
 <section class="maincontent">
 
 
+
+<div class="welcome-row">
+  <div class="welcome-col-5-empty"></div>
+  <div class="welcome-col-5">
+	  <div class="small-box bg-light">
+			<div class="inner">
+			  <h3>PRIMERO</h3>
+
+			  <p>Primero TSL</br>Buses</p>
+			  <div class="platform-image">
+				  <img src="images/primero_logo.png" />
+			  </div>
+			</div>
+			<div class="icon">
+			  <i class="ion ion-bus"></i>
+			</div>
+			<!-- <button type="button" class="btn btn-block bg-gradient-primary">Create Campaign</button> -->
+			<a class="btn btn-lg btn-block bg-gradient-warning" href="maincampaignsadd?showdetail=&showmaster=y_platforms&fk_id=1">
+				<!-- <i class="fa fa-bullhorn"></i> --> Create Campaign
+			</a>
+			<!-- <a href="exterior_campaignslist.php?cmd=resetall" class="small-box-footer">
+			  More info <i class="fa fa-arrow-circle-right"></i>
+			</a> -->
+		  </div>
+  </div>
+  <div class="welcome-col-5-empty"></div>
+  <div class="welcome-col-5">
+	  <div class="small-box bg-light">
+			<div class="inner">
+			  <h3>LAMATA</h3>
+
+			  <p>Lagos Bus Reform</br>Buses</p>
+			  <div class="platform-image">
+				  <img src="images/lamata_logo.jpg" />
+			  </div>
+			</div>
+			<div class="icon">
+			  <i class="ion ion-person-add"></i>
+			</div>
+			<a class="btn btn-lg btn-block bg-gradient-warning" href="maincampaignsadd?showdetail=&showmaster=y_platforms&fk_id=2">
+				<!-- <i class="fa fa-bullhorn"></i>--> Create Campaign 
+			</a>
+			<!-- <a href="buseslist.php?cmd=resetall" class="small-box-footer">
+			  More info <i class="fa fa-arrow-circle-right"></i>
+			</a> -->
+		  </div>
+  </div>
+  <div class="welcome-col-5-empty"></div>
+</div>
+
+
+
+
+<?php
+/*
+
 	  <!-- Small boxes (Stat box) -->
 	  <div class="row">
 		<div class="col-lg-3 col-xs-6">
@@ -80,7 +136,7 @@ $Welcome = &$Page;
 			  <i class="ion ion-bus"></i>
 			</div>
 			<!-- <button type="button" class="btn btn-block bg-gradient-primary">Create Campaign</button> -->
-			<a class="btn btn-block bg-gradient-warning" href="maincampaignsadd?showdetail=&showmaster=y_platforms&fk_id=1">
+			<a class="btn btn-lg btn-block bg-gradient-warning" href="maincampaignsadd?showdetail=&showmaster=y_platforms&fk_id=1">
 				<!-- <i class="fa fa-bullhorn"></i> --> Create Campaign
 			</a>
 			<!-- <a href="exterior_campaignslist.php?cmd=resetall" class="small-box-footer">
@@ -103,7 +159,7 @@ $Welcome = &$Page;
 			<div class="icon">
 			  <i class="ion ion-person-add"></i>
 			</div>
-			<a class="btn btn-block bg-gradient-warning" href="maincampaignsadd?showdetail=&showmaster=y_platforms&fk_id=2">
+			<a class="btn btn-lg btn-block bg-gradient-warning" href="maincampaignsadd?showdetail=&showmaster=y_platforms&fk_id=2">
 				<!-- <i class="fa fa-bullhorn"></i>--> Create Campaign 
 			</a>
 			<!-- <a href="buseslist.php?cmd=resetall" class="small-box-footer">
@@ -118,7 +174,7 @@ $Welcome = &$Page;
 		<!-- ./col -->
 	  </div>
 	  <!-- /.row -->
-
+<?php */ ?>
 		
 </section>	
 </div>
@@ -246,7 +302,31 @@ order by platform_id desc, inventory_id, bus_size";
 
 </section>
 </div>
+
+
 <?php */ ?>
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
 <?php
 
 #$Email = new \PHPMailer\PHPMailer\PHPMailer();

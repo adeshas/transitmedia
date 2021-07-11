@@ -27,7 +27,9 @@ loadjs.ready("head", function () {
         ["exterior_campaign_id", [fields.exterior_campaign_id.required ? ew.Validators.required(fields.exterior_campaign_id.caption) : null], fields.exterior_campaign_id.isInvalid],
         ["interior_campaign_id", [fields.interior_campaign_id.required ? ew.Validators.required(fields.interior_campaign_id.caption) : null], fields.interior_campaign_id.isInvalid],
         ["bus_status_id", [fields.bus_status_id.required ? ew.Validators.required(fields.bus_status_id.caption) : null], fields.bus_status_id.isInvalid],
-        ["bus_depot_id", [fields.bus_depot_id.required ? ew.Validators.required(fields.bus_depot_id.caption) : null], fields.bus_depot_id.isInvalid]
+        ["bus_size_id", [fields.bus_size_id.required ? ew.Validators.required(fields.bus_size_id.caption) : null], fields.bus_size_id.isInvalid],
+        ["bus_depot_id", [fields.bus_depot_id.required ? ew.Validators.required(fields.bus_depot_id.caption) : null], fields.bus_depot_id.isInvalid],
+        ["ts_last_update", [fields.ts_last_update.required ? ew.Validators.required(fields.ts_last_update.caption) : null, ew.Validators.datetime(1)], fields.ts_last_update.isInvalid]
     ]);
 
     // Set invalid fields
@@ -97,7 +99,11 @@ loadjs.ready("head", function () {
             return false;
         if (ew.valueChanged(fobj, rowIndex, "bus_status_id", false))
             return false;
+        if (ew.valueChanged(fobj, rowIndex, "bus_size_id", false))
+            return false;
         if (ew.valueChanged(fobj, rowIndex, "bus_depot_id", false))
+            return false;
+        if (ew.valueChanged(fobj, rowIndex, "ts_last_update", false))
             return false;
         return true;
     }
@@ -117,6 +123,7 @@ loadjs.ready("head", function () {
     fmain_buseslist.lists.exterior_campaign_id = <?= $Page->exterior_campaign_id->toClientList($Page) ?>;
     fmain_buseslist.lists.interior_campaign_id = <?= $Page->interior_campaign_id->toClientList($Page) ?>;
     fmain_buseslist.lists.bus_status_id = <?= $Page->bus_status_id->toClientList($Page) ?>;
+    fmain_buseslist.lists.bus_size_id = <?= $Page->bus_size_id->toClientList($Page) ?>;
     fmain_buseslist.lists.bus_depot_id = <?= $Page->bus_depot_id->toClientList($Page) ?>;
     loadjs.done("fmain_buseslist");
 });
@@ -127,6 +134,13 @@ loadjs.ready("head", function () {
     fmain_buseslistsrch = currentSearchForm = new ew.Form("fmain_buseslistsrch");
 
     // Dynamic selection lists
+    fmain_buseslistsrch.lists.platform_id = <?= $Page->platform_id->toClientList($Page) ?>;
+    fmain_buseslistsrch.lists.operator_id = <?= $Page->operator_id->toClientList($Page) ?>;
+    fmain_buseslistsrch.lists.exterior_campaign_id = <?= $Page->exterior_campaign_id->toClientList($Page) ?>;
+    fmain_buseslistsrch.lists.interior_campaign_id = <?= $Page->interior_campaign_id->toClientList($Page) ?>;
+    fmain_buseslistsrch.lists.bus_status_id = <?= $Page->bus_status_id->toClientList($Page) ?>;
+    fmain_buseslistsrch.lists.bus_size_id = <?= $Page->bus_size_id->toClientList($Page) ?>;
+    fmain_buseslistsrch.lists.bus_depot_id = <?= $Page->bus_depot_id->toClientList($Page) ?>;
 
     // Filters
     fmain_buseslistsrch.filterList = <?= $Page->getFilterList() ?>;
@@ -158,9 +172,23 @@ loadjs.ready("head", function () {
 <?php } ?>
 <?php if (!$Page->isExport() || Config("EXPORT_MASTER_RECORD") && $Page->isExport("print")) { ?>
 <?php
-if ($Page->DbMasterFilter != "" && $Page->getCurrentMasterTable() == "main_campaigns") {
+if ($Page->DbMasterFilter != "" && $Page->getCurrentMasterTable() == "x_bus_status") {
     if ($Page->MasterRecordExists) {
-        include_once "views/MainCampaignsMaster.php";
+        include_once "views/XBusStatusMaster.php";
+    }
+}
+?>
+<?php
+if ($Page->DbMasterFilter != "" && $Page->getCurrentMasterTable() == "x_bus_sizes") {
+    if ($Page->MasterRecordExists) {
+        include_once "views/XBusSizesMaster.php";
+    }
+}
+?>
+<?php
+if ($Page->DbMasterFilter != "" && $Page->getCurrentMasterTable() == "x_bus_depot") {
+    if ($Page->MasterRecordExists) {
+        include_once "views/XBusDepotMaster.php";
     }
 }
 ?>
@@ -221,10 +249,17 @@ $Page->showMessage();
 <input type="hidden" name="<?= $TokenValueKey ?>" value="<?= $TokenValue ?>"><!-- CSRF token value -->
 <?php } ?>
 <input type="hidden" name="t" value="main_buses">
-<?php if ($Page->getCurrentMasterTable() == "main_campaigns" && $Page->CurrentAction) { ?>
-<input type="hidden" name="<?= Config("TABLE_SHOW_MASTER") ?>" value="main_campaigns">
-<input type="hidden" name="fk_id" value="<?= HtmlEncode($Page->exterior_campaign_id->getSessionValue()) ?>">
-<input type="hidden" name="fk_id" value="<?= HtmlEncode($Page->interior_campaign_id->getSessionValue()) ?>">
+<?php if ($Page->getCurrentMasterTable() == "x_bus_status" && $Page->CurrentAction) { ?>
+<input type="hidden" name="<?= Config("TABLE_SHOW_MASTER") ?>" value="x_bus_status">
+<input type="hidden" name="fk_id" value="<?= HtmlEncode($Page->bus_status_id->getSessionValue()) ?>">
+<?php } ?>
+<?php if ($Page->getCurrentMasterTable() == "x_bus_sizes" && $Page->CurrentAction) { ?>
+<input type="hidden" name="<?= Config("TABLE_SHOW_MASTER") ?>" value="x_bus_sizes">
+<input type="hidden" name="fk_id" value="<?= HtmlEncode($Page->bus_size_id->getSessionValue()) ?>">
+<?php } ?>
+<?php if ($Page->getCurrentMasterTable() == "x_bus_depot" && $Page->CurrentAction) { ?>
+<input type="hidden" name="<?= Config("TABLE_SHOW_MASTER") ?>" value="x_bus_depot">
+<input type="hidden" name="fk_id" value="<?= HtmlEncode($Page->bus_depot_id->getSessionValue()) ?>">
 <?php } ?>
 <div id="gmp_main_buses" class="<?= ResponsiveTableClass() ?>card-body ew-grid-middle-panel">
 <?php if ($Page->TotalRecords > 0 || $Page->isGridEdit()) { ?>
@@ -248,10 +283,10 @@ $Page->ListOptions->render("header", "left");
         <th data-name="number" class="<?= $Page->number->headerCellClass() ?>"><div id="elh_main_buses_number" class="main_buses_number"><?= $Page->renderSort($Page->number) ?></div></th>
 <?php } ?>
 <?php if ($Page->platform_id->Visible) { // platform_id ?>
-        <th data-name="platform_id" class="<?= $Page->platform_id->headerCellClass() ?>"><div id="elh_main_buses_platform_id" class="main_buses_platform_id"><?= $Page->renderSort($Page->platform_id) ?></div></th>
+        <th data-name="platform_id" class="<?= $Page->platform_id->headerCellClass() ?>" style="white-space: nowrap;"><div id="elh_main_buses_platform_id" class="main_buses_platform_id"><?= $Page->renderSort($Page->platform_id) ?></div></th>
 <?php } ?>
 <?php if ($Page->operator_id->Visible) { // operator_id ?>
-        <th data-name="operator_id" class="<?= $Page->operator_id->headerCellClass() ?>"><div id="elh_main_buses_operator_id" class="main_buses_operator_id"><?= $Page->renderSort($Page->operator_id) ?></div></th>
+        <th data-name="operator_id" class="<?= $Page->operator_id->headerCellClass() ?>" style="white-space: nowrap;"><div id="elh_main_buses_operator_id" class="main_buses_operator_id"><?= $Page->renderSort($Page->operator_id) ?></div></th>
 <?php } ?>
 <?php if ($Page->exterior_campaign_id->Visible) { // exterior_campaign_id ?>
         <th data-name="exterior_campaign_id" class="<?= $Page->exterior_campaign_id->headerCellClass() ?>"><div id="elh_main_buses_exterior_campaign_id" class="main_buses_exterior_campaign_id"><?= $Page->renderSort($Page->exterior_campaign_id) ?></div></th>
@@ -262,8 +297,14 @@ $Page->ListOptions->render("header", "left");
 <?php if ($Page->bus_status_id->Visible) { // bus_status_id ?>
         <th data-name="bus_status_id" class="<?= $Page->bus_status_id->headerCellClass() ?>"><div id="elh_main_buses_bus_status_id" class="main_buses_bus_status_id"><?= $Page->renderSort($Page->bus_status_id) ?></div></th>
 <?php } ?>
+<?php if ($Page->bus_size_id->Visible) { // bus_size_id ?>
+        <th data-name="bus_size_id" class="<?= $Page->bus_size_id->headerCellClass() ?>"><div id="elh_main_buses_bus_size_id" class="main_buses_bus_size_id"><?= $Page->renderSort($Page->bus_size_id) ?></div></th>
+<?php } ?>
 <?php if ($Page->bus_depot_id->Visible) { // bus_depot_id ?>
         <th data-name="bus_depot_id" class="<?= $Page->bus_depot_id->headerCellClass() ?>"><div id="elh_main_buses_bus_depot_id" class="main_buses_bus_depot_id"><?= $Page->renderSort($Page->bus_depot_id) ?></div></th>
+<?php } ?>
+<?php if ($Page->ts_last_update->Visible) { // ts_last_update ?>
+        <th data-name="ts_last_update" class="<?= $Page->ts_last_update->headerCellClass() ?>"><div id="elh_main_buses_ts_last_update" class="main_buses_ts_last_update"><?= $Page->renderSort($Page->ts_last_update) ?></div></th>
 <?php } ?>
 <?php
 // Render list options (header, right)
@@ -401,6 +442,8 @@ $Page->ListOptions->render("body", "left", $Page->RowCount);
 </span>
 <?php } ?>
 </td>
+    <?php } else { ?>
+            <input type="hidden" data-table="main_buses" data-field="x_id" data-hidden="1" name="x<?= $Page->RowIndex ?>_id" id="x<?= $Page->RowIndex ?>_id" value="<?= HtmlEncode($Page->id->CurrentValue) ?>">
     <?php } ?>
     <?php if ($Page->number->Visible) { // number ?>
         <td data-name="number" <?= $Page->number->cellAttributes() ?>>
@@ -560,13 +603,6 @@ loadjs.ready("head", function() {
     <?php if ($Page->exterior_campaign_id->Visible) { // exterior_campaign_id ?>
         <td data-name="exterior_campaign_id" <?= $Page->exterior_campaign_id->cellAttributes() ?>>
 <?php if ($Page->RowType == ROWTYPE_ADD) { // Add record ?>
-<?php if ($Page->exterior_campaign_id->getSessionValue() != "") { ?>
-<span id="el<?= $Page->RowCount ?>_main_buses_exterior_campaign_id" class="form-group">
-<span<?= $Page->exterior_campaign_id->viewAttributes() ?>>
-<input type="text" readonly class="form-control-plaintext" value="<?= HtmlEncode(RemoveHtml($Page->exterior_campaign_id->getDisplayValue($Page->exterior_campaign_id->ViewValue))) ?>"></span>
-</span>
-<input type="hidden" id="x<?= $Page->RowIndex ?>_exterior_campaign_id" name="x<?= $Page->RowIndex ?>_exterior_campaign_id" value="<?= HtmlEncode($Page->exterior_campaign_id->CurrentValue) ?>" data-hidden="1">
-<?php } else { ?>
 <span id="el<?= $Page->RowCount ?>_main_buses_exterior_campaign_id" class="form-group">
     <select
         id="x<?= $Page->RowIndex ?>_exterior_campaign_id"
@@ -592,17 +628,9 @@ loadjs.ready("head", function() {
 });
 </script>
 </span>
-<?php } ?>
 <input type="hidden" data-table="main_buses" data-field="x_exterior_campaign_id" data-hidden="1" name="o<?= $Page->RowIndex ?>_exterior_campaign_id" id="o<?= $Page->RowIndex ?>_exterior_campaign_id" value="<?= HtmlEncode($Page->exterior_campaign_id->OldValue) ?>">
 <?php } ?>
 <?php if ($Page->RowType == ROWTYPE_EDIT) { // Edit record ?>
-<?php if ($Page->exterior_campaign_id->getSessionValue() != "") { ?>
-<span id="el<?= $Page->RowCount ?>_main_buses_exterior_campaign_id" class="form-group">
-<span<?= $Page->exterior_campaign_id->viewAttributes() ?>>
-<input type="text" readonly class="form-control-plaintext" value="<?= HtmlEncode(RemoveHtml($Page->exterior_campaign_id->getDisplayValue($Page->exterior_campaign_id->ViewValue))) ?>"></span>
-</span>
-<input type="hidden" id="x<?= $Page->RowIndex ?>_exterior_campaign_id" name="x<?= $Page->RowIndex ?>_exterior_campaign_id" value="<?= HtmlEncode($Page->exterior_campaign_id->CurrentValue) ?>" data-hidden="1">
-<?php } else { ?>
 <span id="el<?= $Page->RowCount ?>_main_buses_exterior_campaign_id" class="form-group">
     <select
         id="x<?= $Page->RowIndex ?>_exterior_campaign_id"
@@ -628,7 +656,6 @@ loadjs.ready("head", function() {
 });
 </script>
 </span>
-<?php } ?>
 <?php } ?>
 <?php if ($Page->RowType == ROWTYPE_VIEW) { // View record ?>
 <span id="el<?= $Page->RowCount ?>_main_buses_exterior_campaign_id">
@@ -641,13 +668,6 @@ loadjs.ready("head", function() {
     <?php if ($Page->interior_campaign_id->Visible) { // interior_campaign_id ?>
         <td data-name="interior_campaign_id" <?= $Page->interior_campaign_id->cellAttributes() ?>>
 <?php if ($Page->RowType == ROWTYPE_ADD) { // Add record ?>
-<?php if ($Page->interior_campaign_id->getSessionValue() != "") { ?>
-<span id="el<?= $Page->RowCount ?>_main_buses_interior_campaign_id" class="form-group">
-<span<?= $Page->interior_campaign_id->viewAttributes() ?>>
-<input type="text" readonly class="form-control-plaintext" value="<?= HtmlEncode(RemoveHtml($Page->interior_campaign_id->getDisplayValue($Page->interior_campaign_id->ViewValue))) ?>"></span>
-</span>
-<input type="hidden" id="x<?= $Page->RowIndex ?>_interior_campaign_id" name="x<?= $Page->RowIndex ?>_interior_campaign_id" value="<?= HtmlEncode($Page->interior_campaign_id->CurrentValue) ?>" data-hidden="1">
-<?php } else { ?>
 <span id="el<?= $Page->RowCount ?>_main_buses_interior_campaign_id" class="form-group">
     <select
         id="x<?= $Page->RowIndex ?>_interior_campaign_id"
@@ -673,17 +693,9 @@ loadjs.ready("head", function() {
 });
 </script>
 </span>
-<?php } ?>
 <input type="hidden" data-table="main_buses" data-field="x_interior_campaign_id" data-hidden="1" name="o<?= $Page->RowIndex ?>_interior_campaign_id" id="o<?= $Page->RowIndex ?>_interior_campaign_id" value="<?= HtmlEncode($Page->interior_campaign_id->OldValue) ?>">
 <?php } ?>
 <?php if ($Page->RowType == ROWTYPE_EDIT) { // Edit record ?>
-<?php if ($Page->interior_campaign_id->getSessionValue() != "") { ?>
-<span id="el<?= $Page->RowCount ?>_main_buses_interior_campaign_id" class="form-group">
-<span<?= $Page->interior_campaign_id->viewAttributes() ?>>
-<input type="text" readonly class="form-control-plaintext" value="<?= HtmlEncode(RemoveHtml($Page->interior_campaign_id->getDisplayValue($Page->interior_campaign_id->ViewValue))) ?>"></span>
-</span>
-<input type="hidden" id="x<?= $Page->RowIndex ?>_interior_campaign_id" name="x<?= $Page->RowIndex ?>_interior_campaign_id" value="<?= HtmlEncode($Page->interior_campaign_id->CurrentValue) ?>" data-hidden="1">
-<?php } else { ?>
 <span id="el<?= $Page->RowCount ?>_main_buses_interior_campaign_id" class="form-group">
     <select
         id="x<?= $Page->RowIndex ?>_interior_campaign_id"
@@ -709,7 +721,6 @@ loadjs.ready("head", function() {
 });
 </script>
 </span>
-<?php } ?>
 <?php } ?>
 <?php if ($Page->RowType == ROWTYPE_VIEW) { // View record ?>
 <span id="el<?= $Page->RowCount ?>_main_buses_interior_campaign_id">
@@ -722,6 +733,13 @@ loadjs.ready("head", function() {
     <?php if ($Page->bus_status_id->Visible) { // bus_status_id ?>
         <td data-name="bus_status_id" <?= $Page->bus_status_id->cellAttributes() ?>>
 <?php if ($Page->RowType == ROWTYPE_ADD) { // Add record ?>
+<?php if ($Page->bus_status_id->getSessionValue() != "") { ?>
+<span id="el<?= $Page->RowCount ?>_main_buses_bus_status_id" class="form-group">
+<span<?= $Page->bus_status_id->viewAttributes() ?>>
+<input type="text" readonly class="form-control-plaintext" value="<?= HtmlEncode(RemoveHtml($Page->bus_status_id->getDisplayValue($Page->bus_status_id->ViewValue))) ?>"></span>
+</span>
+<input type="hidden" id="x<?= $Page->RowIndex ?>_bus_status_id" name="x<?= $Page->RowIndex ?>_bus_status_id" value="<?= HtmlEncode($Page->bus_status_id->CurrentValue) ?>" data-hidden="1">
+<?php } else { ?>
 <span id="el<?= $Page->RowCount ?>_main_buses_bus_status_id" class="form-group">
     <select
         id="x<?= $Page->RowIndex ?>_bus_status_id"
@@ -747,9 +765,17 @@ loadjs.ready("head", function() {
 });
 </script>
 </span>
+<?php } ?>
 <input type="hidden" data-table="main_buses" data-field="x_bus_status_id" data-hidden="1" name="o<?= $Page->RowIndex ?>_bus_status_id" id="o<?= $Page->RowIndex ?>_bus_status_id" value="<?= HtmlEncode($Page->bus_status_id->OldValue) ?>">
 <?php } ?>
 <?php if ($Page->RowType == ROWTYPE_EDIT) { // Edit record ?>
+<?php if ($Page->bus_status_id->getSessionValue() != "") { ?>
+<span id="el<?= $Page->RowCount ?>_main_buses_bus_status_id" class="form-group">
+<span<?= $Page->bus_status_id->viewAttributes() ?>>
+<input type="text" readonly class="form-control-plaintext" value="<?= HtmlEncode(RemoveHtml($Page->bus_status_id->getDisplayValue($Page->bus_status_id->ViewValue))) ?>"></span>
+</span>
+<input type="hidden" id="x<?= $Page->RowIndex ?>_bus_status_id" name="x<?= $Page->RowIndex ?>_bus_status_id" value="<?= HtmlEncode($Page->bus_status_id->CurrentValue) ?>" data-hidden="1">
+<?php } else { ?>
 <span id="el<?= $Page->RowCount ?>_main_buses_bus_status_id" class="form-group">
     <select
         id="x<?= $Page->RowIndex ?>_bus_status_id"
@@ -775,6 +801,7 @@ loadjs.ready("head", function() {
 });
 </script>
 </span>
+<?php } ?>
 <?php } ?>
 <?php if ($Page->RowType == ROWTYPE_VIEW) { // View record ?>
 <span id="el<?= $Page->RowCount ?>_main_buses_bus_status_id">
@@ -784,9 +811,97 @@ loadjs.ready("head", function() {
 <?php } ?>
 </td>
     <?php } ?>
+    <?php if ($Page->bus_size_id->Visible) { // bus_size_id ?>
+        <td data-name="bus_size_id" <?= $Page->bus_size_id->cellAttributes() ?>>
+<?php if ($Page->RowType == ROWTYPE_ADD) { // Add record ?>
+<?php if ($Page->bus_size_id->getSessionValue() != "") { ?>
+<span id="el<?= $Page->RowCount ?>_main_buses_bus_size_id" class="form-group">
+<span<?= $Page->bus_size_id->viewAttributes() ?>>
+<input type="text" readonly class="form-control-plaintext" value="<?= HtmlEncode(RemoveHtml($Page->bus_size_id->getDisplayValue($Page->bus_size_id->ViewValue))) ?>"></span>
+</span>
+<input type="hidden" id="x<?= $Page->RowIndex ?>_bus_size_id" name="x<?= $Page->RowIndex ?>_bus_size_id" value="<?= HtmlEncode($Page->bus_size_id->CurrentValue) ?>" data-hidden="1">
+<?php } else { ?>
+<span id="el<?= $Page->RowCount ?>_main_buses_bus_size_id" class="form-group">
+    <select
+        id="x<?= $Page->RowIndex ?>_bus_size_id"
+        name="x<?= $Page->RowIndex ?>_bus_size_id"
+        class="form-control ew-select<?= $Page->bus_size_id->isInvalidClass() ?>"
+        data-select2-id="main_buses_x<?= $Page->RowIndex ?>_bus_size_id"
+        data-table="main_buses"
+        data-field="x_bus_size_id"
+        data-value-separator="<?= $Page->bus_size_id->displayValueSeparatorAttribute() ?>"
+        data-placeholder="<?= HtmlEncode($Page->bus_size_id->getPlaceHolder()) ?>"
+        <?= $Page->bus_size_id->editAttributes() ?>>
+        <?= $Page->bus_size_id->selectOptionListHtml("x{$Page->RowIndex}_bus_size_id") ?>
+    </select>
+    <div class="invalid-feedback"><?= $Page->bus_size_id->getErrorMessage() ?></div>
+<?= $Page->bus_size_id->Lookup->getParamTag($Page, "p_x" . $Page->RowIndex . "_bus_size_id") ?>
+<script>
+loadjs.ready("head", function() {
+    var el = document.querySelector("select[data-select2-id='main_buses_x<?= $Page->RowIndex ?>_bus_size_id']"),
+        options = { name: "x<?= $Page->RowIndex ?>_bus_size_id", selectId: "main_buses_x<?= $Page->RowIndex ?>_bus_size_id", language: ew.LANGUAGE_ID, dir: ew.IS_RTL ? "rtl" : "ltr" };
+    options.dropdownParent = $(el).closest("#ew-modal-dialog, #ew-add-opt-dialog")[0];
+    Object.assign(options, ew.vars.tables.main_buses.fields.bus_size_id.selectOptions);
+    ew.createSelect(options);
+});
+</script>
+</span>
+<?php } ?>
+<input type="hidden" data-table="main_buses" data-field="x_bus_size_id" data-hidden="1" name="o<?= $Page->RowIndex ?>_bus_size_id" id="o<?= $Page->RowIndex ?>_bus_size_id" value="<?= HtmlEncode($Page->bus_size_id->OldValue) ?>">
+<?php } ?>
+<?php if ($Page->RowType == ROWTYPE_EDIT) { // Edit record ?>
+<?php if ($Page->bus_size_id->getSessionValue() != "") { ?>
+<span id="el<?= $Page->RowCount ?>_main_buses_bus_size_id" class="form-group">
+<span<?= $Page->bus_size_id->viewAttributes() ?>>
+<input type="text" readonly class="form-control-plaintext" value="<?= HtmlEncode(RemoveHtml($Page->bus_size_id->getDisplayValue($Page->bus_size_id->ViewValue))) ?>"></span>
+</span>
+<input type="hidden" id="x<?= $Page->RowIndex ?>_bus_size_id" name="x<?= $Page->RowIndex ?>_bus_size_id" value="<?= HtmlEncode($Page->bus_size_id->CurrentValue) ?>" data-hidden="1">
+<?php } else { ?>
+<span id="el<?= $Page->RowCount ?>_main_buses_bus_size_id" class="form-group">
+    <select
+        id="x<?= $Page->RowIndex ?>_bus_size_id"
+        name="x<?= $Page->RowIndex ?>_bus_size_id"
+        class="form-control ew-select<?= $Page->bus_size_id->isInvalidClass() ?>"
+        data-select2-id="main_buses_x<?= $Page->RowIndex ?>_bus_size_id"
+        data-table="main_buses"
+        data-field="x_bus_size_id"
+        data-value-separator="<?= $Page->bus_size_id->displayValueSeparatorAttribute() ?>"
+        data-placeholder="<?= HtmlEncode($Page->bus_size_id->getPlaceHolder()) ?>"
+        <?= $Page->bus_size_id->editAttributes() ?>>
+        <?= $Page->bus_size_id->selectOptionListHtml("x{$Page->RowIndex}_bus_size_id") ?>
+    </select>
+    <div class="invalid-feedback"><?= $Page->bus_size_id->getErrorMessage() ?></div>
+<?= $Page->bus_size_id->Lookup->getParamTag($Page, "p_x" . $Page->RowIndex . "_bus_size_id") ?>
+<script>
+loadjs.ready("head", function() {
+    var el = document.querySelector("select[data-select2-id='main_buses_x<?= $Page->RowIndex ?>_bus_size_id']"),
+        options = { name: "x<?= $Page->RowIndex ?>_bus_size_id", selectId: "main_buses_x<?= $Page->RowIndex ?>_bus_size_id", language: ew.LANGUAGE_ID, dir: ew.IS_RTL ? "rtl" : "ltr" };
+    options.dropdownParent = $(el).closest("#ew-modal-dialog, #ew-add-opt-dialog")[0];
+    Object.assign(options, ew.vars.tables.main_buses.fields.bus_size_id.selectOptions);
+    ew.createSelect(options);
+});
+</script>
+</span>
+<?php } ?>
+<?php } ?>
+<?php if ($Page->RowType == ROWTYPE_VIEW) { // View record ?>
+<span id="el<?= $Page->RowCount ?>_main_buses_bus_size_id">
+<span<?= $Page->bus_size_id->viewAttributes() ?>>
+<?= $Page->bus_size_id->getViewValue() ?></span>
+</span>
+<?php } ?>
+</td>
+    <?php } ?>
     <?php if ($Page->bus_depot_id->Visible) { // bus_depot_id ?>
         <td data-name="bus_depot_id" <?= $Page->bus_depot_id->cellAttributes() ?>>
 <?php if ($Page->RowType == ROWTYPE_ADD) { // Add record ?>
+<?php if ($Page->bus_depot_id->getSessionValue() != "") { ?>
+<span id="el<?= $Page->RowCount ?>_main_buses_bus_depot_id" class="form-group">
+<span<?= $Page->bus_depot_id->viewAttributes() ?>>
+<input type="text" readonly class="form-control-plaintext" value="<?= HtmlEncode(RemoveHtml($Page->bus_depot_id->getDisplayValue($Page->bus_depot_id->ViewValue))) ?>"></span>
+</span>
+<input type="hidden" id="x<?= $Page->RowIndex ?>_bus_depot_id" name="x<?= $Page->RowIndex ?>_bus_depot_id" value="<?= HtmlEncode($Page->bus_depot_id->CurrentValue) ?>" data-hidden="1">
+<?php } else { ?>
 <span id="el<?= $Page->RowCount ?>_main_buses_bus_depot_id" class="form-group">
     <select
         id="x<?= $Page->RowIndex ?>_bus_depot_id"
@@ -812,9 +927,17 @@ loadjs.ready("head", function() {
 });
 </script>
 </span>
+<?php } ?>
 <input type="hidden" data-table="main_buses" data-field="x_bus_depot_id" data-hidden="1" name="o<?= $Page->RowIndex ?>_bus_depot_id" id="o<?= $Page->RowIndex ?>_bus_depot_id" value="<?= HtmlEncode($Page->bus_depot_id->OldValue) ?>">
 <?php } ?>
 <?php if ($Page->RowType == ROWTYPE_EDIT) { // Edit record ?>
+<?php if ($Page->bus_depot_id->getSessionValue() != "") { ?>
+<span id="el<?= $Page->RowCount ?>_main_buses_bus_depot_id" class="form-group">
+<span<?= $Page->bus_depot_id->viewAttributes() ?>>
+<input type="text" readonly class="form-control-plaintext" value="<?= HtmlEncode(RemoveHtml($Page->bus_depot_id->getDisplayValue($Page->bus_depot_id->ViewValue))) ?>"></span>
+</span>
+<input type="hidden" id="x<?= $Page->RowIndex ?>_bus_depot_id" name="x<?= $Page->RowIndex ?>_bus_depot_id" value="<?= HtmlEncode($Page->bus_depot_id->CurrentValue) ?>" data-hidden="1">
+<?php } else { ?>
 <span id="el<?= $Page->RowCount ?>_main_buses_bus_depot_id" class="form-group">
     <select
         id="x<?= $Page->RowIndex ?>_bus_depot_id"
@@ -840,11 +963,49 @@ loadjs.ready("head", function() {
 });
 </script>
 </span>
+<?php } ?>
 <?php } ?>
 <?php if ($Page->RowType == ROWTYPE_VIEW) { // View record ?>
 <span id="el<?= $Page->RowCount ?>_main_buses_bus_depot_id">
 <span<?= $Page->bus_depot_id->viewAttributes() ?>>
 <?= $Page->bus_depot_id->getViewValue() ?></span>
+</span>
+<?php } ?>
+</td>
+    <?php } ?>
+    <?php if ($Page->ts_last_update->Visible) { // ts_last_update ?>
+        <td data-name="ts_last_update" <?= $Page->ts_last_update->cellAttributes() ?>>
+<?php if ($Page->RowType == ROWTYPE_ADD) { // Add record ?>
+<span id="el<?= $Page->RowCount ?>_main_buses_ts_last_update" class="form-group">
+<input type="<?= $Page->ts_last_update->getInputTextType() ?>" data-table="main_buses" data-field="x_ts_last_update" data-format="1" name="x<?= $Page->RowIndex ?>_ts_last_update" id="x<?= $Page->RowIndex ?>_ts_last_update" placeholder="<?= HtmlEncode($Page->ts_last_update->getPlaceHolder()) ?>" value="<?= $Page->ts_last_update->EditValue ?>"<?= $Page->ts_last_update->editAttributes() ?>>
+<div class="invalid-feedback"><?= $Page->ts_last_update->getErrorMessage() ?></div>
+<?php if (!$Page->ts_last_update->ReadOnly && !$Page->ts_last_update->Disabled && !isset($Page->ts_last_update->EditAttrs["readonly"]) && !isset($Page->ts_last_update->EditAttrs["disabled"])) { ?>
+<script>
+loadjs.ready(["fmain_buseslist", "datetimepicker"], function() {
+    ew.createDateTimePicker("fmain_buseslist", "x<?= $Page->RowIndex ?>_ts_last_update", {"ignoreReadonly":true,"useCurrent":false,"format":1});
+});
+</script>
+<?php } ?>
+</span>
+<input type="hidden" data-table="main_buses" data-field="x_ts_last_update" data-hidden="1" name="o<?= $Page->RowIndex ?>_ts_last_update" id="o<?= $Page->RowIndex ?>_ts_last_update" value="<?= HtmlEncode($Page->ts_last_update->OldValue) ?>">
+<?php } ?>
+<?php if ($Page->RowType == ROWTYPE_EDIT) { // Edit record ?>
+<span id="el<?= $Page->RowCount ?>_main_buses_ts_last_update" class="form-group">
+<input type="<?= $Page->ts_last_update->getInputTextType() ?>" data-table="main_buses" data-field="x_ts_last_update" data-format="1" name="x<?= $Page->RowIndex ?>_ts_last_update" id="x<?= $Page->RowIndex ?>_ts_last_update" placeholder="<?= HtmlEncode($Page->ts_last_update->getPlaceHolder()) ?>" value="<?= $Page->ts_last_update->EditValue ?>"<?= $Page->ts_last_update->editAttributes() ?>>
+<div class="invalid-feedback"><?= $Page->ts_last_update->getErrorMessage() ?></div>
+<?php if (!$Page->ts_last_update->ReadOnly && !$Page->ts_last_update->Disabled && !isset($Page->ts_last_update->EditAttrs["readonly"]) && !isset($Page->ts_last_update->EditAttrs["disabled"])) { ?>
+<script>
+loadjs.ready(["fmain_buseslist", "datetimepicker"], function() {
+    ew.createDateTimePicker("fmain_buseslist", "x<?= $Page->RowIndex ?>_ts_last_update", {"ignoreReadonly":true,"useCurrent":false,"format":1});
+});
+</script>
+<?php } ?>
+</span>
+<?php } ?>
+<?php if ($Page->RowType == ROWTYPE_VIEW) { // View record ?>
+<span id="el<?= $Page->RowCount ?>_main_buses_ts_last_update">
+<span<?= $Page->ts_last_update->viewAttributes() ?>>
+<?= $Page->ts_last_update->getViewValue() ?></span>
 </span>
 <?php } ?>
 </td>
@@ -971,13 +1132,6 @@ loadjs.ready("head", function() {
     <?php } ?>
     <?php if ($Page->exterior_campaign_id->Visible) { // exterior_campaign_id ?>
         <td data-name="exterior_campaign_id">
-<?php if ($Page->exterior_campaign_id->getSessionValue() != "") { ?>
-<span id="el$rowindex$_main_buses_exterior_campaign_id" class="form-group main_buses_exterior_campaign_id">
-<span<?= $Page->exterior_campaign_id->viewAttributes() ?>>
-<input type="text" readonly class="form-control-plaintext" value="<?= HtmlEncode(RemoveHtml($Page->exterior_campaign_id->getDisplayValue($Page->exterior_campaign_id->ViewValue))) ?>"></span>
-</span>
-<input type="hidden" id="x<?= $Page->RowIndex ?>_exterior_campaign_id" name="x<?= $Page->RowIndex ?>_exterior_campaign_id" value="<?= HtmlEncode($Page->exterior_campaign_id->CurrentValue) ?>" data-hidden="1">
-<?php } else { ?>
 <span id="el$rowindex$_main_buses_exterior_campaign_id" class="form-group main_buses_exterior_campaign_id">
     <select
         id="x<?= $Page->RowIndex ?>_exterior_campaign_id"
@@ -1003,19 +1157,11 @@ loadjs.ready("head", function() {
 });
 </script>
 </span>
-<?php } ?>
 <input type="hidden" data-table="main_buses" data-field="x_exterior_campaign_id" data-hidden="1" name="o<?= $Page->RowIndex ?>_exterior_campaign_id" id="o<?= $Page->RowIndex ?>_exterior_campaign_id" value="<?= HtmlEncode($Page->exterior_campaign_id->OldValue) ?>">
 </td>
     <?php } ?>
     <?php if ($Page->interior_campaign_id->Visible) { // interior_campaign_id ?>
         <td data-name="interior_campaign_id">
-<?php if ($Page->interior_campaign_id->getSessionValue() != "") { ?>
-<span id="el$rowindex$_main_buses_interior_campaign_id" class="form-group main_buses_interior_campaign_id">
-<span<?= $Page->interior_campaign_id->viewAttributes() ?>>
-<input type="text" readonly class="form-control-plaintext" value="<?= HtmlEncode(RemoveHtml($Page->interior_campaign_id->getDisplayValue($Page->interior_campaign_id->ViewValue))) ?>"></span>
-</span>
-<input type="hidden" id="x<?= $Page->RowIndex ?>_interior_campaign_id" name="x<?= $Page->RowIndex ?>_interior_campaign_id" value="<?= HtmlEncode($Page->interior_campaign_id->CurrentValue) ?>" data-hidden="1">
-<?php } else { ?>
 <span id="el$rowindex$_main_buses_interior_campaign_id" class="form-group main_buses_interior_campaign_id">
     <select
         id="x<?= $Page->RowIndex ?>_interior_campaign_id"
@@ -1041,12 +1187,18 @@ loadjs.ready("head", function() {
 });
 </script>
 </span>
-<?php } ?>
 <input type="hidden" data-table="main_buses" data-field="x_interior_campaign_id" data-hidden="1" name="o<?= $Page->RowIndex ?>_interior_campaign_id" id="o<?= $Page->RowIndex ?>_interior_campaign_id" value="<?= HtmlEncode($Page->interior_campaign_id->OldValue) ?>">
 </td>
     <?php } ?>
     <?php if ($Page->bus_status_id->Visible) { // bus_status_id ?>
         <td data-name="bus_status_id">
+<?php if ($Page->bus_status_id->getSessionValue() != "") { ?>
+<span id="el$rowindex$_main_buses_bus_status_id" class="form-group main_buses_bus_status_id">
+<span<?= $Page->bus_status_id->viewAttributes() ?>>
+<input type="text" readonly class="form-control-plaintext" value="<?= HtmlEncode(RemoveHtml($Page->bus_status_id->getDisplayValue($Page->bus_status_id->ViewValue))) ?>"></span>
+</span>
+<input type="hidden" id="x<?= $Page->RowIndex ?>_bus_status_id" name="x<?= $Page->RowIndex ?>_bus_status_id" value="<?= HtmlEncode($Page->bus_status_id->CurrentValue) ?>" data-hidden="1">
+<?php } else { ?>
 <span id="el$rowindex$_main_buses_bus_status_id" class="form-group main_buses_bus_status_id">
     <select
         id="x<?= $Page->RowIndex ?>_bus_status_id"
@@ -1072,11 +1224,57 @@ loadjs.ready("head", function() {
 });
 </script>
 </span>
+<?php } ?>
 <input type="hidden" data-table="main_buses" data-field="x_bus_status_id" data-hidden="1" name="o<?= $Page->RowIndex ?>_bus_status_id" id="o<?= $Page->RowIndex ?>_bus_status_id" value="<?= HtmlEncode($Page->bus_status_id->OldValue) ?>">
+</td>
+    <?php } ?>
+    <?php if ($Page->bus_size_id->Visible) { // bus_size_id ?>
+        <td data-name="bus_size_id">
+<?php if ($Page->bus_size_id->getSessionValue() != "") { ?>
+<span id="el$rowindex$_main_buses_bus_size_id" class="form-group main_buses_bus_size_id">
+<span<?= $Page->bus_size_id->viewAttributes() ?>>
+<input type="text" readonly class="form-control-plaintext" value="<?= HtmlEncode(RemoveHtml($Page->bus_size_id->getDisplayValue($Page->bus_size_id->ViewValue))) ?>"></span>
+</span>
+<input type="hidden" id="x<?= $Page->RowIndex ?>_bus_size_id" name="x<?= $Page->RowIndex ?>_bus_size_id" value="<?= HtmlEncode($Page->bus_size_id->CurrentValue) ?>" data-hidden="1">
+<?php } else { ?>
+<span id="el$rowindex$_main_buses_bus_size_id" class="form-group main_buses_bus_size_id">
+    <select
+        id="x<?= $Page->RowIndex ?>_bus_size_id"
+        name="x<?= $Page->RowIndex ?>_bus_size_id"
+        class="form-control ew-select<?= $Page->bus_size_id->isInvalidClass() ?>"
+        data-select2-id="main_buses_x<?= $Page->RowIndex ?>_bus_size_id"
+        data-table="main_buses"
+        data-field="x_bus_size_id"
+        data-value-separator="<?= $Page->bus_size_id->displayValueSeparatorAttribute() ?>"
+        data-placeholder="<?= HtmlEncode($Page->bus_size_id->getPlaceHolder()) ?>"
+        <?= $Page->bus_size_id->editAttributes() ?>>
+        <?= $Page->bus_size_id->selectOptionListHtml("x{$Page->RowIndex}_bus_size_id") ?>
+    </select>
+    <div class="invalid-feedback"><?= $Page->bus_size_id->getErrorMessage() ?></div>
+<?= $Page->bus_size_id->Lookup->getParamTag($Page, "p_x" . $Page->RowIndex . "_bus_size_id") ?>
+<script>
+loadjs.ready("head", function() {
+    var el = document.querySelector("select[data-select2-id='main_buses_x<?= $Page->RowIndex ?>_bus_size_id']"),
+        options = { name: "x<?= $Page->RowIndex ?>_bus_size_id", selectId: "main_buses_x<?= $Page->RowIndex ?>_bus_size_id", language: ew.LANGUAGE_ID, dir: ew.IS_RTL ? "rtl" : "ltr" };
+    options.dropdownParent = $(el).closest("#ew-modal-dialog, #ew-add-opt-dialog")[0];
+    Object.assign(options, ew.vars.tables.main_buses.fields.bus_size_id.selectOptions);
+    ew.createSelect(options);
+});
+</script>
+</span>
+<?php } ?>
+<input type="hidden" data-table="main_buses" data-field="x_bus_size_id" data-hidden="1" name="o<?= $Page->RowIndex ?>_bus_size_id" id="o<?= $Page->RowIndex ?>_bus_size_id" value="<?= HtmlEncode($Page->bus_size_id->OldValue) ?>">
 </td>
     <?php } ?>
     <?php if ($Page->bus_depot_id->Visible) { // bus_depot_id ?>
         <td data-name="bus_depot_id">
+<?php if ($Page->bus_depot_id->getSessionValue() != "") { ?>
+<span id="el$rowindex$_main_buses_bus_depot_id" class="form-group main_buses_bus_depot_id">
+<span<?= $Page->bus_depot_id->viewAttributes() ?>>
+<input type="text" readonly class="form-control-plaintext" value="<?= HtmlEncode(RemoveHtml($Page->bus_depot_id->getDisplayValue($Page->bus_depot_id->ViewValue))) ?>"></span>
+</span>
+<input type="hidden" id="x<?= $Page->RowIndex ?>_bus_depot_id" name="x<?= $Page->RowIndex ?>_bus_depot_id" value="<?= HtmlEncode($Page->bus_depot_id->CurrentValue) ?>" data-hidden="1">
+<?php } else { ?>
 <span id="el$rowindex$_main_buses_bus_depot_id" class="form-group main_buses_bus_depot_id">
     <select
         id="x<?= $Page->RowIndex ?>_bus_depot_id"
@@ -1102,7 +1300,24 @@ loadjs.ready("head", function() {
 });
 </script>
 </span>
+<?php } ?>
 <input type="hidden" data-table="main_buses" data-field="x_bus_depot_id" data-hidden="1" name="o<?= $Page->RowIndex ?>_bus_depot_id" id="o<?= $Page->RowIndex ?>_bus_depot_id" value="<?= HtmlEncode($Page->bus_depot_id->OldValue) ?>">
+</td>
+    <?php } ?>
+    <?php if ($Page->ts_last_update->Visible) { // ts_last_update ?>
+        <td data-name="ts_last_update">
+<span id="el$rowindex$_main_buses_ts_last_update" class="form-group main_buses_ts_last_update">
+<input type="<?= $Page->ts_last_update->getInputTextType() ?>" data-table="main_buses" data-field="x_ts_last_update" data-format="1" name="x<?= $Page->RowIndex ?>_ts_last_update" id="x<?= $Page->RowIndex ?>_ts_last_update" placeholder="<?= HtmlEncode($Page->ts_last_update->getPlaceHolder()) ?>" value="<?= $Page->ts_last_update->EditValue ?>"<?= $Page->ts_last_update->editAttributes() ?>>
+<div class="invalid-feedback"><?= $Page->ts_last_update->getErrorMessage() ?></div>
+<?php if (!$Page->ts_last_update->ReadOnly && !$Page->ts_last_update->Disabled && !isset($Page->ts_last_update->EditAttrs["readonly"]) && !isset($Page->ts_last_update->EditAttrs["disabled"])) { ?>
+<script>
+loadjs.ready(["fmain_buseslist", "datetimepicker"], function() {
+    ew.createDateTimePicker("fmain_buseslist", "x<?= $Page->RowIndex ?>_ts_last_update", {"ignoreReadonly":true,"useCurrent":false,"format":1});
+});
+</script>
+<?php } ?>
+</span>
+<input type="hidden" data-table="main_buses" data-field="x_ts_last_update" data-hidden="1" name="o<?= $Page->RowIndex ?>_ts_last_update" id="o<?= $Page->RowIndex ?>_ts_last_update" value="<?= HtmlEncode($Page->ts_last_update->OldValue) ?>">
 </td>
     <?php } ?>
 <?php

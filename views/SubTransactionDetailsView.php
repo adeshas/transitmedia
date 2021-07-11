@@ -64,6 +64,17 @@ $Page->showMessage();
 </td>
     </tr>
 <?php } ?>
+<?php if ($Page->vendor_id->Visible) { // vendor_id ?>
+    <tr id="r_vendor_id">
+        <td class="<?= $Page->TableLeftColumnClass ?>"><span id="elh_sub_transaction_details_vendor_id"><?= $Page->vendor_id->caption() ?></span></td>
+        <td data-name="vendor_id" <?= $Page->vendor_id->cellAttributes() ?>>
+<span id="el_sub_transaction_details_vendor_id">
+<span<?= $Page->vendor_id->viewAttributes() ?>>
+<?= $Page->vendor_id->getViewValue() ?></span>
+</span>
+</td>
+    </tr>
+<?php } ?>
 </table>
 </form>
 <?php

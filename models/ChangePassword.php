@@ -260,7 +260,7 @@ class ChangePassword extends MainUsers
             // Setup variables
             $userName = $Security->currentUserName();
             if (IsPasswordReset())
-                $userName = $_SESSION[SESSION_USER_PROFILE_USER_NAME];
+                $userName = Session(SESSION_USER_PROFILE_USER_NAME);
             $filter = GetUserFilter(Config("LOGIN_USERNAME_FIELD_NAME"),  $userName);
 
             // Set up filter (WHERE Clause)

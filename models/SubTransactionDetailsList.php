@@ -532,6 +532,48 @@ class SubTransactionDetailsList extends SubTransactionDetails
 
         // Create form object
         $CurrentForm = new HttpForm();
+
+        // Get export parameters
+        $custom = "";
+        if (Param("export") !== null) {
+            $this->Export = Param("export");
+            $custom = Param("custom", "");
+        } elseif (IsPost()) {
+            if (Post("exporttype") !== null) {
+                $this->Export = Post("exporttype");
+            }
+            $custom = Post("custom", "");
+        } elseif (Get("cmd") == "json") {
+            $this->Export = Get("cmd");
+        } else {
+            $this->setExportReturnUrl(CurrentUrl());
+        }
+        $ExportFileName = $this->TableVar; // Get export file, used in header
+
+        // Get custom export parameters
+        if ($this->isExport() && $custom != "") {
+            $this->CustomExport = $this->Export;
+            $this->Export = "print";
+        }
+        $CustomExportType = $this->CustomExport;
+        $ExportType = $this->Export; // Get export parameter, used in header
+
+        // Update Export URLs
+        if (Config("USE_PHPEXCEL")) {
+            $this->ExportExcelCustom = false;
+        }
+        if (Config("USE_PHPWORD")) {
+            $this->ExportWordCustom = false;
+        }
+        if ($this->ExportExcelCustom) {
+            $this->ExportExcelUrl .= "&amp;custom=1";
+        }
+        if ($this->ExportWordCustom) {
+            $this->ExportWordUrl .= "&amp;custom=1";
+        }
+        if ($this->ExportPdfCustom) {
+            $this->ExportPdfUrl .= "&amp;custom=1";
+        }
         $this->CurrentAction = Param("action"); // Set up current action
 
         // Get grid add count
@@ -542,12 +584,16 @@ class SubTransactionDetailsList extends SubTransactionDetails
 
         // Set up list options
         $this->setupListOptions();
+
+        // Setup export options
+        $this->setupExportOptions();
         $this->id->Visible = false;
         $this->transaction_id->setVisibility();
         $this->bus_id->setVisibility();
         $this->created_by->Visible = false;
         $this->ts_created->Visible = false;
         $this->ts_last_update->Visible = false;
+        $this->vendor_id->setVisibility();
         $this->hideFieldsForAddEdit();
 
         // Global Page Loading event (in userfn*.php)
@@ -580,6 +626,7 @@ class SubTransactionDetailsList extends SubTransactionDetails
         // Set up lookup cache
         $this->setupLookupOptions($this->transaction_id);
         $this->setupLookupOptions($this->bus_id);
+        $this->setupLookupOptions($this->vendor_id);
 
         // Search filters
         $srchAdvanced = ""; // Advanced search filter
@@ -639,7 +686,7 @@ class SubTransactionDetailsList extends SubTransactionDetails
                     $this->CurrentAction = Post("action"); // Get action
 
                     // Grid Update
-                    if (($this->isGridUpdate() || $this->isGridOverwrite()) && @$_SESSION[SESSION_INLINE_MODE] == "gridedit") {
+                    if (($this->isGridUpdate() || $this->isGridOverwrite()) && Session(SESSION_INLINE_MODE) == "gridedit") {
                         if ($this->validateGridForm()) {
                             $gridUpdate = $this->gridUpdate();
                         } else {
@@ -653,19 +700,19 @@ class SubTransactionDetailsList extends SubTransactionDetails
                     }
 
                     // Inline Update
-                    if (($this->isUpdate() || $this->isOverwrite()) && @$_SESSION[SESSION_INLINE_MODE] == "edit") {
+                    if (($this->isUpdate() || $this->isOverwrite()) && Session(SESSION_INLINE_MODE) == "edit") {
                         $this->setKey(Post($this->OldKeyName));
                         $this->inlineUpdate();
                     }
 
                     // Insert Inline
-                    if ($this->isInsert() && @$_SESSION[SESSION_INLINE_MODE] == "add") {
+                    if ($this->isInsert() && Session(SESSION_INLINE_MODE) == "add") {
                         $this->setKey(Post($this->OldKeyName));
                         $this->inlineInsert();
                     }
 
                     // Grid Insert
-                    if ($this->isGridInsert() && @$_SESSION[SESSION_INLINE_MODE] == "gridadd") {
+                    if ($this->isGridInsert() && Session(SESSION_INLINE_MODE) == "gridadd") {
                         if ($this->validateGridForm()) {
                             $gridInsert = $this->gridInsert();
                         } else {
@@ -677,7 +724,7 @@ class SubTransactionDetailsList extends SubTransactionDetails
                             $this->gridAddMode(); // Stay in Grid add mode
                         }
                     }
-                } elseif (@$_SESSION[SESSION_INLINE_MODE] == "gridedit") { // Previously in grid edit mode
+                } elseif (Session(SESSION_INLINE_MODE) == "gridedit") { // Previously in grid edit mode
                     if (Get(Config("TABLE_START_REC")) !== null || Get(Config("TABLE_PAGE_NO")) !== null) { // Stay in grid edit mode if paging
                         $this->gridEditMode();
                     } else { // Reset grid edit
@@ -719,8 +766,33 @@ class SubTransactionDetailsList extends SubTransactionDetails
                 }
             }
 
+            // Get default search criteria
+            AddFilter($this->DefaultSearchWhere, $this->basicSearchWhere(true));
+
+            // Get basic search values
+            $this->loadBasicSearchValues();
+
+            // Process filter list
+            if ($this->processFilterList()) {
+                $this->terminate();
+                return;
+            }
+
+            // Restore search parms from Session if not searching / reset / export
+            if (($this->isExport() || $this->Command != "search" && $this->Command != "reset" && $this->Command != "resetall") && $this->Command != "json" && $this->checkSearchParms()) {
+                $this->restoreSearchParms();
+            }
+
+            // Call Recordset SearchValidated event
+            $this->recordsetSearchValidated();
+
             // Set up sorting order
             $this->setupSortOrder();
+
+            // Get basic search criteria
+            if (!$this->hasInvalidFields()) {
+                $srchBasic = $this->basicSearchWhere();
+            }
         }
 
         // Restore display records
@@ -736,6 +808,31 @@ class SubTransactionDetailsList extends SubTransactionDetails
             $this->loadSortOrder();
         }
 
+        // Load search default if no existing search criteria
+        if (!$this->checkSearchParms()) {
+            // Load basic search from default
+            $this->BasicSearch->loadDefault();
+            if ($this->BasicSearch->Keyword != "") {
+                $srchBasic = $this->basicSearchWhere();
+            }
+        }
+
+        // Build search criteria
+        AddFilter($this->SearchWhere, $srchAdvanced);
+        AddFilter($this->SearchWhere, $srchBasic);
+
+        // Call Recordset_Searching event
+        $this->recordsetSearching($this->SearchWhere);
+
+        // Save search criteria
+        if ($this->Command == "search" && !$this->RestoreSearch) {
+            $this->setSearchWhere($this->SearchWhere); // Save to Session
+            $this->StartRecord = 1; // Reset start record counter
+            $this->setStartRecordNumber($this->StartRecord);
+        } elseif ($this->Command != "json") {
+            $this->SearchWhere = $this->getSearchWhere();
+        }
+
         // Build filter
         $filter = "";
         if (!$Security->canList()) {
@@ -745,24 +842,15 @@ class SubTransactionDetailsList extends SubTransactionDetails
         // Restore master/detail filter
         $this->DbMasterFilter = $this->getMasterFilter(); // Restore master filter
         $this->DbDetailFilter = $this->getDetailFilter(); // Restore detail filter
+
+        // Add master User ID filter
+        if ($Security->currentUserID() != "" && !$Security->isAdmin()) { // Non system admin
+                if ($this->getCurrentMasterTable() == "main_transactions") {
+                    $this->DbMasterFilter = $this->addMasterUserIDFilter($this->DbMasterFilter, "main_transactions"); // Add master User ID filter
+                }
+        }
         AddFilter($filter, $this->DbDetailFilter);
         AddFilter($filter, $this->SearchWhere);
-
-        // Load master record
-        if ($this->CurrentMode != "add" && $this->getMasterFilter() != "" && $this->getCurrentMasterTable() == "main_buses") {
-            $masterTbl = Container("main_buses");
-            $rsmaster = $masterTbl->loadRs($this->DbMasterFilter)->fetch(\PDO::FETCH_ASSOC);
-            $this->MasterRecordExists = $rsmaster !== false;
-            if (!$this->MasterRecordExists) {
-                $this->setFailureMessage($Language->phrase("NoRecord")); // Set no record found
-                $this->terminate("mainbuseslist"); // Return to master page
-                return;
-            } else {
-                $masterTbl->loadListRowValues($rsmaster);
-                $masterTbl->RowType = ROWTYPE_MASTER; // Master row
-                $masterTbl->renderListRow();
-            }
-        }
 
         // Load master record
         if ($this->CurrentMode != "add" && $this->getMasterFilter() != "" && $this->getCurrentMasterTable() == "main_transactions") {
@@ -787,6 +875,13 @@ class SubTransactionDetailsList extends SubTransactionDetails
         } else {
             $this->setSessionWhere($filter);
             $this->CurrentFilter = "";
+        }
+
+        // Export data only
+        if (!$this->CustomExport && in_array($this->Export, array_keys(Config("EXPORT_CLASSES")))) {
+            $this->exportData();
+            $this->terminate();
+            return;
         }
         if ($this->isGridAdd()) {
             $this->CurrentFilter = "0=1";
@@ -919,6 +1014,13 @@ class SubTransactionDetailsList extends SubTransactionDetails
         }
         if ($inlineEdit) {
             if ($this->loadRow()) {
+                    // Check if valid User ID
+                    if (!$this->showOptionLink("edit")) {
+                        $userIdMsg = $Language->phrase("NoEditPermission");
+                        $this->setFailureMessage($userIdMsg);
+                        $this->clearInlineMode(); // Clear inline edit mode
+                        return false;
+                    }
                 $this->OldKey = $this->getKey(true); // Get from CurrentValue
                 $this->setKey($this->OldKey); // Set to OldValue
                 $_SESSION[SESSION_INLINE_MODE] = "edit"; // Enable inline edit
@@ -1246,6 +1348,9 @@ class SubTransactionDetailsList extends SubTransactionDetails
         if ($CurrentForm->hasValue("x_bus_id") && $CurrentForm->hasValue("o_bus_id") && $this->bus_id->CurrentValue != $this->bus_id->OldValue) {
             return false;
         }
+        if ($CurrentForm->hasValue("x_vendor_id") && $CurrentForm->hasValue("o_vendor_id") && $this->vendor_id->CurrentValue != $this->vendor_id->OldValue) {
+            return false;
+        }
         return true;
     }
 
@@ -1329,6 +1434,282 @@ class SubTransactionDetailsList extends SubTransactionDetails
     {
         $this->transaction_id->clearErrorMessage();
         $this->bus_id->clearErrorMessage();
+        $this->vendor_id->clearErrorMessage();
+    }
+
+    // Get list of filters
+    public function getFilterList()
+    {
+        global $UserProfile;
+
+        // Initialize
+        $filterList = "";
+        $savedFilterList = "";
+        $filterList = Concat($filterList, $this->id->AdvancedSearch->toJson(), ","); // Field id
+        $filterList = Concat($filterList, $this->transaction_id->AdvancedSearch->toJson(), ","); // Field transaction_id
+        $filterList = Concat($filterList, $this->bus_id->AdvancedSearch->toJson(), ","); // Field bus_id
+        $filterList = Concat($filterList, $this->created_by->AdvancedSearch->toJson(), ","); // Field created_by
+        $filterList = Concat($filterList, $this->ts_created->AdvancedSearch->toJson(), ","); // Field ts_created
+        $filterList = Concat($filterList, $this->ts_last_update->AdvancedSearch->toJson(), ","); // Field ts_last_update
+        $filterList = Concat($filterList, $this->vendor_id->AdvancedSearch->toJson(), ","); // Field vendor_id
+        if ($this->BasicSearch->Keyword != "") {
+            $wrk = "\"" . Config("TABLE_BASIC_SEARCH") . "\":\"" . JsEncode($this->BasicSearch->Keyword) . "\",\"" . Config("TABLE_BASIC_SEARCH_TYPE") . "\":\"" . JsEncode($this->BasicSearch->Type) . "\"";
+            $filterList = Concat($filterList, $wrk, ",");
+        }
+
+        // Return filter list in JSON
+        if ($filterList != "") {
+            $filterList = "\"data\":{" . $filterList . "}";
+        }
+        if ($savedFilterList != "") {
+            $filterList = Concat($filterList, "\"filters\":" . $savedFilterList, ",");
+        }
+        return ($filterList != "") ? "{" . $filterList . "}" : "null";
+    }
+
+    // Process filter list
+    protected function processFilterList()
+    {
+        global $UserProfile;
+        if (Post("ajax") == "savefilters") { // Save filter request (Ajax)
+            $filters = Post("filters");
+            $UserProfile->setSearchFilters(CurrentUserName(), "fsub_transaction_detailslistsrch", $filters);
+            WriteJson([["success" => true]]); // Success
+            return true;
+        } elseif (Post("cmd") == "resetfilter") {
+            $this->restoreFilterList();
+        }
+        return false;
+    }
+
+    // Restore list of filters
+    protected function restoreFilterList()
+    {
+        // Return if not reset filter
+        if (Post("cmd") !== "resetfilter") {
+            return false;
+        }
+        $filter = json_decode(Post("filter"), true);
+        $this->Command = "search";
+
+        // Field id
+        $this->id->AdvancedSearch->SearchValue = @$filter["x_id"];
+        $this->id->AdvancedSearch->SearchOperator = @$filter["z_id"];
+        $this->id->AdvancedSearch->SearchCondition = @$filter["v_id"];
+        $this->id->AdvancedSearch->SearchValue2 = @$filter["y_id"];
+        $this->id->AdvancedSearch->SearchOperator2 = @$filter["w_id"];
+        $this->id->AdvancedSearch->save();
+
+        // Field transaction_id
+        $this->transaction_id->AdvancedSearch->SearchValue = @$filter["x_transaction_id"];
+        $this->transaction_id->AdvancedSearch->SearchOperator = @$filter["z_transaction_id"];
+        $this->transaction_id->AdvancedSearch->SearchCondition = @$filter["v_transaction_id"];
+        $this->transaction_id->AdvancedSearch->SearchValue2 = @$filter["y_transaction_id"];
+        $this->transaction_id->AdvancedSearch->SearchOperator2 = @$filter["w_transaction_id"];
+        $this->transaction_id->AdvancedSearch->save();
+
+        // Field bus_id
+        $this->bus_id->AdvancedSearch->SearchValue = @$filter["x_bus_id"];
+        $this->bus_id->AdvancedSearch->SearchOperator = @$filter["z_bus_id"];
+        $this->bus_id->AdvancedSearch->SearchCondition = @$filter["v_bus_id"];
+        $this->bus_id->AdvancedSearch->SearchValue2 = @$filter["y_bus_id"];
+        $this->bus_id->AdvancedSearch->SearchOperator2 = @$filter["w_bus_id"];
+        $this->bus_id->AdvancedSearch->save();
+
+        // Field created_by
+        $this->created_by->AdvancedSearch->SearchValue = @$filter["x_created_by"];
+        $this->created_by->AdvancedSearch->SearchOperator = @$filter["z_created_by"];
+        $this->created_by->AdvancedSearch->SearchCondition = @$filter["v_created_by"];
+        $this->created_by->AdvancedSearch->SearchValue2 = @$filter["y_created_by"];
+        $this->created_by->AdvancedSearch->SearchOperator2 = @$filter["w_created_by"];
+        $this->created_by->AdvancedSearch->save();
+
+        // Field ts_created
+        $this->ts_created->AdvancedSearch->SearchValue = @$filter["x_ts_created"];
+        $this->ts_created->AdvancedSearch->SearchOperator = @$filter["z_ts_created"];
+        $this->ts_created->AdvancedSearch->SearchCondition = @$filter["v_ts_created"];
+        $this->ts_created->AdvancedSearch->SearchValue2 = @$filter["y_ts_created"];
+        $this->ts_created->AdvancedSearch->SearchOperator2 = @$filter["w_ts_created"];
+        $this->ts_created->AdvancedSearch->save();
+
+        // Field ts_last_update
+        $this->ts_last_update->AdvancedSearch->SearchValue = @$filter["x_ts_last_update"];
+        $this->ts_last_update->AdvancedSearch->SearchOperator = @$filter["z_ts_last_update"];
+        $this->ts_last_update->AdvancedSearch->SearchCondition = @$filter["v_ts_last_update"];
+        $this->ts_last_update->AdvancedSearch->SearchValue2 = @$filter["y_ts_last_update"];
+        $this->ts_last_update->AdvancedSearch->SearchOperator2 = @$filter["w_ts_last_update"];
+        $this->ts_last_update->AdvancedSearch->save();
+
+        // Field vendor_id
+        $this->vendor_id->AdvancedSearch->SearchValue = @$filter["x_vendor_id"];
+        $this->vendor_id->AdvancedSearch->SearchOperator = @$filter["z_vendor_id"];
+        $this->vendor_id->AdvancedSearch->SearchCondition = @$filter["v_vendor_id"];
+        $this->vendor_id->AdvancedSearch->SearchValue2 = @$filter["y_vendor_id"];
+        $this->vendor_id->AdvancedSearch->SearchOperator2 = @$filter["w_vendor_id"];
+        $this->vendor_id->AdvancedSearch->save();
+        $this->BasicSearch->setKeyword(@$filter[Config("TABLE_BASIC_SEARCH")]);
+        $this->BasicSearch->setType(@$filter[Config("TABLE_BASIC_SEARCH_TYPE")]);
+    }
+
+    // Return basic search SQL
+    protected function basicSearchSql($arKeywords, $type)
+    {
+        $where = "";
+        $this->buildBasicSearchSql($where, $this->transaction_id, $arKeywords, $type);
+        $this->buildBasicSearchSql($where, $this->bus_id, $arKeywords, $type);
+        return $where;
+    }
+
+    // Build basic search SQL
+    protected function buildBasicSearchSql(&$where, &$fld, $arKeywords, $type)
+    {
+        $defCond = ($type == "OR") ? "OR" : "AND";
+        $arSql = []; // Array for SQL parts
+        $arCond = []; // Array for search conditions
+        $cnt = count($arKeywords);
+        $j = 0; // Number of SQL parts
+        for ($i = 0; $i < $cnt; $i++) {
+            $keyword = $arKeywords[$i];
+            $keyword = trim($keyword);
+            if (Config("BASIC_SEARCH_IGNORE_PATTERN") != "") {
+                $keyword = preg_replace(Config("BASIC_SEARCH_IGNORE_PATTERN"), "\\", $keyword);
+                $ar = explode("\\", $keyword);
+            } else {
+                $ar = [$keyword];
+            }
+            foreach ($ar as $keyword) {
+                if ($keyword != "") {
+                    $wrk = "";
+                    if ($keyword == "OR" && $type == "") {
+                        if ($j > 0) {
+                            $arCond[$j - 1] = "OR";
+                        }
+                    } elseif ($keyword == Config("NULL_VALUE")) {
+                        $wrk = $fld->Expression . " IS NULL";
+                    } elseif ($keyword == Config("NOT_NULL_VALUE")) {
+                        $wrk = $fld->Expression . " IS NOT NULL";
+                    } elseif ($fld->IsVirtual && $fld->Visible) {
+                        $wrk = $fld->VirtualExpression . Like(QuotedValue("%" . $keyword . "%", DATATYPE_STRING, $this->Dbid), $this->Dbid);
+                    } elseif ($fld->DataType != DATATYPE_NUMBER || is_numeric($keyword)) {
+                        $wrk = $fld->BasicSearchExpression . Like(QuotedValue("%" . $keyword . "%", DATATYPE_STRING, $this->Dbid), $this->Dbid);
+                    }
+                    if ($wrk != "") {
+                        $arSql[$j] = $wrk;
+                        $arCond[$j] = $defCond;
+                        $j += 1;
+                    }
+                }
+            }
+        }
+        $cnt = count($arSql);
+        $quoted = false;
+        $sql = "";
+        if ($cnt > 0) {
+            for ($i = 0; $i < $cnt - 1; $i++) {
+                if ($arCond[$i] == "OR") {
+                    if (!$quoted) {
+                        $sql .= "(";
+                    }
+                    $quoted = true;
+                }
+                $sql .= $arSql[$i];
+                if ($quoted && $arCond[$i] != "OR") {
+                    $sql .= ")";
+                    $quoted = false;
+                }
+                $sql .= " " . $arCond[$i] . " ";
+            }
+            $sql .= $arSql[$cnt - 1];
+            if ($quoted) {
+                $sql .= ")";
+            }
+        }
+        if ($sql != "") {
+            if ($where != "") {
+                $where .= " OR ";
+            }
+            $where .= "(" . $sql . ")";
+        }
+    }
+
+    // Return basic search WHERE clause based on search keyword and type
+    protected function basicSearchWhere($default = false)
+    {
+        global $Security;
+        $searchStr = "";
+        if (!$Security->canSearch()) {
+            return "";
+        }
+        $searchKeyword = ($default) ? $this->BasicSearch->KeywordDefault : $this->BasicSearch->Keyword;
+        $searchType = ($default) ? $this->BasicSearch->TypeDefault : $this->BasicSearch->Type;
+
+        // Get search SQL
+        if ($searchKeyword != "") {
+            $ar = $this->BasicSearch->keywordList($default);
+            // Search keyword in any fields
+            if (($searchType == "OR" || $searchType == "AND") && $this->BasicSearch->BasicSearchAnyFields) {
+                foreach ($ar as $keyword) {
+                    if ($keyword != "") {
+                        if ($searchStr != "") {
+                            $searchStr .= " " . $searchType . " ";
+                        }
+                        $searchStr .= "(" . $this->basicSearchSql([$keyword], $searchType) . ")";
+                    }
+                }
+            } else {
+                $searchStr = $this->basicSearchSql($ar, $searchType);
+            }
+            if (!$default && in_array($this->Command, ["", "reset", "resetall"])) {
+                $this->Command = "search";
+            }
+        }
+        if (!$default && $this->Command == "search") {
+            $this->BasicSearch->setKeyword($searchKeyword);
+            $this->BasicSearch->setType($searchType);
+        }
+        return $searchStr;
+    }
+
+    // Check if search parm exists
+    protected function checkSearchParms()
+    {
+        // Check basic search
+        if ($this->BasicSearch->issetSession()) {
+            return true;
+        }
+        return false;
+    }
+
+    // Clear all search parameters
+    protected function resetSearchParms()
+    {
+        // Clear search WHERE clause
+        $this->SearchWhere = "";
+        $this->setSearchWhere($this->SearchWhere);
+
+        // Clear basic search parameters
+        $this->resetBasicSearchParms();
+    }
+
+    // Load advanced search default values
+    protected function loadAdvancedSearchDefault()
+    {
+        return false;
+    }
+
+    // Clear all basic search parameters
+    protected function resetBasicSearchParms()
+    {
+        $this->BasicSearch->unsetSession();
+    }
+
+    // Restore all search parameters
+    protected function restoreSearchParms()
+    {
+        $this->RestoreSearch = true;
+
+        // Restore basic search values
+        $this->BasicSearch->load();
     }
 
     // Set up sort parameters
@@ -1340,6 +1721,7 @@ class SubTransactionDetailsList extends SubTransactionDetails
             $this->CurrentOrderType = Get("ordertype", "");
             $this->updateSort($this->transaction_id); // transaction_id
             $this->updateSort($this->bus_id); // bus_id
+            $this->updateSort($this->vendor_id); // vendor_id
             $this->setStartRecordNumber(1); // Reset start position
         }
     }
@@ -1374,12 +1756,16 @@ class SubTransactionDetailsList extends SubTransactionDetails
     {
         // Check if reset command
         if (StartsString("reset", $this->Command)) {
+            // Reset search criteria
+            if ($this->Command == "reset" || $this->Command == "resetall") {
+                $this->resetSearchParms();
+            }
+
             // Reset master/detail keys
             if ($this->Command == "resetall") {
                 $this->setCurrentMasterTable(""); // Clear master table
                 $this->DbMasterFilter = "";
                 $this->DbDetailFilter = "";
-                        $this->bus_id->setSessionValue("");
                         $this->transaction_id->setSessionValue("");
             }
 
@@ -1394,6 +1780,7 @@ class SubTransactionDetailsList extends SubTransactionDetails
                 $this->created_by->setSort("");
                 $this->ts_created->setSort("");
                 $this->ts_last_update->setSort("");
+                $this->vendor_id->setSort("");
             }
 
             // Reset start position
@@ -1488,7 +1875,6 @@ class SubTransactionDetailsList extends SubTransactionDetails
         $this->listOptionsRendering();
 
         // Set up row action and key
-        $keyName = "";
         if ($CurrentForm && is_numeric($this->RowIndex) && $this->RowType != "view") {
             $CurrentForm->Index = $this->RowIndex;
             $actionName = str_replace("k_", "k" . $this->RowIndex . "_", $this->FormActionName);
@@ -1527,7 +1913,7 @@ class SubTransactionDetailsList extends SubTransactionDetails
             $this->ListOptions->CustomItem = "copy"; // Show copy column only
             $cancelurl = $this->addMasterUrl($pageUrl . "action=cancel");
             $opt->Body = "<div" . (($opt->OnLeft) ? " class=\"text-right\"" : "") . ">" .
-            "<a class=\"ew-grid-link ew-inline-insert\" title=\"" . HtmlTitle($Language->phrase("InsertLink")) . "\" data-caption=\"" . HtmlTitle($Language->phrase("InsertLink")) . "\" href=\"#\" onclick=\"return ew.forms.get(this).submit('" . $this->pageName() . "');\">" . $Language->phrase("InsertLink") . "</a>&nbsp;" .
+            "<a class=\"ew-grid-link ew-inline-insert\" title=\"" . HtmlTitle($Language->phrase("InsertLink")) . "\" data-caption=\"" . HtmlTitle($Language->phrase("InsertLink")) . "\" href=\"#\" onclick=\"return ew.forms.get(this).submit(event, '" . $this->pageName() . "');\">" . $Language->phrase("InsertLink") . "</a>&nbsp;" .
             "<a class=\"ew-grid-link ew-inline-cancel\" title=\"" . HtmlTitle($Language->phrase("CancelLink")) . "\" data-caption=\"" . HtmlTitle($Language->phrase("CancelLink")) . "\" href=\"" . $cancelurl . "\">" . $Language->phrase("CancelLink") . "</a>" .
             "<input type=\"hidden\" name=\"action\" id=\"action\" value=\"insert\"></div>";
             return;
@@ -1539,7 +1925,7 @@ class SubTransactionDetailsList extends SubTransactionDetails
             $this->ListOptions->CustomItem = "edit"; // Show edit column only
             $cancelurl = $this->addMasterUrl($pageUrl . "action=cancel");
                 $opt->Body = "<div" . (($opt->OnLeft) ? " class=\"text-right\"" : "") . ">" .
-                "<a class=\"ew-grid-link ew-inline-update\" title=\"" . HtmlTitle($Language->phrase("UpdateLink")) . "\" data-caption=\"" . HtmlTitle($Language->phrase("UpdateLink")) . "\" href=\"#\" onclick=\"return ew.forms.get(this).submit('" . UrlAddHash($this->pageName(), "r" . $this->RowCount . "_" . $this->TableVar) . "');\">" . $Language->phrase("UpdateLink") . "</a>&nbsp;" .
+                "<a class=\"ew-grid-link ew-inline-update\" title=\"" . HtmlTitle($Language->phrase("UpdateLink")) . "\" data-caption=\"" . HtmlTitle($Language->phrase("UpdateLink")) . "\" href=\"#\" onclick=\"return ew.forms.get(this).submit(event, '" . UrlAddHash($this->pageName(), "r" . $this->RowCount . "_" . $this->TableVar) . "');\">" . $Language->phrase("UpdateLink") . "</a>&nbsp;" .
                 "<a class=\"ew-grid-link ew-inline-cancel\" title=\"" . HtmlTitle($Language->phrase("CancelLink")) . "\" data-caption=\"" . HtmlTitle($Language->phrase("CancelLink")) . "\" href=\"" . $cancelurl . "\">" . $Language->phrase("CancelLink") . "</a>" .
                 "<input type=\"hidden\" name=\"action\" id=\"action\" value=\"update\"></div>";
             $opt->Body .= "<input type=\"hidden\" name=\"k" . $this->RowIndex . "_key\" id=\"k" . $this->RowIndex . "_key\" value=\"" . HtmlEncode($this->id->CurrentValue) . "\">";
@@ -1549,7 +1935,7 @@ class SubTransactionDetailsList extends SubTransactionDetails
             // "view"
             $opt = $this->ListOptions["view"];
             $viewcaption = HtmlTitle($Language->phrase("ViewLink"));
-            if ($Security->canView()) {
+            if ($Security->canView() && $this->showOptionLink("view")) {
                 $opt->Body = "<a class=\"ew-row-link ew-view\" title=\"" . $viewcaption . "\" data-caption=\"" . $viewcaption . "\" href=\"" . HtmlEncode(GetUrl($this->ViewUrl)) . "\">" . $Language->phrase("ViewLink") . "</a>";
             } else {
                 $opt->Body = "";
@@ -1558,7 +1944,7 @@ class SubTransactionDetailsList extends SubTransactionDetails
             // "edit"
             $opt = $this->ListOptions["edit"];
             $editcaption = HtmlTitle($Language->phrase("EditLink"));
-            if ($Security->canEdit()) {
+            if ($Security->canEdit() && $this->showOptionLink("edit")) {
                 $opt->Body = "<a class=\"ew-row-link ew-edit\" title=\"" . HtmlTitle($Language->phrase("EditLink")) . "\" data-caption=\"" . HtmlTitle($Language->phrase("EditLink")) . "\" href=\"" . HtmlEncode(GetUrl($this->EditUrl)) . "\">" . $Language->phrase("EditLink") . "</a>";
                 $opt->Body .= "<a class=\"ew-row-link ew-inline-edit\" title=\"" . HtmlTitle($Language->phrase("InlineEditLink")) . "\" data-caption=\"" . HtmlTitle($Language->phrase("InlineEditLink")) . "\" href=\"" . HtmlEncode(UrlAddHash(GetUrl($this->InlineEditUrl), "r" . $this->RowCount . "_" . $this->TableVar)) . "\">" . $Language->phrase("InlineEditLink") . "</a>";
             } else {
@@ -1567,7 +1953,7 @@ class SubTransactionDetailsList extends SubTransactionDetails
 
             // "delete"
             $opt = $this->ListOptions["delete"];
-            if ($Security->canDelete()) {
+            if ($Security->canDelete() && $this->showOptionLink("delete")) {
             $opt->Body = "<a class=\"ew-row-link ew-delete\"" . "" . " title=\"" . HtmlTitle($Language->phrase("DeleteLink")) . "\" data-caption=\"" . HtmlTitle($Language->phrase("DeleteLink")) . "\" href=\"" . HtmlEncode(GetUrl($this->DeleteUrl)) . "\">" . $Language->phrase("DeleteLink") . "</a>";
             } else {
                 $opt->Body = "";
@@ -1608,11 +1994,6 @@ class SubTransactionDetailsList extends SubTransactionDetails
         // "checkbox"
         $opt = $this->ListOptions["checkbox"];
         $opt->Body = "<div class=\"custom-control custom-checkbox d-inline-block\"><input type=\"checkbox\" id=\"key_m_" . $this->RowCount . "\" name=\"key_m[]\" class=\"custom-control-input ew-multi-select\" value=\"" . HtmlEncode($this->id->CurrentValue) . "\" onclick=\"ew.clickMultiCheckbox(event);\"><label class=\"custom-control-label\" for=\"key_m_" . $this->RowCount . "\"></label></div>";
-        if ($this->isGridEdit() && is_numeric($this->RowIndex)) {
-            if ($keyName != "") {
-                $this->MultiSelectKey .= "<input type=\"hidden\" name=\"" . $keyName . "\" id=\"" . $keyName . "\" value=\"" . $this->id->CurrentValue . "\">";
-            }
-        }
         $this->renderListOptionsExt();
 
         // Call ListOptions_Rendered event
@@ -1663,10 +2044,10 @@ class SubTransactionDetailsList extends SubTransactionDetails
         // Filter button
         $item = &$this->FilterOptions->add("savecurrentfilter");
         $item->Body = "<a class=\"ew-save-filter\" data-form=\"fsub_transaction_detailslistsrch\" href=\"#\" onclick=\"return false;\">" . $Language->phrase("SaveCurrentFilter") . "</a>";
-        $item->Visible = false;
+        $item->Visible = true;
         $item = &$this->FilterOptions->add("deletefilter");
         $item->Body = "<a class=\"ew-delete-filter\" data-form=\"fsub_transaction_detailslistsrch\" href=\"#\" onclick=\"return false;\">" . $Language->phrase("DeleteFilter") . "</a>";
-        $item->Visible = false;
+        $item->Visible = true;
         $this->FilterOptions->UseDropDownButton = true;
         $this->FilterOptions->UseButtonGroup = !$this->FilterOptions->UseDropDownButton;
         $this->FilterOptions->DropDownButtonPhrase = $Language->phrase("Filters");
@@ -1726,7 +2107,7 @@ class SubTransactionDetailsList extends SubTransactionDetails
                 $option->UseDropDownButton = false;
                 // Add grid insert
                 $item = &$option->add("gridinsert");
-                $item->Body = "<a class=\"ew-action ew-grid-insert\" title=\"" . HtmlTitle($Language->phrase("GridInsertLink")) . "\" data-caption=\"" . HtmlTitle($Language->phrase("GridInsertLink")) . "\" href=\"#\" onclick=\"return ew.forms.get(this).submit('" . $this->pageName() . "');\">" . $Language->phrase("GridInsertLink") . "</a>";
+                $item->Body = "<a class=\"ew-action ew-grid-insert\" title=\"" . HtmlTitle($Language->phrase("GridInsertLink")) . "\" data-caption=\"" . HtmlTitle($Language->phrase("GridInsertLink")) . "\" href=\"#\" onclick=\"return ew.forms.get(this).submit(event, '" . $this->pageName() . "');\">" . $Language->phrase("GridInsertLink") . "</a>";
                 // Add grid cancel
                 $item = &$option->add("gridcancel");
                 $cancelurl = $this->addMasterUrl($pageUrl . "action=cancel");
@@ -1746,7 +2127,7 @@ class SubTransactionDetailsList extends SubTransactionDetails
                 $option = $options["action"];
                 $option->UseDropDownButton = false;
                     $item = &$option->add("gridsave");
-                    $item->Body = "<a class=\"ew-action ew-grid-save\" title=\"" . HtmlTitle($Language->phrase("GridSaveLink")) . "\" data-caption=\"" . HtmlTitle($Language->phrase("GridSaveLink")) . "\" href=\"#\" onclick=\"return ew.forms.get(this).submit('" . $this->pageName() . "');\">" . $Language->phrase("GridSaveLink") . "</a>";
+                    $item->Body = "<a class=\"ew-action ew-grid-save\" title=\"" . HtmlTitle($Language->phrase("GridSaveLink")) . "\" data-caption=\"" . HtmlTitle($Language->phrase("GridSaveLink")) . "\" href=\"#\" onclick=\"return ew.forms.get(this).submit(event, '" . $this->pageName() . "');\">" . $Language->phrase("GridSaveLink") . "</a>";
                     $item = &$option->add("gridcancel");
                     $cancelurl = $this->addMasterUrl($pageUrl . "action=cancel");
                     $item->Body = "<a class=\"ew-action ew-grid-cancel\" title=\"" . HtmlTitle($Language->phrase("GridCancelLink")) . "\" data-caption=\"" . HtmlTitle($Language->phrase("GridCancelLink")) . "\" href=\"" . $cancelurl . "\">" . $Language->phrase("GridCancelLink") . "</a>";
@@ -1861,6 +2242,18 @@ class SubTransactionDetailsList extends SubTransactionDetails
         $this->ts_created->OldValue = $this->ts_created->CurrentValue;
         $this->ts_last_update->CurrentValue = null;
         $this->ts_last_update->OldValue = $this->ts_last_update->CurrentValue;
+        $this->vendor_id->CurrentValue = CurrentUserID();
+        $this->vendor_id->OldValue = $this->vendor_id->CurrentValue;
+    }
+
+    // Load basic search values
+    protected function loadBasicSearchValues()
+    {
+        $this->BasicSearch->setKeyword(Get(Config("TABLE_BASIC_SEARCH"), ""), false);
+        if ($this->BasicSearch->Keyword != "" && $this->Command == "") {
+            $this->Command = "search";
+        }
+        $this->BasicSearch->setType(Get(Config("TABLE_BASIC_SEARCH_TYPE"), ""), false);
     }
 
     // Load form values
@@ -1895,6 +2288,19 @@ class SubTransactionDetailsList extends SubTransactionDetails
             $this->bus_id->setOldValue($CurrentForm->getValue("o_bus_id"));
         }
 
+        // Check field name 'vendor_id' first before field var 'x_vendor_id'
+        $val = $CurrentForm->hasValue("vendor_id") ? $CurrentForm->getValue("vendor_id") : $CurrentForm->getValue("x_vendor_id");
+        if (!$this->vendor_id->IsDetailKey) {
+            if (IsApi() && $val === null) {
+                $this->vendor_id->Visible = false; // Disable update for API request
+            } else {
+                $this->vendor_id->setFormValue($val);
+            }
+        }
+        if ($CurrentForm->hasValue("o_vendor_id")) {
+            $this->vendor_id->setOldValue($CurrentForm->getValue("o_vendor_id"));
+        }
+
         // Check field name 'id' first before field var 'x_id'
         $val = $CurrentForm->hasValue("id") ? $CurrentForm->getValue("id") : $CurrentForm->getValue("x_id");
         if (!$this->id->IsDetailKey && !$this->isGridAdd() && !$this->isAdd()) {
@@ -1911,6 +2317,7 @@ class SubTransactionDetailsList extends SubTransactionDetails
         }
         $this->transaction_id->CurrentValue = $this->transaction_id->FormValue;
         $this->bus_id->CurrentValue = $this->bus_id->FormValue;
+        $this->vendor_id->CurrentValue = $this->vendor_id->FormValue;
     }
 
     // Load recordset
@@ -1995,6 +2402,7 @@ class SubTransactionDetailsList extends SubTransactionDetails
         $this->created_by->setDbValue($row['created_by']);
         $this->ts_created->setDbValue($row['ts_created']);
         $this->ts_last_update->setDbValue($row['ts_last_update']);
+        $this->vendor_id->setDbValue($row['vendor_id']);
     }
 
     // Return a row with default values
@@ -2008,6 +2416,7 @@ class SubTransactionDetailsList extends SubTransactionDetails
         $row['created_by'] = $this->created_by->CurrentValue;
         $row['ts_created'] = $this->ts_created->CurrentValue;
         $row['ts_last_update'] = $this->ts_last_update->CurrentValue;
+        $row['vendor_id'] = $this->vendor_id->CurrentValue;
         return $row;
     }
 
@@ -2056,6 +2465,8 @@ class SubTransactionDetailsList extends SubTransactionDetails
         // ts_created
 
         // ts_last_update
+
+        // vendor_id
         if ($this->RowType == ROWTYPE_VIEW) {
             // id
             $this->id->ViewValue = $this->id->CurrentValue;
@@ -2068,7 +2479,7 @@ class SubTransactionDetailsList extends SubTransactionDetails
                 $this->transaction_id->ViewValue = $this->transaction_id->lookupCacheOption($curVal);
                 if ($this->transaction_id->ViewValue === null) { // Lookup from database
                     $filterWrk = "\"id\"" . SearchString("=", $curVal, DATATYPE_NUMBER, "");
-                    $sqlWrk = $this->transaction_id->Lookup->getSql(false, $filterWrk, '', $this, true);
+                    $sqlWrk = $this->transaction_id->Lookup->getSql(false, $filterWrk, '', $this, true, true);
                     $rswrk = Conn()->executeQuery($sqlWrk)->fetchAll(\PDO::FETCH_BOTH);
                     $ari = count($rswrk);
                     if ($ari > 0) { // Lookup values found
@@ -2092,7 +2503,7 @@ class SubTransactionDetailsList extends SubTransactionDetails
                     $this->bus_id->ViewValue = $this->bus_id->lookupCacheOption($curVal);
                     if ($this->bus_id->ViewValue === null) { // Lookup from database
                         $filterWrk = "\"bus_id\"" . SearchString("=", $curVal, DATATYPE_NUMBER, "");
-                        $sqlWrk = $this->bus_id->Lookup->getSql(false, $filterWrk, '', $this, true);
+                        $sqlWrk = $this->bus_id->Lookup->getSql(false, $filterWrk, '', $this, true, true);
                         $rswrk = Conn()->executeQuery($sqlWrk)->fetchAll(\PDO::FETCH_BOTH);
                         $ari = count($rswrk);
                         if ($ari > 0) { // Lookup values found
@@ -2123,6 +2534,28 @@ class SubTransactionDetailsList extends SubTransactionDetails
             $this->ts_last_update->ViewValue = FormatDateTime($this->ts_last_update->ViewValue, 0);
             $this->ts_last_update->ViewCustomAttributes = "";
 
+            // vendor_id
+            $this->vendor_id->ViewValue = $this->vendor_id->CurrentValue;
+            $curVal = strval($this->vendor_id->CurrentValue);
+            if ($curVal != "") {
+                $this->vendor_id->ViewValue = $this->vendor_id->lookupCacheOption($curVal);
+                if ($this->vendor_id->ViewValue === null) { // Lookup from database
+                    $filterWrk = "\"id\"" . SearchString("=", $curVal, DATATYPE_NUMBER, "");
+                    $sqlWrk = $this->vendor_id->Lookup->getSql(false, $filterWrk, '', $this, true, true);
+                    $rswrk = Conn()->executeQuery($sqlWrk)->fetchAll(\PDO::FETCH_BOTH);
+                    $ari = count($rswrk);
+                    if ($ari > 0) { // Lookup values found
+                        $arwrk = $this->vendor_id->Lookup->renderViewRow($rswrk[0]);
+                        $this->vendor_id->ViewValue = $this->vendor_id->displayValue($arwrk);
+                    } else {
+                        $this->vendor_id->ViewValue = $this->vendor_id->CurrentValue;
+                    }
+                }
+            } else {
+                $this->vendor_id->ViewValue = null;
+            }
+            $this->vendor_id->ViewCustomAttributes = "";
+
             // transaction_id
             $this->transaction_id->LinkCustomAttributes = "";
             $this->transaction_id->HrefValue = "";
@@ -2132,6 +2565,11 @@ class SubTransactionDetailsList extends SubTransactionDetails
             $this->bus_id->LinkCustomAttributes = "";
             $this->bus_id->HrefValue = "";
             $this->bus_id->TooltipValue = "";
+
+            // vendor_id
+            $this->vendor_id->LinkCustomAttributes = "";
+            $this->vendor_id->HrefValue = "";
+            $this->vendor_id->TooltipValue = "";
         } elseif ($this->RowType == ROWTYPE_ADD) {
             // transaction_id
             $this->transaction_id->EditAttrs["class"] = "form-control";
@@ -2144,7 +2582,7 @@ class SubTransactionDetailsList extends SubTransactionDetails
                     $this->transaction_id->ViewValue = $this->transaction_id->lookupCacheOption($curVal);
                     if ($this->transaction_id->ViewValue === null) { // Lookup from database
                         $filterWrk = "\"id\"" . SearchString("=", $curVal, DATATYPE_NUMBER, "");
-                        $sqlWrk = $this->transaction_id->Lookup->getSql(false, $filterWrk, '', $this, true);
+                        $sqlWrk = $this->transaction_id->Lookup->getSql(false, $filterWrk, '', $this, true, true);
                         $rswrk = Conn()->executeQuery($sqlWrk)->fetchAll(\PDO::FETCH_BOTH);
                         $ari = count($rswrk);
                         if ($ari > 0) { // Lookup values found
@@ -2173,7 +2611,7 @@ class SubTransactionDetailsList extends SubTransactionDetails
                     } else {
                         $filterWrk = "\"id\"" . SearchString("=", $this->transaction_id->CurrentValue, DATATYPE_NUMBER, "");
                     }
-                    $sqlWrk = $this->transaction_id->Lookup->getSql(true, $filterWrk, '', $this);
+                    $sqlWrk = $this->transaction_id->Lookup->getSql(true, $filterWrk, '', $this, false, true);
                     $rswrk = Conn()->executeQuery($sqlWrk)->fetchAll(\PDO::FETCH_BOTH);
                     $ari = count($rswrk);
                     $arwrk = $rswrk;
@@ -2187,54 +2625,62 @@ class SubTransactionDetailsList extends SubTransactionDetails
             // bus_id
             $this->bus_id->EditAttrs["class"] = "form-control";
             $this->bus_id->EditCustomAttributes = "";
-            if ($this->bus_id->getSessionValue() != "") {
-                $this->bus_id->CurrentValue = GetForeignKeyValue($this->bus_id->getSessionValue());
-                $this->bus_id->OldValue = $this->bus_id->CurrentValue;
-                if ($this->bus_id->VirtualValue != "") {
-                    $this->bus_id->ViewValue = $this->bus_id->VirtualValue;
-                } else {
-                    $curVal = strval($this->bus_id->CurrentValue);
-                    if ($curVal != "") {
-                        $this->bus_id->ViewValue = $this->bus_id->lookupCacheOption($curVal);
-                        if ($this->bus_id->ViewValue === null) { // Lookup from database
-                            $filterWrk = "\"bus_id\"" . SearchString("=", $curVal, DATATYPE_NUMBER, "");
-                            $sqlWrk = $this->bus_id->Lookup->getSql(false, $filterWrk, '', $this, true);
-                            $rswrk = Conn()->executeQuery($sqlWrk)->fetchAll(\PDO::FETCH_BOTH);
-                            $ari = count($rswrk);
-                            if ($ari > 0) { // Lookup values found
-                                $arwrk = $this->bus_id->Lookup->renderViewRow($rswrk[0]);
-                                $this->bus_id->ViewValue = $this->bus_id->displayValue($arwrk);
-                            } else {
-                                $this->bus_id->ViewValue = $this->bus_id->CurrentValue;
-                            }
-                        }
-                    } else {
-                        $this->bus_id->ViewValue = null;
-                    }
-                }
-                $this->bus_id->ViewCustomAttributes = "";
+            $curVal = trim(strval($this->bus_id->CurrentValue));
+            if ($curVal != "") {
+                $this->bus_id->ViewValue = $this->bus_id->lookupCacheOption($curVal);
             } else {
-                $curVal = trim(strval($this->bus_id->CurrentValue));
-                if ($curVal != "") {
-                    $this->bus_id->ViewValue = $this->bus_id->lookupCacheOption($curVal);
+                $this->bus_id->ViewValue = $this->bus_id->Lookup !== null && is_array($this->bus_id->Lookup->Options) ? $curVal : null;
+            }
+            if ($this->bus_id->ViewValue !== null) { // Load from cache
+                $this->bus_id->EditValue = array_values($this->bus_id->Lookup->Options);
+            } else { // Lookup from database
+                if ($curVal == "") {
+                    $filterWrk = "0=1";
                 } else {
-                    $this->bus_id->ViewValue = $this->bus_id->Lookup !== null && is_array($this->bus_id->Lookup->Options) ? $curVal : null;
+                    $filterWrk = "\"bus_id\"" . SearchString("=", $this->bus_id->CurrentValue, DATATYPE_NUMBER, "");
                 }
-                if ($this->bus_id->ViewValue !== null) { // Load from cache
-                    $this->bus_id->EditValue = array_values($this->bus_id->Lookup->Options);
-                } else { // Lookup from database
-                    if ($curVal == "") {
-                        $filterWrk = "0=1";
-                    } else {
-                        $filterWrk = "\"bus_id\"" . SearchString("=", $this->bus_id->CurrentValue, DATATYPE_NUMBER, "");
+                $sqlWrk = $this->bus_id->Lookup->getSql(true, $filterWrk, '', $this, false, true);
+                $rswrk = Conn()->executeQuery($sqlWrk)->fetchAll(\PDO::FETCH_BOTH);
+                $ari = count($rswrk);
+                $arwrk = $rswrk;
+                $this->bus_id->EditValue = $arwrk;
+            }
+            $this->bus_id->PlaceHolder = RemoveHtml($this->bus_id->caption());
+
+            // vendor_id
+            $this->vendor_id->EditAttrs["class"] = "form-control";
+            $this->vendor_id->EditCustomAttributes = "";
+            if (!$Security->isAdmin() && $Security->isLoggedIn() && !$this->userIDAllow($this->CurrentAction)) { // Non system admin
+                if (trim(strval($this->vendor_id->CurrentValue)) == "") {
+                    $filterWrk = "0=1";
+                } else {
+                    $filterWrk = "\"id\"" . SearchString("=", $this->vendor_id->CurrentValue, DATATYPE_NUMBER, "");
+                }
+                $sqlWrk = $this->vendor_id->Lookup->getSql(true, $filterWrk, '', $this, false, true);
+                $rswrk = Conn()->executeQuery($sqlWrk)->fetchAll(\PDO::FETCH_BOTH);
+                $arwrk = $rswrk;
+                $this->vendor_id->EditValue = $arwrk;
+            } else {
+                $this->vendor_id->EditValue = HtmlEncode($this->vendor_id->CurrentValue);
+                $curVal = strval($this->vendor_id->CurrentValue);
+                if ($curVal != "") {
+                    $this->vendor_id->EditValue = $this->vendor_id->lookupCacheOption($curVal);
+                    if ($this->vendor_id->EditValue === null) { // Lookup from database
+                        $filterWrk = "\"id\"" . SearchString("=", $curVal, DATATYPE_NUMBER, "");
+                        $sqlWrk = $this->vendor_id->Lookup->getSql(false, $filterWrk, '', $this, true, true);
+                        $rswrk = Conn()->executeQuery($sqlWrk)->fetchAll(\PDO::FETCH_BOTH);
+                        $ari = count($rswrk);
+                        if ($ari > 0) { // Lookup values found
+                            $arwrk = $this->vendor_id->Lookup->renderViewRow($rswrk[0]);
+                            $this->vendor_id->EditValue = $this->vendor_id->displayValue($arwrk);
+                        } else {
+                            $this->vendor_id->EditValue = HtmlEncode($this->vendor_id->CurrentValue);
+                        }
                     }
-                    $sqlWrk = $this->bus_id->Lookup->getSql(true, $filterWrk, '', $this);
-                    $rswrk = Conn()->executeQuery($sqlWrk)->fetchAll(\PDO::FETCH_BOTH);
-                    $ari = count($rswrk);
-                    $arwrk = $rswrk;
-                    $this->bus_id->EditValue = $arwrk;
+                } else {
+                    $this->vendor_id->EditValue = null;
                 }
-                $this->bus_id->PlaceHolder = RemoveHtml($this->bus_id->caption());
+                $this->vendor_id->PlaceHolder = RemoveHtml($this->vendor_id->caption());
             }
 
             // Add refer script
@@ -2246,6 +2692,10 @@ class SubTransactionDetailsList extends SubTransactionDetails
             // bus_id
             $this->bus_id->LinkCustomAttributes = "";
             $this->bus_id->HrefValue = "";
+
+            // vendor_id
+            $this->vendor_id->LinkCustomAttributes = "";
+            $this->vendor_id->HrefValue = "";
         } elseif ($this->RowType == ROWTYPE_EDIT) {
             // transaction_id
             $this->transaction_id->EditAttrs["class"] = "form-control";
@@ -2258,7 +2708,7 @@ class SubTransactionDetailsList extends SubTransactionDetails
                     $this->transaction_id->ViewValue = $this->transaction_id->lookupCacheOption($curVal);
                     if ($this->transaction_id->ViewValue === null) { // Lookup from database
                         $filterWrk = "\"id\"" . SearchString("=", $curVal, DATATYPE_NUMBER, "");
-                        $sqlWrk = $this->transaction_id->Lookup->getSql(false, $filterWrk, '', $this, true);
+                        $sqlWrk = $this->transaction_id->Lookup->getSql(false, $filterWrk, '', $this, true, true);
                         $rswrk = Conn()->executeQuery($sqlWrk)->fetchAll(\PDO::FETCH_BOTH);
                         $ari = count($rswrk);
                         if ($ari > 0) { // Lookup values found
@@ -2287,7 +2737,7 @@ class SubTransactionDetailsList extends SubTransactionDetails
                     } else {
                         $filterWrk = "\"id\"" . SearchString("=", $this->transaction_id->CurrentValue, DATATYPE_NUMBER, "");
                     }
-                    $sqlWrk = $this->transaction_id->Lookup->getSql(true, $filterWrk, '', $this);
+                    $sqlWrk = $this->transaction_id->Lookup->getSql(true, $filterWrk, '', $this, false, true);
                     $rswrk = Conn()->executeQuery($sqlWrk)->fetchAll(\PDO::FETCH_BOTH);
                     $ari = count($rswrk);
                     $arwrk = $rswrk;
@@ -2301,54 +2751,62 @@ class SubTransactionDetailsList extends SubTransactionDetails
             // bus_id
             $this->bus_id->EditAttrs["class"] = "form-control";
             $this->bus_id->EditCustomAttributes = "";
-            if ($this->bus_id->getSessionValue() != "") {
-                $this->bus_id->CurrentValue = GetForeignKeyValue($this->bus_id->getSessionValue());
-                $this->bus_id->OldValue = $this->bus_id->CurrentValue;
-                if ($this->bus_id->VirtualValue != "") {
-                    $this->bus_id->ViewValue = $this->bus_id->VirtualValue;
-                } else {
-                    $curVal = strval($this->bus_id->CurrentValue);
-                    if ($curVal != "") {
-                        $this->bus_id->ViewValue = $this->bus_id->lookupCacheOption($curVal);
-                        if ($this->bus_id->ViewValue === null) { // Lookup from database
-                            $filterWrk = "\"bus_id\"" . SearchString("=", $curVal, DATATYPE_NUMBER, "");
-                            $sqlWrk = $this->bus_id->Lookup->getSql(false, $filterWrk, '', $this, true);
-                            $rswrk = Conn()->executeQuery($sqlWrk)->fetchAll(\PDO::FETCH_BOTH);
-                            $ari = count($rswrk);
-                            if ($ari > 0) { // Lookup values found
-                                $arwrk = $this->bus_id->Lookup->renderViewRow($rswrk[0]);
-                                $this->bus_id->ViewValue = $this->bus_id->displayValue($arwrk);
-                            } else {
-                                $this->bus_id->ViewValue = $this->bus_id->CurrentValue;
-                            }
-                        }
-                    } else {
-                        $this->bus_id->ViewValue = null;
-                    }
-                }
-                $this->bus_id->ViewCustomAttributes = "";
+            $curVal = trim(strval($this->bus_id->CurrentValue));
+            if ($curVal != "") {
+                $this->bus_id->ViewValue = $this->bus_id->lookupCacheOption($curVal);
             } else {
-                $curVal = trim(strval($this->bus_id->CurrentValue));
-                if ($curVal != "") {
-                    $this->bus_id->ViewValue = $this->bus_id->lookupCacheOption($curVal);
+                $this->bus_id->ViewValue = $this->bus_id->Lookup !== null && is_array($this->bus_id->Lookup->Options) ? $curVal : null;
+            }
+            if ($this->bus_id->ViewValue !== null) { // Load from cache
+                $this->bus_id->EditValue = array_values($this->bus_id->Lookup->Options);
+            } else { // Lookup from database
+                if ($curVal == "") {
+                    $filterWrk = "0=1";
                 } else {
-                    $this->bus_id->ViewValue = $this->bus_id->Lookup !== null && is_array($this->bus_id->Lookup->Options) ? $curVal : null;
+                    $filterWrk = "\"bus_id\"" . SearchString("=", $this->bus_id->CurrentValue, DATATYPE_NUMBER, "");
                 }
-                if ($this->bus_id->ViewValue !== null) { // Load from cache
-                    $this->bus_id->EditValue = array_values($this->bus_id->Lookup->Options);
-                } else { // Lookup from database
-                    if ($curVal == "") {
-                        $filterWrk = "0=1";
-                    } else {
-                        $filterWrk = "\"bus_id\"" . SearchString("=", $this->bus_id->CurrentValue, DATATYPE_NUMBER, "");
+                $sqlWrk = $this->bus_id->Lookup->getSql(true, $filterWrk, '', $this, false, true);
+                $rswrk = Conn()->executeQuery($sqlWrk)->fetchAll(\PDO::FETCH_BOTH);
+                $ari = count($rswrk);
+                $arwrk = $rswrk;
+                $this->bus_id->EditValue = $arwrk;
+            }
+            $this->bus_id->PlaceHolder = RemoveHtml($this->bus_id->caption());
+
+            // vendor_id
+            $this->vendor_id->EditAttrs["class"] = "form-control";
+            $this->vendor_id->EditCustomAttributes = "";
+            if (!$Security->isAdmin() && $Security->isLoggedIn() && !$this->userIDAllow($this->CurrentAction)) { // Non system admin
+                if (trim(strval($this->vendor_id->CurrentValue)) == "") {
+                    $filterWrk = "0=1";
+                } else {
+                    $filterWrk = "\"id\"" . SearchString("=", $this->vendor_id->CurrentValue, DATATYPE_NUMBER, "");
+                }
+                $sqlWrk = $this->vendor_id->Lookup->getSql(true, $filterWrk, '', $this, false, true);
+                $rswrk = Conn()->executeQuery($sqlWrk)->fetchAll(\PDO::FETCH_BOTH);
+                $arwrk = $rswrk;
+                $this->vendor_id->EditValue = $arwrk;
+            } else {
+                $this->vendor_id->EditValue = HtmlEncode($this->vendor_id->CurrentValue);
+                $curVal = strval($this->vendor_id->CurrentValue);
+                if ($curVal != "") {
+                    $this->vendor_id->EditValue = $this->vendor_id->lookupCacheOption($curVal);
+                    if ($this->vendor_id->EditValue === null) { // Lookup from database
+                        $filterWrk = "\"id\"" . SearchString("=", $curVal, DATATYPE_NUMBER, "");
+                        $sqlWrk = $this->vendor_id->Lookup->getSql(false, $filterWrk, '', $this, true, true);
+                        $rswrk = Conn()->executeQuery($sqlWrk)->fetchAll(\PDO::FETCH_BOTH);
+                        $ari = count($rswrk);
+                        if ($ari > 0) { // Lookup values found
+                            $arwrk = $this->vendor_id->Lookup->renderViewRow($rswrk[0]);
+                            $this->vendor_id->EditValue = $this->vendor_id->displayValue($arwrk);
+                        } else {
+                            $this->vendor_id->EditValue = HtmlEncode($this->vendor_id->CurrentValue);
+                        }
                     }
-                    $sqlWrk = $this->bus_id->Lookup->getSql(true, $filterWrk, '', $this);
-                    $rswrk = Conn()->executeQuery($sqlWrk)->fetchAll(\PDO::FETCH_BOTH);
-                    $ari = count($rswrk);
-                    $arwrk = $rswrk;
-                    $this->bus_id->EditValue = $arwrk;
+                } else {
+                    $this->vendor_id->EditValue = null;
                 }
-                $this->bus_id->PlaceHolder = RemoveHtml($this->bus_id->caption());
+                $this->vendor_id->PlaceHolder = RemoveHtml($this->vendor_id->caption());
             }
 
             // Edit refer script
@@ -2360,6 +2818,10 @@ class SubTransactionDetailsList extends SubTransactionDetails
             // bus_id
             $this->bus_id->LinkCustomAttributes = "";
             $this->bus_id->HrefValue = "";
+
+            // vendor_id
+            $this->vendor_id->LinkCustomAttributes = "";
+            $this->vendor_id->HrefValue = "";
         }
         if ($this->RowType == ROWTYPE_ADD || $this->RowType == ROWTYPE_EDIT || $this->RowType == ROWTYPE_SEARCH) { // Add/Edit/Search row
             $this->setupFieldTitles();
@@ -2389,6 +2851,14 @@ class SubTransactionDetailsList extends SubTransactionDetails
             if (!$this->bus_id->IsDetailKey && EmptyValue($this->bus_id->FormValue)) {
                 $this->bus_id->addErrorMessage(str_replace("%s", $this->bus_id->caption(), $this->bus_id->RequiredErrorMessage));
             }
+        }
+        if ($this->vendor_id->Required) {
+            if (!$this->vendor_id->IsDetailKey && EmptyValue($this->vendor_id->FormValue)) {
+                $this->vendor_id->addErrorMessage(str_replace("%s", $this->vendor_id->caption(), $this->vendor_id->RequiredErrorMessage));
+            }
+        }
+        if (!CheckInteger($this->vendor_id->FormValue)) {
+            $this->vendor_id->addErrorMessage($this->vendor_id->getErrorMessage(false));
         }
 
         // Return validate result
@@ -2499,10 +2969,35 @@ class SubTransactionDetailsList extends SubTransactionDetails
             $rsnew = [];
 
             // transaction_id
+            if ($this->transaction_id->getSessionValue() != "") {
+                $this->transaction_id->ReadOnly = true;
+            }
             $this->transaction_id->setDbValueDef($rsnew, $this->transaction_id->CurrentValue, 0, $this->transaction_id->ReadOnly);
 
             // bus_id
             $this->bus_id->setDbValueDef($rsnew, $this->bus_id->CurrentValue, 0, $this->bus_id->ReadOnly);
+
+            // vendor_id
+            $this->vendor_id->setDbValueDef($rsnew, $this->vendor_id->CurrentValue, null, $this->vendor_id->ReadOnly);
+
+            // Check referential integrity for master table 'main_transactions'
+            $validMasterRecord = true;
+            $masterFilter = $this->sqlMasterFilter_main_transactions();
+            $keyValue = $rsnew['transaction_id'] ?? $rsold['transaction_id'];
+            if (strval($keyValue) != "") {
+                $masterFilter = str_replace("@id@", AdjustSql($keyValue), $masterFilter);
+            } else {
+                $validMasterRecord = false;
+            }
+            if ($validMasterRecord) {
+                $rsmaster = Container("main_transactions")->loadRs($masterFilter)->fetch();
+                $validMasterRecord = $rsmaster !== false;
+            }
+            if (!$validMasterRecord) {
+                $relatedRecordMsg = str_replace("%t", "main_transactions", $Language->phrase("RelatedRecordRequired"));
+                $this->setFailureMessage($relatedRecordMsg);
+                return false;
+            }
 
             // Call Row Updating event
             $updateRow = $this->rowUpdating($rsold, $rsnew);
@@ -2567,6 +3062,7 @@ class SubTransactionDetailsList extends SubTransactionDetails
         $hash = "";
         $hash .= GetFieldHash($row['transaction_id']); // transaction_id
         $hash .= GetFieldHash($row['bus_id']); // bus_id
+        $hash .= GetFieldHash($row['vendor_id']); // vendor_id
         return md5($hash);
     }
 
@@ -2574,6 +3070,62 @@ class SubTransactionDetailsList extends SubTransactionDetails
     protected function addRow($rsold = null)
     {
         global $Language, $Security;
+
+        // Check if valid User ID
+        $validUser = false;
+        if ($Security->currentUserID() != "" && !EmptyValue($this->vendor_id->CurrentValue) && !$Security->isAdmin()) { // Non system admin
+            $validUser = $Security->isValidUserID($this->vendor_id->CurrentValue);
+            if (!$validUser) {
+                $userIdMsg = str_replace("%c", CurrentUserID(), $Language->phrase("UnAuthorizedUserID"));
+                $userIdMsg = str_replace("%u", $this->vendor_id->CurrentValue, $userIdMsg);
+                $this->setFailureMessage($userIdMsg);
+                return false;
+            }
+        }
+
+        // Check if valid key values for master user
+        if ($Security->currentUserID() != "" && !$Security->isAdmin()) { // Non system admin
+            $masterFilter = $this->sqlMasterFilter_main_transactions();
+            if (strval($this->transaction_id->CurrentValue) != "") {
+                $masterFilter = str_replace("@id@", AdjustSql($this->transaction_id->CurrentValue, "DB"), $masterFilter);
+            } else {
+                $masterFilter = "";
+            }
+            if ($masterFilter != "") {
+                $rsmaster = Container("main_transactions")->loadRs($masterFilter)->fetch(\PDO::FETCH_ASSOC);
+                $this->MasterRecordExists = $rsmaster !== false;
+                $validMasterKey = true;
+                if ($this->MasterRecordExists) {
+                    $validMasterKey = $Security->isValidUserID($rsmaster['vendor_id']);
+                } elseif ($this->getCurrentMasterTable() == "main_transactions") {
+                    $validMasterKey = false;
+                }
+                if (!$validMasterKey) {
+                    $masterUserIdMsg = str_replace("%c", CurrentUserID(), $Language->phrase("UnAuthorizedMasterUserID"));
+                    $masterUserIdMsg = str_replace("%f", $masterFilter, $masterUserIdMsg);
+                    $this->setFailureMessage($masterUserIdMsg);
+                    return false;
+                }
+            }
+        }
+
+        // Check referential integrity for master table 'sub_transaction_details'
+        $validMasterRecord = true;
+        $masterFilter = $this->sqlMasterFilter_main_transactions();
+        if (strval($this->transaction_id->CurrentValue) != "") {
+            $masterFilter = str_replace("@id@", AdjustSql($this->transaction_id->CurrentValue, "DB"), $masterFilter);
+        } else {
+            $validMasterRecord = false;
+        }
+        if ($validMasterRecord) {
+            $rsmaster = Container("main_transactions")->loadRs($masterFilter)->fetch();
+            $validMasterRecord = $rsmaster !== false;
+        }
+        if (!$validMasterRecord) {
+            $relatedRecordMsg = str_replace("%t", "main_transactions", $Language->phrase("RelatedRecordRequired"));
+            $this->setFailureMessage($relatedRecordMsg);
+            return false;
+        }
         $conn = $this->getConnection();
 
         // Load db values from rsold
@@ -2587,6 +3139,9 @@ class SubTransactionDetailsList extends SubTransactionDetails
 
         // bus_id
         $this->bus_id->setDbValueDef($rsnew, $this->bus_id->CurrentValue, 0, false);
+
+        // vendor_id
+        $this->vendor_id->setDbValueDef($rsnew, $this->vendor_id->CurrentValue, null, false);
 
         // Call Row Inserting event
         $insertRow = $this->rowInserting($rsold, $rsnew);
@@ -2622,6 +3177,102 @@ class SubTransactionDetailsList extends SubTransactionDetails
         return $addRow;
     }
 
+    // Get export HTML tag
+    protected function getExportTag($type, $custom = false)
+    {
+        global $Language;
+        $pageUrl = $this->pageUrl();
+        if (SameText($type, "excel")) {
+            if ($custom) {
+                return "<a href=\"#\" class=\"ew-export-link ew-excel\" title=\"" . HtmlEncode($Language->phrase("ExportToExcelText")) . "\" data-caption=\"" . HtmlEncode($Language->phrase("ExportToExcelText")) . "\" onclick=\"return ew.export(document.fsub_transaction_detailslist, '" . $this->ExportExcelUrl . "', 'excel', true);\">" . $Language->phrase("ExportToExcel") . "</a>";
+            } else {
+                return "<a href=\"" . $this->ExportExcelUrl . "\" class=\"ew-export-link ew-excel\" title=\"" . HtmlEncode($Language->phrase("ExportToExcelText")) . "\" data-caption=\"" . HtmlEncode($Language->phrase("ExportToExcelText")) . "\">" . $Language->phrase("ExportToExcel") . "</a>";
+            }
+        } elseif (SameText($type, "word")) {
+            if ($custom) {
+                return "<a href=\"#\" class=\"ew-export-link ew-word\" title=\"" . HtmlEncode($Language->phrase("ExportToWordText")) . "\" data-caption=\"" . HtmlEncode($Language->phrase("ExportToWordText")) . "\" onclick=\"return ew.export(document.fsub_transaction_detailslist, '" . $this->ExportWordUrl . "', 'word', true);\">" . $Language->phrase("ExportToWord") . "</a>";
+            } else {
+                return "<a href=\"" . $this->ExportWordUrl . "\" class=\"ew-export-link ew-word\" title=\"" . HtmlEncode($Language->phrase("ExportToWordText")) . "\" data-caption=\"" . HtmlEncode($Language->phrase("ExportToWordText")) . "\">" . $Language->phrase("ExportToWord") . "</a>";
+            }
+        } elseif (SameText($type, "pdf")) {
+            if ($custom) {
+                return "<a href=\"#\" class=\"ew-export-link ew-pdf\" title=\"" . HtmlEncode($Language->phrase("ExportToPDFText")) . "\" data-caption=\"" . HtmlEncode($Language->phrase("ExportToPDFText")) . "\" onclick=\"return ew.export(document.fsub_transaction_detailslist, '" . $this->ExportPdfUrl . "', 'pdf', true);\">" . $Language->phrase("ExportToPDF") . "</a>";
+            } else {
+                return "<a href=\"" . $this->ExportPdfUrl . "\" class=\"ew-export-link ew-pdf\" title=\"" . HtmlEncode($Language->phrase("ExportToPDFText")) . "\" data-caption=\"" . HtmlEncode($Language->phrase("ExportToPDFText")) . "\">" . $Language->phrase("ExportToPDF") . "</a>";
+            }
+        } elseif (SameText($type, "html")) {
+            return "<a href=\"" . $this->ExportHtmlUrl . "\" class=\"ew-export-link ew-html\" title=\"" . HtmlEncode($Language->phrase("ExportToHtmlText")) . "\" data-caption=\"" . HtmlEncode($Language->phrase("ExportToHtmlText")) . "\">" . $Language->phrase("ExportToHtml") . "</a>";
+        } elseif (SameText($type, "xml")) {
+            return "<a href=\"" . $this->ExportXmlUrl . "\" class=\"ew-export-link ew-xml\" title=\"" . HtmlEncode($Language->phrase("ExportToXmlText")) . "\" data-caption=\"" . HtmlEncode($Language->phrase("ExportToXmlText")) . "\">" . $Language->phrase("ExportToXml") . "</a>";
+        } elseif (SameText($type, "csv")) {
+            return "<a href=\"" . $this->ExportCsvUrl . "\" class=\"ew-export-link ew-csv\" title=\"" . HtmlEncode($Language->phrase("ExportToCsvText")) . "\" data-caption=\"" . HtmlEncode($Language->phrase("ExportToCsvText")) . "\">" . $Language->phrase("ExportToCsv") . "</a>";
+        } elseif (SameText($type, "email")) {
+            $url = $custom ? ",url:'" . $pageUrl . "export=email&amp;custom=1'" : "";
+            return '<button id="emf_sub_transaction_details" class="ew-export-link ew-email" title="' . $Language->phrase("ExportToEmailText") . '" data-caption="' . $Language->phrase("ExportToEmailText") . '" onclick="ew.emailDialogShow({lnk:\'emf_sub_transaction_details\', hdr:ew.language.phrase(\'ExportToEmailText\'), f:document.fsub_transaction_detailslist, sel:false' . $url . '});">' . $Language->phrase("ExportToEmail") . '</button>';
+        } elseif (SameText($type, "print")) {
+            return "<a href=\"" . $this->ExportPrintUrl . "\" class=\"ew-export-link ew-print\" title=\"" . HtmlEncode($Language->phrase("PrinterFriendlyText")) . "\" data-caption=\"" . HtmlEncode($Language->phrase("PrinterFriendlyText")) . "\">" . $Language->phrase("PrinterFriendly") . "</a>";
+        }
+    }
+
+    // Set up export options
+    protected function setupExportOptions()
+    {
+        global $Language;
+
+        // Printer friendly
+        $item = &$this->ExportOptions->add("print");
+        $item->Body = $this->getExportTag("print");
+        $item->Visible = true;
+
+        // Export to Excel
+        $item = &$this->ExportOptions->add("excel");
+        $item->Body = $this->getExportTag("excel");
+        $item->Visible = true;
+
+        // Export to Word
+        $item = &$this->ExportOptions->add("word");
+        $item->Body = $this->getExportTag("word");
+        $item->Visible = true;
+
+        // Export to Html
+        $item = &$this->ExportOptions->add("html");
+        $item->Body = $this->getExportTag("html");
+        $item->Visible = true;
+
+        // Export to Xml
+        $item = &$this->ExportOptions->add("xml");
+        $item->Body = $this->getExportTag("xml");
+        $item->Visible = false;
+
+        // Export to Csv
+        $item = &$this->ExportOptions->add("csv");
+        $item->Body = $this->getExportTag("csv");
+        $item->Visible = true;
+
+        // Export to Pdf
+        $item = &$this->ExportOptions->add("pdf");
+        $item->Body = $this->getExportTag("pdf");
+        $item->Visible = false;
+
+        // Export to Email
+        $item = &$this->ExportOptions->add("email");
+        $item->Body = $this->getExportTag("email");
+        $item->Visible = false;
+
+        // Drop down button for export
+        $this->ExportOptions->UseButtonGroup = true;
+        $this->ExportOptions->UseDropDownButton = true;
+        if ($this->ExportOptions->UseButtonGroup && IsMobile()) {
+            $this->ExportOptions->UseDropDownButton = true;
+        }
+        $this->ExportOptions->DropDownButtonPhrase = $Language->phrase("ButtonExport");
+
+        // Add group option item
+        $item = &$this->ExportOptions->add($this->ExportOptions->GroupOptionName);
+        $item->Body = "";
+        $item->Visible = false;
+    }
+
     // Set up search/sort options
     protected function setupSearchSortOptions()
     {
@@ -2629,6 +3280,17 @@ class SubTransactionDetailsList extends SubTransactionDetails
         $pageUrl = $this->pageUrl();
         $this->SearchOptions = new ListOptions("div");
         $this->SearchOptions->TagClassName = "ew-search-option";
+
+        // Search button
+        $item = &$this->SearchOptions->add("searchtoggle");
+        $searchToggleClass = ($this->SearchWhere != "") ? " active" : " active";
+        $item->Body = "<a class=\"btn btn-default ew-search-toggle" . $searchToggleClass . "\" href=\"#\" role=\"button\" title=\"" . $Language->phrase("SearchPanel") . "\" data-caption=\"" . $Language->phrase("SearchPanel") . "\" data-toggle=\"button\" data-form=\"fsub_transaction_detailslistsrch\" aria-pressed=\"" . ($searchToggleClass == " active" ? "true" : "false") . "\">" . $Language->phrase("SearchLink") . "</a>";
+        $item->Visible = true;
+
+        // Show all button
+        $item = &$this->SearchOptions->add("showall");
+        $item->Body = "<a class=\"btn btn-default ew-show-all\" title=\"" . $Language->phrase("ShowAll") . "\" data-caption=\"" . $Language->phrase("ShowAll") . "\" href=\"" . $pageUrl . "cmd=reset\">" . $Language->phrase("ShowAllBtn") . "</a>";
+        $item->Visible = ($this->SearchWhere != $this->DefaultSearchWhere && $this->SearchWhere != "0=101");
 
         // Button group for search
         $this->SearchOptions->UseDropDownButton = false;
@@ -2650,6 +3312,128 @@ class SubTransactionDetailsList extends SubTransactionDetails
         }
     }
 
+    /**
+    * Export data in HTML/CSV/Word/Excel/XML/Email/PDF format
+    *
+    * @param boolean $return Return the data rather than output it
+    * @return mixed
+    */
+    public function exportData($return = false)
+    {
+        global $Language;
+        $utf8 = SameText(Config("PROJECT_CHARSET"), "utf-8");
+
+        // Load recordset
+        $this->TotalRecords = $this->listRecordCount();
+        $this->StartRecord = 1;
+
+        // Export all
+        if ($this->ExportAll) {
+            set_time_limit(Config("EXPORT_ALL_TIME_LIMIT"));
+            $this->DisplayRecords = $this->TotalRecords;
+            $this->StopRecord = $this->TotalRecords;
+        } else { // Export one page only
+            $this->setupStartRecord(); // Set up start record position
+            // Set the last record to display
+            if ($this->DisplayRecords <= 0) {
+                $this->StopRecord = $this->TotalRecords;
+            } else {
+                $this->StopRecord = $this->StartRecord + $this->DisplayRecords - 1;
+            }
+        }
+        $rs = $this->loadRecordset($this->StartRecord - 1, $this->DisplayRecords <= 0 ? $this->TotalRecords : $this->DisplayRecords);
+        $this->ExportDoc = GetExportDocument($this, "h");
+        $doc = &$this->ExportDoc;
+        if (!$doc) {
+            $this->setFailureMessage($Language->phrase("ExportClassNotFound")); // Export class not found
+        }
+        if (!$rs || !$doc) {
+            RemoveHeader("Content-Type"); // Remove header
+            RemoveHeader("Content-Disposition");
+            $this->showMessage();
+            return;
+        }
+        $this->StartRecord = 1;
+        $this->StopRecord = $this->DisplayRecords <= 0 ? $this->TotalRecords : $this->DisplayRecords;
+
+        // Call Page Exporting server event
+        $this->ExportDoc->ExportCustom = !$this->pageExporting();
+
+        // Export master record
+        if (Config("EXPORT_MASTER_RECORD") && $this->getMasterFilter() != "" && $this->getCurrentMasterTable() == "main_transactions") {
+            $main_transactions = Container("main_transactions");
+            $rsmaster = $main_transactions->loadRs($this->DbMasterFilter); // Load master record
+            if ($rsmaster) {
+                $exportStyle = $doc->Style;
+                $doc->setStyle("v"); // Change to vertical
+                if (!$this->isExport("csv") || Config("EXPORT_MASTER_RECORD_FOR_CSV")) {
+                    $doc->Table = $main_transactions;
+                    $main_transactions->exportDocument($doc, new Recordset($rsmaster));
+                    $doc->exportEmptyRow();
+                    $doc->Table = &$this;
+                }
+                $doc->setStyle($exportStyle); // Restore
+                $rsmaster->closeCursor();
+            }
+        }
+        $header = $this->PageHeader;
+        $this->pageDataRendering($header);
+        $doc->Text .= $header;
+        $this->exportDocument($doc, $rs, $this->StartRecord, $this->StopRecord, "");
+        $footer = $this->PageFooter;
+        $this->pageDataRendered($footer);
+        $doc->Text .= $footer;
+
+        // Close recordset
+        $rs->close();
+
+        // Call Page Exported server event
+        $this->pageExported();
+
+        // Export header and footer
+        $doc->exportHeaderAndFooter();
+
+        // Clean output buffer (without destroying output buffer)
+        $buffer = ob_get_contents(); // Save the output buffer
+        if (!Config("DEBUG") && $buffer) {
+            ob_clean();
+        }
+
+        // Write debug message if enabled
+        if (Config("DEBUG") && !$this->isExport("pdf")) {
+            echo GetDebugMessage();
+        }
+
+        // Output data
+        if ($this->isExport("email")) {
+            // Export-to-email disabled
+        } else {
+            $doc->export();
+            if ($return) {
+                RemoveHeader("Content-Type"); // Remove header
+                RemoveHeader("Content-Disposition");
+                $content = ob_get_contents();
+                if ($content) {
+                    ob_clean();
+                }
+                if ($buffer) {
+                    echo $buffer; // Resume the output buffer
+                }
+                return $content;
+            }
+        }
+    }
+
+    // Show link optionally based on User ID
+    protected function showOptionLink($id = "")
+    {
+        global $Security;
+        if ($Security->isLoggedIn() && !$Security->isAdmin() && !$this->userIDAllow($id)) {
+            return $Security->isValidUserID($this->vendor_id->CurrentValue);
+        }
+        return true;
+    }
+
     // Set up master/detail based on QueryString
     protected function setupMasterParms()
     {
@@ -2661,20 +3445,6 @@ class SubTransactionDetailsList extends SubTransactionDetails
                 $validMaster = true;
                 $this->DbMasterFilter = "";
                 $this->DbDetailFilter = "";
-            }
-            if ($masterTblVar == "main_buses") {
-                $validMaster = true;
-                $masterTbl = Container("main_buses");
-                if (($parm = Get("fk_id", Get("bus_id"))) !== null) {
-                    $masterTbl->id->setQueryStringValue($parm);
-                    $this->bus_id->setQueryStringValue($masterTbl->id->QueryStringValue);
-                    $this->bus_id->setSessionValue($this->bus_id->QueryStringValue);
-                    if (!is_numeric($masterTbl->id->QueryStringValue)) {
-                        $validMaster = false;
-                    }
-                } else {
-                    $validMaster = false;
-                }
             }
             if ($masterTblVar == "main_transactions") {
                 $validMaster = true;
@@ -2696,20 +3466,6 @@ class SubTransactionDetailsList extends SubTransactionDetails
                     $validMaster = true;
                     $this->DbMasterFilter = "";
                     $this->DbDetailFilter = "";
-            }
-            if ($masterTblVar == "main_buses") {
-                $validMaster = true;
-                $masterTbl = Container("main_buses");
-                if (($parm = Post("fk_id", Post("bus_id"))) !== null) {
-                    $masterTbl->id->setFormValue($parm);
-                    $this->bus_id->setFormValue($masterTbl->id->FormValue);
-                    $this->bus_id->setSessionValue($this->bus_id->FormValue);
-                    if (!is_numeric($masterTbl->id->FormValue)) {
-                        $validMaster = false;
-                    }
-                } else {
-                    $validMaster = false;
-                }
             }
             if ($masterTblVar == "main_transactions") {
                 $validMaster = true;
@@ -2743,11 +3499,6 @@ class SubTransactionDetailsList extends SubTransactionDetails
             }
 
             // Clear previous master key from Session
-            if ($masterTblVar != "main_buses") {
-                if ($this->bus_id->CurrentValue == "") {
-                    $this->bus_id->setSessionValue("");
-                }
-            }
             if ($masterTblVar != "main_transactions") {
                 if ($this->transaction_id->CurrentValue == "") {
                     $this->transaction_id->setSessionValue("");
@@ -2784,6 +3535,8 @@ class SubTransactionDetailsList extends SubTransactionDetails
                 case "x_transaction_id":
                     break;
                 case "x_bus_id":
+                    break;
+                case "x_vendor_id":
                     break;
                 default:
                     $lookupFilter = "";
@@ -2853,6 +3606,9 @@ class SubTransactionDetailsList extends SubTransactionDetails
     public function pageLoad()
     {
         //Log("Page Load");
+        global $Language;
+        $Language->setPhraseClass("addlink", ""); // remove icon to remove <span> element
+        $Language->setPhrase("addlink", "<span class='btn btn-block bg-gradient-primary btn-sm'>ADD / ASSIGN BUSES</span>"); // re-draw <span> element yourself
     }
 
     // Page Unload event

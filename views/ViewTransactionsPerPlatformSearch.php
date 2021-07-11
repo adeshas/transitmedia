@@ -31,9 +31,6 @@ loadjs.ready("head", function () {
         ["vendor", [], fields.vendor.isInvalid],
         ["operator", [], fields.operator.isInvalid],
         ["transaction_status", [], fields.transaction_status.isInvalid],
-        ["quantity", [ew.Validators.integer], fields.quantity.isInvalid],
-        ["lamata_fee", [ew.Validators.integer], fields.lamata_fee.isInvalid],
-        ["total", [ew.Validators.integer], fields.total.isInvalid],
         ["start_date", [ew.Validators.datetime(0)], fields.start_date.isInvalid],
         ["end_date", [ew.Validators.datetime(0)], fields.end_date.isInvalid],
         ["platform", [], fields.platform.isInvalid],
@@ -44,7 +41,14 @@ loadjs.ready("head", function () {
         ["operator_id", [ew.Validators.integer], fields.operator_id.isInvalid],
         ["bus_size_id", [ew.Validators.integer], fields.bus_size_id.isInvalid],
         ["vendor_search_id", [ew.Validators.integer], fields.vendor_search_id.isInvalid],
-        ["vendor_search_name", [], fields.vendor_search_name.isInvalid]
+        ["vendor_search_name", [], fields.vendor_search_name.isInvalid],
+        ["price", [ew.Validators.integer], fields.price.isInvalid],
+        ["quantity", [ew.Validators.integer], fields.quantity.isInvalid],
+        ["amount_paid", [ew.Validators.integer], fields.amount_paid.isInvalid],
+        ["transitmedia_fee", [ew.Validators.integer], fields.transitmedia_fee.isInvalid],
+        ["lasaa_fee", [ew.Validators.integer], fields.lasaa_fee.isInvalid],
+        ["operator_fee", [ew.Validators.integer], fields.operator_fee.isInvalid],
+        ["lamata_fee", [ew.Validators.integer], fields.lamata_fee.isInvalid]
     ]);
 
     // Set invalid fields
@@ -255,54 +259,6 @@ loadjs.ready(["fview_transactions_per_platformsearch", "datetimepicker"], functi
         </div></div>
     </div>
 <?php } ?>
-<?php if ($Page->quantity->Visible) { // quantity ?>
-    <div id="r_quantity" class="form-group row">
-        <label for="x_quantity" class="<?= $Page->LeftColumnClass ?>"><span id="elh_view_transactions_per_platform_quantity"><?= $Page->quantity->caption() ?></span>
-        <span class="ew-search-operator">
-<?= $Language->phrase("=") ?>
-<input type="hidden" name="z_quantity" id="z_quantity" value="=">
-</span>
-        </label>
-        <div class="<?= $Page->RightColumnClass ?>"><div <?= $Page->quantity->cellAttributes() ?>>
-            <span id="el_view_transactions_per_platform_quantity" class="ew-search-field">
-<input type="<?= $Page->quantity->getInputTextType() ?>" data-table="view_transactions_per_platform" data-field="x_quantity" name="x_quantity" id="x_quantity" size="30" placeholder="<?= HtmlEncode($Page->quantity->getPlaceHolder()) ?>" value="<?= $Page->quantity->EditValue ?>"<?= $Page->quantity->editAttributes() ?>>
-<div class="invalid-feedback"><?= $Page->quantity->getErrorMessage(false) ?></div>
-</span>
-        </div></div>
-    </div>
-<?php } ?>
-<?php if ($Page->lamata_fee->Visible) { // lamata_fee ?>
-    <div id="r_lamata_fee" class="form-group row">
-        <label for="x_lamata_fee" class="<?= $Page->LeftColumnClass ?>"><span id="elh_view_transactions_per_platform_lamata_fee"><?= $Page->lamata_fee->caption() ?></span>
-        <span class="ew-search-operator">
-<?= $Language->phrase("=") ?>
-<input type="hidden" name="z_lamata_fee" id="z_lamata_fee" value="=">
-</span>
-        </label>
-        <div class="<?= $Page->RightColumnClass ?>"><div <?= $Page->lamata_fee->cellAttributes() ?>>
-            <span id="el_view_transactions_per_platform_lamata_fee" class="ew-search-field">
-<input type="<?= $Page->lamata_fee->getInputTextType() ?>" data-table="view_transactions_per_platform" data-field="x_lamata_fee" name="x_lamata_fee" id="x_lamata_fee" size="30" placeholder="<?= HtmlEncode($Page->lamata_fee->getPlaceHolder()) ?>" value="<?= $Page->lamata_fee->EditValue ?>"<?= $Page->lamata_fee->editAttributes() ?>>
-<div class="invalid-feedback"><?= $Page->lamata_fee->getErrorMessage(false) ?></div>
-</span>
-        </div></div>
-    </div>
-<?php } ?>
-<?php if ($Page->total->Visible) { // total ?>
-    <div id="r_total" class="form-group row">
-        <label for="x_total" class="<?= $Page->LeftColumnClass ?>"><span id="elh_view_transactions_per_platform_total"><?= $Page->total->caption() ?></span>
-        <span class="ew-search-operator">
-<?= $Language->phrase("=") ?>
-<input type="hidden" name="z_total" id="z_total" value="=">
-</span>
-        </label>
-        <div class="<?= $Page->RightColumnClass ?>"><div <?= $Page->total->cellAttributes() ?>>
-            <span id="el_view_transactions_per_platform_total" class="ew-search-field">
-<input type="<?= $Page->total->getInputTextType() ?>" data-table="view_transactions_per_platform" data-field="x_total" name="x_total" id="x_total" size="30" placeholder="<?= HtmlEncode($Page->total->getPlaceHolder()) ?>" value="<?= $Page->total->EditValue ?>"<?= $Page->total->editAttributes() ?>>
-<div class="invalid-feedback"><?= $Page->total->getErrorMessage(false) ?></div>
-</span>
-        </div></div>
-    </div>
-<?php } ?>
 <?php if ($Page->start_date->Visible) { // start_date ?>
     <div id="r_start_date" class="form-group row">
         <label for="x_start_date" class="<?= $Page->LeftColumnClass ?>"><span id="elh_view_transactions_per_platform_start_date"><?= $Page->start_date->caption() ?></span>
@@ -489,6 +445,118 @@ loadjs.ready(["fview_transactions_per_platformsearch", "datetimepicker"], functi
             <span id="el_view_transactions_per_platform_vendor_search_name" class="ew-search-field">
 <input type="<?= $Page->vendor_search_name->getInputTextType() ?>" data-table="view_transactions_per_platform" data-field="x_vendor_search_name" name="x_vendor_search_name" id="x_vendor_search_name" size="30" placeholder="<?= HtmlEncode($Page->vendor_search_name->getPlaceHolder()) ?>" value="<?= $Page->vendor_search_name->EditValue ?>"<?= $Page->vendor_search_name->editAttributes() ?>>
 <div class="invalid-feedback"><?= $Page->vendor_search_name->getErrorMessage(false) ?></div>
+</span>
+        </div></div>
+    </div>
+<?php } ?>
+<?php if ($Page->price->Visible) { // price ?>
+    <div id="r_price" class="form-group row">
+        <label for="x_price" class="<?= $Page->LeftColumnClass ?>"><span id="elh_view_transactions_per_platform_price"><?= $Page->price->caption() ?></span>
+        <span class="ew-search-operator">
+<?= $Language->phrase("=") ?>
+<input type="hidden" name="z_price" id="z_price" value="=">
+</span>
+        </label>
+        <div class="<?= $Page->RightColumnClass ?>"><div <?= $Page->price->cellAttributes() ?>>
+            <span id="el_view_transactions_per_platform_price" class="ew-search-field">
+<input type="<?= $Page->price->getInputTextType() ?>" data-table="view_transactions_per_platform" data-field="x_price" name="x_price" id="x_price" size="30" placeholder="<?= HtmlEncode($Page->price->getPlaceHolder()) ?>" value="<?= $Page->price->EditValue ?>"<?= $Page->price->editAttributes() ?>>
+<div class="invalid-feedback"><?= $Page->price->getErrorMessage(false) ?></div>
+</span>
+        </div></div>
+    </div>
+<?php } ?>
+<?php if ($Page->quantity->Visible) { // quantity ?>
+    <div id="r_quantity" class="form-group row">
+        <label for="x_quantity" class="<?= $Page->LeftColumnClass ?>"><span id="elh_view_transactions_per_platform_quantity"><?= $Page->quantity->caption() ?></span>
+        <span class="ew-search-operator">
+<?= $Language->phrase("=") ?>
+<input type="hidden" name="z_quantity" id="z_quantity" value="=">
+</span>
+        </label>
+        <div class="<?= $Page->RightColumnClass ?>"><div <?= $Page->quantity->cellAttributes() ?>>
+            <span id="el_view_transactions_per_platform_quantity" class="ew-search-field">
+<input type="<?= $Page->quantity->getInputTextType() ?>" data-table="view_transactions_per_platform" data-field="x_quantity" name="x_quantity" id="x_quantity" size="30" placeholder="<?= HtmlEncode($Page->quantity->getPlaceHolder()) ?>" value="<?= $Page->quantity->EditValue ?>"<?= $Page->quantity->editAttributes() ?>>
+<div class="invalid-feedback"><?= $Page->quantity->getErrorMessage(false) ?></div>
+</span>
+        </div></div>
+    </div>
+<?php } ?>
+<?php if ($Page->amount_paid->Visible) { // amount_paid ?>
+    <div id="r_amount_paid" class="form-group row">
+        <label for="x_amount_paid" class="<?= $Page->LeftColumnClass ?>"><span id="elh_view_transactions_per_platform_amount_paid"><?= $Page->amount_paid->caption() ?></span>
+        <span class="ew-search-operator">
+<?= $Language->phrase("=") ?>
+<input type="hidden" name="z_amount_paid" id="z_amount_paid" value="=">
+</span>
+        </label>
+        <div class="<?= $Page->RightColumnClass ?>"><div <?= $Page->amount_paid->cellAttributes() ?>>
+            <span id="el_view_transactions_per_platform_amount_paid" class="ew-search-field">
+<input type="<?= $Page->amount_paid->getInputTextType() ?>" data-table="view_transactions_per_platform" data-field="x_amount_paid" name="x_amount_paid" id="x_amount_paid" size="30" placeholder="<?= HtmlEncode($Page->amount_paid->getPlaceHolder()) ?>" value="<?= $Page->amount_paid->EditValue ?>"<?= $Page->amount_paid->editAttributes() ?>>
+<div class="invalid-feedback"><?= $Page->amount_paid->getErrorMessage(false) ?></div>
+</span>
+        </div></div>
+    </div>
+<?php } ?>
+<?php if ($Page->transitmedia_fee->Visible) { // transitmedia_fee ?>
+    <div id="r_transitmedia_fee" class="form-group row">
+        <label for="x_transitmedia_fee" class="<?= $Page->LeftColumnClass ?>"><span id="elh_view_transactions_per_platform_transitmedia_fee"><?= $Page->transitmedia_fee->caption() ?></span>
+        <span class="ew-search-operator">
+<?= $Language->phrase("=") ?>
+<input type="hidden" name="z_transitmedia_fee" id="z_transitmedia_fee" value="=">
+</span>
+        </label>
+        <div class="<?= $Page->RightColumnClass ?>"><div <?= $Page->transitmedia_fee->cellAttributes() ?>>
+            <span id="el_view_transactions_per_platform_transitmedia_fee" class="ew-search-field">
+<input type="<?= $Page->transitmedia_fee->getInputTextType() ?>" data-table="view_transactions_per_platform" data-field="x_transitmedia_fee" name="x_transitmedia_fee" id="x_transitmedia_fee" size="30" placeholder="<?= HtmlEncode($Page->transitmedia_fee->getPlaceHolder()) ?>" value="<?= $Page->transitmedia_fee->EditValue ?>"<?= $Page->transitmedia_fee->editAttributes() ?>>
+<div class="invalid-feedback"><?= $Page->transitmedia_fee->getErrorMessage(false) ?></div>
+</span>
+        </div></div>
+    </div>
+<?php } ?>
+<?php if ($Page->lasaa_fee->Visible) { // lasaa_fee ?>
+    <div id="r_lasaa_fee" class="form-group row">
+        <label for="x_lasaa_fee" class="<?= $Page->LeftColumnClass ?>"><span id="elh_view_transactions_per_platform_lasaa_fee"><?= $Page->lasaa_fee->caption() ?></span>
+        <span class="ew-search-operator">
+<?= $Language->phrase("=") ?>
+<input type="hidden" name="z_lasaa_fee" id="z_lasaa_fee" value="=">
+</span>
+        </label>
+        <div class="<?= $Page->RightColumnClass ?>"><div <?= $Page->lasaa_fee->cellAttributes() ?>>
+            <span id="el_view_transactions_per_platform_lasaa_fee" class="ew-search-field">
+<input type="<?= $Page->lasaa_fee->getInputTextType() ?>" data-table="view_transactions_per_platform" data-field="x_lasaa_fee" name="x_lasaa_fee" id="x_lasaa_fee" size="30" placeholder="<?= HtmlEncode($Page->lasaa_fee->getPlaceHolder()) ?>" value="<?= $Page->lasaa_fee->EditValue ?>"<?= $Page->lasaa_fee->editAttributes() ?>>
+<div class="invalid-feedback"><?= $Page->lasaa_fee->getErrorMessage(false) ?></div>
+</span>
+        </div></div>
+    </div>
+<?php } ?>
+<?php if ($Page->operator_fee->Visible) { // operator_fee ?>
+    <div id="r_operator_fee" class="form-group row">
+        <label for="x_operator_fee" class="<?= $Page->LeftColumnClass ?>"><span id="elh_view_transactions_per_platform_operator_fee"><?= $Page->operator_fee->caption() ?></span>
+        <span class="ew-search-operator">
+<?= $Language->phrase("=") ?>
+<input type="hidden" name="z_operator_fee" id="z_operator_fee" value="=">
+</span>
+        </label>
+        <div class="<?= $Page->RightColumnClass ?>"><div <?= $Page->operator_fee->cellAttributes() ?>>
+            <span id="el_view_transactions_per_platform_operator_fee" class="ew-search-field">
+<input type="<?= $Page->operator_fee->getInputTextType() ?>" data-table="view_transactions_per_platform" data-field="x_operator_fee" name="x_operator_fee" id="x_operator_fee" size="30" placeholder="<?= HtmlEncode($Page->operator_fee->getPlaceHolder()) ?>" value="<?= $Page->operator_fee->EditValue ?>"<?= $Page->operator_fee->editAttributes() ?>>
+<div class="invalid-feedback"><?= $Page->operator_fee->getErrorMessage(false) ?></div>
+</span>
+        </div></div>
+    </div>
+<?php } ?>
+<?php if ($Page->lamata_fee->Visible) { // lamata_fee ?>
+    <div id="r_lamata_fee" class="form-group row">
+        <label for="x_lamata_fee" class="<?= $Page->LeftColumnClass ?>"><span id="elh_view_transactions_per_platform_lamata_fee"><?= $Page->lamata_fee->caption() ?></span>
+        <span class="ew-search-operator">
+<?= $Language->phrase("=") ?>
+<input type="hidden" name="z_lamata_fee" id="z_lamata_fee" value="=">
+</span>
+        </label>
+        <div class="<?= $Page->RightColumnClass ?>"><div <?= $Page->lamata_fee->cellAttributes() ?>>
+            <span id="el_view_transactions_per_platform_lamata_fee" class="ew-search-field">
+<input type="<?= $Page->lamata_fee->getInputTextType() ?>" data-table="view_transactions_per_platform" data-field="x_lamata_fee" name="x_lamata_fee" id="x_lamata_fee" size="30" placeholder="<?= HtmlEncode($Page->lamata_fee->getPlaceHolder()) ?>" value="<?= $Page->lamata_fee->EditValue ?>"<?= $Page->lamata_fee->editAttributes() ?>>
+<div class="invalid-feedback"><?= $Page->lamata_fee->getErrorMessage(false) ?></div>
 </span>
         </div></div>
     </div>

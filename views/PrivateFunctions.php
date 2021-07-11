@@ -139,34 +139,34 @@ function determine_price($price,$qty,$html=FALSE){
 <div class="col-sm-10" style="margin-top: 10px;">
 <table class="table-bordered table-sm ew-db-table" style="min-width: 60%">
   <tr>
-    <th colspan="2">Cost Breakdown (estimated)</th>
+    <th colspan="2" style=" text-transform: uppercase; background-color: #0074b3; color: #FFF;">Cost Breakdown (estimated)</th>
   </tr>
   <tr>
-    <th>Platform</th>
+    <th style="text-align:right">Platform</th>
     <td>{$final_price["platform"]}</td>
   </tr>
   <tr>
-    <th>Inventory</th>
+    <th style="text-align:right">Inventory</th>
     <td>{$final_price["inventory"]}</td>
   </tr>
   <tr>
-    <th>Bus Size</th>
+    <th style="text-align:right">Bus Size</th>
     <td>{$final_price["bus_size"]}</td>
   </tr>
   <tr>
-    <th>Rate Details</th>
+    <th style="text-align:right">Rate Details</th>
     <td>{$final_price["details"]}</td>
   </tr>
   <tr>
-    <th>Number of Buses</th>
+    <th style="text-align:right">Number of Buses</th>
     <td>{$final_price["display_quantity"]}</td>
   </tr>
   <tr>
-    <th>Rate</th>
+    <th style="text-align:right">Rate</th>
     <td>{$final_price["display_rate"]}</td>
   </tr>
   <tr>
-    <th>Est. Cost:</th>
+    <th style="text-align:right">Est. Cost:</th>
     <td><b>{$final_price["display_price"]}</b></td>
   </tr>
 </table>
@@ -248,10 +248,11 @@ function sendTMmail($from, $to, $subject, $msg, $msgtxt="", $attach = null, $cc 
 		$email->Cc = 'ademola.shasanya@valuemedia.com.ng'; 
 		$email->Bcc = ''; 
 		$email->Subject = 'Test Trial'; 
-		$email->Content = $msg; 
+		$email->Content = $msg;
+		*/
 		$email->Format = 'HTML'; 
 		$email->Charset = '';
-		*/
+		
 
 		//Attachments
         if (isset($attach)) {
@@ -271,7 +272,10 @@ function sendTMmail($from, $to, $subject, $msg, $msgtxt="", $attach = null, $cc 
         $msg = html_entity_decode($msg);
 		
 		$email->Content = $msg;
+
+		//COMMENT FOR LIVE EMAIL 
 		$debugme = deubgEmail($email,TRUE);
+
         $email->Content = beautify_email($msg);
         $email->AltBody = $msgtxt;
 
@@ -281,6 +285,8 @@ function sendTMmail($from, $to, $subject, $msg, $msgtxt="", $attach = null, $cc 
 		
 		// var_dump($email->Recipient);		
 		// exit;
+
+		//COMMENT FOR DEBUG EMAIL
         //$email->send();
 
 
@@ -307,12 +313,14 @@ function deubgEmail($email,$send=false){
 	if($send){
 		$newmail = new Email();
 		$newmail->Sender = 'admin@transitmedia.com.ng'; 
-		$newmail->Recipient = 'ademola.shasanya@valuemedia.com.ng'; 
+		$newmail->Recipient = 'ademola.shasanya@valuemedia.com.ng; adeshas@gmail.com'; 
 		$newmail->Bcc = ''; 
 		$newmail->Subject = 'Debugging Email'; 
 		$newmail->Content = beautify_email($msg); 
 		$newmail->Format = 'HTML'; 
 		$newmail->Charset = '';
+		if(isset($email->Attachments[0]['filename']))
+        $newmail->addAttachment($email->Attachments[0]['filename']);
 		$newmail->send();
 	}		
 	return $msg;
@@ -327,6 +335,29 @@ function beautify_email($new_content){
 }
 
 
+function buttonStyle($ps){
+
+        switch ($ps) {
+        case "1":
+            $ps_output = "btn btn-block btn-default disabled";
+            break;
+        case "2":
+            $ps_output = "btn btn-block btn-success disabled";
+            break;
+        case "3":
+            $ps_output = "btn btn-block btn-danger disabled";
+            break;
+        case "4":
+            $ps_output = "btn btn-block btn-secondary disabled";
+            break;
+        case "5":
+            $ps_output = "btn btn-block btn-info disabled";
+            break;
+        default:
+            $ps_output = "btn btn-block btn-default disabled";
+        }
+        return $ps_output;
+}
 
 /*
 TEXT IN XML TO REPLACE
@@ -366,6 +397,23 @@ REPLACE WITH THIS
 
 </p:txBody>
 </p:sp>
+
+ */
+
+
+ /*
+SAVE
+-----------------
+filter for Vendor ID on campaign table
+((!IsAdmin())? " id = ".Profile()->vendor_id:"   ")
+
+
+
+
+
+
+
+
 
  */
 

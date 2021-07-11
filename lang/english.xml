@@ -1,5 +1,5 @@
 ﻿<?xml version="1.0" encoding="utf-8" standalone="yes"?>
-<ew-language date="2020/11/12" version="17.0.3" id="en" name="English" desc="English" author="e.World Technology Limited">
+<ew-language date="2021/1/9" version="17.0.5" id="en" name="English" desc="English" author="e.World Technology Limited">
   <!--
     *** Important Notes:
     1. Language ID should follow: https://developers.google.com/recaptcha/docs/language,
@@ -521,6 +521,8 @@
     <!-- v2020 (report) -->
     <phrase id="norecordselected" value="No records selected" client="1" />
     <phrase id="notablegenerated" value="No tables generated" />
+    <phrase id="notice" value="Notice" />
+    <!-- v2021 -->
     <phrase id="nouserlevel" value="No user level settings." />
     <phrase id="nulllabel" value="(Null)" />
     <!-- v2020 (report) -->
@@ -923,17 +925,23 @@
   <project>
     <phrase id="bodytitle" value="Transit Media Vendor Portal" />
     <phrase id="footertext" value="&amp;copy;2020 Transit Media Ltd. All rights reserved." />
+    <menu id="205">
+      <phrase id="menutext" value="Download Branders Pass" />
+    </menu>
+    <menu id="204">
+      <phrase id="menutext" value="Download" />
+    </menu>
+    <menu id="202">
+      <phrase id="menutext" value="Safety" />
+    </menu>
     <menu id="199">
-      <phrase id="menutext" value="view buses assigned" />
+      <phrase id="menutext" value="Assigned Buses" />
     </menu>
     <menu id="196">
       <phrase id="menutext" value="view vendors operators" />
     </menu>
     <menu id="189">
       <phrase id="menutext" value="View Campaign Status" />
-    </menu>
-    <menu id="190">
-      <phrase id="menutext" value="view payments pending" />
     </menu>
     <menu id="191">
       <phrase id="menutext" value="Confirm Renewal" />
@@ -962,6 +970,9 @@
     <menu id="10">
       <phrase id="menutext" value="Manage Campaigns" />
     </menu>
+    <menu id="198">
+      <phrase id="menutext" value="Pending Campaigns " />
+    </menu>
     <menu id="133">
       <phrase id="menutext" value="Campaigns/Platform" />
     </menu>
@@ -976,6 +987,9 @@
     </menu>
     <menu id="177">
       <phrase id="menutext" value="Buses (Interior)" />
+    </menu>
+    <menu id="203">
+      <phrase id="menutext" value="View All Buses" />
     </menu>
     <menu id="98">
       <phrase id="menutext" value="Transactions" />
@@ -992,11 +1006,20 @@
     <menu id="14">
       <phrase id="menutext" value="Media Allocation" />
     </menu>
+    <menu id="190">
+      <phrase id="menutext" value="Pending Payments" />
+    </menu>
     <menu id="64">
       <phrase id="menutext" value="Renewal Requests" />
     </menu>
     <menu id="201">
       <phrase id="menutext" value="Print Orders" />
+    </menu>
+    <menu id="197">
+      <phrase id="menutext" value="Payments (Platform)" />
+    </menu>
+    <menu id="195">
+      <phrase id="menutext" value="Payments (Operator)" />
     </menu>
     <menu id="34">
       <phrase id="menutext" value="Reports" />
@@ -1005,7 +1028,7 @@
       <phrase id="menutext" value="Reports" />
     </menu>
     <menu id="182">
-      <phrase id="menutext" value="Bus Summary" />
+      <phrase id="menutext" value="Bus Summary Ext" />
     </menu>
     <menu id="181">
       <phrase id="menutext" value="Bus Summary (Ext)" />
@@ -1039,6 +1062,9 @@
     </menu>
     <menu id="194">
       <phrase id="menutext" value="Vendors/Operators" />
+    </menu>
+    <menu id="206">
+      <phrase id="menutext" value="Managers/Platform" />
     </menu>
     <menu id="56">
       <phrase id="menutext" value="Settings" />
@@ -1094,15 +1120,6 @@
     <menu id="11">
       <phrase id="menutext" value="Pricing View Initial" />
     </menu>
-    <menu id="195">
-      <phrase id="menutext" value="Payments (Operator)" />
-    </menu>
-    <menu id="197">
-      <phrase id="menutext" value="Payments (Platform)" />
-    </menu>
-    <menu id="198">
-      <phrase id="menutext" value="Pending Campaigns " />
-    </menu>
     <menu id="130">
       <phrase id="menutext" value="Pricing View" />
     </menu>
@@ -1146,6 +1163,9 @@
       </field>
       <field id="bus_status_id">
         <phrase id="fldcaption" value="Bus Status" />
+      </field>
+      <field id="bus_size_id">
+        <phrase id="fldcaption" value="Bus Size" />
       </field>
       <field id="bus_depot_id">
         <phrase id="fldcaption" value="Bus Depot" />
@@ -1247,7 +1267,7 @@
         <phrase id="fldcaption" value="ID" />
       </field>
       <field id="campaign_id">
-        <phrase id="fldcaption" value="Campaign Order" />
+        <phrase id="fldcaption" value="Campaign Ordered" />
       </field>
       <field id="operator_id">
         <phrase id="fldcaption" value="Operator" />
@@ -1255,11 +1275,17 @@
       <field id="payment_date">
         <phrase id="fldcaption" value="Payment Date" />
       </field>
+      <field id="vendor_id">
+        <phrase id="fldcaption" value="Vendor" />
+      </field>
       <field id="price_id">
         <phrase id="fldcaption" value="Price / Rate" />
       </field>
       <field id="quantity">
-        <phrase id="fldcaption" value="Quantity" />
+        <phrase id="fldcaption" value="Quantity Requested" />
+      </field>
+      <field id="assigned_buses">
+        <phrase id="fldcaption" value="Assigned Buses" />
       </field>
       <field id="start_date">
         <phrase id="fldcaption" value="Start Date" />
@@ -1330,6 +1356,8 @@
         <phrase id="fldtagcaption8" value="Operator" />
         <phrase id="fldtagvalue9" value="6" />
         <phrase id="fldtagcaption9" value="Super Operator (Platform)" />
+        <phrase id="fldtagvalue10" value="7" />
+        <phrase id="fldtagcaption10" value="Print Manager" />
       </field>
       <field id="vendor_id">
         <phrase id="fldcaption" value="Vendor" />
@@ -1337,9 +1365,56 @@
       <field id="reportsto">
         <phrase id="fldcaption" value="Reports to" />
       </field>
+      <field id="ts">
+        <phrase id="fldcaption" value="ts" />
+      </field>
     </table>
     <table id="spook">
       <phrase id="tblcaption" value="spook" />
+    </table>
+    <table id="main_print_orders">
+      <phrase id="tblcaption" value="Print Orders" />
+      <field id="id">
+        <phrase id="fldcaption" value="id" />
+      </field>
+      <field id="campaign_id">
+        <phrase id="fldcaption" value="Campaign Details" />
+      </field>
+      <field id="printer_id">
+        <phrase id="fldcaption" value="Printer" />
+      </field>
+      <field id="ts_created">
+        <phrase id="fldcaption" value="Time Created" />
+      </field>
+      <field id="link">
+        <phrase id="fldcaption" value="Branders Pass" />
+      </field>
+      <field id="quantity">
+        <phrase id="fldcaption" value="Quantity" />
+      </field>
+      <field id="approved">
+        <phrase id="fldcaption" value="Approved" />
+        <phrase id="fldtagvalue1" value="1" />
+        <phrase id="fldtagcaption1" value="Yes" />
+        <phrase id="fldtagvalue2" value="0" />
+        <phrase id="fldtagcaption2" value="No" />
+      </field>
+      <field id="comments">
+        <phrase id="fldcaption" value="Comments" />
+      </field>
+      <field id="all_codes_assigned_in_campaign">
+        <phrase id="fldcaption" value="All Possible Bus Codes in Campaign (Parking Info)" />
+      </field>
+      <field id="bus_codes">
+        <phrase id="fldcaption" value="Bus Codes" />
+        <phrase id="fldtitle" value="'Enter required bus codes from below'" />
+      </field>
+      <field id="available_codes_to_be_assigned">
+        <phrase id="fldcaption" value="Available Bus Codes (yet to be assigned)" />
+      </field>
+      <field id="tags">
+        <phrase id="fldcaption" value="Tags" />
+      </field>
     </table>
     <table id="sub_media_allocation">
       <phrase id="tblcaption" value="Allocation" />
@@ -1382,27 +1457,6 @@
       </field>
       <field id="ts_created">
         <phrase id="fldcaption" value="Created by" />
-      </field>
-      <field id="ts_last_update">
-        <phrase id="fldcaption" value="Last Updated" />
-      </field>
-    </table>
-    <table id="sub_transaction_details">
-      <phrase id="tblcaption" value="Assigned Buses" />
-      <field id="id">
-        <phrase id="fldcaption" value="id" />
-      </field>
-      <field id="transaction_id">
-        <phrase id="fldcaption" value="Transaction" />
-      </field>
-      <field id="bus_id">
-        <phrase id="fldcaption" value="Bus" />
-      </field>
-      <field id="created_by">
-        <phrase id="fldcaption" value="Created by" />
-      </field>
-      <field id="ts_created">
-        <phrase id="fldcaption" value="Created at" />
       </field>
       <field id="ts_last_update">
         <phrase id="fldcaption" value="Last Updated" />
@@ -1464,9 +1518,40 @@
       <field id="printers_fee">
         <phrase id="fldcaption" value="Printers Fee" />
       </field>
+      <field id="active">
+        <phrase id="fldcaption" value="active" />
+        <phrase id="fldtagvalue1" value="1" />
+        <phrase id="fldtagcaption1" value="Yes" />
+        <phrase id="fldtagvalue2" value="0" />
+        <phrase id="fldtagcaption2" value="No" />
+      </field>
     </table>
     <table id="welcome">
       <phrase id="tblcaption" value="Dashboard" />
+    </table>
+    <table id="sub_transaction_details">
+      <phrase id="tblcaption" value="Assigned Buses" />
+      <field id="id">
+        <phrase id="fldcaption" value="id" />
+      </field>
+      <field id="transaction_id">
+        <phrase id="fldcaption" value="Transaction" />
+      </field>
+      <field id="bus_id">
+        <phrase id="fldcaption" value="Bus" />
+      </field>
+      <field id="created_by">
+        <phrase id="fldcaption" value="Created by" />
+      </field>
+      <field id="ts_created">
+        <phrase id="fldcaption" value="Created at" />
+      </field>
+      <field id="ts_last_update">
+        <phrase id="fldcaption" value="Last Updated" />
+      </field>
+      <field id="vendor_id">
+        <phrase id="fldcaption" value="Vendor" />
+      </field>
     </table>
     <table id="x_bus_depot">
       <phrase id="tblcaption" value="Bus Depot" />
@@ -1601,6 +1686,21 @@
         <phrase id="fldcaption" value="contact name" />
       </field>
     </table>
+    <table id="y_printers">
+      <phrase id="tblcaption" value="Printers" />
+      <field id="id">
+        <phrase id="fldcaption" value="ID" />
+      </field>
+      <field id="name">
+        <phrase id="fldcaption" value="Name" />
+      </field>
+      <field id="passcode">
+        <phrase id="fldcaption" value="Passcode" />
+      </field>
+      <field id="_email">
+        <phrase id="fldcaption" value="Email" />
+      </field>
+    </table>
     <table id="y_platforms">
       <phrase id="tblcaption" value="Platforms" />
       <field id="id">
@@ -1613,7 +1713,7 @@
         <phrase id="fldcaption" value="Short Name" />
       </field>
       <field id="_email">
-        <phrase id="fldcaption" value="email" />
+        <phrase id="fldcaption" value="Email" />
       </field>
     </table>
     <table id="y_vendors">
@@ -1635,72 +1735,6 @@
       </field>
       <field id="value">
         <phrase id="fldcaption" value="Value" />
-      </field>
-    </table>
-    <table id="z_email_settings">
-      <phrase id="tblcaption" value="Email Settings" />
-      <field id="id">
-        <phrase id="fldcaption" value="ID" />
-      </field>
-      <field id="name">
-        <phrase id="fldcaption" value="Name" />
-      </field>
-      <field id="description">
-        <phrase id="fldcaption" value="Description" />
-      </field>
-      <field id="to_value">
-        <phrase id="fldcaption" value="To value" />
-      </field>
-      <field id="cc_value">
-        <phrase id="fldcaption" value="CC value" />
-      </field>
-      <field id="bcc_value">
-        <phrase id="fldcaption" value="BCC value" />
-      </field>
-    </table>
-    <table id="z_price_settings">
-      <phrase id="tblcaption" value="Pricing" />
-      <field id="id">
-        <phrase id="fldcaption" value="ID" />
-      </field>
-      <field id="platform_id">
-        <phrase id="fldcaption" value="Platform" />
-      </field>
-      <field id="inventory_id">
-        <phrase id="fldcaption" value="Inventory" />
-      </field>
-      <field id="print_stage_id">
-        <phrase id="fldcaption" value="Print Stage" />
-      </field>
-      <field id="bus_size_id">
-        <phrase id="fldcaption" value="Bus Size" />
-      </field>
-      <field id="details">
-        <phrase id="fldcaption" value="Details" />
-      </field>
-      <field id="max_limit">
-        <phrase id="fldcaption" value="Max Limit" />
-      </field>
-      <field id="min_limit">
-        <phrase id="fldcaption" value="Min Limit" />
-      </field>
-      <field id="price">
-        <phrase id="fldcaption" value="Price" />
-      </field>
-      <field id="operator_fee">
-        <phrase id="fldcaption" value="Operator Fee" />
-      </field>
-      <field id="agency_fee">
-        <phrase id="fldcaption" value="Agency Fee" />
-      </field>
-      <field id="lamata_fee">
-        <phrase id="fldcaption" value="Lamata Fee" />
-      </field>
-      <field id="lasaa_fee">
-        <phrase id="fldcaption" value="Lasaa Fee" />
-      </field>
-      <field id="printers_fee">
-        <phrase id="fldcaption" value="Printers Fee" />
       </field>
     </table>
     <table id="view_pricing_all">
@@ -1758,6 +1792,13 @@
       </field>
       <field id="printers_fee">
         <phrase id="fldcaption" value="printers fee" />
+      </field>
+      <field id="active">
+        <phrase id="fldcaption" value="active" />
+        <phrase id="fldtagvalue1" value="1" />
+        <phrase id="fldtagcaption1" value="Yes" />
+        <phrase id="fldtagvalue2" value="0" />
+        <phrase id="fldtagcaption2" value="No" />
       </field>
     </table>
     <table id="view_operators_platforms">
@@ -1913,91 +1954,109 @@
     <table id="view_bus_depot_summary">
       <phrase id="tblcaption" value="view bus depot summary" />
       <field id="depot">
-        <phrase id="fldcaption" value="depot" />
+        <phrase id="fldcaption" value="Depot" />
       </field>
       <field id="total_buses">
-        <phrase id="fldcaption" value="total buses" />
+        <phrase id="fldcaption" value="Total Buses" />
       </field>
       <field id="bus_codes">
-        <phrase id="fldcaption" value="bus codes" />
+        <phrase id="fldcaption" value="Bus Codes" />
       </field>
       <field id="good_bus_codes">
-        <phrase id="fldcaption" value="good bus codes" />
+        <phrase id="fldcaption" value="Good Bus Codes" />
       </field>
       <field id="bad_bus_codes">
-        <phrase id="fldcaption" value="bad bus codes" />
+        <phrase id="fldcaption" value="Bad Bus Codes" />
       </field>
     </table>
     <table id="view_bus_int_summary_at_a_glance">
-      <phrase id="tblcaption" value="view bus int summary at a glance" />
+      <phrase id="tblcaption" value="Int. Summary (Glance)" />
       <field id="brand_status">
-        <phrase id="fldcaption" value="brand status" />
+        <phrase id="fldcaption" value="Brand Status" />
       </field>
       <field id="active">
-        <phrase id="fldcaption" value="active" />
+        <phrase id="fldcaption" value="Active" />
       </field>
       <field id="maintenance">
-        <phrase id="fldcaption" value="maintenance" />
+        <phrase id="fldcaption" value="Maintenance" />
       </field>
       <field id="total">
-        <phrase id="fldcaption" value="total" />
+        <phrase id="fldcaption" value="Total" />
       </field>
       <field id="last_updated_at">
-        <phrase id="fldcaption" value="last updated at" />
+        <phrase id="fldcaption" value="Last Update" />
+      </field>
+      <field id="platform_id">
+        <phrase id="fldcaption" value="Platform" />
+      </field>
+      <field id="operator_id">
+        <phrase id="fldcaption" value="Operator" />
       </field>
     </table>
     <table id="view_bus_ext_summary_at_a_glance">
-      <phrase id="tblcaption" value="view bus ext summary at a glance" />
+      <phrase id="tblcaption" value="Ext. Summary (Glance)" />
       <field id="brand_status">
-        <phrase id="fldcaption" value="brand status" />
+        <phrase id="fldcaption" value="Brand Status" />
       </field>
       <field id="active">
-        <phrase id="fldcaption" value="active" />
+        <phrase id="fldcaption" value="Active" />
       </field>
       <field id="maintenance">
-        <phrase id="fldcaption" value="maintenance" />
+        <phrase id="fldcaption" value="Maintenance" />
       </field>
       <field id="total">
-        <phrase id="fldcaption" value="total" />
+        <phrase id="fldcaption" value="Total" />
       </field>
       <field id="last_updated_at">
-        <phrase id="fldcaption" value="last updated at" />
+        <phrase id="fldcaption" value="Last Updated" />
+      </field>
+      <field id="platform_id">
+        <phrase id="fldcaption" value="Platform" />
+      </field>
+      <field id="operator_id">
+        <phrase id="fldcaption" value="Operator" />
       </field>
     </table>
     <table id="view_bus_summary">
-      <phrase id="tblcaption" value="view bus summary" />
+      <phrase id="tblcaption" value="Bus Summary Ext" />
       <field id="exterior_campaign_id">
-        <phrase id="fldcaption" value="exterior campaign id" />
+        <phrase id="fldcaption" value="Exterior Campaign id" />
       </field>
       <field id="campaign_name">
-        <phrase id="fldcaption" value="campaign name" />
+        <phrase id="fldcaption" value="Campaign Name" />
       </field>
       <field id="period">
-        <phrase id="fldcaption" value="period" />
+        <phrase id="fldcaption" value="Period" />
       </field>
       <field id="buses">
-        <phrase id="fldcaption" value="buses" />
+        <phrase id="fldcaption" value="Buses" />
       </field>
       <field id="active_working">
-        <phrase id="fldcaption" value="active working" />
+        <phrase id="fldcaption" value="Active Working" />
       </field>
       <field id="requires_maintenance">
-        <phrase id="fldcaption" value="requires maintenance" />
+        <phrase id="fldcaption" value="Requires Maintenance" />
       </field>
       <field id="issues">
-        <phrase id="fldcaption" value="issues" />
+        <phrase id="fldcaption" value="Issues" />
       </field>
       <field id="good_bus_codes">
-        <phrase id="fldcaption" value="good bus codes" />
+        <phrase id="fldcaption" value="Good Bus Codes" />
       </field>
       <field id="bad_bus_codes">
-        <phrase id="fldcaption" value="bad bus codes" />
+        <phrase id="fldcaption" value="Bad Bus Codes" />
       </field>
       <field id="bus_codes">
-        <phrase id="fldcaption" value="bus codes" />
+        <phrase id="fldcaption" value="Bus Codes" />
       </field>
       <field id="last_updated_at">
-        <phrase id="fldcaption" value="last updated at" />
+        <phrase id="fldcaption" value="Last Updated" />
+      </field>
+      <field id="platform_id">
+        <phrase id="fldcaption" value="Platform" />
+      </field>
+      <field id="operator_id">
+        <phrase id="fldcaption" value="Operator" />
       </field>
     </table>
     <table id="private_functions">
@@ -2037,7 +2096,7 @@
       </field>
     </table>
     <table id="view_payments_pending">
-      <phrase id="tblcaption" value="view payments pending" />
+      <phrase id="tblcaption" value="Pending Payments" />
       <field id="transaction_id">
         <phrase id="fldcaption" value="transaction id" />
       </field>
@@ -2207,16 +2266,25 @@
         <phrase id="fldcaption" value="operator" />
       </field>
     </table>
-    <table id="w_vendors_operators">
-      <phrase id="tblcaption" value="Vendors/Operators" />
+    <table id="z_email_settings">
+      <phrase id="tblcaption" value="Email Settings" />
       <field id="id">
-        <phrase id="fldcaption" value="id" />
+        <phrase id="fldcaption" value="ID" />
       </field>
-      <field id="vendor_id">
-        <phrase id="fldcaption" value="Vendor" />
+      <field id="name">
+        <phrase id="fldcaption" value="Name" />
       </field>
-      <field id="operator_id">
-        <phrase id="fldcaption" value="Action" />
+      <field id="description">
+        <phrase id="fldcaption" value="Description" />
+      </field>
+      <field id="to_value">
+        <phrase id="fldcaption" value="To value" />
+      </field>
+      <field id="cc_value">
+        <phrase id="fldcaption" value="CC value" />
+      </field>
+      <field id="bcc_value">
+        <phrase id="fldcaption" value="BCC value" />
       </field>
     </table>
     <table id="view_transactions_per_operator">
@@ -2237,7 +2305,7 @@
         <phrase id="fldcaption" value="Bus size" />
       </field>
       <field id="print_stage">
-        <phrase id="fldcaption" value="print stage" />
+        <phrase id="fldcaption" value="Stage" />
       </field>
       <field id="vendor">
         <phrase id="fldcaption" value="Vendor" />
@@ -2290,6 +2358,9 @@
       <field id="vendor_search_name">
         <phrase id="fldcaption" value="vendor search name" />
       </field>
+      <field id="download">
+        <phrase id="fldcaption" value="Download" />
+      </field>
     </table>
     <table id="view_transactions_per_platform">
       <phrase id="tblcaption" value="Payments (Platform)" />
@@ -2319,15 +2390,6 @@
       </field>
       <field id="transaction_status">
         <phrase id="fldcaption" value="Transaction status" />
-      </field>
-      <field id="quantity">
-        <phrase id="fldcaption" value="Quantity" />
-      </field>
-      <field id="lamata_fee">
-        <phrase id="fldcaption" value="Amount" />
-      </field>
-      <field id="total">
-        <phrase id="fldcaption" value="Total" />
       </field>
       <field id="start_date">
         <phrase id="fldcaption" value="Start date" />
@@ -2361,6 +2423,27 @@
       </field>
       <field id="vendor_search_name">
         <phrase id="fldcaption" value="Stage" />
+      </field>
+      <field id="price">
+        <phrase id="fldcaption" value="Unit Price" />
+      </field>
+      <field id="quantity">
+        <phrase id="fldcaption" value="Quantity" />
+      </field>
+      <field id="amount_paid">
+        <phrase id="fldcaption" value="Amount Paid" />
+      </field>
+      <field id="transitmedia_fee">
+        <phrase id="fldcaption" value="Transit Media Total" />
+      </field>
+      <field id="lasaa_fee">
+        <phrase id="fldcaption" value="LASAA Total" />
+      </field>
+      <field id="operator_fee">
+        <phrase id="fldcaption" value="Operator Total" />
+      </field>
+      <field id="lamata_fee">
+        <phrase id="fldcaption" value="LAMATA Total" />
       </field>
     </table>
     <table id="view_vendors_operators">
@@ -2463,7 +2546,7 @@
       </field>
     </table>
     <table id="view_buses_assigned">
-      <phrase id="tblcaption" value="view buses assigned" />
+      <phrase id="tblcaption" value="Assigned Buses" />
       <field id="id">
         <phrase id="fldcaption" value="id" />
       </field>
@@ -2474,63 +2557,155 @@
         <phrase id="fldcaption" value="Campaign" />
       </field>
     </table>
-    <table id="printers">
-      <phrase id="tblcaption" value="Printers" />
+    <table id="z_price_settings">
+      <phrase id="tblcaption" value="Pricing" />
       <field id="id">
         <phrase id="fldcaption" value="ID" />
       </field>
-      <field id="name">
-        <phrase id="fldcaption" value="Name" />
+      <field id="platform_id">
+        <phrase id="fldcaption" value="Platform" />
       </field>
-      <field id="passcode">
-        <phrase id="fldcaption" value="Passcode" />
+      <field id="inventory_id">
+        <phrase id="fldcaption" value="Inventory" />
       </field>
-      <field id="_email">
-        <phrase id="fldcaption" value="Email" />
+      <field id="print_stage_id">
+        <phrase id="fldcaption" value="Print Stage" />
       </field>
-    </table>
-    <table id="print_orders">
-      <phrase id="tblcaption" value="Print Orders" />
-      <field id="id">
-        <phrase id="fldcaption" value="id" />
+      <field id="bus_size_id">
+        <phrase id="fldcaption" value="Bus Size" />
       </field>
-      <field id="campaign_id">
-        <phrase id="fldcaption" value="Campaign Details" />
+      <field id="details">
+        <phrase id="fldcaption" value="Details" />
       </field>
-      <field id="printer_id">
-        <phrase id="fldcaption" value="Printer" />
+      <field id="max_limit">
+        <phrase id="fldcaption" value="Max Limit" />
       </field>
-      <field id="ts_created">
-        <phrase id="fldcaption" value="Time Created" />
+      <field id="min_limit">
+        <phrase id="fldcaption" value="Min Limit" />
       </field>
-      <field id="link">
-        <phrase id="fldcaption" value="Branders Pass" />
+      <field id="price">
+        <phrase id="fldcaption" value="Price" />
       </field>
-      <field id="quantity">
-        <phrase id="fldcaption" value="Quantity" />
+      <field id="operator_fee">
+        <phrase id="fldcaption" value="Operator Fee" />
       </field>
-      <field id="approved">
-        <phrase id="fldcaption" value="Approved" />
+      <field id="agency_fee">
+        <phrase id="fldcaption" value="Agency Fee" />
+      </field>
+      <field id="lamata_fee">
+        <phrase id="fldcaption" value="Lamata Fee" />
+      </field>
+      <field id="lasaa_fee">
+        <phrase id="fldcaption" value="Lasaa Fee" />
+      </field>
+      <field id="printers_fee">
+        <phrase id="fldcaption" value="Printers Fee" />
+      </field>
+      <field id="active">
+        <phrase id="fldcaption" value="Active" />
         <phrase id="fldtagvalue1" value="1" />
         <phrase id="fldtagcaption1" value="Yes" />
         <phrase id="fldtagvalue2" value="0" />
         <phrase id="fldtagcaption2" value="No" />
       </field>
-      <field id="comments">
-        <phrase id="fldcaption" value="Comments" />
+      <field id="ts_created">
+        <phrase id="fldcaption" value="Created at" />
       </field>
-      <field id="all_codes_assigned_in_campaign">
-        <phrase id="fldcaption" value="All Possible Bus Codes in Campaign (Parking Info)" />
+    </table>
+    <table id="w_vendors_operators">
+      <phrase id="tblcaption" value="Vendors/Operators" />
+      <field id="id">
+        <phrase id="fldcaption" value="id" />
       </field>
-      <field id="bus_codes">
-        <phrase id="fldcaption" value="Bus Codes" />
-        <phrase id="fldtitle" value="'Enter required bus codes from below'" />
+      <field id="vendor_id">
+        <phrase id="fldcaption" value="Vendor" />
       </field>
-      <field id="available_codes_to_be_assigned">
-        <phrase id="fldcaption" value="Available Bus Codes (yet to be assigned)" />
+      <field id="operator_id">
+        <phrase id="fldcaption" value="Action" />
       </field>
-      <field id="tags">
-        <phrase id="fldcaption" value="Tags" />
+    </table>
+    <table id="safetysql">
+      <phrase id="tblcaption" value="Safety" />
+    </table>
+    <table id="view_all_buses">
+      <phrase id="tblcaption" value="All Buses" />
+      <field id="id">
+        <phrase id="fldcaption" value="ID" />
+      </field>
+      <field id="number">
+        <phrase id="fldcaption" value="Bus Code" />
+      </field>
+      <field id="platform">
+        <phrase id="fldcaption" value="Platform" />
+      </field>
+      <field id="operator">
+        <phrase id="fldcaption" value="Operator" />
+      </field>
+      <field id="exterior_campaign">
+        <phrase id="fldcaption" value="Ext. Campaign" />
+      </field>
+      <field id="exterior_campaign_vendor">
+        <phrase id="fldcaption" value="Ext. Campaign Vendor" />
+      </field>
+      <field id="interior_campaign">
+        <phrase id="fldcaption" value="Int. Campaign" />
+      </field>
+      <field id="interior_campaign_vendor">
+        <phrase id="fldcaption" value="Int. Campaign Vendor" />
+      </field>
+      <field id="bus_status">
+        <phrase id="fldcaption" value="Status" />
+      </field>
+      <field id="bus_size">
+        <phrase id="fldcaption" value="Size" />
+      </field>
+      <field id="bus_depot">
+        <phrase id="fldcaption" value="Depot" />
+      </field>
+      <field id="ts_created">
+        <phrase id="fldcaption" value="Created at" />
+      </field>
+      <field id="ts_last_update">
+        <phrase id="fldcaption" value="Last Updated" />
+      </field>
+      <field id="bus_status_id">
+        <phrase id="fldcaption" value="Bus Status" />
+      </field>
+      <field id="bus_size_id">
+        <phrase id="fldcaption" value="Bus Size id" />
+      </field>
+      <field id="bus_depot_id">
+        <phrase id="fldcaption" value="Bus Depot" />
+      </field>
+      <field id="platform_id">
+        <phrase id="fldcaption" value="Platform" />
+      </field>
+      <field id="operator_id">
+        <phrase id="fldcaption" value="Operator" />
+      </field>
+      <field id="exterior_campaign_id">
+        <phrase id="fldcaption" value="Exterior Campaign" />
+      </field>
+      <field id="interior_campaign_id">
+        <phrase id="fldcaption" value="Interior Campaign" />
+      </field>
+    </table>
+    <table id="download">
+      <phrase id="tblcaption" value="Download" />
+    </table>
+    <table id="downloadbp">
+      <phrase id="tblcaption" value="Download Branders Pass" />
+    </table>
+    <table id="w_managers_platform">
+      <phrase id="tblcaption" value="Managers/Platform" />
+      <field id="id">
+        <phrase id="fldcaption" value="id" />
+      </field>
+      <field id="platform_id">
+        <phrase id="fldcaption" value="Platform" />
+      </field>
+      <field id="user_id">
+        <phrase id="fldcaption" value="User" />
       </field>
     </table>
   </project>

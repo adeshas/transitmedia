@@ -5,30 +5,7 @@
 -- Dumped from database version 11.2
 -- Dumped by pg_dump version 11.2
 
--- Started on 2020-11-12 18:15:44
-
-SET statement_timeout = 0;
-SET lock_timeout = 0;
-SET idle_in_transaction_session_timeout = 0;
-SET client_encoding = 'UTF8';
-SET standard_conforming_strings = on;
-SELECT pg_catalog.set_config('search_path', '', false);
-SET check_function_bodies = false;
-SET client_min_messages = warning;
-SET row_security = off;
-
-DROP DATABASE test;
---
--- TOC entry 3281 (class 1262 OID 33867)
--- Name: test; Type: DATABASE; Schema: -; Owner: postgres
---
-
-CREATE DATABASE test WITH TEMPLATE = template0 ENCODING = 'UTF8' LC_COLLATE = 'English_United States.1252' LC_CTYPE = 'English_United States.1252';
-
-
-ALTER DATABASE test OWNER TO postgres;
-
-\connect test
+-- Started on 2020-12-09 09:32:42
 
 SET statement_timeout = 0;
 SET lock_timeout = 0;
@@ -45,164 +22,6 @@ SET default_tablespace = '';
 SET default_with_oids = false;
 
 --
--- TOC entry 220 (class 1259 OID 34183)
--- Name: sub_media_allocation; Type: TABLE; Schema: public; Owner: postgres
---
-
-CREATE TABLE public.sub_media_allocation (
-    id integer NOT NULL,
-    bus_id integer,
-    campaign_id integer,
-    active boolean DEFAULT false NOT NULL,
-    created_by integer,
-    ts_created timestamp with time zone DEFAULT now(),
-    ts_last_update timestamp with time zone
-);
-
-
-ALTER TABLE public.sub_media_allocation OWNER TO postgres;
-
---
--- TOC entry 219 (class 1259 OID 34181)
--- Name: allocation_id_seq; Type: SEQUENCE; Schema: public; Owner: postgres
---
-
-CREATE SEQUENCE public.allocation_id_seq
-    AS integer
-    START WITH 1
-    INCREMENT BY 1
-    NO MINVALUE
-    NO MAXVALUE
-    CACHE 1;
-
-
-ALTER TABLE public.allocation_id_seq OWNER TO postgres;
-
---
--- TOC entry 3282 (class 0 OID 0)
--- Dependencies: 219
--- Name: allocation_id_seq; Type: SEQUENCE OWNED BY; Schema: public; Owner: postgres
---
-
-ALTER SEQUENCE public.allocation_id_seq OWNED BY public.sub_media_allocation.id;
-
-
---
--- TOC entry 214 (class 1259 OID 34110)
--- Name: x_bus_depot; Type: TABLE; Schema: public; Owner: postgres
---
-
-CREATE TABLE public.x_bus_depot (
-    id integer NOT NULL,
-    name text NOT NULL
-);
-
-
-ALTER TABLE public.x_bus_depot OWNER TO postgres;
-
---
--- TOC entry 213 (class 1259 OID 34108)
--- Name: bus_depot_id_seq; Type: SEQUENCE; Schema: public; Owner: postgres
---
-
-CREATE SEQUENCE public.bus_depot_id_seq
-    AS integer
-    START WITH 1
-    INCREMENT BY 1
-    NO MINVALUE
-    NO MAXVALUE
-    CACHE 1;
-
-
-ALTER TABLE public.bus_depot_id_seq OWNER TO postgres;
-
---
--- TOC entry 3283 (class 0 OID 0)
--- Dependencies: 213
--- Name: bus_depot_id_seq; Type: SEQUENCE OWNED BY; Schema: public; Owner: postgres
---
-
-ALTER SEQUENCE public.bus_depot_id_seq OWNED BY public.x_bus_depot.id;
-
-
---
--- TOC entry 209 (class 1259 OID 33978)
--- Name: x_bus_sizes; Type: TABLE; Schema: public; Owner: postgres
---
-
-CREATE TABLE public.x_bus_sizes (
-    id integer NOT NULL,
-    name text
-);
-
-
-ALTER TABLE public.x_bus_sizes OWNER TO postgres;
-
---
--- TOC entry 208 (class 1259 OID 33976)
--- Name: bus_sizes_id_seq; Type: SEQUENCE; Schema: public; Owner: postgres
---
-
-CREATE SEQUENCE public.bus_sizes_id_seq
-    AS integer
-    START WITH 1
-    INCREMENT BY 1
-    NO MINVALUE
-    NO MAXVALUE
-    CACHE 1;
-
-
-ALTER TABLE public.bus_sizes_id_seq OWNER TO postgres;
-
---
--- TOC entry 3284 (class 0 OID 0)
--- Dependencies: 208
--- Name: bus_sizes_id_seq; Type: SEQUENCE OWNED BY; Schema: public; Owner: postgres
---
-
-ALTER SEQUENCE public.bus_sizes_id_seq OWNED BY public.x_bus_sizes.id;
-
-
---
--- TOC entry 216 (class 1259 OID 34123)
--- Name: x_bus_status; Type: TABLE; Schema: public; Owner: postgres
---
-
-CREATE TABLE public.x_bus_status (
-    id integer NOT NULL,
-    name character varying NOT NULL,
-    availability boolean NOT NULL
-);
-
-
-ALTER TABLE public.x_bus_status OWNER TO postgres;
-
---
--- TOC entry 215 (class 1259 OID 34121)
--- Name: bus_status_id_seq; Type: SEQUENCE; Schema: public; Owner: postgres
---
-
-CREATE SEQUENCE public.bus_status_id_seq
-    AS integer
-    START WITH 1
-    INCREMENT BY 1
-    NO MINVALUE
-    NO MAXVALUE
-    CACHE 1;
-
-
-ALTER TABLE public.bus_status_id_seq OWNER TO postgres;
-
---
--- TOC entry 3285 (class 0 OID 0)
--- Dependencies: 215
--- Name: bus_status_id_seq; Type: SEQUENCE OWNED BY; Schema: public; Owner: postgres
---
-
-ALTER SEQUENCE public.bus_status_id_seq OWNED BY public.x_bus_status.id;
-
-
---
 -- TOC entry 218 (class 1259 OID 34136)
 -- Name: main_buses; Type: TABLE; Schema: public; Owner: postgres
 --
@@ -217,7 +36,8 @@ CREATE TABLE public.main_buses (
     bus_status_id integer DEFAULT 1 NOT NULL,
     ts_created timestamp with time zone DEFAULT now() NOT NULL,
     ts_last_update timestamp with time zone DEFAULT now() NOT NULL,
-    bus_depot_id integer
+    bus_depot_id integer,
+    bus_size_id integer
 );
 
 
@@ -225,10 +45,10 @@ ALTER TABLE public.main_buses OWNER TO postgres;
 
 --
 -- TOC entry 217 (class 1259 OID 34134)
--- Name: buses_id_seq; Type: SEQUENCE; Schema: public; Owner: postgres
+-- Name: main_buses_id_seq; Type: SEQUENCE; Schema: public; Owner: postgres
 --
 
-CREATE SEQUENCE public.buses_id_seq
+CREATE SEQUENCE public.main_buses_id_seq
     AS integer
     START WITH 1
     INCREMENT BY 1
@@ -237,220 +57,15 @@ CREATE SEQUENCE public.buses_id_seq
     CACHE 1;
 
 
-ALTER TABLE public.buses_id_seq OWNER TO postgres;
-
---
--- TOC entry 3286 (class 0 OID 0)
--- Dependencies: 217
--- Name: buses_id_seq; Type: SEQUENCE OWNED BY; Schema: public; Owner: postgres
---
-
-ALTER SEQUENCE public.buses_id_seq OWNED BY public.main_buses.id;
-
-
---
--- TOC entry 226 (class 1259 OID 42281)
--- Name: x_transaction_status; Type: TABLE; Schema: public; Owner: postgres
---
-
-CREATE TABLE public.x_transaction_status (
-    id integer NOT NULL,
-    name character varying NOT NULL,
-    admin_name character varying,
-    operator_name character varying
-);
-
-
-ALTER TABLE public.x_transaction_status OWNER TO postgres;
-
---
--- TOC entry 225 (class 1259 OID 42279)
--- Name: campaign_status_id_seq; Type: SEQUENCE; Schema: public; Owner: postgres
---
-
-CREATE SEQUENCE public.campaign_status_id_seq
-    AS integer
-    START WITH 1
-    INCREMENT BY 1
-    NO MINVALUE
-    NO MAXVALUE
-    CACHE 1;
-
-
-ALTER TABLE public.campaign_status_id_seq OWNER TO postgres;
-
---
--- TOC entry 3287 (class 0 OID 0)
--- Dependencies: 225
--- Name: campaign_status_id_seq; Type: SEQUENCE OWNED BY; Schema: public; Owner: postgres
---
-
-ALTER SEQUENCE public.campaign_status_id_seq OWNED BY public.x_transaction_status.id;
-
-
---
--- TOC entry 237 (class 1259 OID 42427)
--- Name: z_core_settings; Type: TABLE; Schema: public; Owner: postgres
---
-
-CREATE TABLE public.z_core_settings (
-    id integer NOT NULL,
-    name character varying NOT NULL,
-    value character varying NOT NULL
-);
-
-
-ALTER TABLE public.z_core_settings OWNER TO postgres;
-
---
--- TOC entry 236 (class 1259 OID 42425)
--- Name: core_settings_id_seq; Type: SEQUENCE; Schema: public; Owner: postgres
---
-
-CREATE SEQUENCE public.core_settings_id_seq
-    AS integer
-    START WITH 1
-    INCREMENT BY 1
-    NO MINVALUE
-    NO MAXVALUE
-    CACHE 1;
-
-
-ALTER TABLE public.core_settings_id_seq OWNER TO postgres;
+ALTER TABLE public.main_buses_id_seq OWNER TO postgres;
 
 --
 -- TOC entry 3288 (class 0 OID 0)
--- Dependencies: 236
--- Name: core_settings_id_seq; Type: SEQUENCE OWNED BY; Schema: public; Owner: postgres
+-- Dependencies: 217
+-- Name: main_buses_id_seq; Type: SEQUENCE OWNED BY; Schema: public; Owner: postgres
 --
 
-ALTER SEQUENCE public.core_settings_id_seq OWNED BY public.z_core_settings.id;
-
-
---
--- TOC entry 235 (class 1259 OID 42414)
--- Name: z_email_settings; Type: TABLE; Schema: public; Owner: postgres
---
-
-CREATE TABLE public.z_email_settings (
-    id integer NOT NULL,
-    name character varying(60) NOT NULL,
-    description text,
-    to_value text,
-    cc_value text,
-    bcc_value text
-);
-
-
-ALTER TABLE public.z_email_settings OWNER TO postgres;
-
---
--- TOC entry 234 (class 1259 OID 42412)
--- Name: email_settings_id_seq; Type: SEQUENCE; Schema: public; Owner: postgres
---
-
-CREATE SEQUENCE public.email_settings_id_seq
-    AS integer
-    START WITH 1
-    INCREMENT BY 1
-    NO MINVALUE
-    NO MAXVALUE
-    CACHE 1;
-
-
-ALTER TABLE public.email_settings_id_seq OWNER TO postgres;
-
---
--- TOC entry 3289 (class 0 OID 0)
--- Dependencies: 234
--- Name: email_settings_id_seq; Type: SEQUENCE OWNED BY; Schema: public; Owner: postgres
---
-
-ALTER SEQUENCE public.email_settings_id_seq OWNED BY public.z_email_settings.id;
-
-
---
--- TOC entry 233 (class 1259 OID 42392)
--- Name: main_reports; Type: TABLE; Schema: public; Owner: postgres
---
-
-CREATE TABLE public.main_reports (
-    id integer NOT NULL,
-    date date NOT NULL,
-    image text,
-    video text,
-    comments text,
-    vendor_id integer NOT NULL,
-    ref_bus_id integer,
-    campaign_id integer NOT NULL,
-    ts_created timestamp with time zone DEFAULT now() NOT NULL,
-    type_id integer
-);
-
-
-ALTER TABLE public.main_reports OWNER TO postgres;
-
---
--- TOC entry 232 (class 1259 OID 42390)
--- Name: exterior_reports_id_seq; Type: SEQUENCE; Schema: public; Owner: postgres
---
-
-CREATE SEQUENCE public.exterior_reports_id_seq
-    AS integer
-    START WITH 1
-    INCREMENT BY 1
-    NO MINVALUE
-    NO MAXVALUE
-    CACHE 1;
-
-
-ALTER TABLE public.exterior_reports_id_seq OWNER TO postgres;
-
---
--- TOC entry 3290 (class 0 OID 0)
--- Dependencies: 232
--- Name: exterior_reports_id_seq; Type: SEQUENCE OWNED BY; Schema: public; Owner: postgres
---
-
-ALTER SEQUENCE public.exterior_reports_id_seq OWNED BY public.main_reports.id;
-
-
---
--- TOC entry 205 (class 1259 OID 33956)
--- Name: y_inventory; Type: TABLE; Schema: public; Owner: postgres
---
-
-CREATE TABLE public.y_inventory (
-    id integer NOT NULL,
-    name text
-);
-
-
-ALTER TABLE public.y_inventory OWNER TO postgres;
-
---
--- TOC entry 204 (class 1259 OID 33954)
--- Name: inventory_id_seq; Type: SEQUENCE; Schema: public; Owner: postgres
---
-
-CREATE SEQUENCE public.inventory_id_seq
-    AS integer
-    START WITH 1
-    INCREMENT BY 1
-    NO MINVALUE
-    NO MAXVALUE
-    CACHE 1;
-
-
-ALTER TABLE public.inventory_id_seq OWNER TO postgres;
-
---
--- TOC entry 3291 (class 0 OID 0)
--- Dependencies: 204
--- Name: inventory_id_seq; Type: SEQUENCE OWNED BY; Schema: public; Owner: postgres
---
-
-ALTER SEQUENCE public.inventory_id_seq OWNED BY public.y_inventory.id;
+ALTER SEQUENCE public.main_buses_id_seq OWNED BY public.main_buses.id;
 
 
 --
@@ -479,6 +94,122 @@ CREATE TABLE public.main_campaigns (
 ALTER TABLE public.main_campaigns OWNER TO postgres;
 
 --
+-- TOC entry 210 (class 1259 OID 33999)
+-- Name: main_campaigns_id_seq; Type: SEQUENCE; Schema: public; Owner: postgres
+--
+
+CREATE SEQUENCE public.main_campaigns_id_seq
+    AS integer
+    START WITH 1
+    INCREMENT BY 1
+    NO MINVALUE
+    NO MAXVALUE
+    CACHE 1;
+
+
+ALTER TABLE public.main_campaigns_id_seq OWNER TO postgres;
+
+--
+-- TOC entry 3289 (class 0 OID 0)
+-- Dependencies: 210
+-- Name: main_campaigns_id_seq; Type: SEQUENCE OWNED BY; Schema: public; Owner: postgres
+--
+
+ALTER SEQUENCE public.main_campaigns_id_seq OWNED BY public.main_campaigns.id;
+
+
+--
+-- TOC entry 270 (class 1259 OID 50814)
+-- Name: main_print_orders; Type: TABLE; Schema: public; Owner: postgres
+--
+
+CREATE TABLE public.main_print_orders (
+    id integer NOT NULL,
+    campaign_id integer,
+    printer_id integer,
+    ts_created timestamp with time zone DEFAULT now() NOT NULL,
+    link text DEFAULT 'click here'::text,
+    approved boolean DEFAULT false,
+    quantity integer NOT NULL,
+    comments text,
+    bus_codes text
+);
+
+
+ALTER TABLE public.main_print_orders OWNER TO postgres;
+
+--
+-- TOC entry 269 (class 1259 OID 50812)
+-- Name: main_print_orders_id_seq; Type: SEQUENCE; Schema: public; Owner: postgres
+--
+
+CREATE SEQUENCE public.main_print_orders_id_seq
+    AS integer
+    START WITH 1
+    INCREMENT BY 1
+    NO MINVALUE
+    NO MAXVALUE
+    CACHE 1;
+
+
+ALTER TABLE public.main_print_orders_id_seq OWNER TO postgres;
+
+--
+-- TOC entry 3290 (class 0 OID 0)
+-- Dependencies: 269
+-- Name: main_print_orders_id_seq; Type: SEQUENCE OWNED BY; Schema: public; Owner: postgres
+--
+
+ALTER SEQUENCE public.main_print_orders_id_seq OWNED BY public.main_print_orders.id;
+
+
+--
+-- TOC entry 233 (class 1259 OID 42392)
+-- Name: main_reports; Type: TABLE; Schema: public; Owner: postgres
+--
+
+CREATE TABLE public.main_reports (
+    id integer NOT NULL,
+    date date NOT NULL,
+    image text,
+    video text,
+    comments text,
+    vendor_id integer NOT NULL,
+    ref_bus_id integer,
+    campaign_id integer NOT NULL,
+    ts_created timestamp with time zone DEFAULT now() NOT NULL,
+    type_id integer
+);
+
+
+ALTER TABLE public.main_reports OWNER TO postgres;
+
+--
+-- TOC entry 232 (class 1259 OID 42390)
+-- Name: main_reports_id_seq; Type: SEQUENCE; Schema: public; Owner: postgres
+--
+
+CREATE SEQUENCE public.main_reports_id_seq
+    AS integer
+    START WITH 1
+    INCREMENT BY 1
+    NO MINVALUE
+    NO MAXVALUE
+    CACHE 1;
+
+
+ALTER TABLE public.main_reports_id_seq OWNER TO postgres;
+
+--
+-- TOC entry 3291 (class 0 OID 0)
+-- Dependencies: 232
+-- Name: main_reports_id_seq; Type: SEQUENCE OWNED BY; Schema: public; Owner: postgres
+--
+
+ALTER SEQUENCE public.main_reports_id_seq OWNED BY public.main_reports.id;
+
+
+--
 -- TOC entry 239 (class 1259 OID 42437)
 -- Name: main_transactions; Type: TABLE; Schema: public; Owner: postgres
 --
@@ -504,6 +235,31 @@ CREATE TABLE public.main_transactions (
 ALTER TABLE public.main_transactions OWNER TO postgres;
 
 --
+-- TOC entry 238 (class 1259 OID 42435)
+-- Name: main_transactions_id_seq; Type: SEQUENCE; Schema: public; Owner: postgres
+--
+
+CREATE SEQUENCE public.main_transactions_id_seq
+    AS integer
+    START WITH 1
+    INCREMENT BY 1
+    NO MINVALUE
+    NO MAXVALUE
+    CACHE 1;
+
+
+ALTER TABLE public.main_transactions_id_seq OWNER TO postgres;
+
+--
+-- TOC entry 3292 (class 0 OID 0)
+-- Dependencies: 238
+-- Name: main_transactions_id_seq; Type: SEQUENCE OWNED BY; Schema: public; Owner: postgres
+--
+
+ALTER SEQUENCE public.main_transactions_id_seq OWNED BY public.main_transactions.id;
+
+
+--
 -- TOC entry 197 (class 1259 OID 33870)
 -- Name: main_users; Type: TABLE; Schema: public; Owner: postgres
 --
@@ -523,11 +279,11 @@ CREATE TABLE public.main_users (
 ALTER TABLE public.main_users OWNER TO postgres;
 
 --
--- TOC entry 210 (class 1259 OID 33999)
--- Name: new_campaign_id_seq; Type: SEQUENCE; Schema: public; Owner: postgres
+-- TOC entry 196 (class 1259 OID 33868)
+-- Name: main_users_id_seq; Type: SEQUENCE; Schema: public; Owner: postgres
 --
 
-CREATE SEQUENCE public.new_campaign_id_seq
+CREATE SEQUENCE public.main_users_id_seq
     AS integer
     START WITH 1
     INCREMENT BY 1
@@ -536,78 +292,41 @@ CREATE SEQUENCE public.new_campaign_id_seq
     CACHE 1;
 
 
-ALTER TABLE public.new_campaign_id_seq OWNER TO postgres;
-
---
--- TOC entry 3292 (class 0 OID 0)
--- Dependencies: 210
--- Name: new_campaign_id_seq; Type: SEQUENCE OWNED BY; Schema: public; Owner: postgres
---
-
-ALTER SEQUENCE public.new_campaign_id_seq OWNED BY public.main_campaigns.id;
-
-
---
--- TOC entry 201 (class 1259 OID 33930)
--- Name: y_operators; Type: TABLE; Schema: public; Owner: postgres
---
-
-CREATE TABLE public.y_operators (
-    id integer NOT NULL,
-    name character varying(50),
-    shortname character varying(50),
-    platform_id integer,
-    email character varying,
-    contact_name character varying
-);
-
-
-ALTER TABLE public.y_operators OWNER TO postgres;
-
---
--- TOC entry 200 (class 1259 OID 33928)
--- Name: operators_id_seq; Type: SEQUENCE; Schema: public; Owner: postgres
---
-
-CREATE SEQUENCE public.operators_id_seq
-    AS integer
-    START WITH 1
-    INCREMENT BY 1
-    NO MINVALUE
-    NO MAXVALUE
-    CACHE 1;
-
-
-ALTER TABLE public.operators_id_seq OWNER TO postgres;
+ALTER TABLE public.main_users_id_seq OWNER TO postgres;
 
 --
 -- TOC entry 3293 (class 0 OID 0)
--- Dependencies: 200
--- Name: operators_id_seq; Type: SEQUENCE OWNED BY; Schema: public; Owner: postgres
+-- Dependencies: 196
+-- Name: main_users_id_seq; Type: SEQUENCE OWNED BY; Schema: public; Owner: postgres
 --
 
-ALTER SEQUENCE public.operators_id_seq OWNED BY public.y_operators.id;
+ALTER SEQUENCE public.main_users_id_seq OWNED BY public.main_users.id;
 
 
 --
--- TOC entry 224 (class 1259 OID 42268)
--- Name: x_payment_status; Type: TABLE; Schema: public; Owner: postgres
+-- TOC entry 220 (class 1259 OID 34183)
+-- Name: sub_media_allocation; Type: TABLE; Schema: public; Owner: postgres
 --
 
-CREATE TABLE public.x_payment_status (
+CREATE TABLE public.sub_media_allocation (
     id integer NOT NULL,
-    name character varying NOT NULL
+    bus_id integer,
+    campaign_id integer,
+    active boolean DEFAULT false NOT NULL,
+    created_by integer,
+    ts_created timestamp with time zone DEFAULT now(),
+    ts_last_update timestamp with time zone
 );
 
 
-ALTER TABLE public.x_payment_status OWNER TO postgres;
+ALTER TABLE public.sub_media_allocation OWNER TO postgres;
 
 --
--- TOC entry 223 (class 1259 OID 42266)
--- Name: payment_status_id_seq; Type: SEQUENCE; Schema: public; Owner: postgres
+-- TOC entry 219 (class 1259 OID 34181)
+-- Name: sub_media_allocation_id_seq; Type: SEQUENCE; Schema: public; Owner: postgres
 --
 
-CREATE SEQUENCE public.payment_status_id_seq
+CREATE SEQUENCE public.sub_media_allocation_id_seq
     AS integer
     START WITH 1
     INCREMENT BY 1
@@ -616,266 +335,15 @@ CREATE SEQUENCE public.payment_status_id_seq
     CACHE 1;
 
 
-ALTER TABLE public.payment_status_id_seq OWNER TO postgres;
+ALTER TABLE public.sub_media_allocation_id_seq OWNER TO postgres;
 
 --
 -- TOC entry 3294 (class 0 OID 0)
--- Dependencies: 223
--- Name: payment_status_id_seq; Type: SEQUENCE OWNED BY; Schema: public; Owner: postgres
+-- Dependencies: 219
+-- Name: sub_media_allocation_id_seq; Type: SEQUENCE OWNED BY; Schema: public; Owner: postgres
 --
 
-ALTER SEQUENCE public.payment_status_id_seq OWNED BY public.x_payment_status.id;
-
-
---
--- TOC entry 199 (class 1259 OID 33919)
--- Name: y_platforms; Type: TABLE; Schema: public; Owner: postgres
---
-
-CREATE TABLE public.y_platforms (
-    id integer NOT NULL,
-    name character varying(50),
-    shortname character varying(50),
-    email character varying
-);
-
-
-ALTER TABLE public.y_platforms OWNER TO postgres;
-
---
--- TOC entry 198 (class 1259 OID 33917)
--- Name: platforms_id_seq; Type: SEQUENCE; Schema: public; Owner: postgres
---
-
-CREATE SEQUENCE public.platforms_id_seq
-    AS integer
-    START WITH 1
-    INCREMENT BY 1
-    NO MINVALUE
-    NO MAXVALUE
-    CACHE 1;
-
-
-ALTER TABLE public.platforms_id_seq OWNER TO postgres;
-
---
--- TOC entry 3295 (class 0 OID 0)
--- Dependencies: 198
--- Name: platforms_id_seq; Type: SEQUENCE OWNED BY; Schema: public; Owner: postgres
---
-
-ALTER SEQUENCE public.platforms_id_seq OWNED BY public.y_platforms.id;
-
-
---
--- TOC entry 203 (class 1259 OID 33943)
--- Name: z_price_settings; Type: TABLE; Schema: public; Owner: postgres
---
-
-CREATE TABLE public.z_price_settings (
-    id integer NOT NULL,
-    platform_id integer NOT NULL,
-    inventory_id integer NOT NULL,
-    print_stage_id integer,
-    bus_size_id integer,
-    details text,
-    max_limit integer,
-    min_limit integer,
-    price bigint,
-    operator_fee bigint,
-    agency_fee bigint,
-    lamata_fee bigint,
-    lasaa_fee bigint,
-    printers_fee bigint
-);
-
-
-ALTER TABLE public.z_price_settings OWNER TO postgres;
-
---
--- TOC entry 202 (class 1259 OID 33941)
--- Name: pricing_id_seq; Type: SEQUENCE; Schema: public; Owner: postgres
---
-
-CREATE SEQUENCE public.pricing_id_seq
-    AS integer
-    START WITH 1
-    INCREMENT BY 1
-    NO MINVALUE
-    NO MAXVALUE
-    CACHE 1;
-
-
-ALTER TABLE public.pricing_id_seq OWNER TO postgres;
-
---
--- TOC entry 3296 (class 0 OID 0)
--- Dependencies: 202
--- Name: pricing_id_seq; Type: SEQUENCE OWNED BY; Schema: public; Owner: postgres
---
-
-ALTER SEQUENCE public.pricing_id_seq OWNED BY public.z_price_settings.id;
-
-
---
--- TOC entry 270 (class 1259 OID 50814)
--- Name: print_orders; Type: TABLE; Schema: public; Owner: postgres
---
-
-CREATE TABLE public.print_orders (
-    id integer NOT NULL,
-    campaign_id integer,
-    printer_id integer,
-    ts_created timestamp with time zone DEFAULT now() NOT NULL,
-    link text DEFAULT 'click here'::text,
-    approved boolean DEFAULT false,
-    quantity integer NOT NULL,
-    comments text,
-    bus_codes text
-);
-
-
-ALTER TABLE public.print_orders OWNER TO postgres;
-
---
--- TOC entry 269 (class 1259 OID 50812)
--- Name: print_orders_id_seq; Type: SEQUENCE; Schema: public; Owner: postgres
---
-
-CREATE SEQUENCE public.print_orders_id_seq
-    AS integer
-    START WITH 1
-    INCREMENT BY 1
-    NO MINVALUE
-    NO MAXVALUE
-    CACHE 1;
-
-
-ALTER TABLE public.print_orders_id_seq OWNER TO postgres;
-
---
--- TOC entry 3297 (class 0 OID 0)
--- Dependencies: 269
--- Name: print_orders_id_seq; Type: SEQUENCE OWNED BY; Schema: public; Owner: postgres
---
-
-ALTER SEQUENCE public.print_orders_id_seq OWNED BY public.print_orders.id;
-
-
---
--- TOC entry 207 (class 1259 OID 33967)
--- Name: x_print_stage; Type: TABLE; Schema: public; Owner: postgres
---
-
-CREATE TABLE public.x_print_stage (
-    id integer NOT NULL,
-    name text
-);
-
-
-ALTER TABLE public.x_print_stage OWNER TO postgres;
-
---
--- TOC entry 206 (class 1259 OID 33965)
--- Name: print_stage_id_seq; Type: SEQUENCE; Schema: public; Owner: postgres
---
-
-CREATE SEQUENCE public.print_stage_id_seq
-    AS integer
-    START WITH 1
-    INCREMENT BY 1
-    NO MINVALUE
-    NO MAXVALUE
-    CACHE 1;
-
-
-ALTER TABLE public.print_stage_id_seq OWNER TO postgres;
-
---
--- TOC entry 3298 (class 0 OID 0)
--- Dependencies: 206
--- Name: print_stage_id_seq; Type: SEQUENCE OWNED BY; Schema: public; Owner: postgres
---
-
-ALTER SEQUENCE public.print_stage_id_seq OWNED BY public.x_print_stage.id;
-
-
---
--- TOC entry 222 (class 1259 OID 42255)
--- Name: x_print_status; Type: TABLE; Schema: public; Owner: postgres
---
-
-CREATE TABLE public.x_print_status (
-    id integer NOT NULL,
-    name character varying NOT NULL
-);
-
-
-ALTER TABLE public.x_print_status OWNER TO postgres;
-
---
--- TOC entry 221 (class 1259 OID 42253)
--- Name: print_status_id_seq; Type: SEQUENCE; Schema: public; Owner: postgres
---
-
-CREATE SEQUENCE public.print_status_id_seq
-    AS integer
-    START WITH 1
-    INCREMENT BY 1
-    NO MINVALUE
-    NO MAXVALUE
-    CACHE 1;
-
-
-ALTER TABLE public.print_status_id_seq OWNER TO postgres;
-
---
--- TOC entry 3299 (class 0 OID 0)
--- Dependencies: 221
--- Name: print_status_id_seq; Type: SEQUENCE OWNED BY; Schema: public; Owner: postgres
---
-
-ALTER SEQUENCE public.print_status_id_seq OWNED BY public.x_print_status.id;
-
-
---
--- TOC entry 268 (class 1259 OID 50803)
--- Name: printers; Type: TABLE; Schema: public; Owner: postgres
---
-
-CREATE TABLE public.printers (
-    id integer NOT NULL,
-    name text,
-    passcode character varying(5),
-    email text
-);
-
-
-ALTER TABLE public.printers OWNER TO postgres;
-
---
--- TOC entry 267 (class 1259 OID 50801)
--- Name: printers_id_seq; Type: SEQUENCE; Schema: public; Owner: postgres
---
-
-CREATE SEQUENCE public.printers_id_seq
-    AS integer
-    START WITH 1
-    INCREMENT BY 1
-    NO MINVALUE
-    NO MAXVALUE
-    CACHE 1;
-
-
-ALTER TABLE public.printers_id_seq OWNER TO postgres;
-
---
--- TOC entry 3300 (class 0 OID 0)
--- Dependencies: 267
--- Name: printers_id_seq; Type: SEQUENCE OWNED BY; Schema: public; Owner: postgres
---
-
-ALTER SEQUENCE public.printers_id_seq OWNED BY public.printers.id;
+ALTER SEQUENCE public.sub_media_allocation_id_seq OWNED BY public.sub_media_allocation.id;
 
 
 --
@@ -896,10 +364,10 @@ ALTER TABLE public.sub_renewal_requests OWNER TO postgres;
 
 --
 -- TOC entry 240 (class 1259 OID 42446)
--- Name: renewal_requests_id_seq; Type: SEQUENCE; Schema: public; Owner: postgres
+-- Name: sub_renewal_requests_id_seq; Type: SEQUENCE; Schema: public; Owner: postgres
 --
 
-CREATE SEQUENCE public.renewal_requests_id_seq
+CREATE SEQUENCE public.sub_renewal_requests_id_seq
     AS integer
     START WITH 1
     INCREMENT BY 1
@@ -908,53 +376,15 @@ CREATE SEQUENCE public.renewal_requests_id_seq
     CACHE 1;
 
 
-ALTER TABLE public.renewal_requests_id_seq OWNER TO postgres;
+ALTER TABLE public.sub_renewal_requests_id_seq OWNER TO postgres;
 
 --
--- TOC entry 3301 (class 0 OID 0)
+-- TOC entry 3295 (class 0 OID 0)
 -- Dependencies: 240
--- Name: renewal_requests_id_seq; Type: SEQUENCE OWNED BY; Schema: public; Owner: postgres
+-- Name: sub_renewal_requests_id_seq; Type: SEQUENCE OWNED BY; Schema: public; Owner: postgres
 --
 
-ALTER SEQUENCE public.renewal_requests_id_seq OWNED BY public.sub_renewal_requests.id;
-
-
---
--- TOC entry 245 (class 1259 OID 42473)
--- Name: x_renewal_stage; Type: TABLE; Schema: public; Owner: postgres
---
-
-CREATE TABLE public.x_renewal_stage (
-    id integer NOT NULL,
-    name text NOT NULL
-);
-
-
-ALTER TABLE public.x_renewal_stage OWNER TO postgres;
-
---
--- TOC entry 244 (class 1259 OID 42471)
--- Name: renewal_stage_id_seq; Type: SEQUENCE; Schema: public; Owner: postgres
---
-
-CREATE SEQUENCE public.renewal_stage_id_seq
-    AS integer
-    START WITH 1
-    INCREMENT BY 1
-    NO MINVALUE
-    NO MAXVALUE
-    CACHE 1;
-
-
-ALTER TABLE public.renewal_stage_id_seq OWNER TO postgres;
-
---
--- TOC entry 3302 (class 0 OID 0)
--- Dependencies: 244
--- Name: renewal_stage_id_seq; Type: SEQUENCE OWNED BY; Schema: public; Owner: postgres
---
-
-ALTER SEQUENCE public.renewal_stage_id_seq OWNED BY public.x_renewal_stage.id;
+ALTER SEQUENCE public.sub_renewal_requests_id_seq OWNED BY public.sub_renewal_requests.id;
 
 
 --
@@ -976,10 +406,10 @@ ALTER TABLE public.sub_transaction_details OWNER TO postgres;
 
 --
 -- TOC entry 242 (class 1259 OID 42454)
--- Name: transaction_details_id_seq; Type: SEQUENCE; Schema: public; Owner: postgres
+-- Name: sub_transaction_details_id_seq; Type: SEQUENCE; Schema: public; Owner: postgres
 --
 
-CREATE SEQUENCE public.transaction_details_id_seq
+CREATE SEQUENCE public.sub_transaction_details_id_seq
     AS integer
     START WITH 1
     INCREMENT BY 1
@@ -988,104 +418,88 @@ CREATE SEQUENCE public.transaction_details_id_seq
     CACHE 1;
 
 
-ALTER TABLE public.transaction_details_id_seq OWNER TO postgres;
+ALTER TABLE public.sub_transaction_details_id_seq OWNER TO postgres;
 
 --
--- TOC entry 3303 (class 0 OID 0)
+-- TOC entry 3296 (class 0 OID 0)
 -- Dependencies: 242
--- Name: transaction_details_id_seq; Type: SEQUENCE OWNED BY; Schema: public; Owner: postgres
+-- Name: sub_transaction_details_id_seq; Type: SEQUENCE OWNED BY; Schema: public; Owner: postgres
 --
 
-ALTER SEQUENCE public.transaction_details_id_seq OWNED BY public.sub_transaction_details.id;
-
-
---
--- TOC entry 238 (class 1259 OID 42435)
--- Name: transactions_id_seq; Type: SEQUENCE; Schema: public; Owner: postgres
---
-
-CREATE SEQUENCE public.transactions_id_seq
-    AS integer
-    START WITH 1
-    INCREMENT BY 1
-    NO MINVALUE
-    NO MAXVALUE
-    CACHE 1;
-
-
-ALTER TABLE public.transactions_id_seq OWNER TO postgres;
-
---
--- TOC entry 3304 (class 0 OID 0)
--- Dependencies: 238
--- Name: transactions_id_seq; Type: SEQUENCE OWNED BY; Schema: public; Owner: postgres
---
-
-ALTER SEQUENCE public.transactions_id_seq OWNED BY public.main_transactions.id;
+ALTER SEQUENCE public.sub_transaction_details_id_seq OWNED BY public.sub_transaction_details.id;
 
 
 --
--- TOC entry 230 (class 1259 OID 42308)
--- Name: x_user_types; Type: TABLE; Schema: public; Owner: postgres
+-- TOC entry 214 (class 1259 OID 34110)
+-- Name: x_bus_depot; Type: TABLE; Schema: public; Owner: postgres
 --
 
-CREATE TABLE public.x_user_types (
+CREATE TABLE public.x_bus_depot (
     id integer NOT NULL,
-    name character varying NOT NULL
+    name text NOT NULL
 );
 
 
-ALTER TABLE public.x_user_types OWNER TO postgres;
+ALTER TABLE public.x_bus_depot OWNER TO postgres;
 
 --
--- TOC entry 229 (class 1259 OID 42306)
--- Name: user_types_id_seq; Type: SEQUENCE; Schema: public; Owner: postgres
+-- TOC entry 209 (class 1259 OID 33978)
+-- Name: x_bus_sizes; Type: TABLE; Schema: public; Owner: postgres
 --
 
-CREATE SEQUENCE public.user_types_id_seq
-    AS integer
-    START WITH 1
-    INCREMENT BY 1
-    NO MINVALUE
-    NO MAXVALUE
-    CACHE 1;
+CREATE TABLE public.x_bus_sizes (
+    id integer NOT NULL,
+    name text
+);
 
 
-ALTER TABLE public.user_types_id_seq OWNER TO postgres;
+ALTER TABLE public.x_bus_sizes OWNER TO postgres;
 
 --
--- TOC entry 3305 (class 0 OID 0)
--- Dependencies: 229
--- Name: user_types_id_seq; Type: SEQUENCE OWNED BY; Schema: public; Owner: postgres
+-- TOC entry 216 (class 1259 OID 34123)
+-- Name: x_bus_status; Type: TABLE; Schema: public; Owner: postgres
 --
 
-ALTER SEQUENCE public.user_types_id_seq OWNED BY public.x_user_types.id;
+CREATE TABLE public.x_bus_status (
+    id integer NOT NULL,
+    name character varying NOT NULL,
+    availability boolean NOT NULL
+);
 
 
---
--- TOC entry 196 (class 1259 OID 33868)
--- Name: users_id_seq; Type: SEQUENCE; Schema: public; Owner: postgres
---
-
-CREATE SEQUENCE public.users_id_seq
-    AS integer
-    START WITH 1
-    INCREMENT BY 1
-    NO MINVALUE
-    NO MAXVALUE
-    CACHE 1;
-
-
-ALTER TABLE public.users_id_seq OWNER TO postgres;
+ALTER TABLE public.x_bus_status OWNER TO postgres;
 
 --
--- TOC entry 3306 (class 0 OID 0)
--- Dependencies: 196
--- Name: users_id_seq; Type: SEQUENCE OWNED BY; Schema: public; Owner: postgres
+-- TOC entry 201 (class 1259 OID 33930)
+-- Name: y_operators; Type: TABLE; Schema: public; Owner: postgres
 --
 
-ALTER SEQUENCE public.users_id_seq OWNED BY public.main_users.id;
+CREATE TABLE public.y_operators (
+    id integer NOT NULL,
+    name character varying(50),
+    shortname character varying(50),
+    platform_id integer,
+    email character varying,
+    contact_name character varying
+);
 
+
+ALTER TABLE public.y_operators OWNER TO postgres;
+
+--
+-- TOC entry 199 (class 1259 OID 33919)
+-- Name: y_platforms; Type: TABLE; Schema: public; Owner: postgres
+--
+
+CREATE TABLE public.y_platforms (
+    id integer NOT NULL,
+    name character varying(50),
+    shortname character varying(50),
+    email character varying
+);
+
+
+ALTER TABLE public.y_platforms OWNER TO postgres;
 
 --
 -- TOC entry 228 (class 1259 OID 42299)
@@ -1101,29 +515,57 @@ CREATE TABLE public.y_vendors (
 ALTER TABLE public.y_vendors OWNER TO postgres;
 
 --
--- TOC entry 227 (class 1259 OID 42297)
--- Name: vendors_id_seq; Type: SEQUENCE; Schema: public; Owner: postgres
+-- TOC entry 271 (class 1259 OID 50848)
+-- Name: view_all_buses; Type: VIEW; Schema: public; Owner: postgres
 --
 
-CREATE SEQUENCE public.vendors_id_seq
-    AS integer
-    START WITH 1
-    INCREMENT BY 1
-    NO MINVALUE
-    NO MAXVALUE
-    CACHE 1;
+CREATE VIEW public.view_all_buses AS
+ SELECT main_buses.id,
+    main_buses.number,
+    ( SELECT y.name
+           FROM public.y_platforms y
+          WHERE (y.id = main_buses.platform_id)) AS platform,
+    ( SELECT o.name
+           FROM public.y_operators o
+          WHERE (o.id = main_buses.operator_id)) AS operator,
+    ( SELECT c.name
+           FROM public.main_campaigns c
+          WHERE (c.id = main_buses.exterior_campaign_id)) AS exterior_campaign,
+    ( SELECT v.name
+           FROM public.y_vendors v
+          WHERE (v.id = ( SELECT c.vendor_id
+                   FROM public.main_campaigns c
+                  WHERE (c.id = main_buses.exterior_campaign_id)))) AS exterior_campaign_vendor,
+    ( SELECT c.name
+           FROM public.main_campaigns c
+          WHERE (c.id = main_buses.interior_campaign_id)) AS interior_campaign,
+    ( SELECT v.name
+           FROM public.y_vendors v
+          WHERE (v.id = ( SELECT c.vendor_id
+                   FROM public.main_campaigns c
+                  WHERE (c.id = main_buses.interior_campaign_id)))) AS interior_campaign_vendor,
+    ( SELECT b.name
+           FROM public.x_bus_status b
+          WHERE (b.id = main_buses.bus_status_id)) AS bus_status,
+    ( SELECT b.name
+           FROM public.x_bus_sizes b
+          WHERE (b.id = main_buses.bus_size_id)) AS bus_size,
+    ( SELECT b.name
+           FROM public.x_bus_depot b
+          WHERE (b.id = main_buses.bus_depot_id)) AS bus_depot,
+    main_buses.ts_created,
+    main_buses.ts_last_update,
+    main_buses.bus_status_id,
+    main_buses.bus_size_id,
+    main_buses.bus_depot_id,
+    main_buses.platform_id,
+    main_buses.operator_id,
+    main_buses.exterior_campaign_id,
+    main_buses.interior_campaign_id
+   FROM public.main_buses;
 
 
-ALTER TABLE public.vendors_id_seq OWNER TO postgres;
-
---
--- TOC entry 3307 (class 0 OID 0)
--- Dependencies: 227
--- Name: vendors_id_seq; Type: SEQUENCE OWNED BY; Schema: public; Owner: postgres
---
-
-ALTER SEQUENCE public.vendors_id_seq OWNED BY public.y_vendors.id;
-
+ALTER TABLE public.view_all_buses OWNER TO postgres;
 
 --
 -- TOC entry 252 (class 1259 OID 50637)
@@ -1391,11 +833,92 @@ SELECT
 ALTER TABLE public.view_campaign_status OWNER TO postgres;
 
 --
+-- TOC entry 224 (class 1259 OID 42268)
+-- Name: x_payment_status; Type: TABLE; Schema: public; Owner: postgres
+--
+
+CREATE TABLE public.x_payment_status (
+    id integer NOT NULL,
+    name character varying NOT NULL
+);
+
+
+ALTER TABLE public.x_payment_status OWNER TO postgres;
+
+--
+-- TOC entry 207 (class 1259 OID 33967)
+-- Name: x_print_stage; Type: TABLE; Schema: public; Owner: postgres
+--
+
+CREATE TABLE public.x_print_stage (
+    id integer NOT NULL,
+    name text
+);
+
+
+ALTER TABLE public.x_print_stage OWNER TO postgres;
+
+--
+-- TOC entry 226 (class 1259 OID 42281)
+-- Name: x_transaction_status; Type: TABLE; Schema: public; Owner: postgres
+--
+
+CREATE TABLE public.x_transaction_status (
+    id integer NOT NULL,
+    name character varying NOT NULL,
+    admin_name character varying,
+    operator_name character varying
+);
+
+
+ALTER TABLE public.x_transaction_status OWNER TO postgres;
+
+--
+-- TOC entry 205 (class 1259 OID 33956)
+-- Name: y_inventory; Type: TABLE; Schema: public; Owner: postgres
+--
+
+CREATE TABLE public.y_inventory (
+    id integer NOT NULL,
+    name text
+);
+
+
+ALTER TABLE public.y_inventory OWNER TO postgres;
+
+--
+-- TOC entry 203 (class 1259 OID 33943)
+-- Name: z_price_settings; Type: TABLE; Schema: public; Owner: postgres
+--
+
+CREATE TABLE public.z_price_settings (
+    id integer NOT NULL,
+    platform_id integer NOT NULL,
+    inventory_id integer NOT NULL,
+    print_stage_id integer,
+    bus_size_id integer,
+    details text,
+    max_limit integer,
+    min_limit integer,
+    price bigint,
+    operator_fee bigint,
+    agency_fee bigint,
+    lamata_fee bigint,
+    lasaa_fee bigint,
+    printers_fee bigint,
+    active boolean DEFAULT false NOT NULL,
+    ts_created timestamp with time zone DEFAULT now() NOT NULL
+);
+
+
+ALTER TABLE public.z_price_settings OWNER TO postgres;
+
+--
 -- TOC entry 265 (class 1259 OID 50785)
 -- Name: view_campaigns_pending; Type: VIEW; Schema: public; Owner: postgres
 --
 
-CREATE VIEW public.view_campaigns_pending WITH (security_barrier='false') AS
+CREATE VIEW public.view_campaigns_pending AS
  SELECT t.payment_date,
     t.start_date,
     t.end_date,
@@ -1441,6 +964,19 @@ CREATE VIEW public.view_campaigns_pending WITH (security_barrier='false') AS
 ALTER TABLE public.view_campaigns_pending OWNER TO postgres;
 
 --
+-- TOC entry 230 (class 1259 OID 42308)
+-- Name: x_user_types; Type: TABLE; Schema: public; Owner: postgres
+--
+
+CREATE TABLE public.x_user_types (
+    id integer NOT NULL,
+    name character varying NOT NULL
+);
+
+
+ALTER TABLE public.x_user_types OWNER TO postgres;
+
+--
 -- TOC entry 259 (class 1259 OID 50727)
 -- Name: view_operators; Type: VIEW; Schema: public; Owner: postgres
 --
@@ -1475,6 +1011,19 @@ CREATE VIEW public.view_operators_platforms WITH (security_barrier='false') AS
 
 
 ALTER TABLE public.view_operators_platforms OWNER TO postgres;
+
+--
+-- TOC entry 222 (class 1259 OID 42255)
+-- Name: x_print_status; Type: TABLE; Schema: public; Owner: postgres
+--
+
+CREATE TABLE public.x_print_status (
+    id integer NOT NULL,
+    name character varying NOT NULL
+);
+
+
+ALTER TABLE public.x_print_status OWNER TO postgres;
 
 --
 -- TOC entry 257 (class 1259 OID 50704)
@@ -1553,7 +1102,8 @@ CREATE VIEW public.view_pricing_all AS
     p.agency_fee,
     p.lamata_fee,
     p.lasaa_fee,
-    p.printers_fee
+    p.printers_fee,
+    p.active
    FROM public.z_price_settings p;
 
 
@@ -1590,7 +1140,8 @@ CREATE VIEW public.view_pricing_initial AS
     p.agency_fee,
     p.lamata_fee,
     p.lasaa_fee,
-    p.printers_fee
+    p.printers_fee,
+    p.active
    FROM public.z_price_settings p
   WHERE (p.print_stage_id = 1);
 
@@ -1610,7 +1161,7 @@ CREATE VIEW public.view_pricing_options AS
     ((((((('N '::text || to_char(p.price, '999,999.99'::text)) || ' | '::text) || p.bus_size) || ' | '::text) || p.print_stage) || ' | '::text) || p.details) AS price_details
    FROM public.main_campaigns c,
     public.view_pricing_all p
-  WHERE ((p.inventory_id = c.inventory_id) AND (p.platform_id = c.platform_id))
+  WHERE ((p.inventory_id = c.inventory_id) AND (p.platform_id = c.platform_id) AND (p.active = true))
   ORDER BY (p.id <> c.price_id);
 
 
@@ -1783,12 +1334,200 @@ CREATE SEQUENCE public.w_vendors_operators_id_seq
 ALTER TABLE public.w_vendors_operators_id_seq OWNER TO postgres;
 
 --
--- TOC entry 3308 (class 0 OID 0)
+-- TOC entry 3297 (class 0 OID 0)
 -- Dependencies: 260
 -- Name: w_vendors_operators_id_seq; Type: SEQUENCE OWNED BY; Schema: public; Owner: postgres
 --
 
 ALTER SEQUENCE public.w_vendors_operators_id_seq OWNED BY public.w_vendors_operators.id;
+
+
+--
+-- TOC entry 213 (class 1259 OID 34108)
+-- Name: x_bus_depot_id_seq; Type: SEQUENCE; Schema: public; Owner: postgres
+--
+
+CREATE SEQUENCE public.x_bus_depot_id_seq
+    AS integer
+    START WITH 1
+    INCREMENT BY 1
+    NO MINVALUE
+    NO MAXVALUE
+    CACHE 1;
+
+
+ALTER TABLE public.x_bus_depot_id_seq OWNER TO postgres;
+
+--
+-- TOC entry 3298 (class 0 OID 0)
+-- Dependencies: 213
+-- Name: x_bus_depot_id_seq; Type: SEQUENCE OWNED BY; Schema: public; Owner: postgres
+--
+
+ALTER SEQUENCE public.x_bus_depot_id_seq OWNED BY public.x_bus_depot.id;
+
+
+--
+-- TOC entry 208 (class 1259 OID 33976)
+-- Name: x_bus_sizes_id_seq; Type: SEQUENCE; Schema: public; Owner: postgres
+--
+
+CREATE SEQUENCE public.x_bus_sizes_id_seq
+    AS integer
+    START WITH 1
+    INCREMENT BY 1
+    NO MINVALUE
+    NO MAXVALUE
+    CACHE 1;
+
+
+ALTER TABLE public.x_bus_sizes_id_seq OWNER TO postgres;
+
+--
+-- TOC entry 3299 (class 0 OID 0)
+-- Dependencies: 208
+-- Name: x_bus_sizes_id_seq; Type: SEQUENCE OWNED BY; Schema: public; Owner: postgres
+--
+
+ALTER SEQUENCE public.x_bus_sizes_id_seq OWNED BY public.x_bus_sizes.id;
+
+
+--
+-- TOC entry 215 (class 1259 OID 34121)
+-- Name: x_bus_status_id_seq; Type: SEQUENCE; Schema: public; Owner: postgres
+--
+
+CREATE SEQUENCE public.x_bus_status_id_seq
+    AS integer
+    START WITH 1
+    INCREMENT BY 1
+    NO MINVALUE
+    NO MAXVALUE
+    CACHE 1;
+
+
+ALTER TABLE public.x_bus_status_id_seq OWNER TO postgres;
+
+--
+-- TOC entry 3300 (class 0 OID 0)
+-- Dependencies: 215
+-- Name: x_bus_status_id_seq; Type: SEQUENCE OWNED BY; Schema: public; Owner: postgres
+--
+
+ALTER SEQUENCE public.x_bus_status_id_seq OWNED BY public.x_bus_status.id;
+
+
+--
+-- TOC entry 223 (class 1259 OID 42266)
+-- Name: x_payment_status_id_seq; Type: SEQUENCE; Schema: public; Owner: postgres
+--
+
+CREATE SEQUENCE public.x_payment_status_id_seq
+    AS integer
+    START WITH 1
+    INCREMENT BY 1
+    NO MINVALUE
+    NO MAXVALUE
+    CACHE 1;
+
+
+ALTER TABLE public.x_payment_status_id_seq OWNER TO postgres;
+
+--
+-- TOC entry 3301 (class 0 OID 0)
+-- Dependencies: 223
+-- Name: x_payment_status_id_seq; Type: SEQUENCE OWNED BY; Schema: public; Owner: postgres
+--
+
+ALTER SEQUENCE public.x_payment_status_id_seq OWNED BY public.x_payment_status.id;
+
+
+--
+-- TOC entry 206 (class 1259 OID 33965)
+-- Name: x_print_stage_id_seq; Type: SEQUENCE; Schema: public; Owner: postgres
+--
+
+CREATE SEQUENCE public.x_print_stage_id_seq
+    AS integer
+    START WITH 1
+    INCREMENT BY 1
+    NO MINVALUE
+    NO MAXVALUE
+    CACHE 1;
+
+
+ALTER TABLE public.x_print_stage_id_seq OWNER TO postgres;
+
+--
+-- TOC entry 3302 (class 0 OID 0)
+-- Dependencies: 206
+-- Name: x_print_stage_id_seq; Type: SEQUENCE OWNED BY; Schema: public; Owner: postgres
+--
+
+ALTER SEQUENCE public.x_print_stage_id_seq OWNED BY public.x_print_stage.id;
+
+
+--
+-- TOC entry 221 (class 1259 OID 42253)
+-- Name: x_print_status_id_seq; Type: SEQUENCE; Schema: public; Owner: postgres
+--
+
+CREATE SEQUENCE public.x_print_status_id_seq
+    AS integer
+    START WITH 1
+    INCREMENT BY 1
+    NO MINVALUE
+    NO MAXVALUE
+    CACHE 1;
+
+
+ALTER TABLE public.x_print_status_id_seq OWNER TO postgres;
+
+--
+-- TOC entry 3303 (class 0 OID 0)
+-- Dependencies: 221
+-- Name: x_print_status_id_seq; Type: SEQUENCE OWNED BY; Schema: public; Owner: postgres
+--
+
+ALTER SEQUENCE public.x_print_status_id_seq OWNED BY public.x_print_status.id;
+
+
+--
+-- TOC entry 245 (class 1259 OID 42473)
+-- Name: x_renewal_stage; Type: TABLE; Schema: public; Owner: postgres
+--
+
+CREATE TABLE public.x_renewal_stage (
+    id integer NOT NULL,
+    name text NOT NULL
+);
+
+
+ALTER TABLE public.x_renewal_stage OWNER TO postgres;
+
+--
+-- TOC entry 244 (class 1259 OID 42471)
+-- Name: x_renewal_stage_id_seq; Type: SEQUENCE; Schema: public; Owner: postgres
+--
+
+CREATE SEQUENCE public.x_renewal_stage_id_seq
+    AS integer
+    START WITH 1
+    INCREMENT BY 1
+    NO MINVALUE
+    NO MAXVALUE
+    CACHE 1;
+
+
+ALTER TABLE public.x_renewal_stage_id_seq OWNER TO postgres;
+
+--
+-- TOC entry 3304 (class 0 OID 0)
+-- Dependencies: 244
+-- Name: x_renewal_stage_id_seq; Type: SEQUENCE OWNED BY; Schema: public; Owner: postgres
+--
+
+ALTER SEQUENCE public.x_renewal_stage_id_seq OWNED BY public.x_renewal_stage.id;
 
 
 --
@@ -1805,87 +1544,375 @@ CREATE TABLE public.x_report_types (
 ALTER TABLE public.x_report_types OWNER TO postgres;
 
 --
--- TOC entry 2961 (class 2604 OID 34139)
+-- TOC entry 225 (class 1259 OID 42279)
+-- Name: x_transaction_status_id_seq; Type: SEQUENCE; Schema: public; Owner: postgres
+--
+
+CREATE SEQUENCE public.x_transaction_status_id_seq
+    AS integer
+    START WITH 1
+    INCREMENT BY 1
+    NO MINVALUE
+    NO MAXVALUE
+    CACHE 1;
+
+
+ALTER TABLE public.x_transaction_status_id_seq OWNER TO postgres;
+
+--
+-- TOC entry 3305 (class 0 OID 0)
+-- Dependencies: 225
+-- Name: x_transaction_status_id_seq; Type: SEQUENCE OWNED BY; Schema: public; Owner: postgres
+--
+
+ALTER SEQUENCE public.x_transaction_status_id_seq OWNED BY public.x_transaction_status.id;
+
+
+--
+-- TOC entry 229 (class 1259 OID 42306)
+-- Name: x_user_types_id_seq; Type: SEQUENCE; Schema: public; Owner: postgres
+--
+
+CREATE SEQUENCE public.x_user_types_id_seq
+    AS integer
+    START WITH 1
+    INCREMENT BY 1
+    NO MINVALUE
+    NO MAXVALUE
+    CACHE 1;
+
+
+ALTER TABLE public.x_user_types_id_seq OWNER TO postgres;
+
+--
+-- TOC entry 3306 (class 0 OID 0)
+-- Dependencies: 229
+-- Name: x_user_types_id_seq; Type: SEQUENCE OWNED BY; Schema: public; Owner: postgres
+--
+
+ALTER SEQUENCE public.x_user_types_id_seq OWNED BY public.x_user_types.id;
+
+
+--
+-- TOC entry 204 (class 1259 OID 33954)
+-- Name: y_inventory_id_seq; Type: SEQUENCE; Schema: public; Owner: postgres
+--
+
+CREATE SEQUENCE public.y_inventory_id_seq
+    AS integer
+    START WITH 1
+    INCREMENT BY 1
+    NO MINVALUE
+    NO MAXVALUE
+    CACHE 1;
+
+
+ALTER TABLE public.y_inventory_id_seq OWNER TO postgres;
+
+--
+-- TOC entry 3307 (class 0 OID 0)
+-- Dependencies: 204
+-- Name: y_inventory_id_seq; Type: SEQUENCE OWNED BY; Schema: public; Owner: postgres
+--
+
+ALTER SEQUENCE public.y_inventory_id_seq OWNED BY public.y_inventory.id;
+
+
+--
+-- TOC entry 200 (class 1259 OID 33928)
+-- Name: y_operators_id_seq; Type: SEQUENCE; Schema: public; Owner: postgres
+--
+
+CREATE SEQUENCE public.y_operators_id_seq
+    AS integer
+    START WITH 1
+    INCREMENT BY 1
+    NO MINVALUE
+    NO MAXVALUE
+    CACHE 1;
+
+
+ALTER TABLE public.y_operators_id_seq OWNER TO postgres;
+
+--
+-- TOC entry 3308 (class 0 OID 0)
+-- Dependencies: 200
+-- Name: y_operators_id_seq; Type: SEQUENCE OWNED BY; Schema: public; Owner: postgres
+--
+
+ALTER SEQUENCE public.y_operators_id_seq OWNED BY public.y_operators.id;
+
+
+--
+-- TOC entry 198 (class 1259 OID 33917)
+-- Name: y_platforms_id_seq; Type: SEQUENCE; Schema: public; Owner: postgres
+--
+
+CREATE SEQUENCE public.y_platforms_id_seq
+    AS integer
+    START WITH 1
+    INCREMENT BY 1
+    NO MINVALUE
+    NO MAXVALUE
+    CACHE 1;
+
+
+ALTER TABLE public.y_platforms_id_seq OWNER TO postgres;
+
+--
+-- TOC entry 3309 (class 0 OID 0)
+-- Dependencies: 198
+-- Name: y_platforms_id_seq; Type: SEQUENCE OWNED BY; Schema: public; Owner: postgres
+--
+
+ALTER SEQUENCE public.y_platforms_id_seq OWNED BY public.y_platforms.id;
+
+
+--
+-- TOC entry 268 (class 1259 OID 50803)
+-- Name: y_printers; Type: TABLE; Schema: public; Owner: postgres
+--
+
+CREATE TABLE public.y_printers (
+    id integer NOT NULL,
+    name text,
+    passcode character varying(5),
+    email text
+);
+
+
+ALTER TABLE public.y_printers OWNER TO postgres;
+
+--
+-- TOC entry 267 (class 1259 OID 50801)
+-- Name: y_printers_id_seq; Type: SEQUENCE; Schema: public; Owner: postgres
+--
+
+CREATE SEQUENCE public.y_printers_id_seq
+    AS integer
+    START WITH 1
+    INCREMENT BY 1
+    NO MINVALUE
+    NO MAXVALUE
+    CACHE 1;
+
+
+ALTER TABLE public.y_printers_id_seq OWNER TO postgres;
+
+--
+-- TOC entry 3310 (class 0 OID 0)
+-- Dependencies: 267
+-- Name: y_printers_id_seq; Type: SEQUENCE OWNED BY; Schema: public; Owner: postgres
+--
+
+ALTER SEQUENCE public.y_printers_id_seq OWNED BY public.y_printers.id;
+
+
+--
+-- TOC entry 227 (class 1259 OID 42297)
+-- Name: y_vendors_id_seq; Type: SEQUENCE; Schema: public; Owner: postgres
+--
+
+CREATE SEQUENCE public.y_vendors_id_seq
+    AS integer
+    START WITH 1
+    INCREMENT BY 1
+    NO MINVALUE
+    NO MAXVALUE
+    CACHE 1;
+
+
+ALTER TABLE public.y_vendors_id_seq OWNER TO postgres;
+
+--
+-- TOC entry 3311 (class 0 OID 0)
+-- Dependencies: 227
+-- Name: y_vendors_id_seq; Type: SEQUENCE OWNED BY; Schema: public; Owner: postgres
+--
+
+ALTER SEQUENCE public.y_vendors_id_seq OWNED BY public.y_vendors.id;
+
+
+--
+-- TOC entry 237 (class 1259 OID 42427)
+-- Name: z_core_settings; Type: TABLE; Schema: public; Owner: postgres
+--
+
+CREATE TABLE public.z_core_settings (
+    id integer NOT NULL,
+    name character varying NOT NULL,
+    value character varying NOT NULL
+);
+
+
+ALTER TABLE public.z_core_settings OWNER TO postgres;
+
+--
+-- TOC entry 236 (class 1259 OID 42425)
+-- Name: z_core_settings_id_seq; Type: SEQUENCE; Schema: public; Owner: postgres
+--
+
+CREATE SEQUENCE public.z_core_settings_id_seq
+    AS integer
+    START WITH 1
+    INCREMENT BY 1
+    NO MINVALUE
+    NO MAXVALUE
+    CACHE 1;
+
+
+ALTER TABLE public.z_core_settings_id_seq OWNER TO postgres;
+
+--
+-- TOC entry 3312 (class 0 OID 0)
+-- Dependencies: 236
+-- Name: z_core_settings_id_seq; Type: SEQUENCE OWNED BY; Schema: public; Owner: postgres
+--
+
+ALTER SEQUENCE public.z_core_settings_id_seq OWNED BY public.z_core_settings.id;
+
+
+--
+-- TOC entry 235 (class 1259 OID 42414)
+-- Name: z_email_settings; Type: TABLE; Schema: public; Owner: postgres
+--
+
+CREATE TABLE public.z_email_settings (
+    id integer NOT NULL,
+    name character varying(60) NOT NULL,
+    description text,
+    to_value text,
+    cc_value text,
+    bcc_value text
+);
+
+
+ALTER TABLE public.z_email_settings OWNER TO postgres;
+
+--
+-- TOC entry 234 (class 1259 OID 42412)
+-- Name: z_email_settings_id_seq; Type: SEQUENCE; Schema: public; Owner: postgres
+--
+
+CREATE SEQUENCE public.z_email_settings_id_seq
+    AS integer
+    START WITH 1
+    INCREMENT BY 1
+    NO MINVALUE
+    NO MAXVALUE
+    CACHE 1;
+
+
+ALTER TABLE public.z_email_settings_id_seq OWNER TO postgres;
+
+--
+-- TOC entry 3313 (class 0 OID 0)
+-- Dependencies: 234
+-- Name: z_email_settings_id_seq; Type: SEQUENCE OWNED BY; Schema: public; Owner: postgres
+--
+
+ALTER SEQUENCE public.z_email_settings_id_seq OWNED BY public.z_email_settings.id;
+
+
+--
+-- TOC entry 202 (class 1259 OID 33941)
+-- Name: z_price_settings_id_seq; Type: SEQUENCE; Schema: public; Owner: postgres
+--
+
+CREATE SEQUENCE public.z_price_settings_id_seq
+    AS integer
+    START WITH 1
+    INCREMENT BY 1
+    NO MINVALUE
+    NO MAXVALUE
+    CACHE 1;
+
+
+ALTER TABLE public.z_price_settings_id_seq OWNER TO postgres;
+
+--
+-- TOC entry 3314 (class 0 OID 0)
+-- Dependencies: 202
+-- Name: z_price_settings_id_seq; Type: SEQUENCE OWNED BY; Schema: public; Owner: postgres
+--
+
+ALTER SEQUENCE public.z_price_settings_id_seq OWNED BY public.z_price_settings.id;
+
+
+--
+-- TOC entry 2967 (class 2604 OID 34139)
 -- Name: main_buses id; Type: DEFAULT; Schema: public; Owner: postgres
 --
 
-ALTER TABLE ONLY public.main_buses ALTER COLUMN id SET DEFAULT nextval('public.buses_id_seq'::regclass);
+ALTER TABLE ONLY public.main_buses ALTER COLUMN id SET DEFAULT nextval('public.main_buses_id_seq'::regclass);
 
 
 --
--- TOC entry 2955 (class 2604 OID 34004)
+-- TOC entry 2961 (class 2604 OID 34004)
 -- Name: main_campaigns id; Type: DEFAULT; Schema: public; Owner: postgres
 --
 
-ALTER TABLE ONLY public.main_campaigns ALTER COLUMN id SET DEFAULT nextval('public.new_campaign_id_seq'::regclass);
+ALTER TABLE ONLY public.main_campaigns ALTER COLUMN id SET DEFAULT nextval('public.main_campaigns_id_seq'::regclass);
 
 
 --
--- TOC entry 2973 (class 2604 OID 42395)
+-- TOC entry 2996 (class 2604 OID 50817)
+-- Name: main_print_orders id; Type: DEFAULT; Schema: public; Owner: postgres
+--
+
+ALTER TABLE ONLY public.main_print_orders ALTER COLUMN id SET DEFAULT nextval('public.main_print_orders_id_seq'::regclass);
+
+
+--
+-- TOC entry 2979 (class 2604 OID 42395)
 -- Name: main_reports id; Type: DEFAULT; Schema: public; Owner: postgres
 --
 
-ALTER TABLE ONLY public.main_reports ALTER COLUMN id SET DEFAULT nextval('public.exterior_reports_id_seq'::regclass);
+ALTER TABLE ONLY public.main_reports ALTER COLUMN id SET DEFAULT nextval('public.main_reports_id_seq'::regclass);
 
 
 --
--- TOC entry 2977 (class 2604 OID 42440)
+-- TOC entry 2983 (class 2604 OID 42440)
 -- Name: main_transactions id; Type: DEFAULT; Schema: public; Owner: postgres
 --
 
-ALTER TABLE ONLY public.main_transactions ALTER COLUMN id SET DEFAULT nextval('public.transactions_id_seq'::regclass);
+ALTER TABLE ONLY public.main_transactions ALTER COLUMN id SET DEFAULT nextval('public.main_transactions_id_seq'::regclass);
 
 
 --
--- TOC entry 2948 (class 2604 OID 33873)
+-- TOC entry 2952 (class 2604 OID 33873)
 -- Name: main_users id; Type: DEFAULT; Schema: public; Owner: postgres
 --
 
-ALTER TABLE ONLY public.main_users ALTER COLUMN id SET DEFAULT nextval('public.users_id_seq'::regclass);
+ALTER TABLE ONLY public.main_users ALTER COLUMN id SET DEFAULT nextval('public.main_users_id_seq'::regclass);
 
 
 --
--- TOC entry 2990 (class 2604 OID 50817)
--- Name: print_orders id; Type: DEFAULT; Schema: public; Owner: postgres
---
-
-ALTER TABLE ONLY public.print_orders ALTER COLUMN id SET DEFAULT nextval('public.print_orders_id_seq'::regclass);
-
-
---
--- TOC entry 2989 (class 2604 OID 50806)
--- Name: printers id; Type: DEFAULT; Schema: public; Owner: postgres
---
-
-ALTER TABLE ONLY public.printers ALTER COLUMN id SET DEFAULT nextval('public.printers_id_seq'::regclass);
-
-
---
--- TOC entry 2965 (class 2604 OID 34186)
+-- TOC entry 2971 (class 2604 OID 34186)
 -- Name: sub_media_allocation id; Type: DEFAULT; Schema: public; Owner: postgres
 --
 
-ALTER TABLE ONLY public.sub_media_allocation ALTER COLUMN id SET DEFAULT nextval('public.allocation_id_seq'::regclass);
+ALTER TABLE ONLY public.sub_media_allocation ALTER COLUMN id SET DEFAULT nextval('public.sub_media_allocation_id_seq'::regclass);
 
 
 --
--- TOC entry 2983 (class 2604 OID 42451)
+-- TOC entry 2989 (class 2604 OID 42451)
 -- Name: sub_renewal_requests id; Type: DEFAULT; Schema: public; Owner: postgres
 --
 
-ALTER TABLE ONLY public.sub_renewal_requests ALTER COLUMN id SET DEFAULT nextval('public.renewal_requests_id_seq'::regclass);
+ALTER TABLE ONLY public.sub_renewal_requests ALTER COLUMN id SET DEFAULT nextval('public.sub_renewal_requests_id_seq'::regclass);
 
 
 --
--- TOC entry 2984 (class 2604 OID 42459)
+-- TOC entry 2990 (class 2604 OID 42459)
 -- Name: sub_transaction_details id; Type: DEFAULT; Schema: public; Owner: postgres
 --
 
-ALTER TABLE ONLY public.sub_transaction_details ALTER COLUMN id SET DEFAULT nextval('public.transaction_details_id_seq'::regclass);
+ALTER TABLE ONLY public.sub_transaction_details ALTER COLUMN id SET DEFAULT nextval('public.sub_transaction_details_id_seq'::regclass);
 
 
 --
--- TOC entry 2988 (class 2604 OID 50754)
+-- TOC entry 2994 (class 2604 OID 50754)
 -- Name: w_vendors_operators id; Type: DEFAULT; Schema: public; Owner: postgres
 --
 
@@ -1893,202 +1920,626 @@ ALTER TABLE ONLY public.w_vendors_operators ALTER COLUMN id SET DEFAULT nextval(
 
 
 --
--- TOC entry 2959 (class 2604 OID 34113)
+-- TOC entry 2965 (class 2604 OID 34113)
 -- Name: x_bus_depot id; Type: DEFAULT; Schema: public; Owner: postgres
 --
 
-ALTER TABLE ONLY public.x_bus_depot ALTER COLUMN id SET DEFAULT nextval('public.bus_depot_id_seq'::regclass);
+ALTER TABLE ONLY public.x_bus_depot ALTER COLUMN id SET DEFAULT nextval('public.x_bus_depot_id_seq'::regclass);
 
 
 --
--- TOC entry 2954 (class 2604 OID 33981)
+-- TOC entry 2960 (class 2604 OID 33981)
 -- Name: x_bus_sizes id; Type: DEFAULT; Schema: public; Owner: postgres
 --
 
-ALTER TABLE ONLY public.x_bus_sizes ALTER COLUMN id SET DEFAULT nextval('public.bus_sizes_id_seq'::regclass);
+ALTER TABLE ONLY public.x_bus_sizes ALTER COLUMN id SET DEFAULT nextval('public.x_bus_sizes_id_seq'::regclass);
 
 
 --
--- TOC entry 2960 (class 2604 OID 34126)
+-- TOC entry 2966 (class 2604 OID 34126)
 -- Name: x_bus_status id; Type: DEFAULT; Schema: public; Owner: postgres
 --
 
-ALTER TABLE ONLY public.x_bus_status ALTER COLUMN id SET DEFAULT nextval('public.bus_status_id_seq'::regclass);
+ALTER TABLE ONLY public.x_bus_status ALTER COLUMN id SET DEFAULT nextval('public.x_bus_status_id_seq'::regclass);
 
 
 --
--- TOC entry 2969 (class 2604 OID 42271)
+-- TOC entry 2975 (class 2604 OID 42271)
 -- Name: x_payment_status id; Type: DEFAULT; Schema: public; Owner: postgres
 --
 
-ALTER TABLE ONLY public.x_payment_status ALTER COLUMN id SET DEFAULT nextval('public.payment_status_id_seq'::regclass);
+ALTER TABLE ONLY public.x_payment_status ALTER COLUMN id SET DEFAULT nextval('public.x_payment_status_id_seq'::regclass);
 
 
 --
--- TOC entry 2953 (class 2604 OID 33970)
+-- TOC entry 2959 (class 2604 OID 33970)
 -- Name: x_print_stage id; Type: DEFAULT; Schema: public; Owner: postgres
 --
 
-ALTER TABLE ONLY public.x_print_stage ALTER COLUMN id SET DEFAULT nextval('public.print_stage_id_seq'::regclass);
+ALTER TABLE ONLY public.x_print_stage ALTER COLUMN id SET DEFAULT nextval('public.x_print_stage_id_seq'::regclass);
 
 
 --
--- TOC entry 2968 (class 2604 OID 42258)
+-- TOC entry 2974 (class 2604 OID 42258)
 -- Name: x_print_status id; Type: DEFAULT; Schema: public; Owner: postgres
 --
 
-ALTER TABLE ONLY public.x_print_status ALTER COLUMN id SET DEFAULT nextval('public.print_status_id_seq'::regclass);
+ALTER TABLE ONLY public.x_print_status ALTER COLUMN id SET DEFAULT nextval('public.x_print_status_id_seq'::regclass);
 
 
 --
--- TOC entry 2987 (class 2604 OID 42476)
+-- TOC entry 2993 (class 2604 OID 42476)
 -- Name: x_renewal_stage id; Type: DEFAULT; Schema: public; Owner: postgres
 --
 
-ALTER TABLE ONLY public.x_renewal_stage ALTER COLUMN id SET DEFAULT nextval('public.renewal_stage_id_seq'::regclass);
+ALTER TABLE ONLY public.x_renewal_stage ALTER COLUMN id SET DEFAULT nextval('public.x_renewal_stage_id_seq'::regclass);
 
 
 --
--- TOC entry 2970 (class 2604 OID 42284)
+-- TOC entry 2976 (class 2604 OID 42284)
 -- Name: x_transaction_status id; Type: DEFAULT; Schema: public; Owner: postgres
 --
 
-ALTER TABLE ONLY public.x_transaction_status ALTER COLUMN id SET DEFAULT nextval('public.campaign_status_id_seq'::regclass);
+ALTER TABLE ONLY public.x_transaction_status ALTER COLUMN id SET DEFAULT nextval('public.x_transaction_status_id_seq'::regclass);
 
 
 --
--- TOC entry 2972 (class 2604 OID 42311)
+-- TOC entry 2978 (class 2604 OID 42311)
 -- Name: x_user_types id; Type: DEFAULT; Schema: public; Owner: postgres
 --
 
-ALTER TABLE ONLY public.x_user_types ALTER COLUMN id SET DEFAULT nextval('public.user_types_id_seq'::regclass);
+ALTER TABLE ONLY public.x_user_types ALTER COLUMN id SET DEFAULT nextval('public.x_user_types_id_seq'::regclass);
 
 
 --
--- TOC entry 2952 (class 2604 OID 33959)
+-- TOC entry 2958 (class 2604 OID 33959)
 -- Name: y_inventory id; Type: DEFAULT; Schema: public; Owner: postgres
 --
 
-ALTER TABLE ONLY public.y_inventory ALTER COLUMN id SET DEFAULT nextval('public.inventory_id_seq'::regclass);
+ALTER TABLE ONLY public.y_inventory ALTER COLUMN id SET DEFAULT nextval('public.y_inventory_id_seq'::regclass);
 
 
 --
--- TOC entry 2950 (class 2604 OID 33933)
+-- TOC entry 2954 (class 2604 OID 33933)
 -- Name: y_operators id; Type: DEFAULT; Schema: public; Owner: postgres
 --
 
-ALTER TABLE ONLY public.y_operators ALTER COLUMN id SET DEFAULT nextval('public.operators_id_seq'::regclass);
+ALTER TABLE ONLY public.y_operators ALTER COLUMN id SET DEFAULT nextval('public.y_operators_id_seq'::regclass);
 
 
 --
--- TOC entry 2949 (class 2604 OID 33922)
+-- TOC entry 2953 (class 2604 OID 33922)
 -- Name: y_platforms id; Type: DEFAULT; Schema: public; Owner: postgres
 --
 
-ALTER TABLE ONLY public.y_platforms ALTER COLUMN id SET DEFAULT nextval('public.platforms_id_seq'::regclass);
+ALTER TABLE ONLY public.y_platforms ALTER COLUMN id SET DEFAULT nextval('public.y_platforms_id_seq'::regclass);
 
 
 --
--- TOC entry 2971 (class 2604 OID 42302)
+-- TOC entry 2995 (class 2604 OID 50806)
+-- Name: y_printers id; Type: DEFAULT; Schema: public; Owner: postgres
+--
+
+ALTER TABLE ONLY public.y_printers ALTER COLUMN id SET DEFAULT nextval('public.y_printers_id_seq'::regclass);
+
+
+--
+-- TOC entry 2977 (class 2604 OID 42302)
 -- Name: y_vendors id; Type: DEFAULT; Schema: public; Owner: postgres
 --
 
-ALTER TABLE ONLY public.y_vendors ALTER COLUMN id SET DEFAULT nextval('public.vendors_id_seq'::regclass);
+ALTER TABLE ONLY public.y_vendors ALTER COLUMN id SET DEFAULT nextval('public.y_vendors_id_seq'::regclass);
 
 
 --
--- TOC entry 2976 (class 2604 OID 42430)
+-- TOC entry 2982 (class 2604 OID 42430)
 -- Name: z_core_settings id; Type: DEFAULT; Schema: public; Owner: postgres
 --
 
-ALTER TABLE ONLY public.z_core_settings ALTER COLUMN id SET DEFAULT nextval('public.core_settings_id_seq'::regclass);
+ALTER TABLE ONLY public.z_core_settings ALTER COLUMN id SET DEFAULT nextval('public.z_core_settings_id_seq'::regclass);
 
 
 --
--- TOC entry 2975 (class 2604 OID 42417)
+-- TOC entry 2981 (class 2604 OID 42417)
 -- Name: z_email_settings id; Type: DEFAULT; Schema: public; Owner: postgres
 --
 
-ALTER TABLE ONLY public.z_email_settings ALTER COLUMN id SET DEFAULT nextval('public.email_settings_id_seq'::regclass);
+ALTER TABLE ONLY public.z_email_settings ALTER COLUMN id SET DEFAULT nextval('public.z_email_settings_id_seq'::regclass);
 
 
 --
--- TOC entry 2951 (class 2604 OID 33946)
+-- TOC entry 2955 (class 2604 OID 33946)
 -- Name: z_price_settings id; Type: DEFAULT; Schema: public; Owner: postgres
 --
 
-ALTER TABLE ONLY public.z_price_settings ALTER COLUMN id SET DEFAULT nextval('public.pricing_id_seq'::regclass);
+ALTER TABLE ONLY public.z_price_settings ALTER COLUMN id SET DEFAULT nextval('public.z_price_settings_id_seq'::regclass);
 
 
 --
--- TOC entry 3242 (class 0 OID 34136)
+-- TOC entry 3249 (class 0 OID 34136)
 -- Dependencies: 218
 -- Data for Name: main_buses; Type: TABLE DATA; Schema: public; Owner: postgres
 --
 
-INSERT INTO public.main_buses VALUES (5, '002', 1, 1, NULL, NULL, 1, '2020-11-02 13:16:18.516647+00', '2020-11-02 13:16:18.516647+00', 1);
-INSERT INTO public.main_buses VALUES (7, '003', 1, 1, NULL, NULL, 1, '2020-11-02 13:19:16.681323+00', '2020-11-02 13:19:16.681323+00', 1);
-INSERT INTO public.main_buses VALUES (9, '005', 3, 2, NULL, NULL, 1, '2020-11-02 13:19:16.681323+00', '2020-11-02 13:19:16.681323+00', 1);
-INSERT INTO public.main_buses VALUES (10, '006', 4, 2, NULL, NULL, 1, '2020-11-02 13:19:16.681323+00', '2020-11-02 13:19:16.681323+00', 1);
-INSERT INTO public.main_buses VALUES (11, '100', 1, 1, NULL, NULL, 1, '2020-11-02 13:23:51.753958+00', '2020-11-02 13:23:51.753958+00', 1);
-INSERT INTO public.main_buses VALUES (12, '101', 1, 1, NULL, NULL, 1, '2020-11-02 13:23:51.753958+00', '2020-11-02 13:23:51.753958+00', 1);
-INSERT INTO public.main_buses VALUES (13, '102', 1, 1, NULL, NULL, 1, '2020-11-02 13:23:51.753958+00', '2020-11-02 13:23:51.753958+00', 1);
-INSERT INTO public.main_buses VALUES (14, '103', 1, 1, NULL, NULL, 1, '2020-11-02 13:23:51.753958+00', '2020-11-02 13:23:51.753958+00', 1);
-INSERT INTO public.main_buses VALUES (15, '104', 1, 1, NULL, NULL, 1, '2020-11-02 13:23:51.753958+00', '2020-11-02 13:23:51.753958+00', 1);
-INSERT INTO public.main_buses VALUES (16, '105', 1, 1, NULL, NULL, 1, '2020-11-02 13:23:51.753958+00', '2020-11-02 13:23:51.753958+00', 1);
-INSERT INTO public.main_buses VALUES (17, '106', 1, 1, NULL, NULL, 1, '2020-11-02 13:23:51.753958+00', '2020-11-02 13:23:51.753958+00', 1);
-INSERT INTO public.main_buses VALUES (18, '107', 1, 1, NULL, NULL, 1, '2020-11-02 13:23:51.753958+00', '2020-11-02 13:23:51.753958+00', 1);
-INSERT INTO public.main_buses VALUES (19, '108', 1, 1, NULL, NULL, 1, '2020-11-02 13:23:51.753958+00', '2020-11-02 13:23:51.753958+00', 1);
-INSERT INTO public.main_buses VALUES (20, '109', 1, 1, NULL, NULL, 1, '2020-11-02 13:23:51.753958+00', '2020-11-02 13:23:51.753958+00', 1);
-INSERT INTO public.main_buses VALUES (21, '110', 1, 1, NULL, NULL, 1, '2020-11-02 13:23:51.753958+00', '2020-11-02 13:23:51.753958+00', 1);
-INSERT INTO public.main_buses VALUES (22, '111', 1, 1, NULL, NULL, 1, '2020-11-02 13:23:51.753958+00', '2020-11-02 13:23:51.753958+00', 1);
-INSERT INTO public.main_buses VALUES (24, '113', 2, 2, NULL, NULL, 1, '2020-11-02 13:23:51.753958+00', '2020-11-02 13:23:51.753958+00', 1);
-INSERT INTO public.main_buses VALUES (26, '115', 2, 2, NULL, NULL, 1, '2020-11-02 13:23:51.753958+00', '2020-11-02 13:23:51.753958+00', 1);
-INSERT INTO public.main_buses VALUES (27, '116', 2, 2, NULL, NULL, 1, '2020-11-02 13:23:51.753958+00', '2020-11-02 13:23:51.753958+00', 1);
-INSERT INTO public.main_buses VALUES (28, '117', 2, 2, NULL, NULL, 1, '2020-11-02 13:23:51.753958+00', '2020-11-02 13:23:51.753958+00', 1);
-INSERT INTO public.main_buses VALUES (29, '118', 2, 2, NULL, NULL, 1, '2020-11-02 13:23:51.753958+00', '2020-11-02 13:23:51.753958+00', 1);
-INSERT INTO public.main_buses VALUES (30, '119', 2, 2, NULL, NULL, 1, '2020-11-02 13:23:51.753958+00', '2020-11-02 13:23:51.753958+00', 1);
-INSERT INTO public.main_buses VALUES (32, '121', 2, 2, NULL, NULL, 1, '2020-11-02 13:23:51.753958+00', '2020-11-02 13:23:51.753958+00', 1);
-INSERT INTO public.main_buses VALUES (33, '122', 2, 2, NULL, NULL, 1, '2020-11-02 13:23:51.753958+00', '2020-11-02 13:23:51.753958+00', 1);
-INSERT INTO public.main_buses VALUES (34, '123', 2, 2, NULL, NULL, 1, '2020-11-02 13:23:51.753958+00', '2020-11-02 13:23:51.753958+00', 1);
-INSERT INTO public.main_buses VALUES (35, '124', 2, 2, NULL, NULL, 1, '2020-11-02 13:23:51.753958+00', '2020-11-02 13:23:51.753958+00', 1);
-INSERT INTO public.main_buses VALUES (36, '125', 3, 2, NULL, NULL, 1, '2020-11-02 13:23:51.753958+00', '2020-11-02 13:23:51.753958+00', 1);
-INSERT INTO public.main_buses VALUES (37, '126', 3, 2, NULL, NULL, 1, '2020-11-02 13:23:51.753958+00', '2020-11-02 13:23:51.753958+00', 1);
-INSERT INTO public.main_buses VALUES (38, '127', 3, 2, NULL, NULL, 1, '2020-11-02 13:23:51.753958+00', '2020-11-02 13:23:51.753958+00', 1);
-INSERT INTO public.main_buses VALUES (39, '128', 3, 2, NULL, NULL, 1, '2020-11-02 13:23:51.753958+00', '2020-11-02 13:23:51.753958+00', 1);
-INSERT INTO public.main_buses VALUES (40, '129', 3, 2, NULL, NULL, 1, '2020-11-02 13:23:51.753958+00', '2020-11-02 13:23:51.753958+00', 1);
-INSERT INTO public.main_buses VALUES (41, '130', 3, 2, NULL, NULL, 1, '2020-11-02 13:23:51.753958+00', '2020-11-02 13:23:51.753958+00', 1);
-INSERT INTO public.main_buses VALUES (42, '131', 3, 2, NULL, NULL, 1, '2020-11-02 13:23:51.753958+00', '2020-11-02 13:23:51.753958+00', 1);
-INSERT INTO public.main_buses VALUES (43, '132', 3, 2, NULL, NULL, 1, '2020-11-02 13:23:51.753958+00', '2020-11-02 13:23:51.753958+00', 1);
-INSERT INTO public.main_buses VALUES (45, '134', 3, 2, NULL, NULL, 1, '2020-11-02 13:23:51.753958+00', '2020-11-02 13:23:51.753958+00', 1);
-INSERT INTO public.main_buses VALUES (46, '135', 3, 2, NULL, NULL, 1, '2020-11-02 13:23:51.753958+00', '2020-11-02 13:23:51.753958+00', 1);
-INSERT INTO public.main_buses VALUES (47, '136', 3, 2, NULL, NULL, 1, '2020-11-02 13:23:51.753958+00', '2020-11-02 13:23:51.753958+00', 1);
-INSERT INTO public.main_buses VALUES (48, '137', 3, 2, NULL, NULL, 1, '2020-11-02 13:23:51.753958+00', '2020-11-02 13:23:51.753958+00', 1);
-INSERT INTO public.main_buses VALUES (49, '138', 3, 2, NULL, NULL, 1, '2020-11-02 13:23:51.753958+00', '2020-11-02 13:23:51.753958+00', 1);
-INSERT INTO public.main_buses VALUES (50, '139', 4, 2, NULL, NULL, 1, '2020-11-02 13:23:51.753958+00', '2020-11-02 13:23:51.753958+00', 1);
-INSERT INTO public.main_buses VALUES (51, '140', 4, 2, NULL, NULL, 1, '2020-11-02 13:23:51.753958+00', '2020-11-02 13:23:51.753958+00', 1);
-INSERT INTO public.main_buses VALUES (52, '141', 4, 2, NULL, NULL, 1, '2020-11-02 13:23:51.753958+00', '2020-11-02 13:23:51.753958+00', 1);
-INSERT INTO public.main_buses VALUES (53, '142', 4, 2, NULL, NULL, 1, '2020-11-02 13:23:51.753958+00', '2020-11-02 13:23:51.753958+00', 1);
-INSERT INTO public.main_buses VALUES (54, '143', 4, 2, NULL, NULL, 1, '2020-11-02 13:23:51.753958+00', '2020-11-02 13:23:51.753958+00', 1);
-INSERT INTO public.main_buses VALUES (55, '144', 4, 2, NULL, NULL, 1, '2020-11-02 13:23:51.753958+00', '2020-11-02 13:23:51.753958+00', 1);
-INSERT INTO public.main_buses VALUES (56, '145', 4, 2, NULL, NULL, 1, '2020-11-02 13:23:51.753958+00', '2020-11-02 13:23:51.753958+00', 1);
-INSERT INTO public.main_buses VALUES (57, '146', 4, 2, NULL, NULL, 1, '2020-11-02 13:23:51.753958+00', '2020-11-02 13:23:51.753958+00', 1);
-INSERT INTO public.main_buses VALUES (58, '147', 4, 2, NULL, NULL, 1, '2020-11-02 13:23:51.753958+00', '2020-11-02 13:23:51.753958+00', 1);
-INSERT INTO public.main_buses VALUES (59, '148', 4, 2, NULL, NULL, 1, '2020-11-02 13:23:51.753958+00', '2020-11-02 13:23:51.753958+00', 1);
-INSERT INTO public.main_buses VALUES (60, '149', 4, 2, NULL, NULL, 1, '2020-11-02 13:23:51.753958+00', '2020-11-02 13:23:51.753958+00', 1);
-INSERT INTO public.main_buses VALUES (61, '150', 4, 2, NULL, 20, 1, '2020-11-02 00:00:00+00', '2020-11-02 00:00:00+00', 1);
-INSERT INTO public.main_buses VALUES (3, '444', 2, 2, 16, 21, 1, '2020-10-24 00:00:00+00', '2020-10-24 00:00:00+00', 1);
-INSERT INTO public.main_buses VALUES (4, '001', 1, 1, NULL, NULL, 1, '2020-10-31 05:37:53.31003+00', '2020-10-31 05:37:53.31003+00', 1);
-INSERT INTO public.main_buses VALUES (2, '333', NULL, 1, NULL, NULL, 1, '2020-10-23 00:00:00+00', '2020-10-29 00:00:00+00', 1);
-INSERT INTO public.main_buses VALUES (44, '133', 3, 2, 128, NULL, 1, '2020-11-02 13:23:51.753958+00', '2020-11-02 13:23:51.753958+00', 1);
-INSERT INTO public.main_buses VALUES (8, '004', 2, 2, 129, NULL, 1, '2020-11-02 13:19:16.681323+00', '2020-11-02 13:19:16.681323+00', 1);
-INSERT INTO public.main_buses VALUES (23, '112', 2, 2, 202, NULL, 1, '2020-11-02 13:23:51.753958+00', '2020-11-02 13:23:51.753958+00', 1);
-INSERT INTO public.main_buses VALUES (31, '120', 2, 2, 202, NULL, 1, '2020-11-02 13:23:51.753958+00', '2020-11-02 13:23:51.753958+00', 1);
-INSERT INTO public.main_buses VALUES (25, '114', 2, 2, 202, NULL, 1, '2020-11-02 13:23:51.753958+00', '2020-11-02 13:23:51.753958+00', 1);
+INSERT INTO public.main_buses VALUES (103, '003', 1, 1, NULL, NULL, 7, '2019-12-20 00:00:00+00', '2020-08-26 00:00:00+00', 2, 1);
+INSERT INTO public.main_buses VALUES (102, '102246', 2, 2, 204, NULL, 1, '2020-11-17 12:54:12.861584+00', '2020-11-17 12:54:12.861584+00', 4, 1);
+INSERT INTO public.main_buses VALUES (104, '422', 1, 1, NULL, NULL, 1, '2018-01-02 00:00:00+00', '2020-09-04 00:00:00+00', 2, 1);
+INSERT INTO public.main_buses VALUES (105, '346', 1, 1, NULL, NULL, 1, '2017-12-18 00:00:00+00', '2020-10-09 00:00:00+00', 2, 1);
+INSERT INTO public.main_buses VALUES (106, '086', 1, 1, NULL, NULL, 1, '2017-12-18 00:00:00+00', '2020-03-30 00:00:00+00', 1, 1);
+INSERT INTO public.main_buses VALUES (107, '364', 1, 1, NULL, NULL, 12, '2017-12-18 00:00:00+00', '2019-09-10 00:00:00+00', 2, 1);
+INSERT INTO public.main_buses VALUES (97, '102226', 2, 2, NULL, NULL, 1, '2020-11-17 12:54:12.861584+00', '2020-11-17 12:54:12.861584+00', 3, 1);
+INSERT INTO public.main_buses VALUES (96, '102225', 2, 2, NULL, NULL, 1, '2020-11-17 12:54:12.861584+00', '2020-11-17 12:54:12.861584+00', 4, 1);
+INSERT INTO public.main_buses VALUES (95, '102222', 2, 2, NULL, NULL, 1, '2020-11-17 12:54:12.861584+00', '2020-11-17 12:54:12.861584+00', 4, 1);
+INSERT INTO public.main_buses VALUES (94, '102221', 2, 2, NULL, NULL, 1, '2020-11-17 12:54:12.861584+00', '2020-11-17 12:54:12.861584+00', 4, 1);
+INSERT INTO public.main_buses VALUES (93, '102220', 2, 2, NULL, NULL, 1, '2020-11-17 12:54:12.861584+00', '2020-11-17 12:54:12.861584+00', 3, 1);
+INSERT INTO public.main_buses VALUES (92, '102217', 2, 2, NULL, NULL, 1, '2020-11-17 12:54:12.861584+00', '2020-11-17 12:54:12.861584+00', 3, 1);
+INSERT INTO public.main_buses VALUES (91, '102216', 2, 2, NULL, NULL, 1, '2020-11-17 12:54:12.861584+00', '2020-11-17 12:54:12.861584+00', 4, 1);
+INSERT INTO public.main_buses VALUES (90, '102215', 2, 2, NULL, NULL, 1, '2020-11-17 12:54:12.861584+00', '2020-11-17 12:54:12.861584+00', 4, 1);
+INSERT INTO public.main_buses VALUES (89, '102213', 2, 2, NULL, NULL, 1, '2020-11-17 12:54:12.861584+00', '2020-11-17 12:54:12.861584+00', 3, 1);
+INSERT INTO public.main_buses VALUES (88, '102212', 2, 2, NULL, NULL, 1, '2020-11-17 12:54:12.861584+00', '2020-11-17 12:54:12.861584+00', 3, 1);
+INSERT INTO public.main_buses VALUES (87, '102210', 2, 2, NULL, NULL, 1, '2020-11-17 12:54:12.861584+00', '2020-11-17 12:54:12.861584+00', 3, 1);
+INSERT INTO public.main_buses VALUES (86, '102194', 2, 2, NULL, NULL, 1, '2020-11-17 12:54:12.861584+00', '2020-11-17 12:54:12.861584+00', 4, 1);
+INSERT INTO public.main_buses VALUES (85, '102168', 2, 2, NULL, NULL, 1, '2020-11-17 12:54:12.861584+00', '2020-11-17 12:54:12.861584+00', 4, 1);
+INSERT INTO public.main_buses VALUES (84, '102163', 2, 2, NULL, NULL, 1, '2020-11-17 12:54:12.861584+00', '2020-11-17 12:54:12.861584+00', 4, 1);
+INSERT INTO public.main_buses VALUES (83, '102157', 2, 2, NULL, NULL, 1, '2020-11-17 12:54:12.861584+00', '2020-11-17 12:54:12.861584+00', 4, 1);
+INSERT INTO public.main_buses VALUES (82, '102127', 2, 2, NULL, NULL, 1, '2020-11-17 12:54:12.861584+00', '2020-11-17 12:54:12.861584+00', 4, 1);
+INSERT INTO public.main_buses VALUES (81, '102112', 2, 2, NULL, NULL, 1, '2020-11-17 12:54:12.861584+00', '2020-11-17 12:54:12.861584+00', 4, 1);
+INSERT INTO public.main_buses VALUES (80, '102108', 2, 2, NULL, NULL, 1, '2020-11-17 12:54:12.861584+00', '2020-11-17 12:54:12.861584+00', 4, 1);
+INSERT INTO public.main_buses VALUES (79, '102102', 2, 2, NULL, NULL, 1, '2020-11-17 12:54:12.861584+00', '2020-11-17 12:54:12.861584+00', 4, 1);
+INSERT INTO public.main_buses VALUES (78, '102095', 2, 2, NULL, NULL, 1, '2020-11-17 12:54:12.861584+00', '2020-11-17 12:54:12.861584+00', 4, 1);
+INSERT INTO public.main_buses VALUES (77, '102092', 2, 2, NULL, NULL, 1, '2020-11-17 12:54:12.861584+00', '2020-11-17 12:54:12.861584+00', 3, 1);
+INSERT INTO public.main_buses VALUES (76, '102077', 2, 2, NULL, NULL, 1, '2020-11-17 12:54:12.861584+00', '2020-11-17 12:54:12.861584+00', 4, 1);
+INSERT INTO public.main_buses VALUES (75, '102065', 2, 2, NULL, NULL, 1, '2020-11-17 12:54:12.861584+00', '2020-11-17 12:54:12.861584+00', 4, 1);
+INSERT INTO public.main_buses VALUES (74, '102055', 2, 2, NULL, NULL, 1, '2020-11-17 12:54:12.861584+00', '2020-11-17 12:54:12.861584+00', 4, 1);
+INSERT INTO public.main_buses VALUES (73, '102042', 2, 2, NULL, NULL, 1, '2020-11-17 12:54:12.861584+00', '2020-11-17 12:54:12.861584+00', 4, 1);
+INSERT INTO public.main_buses VALUES (72, '102040', 2, 2, NULL, NULL, 1, '2020-11-17 12:54:12.861584+00', '2020-11-17 12:54:12.861584+00', 4, 1);
+INSERT INTO public.main_buses VALUES (71, '102034', 2, 2, NULL, NULL, 1, '2020-11-17 12:54:12.861584+00', '2020-11-17 12:54:12.861584+00', 4, 1);
+INSERT INTO public.main_buses VALUES (70, '102031', 2, 2, NULL, NULL, 1, '2020-11-17 12:54:12.861584+00', '2020-11-17 12:54:12.861584+00', 4, 1);
+INSERT INTO public.main_buses VALUES (69, '102030', 2, 2, NULL, NULL, 1, '2020-11-17 12:54:12.861584+00', '2020-11-17 12:54:12.861584+00', 4, 1);
+INSERT INTO public.main_buses VALUES (68, '102025', 2, 2, NULL, NULL, 1, '2020-11-17 12:54:12.861584+00', '2020-11-17 12:54:12.861584+00', 4, 1);
+INSERT INTO public.main_buses VALUES (67, '101296', 2, 2, NULL, NULL, 1, '2020-11-17 12:54:12.861584+00', '2020-11-17 12:54:12.861584+00', 5, 1);
+INSERT INTO public.main_buses VALUES (66, '101291', 2, 2, NULL, NULL, 1, '2020-11-17 12:54:12.861584+00', '2020-11-17 12:54:12.861584+00', 5, 1);
+INSERT INTO public.main_buses VALUES (65, '101280', 2, 2, NULL, NULL, 1, '2020-11-17 12:54:12.861584+00', '2020-11-17 12:54:12.861584+00', 5, 1);
+INSERT INTO public.main_buses VALUES (64, '101268', 2, 2, NULL, NULL, 1, '2020-11-17 12:54:12.861584+00', '2020-11-17 12:54:12.861584+00', 5, 1);
+INSERT INTO public.main_buses VALUES (63, '101266', 2, 2, NULL, NULL, 1, '2020-11-17 12:54:12.861584+00', '2020-11-17 12:54:12.861584+00', 5, 1);
+INSERT INTO public.main_buses VALUES (62, '101260', 2, 2, NULL, NULL, 1, '2020-11-17 12:54:12.861584+00', '2020-11-17 12:54:12.861584+00', 5, 1);
+INSERT INTO public.main_buses VALUES (101, '102244', 2, 2, 204, NULL, 1, '2020-11-17 12:54:12.861584+00', '2020-11-17 12:54:12.861584+00', 4, 1);
+INSERT INTO public.main_buses VALUES (100, '102241', 2, 2, 204, NULL, 1, '2020-11-17 12:54:12.861584+00', '2020-11-17 12:54:12.861584+00', 4, 1);
+INSERT INTO public.main_buses VALUES (99, '102231', 2, 2, 204, NULL, 1, '2020-11-17 12:54:12.861584+00', '2020-11-17 12:54:12.861584+00', 4, 1);
+INSERT INTO public.main_buses VALUES (98, '102228', 2, 2, 204, NULL, 1, '2020-11-17 12:54:12.861584+00', '2020-11-17 12:54:12.861584+00', 4, 1);
+INSERT INTO public.main_buses VALUES (108, '084', 1, 1, NULL, NULL, 1, '2017-12-18 00:00:00+00', '2020-11-12 00:00:00+00', 1, 1);
+INSERT INTO public.main_buses VALUES (109, '075', 1, 1, NULL, NULL, 1, '2017-12-18 00:00:00+00', '2020-10-19 00:00:00+00', 1, 1);
+INSERT INTO public.main_buses VALUES (110, '093', 1, 1, NULL, NULL, 1, '2017-12-18 00:00:00+00', '2020-11-12 00:00:00+00', 1, 1);
+INSERT INTO public.main_buses VALUES (111, '339', 1, 1, NULL, NULL, 7, '2017-12-18 00:00:00+00', '2020-09-21 00:00:00+00', 2, 1);
+INSERT INTO public.main_buses VALUES (112, '217', 1, 1, NULL, NULL, 7, '2017-12-18 00:00:00+00', '2019-08-14 00:00:00+00', 1, 1);
+INSERT INTO public.main_buses VALUES (113, '160', 1, 1, NULL, NULL, 1, '2017-12-18 00:00:00+00', '2020-11-13 00:00:00+00', 1, 1);
+INSERT INTO public.main_buses VALUES (114, '027', 1, 1, NULL, NULL, 7, '2017-12-18 00:00:00+00', '2020-09-09 00:00:00+00', 1, 1);
+INSERT INTO public.main_buses VALUES (115, '173', 1, 1, NULL, NULL, 1, '2017-12-18 00:00:00+00', '2020-11-16 00:00:00+00', 1, 1);
+INSERT INTO public.main_buses VALUES (116, '009', 1, 1, NULL, NULL, 1, '2017-12-18 00:00:00+00', '2020-09-12 00:00:00+00', 1, 1);
+INSERT INTO public.main_buses VALUES (117, '076', 1, 1, NULL, NULL, 1, '2017-12-18 16:28:25.044403+00', '2020-03-23 00:00:00+00', 1, 1);
+INSERT INTO public.main_buses VALUES (118, '001', 1, 1, NULL, NULL, 1, '2017-12-18 00:00:00+00', '2020-08-29 00:00:00+00', 1, 1);
+INSERT INTO public.main_buses VALUES (119, '016', 1, 1, NULL, NULL, 1, '2017-12-18 00:00:00+00', '2020-09-12 00:00:00+00', 1, 1);
+INSERT INTO public.main_buses VALUES (120, '012', 1, 1, NULL, NULL, 7, '2017-12-18 00:00:00+00', '2020-11-16 00:00:00+00', 1, 1);
+INSERT INTO public.main_buses VALUES (121, '103', 1, 1, NULL, NULL, 7, '2017-12-18 00:00:00+00', '2020-01-20 00:00:00+00', 1, 1);
+INSERT INTO public.main_buses VALUES (122, '023', 1, 1, NULL, NULL, 1, '2017-12-18 00:00:00+00', '2020-09-12 00:00:00+00', 1, 1);
+INSERT INTO public.main_buses VALUES (123, '045', 1, 1, NULL, NULL, 1, '2017-12-18 00:00:00+00', '2020-08-15 00:00:00+00', 1, 1);
+INSERT INTO public.main_buses VALUES (124, '107', 1, 1, NULL, NULL, 1, '2017-12-18 00:00:00+00', '2020-11-17 00:00:00+00', 1, 1);
+INSERT INTO public.main_buses VALUES (125, '341', 1, 1, NULL, NULL, 1, '2017-12-18 00:00:00+00', '2020-08-15 00:00:00+00', 2, 1);
+INSERT INTO public.main_buses VALUES (126, '061', 1, 1, NULL, NULL, 1, '2017-12-18 00:00:00+00', '2020-10-30 00:00:00+00', 1, 1);
+INSERT INTO public.main_buses VALUES (127, '005', 1, 1, NULL, NULL, 1, '2017-12-18 00:00:00+00', '2020-08-15 00:00:00+00', 1, 1);
+INSERT INTO public.main_buses VALUES (128, '057', 1, 1, NULL, NULL, 1, '2017-12-18 00:00:00+00', '2020-09-12 00:00:00+00', 1, 1);
+INSERT INTO public.main_buses VALUES (129, '151', 1, 1, NULL, NULL, 1, '2017-12-18 00:00:00+00', '2020-10-30 00:00:00+00', 1, 1);
+INSERT INTO public.main_buses VALUES (130, '379', 1, 1, NULL, NULL, 1, '2017-12-18 00:00:00+00', '2020-11-17 00:00:00+00', 2, 1);
+INSERT INTO public.main_buses VALUES (131, '031', 1, 1, NULL, NULL, 7, '2017-12-18 00:00:00+00', '2020-09-07 00:00:00+00', 1, 1);
+INSERT INTO public.main_buses VALUES (132, '201', 1, 1, NULL, NULL, 1, '2017-12-18 00:00:00+00', '2020-09-12 00:00:00+00', 1, 1);
+INSERT INTO public.main_buses VALUES (133, '094', 1, 1, NULL, NULL, 1, '2017-12-18 00:00:00+00', '2020-02-19 00:00:00+00', 1, 1);
+INSERT INTO public.main_buses VALUES (134, '363', 1, 1, NULL, NULL, 1, '2017-12-18 00:00:00+00', '2020-11-02 00:00:00+00', 2, 1);
+INSERT INTO public.main_buses VALUES (135, '360', 1, 1, NULL, NULL, 1, '2017-12-18 00:00:00+00', '2020-09-14 00:00:00+00', 2, 1);
+INSERT INTO public.main_buses VALUES (136, '064', 1, 1, NULL, NULL, 1, '2017-12-18 00:00:00+00', '2020-03-24 00:00:00+00', 1, 1);
+INSERT INTO public.main_buses VALUES (137, '215', 1, 1, NULL, NULL, 1, '2017-12-18 00:00:00+00', '2020-10-12 00:00:00+00', 1, 1);
+INSERT INTO public.main_buses VALUES (138, '188', 1, 1, NULL, NULL, 12, '2017-12-18 00:00:00+00', '2020-11-03 00:00:00+00', 1, 1);
+INSERT INTO public.main_buses VALUES (139, '011', 1, 1, NULL, NULL, 1, '2017-12-18 00:00:00+00', '2020-11-18 00:00:00+00', 1, 1);
+INSERT INTO public.main_buses VALUES (140, '147', 1, 1, NULL, NULL, 12, '2017-12-18 00:00:00+00', '2020-10-15 00:00:00+00', 1, 1);
+INSERT INTO public.main_buses VALUES (141, '013', 1, 1, NULL, NULL, 1, '2017-12-18 00:00:00+00', '2020-07-15 00:00:00+00', 1, 1);
+INSERT INTO public.main_buses VALUES (142, '073', 1, 1, NULL, NULL, 1, '2017-12-18 00:00:00+00', '2020-09-14 00:00:00+00', 1, 1);
+INSERT INTO public.main_buses VALUES (143, '030', 1, 1, NULL, NULL, 1, '2017-12-18 00:00:00+00', '2020-07-17 00:00:00+00', 1, 1);
+INSERT INTO public.main_buses VALUES (144, '206', 1, 1, NULL, NULL, 1, '2017-12-18 00:00:00+00', '2020-06-01 00:00:00+00', 1, 1);
+INSERT INTO public.main_buses VALUES (145, '032', 1, 1, NULL, NULL, 1, '2017-12-18 00:00:00+00', '2020-09-23 00:00:00+00', 1, 1);
+INSERT INTO public.main_buses VALUES (146, '026', 1, 1, NULL, NULL, 1, '2017-12-18 00:00:00+00', '2020-08-31 00:00:00+00', 1, 1);
+INSERT INTO public.main_buses VALUES (147, '109', 1, 1, NULL, NULL, 1, '2017-12-18 00:00:00+00', '2020-05-05 00:00:00+00', 1, 1);
+INSERT INTO public.main_buses VALUES (148, '077', 1, 1, NULL, NULL, 7, '2017-12-18 00:00:00+00', '2020-09-24 00:00:00+00', 1, 1);
+INSERT INTO public.main_buses VALUES (149, '014', 1, 1, NULL, NULL, 1, '2017-12-18 00:00:00+00', '2020-03-24 00:00:00+00', 1, 1);
+INSERT INTO public.main_buses VALUES (150, '186', 1, 1, NULL, NULL, 1, '2017-12-18 00:00:00+00', '2020-09-14 00:00:00+00', 1, 1);
+INSERT INTO public.main_buses VALUES (151, '349', 1, 1, NULL, NULL, 7, '2017-12-18 00:00:00+00', '2020-06-22 00:00:00+00', 2, 1);
+INSERT INTO public.main_buses VALUES (152, '085', 1, 1, NULL, NULL, 1, '2017-12-18 00:00:00+00', '2020-10-16 00:00:00+00', 1, 1);
+INSERT INTO public.main_buses VALUES (153, '053', 1, 1, NULL, NULL, 1, '2017-12-18 00:00:00+00', '2020-10-19 00:00:00+00', 1, 1);
+INSERT INTO public.main_buses VALUES (154, '415', 1, 1, NULL, NULL, 1, '2019-09-06 00:00:00+00', '2020-11-06 00:00:00+00', 2, 1);
+INSERT INTO public.main_buses VALUES (155, '037', 1, 1, NULL, NULL, 1, '2017-12-18 00:00:00+00', '2020-11-11 00:00:00+00', 1, 1);
+INSERT INTO public.main_buses VALUES (156, '097', 1, 1, NULL, NULL, 1, '2017-12-18 00:00:00+00', '2020-11-11 00:00:00+00', 1, 1);
+INSERT INTO public.main_buses VALUES (157, '050', 1, 1, NULL, NULL, 7, '2017-12-18 00:00:00+00', '2020-07-20 00:00:00+00', 1, 1);
+INSERT INTO public.main_buses VALUES (158, '104', 1, 1, NULL, NULL, 1, '2017-12-18 00:00:00+00', '2020-11-11 00:00:00+00', 1, 1);
+INSERT INTO public.main_buses VALUES (159, '235', 1, 1, NULL, NULL, 1, '2017-12-18 00:00:00+00', '2020-11-11 00:00:00+00', 2, 1);
+INSERT INTO public.main_buses VALUES (160, '336', 1, 1, NULL, NULL, 12, '2017-12-18 00:00:00+00', '2019-10-22 00:00:00+00', 2, 1);
+INSERT INTO public.main_buses VALUES (161, '260', 1, 1, NULL, NULL, 1, '2017-12-18 00:00:00+00', '2020-07-20 00:00:00+00', 2, 1);
+INSERT INTO public.main_buses VALUES (162, '342', 1, 1, NULL, NULL, 1, '2017-12-18 00:00:00+00', '2020-11-11 00:00:00+00', 2, 1);
+INSERT INTO public.main_buses VALUES (163, '049', 1, 1, NULL, NULL, 1, '2017-12-18 00:00:00+00', '2020-07-03 00:00:00+00', 1, 1);
+INSERT INTO public.main_buses VALUES (164, '323', 1, 1, NULL, NULL, 1, '2017-12-18 00:00:00+00', '2020-09-14 00:00:00+00', 2, 1);
+INSERT INTO public.main_buses VALUES (165, '367', 1, 1, NULL, NULL, 7, '2017-12-18 00:00:00+00', '2020-10-07 00:00:00+00', 1, 1);
+INSERT INTO public.main_buses VALUES (166, '108', 1, 1, NULL, NULL, 1, '2017-12-18 00:00:00+00', '2020-07-22 00:00:00+00', 1, 1);
+INSERT INTO public.main_buses VALUES (167, '407', 1, 1, NULL, NULL, 1, '2018-01-02 00:00:00+00', '2020-11-11 00:00:00+00', 2, 1);
+INSERT INTO public.main_buses VALUES (168, '035', 1, 1, NULL, NULL, 7, '2017-12-18 00:00:00+00', '2020-11-12 00:00:00+00', 1, 1);
+INSERT INTO public.main_buses VALUES (169, '038', 1, 1, NULL, NULL, 1, '2017-12-18 00:00:00+00', '2020-10-07 00:00:00+00', 1, 1);
+INSERT INTO public.main_buses VALUES (170, '006', 1, 1, NULL, NULL, 7, '2017-12-18 00:00:00+00', '2020-10-07 00:00:00+00', 1, 1);
+INSERT INTO public.main_buses VALUES (171, '062', 1, 1, NULL, NULL, 10, '2017-12-18 16:28:25.03119+00', '2019-06-18 00:00:00+00', 1, 1);
+INSERT INTO public.main_buses VALUES (172, '063', 1, 1, NULL, NULL, 10, '2017-12-18 16:28:25.032034+00', '2019-06-03 00:00:00+00', 1, 1);
+INSERT INTO public.main_buses VALUES (173, '071', 1, 1, NULL, NULL, 1, '2017-12-18 00:00:00+00', '2020-06-23 00:00:00+00', 1, 1);
+INSERT INTO public.main_buses VALUES (174, '058', 1, 1, NULL, NULL, 1, '2017-12-18 00:00:00+00', '2020-10-12 00:00:00+00', 1, 1);
+INSERT INTO public.main_buses VALUES (175, '020', 1, 1, NULL, NULL, 1, '2017-12-18 00:00:00+00', '2020-09-12 00:00:00+00', 1, 1);
+INSERT INTO public.main_buses VALUES (176, '101', 1, 1, NULL, NULL, 1, '2017-12-18 00:00:00+00', '2020-07-23 00:00:00+00', 1, 1);
+INSERT INTO public.main_buses VALUES (177, '120', 1, 1, NULL, NULL, 7, '2017-12-18 00:00:00+00', '2020-08-11 00:00:00+00', 1, 1);
+INSERT INTO public.main_buses VALUES (178, '022', 1, 1, NULL, NULL, 7, '2017-12-18 00:00:00+00', '2020-10-13 00:00:00+00', 1, 1);
+INSERT INTO public.main_buses VALUES (179, '067', 1, 1, NULL, NULL, 7, '2017-12-18 00:00:00+00', '2020-09-14 00:00:00+00', 1, 1);
+INSERT INTO public.main_buses VALUES (180, '102', 1, 1, NULL, NULL, 7, '2017-12-18 00:00:00+00', '2020-09-14 00:00:00+00', 1, 1);
+INSERT INTO public.main_buses VALUES (181, '130', 1, 1, NULL, NULL, 7, '2017-12-18 00:00:00+00', '2020-09-14 00:00:00+00', 1, 1);
+INSERT INTO public.main_buses VALUES (182, '074', 1, 1, NULL, NULL, 1, '2017-12-18 00:00:00+00', '2020-09-12 00:00:00+00', 1, 1);
+INSERT INTO public.main_buses VALUES (183, '088', 1, 1, NULL, NULL, 1, '2017-12-18 00:00:00+00', '2020-10-19 00:00:00+00', 1, 1);
+INSERT INTO public.main_buses VALUES (184, '089', 1, 1, NULL, NULL, 1, '2017-12-18 00:00:00+00', '2020-10-13 00:00:00+00', 1, 1);
+INSERT INTO public.main_buses VALUES (185, '056', 1, 1, NULL, NULL, 1, '2017-12-18 00:00:00+00', '2020-03-24 00:00:00+00', 1, 1);
+INSERT INTO public.main_buses VALUES (186, '100', 1, 1, NULL, NULL, 1, '2017-12-18 00:00:00+00', '2020-03-24 00:00:00+00', 1, 1);
+INSERT INTO public.main_buses VALUES (187, '105', 1, 1, NULL, NULL, 1, '2017-12-18 00:00:00+00', '2020-03-24 00:00:00+00', 1, 1);
+INSERT INTO public.main_buses VALUES (188, '132', 1, 1, NULL, NULL, 7, '2017-12-18 00:00:00+00', '2020-10-16 00:00:00+00', 1, 1);
+INSERT INTO public.main_buses VALUES (189, '165', 1, 1, NULL, NULL, 1, '2017-12-18 00:00:00+00', '2020-09-12 00:00:00+00', 1, 1);
+INSERT INTO public.main_buses VALUES (190, '096', 1, 1, NULL, NULL, 1, '2017-12-18 00:00:00+00', '2020-09-15 00:00:00+00', 1, 1);
+INSERT INTO public.main_buses VALUES (191, '025', 1, 1, NULL, NULL, 7, '2017-12-18 00:00:00+00', '2020-06-01 00:00:00+00', 1, 1);
+INSERT INTO public.main_buses VALUES (192, '065', 1, 1, NULL, NULL, 1, '2017-12-18 00:00:00+00', '2019-12-23 00:00:00+00', 1, 1);
+INSERT INTO public.main_buses VALUES (193, '178', 1, 1, NULL, NULL, 1, '2017-12-18 00:00:00+00', '2020-09-12 00:00:00+00', NULL, 1);
+INSERT INTO public.main_buses VALUES (194, '204', 1, 1, NULL, NULL, 7, '2017-12-18 00:00:00+00', '2020-09-28 00:00:00+00', 1, 1);
+INSERT INTO public.main_buses VALUES (195, '024', 1, 1, NULL, NULL, 1, '2017-12-18 00:00:00+00', '2020-06-22 00:00:00+00', 1, 1);
+INSERT INTO public.main_buses VALUES (196, '079', 1, 1, NULL, NULL, 7, '2017-12-18 00:00:00+00', '2020-11-06 00:00:00+00', 1, 1);
+INSERT INTO public.main_buses VALUES (197, '122', 1, 1, NULL, NULL, 1, '2017-12-18 00:00:00+00', '2020-03-24 00:00:00+00', 1, 1);
+INSERT INTO public.main_buses VALUES (198, '230', 1, 1, NULL, NULL, 1, '2019-12-20 00:00:00+00', '2020-09-14 00:00:00+00', 1, 1);
+INSERT INTO public.main_buses VALUES (199, '125', 1, 1, NULL, NULL, 1, '2017-12-18 00:00:00+00', '2020-03-24 00:00:00+00', 1, 1);
+INSERT INTO public.main_buses VALUES (200, '111', 1, 1, NULL, NULL, 1, '2017-12-18 00:00:00+00', '2020-09-14 00:00:00+00', 1, 1);
+INSERT INTO public.main_buses VALUES (201, '047', 1, 1, NULL, NULL, 7, '2017-12-18 00:00:00+00', '2020-11-16 00:00:00+00', 1, 1);
+INSERT INTO public.main_buses VALUES (202, '179', 1, 1, NULL, NULL, 7, '2017-12-18 00:00:00+00', '2020-02-18 00:00:00+00', 1, 1);
+INSERT INTO public.main_buses VALUES (203, '010', 1, 1, NULL, NULL, 1, '2017-12-18 00:00:00+00', '2020-03-24 00:00:00+00', 1, 1);
+INSERT INTO public.main_buses VALUES (204, '069', 1, 1, NULL, NULL, 12, '2017-12-18 00:00:00+00', '2020-10-14 00:00:00+00', 1, 1);
+INSERT INTO public.main_buses VALUES (205, '095', 1, 1, NULL, NULL, 7, '2017-12-18 00:00:00+00', '2020-02-20 00:00:00+00', 1, 1);
+INSERT INTO public.main_buses VALUES (206, '055', 1, 1, NULL, NULL, 1, '2017-12-18 00:00:00+00', '2020-09-28 00:00:00+00', 1, 1);
+INSERT INTO public.main_buses VALUES (207, '133', 1, 1, NULL, NULL, 7, '2017-12-18 00:00:00+00', '2020-11-16 00:00:00+00', 1, 1);
+INSERT INTO public.main_buses VALUES (208, '083', 1, 1, NULL, NULL, 12, '2017-12-18 00:00:00+00', '2020-10-14 00:00:00+00', 1, 1);
+INSERT INTO public.main_buses VALUES (209, '138', 1, 1, NULL, NULL, 1, '2017-12-18 00:00:00+00', '2020-10-16 00:00:00+00', 1, 1);
+INSERT INTO public.main_buses VALUES (210, '051', 1, 1, NULL, NULL, 7, '2017-12-18 00:00:00+00', '2020-09-22 00:00:00+00', 1, 1);
+INSERT INTO public.main_buses VALUES (211, '066', 1, 1, NULL, NULL, 1, '2017-12-18 00:00:00+00', '2020-10-05 00:00:00+00', 1, 1);
+INSERT INTO public.main_buses VALUES (212, '018', 1, 1, NULL, NULL, 7, '2017-12-18 00:00:00+00', '2019-11-26 00:00:00+00', 1, 1);
+INSERT INTO public.main_buses VALUES (213, '021', 1, 1, NULL, NULL, 7, '2017-12-18 00:00:00+00', '2019-02-08 00:00:00+00', 1, 1);
+INSERT INTO public.main_buses VALUES (214, '203', 1, 1, NULL, NULL, 1, '2017-12-18 00:00:00+00', '2020-06-29 00:00:00+00', 1, 1);
+INSERT INTO public.main_buses VALUES (215, '034', 1, 1, NULL, NULL, 1, '2017-12-18 00:00:00+00', '2020-10-19 00:00:00+00', 1, 1);
+INSERT INTO public.main_buses VALUES (216, '054', 1, 1, NULL, NULL, 1, '2017-12-18 00:00:00+00', '2020-10-19 00:00:00+00', 1, 1);
+INSERT INTO public.main_buses VALUES (217, '171', 1, 1, NULL, NULL, 7, '2017-12-18 00:00:00+00', '2020-08-31 00:00:00+00', 1, 1);
+INSERT INTO public.main_buses VALUES (218, '082', 1, 1, NULL, NULL, 1, '2017-12-18 00:00:00+00', '2020-11-16 00:00:00+00', 1, 1);
+INSERT INTO public.main_buses VALUES (219, '200', 1, 1, NULL, NULL, 12, '2017-12-18 00:00:00+00', '2019-12-30 00:00:00+00', 1, 1);
+INSERT INTO public.main_buses VALUES (220, '145', 1, 1, NULL, NULL, 12, '2017-12-18 00:00:00+00', '2020-10-14 00:00:00+00', 1, 1);
+INSERT INTO public.main_buses VALUES (221, '197', 1, 1, NULL, NULL, 12, '2017-12-18 00:00:00+00', '2020-09-21 00:00:00+00', 1, 1);
+INSERT INTO public.main_buses VALUES (222, '210', 1, 1, NULL, NULL, 1, '2017-12-18 16:28:25.163151+00', '2020-10-05 00:00:00+00', 1, 1);
+INSERT INTO public.main_buses VALUES (223, '036', 1, 1, NULL, NULL, 1, '2017-12-18 00:00:00+00', '2020-11-17 00:00:00+00', 1, 1);
+INSERT INTO public.main_buses VALUES (224, '148', 1, 1, NULL, NULL, 1, '2017-12-18 00:00:00+00', '2020-02-18 00:00:00+00', 1, 1);
+INSERT INTO public.main_buses VALUES (225, '126', 1, 1, NULL, NULL, 1, '2017-12-18 00:00:00+00', '2020-11-17 00:00:00+00', 1, 1);
+INSERT INTO public.main_buses VALUES (226, '159', 1, 1, NULL, NULL, 7, '2017-12-18 00:00:00+00', '2020-11-09 00:00:00+00', 1, 1);
+INSERT INTO public.main_buses VALUES (227, '168', 1, 1, NULL, NULL, 1, '2017-12-18 00:00:00+00', '2020-11-17 00:00:00+00', 1, 1);
+INSERT INTO public.main_buses VALUES (228, '070', 1, 1, NULL, NULL, 7, '2017-12-18 00:00:00+00', '2020-08-26 00:00:00+00', 1, 1);
+INSERT INTO public.main_buses VALUES (229, '060', 1, 1, NULL, NULL, 1, '2017-12-18 00:00:00+00', '2020-11-09 00:00:00+00', 1, 1);
+INSERT INTO public.main_buses VALUES (230, '199', 1, 1, NULL, NULL, 1, '2017-12-18 00:00:00+00', '2020-09-22 00:00:00+00', 1, 1);
+INSERT INTO public.main_buses VALUES (231, '078', 1, 1, NULL, NULL, 7, '2017-12-18 00:00:00+00', '2020-09-02 00:00:00+00', 1, 1);
+INSERT INTO public.main_buses VALUES (232, '028', 1, 1, NULL, NULL, 1, '2017-12-18 00:00:00+00', '2020-06-08 00:00:00+00', 1, 1);
+INSERT INTO public.main_buses VALUES (233, '209', 1, 1, NULL, NULL, 1, '2017-12-18 00:00:00+00', '2020-01-22 00:00:00+00', 1, 1);
+INSERT INTO public.main_buses VALUES (234, '211', 1, 1, NULL, NULL, 7, '2017-12-18 00:00:00+00', '2020-10-14 00:00:00+00', 1, 1);
+INSERT INTO public.main_buses VALUES (235, '142', 1, 1, NULL, NULL, 1, '2017-12-18 00:00:00+00', '2020-06-08 00:00:00+00', 1, 1);
+INSERT INTO public.main_buses VALUES (236, '019', 1, 1, NULL, NULL, 12, '2017-12-18 00:00:00+00', '2020-10-14 00:00:00+00', 1, 1);
+INSERT INTO public.main_buses VALUES (237, '029', 1, 1, NULL, NULL, 7, '2017-12-18 00:00:00+00', '2020-09-14 00:00:00+00', 1, 1);
+INSERT INTO public.main_buses VALUES (238, '015', 1, 1, NULL, NULL, 1, '2017-12-18 00:00:00+00', '2020-09-23 00:00:00+00', 1, 1);
+INSERT INTO public.main_buses VALUES (239, '039', 1, 1, NULL, NULL, 7, '2017-12-18 00:00:00+00', '2019-09-09 00:00:00+00', 1, 1);
+INSERT INTO public.main_buses VALUES (240, '043', 1, 1, NULL, NULL, 1, '2017-12-18 00:00:00+00', '2020-09-23 00:00:00+00', 1, 1);
+INSERT INTO public.main_buses VALUES (241, '044', 1, 1, NULL, NULL, 7, '2017-12-18 00:00:00+00', '2020-07-15 00:00:00+00', 1, 1);
+INSERT INTO public.main_buses VALUES (242, '052', 1, 1, NULL, NULL, 7, '2017-12-18 16:28:25.016358+00', '2019-11-15 00:00:00+00', 1, 1);
+INSERT INTO public.main_buses VALUES (243, '004', 1, 1, NULL, NULL, 7, '2017-12-18 00:00:00+00', '2020-11-10 00:00:00+00', 1, 1);
+INSERT INTO public.main_buses VALUES (244, '098', 1, 1, NULL, NULL, 7, '2017-12-18 16:28:25.060957+00', '2019-11-15 00:00:00+00', 1, 1);
+INSERT INTO public.main_buses VALUES (245, '134', 1, 1, NULL, NULL, 7, '2017-12-18 16:28:25.085785+00', '2019-10-08 00:00:00+00', 1, 1);
+INSERT INTO public.main_buses VALUES (246, '007', 1, 1, NULL, NULL, 1, '2017-12-18 00:00:00+00', '2020-06-29 00:00:00+00', 1, 1);
+INSERT INTO public.main_buses VALUES (247, '041', 1, 1, NULL, NULL, 7, '2017-12-18 16:28:25.000139+00', '2020-11-12 00:00:00+00', 1, 1);
+INSERT INTO public.main_buses VALUES (248, '184', 1, 1, NULL, NULL, 10, '2017-12-18 00:00:00+00', '2020-08-06 00:00:00+00', 1, 1);
+INSERT INTO public.main_buses VALUES (249, '068', 1, 1, NULL, NULL, 1, '2017-12-18 00:00:00+00', '2020-02-19 00:00:00+00', 1, 1);
+INSERT INTO public.main_buses VALUES (250, '033', 1, 1, NULL, NULL, 12, '2017-12-18 00:00:00+00', '2020-10-14 00:00:00+00', 1, 1);
+INSERT INTO public.main_buses VALUES (251, '048', 1, 1, NULL, NULL, 7, '2017-12-18 00:00:00+00', '2020-08-10 00:00:00+00', 1, 1);
+INSERT INTO public.main_buses VALUES (252, '040', 1, 1, NULL, NULL, 1, '2017-12-18 00:00:00+00', '2020-09-10 00:00:00+00', 1, 1);
+INSERT INTO public.main_buses VALUES (253, '233', 1, 1, NULL, NULL, 7, '2017-12-18 00:00:00+00', '2019-12-02 00:00:00+00', 2, 1);
+INSERT INTO public.main_buses VALUES (254, '124', 1, 1, NULL, NULL, 1, '2017-12-18 00:00:00+00', '2020-06-02 00:00:00+00', 1, 1);
+INSERT INTO public.main_buses VALUES (255, '208', 1, 1, NULL, NULL, 1, '2017-12-18 00:00:00+00', '2020-06-02 00:00:00+00', 1, 1);
+INSERT INTO public.main_buses VALUES (256, '329', 1, 1, NULL, NULL, 7, '2017-12-18 00:00:00+00', '2020-11-05 00:00:00+00', 2, 1);
+INSERT INTO public.main_buses VALUES (257, '416', 1, 1, NULL, NULL, 1, '2018-01-02 00:00:00+00', '2020-11-16 00:00:00+00', 2, 1);
+INSERT INTO public.main_buses VALUES (258, '140', 1, 1, NULL, NULL, 7, '2017-12-18 00:00:00+00', '2020-05-15 00:00:00+00', 1, 1);
+INSERT INTO public.main_buses VALUES (259, '424', 1, 1, NULL, NULL, 7, '2018-01-02 00:00:00+00', '2020-06-29 00:00:00+00', 2, 1);
+INSERT INTO public.main_buses VALUES (260, '212', 1, 1, NULL, NULL, 7, '2017-12-18 00:00:00+00', '2020-10-14 00:00:00+00', 1, 1);
+INSERT INTO public.main_buses VALUES (261, '371', 1, 1, NULL, NULL, 1, '2017-12-18 00:00:00+00', '2020-09-04 00:00:00+00', 2, 1);
+INSERT INTO public.main_buses VALUES (262, '119', 1, 1, NULL, NULL, 1, '2017-12-18 00:00:00+00', '2020-09-04 00:00:00+00', 1, 1);
+INSERT INTO public.main_buses VALUES (263, '264', 1, 1, NULL, NULL, 1, '2017-12-18 00:00:00+00', '2020-08-25 00:00:00+00', 2, 1);
+INSERT INTO public.main_buses VALUES (264, '284', 1, 1, NULL, NULL, 1, '2017-12-18 00:00:00+00', '2020-08-25 00:00:00+00', 2, 1);
+INSERT INTO public.main_buses VALUES (265, '333', 1, 1, NULL, NULL, 7, '2017-12-18 00:00:00+00', '2020-10-14 00:00:00+00', 2, 1);
+INSERT INTO public.main_buses VALUES (266, '359', 1, 1, NULL, NULL, 1, '2017-12-18 00:00:00+00', '2020-09-14 00:00:00+00', 2, 1);
+INSERT INTO public.main_buses VALUES (267, '161', 1, 1, NULL, NULL, 7, '2017-12-18 16:28:25.105639+00', '2018-10-22 00:00:00+00', 1, 1);
+INSERT INTO public.main_buses VALUES (268, '163', 1, 1, NULL, NULL, 7, '2017-12-18 00:00:00+00', '2019-05-10 00:00:00+00', 1, 1);
+INSERT INTO public.main_buses VALUES (269, '375', 1, 1, NULL, NULL, 1, '2017-12-18 00:00:00+00', '2020-11-06 00:00:00+00', 2, 1);
+INSERT INTO public.main_buses VALUES (270, '118', 1, 1, NULL, NULL, 7, '2017-12-18 00:00:00+00', '2020-01-20 00:00:00+00', 1, 1);
+INSERT INTO public.main_buses VALUES (271, '298', 1, 1, NULL, NULL, 1, '2017-12-18 00:00:00+00', '2020-08-25 00:00:00+00', 2, 1);
+INSERT INTO public.main_buses VALUES (272, '431', 1, 1, NULL, NULL, 1, '2018-01-02 00:00:00+00', '2020-10-15 00:00:00+00', 2, 1);
+INSERT INTO public.main_buses VALUES (273, '365', 1, 1, NULL, NULL, 1, '2017-12-18 00:00:00+00', '2020-11-16 00:00:00+00', 2, 1);
+INSERT INTO public.main_buses VALUES (274, '135', 1, 1, NULL, NULL, 1, '2017-12-18 00:00:00+00', '2020-08-15 00:00:00+00', 1, 1);
+INSERT INTO public.main_buses VALUES (275, '207', 1, 1, NULL, NULL, 7, '2017-12-18 00:00:00+00', '2020-08-31 00:00:00+00', 1, 1);
+INSERT INTO public.main_buses VALUES (276, '432', 1, 1, NULL, NULL, 1, '2018-01-02 00:00:00+00', '2020-09-14 00:00:00+00', 2, 1);
+INSERT INTO public.main_buses VALUES (277, '137', 1, 1, NULL, NULL, 7, '2017-12-18 00:00:00+00', '2020-07-13 00:00:00+00', 1, 1);
+INSERT INTO public.main_buses VALUES (278, '169', 1, 1, NULL, NULL, 1, '2017-12-18 00:00:00+00', '2020-11-11 00:00:00+00', 1, 1);
+INSERT INTO public.main_buses VALUES (279, '195', 1, 1, NULL, NULL, 7, '2017-12-18 00:00:00+00', '2020-06-22 00:00:00+00', 1, 1);
+INSERT INTO public.main_buses VALUES (280, '231', 1, 1, NULL, NULL, 7, '2017-12-18 16:28:25.186352+00', '2019-10-31 00:00:00+00', 2, 1);
+INSERT INTO public.main_buses VALUES (281, '154', 1, 1, NULL, NULL, 1, '2017-12-18 00:00:00+00', '2020-11-12 00:00:00+00', 1, 1);
+INSERT INTO public.main_buses VALUES (282, '326', 1, 1, NULL, NULL, 7, '2017-12-18 00:00:00+00', '2019-11-25 00:00:00+00', 2, 1);
+INSERT INTO public.main_buses VALUES (283, '242', 1, 1, NULL, NULL, 1, '2017-12-18 00:00:00+00', '2020-06-15 00:00:00+00', 2, 1);
+INSERT INTO public.main_buses VALUES (284, '183', 1, 1, NULL, NULL, 1, '2017-12-18 00:00:00+00', '2020-03-24 00:00:00+00', 1, 1);
+INSERT INTO public.main_buses VALUES (285, '423', 1, 1, NULL, NULL, 12, '2018-01-02 00:00:00+00', '2019-10-21 00:00:00+00', 2, 1);
+INSERT INTO public.main_buses VALUES (286, '156', 1, 1, NULL, NULL, 1, '2017-12-18 00:00:00+00', '2020-10-30 00:00:00+00', 1, 1);
+INSERT INTO public.main_buses VALUES (287, '414', 1, 1, NULL, NULL, 1, '2018-01-02 00:00:00+00', '2020-11-13 00:00:00+00', 2, 1);
+INSERT INTO public.main_buses VALUES (288, '146', 1, 1, NULL, NULL, 7, '2017-12-18 00:00:00+00', '2020-09-28 00:00:00+00', 1, 1);
+INSERT INTO public.main_buses VALUES (289, '181', 1, 1, NULL, NULL, 1, '2017-12-18 00:00:00+00', '2020-11-11 00:00:00+00', 1, 1);
+INSERT INTO public.main_buses VALUES (290, '401', 1, 1, NULL, NULL, 1, '2018-01-02 00:00:00+00', '2020-03-24 00:00:00+00', 2, 1);
+INSERT INTO public.main_buses VALUES (291, '220', 1, 1, NULL, NULL, 1, '2017-12-18 00:00:00+00', '2020-03-03 00:00:00+00', 2, 1);
+INSERT INTO public.main_buses VALUES (292, '175', 1, 1, NULL, NULL, 1, '2017-12-18 00:00:00+00', '2020-05-08 00:00:00+00', 1, 1);
+INSERT INTO public.main_buses VALUES (293, '123', 1, 1, NULL, NULL, 1, '2017-12-18 00:00:00+00', '2020-11-11 00:00:00+00', 1, 1);
+INSERT INTO public.main_buses VALUES (294, '245', 1, 1, NULL, NULL, 7, '2017-12-18 00:00:00+00', '2020-09-28 00:00:00+00', 2, 1);
+INSERT INTO public.main_buses VALUES (295, '164', 1, 1, NULL, NULL, 12, '2017-12-18 00:00:00+00', '2020-07-03 00:00:00+00', 1, 1);
+INSERT INTO public.main_buses VALUES (296, '189', 1, 1, NULL, NULL, 1, '2017-12-18 00:00:00+00', '2020-11-05 00:00:00+00', 1, 1);
+INSERT INTO public.main_buses VALUES (297, '214', 1, 1, NULL, NULL, 1, '2017-12-18 16:28:25.166368+00', '2020-03-02 00:00:00+00', 1, 1);
+INSERT INTO public.main_buses VALUES (298, '361', 1, 1, NULL, NULL, 1, '2017-12-18 00:00:00+00', '2020-02-18 00:00:00+00', 2, 1);
+INSERT INTO public.main_buses VALUES (299, '127', 1, 1, NULL, NULL, 1, '2017-12-18 00:00:00+00', '2020-08-15 00:00:00+00', 1, 1);
+INSERT INTO public.main_buses VALUES (300, '347', 1, 1, NULL, NULL, 7, '2017-12-18 00:00:00+00', '2019-10-03 00:00:00+00', 2, 1);
+INSERT INTO public.main_buses VALUES (301, '191', 1, 1, NULL, NULL, 7, '2017-12-18 00:00:00+00', '2020-08-07 00:00:00+00', 1, 1);
+INSERT INTO public.main_buses VALUES (302, '177', 1, 1, NULL, NULL, 1, '2017-12-18 00:00:00+00', '2020-09-28 00:00:00+00', 1, 1);
+INSERT INTO public.main_buses VALUES (303, '433', 1, 1, NULL, NULL, 12, '2018-01-02 00:00:00+00', '2020-06-01 00:00:00+00', 2, 1);
+INSERT INTO public.main_buses VALUES (304, '117', 1, 1, NULL, NULL, 1, '2017-12-18 00:00:00+00', '2020-03-24 00:00:00+00', 1, 1);
+INSERT INTO public.main_buses VALUES (305, '332', 1, 1, NULL, NULL, 7, '2017-12-18 00:00:00+00', '2020-06-10 00:00:00+00', 2, 1);
+INSERT INTO public.main_buses VALUES (306, '194', 1, 1, NULL, NULL, 7, '2017-12-18 00:00:00+00', '2020-08-10 00:00:00+00', 1, 1);
+INSERT INTO public.main_buses VALUES (307, '114', 1, 1, NULL, NULL, 1, '2017-12-18 00:00:00+00', '2020-02-29 00:00:00+00', 1, 1);
+INSERT INTO public.main_buses VALUES (308, '131', 1, 1, NULL, NULL, 1, '2017-12-18 00:00:00+00', '2020-11-16 00:00:00+00', 1, 1);
+INSERT INTO public.main_buses VALUES (309, '430', 1, 1, NULL, NULL, 1, '2018-01-02 00:00:00+00', '2020-11-16 00:00:00+00', 2, 1);
+INSERT INTO public.main_buses VALUES (310, '234', 1, 1, NULL, NULL, 1, '2017-12-18 00:00:00+00', '2020-11-16 00:00:00+00', 2, 1);
+INSERT INTO public.main_buses VALUES (311, '121', 1, 1, NULL, NULL, 1, '2017-12-18 00:00:00+00', '2020-05-05 00:00:00+00', 1, 1);
+INSERT INTO public.main_buses VALUES (312, '136', 1, 1, NULL, NULL, 1, '2017-12-18 00:00:00+00', '2020-10-05 00:00:00+00', 1, 1);
+INSERT INTO public.main_buses VALUES (313, '357', 1, 1, NULL, NULL, 1, '2017-12-18 00:00:00+00', '2020-11-16 00:00:00+00', 2, 1);
+INSERT INTO public.main_buses VALUES (314, '350', 1, 1, NULL, NULL, 1, '2017-12-18 00:00:00+00', '2020-11-02 00:00:00+00', 2, 1);
+INSERT INTO public.main_buses VALUES (315, '308', 1, 1, NULL, NULL, 7, '2017-12-18 00:00:00+00', '2020-11-05 00:00:00+00', 2, 1);
+INSERT INTO public.main_buses VALUES (316, '150', 1, 1, NULL, NULL, 7, '2017-12-18 00:00:00+00', '2020-02-24 00:00:00+00', 1, 1);
+INSERT INTO public.main_buses VALUES (317, '162', 1, 1, NULL, NULL, 7, '2017-12-18 00:00:00+00', '2020-01-20 00:00:00+00', 1, 1);
+INSERT INTO public.main_buses VALUES (318, '158', 1, 1, NULL, NULL, 1, '2017-12-18 00:00:00+00', '2020-08-25 00:00:00+00', 1, 1);
+INSERT INTO public.main_buses VALUES (319, '373', 1, 1, NULL, NULL, 1, '2017-12-18 00:00:00+00', '2020-11-16 00:00:00+00', 2, 1);
+INSERT INTO public.main_buses VALUES (320, '170', 1, 1, NULL, NULL, 1, '2017-12-18 00:00:00+00', '2020-10-12 00:00:00+00', 1, 1);
+INSERT INTO public.main_buses VALUES (321, '167', 1, 1, NULL, NULL, 1, '2017-12-18 00:00:00+00', '2020-10-08 00:00:00+00', 1, 1);
+INSERT INTO public.main_buses VALUES (322, '187', 1, 1, NULL, NULL, 1, '2017-12-18 00:00:00+00', '2020-08-15 00:00:00+00', 1, 1);
+INSERT INTO public.main_buses VALUES (323, '355', 1, 1, NULL, NULL, 1, '2017-12-18 00:00:00+00', '2020-09-14 00:00:00+00', 2, 1);
+INSERT INTO public.main_buses VALUES (324, '409', 1, 1, NULL, NULL, 1, '2018-01-02 00:00:00+00', '2020-08-15 00:00:00+00', 2, 1);
+INSERT INTO public.main_buses VALUES (325, '370', 1, 1, NULL, NULL, 1, '2017-12-18 00:00:00+00', '2020-11-11 00:00:00+00', 2, 1);
+INSERT INTO public.main_buses VALUES (326, '196', 1, 1, NULL, NULL, 1, '2017-12-18 00:00:00+00', '2020-09-04 00:00:00+00', 1, 1);
+INSERT INTO public.main_buses VALUES (327, '434', 1, 1, NULL, NULL, 7, '2018-01-02 00:00:00+00', '2020-11-12 00:00:00+00', 2, 1);
+INSERT INTO public.main_buses VALUES (328, '193', 1, 1, NULL, NULL, 1, '2017-12-18 00:00:00+00', '2020-11-17 00:00:00+00', 1, 1);
+INSERT INTO public.main_buses VALUES (329, '216', 1, 1, NULL, NULL, 7, '2017-12-18 00:00:00+00', '2020-11-16 00:00:00+00', 1, 1);
+INSERT INTO public.main_buses VALUES (330, '309', 1, 1, NULL, NULL, 7, '2017-12-18 00:00:00+00', '2020-09-23 00:00:00+00', 2, 1);
+INSERT INTO public.main_buses VALUES (331, '362', 1, 1, NULL, NULL, 1, '2017-12-18 00:00:00+00', '2020-11-17 00:00:00+00', 2, 1);
+INSERT INTO public.main_buses VALUES (332, '408', 1, 1, NULL, NULL, 7, '2018-01-02 00:00:00+00', '2020-09-30 00:00:00+00', 2, 1);
+INSERT INTO public.main_buses VALUES (333, '143', 1, 1, NULL, NULL, 1, '2017-12-18 00:00:00+00', '2020-11-12 00:00:00+00', 1, 1);
+INSERT INTO public.main_buses VALUES (334, '157', 1, 1, NULL, NULL, 1, '2017-12-18 00:00:00+00', '2020-11-11 00:00:00+00', 1, 1);
+INSERT INTO public.main_buses VALUES (335, '338', 1, 1, NULL, NULL, 1, '2017-12-18 00:00:00+00', '2020-11-16 00:00:00+00', 2, 1);
+INSERT INTO public.main_buses VALUES (336, '311', 1, 1, NULL, NULL, 1, '2017-12-18 00:00:00+00', '2020-11-11 00:00:00+00', 2, 1);
+INSERT INTO public.main_buses VALUES (337, '352', 1, 1, NULL, NULL, 1, '2017-12-18 00:00:00+00', '2020-11-03 00:00:00+00', 2, 1);
+INSERT INTO public.main_buses VALUES (338, '263', 1, 1, NULL, NULL, 1, '2017-12-18 00:00:00+00', '2020-10-07 00:00:00+00', 2, 1);
+INSERT INTO public.main_buses VALUES (339, '272', 1, 1, NULL, NULL, 1, '2017-12-18 00:00:00+00', '2020-11-12 00:00:00+00', 2, 1);
+INSERT INTO public.main_buses VALUES (340, '269', 1, 1, NULL, NULL, 1, '2017-12-18 00:00:00+00', '2020-10-07 00:00:00+00', 2, 1);
+INSERT INTO public.main_buses VALUES (341, '291', 1, 1, NULL, NULL, 7, '2017-12-18 00:00:00+00', '2020-11-03 00:00:00+00', 2, 1);
+INSERT INTO public.main_buses VALUES (342, '251', 1, 1, NULL, NULL, 1, '2017-12-18 00:00:00+00', '2020-03-12 00:00:00+00', 2, 1);
+INSERT INTO public.main_buses VALUES (343, '313', 1, 1, NULL, NULL, 7, '2017-12-18 00:00:00+00', '2020-08-13 00:00:00+00', 2, 1);
+INSERT INTO public.main_buses VALUES (344, '087', 1, 1, NULL, NULL, 1, '2017-12-18 00:00:00+00', '2020-08-15 00:00:00+00', 1, 1);
+INSERT INTO public.main_buses VALUES (345, '315', 1, 1, NULL, NULL, 7, '2017-12-18 00:00:00+00', '2019-10-28 00:00:00+00', 2, 1);
+INSERT INTO public.main_buses VALUES (346, '292', 1, 1, NULL, NULL, 7, '2017-12-18 00:00:00+00', '2020-11-09 00:00:00+00', 2, 1);
+INSERT INTO public.main_buses VALUES (347, '267', 1, 1, NULL, NULL, 1, '2017-12-18 00:00:00+00', '2020-06-15 00:00:00+00', 2, 1);
+INSERT INTO public.main_buses VALUES (348, '337', 1, 1, NULL, NULL, 7, '2017-12-18 00:00:00+00', '2020-03-03 00:00:00+00', 2, 1);
+INSERT INTO public.main_buses VALUES (349, '256', 1, 1, NULL, NULL, 7, '2017-12-18 00:00:00+00', '2020-08-21 00:00:00+00', 2, 1);
+INSERT INTO public.main_buses VALUES (350, '259', 1, 1, NULL, NULL, 1, '2017-12-18 00:00:00+00', '2020-07-10 00:00:00+00', 2, 1);
+INSERT INTO public.main_buses VALUES (351, '236', 1, 1, NULL, NULL, 1, '2017-12-18 00:00:00+00', '2020-11-11 00:00:00+00', 2, 1);
+INSERT INTO public.main_buses VALUES (352, '046', 1, 1, NULL, NULL, 7, '2017-12-18 16:28:25.004268+00', '2020-06-22 00:00:00+00', 1, 1);
+INSERT INTO public.main_buses VALUES (353, '410', 1, 1, NULL, NULL, 1, '2018-01-02 00:00:00+00', '2020-09-14 00:00:00+00', 2, 1);
+INSERT INTO public.main_buses VALUES (354, '282', 1, 1, NULL, NULL, 7, '2017-12-18 00:00:00+00', '2020-09-21 00:00:00+00', 2, 1);
+INSERT INTO public.main_buses VALUES (355, '266', 1, 1, NULL, NULL, 1, '2017-12-18 00:00:00+00', '2020-11-11 00:00:00+00', 2, 1);
+INSERT INTO public.main_buses VALUES (356, '268', 1, 1, NULL, NULL, 1, '2017-12-18 00:00:00+00', '2020-09-14 00:00:00+00', 2, 1);
+INSERT INTO public.main_buses VALUES (357, '319', 1, 1, NULL, NULL, 1, '2017-12-18 00:00:00+00', '2020-08-06 00:00:00+00', 2, 1);
+INSERT INTO public.main_buses VALUES (358, '221', 1, 1, NULL, NULL, 7, '2017-12-18 00:00:00+00', '2020-06-10 00:00:00+00', 2, 1);
+INSERT INTO public.main_buses VALUES (359, '271', 1, 1, NULL, NULL, 7, '2017-12-18 00:00:00+00', '2020-07-20 00:00:00+00', 2, 1);
+INSERT INTO public.main_buses VALUES (360, '335', 1, 1, NULL, NULL, 1, '2017-12-18 00:00:00+00', '2020-08-15 00:00:00+00', 2, 1);
+INSERT INTO public.main_buses VALUES (361, '244', 1, 1, NULL, NULL, 1, '2017-12-18 00:00:00+00', '2020-06-29 00:00:00+00', 2, 1);
+INSERT INTO public.main_buses VALUES (362, '250', 1, 1, NULL, NULL, 7, '2017-12-18 00:00:00+00', '2020-03-23 00:00:00+00', 2, 1);
+INSERT INTO public.main_buses VALUES (363, '072', 1, 1, NULL, NULL, 1, '2017-12-18 00:00:00+00', '2020-09-12 00:00:00+00', 1, 1);
+INSERT INTO public.main_buses VALUES (364, '285', 1, 1, NULL, NULL, 7, '2017-12-18 00:00:00+00', '2020-09-21 00:00:00+00', 2, 1);
+INSERT INTO public.main_buses VALUES (365, '353', 1, 1, NULL, NULL, 1, '2017-12-18 00:00:00+00', '2020-11-05 00:00:00+00', 2, 1);
+INSERT INTO public.main_buses VALUES (366, '356', 1, 1, NULL, NULL, 1, '2017-12-18 00:00:00+00', '2020-11-11 00:00:00+00', 2, 1);
+INSERT INTO public.main_buses VALUES (367, '247', 1, 1, NULL, NULL, 1, '2017-12-18 00:00:00+00', '2020-11-17 00:00:00+00', 2, 1);
+INSERT INTO public.main_buses VALUES (368, '420', 1, 1, NULL, NULL, 7, '2018-01-02 00:00:00+00', '2020-08-31 00:00:00+00', 2, 1);
+INSERT INTO public.main_buses VALUES (369, '241', 1, 1, NULL, NULL, 1, '2017-12-18 00:00:00+00', '2020-08-25 00:00:00+00', 2, 1);
+INSERT INTO public.main_buses VALUES (370, '376', 1, 1, NULL, NULL, 1, '2017-12-18 00:00:00+00', '2020-11-11 00:00:00+00', 2, 1);
+INSERT INTO public.main_buses VALUES (371, '275', 1, 1, NULL, NULL, 1, '2017-12-18 00:00:00+00', '2020-11-11 00:00:00+00', 2, 1);
+INSERT INTO public.main_buses VALUES (372, '262', 1, 1, NULL, NULL, 1, '2017-12-18 00:00:00+00', '2020-10-16 00:00:00+00', 2, 1);
+INSERT INTO public.main_buses VALUES (373, '276', 1, 1, NULL, NULL, 1, '2017-12-18 00:00:00+00', '2020-10-16 00:00:00+00', 2, 1);
+INSERT INTO public.main_buses VALUES (374, '417', 1, 1, NULL, NULL, 7, '2018-01-02 00:00:00+00', '2020-01-29 00:00:00+00', 2, 1);
+INSERT INTO public.main_buses VALUES (375, '351', 1, 1, NULL, NULL, 7, '2017-12-18 00:00:00+00', '2020-11-12 00:00:00+00', 2, 1);
+INSERT INTO public.main_buses VALUES (376, '092', 1, 1, NULL, NULL, 1, '2017-12-18 00:00:00+00', '2020-11-12 00:00:00+00', 1, 1);
+INSERT INTO public.main_buses VALUES (377, '374', 1, 1, NULL, NULL, 7, '2017-12-18 00:00:00+00', '2020-10-14 00:00:00+00', 2, 1);
+INSERT INTO public.main_buses VALUES (378, '381', 1, 1, NULL, NULL, 1, '2017-12-18 00:00:00+00', '2020-02-29 00:00:00+00', 2, 1);
+INSERT INTO public.main_buses VALUES (379, '366', 1, 1, NULL, NULL, 1, '2017-12-18 00:00:00+00', '2020-10-05 00:00:00+00', 2, 1);
+INSERT INTO public.main_buses VALUES (380, '258', 1, 1, NULL, NULL, 1, '2017-12-18 00:00:00+00', '2020-05-05 00:00:00+00', 2, 1);
+INSERT INTO public.main_buses VALUES (381, '321', 1, 1, NULL, NULL, 1, '2017-12-18 00:00:00+00', '2020-05-21 00:00:00+00', 2, 1);
+INSERT INTO public.main_buses VALUES (382, '318', 1, 1, NULL, NULL, 12, '2017-12-18 00:00:00+00', '2020-06-09 00:00:00+00', 2, 1);
+INSERT INTO public.main_buses VALUES (383, '246', 1, 1, NULL, NULL, 12, '2017-12-18 00:00:00+00', '2020-11-06 00:00:00+00', 2, 1);
+INSERT INTO public.main_buses VALUES (384, '302', 1, 1, NULL, NULL, 1, '2017-12-18 00:00:00+00', '2020-11-11 00:00:00+00', 2, 1);
+INSERT INTO public.main_buses VALUES (385, '314', 1, 1, NULL, NULL, 12, '2017-12-18 00:00:00+00', '2020-03-12 00:00:00+00', 2, 1);
+INSERT INTO public.main_buses VALUES (386, '280', 1, 1, NULL, NULL, 1, '2017-12-18 00:00:00+00', '2020-09-14 00:00:00+00', 2, 1);
+INSERT INTO public.main_buses VALUES (387, '324', 1, 1, NULL, NULL, 12, '2017-12-18 00:00:00+00', '2019-09-18 00:00:00+00', 2, 1);
+INSERT INTO public.main_buses VALUES (388, '225', 1, 1, NULL, NULL, 7, '2017-12-18 00:00:00+00', '2020-08-26 00:00:00+00', 2, 1);
+INSERT INTO public.main_buses VALUES (389, '306', 1, 1, NULL, NULL, 7, '2017-12-18 00:00:00+00', '2020-07-29 00:00:00+00', 2, 1);
+INSERT INTO public.main_buses VALUES (390, '227', 1, 1, NULL, NULL, 1, '2017-12-18 00:00:00+00', '2020-02-29 00:00:00+00', 2, 1);
+INSERT INTO public.main_buses VALUES (391, '402', 1, 1, NULL, NULL, 7, '2018-01-02 00:00:00+00', '2020-11-12 00:00:00+00', 2, 1);
+INSERT INTO public.main_buses VALUES (392, '303', 1, 1, NULL, NULL, 1, '2017-12-18 00:00:00+00', '2020-11-11 00:00:00+00', 2, 1);
+INSERT INTO public.main_buses VALUES (393, '265', 1, 1, NULL, NULL, 7, '2017-12-18 00:00:00+00', '2020-11-06 00:00:00+00', 2, 1);
+INSERT INTO public.main_buses VALUES (394, '226', 1, 1, NULL, NULL, 7, '2017-12-18 00:00:00+00', '2020-10-13 00:00:00+00', 2, 1);
+INSERT INTO public.main_buses VALUES (395, '243', 1, 1, NULL, NULL, 1, '2017-12-18 00:00:00+00', '2020-03-24 00:00:00+00', 2, 1);
+INSERT INTO public.main_buses VALUES (396, '240', 1, 1, NULL, NULL, 1, '2017-12-18 00:00:00+00', '2020-09-14 00:00:00+00', 2, 1);
+INSERT INTO public.main_buses VALUES (397, '254', 1, 1, NULL, NULL, 10, '2017-12-18 00:00:00+00', '2019-08-05 00:00:00+00', 2, 1);
+INSERT INTO public.main_buses VALUES (398, '274', 1, 1, NULL, NULL, 1, '2017-12-18 00:00:00+00', '2020-10-05 00:00:00+00', 2, 1);
+INSERT INTO public.main_buses VALUES (399, '378', 1, 1, NULL, NULL, 7, '2017-12-18 00:00:00+00', '2020-11-09 00:00:00+00', 2, 1);
+INSERT INTO public.main_buses VALUES (400, '253', 1, 1, NULL, NULL, 12, '2017-12-18 00:00:00+00', '2020-01-07 00:00:00+00', 2, 1);
+INSERT INTO public.main_buses VALUES (401, '300', 1, 1, NULL, NULL, 7, '2017-12-18 00:00:00+00', '2020-11-12 00:00:00+00', 2, 1);
+INSERT INTO public.main_buses VALUES (402, '312', 1, 1, NULL, NULL, 7, '2017-12-18 00:00:00+00', '2020-11-06 00:00:00+00', 2, 1);
+INSERT INTO public.main_buses VALUES (403, '320', 1, 1, NULL, NULL, 7, '2017-12-18 00:00:00+00', '2020-11-05 00:00:00+00', 2, 1);
+INSERT INTO public.main_buses VALUES (404, '330', 1, 1, NULL, NULL, 1, '2017-12-18 00:00:00+00', '2020-10-30 00:00:00+00', 2, 1);
+INSERT INTO public.main_buses VALUES (405, '372', 1, 1, NULL, NULL, 7, '2017-12-18 00:00:00+00', '2020-10-09 00:00:00+00', 2, 1);
+INSERT INTO public.main_buses VALUES (406, '261', 1, 1, NULL, NULL, 7, '2017-12-18 00:00:00+00', '2020-10-02 00:00:00+00', 2, 1);
+INSERT INTO public.main_buses VALUES (407, '219', 1, 1, NULL, NULL, 7, '2017-12-18 00:00:00+00', '2020-01-22 00:00:00+00', 2, 1);
+INSERT INTO public.main_buses VALUES (408, '229', 1, 1, NULL, NULL, 1, '2017-12-18 00:00:00+00', '2020-11-11 00:00:00+00', 2, 1);
+INSERT INTO public.main_buses VALUES (409, '299', 1, 1, NULL, NULL, 1, '2017-12-18 00:00:00+00', '2020-10-09 00:00:00+00', 2, 1);
+INSERT INTO public.main_buses VALUES (410, '252', 1, 1, NULL, NULL, 1, '2017-12-18 00:00:00+00', '2020-11-12 00:00:00+00', 2, 1);
+INSERT INTO public.main_buses VALUES (411, '238', 1, 1, NULL, NULL, 7, '2017-12-18 00:00:00+00', '2020-08-17 00:00:00+00', 2, 1);
+INSERT INTO public.main_buses VALUES (412, '331', 1, 1, NULL, NULL, 1, '2017-12-18 00:00:00+00', '2020-11-16 00:00:00+00', 2, 1);
+INSERT INTO public.main_buses VALUES (413, '042', 1, 1, NULL, NULL, 7, '2017-12-18 00:00:00+00', '2020-08-05 00:00:00+00', 1, 1);
+INSERT INTO public.main_buses VALUES (414, '248', 1, 1, NULL, NULL, 1, '2017-12-18 00:00:00+00', '2020-09-04 00:00:00+00', 2, 1);
+INSERT INTO public.main_buses VALUES (415, '307', 1, 1, NULL, NULL, 1, '2017-12-18 00:00:00+00', '2020-11-16 00:00:00+00', 2, 1);
+INSERT INTO public.main_buses VALUES (416, '425', 1, 1, NULL, NULL, 7, '2018-01-02 00:00:00+00', '2020-10-09 00:00:00+00', 2, 1);
+INSERT INTO public.main_buses VALUES (417, '287', 1, 1, NULL, NULL, 1, '2017-12-18 00:00:00+00', '2020-03-24 00:00:00+00', 2, 1);
+INSERT INTO public.main_buses VALUES (418, '344', 1, 1, NULL, NULL, 1, '2017-12-18 00:00:00+00', '2020-09-04 00:00:00+00', 2, 1);
+INSERT INTO public.main_buses VALUES (419, '176', 1, 1, NULL, NULL, 1, '2017-12-18 00:00:00+00', '2020-10-30 00:00:00+00', 1, 1);
+INSERT INTO public.main_buses VALUES (420, '270', 1, 1, NULL, NULL, 1, '2017-12-18 00:00:00+00', '2020-09-04 00:00:00+00', 2, 1);
+INSERT INTO public.main_buses VALUES (421, '418', 1, 1, NULL, NULL, 7, '2018-01-02 00:00:00+00', '2020-09-04 00:00:00+00', 2, 1);
+INSERT INTO public.main_buses VALUES (422, '152', 1, 1, NULL, NULL, 1, '2017-12-18 00:00:00+00', '2020-11-05 00:00:00+00', 1, 1);
+INSERT INTO public.main_buses VALUES (423, '202', 1, 1, NULL, NULL, 1, '2017-12-18 00:00:00+00', '2020-11-06 00:00:00+00', 1, 1);
+INSERT INTO public.main_buses VALUES (424, '343', 1, 1, NULL, NULL, 1, '2017-12-18 00:00:00+00', '2020-09-07 00:00:00+00', 2, 1);
+INSERT INTO public.main_buses VALUES (425, '141', 1, 1, NULL, NULL, 1, '2017-12-18 00:00:00+00', '2020-09-09 00:00:00+00', 1, 1);
+INSERT INTO public.main_buses VALUES (426, '192', 1, 1, NULL, NULL, 1, '2017-12-18 00:00:00+00', '2020-11-11 00:00:00+00', 1, 1);
+INSERT INTO public.main_buses VALUES (427, '289', 1, 1, NULL, NULL, 1, '2017-12-18 00:00:00+00', '2020-11-11 00:00:00+00', 2, 1);
+INSERT INTO public.main_buses VALUES (428, '403', 1, 1, NULL, NULL, 1, '2018-01-02 00:00:00+00', '2020-03-24 00:00:00+00', 2, 1);
+INSERT INTO public.main_buses VALUES (429, '322', 1, 1, NULL, NULL, 1, '2017-12-18 00:00:00+00', '2020-11-11 00:00:00+00', 2, 1);
+INSERT INTO public.main_buses VALUES (430, '279', 1, 1, NULL, NULL, 1, '2017-12-18 00:00:00+00', '2020-03-24 00:00:00+00', 2, 1);
+INSERT INTO public.main_buses VALUES (431, '369', 1, 1, NULL, NULL, 1, '2017-12-18 00:00:00+00', '2020-11-11 00:00:00+00', 2, 1);
+INSERT INTO public.main_buses VALUES (432, '290', 1, 1, NULL, NULL, 7, '2017-12-18 00:00:00+00', '2020-11-12 00:00:00+00', 2, 1);
+INSERT INTO public.main_buses VALUES (433, '222', 1, 1, NULL, NULL, 7, '2017-12-18 00:00:00+00', '2019-08-05 00:00:00+00', 2, 1);
+INSERT INTO public.main_buses VALUES (434, '296', 1, 1, NULL, NULL, 1, '2017-12-18 00:00:00+00', '2020-11-12 00:00:00+00', 2, 1);
+INSERT INTO public.main_buses VALUES (435, '293', 1, 1, NULL, NULL, 1, '2017-12-18 00:00:00+00', '2020-11-16 00:00:00+00', 2, 1);
+INSERT INTO public.main_buses VALUES (436, '316', 1, 1, NULL, NULL, 1, '2017-12-18 00:00:00+00', '2020-11-16 00:00:00+00', 2, 1);
+INSERT INTO public.main_buses VALUES (437, '286', 1, 1, NULL, NULL, 1, '2017-12-18 00:00:00+00', '2020-11-16 00:00:00+00', NULL, 1);
+INSERT INTO public.main_buses VALUES (438, '166', 1, 1, NULL, NULL, 1, '2017-12-18 00:00:00+00', '2020-11-17 00:00:00+00', 1, 1);
+INSERT INTO public.main_buses VALUES (439, '172', 1, 1, NULL, NULL, 1, '2017-12-18 00:00:00+00', '2020-09-12 00:00:00+00', 1, 1);
+INSERT INTO public.main_buses VALUES (440, '283', 1, 1, NULL, NULL, 1, '2017-12-18 00:00:00+00', '2020-09-14 00:00:00+00', 2, 1);
+INSERT INTO public.main_buses VALUES (441, '345', 1, 1, NULL, NULL, 1, '2017-12-18 00:00:00+00', '2020-09-14 00:00:00+00', 2, 1);
+INSERT INTO public.main_buses VALUES (442, '358', 1, 1, NULL, NULL, 1, '2017-12-18 00:00:00+00', '2020-09-14 00:00:00+00', 2, 1);
+INSERT INTO public.main_buses VALUES (443, '368', 1, 1, NULL, NULL, 7, '2017-12-18 00:00:00+00', '2020-09-23 00:00:00+00', 2, 1);
+INSERT INTO public.main_buses VALUES (444, '310', 1, 1, NULL, NULL, 7, '2017-12-18 00:00:00+00', '2020-07-23 00:00:00+00', 2, 1);
+INSERT INTO public.main_buses VALUES (445, '325', 1, 1, NULL, NULL, 1, '2017-12-18 00:00:00+00', '2020-10-02 00:00:00+00', 2, 1);
+INSERT INTO public.main_buses VALUES (446, '305', 1, 1, NULL, NULL, 1, '2017-12-18 00:00:00+00', '2020-08-15 00:00:00+00', 2, 1);
+INSERT INTO public.main_buses VALUES (447, '153', 1, 1, NULL, NULL, 7, '2017-12-18 00:00:00+00', '2020-08-21 00:00:00+00', 1, 1);
+INSERT INTO public.main_buses VALUES (448, '180', 1, 1, NULL, NULL, 7, '2017-12-18 16:28:25.134498+00', '2020-06-01 00:00:00+00', 1, 1);
+INSERT INTO public.main_buses VALUES (449, '232', 1, 1, NULL, NULL, 7, '2017-12-18 00:00:00+00', '2020-06-01 00:00:00+00', 2, 1);
+INSERT INTO public.main_buses VALUES (450, '223', 1, 1, NULL, NULL, 7, '2017-12-18 00:00:00+00', '2020-08-21 00:00:00+00', NULL, 1);
+INSERT INTO public.main_buses VALUES (451, '155', 1, 1, NULL, NULL, 1, '2017-12-18 00:00:00+00', '2020-06-01 00:00:00+00', 1, 1);
+INSERT INTO public.main_buses VALUES (452, '185', 1, 1, NULL, NULL, 1, '2017-12-18 00:00:00+00', '2020-03-16 00:00:00+00', 1, 1);
+INSERT INTO public.main_buses VALUES (453, '257', 1, 1, NULL, NULL, 7, '2017-12-18 00:00:00+00', '2020-08-26 00:00:00+00', 2, 1);
+INSERT INTO public.main_buses VALUES (454, '198', 1, 1, NULL, NULL, 7, '2017-12-18 00:00:00+00', '2020-03-02 00:00:00+00', 1, 1);
+INSERT INTO public.main_buses VALUES (455, '144', 1, 1, NULL, NULL, 1, '2017-12-18 00:00:00+00', '2020-06-04 00:00:00+00', 1, 1);
+INSERT INTO public.main_buses VALUES (456, '278', 1, 1, NULL, NULL, 7, '2017-12-18 00:00:00+00', '2020-02-07 00:00:00+00', 2, 1);
+INSERT INTO public.main_buses VALUES (457, '190', 1, 1, NULL, NULL, 1, '2017-12-18 00:00:00+00', '2020-06-04 00:00:00+00', 1, 1);
+INSERT INTO public.main_buses VALUES (458, '237', 1, 1, NULL, NULL, 1, '2017-12-18 00:00:00+00', '2020-09-04 00:00:00+00', 2, 1);
+INSERT INTO public.main_buses VALUES (459, '377', 1, 1, NULL, NULL, 1, '2017-12-18 00:00:00+00', '2020-02-07 00:00:00+00', 2, 1);
+INSERT INTO public.main_buses VALUES (460, '294', 1, 1, NULL, NULL, 1, '2017-12-18 00:00:00+00', '2020-10-16 00:00:00+00', 2, 1);
+INSERT INTO public.main_buses VALUES (461, '328', 1, 1, NULL, NULL, 1, '2017-12-18 00:00:00+00', '2020-10-16 00:00:00+00', 2, 1);
+INSERT INTO public.main_buses VALUES (462, '426', 1, 1, NULL, NULL, 12, '2018-01-02 00:00:00+00', '2020-03-23 00:00:00+00', 2, 1);
+INSERT INTO public.main_buses VALUES (463, '182', 1, 1, NULL, NULL, 7, '2017-12-18 00:00:00+00', '2020-03-23 00:00:00+00', 1, 1);
+INSERT INTO public.main_buses VALUES (464, '404', 1, 1, NULL, NULL, 1, '2018-01-02 00:00:00+00', '2020-11-16 00:00:00+00', 2, 1);
+INSERT INTO public.main_buses VALUES (465, '427', 1, 1, NULL, NULL, 1, '2018-01-02 00:00:00+00', '2020-11-17 00:00:00+00', 2, 1);
+INSERT INTO public.main_buses VALUES (466, '411', 1, 1, NULL, NULL, 1, '2018-01-02 00:00:00+00', '2020-09-14 00:00:00+00', 2, 1);
+INSERT INTO public.main_buses VALUES (467, '419', 1, 1, NULL, NULL, 7, '2018-01-02 00:00:00+00', '2020-09-28 00:00:00+00', 2, 1);
+INSERT INTO public.main_buses VALUES (468, '080', 1, 1, NULL, NULL, 1, '2017-12-18 00:00:00+00', '2020-10-26 00:00:00+00', 1, 1);
+INSERT INTO public.main_buses VALUES (469, '090', 1, 1, NULL, NULL, 1, '2017-12-18 00:00:00+00', '2020-10-30 00:00:00+00', 1, 1);
+INSERT INTO public.main_buses VALUES (470, '059', 1, 1, NULL, NULL, 7, '2017-12-18 00:00:00+00', '2020-11-06 00:00:00+00', 1, 1);
+INSERT INTO public.main_buses VALUES (471, '008', 1, 1, NULL, NULL, 1, '2017-12-18 00:00:00+00', '2020-11-09 00:00:00+00', 1, 1);
+INSERT INTO public.main_buses VALUES (472, '405', 1, 1, NULL, NULL, 7, '2018-01-02 00:00:00+00', '2020-11-16 00:00:00+00', 2, 1);
+INSERT INTO public.main_buses VALUES (473, '091', 1, 1, NULL, NULL, 1, '2017-12-18 00:00:00+00', '2020-09-14 00:00:00+00', 1, 1);
+INSERT INTO public.main_buses VALUES (474, '002', 1, 1, NULL, NULL, 1, '2017-12-18 00:00:00+00', '2020-09-21 00:00:00+00', 1, 1);
+INSERT INTO public.main_buses VALUES (475, '110', 1, 1, NULL, NULL, 7, '2017-12-18 00:00:00+00', '2020-07-13 00:00:00+00', 1, 1);
+INSERT INTO public.main_buses VALUES (476, '428', 1, 1, NULL, NULL, 1, '2018-01-02 00:00:00+00', '2020-10-16 00:00:00+00', 2, 1);
+INSERT INTO public.main_buses VALUES (477, '081', 1, 1, NULL, NULL, 1, '2017-12-18 00:00:00+00', '2020-07-20 00:00:00+00', 1, 1);
+INSERT INTO public.main_buses VALUES (478, '106', 1, 1, NULL, NULL, 7, '2017-12-18 00:00:00+00', '2020-08-05 00:00:00+00', 1, 1);
+INSERT INTO public.main_buses VALUES (479, '412', 1, 1, NULL, NULL, 7, '2018-01-02 00:00:00+00', '2020-08-14 00:00:00+00', 2, 1);
+INSERT INTO public.main_buses VALUES (480, '017', 1, 1, NULL, NULL, 1, '2017-12-18 00:00:00+00', '2020-08-29 00:00:00+00', 1, 1);
+INSERT INTO public.main_buses VALUES (481, '099', 1, 1, NULL, NULL, 7, '2017-12-18 16:28:25.061546+00', '2019-04-18 00:00:00+00', 1, 1);
+INSERT INTO public.main_buses VALUES (482, '139', 1, 1, NULL, NULL, 7, '2017-12-18 00:00:00+00', '2020-06-30 00:00:00+00', 1, 1);
+INSERT INTO public.main_buses VALUES (483, '218', 1, 1, NULL, NULL, 1, '2017-12-18 00:00:00+00', '2020-11-09 00:00:00+00', 2, 1);
+INSERT INTO public.main_buses VALUES (484, '129', 1, 1, NULL, NULL, 1, '2017-12-18 00:00:00+00', '2020-11-09 00:00:00+00', 1, 1);
+INSERT INTO public.main_buses VALUES (485, '239', 1, 1, NULL, NULL, 7, '2017-12-18 00:00:00+00', '2020-08-07 00:00:00+00', 2, 1);
+INSERT INTO public.main_buses VALUES (486, '116', 1, 1, NULL, NULL, 7, '2017-12-18 16:28:25.073341+00', '2019-08-14 00:00:00+00', 1, 1);
+INSERT INTO public.main_buses VALUES (487, '128', 1, 1, NULL, NULL, 7, '2017-12-18 00:00:00+00', '2020-08-07 00:00:00+00', 1, 1);
+INSERT INTO public.main_buses VALUES (488, '113', 1, 1, NULL, NULL, 7, '2017-12-18 00:00:00+00', '2020-09-10 00:00:00+00', 1, 1);
+INSERT INTO public.main_buses VALUES (489, '112', 1, 1, NULL, NULL, 1, '2017-12-18 00:00:00+00', '2020-09-12 00:00:00+00', 1, 1);
+INSERT INTO public.main_buses VALUES (490, '149', 1, 1, NULL, NULL, 1, '2017-12-18 00:00:00+00', '2020-09-12 00:00:00+00', 1, 1);
+INSERT INTO public.main_buses VALUES (491, '115', 1, 1, NULL, NULL, 1, '2017-12-18 00:00:00+00', '2020-09-22 00:00:00+00', 1, 1);
+INSERT INTO public.main_buses VALUES (492, '228', 1, 1, NULL, NULL, 7, '2017-12-18 00:00:00+00', '2020-10-05 00:00:00+00', 2, 1);
+INSERT INTO public.main_buses VALUES (493, '205', 1, 1, NULL, NULL, 8, '2017-12-18 00:00:00+00', '2020-06-01 00:00:00+00', 1, 1);
+INSERT INTO public.main_buses VALUES (494, '224', 1, 1, NULL, NULL, 1, '2017-12-18 00:00:00+00', '2020-10-12 00:00:00+00', 2, 1);
+INSERT INTO public.main_buses VALUES (495, '174', 1, 1, NULL, NULL, 1, '2017-12-18 16:28:25.12191+00', '2020-05-05 00:00:00+00', 1, 1);
+INSERT INTO public.main_buses VALUES (496, '213', 1, 1, NULL, NULL, 1, '2017-12-18 00:00:00+00', '2020-06-29 00:00:00+00', 1, 1);
+INSERT INTO public.main_buses VALUES (497, '255', 1, 1, NULL, NULL, 7, '2017-12-18 00:00:00+00', '2020-02-18 00:00:00+00', 2, 1);
+INSERT INTO public.main_buses VALUES (498, '295', 1, 1, NULL, NULL, 7, '2017-12-18 00:00:00+00', '2020-02-18 00:00:00+00', 2, 1);
+INSERT INTO public.main_buses VALUES (499, '380', 1, 1, NULL, NULL, 1, '2017-12-18 00:00:00+00', '2020-10-30 00:00:00+00', 2, 1);
+INSERT INTO public.main_buses VALUES (500, '354', 1, 1, NULL, NULL, 1, '2017-12-18 00:00:00+00', '2020-11-02 00:00:00+00', 2, 1);
+INSERT INTO public.main_buses VALUES (501, '382', 1, 1, NULL, NULL, 7, '2017-12-18 00:00:00+00', '2019-09-06 00:00:00+00', 2, 1);
+INSERT INTO public.main_buses VALUES (502, '281', 1, 1, NULL, NULL, 1, '2017-12-18 00:00:00+00', '2020-09-07 00:00:00+00', 2, 1);
+INSERT INTO public.main_buses VALUES (503, '348', 1, 1, NULL, NULL, 7, '2017-12-18 00:00:00+00', '2020-11-10 00:00:00+00', 2, 1);
+INSERT INTO public.main_buses VALUES (504, '277', 1, 1, NULL, NULL, 1, '2017-12-18 00:00:00+00', '2020-11-11 00:00:00+00', 2, 1);
+INSERT INTO public.main_buses VALUES (505, '334', 1, 1, NULL, NULL, 7, '2017-12-18 00:00:00+00', '2020-11-11 00:00:00+00', 2, 1);
+INSERT INTO public.main_buses VALUES (506, '273', 1, 1, NULL, NULL, 1, '2017-12-18 00:00:00+00', '2020-11-16 00:00:00+00', 2, 1);
+INSERT INTO public.main_buses VALUES (507, '327', 1, 1, NULL, NULL, 1, '2017-12-18 00:00:00+00', '2020-10-05 00:00:00+00', 2, 1);
+INSERT INTO public.main_buses VALUES (508, '301', 1, 1, NULL, NULL, 12, '2017-12-18 00:00:00+00', '2020-10-07 00:00:00+00', 2, 1);
+INSERT INTO public.main_buses VALUES (509, '288', 1, 1, NULL, NULL, 1, '2017-12-18 00:00:00+00', '2020-10-07 00:00:00+00', 2, 1);
+INSERT INTO public.main_buses VALUES (510, '340', 1, 1, NULL, NULL, 7, '2017-12-18 00:00:00+00', '2020-02-07 00:00:00+00', 2, 1);
+INSERT INTO public.main_buses VALUES (511, '304', 1, 1, NULL, NULL, 1, '2017-12-18 00:00:00+00', '2020-10-07 00:00:00+00', 2, 1);
+INSERT INTO public.main_buses VALUES (512, '317', 1, 1, NULL, NULL, 1, '2017-12-18 00:00:00+00', '2020-02-07 00:00:00+00', 2, 1);
+INSERT INTO public.main_buses VALUES (513, '297', 1, 1, NULL, NULL, 7, '2017-12-18 00:00:00+00', '2019-11-04 00:00:00+00', 2, 1);
+INSERT INTO public.main_buses VALUES (514, '249', 1, 1, NULL, NULL, 1, '2017-12-18 00:00:00+00', '2020-03-24 00:00:00+00', 2, 1);
+INSERT INTO public.main_buses VALUES (515, '394', 1, 1, NULL, NULL, 7, '2017-12-18 00:00:00+00', '2020-02-18 00:00:00+00', 2, 1);
+INSERT INTO public.main_buses VALUES (516, '385', 1, 1, NULL, NULL, 1, '2017-12-18 00:00:00+00', '2020-09-04 00:00:00+00', 2, 1);
+INSERT INTO public.main_buses VALUES (517, '421', 1, 1, NULL, NULL, 1, '2018-01-02 00:00:00+00', '2020-09-04 00:00:00+00', 2, 1);
+INSERT INTO public.main_buses VALUES (518, '399', 1, 1, NULL, NULL, 1, '2017-12-18 00:00:00+00', '2020-09-04 00:00:00+00', 2, 1);
+INSERT INTO public.main_buses VALUES (519, '406', 1, 1, NULL, NULL, 1, '2018-01-02 00:00:00+00', '2020-11-06 00:00:00+00', 2, 1);
+INSERT INTO public.main_buses VALUES (520, '388', 1, 1, NULL, NULL, 1, '2017-12-18 00:00:00+00', '2020-11-09 00:00:00+00', 2, 1);
+INSERT INTO public.main_buses VALUES (521, '386', 1, 1, NULL, NULL, 1, '2017-12-18 00:00:00+00', '2020-11-09 00:00:00+00', 2, 1);
+INSERT INTO public.main_buses VALUES (522, '395', 1, 1, NULL, NULL, 1, '2017-12-18 00:00:00+00', '2020-11-11 00:00:00+00', 2, 1);
+INSERT INTO public.main_buses VALUES (523, '413', 1, 1, NULL, NULL, 1, '2018-01-02 00:00:00+00', '2020-11-16 00:00:00+00', 2, 1);
+INSERT INTO public.main_buses VALUES (524, '387', 1, 1, NULL, NULL, 1, '2017-12-18 00:00:00+00', '2020-09-14 00:00:00+00', 2, 1);
+INSERT INTO public.main_buses VALUES (525, '390', 1, 1, NULL, NULL, 1, '2017-12-18 00:00:00+00', '2020-09-14 00:00:00+00', 2, 1);
+INSERT INTO public.main_buses VALUES (526, '396', 1, 1, NULL, NULL, 1, '2017-12-18 00:00:00+00', '2020-09-14 00:00:00+00', 2, 1);
+INSERT INTO public.main_buses VALUES (527, '429', 1, 1, NULL, NULL, 12, '2018-01-02 00:00:00+00', '2020-07-07 00:00:00+00', 2, 1);
+INSERT INTO public.main_buses VALUES (528, '398', 1, 1, NULL, NULL, 7, '2017-12-18 00:00:00+00', '2020-10-02 00:00:00+00', 2, 1);
+INSERT INTO public.main_buses VALUES (529, '392', 1, 1, NULL, NULL, 1, '2017-12-18 00:00:00+00', '2020-10-06 00:00:00+00', 2, 1);
+INSERT INTO public.main_buses VALUES (530, '397', 1, 1, NULL, NULL, 1, '2017-12-18 00:00:00+00', '2020-10-07 00:00:00+00', 2, 1);
+INSERT INTO public.main_buses VALUES (531, '384', 1, 1, NULL, NULL, 7, '2017-12-18 00:00:00+00', '2020-06-29 00:00:00+00', 2, 1);
+INSERT INTO public.main_buses VALUES (532, '383', 1, 1, NULL, NULL, 12, '2017-12-18 00:00:00+00', '2019-08-30 00:00:00+00', 2, 1);
+INSERT INTO public.main_buses VALUES (533, '400', 1, 1, NULL, NULL, 7, '2017-12-18 00:00:00+00', '2020-01-20 00:00:00+00', 2, 1);
+INSERT INTO public.main_buses VALUES (534, '393', 1, 1, NULL, NULL, 7, '2017-12-18 00:00:00+00', '2020-10-14 00:00:00+00', 2, 1);
+INSERT INTO public.main_buses VALUES (535, '389', 1, 1, NULL, NULL, 1, '2017-12-18 00:00:00+00', '2020-10-16 00:00:00+00', 2, 1);
+INSERT INTO public.main_buses VALUES (536, '391', 1, 1, NULL, NULL, 7, '2017-12-18 00:00:00+00', '2020-08-26 00:00:00+00', 2, 1);
 
 
 --
--- TOC entry 3236 (class 0 OID 34001)
+-- TOC entry 3243 (class 0 OID 34001)
 -- Dependencies: 211
 -- Data for Name: main_campaigns; Type: TABLE DATA; Schema: public; Owner: postgres
 --
@@ -2096,12 +2547,14 @@ INSERT INTO public.main_buses VALUES (25, '114', 2, 2, 202, NULL, 1, '2020-11-02
 INSERT INTO public.main_campaigns VALUES (131, 1, 1, 1, 9, 16, '2020-11-17', '2020-12-17', 0, 1, '2020-11-10 08:34:50.772751+00', '2020-11-10 08:34:50.772751+00', 'Yoyo', 1);
 INSERT INTO public.main_campaigns VALUES (196, 1, 2, 1, 1, 10, '2020-11-19', '2020-12-19', 0, 1, '2020-11-10 16:27:51.216941+00', '2020-11-10 16:27:51.216941+00', 'Sailors Campaign', 1);
 INSERT INTO public.main_campaigns VALUES (200, 1, 1, 1, 9, 7, '2020-11-18', '2020-12-18', 0, 1, '2020-11-11 11:18:49.06322+00', '2020-11-11 11:18:49.06322+00', 'Test Campaign', 1);
+INSERT INTO public.main_campaigns VALUES (203, 1, 2, 1, 22, 80, '2020-11-18', '2020-12-18', 0, 2, '2020-11-14 14:28:32.120225+00', '2020-11-14 14:28:32.120225+00', 'Corn Flakes', 1);
 INSERT INTO public.main_campaigns VALUES (3, 1, 1, 1, 9, 10, '2020-10-18', '2020-10-18', 0, NULL, '2020-10-18 00:00:00+00', '2020-10-18 00:00:00+00', NULL, 1);
 INSERT INTO public.main_campaigns VALUES (11, 1, 1, 1, 9, 34, '2020-10-27', '2020-11-26', 1, NULL, '2020-10-24 09:56:40.945427+00', '2020-10-24 09:56:40.945427+00', 'xxd', 1);
 INSERT INTO public.main_campaigns VALUES (12, 3, 1, 1, 17, 10, '2020-10-26', '2020-12-03', 1, 1, '2020-10-24 10:09:28.547463+00', '2020-10-24 10:09:28.547463+00', 'Hat Trick', 1);
 INSERT INTO public.main_campaigns VALUES (13, 1, 1, 1, 9, 10, '2020-10-26', '2020-11-25', 1, 1, '2020-10-24 10:32:53.018443+00', '2020-10-24 10:32:53.018443+00', 'jnkj', 1);
 INSERT INTO public.main_campaigns VALUES (197, 1, 1, 1, 9, 7, '2020-11-18', '2020-12-18', 0, 1, '2020-11-11 11:14:19.240129+00', '2020-11-11 11:14:19.240129+00', 'Test Campaign', 1);
 INSERT INTO public.main_campaigns VALUES (201, 1, 1, 1, 9, 7, '2020-11-18', '2020-12-18', 0, 1, '2020-11-11 11:21:08.230348+00', '2020-11-11 11:21:08.230348+00', 'Test Campaign', 1);
+INSERT INTO public.main_campaigns VALUES (204, 1, 2, 1, 22, 10, '2020-11-17', '2020-12-17', 0, 1, '2020-11-15 23:42:22.82101+00', '2020-11-15 23:42:22.82101+00', 'Bet9ja Campaign', 1);
 INSERT INTO public.main_campaigns VALUES (14, 3, 2, 1, 14, 60, '2020-10-26', '2020-11-25', 1, 1, '2020-10-24 10:33:41.512202+00', '2020-10-24 10:33:41.512202+00', 'jnlk', 1);
 INSERT INTO public.main_campaigns VALUES (15, 3, 1, 1, 17, 10, '2020-10-27', '2020-11-26', 1, 1, '2020-10-24 10:36:21.18195+00', '2020-10-24 10:36:21.18195+00', 'Hat Trick', 1);
 INSERT INTO public.main_campaigns VALUES (16, 1, 1, 1, 9, 15, '2020-10-26', '2020-11-25', 1, 1, '2020-10-25 22:00:46.760993+00', '2020-10-25 22:00:46.760993+00', 'Milo VM', 1);
@@ -2131,7 +2584,9 @@ INSERT INTO public.main_campaigns VALUES (40, 2, 1, 1, 11, 20, '2020-11-20', '20
 INSERT INTO public.main_campaigns VALUES (41, 1, 1, 1, 9, 15, '2020-11-18', '2020-12-18', 0, 3, '2020-11-04 05:50:23.729373+00', '2020-11-04 05:50:23.729373+00', 'Intel Promo', 1);
 INSERT INTO public.main_campaigns VALUES (198, 1, 1, 1, 9, 7, '2020-11-18', '2020-12-18', 0, 1, '2020-11-11 11:15:51.047272+00', '2020-11-11 11:15:51.047272+00', 'Test Campaign', 1);
 INSERT INTO public.main_campaigns VALUES (202, 1, 2, 1, 1, 3, '2020-11-18', '2020-12-18', 0, 1, '2020-11-11 11:28:52.964703+00', '2020-11-11 11:28:52.964703+00', 'Max Limited (Large)', 1);
+INSERT INTO public.main_campaigns VALUES (205, 1, 2, 1, 22, 15, '2020-11-26', '2020-12-26', 0, 1, '2020-11-16 14:21:58.233947+00', '2020-11-16 14:21:58.233947+00', 'Yoyo', 1);
 INSERT INTO public.main_campaigns VALUES (199, 1, 1, 1, 9, 7, '2020-11-18', '2020-12-18', 0, 1, '2020-11-11 11:16:46.149271+00', '2020-11-11 11:16:46.149271+00', 'Test Campaign', 1);
+INSERT INTO public.main_campaigns VALUES (206, 1, 1, 1, 9, 10, '2020-11-18', '2020-12-18', 0, 1, '2020-11-16 16:39:16.214133+00', '2020-11-16 16:39:16.214133+00', 'Yore', 1);
 INSERT INTO public.main_campaigns VALUES (121, 1, 1, 1, 9, 10, '2020-11-20', '2020-12-20', 0, 1, '2020-11-04 08:31:41.244053+00', '2020-11-04 08:31:41.244053+00', 'TP3 Campaign', 1);
 INSERT INTO public.main_campaigns VALUES (122, 1, 1, 1, 9, 10, '2020-11-20', '2020-12-20', 0, 1, '2020-11-04 08:32:08.598825+00', '2020-11-04 08:32:08.598825+00', 'TP3 Campaign', 1);
 INSERT INTO public.main_campaigns VALUES (123, 1, 1, 1, 9, 10, '2020-11-20', '2020-12-20', 0, 1, '2020-11-04 08:37:17.976895+00', '2020-11-04 08:37:17.976895+00', 'TP3 Campaign', 1);
@@ -2145,16 +2600,25 @@ INSERT INTO public.main_campaigns VALUES (127, 1, 1, 1, 9, 20, '2020-11-05', '20
 
 
 --
--- TOC entry 3257 (class 0 OID 42392)
+-- TOC entry 3282 (class 0 OID 50814)
+-- Dependencies: 270
+-- Data for Name: main_print_orders; Type: TABLE DATA; Schema: public; Owner: postgres
+--
+
+INSERT INTO public.main_print_orders VALUES (1, 196, 4, '2020-11-11 03:22:29.760338+00', 'click here', false, 10, NULL, NULL);
+INSERT INTO public.main_print_orders VALUES (2, 204, 5, '2020-11-17 15:48:52.531622+00', 'click here', false, 10, NULL, NULL);
+
+
+--
+-- TOC entry 3264 (class 0 OID 42392)
 -- Dependencies: 233
 -- Data for Name: main_reports; Type: TABLE DATA; Schema: public; Owner: postgres
 --
 
-INSERT INTO public.main_reports VALUES (3, '2020-11-04', '<a href="https://www.flickr.com/photos/137526969@N06/albums/72157716721755923" title="TM REPORT 2020-11-02 POWER OIL"><img src="https://live.staticflickr.com/65535/50560248677_3625e73aca_z.jpg" width="640" height="480" alt="TM REPORT 2020-11-02 POWER OIL" /></a>', NULL, 'First Report', 4, 14, 37, '2020-11-03 11:45:18.860802+00', 1);
 
 
 --
--- TOC entry 3263 (class 0 OID 42437)
+-- TOC entry 3270 (class 0 OID 42437)
 -- Dependencies: 239
 -- Data for Name: main_transactions; Type: TABLE DATA; Schema: public; Owner: postgres
 --
@@ -2165,6 +2629,9 @@ INSERT INTO public.main_transactions VALUES (12, 37, 1, 12, 1, 1, 1, -1, '2020-1
 INSERT INTO public.main_transactions VALUES (13, 21, 1, 40, 1, 1, 1, -1, '2020-11-03 12:57:09.850259+00', '2020-11-03 12:57:09.850259+00', '2020-11-03', NULL, NULL, 12);
 INSERT INTO public.main_transactions VALUES (24, 196, 2, 10, 4, 2, 2, 11, '2020-11-10 16:47:50.644342+00', '2020-11-10 16:47:50.644342+00', NULL, '2020-11-20', '2020-12-20', 1);
 INSERT INTO public.main_transactions VALUES (25, 202, 2, 3, 2, 2, 2, 11, '2020-11-11 11:50:32.113846+00', '2020-11-11 11:50:32.113846+00', NULL, '2020-11-18', '2020-12-18', 1);
+INSERT INTO public.main_transactions VALUES (26, 204, 2, 10, 1, 1, 1, 11, '2020-11-16 07:00:29.240659+00', '2020-11-16 07:00:29.240659+00', '2020-11-17', '2020-11-17', '2020-12-17', 22);
+INSERT INTO public.main_transactions VALUES (27, 206, 1, 10, 1, 1, 1, 11, '2020-11-17 16:12:23.861009+00', '2020-11-17 16:12:23.861009+00', '2020-11-18', NULL, NULL, 9);
+INSERT INTO public.main_transactions VALUES (28, 204, 2, 15, 1, 1, 1, 11, '2020-11-17 16:14:16.225692+00', '2020-11-17 16:14:16.225692+00', '2020-11-19', '2020-11-26', '2020-12-26', 22);
 INSERT INTO public.main_transactions VALUES (14, 21, 1, 10, 1, 2, 2, -1, '2020-11-03 12:58:54.448445+00', '2020-11-03 12:58:54.448445+00', '2020-11-03', '2020-11-19', NULL, 11);
 INSERT INTO public.main_transactions VALUES (15, 127, 1, 20, 1, 1, 1, 11, '2020-11-04 13:15:48.692671+00', '2020-11-04 13:15:48.692671+00', '2020-11-04', '2020-11-05', '2020-12-05', 9);
 INSERT INTO public.main_transactions VALUES (16, 128, 2, 20, 1, 1, 1, -1, '2020-11-04 13:24:13.922479+00', '2020-11-04 13:24:13.922479+00', '2020-11-04', '2020-11-12', '2020-12-12', 1);
@@ -2172,6 +2639,7 @@ INSERT INTO public.main_transactions VALUES (17, 128, 3, 20, 1, 1, 1, -1, '2020-
 INSERT INTO public.main_transactions VALUES (18, 128, 4, 10, 1, 1, 1, -1, '2020-11-04 13:25:34.249122+00', '2020-11-04 13:25:34.249122+00', '2020-11-04', '2020-11-12', '2020-12-12', 1);
 INSERT INTO public.main_transactions VALUES (19, 128, 3, 8, 1, 1, 1, -1, '2020-11-04 13:28:58.799252+00', '2020-11-04 13:28:58.799252+00', '2020-12-12', '2020-12-13', '2021-01-12', 2);
 INSERT INTO public.main_transactions VALUES (21, 129, 3, 3, 1, 2, 2, -1, '2020-11-06 12:11:23.166464+00', '2020-11-06 12:11:23.166464+00', '2020-11-06', '2020-11-15', '2020-12-15', 1);
+INSERT INTO public.main_transactions VALUES (29, 202, 2, 12, 1, 1, 1, 11, '2020-11-17 17:37:36.72684+00', '2020-11-17 17:37:36.72684+00', '2020-11-19', '2020-11-26', '2020-12-26', 23);
 INSERT INTO public.main_transactions VALUES (8, 37, 1, 55, 4, 1, 1, -1, '2020-11-02 23:21:15.994869+00', '2020-11-02 23:21:15.994869+00', '2020-11-02', '2020-11-11', '2020-12-11', 9);
 INSERT INTO public.main_transactions VALUES (7, 37, 1, 55, 2, 1, 1, -1, '2020-11-02 23:21:08.571811+00', '2020-11-02 23:21:08.571811+00', '2020-11-02', '2020-11-11', '2020-12-11', 9);
 INSERT INTO public.main_transactions VALUES (3, 37, 1, 10, 3, 1, 1, -1, '2020-11-02 10:19:21.954539+00', '2020-11-02 10:19:21.954539+00', '2020-11-02', '2020-11-18', '2020-12-18', 9);
@@ -2183,7 +2651,7 @@ INSERT INTO public.main_transactions VALUES (20, 129, 2, 3, 1, 1, 1, -1, '2020-1
 
 
 --
--- TOC entry 3222 (class 0 OID 33870)
+-- TOC entry 3229 (class 0 OID 33870)
 -- Dependencies: 197
 -- Data for Name: main_users; Type: TABLE DATA; Schema: public; Owner: postgres
 --
@@ -2206,45 +2674,25 @@ INSERT INTO public.main_users VALUES (1, 'Ademola', 15, 'adeshas', '1234', 'ades
 INSERT INTO public.main_users VALUES (-1, 'Admin', NULL, 'admin', 'oehjowruh8wehhweio2244esq', 'admin@abc.com', -1, NULL);
 INSERT INTO public.main_users VALUES (3, 'Test Primero LBR', NULL, 'primerolbr', '1234', 'lamata@abc.com', 5, 19);
 INSERT INTO public.main_users VALUES (2, 'Test Primero', NULL, 'primero', '1234', 'primero@abc.com', 5, 14);
+INSERT INTO public.main_users VALUES (19, 'Test Print Manager', NULL, 'printman', '1234', 'ademola.shasanya@valuemedia.com.ng', 7, 15);
+INSERT INTO public.main_users VALUES (20, 'Dokun Balogun', 15, 'provisions', '1234', 'dbalogun@provisionads.com', 0, 2);
+INSERT INTO public.main_users VALUES (21, 'Jeleel Atunwa', 15, 'ninthdayglobal', '1234', 'ninthdayglobal@gmail.com', 0, 12);
+INSERT INTO public.main_users VALUES (23, 'Rocklane', 15, 'adedeji', '1234', 'adedeji@rocklaneassociates.com', 0, 6);
+INSERT INTO public.main_users VALUES (25, 'UlotMedia', 15, 'leye.morafa', '1234', 'leye.morafa@ulotmedia.com', 0, 20);
+INSERT INTO public.main_users VALUES (22, 'UlotMedia', 15, 'ulotmediamail', '1234', 'ulotmediamail@gmail.com', 0, 20);
+INSERT INTO public.main_users VALUES (24, 'Wale Makinde', 15, 'wale.makinde', '1234', 'wale.makinde@n-guagegroup.com', 0, 21);
 
 
 --
--- TOC entry 3275 (class 0 OID 50814)
--- Dependencies: 270
--- Data for Name: print_orders; Type: TABLE DATA; Schema: public; Owner: postgres
---
-
-INSERT INTO public.print_orders VALUES (1, 196, 4, '2020-11-11 03:22:29.760338+00', 'click here', false, 10, NULL, NULL);
-
-
---
--- TOC entry 3273 (class 0 OID 50803)
--- Dependencies: 268
--- Data for Name: printers; Type: TABLE DATA; Schema: public; Owner: postgres
---
-
-INSERT INTO public.printers VALUES (2, 'Rainbow', 'RA', 'rainbowooh@gmail.com; alfred@rainbowadvertisingltd.com');
-INSERT INTO public.printers VALUES (4, 'Don Collection', 'DC', 'doncollection@gmail.com');
-INSERT INTO public.printers VALUES (3, 'Ink Touch', 'IT', 'femiadeosun2004@yahoo.com');
-INSERT INTO public.printers VALUES (1, 'Owl Media', 'OW', 'owlmedialimited@gmail.com');
-INSERT INTO public.printers VALUES (5, 'DSL', 'DP', 'anu.fowler@dsl.com.ng; Nkechi.dimgbe@dsl.com.ng');
-INSERT INTO public.printers VALUES (6, 'Test Printer', 'TP', 'Johnson.udoeka@valuemedia.com.ng');
-
-
---
--- TOC entry 3244 (class 0 OID 34183)
+-- TOC entry 3251 (class 0 OID 34183)
 -- Dependencies: 220
 -- Data for Name: sub_media_allocation; Type: TABLE DATA; Schema: public; Owner: postgres
 --
 
-INSERT INTO public.sub_media_allocation VALUES (1, 2, 13, false, NULL, NULL, NULL);
-INSERT INTO public.sub_media_allocation VALUES (2, 3, 12, true, NULL, NULL, NULL);
-INSERT INTO public.sub_media_allocation VALUES (3, 2, 14, true, NULL, NULL, NULL);
-INSERT INTO public.sub_media_allocation VALUES (4, 2, 12, true, NULL, NULL, NULL);
 
 
 --
--- TOC entry 3265 (class 0 OID 42448)
+-- TOC entry 3272 (class 0 OID 42448)
 -- Dependencies: 241
 -- Data for Name: sub_renewal_requests; Type: TABLE DATA; Schema: public; Owner: postgres
 --
@@ -2252,7 +2700,7 @@ INSERT INTO public.sub_media_allocation VALUES (4, 2, 12, true, NULL, NULL, NULL
 
 
 --
--- TOC entry 3267 (class 0 OID 42456)
+-- TOC entry 3274 (class 0 OID 42456)
 -- Dependencies: 243
 -- Data for Name: sub_transaction_details; Type: TABLE DATA; Schema: public; Owner: postgres
 --
@@ -2282,7 +2730,7 @@ INSERT INTO public.sub_transaction_details VALUES (27, 25, 25, 13, '2020-11-11 1
 
 
 --
--- TOC entry 3271 (class 0 OID 50751)
+-- TOC entry 3278 (class 0 OID 50751)
 -- Dependencies: 261
 -- Data for Name: w_vendors_operators; Type: TABLE DATA; Schema: public; Owner: postgres
 --
@@ -2297,17 +2745,20 @@ INSERT INTO public.w_vendors_operators VALUES (6, 14, 1);
 
 
 --
--- TOC entry 3238 (class 0 OID 34110)
+-- TOC entry 3245 (class 0 OID 34110)
 -- Dependencies: 214
 -- Data for Name: x_bus_depot; Type: TABLE DATA; Schema: public; Owner: postgres
 --
 
 INSERT INTO public.x_bus_depot VALUES (1, 'OJOTA / MILE 12');
 INSERT INTO public.x_bus_depot VALUES (2, 'MAJIDUN');
+INSERT INTO public.x_bus_depot VALUES (3, 'OSHODI - AYOBO');
+INSERT INTO public.x_bus_depot VALUES (4, 'OSHODI - ABULE - EGBA');
+INSERT INTO public.x_bus_depot VALUES (5, 'IKOTUN - IKEJA');
 
 
 --
--- TOC entry 3234 (class 0 OID 33978)
+-- TOC entry 3241 (class 0 OID 33978)
 -- Dependencies: 209
 -- Data for Name: x_bus_sizes; Type: TABLE DATA; Schema: public; Owner: postgres
 --
@@ -2317,7 +2768,7 @@ INSERT INTO public.x_bus_sizes VALUES (2, 'Medium');
 
 
 --
--- TOC entry 3240 (class 0 OID 34123)
+-- TOC entry 3247 (class 0 OID 34123)
 -- Dependencies: 216
 -- Data for Name: x_bus_status; Type: TABLE DATA; Schema: public; Owner: postgres
 --
@@ -2339,7 +2790,7 @@ INSERT INTO public.x_bus_status VALUES (15, 'Engine Service', false);
 
 
 --
--- TOC entry 3248 (class 0 OID 42268)
+-- TOC entry 3255 (class 0 OID 42268)
 -- Dependencies: 224
 -- Data for Name: x_payment_status; Type: TABLE DATA; Schema: public; Owner: postgres
 --
@@ -2350,7 +2801,7 @@ INSERT INTO public.x_payment_status VALUES (3, 'DENIED');
 
 
 --
--- TOC entry 3232 (class 0 OID 33967)
+-- TOC entry 3239 (class 0 OID 33967)
 -- Dependencies: 207
 -- Data for Name: x_print_stage; Type: TABLE DATA; Schema: public; Owner: postgres
 --
@@ -2360,7 +2811,7 @@ INSERT INTO public.x_print_stage VALUES (2, 'Renewal / without Print');
 
 
 --
--- TOC entry 3246 (class 0 OID 42255)
+-- TOC entry 3253 (class 0 OID 42255)
 -- Dependencies: 222
 -- Data for Name: x_print_status; Type: TABLE DATA; Schema: public; Owner: postgres
 --
@@ -2371,7 +2822,7 @@ INSERT INTO public.x_print_status VALUES (3, 'DENIED');
 
 
 --
--- TOC entry 3269 (class 0 OID 42473)
+-- TOC entry 3276 (class 0 OID 42473)
 -- Dependencies: 245
 -- Data for Name: x_renewal_stage; Type: TABLE DATA; Schema: public; Owner: postgres
 --
@@ -2384,7 +2835,7 @@ INSERT INTO public.x_renewal_stage VALUES (3, 'PENDING APPROVAL');
 
 
 --
--- TOC entry 3255 (class 0 OID 42384)
+-- TOC entry 3262 (class 0 OID 42384)
 -- Dependencies: 231
 -- Data for Name: x_report_types; Type: TABLE DATA; Schema: public; Owner: postgres
 --
@@ -2394,7 +2845,7 @@ INSERT INTO public.x_report_types VALUES (2, 'Close-out');
 
 
 --
--- TOC entry 3250 (class 0 OID 42281)
+-- TOC entry 3257 (class 0 OID 42281)
 -- Dependencies: 226
 -- Data for Name: x_transaction_status; Type: TABLE DATA; Schema: public; Owner: postgres
 --
@@ -2407,7 +2858,7 @@ INSERT INTO public.x_transaction_status VALUES (2, 'APPROVED ACTIVE', 'APPROVED 
 
 
 --
--- TOC entry 3254 (class 0 OID 42308)
+-- TOC entry 3261 (class 0 OID 42308)
 -- Dependencies: 230
 -- Data for Name: x_user_types; Type: TABLE DATA; Schema: public; Owner: postgres
 --
@@ -2420,10 +2871,11 @@ INSERT INTO public.x_user_types VALUES (3, 'Fleet Manager');
 INSERT INTO public.x_user_types VALUES (4, 'Reports Manager');
 INSERT INTO public.x_user_types VALUES (5, 'Operator');
 INSERT INTO public.x_user_types VALUES (6, 'Super Operator (Platform)');
+INSERT INTO public.x_user_types VALUES (7, 'Print Manager');
 
 
 --
--- TOC entry 3230 (class 0 OID 33956)
+-- TOC entry 3237 (class 0 OID 33956)
 -- Dependencies: 205
 -- Data for Name: y_inventory; Type: TABLE DATA; Schema: public; Owner: postgres
 --
@@ -2434,7 +2886,7 @@ INSERT INTO public.y_inventory VALUES (3, 'BRT TV');
 
 
 --
--- TOC entry 3226 (class 0 OID 33930)
+-- TOC entry 3233 (class 0 OID 33930)
 -- Dependencies: 201
 -- Data for Name: y_operators; Type: TABLE DATA; Schema: public; Owner: postgres
 --
@@ -2442,11 +2894,11 @@ INSERT INTO public.y_inventory VALUES (3, 'BRT TV');
 INSERT INTO public.y_operators VALUES (2, 'Transport Services Limited', 'TSL', 2, 'test@tsl.com', 'TSL Contact');
 INSERT INTO public.y_operators VALUES (3, 'Lagos Bus Services Limited', 'LBSL', 2, 'test@lbsl.com', 'LBSL Contact');
 INSERT INTO public.y_operators VALUES (4, 'Primero (Lagos Bus Reform)', 'Primero LBR', 2, 'test@primerotsl.com', 'Jeleel Atunwa');
-INSERT INTO public.y_operators VALUES (1, 'Primero TSL', 'Primero', 1, 'test@primerotsl.com', 'Jeleel Atunwa');
+INSERT INTO public.y_operators VALUES (1, 'Primero TSL', 'Primero TSL', 1, 'test@primerotsl.com', 'Jeleel Atunwa');
 
 
 --
--- TOC entry 3224 (class 0 OID 33919)
+-- TOC entry 3231 (class 0 OID 33919)
 -- Dependencies: 199
 -- Data for Name: y_platforms; Type: TABLE DATA; Schema: public; Owner: postgres
 --
@@ -2456,7 +2908,21 @@ INSERT INTO public.y_platforms VALUES (2, 'Lagos Bus Reform', 'LBR - LAMATA', NU
 
 
 --
--- TOC entry 3252 (class 0 OID 42299)
+-- TOC entry 3280 (class 0 OID 50803)
+-- Dependencies: 268
+-- Data for Name: y_printers; Type: TABLE DATA; Schema: public; Owner: postgres
+--
+
+INSERT INTO public.y_printers VALUES (2, 'Rainbow', 'RA', 'rainbowooh@gmail.com; alfred@rainbowadvertisingltd.com');
+INSERT INTO public.y_printers VALUES (4, 'Don Collection', 'DC', 'doncollection@gmail.com');
+INSERT INTO public.y_printers VALUES (3, 'Ink Touch', 'IT', 'femiadeosun2004@yahoo.com');
+INSERT INTO public.y_printers VALUES (1, 'Owl Media', 'OW', 'owlmedialimited@gmail.com');
+INSERT INTO public.y_printers VALUES (5, 'DSL', 'DP', 'anu.fowler@dsl.com.ng; Nkechi.dimgbe@dsl.com.ng');
+INSERT INTO public.y_printers VALUES (6, 'Test Printer', 'TP', 'Johnson.udoeka@valuemedia.com.ng');
+
+
+--
+-- TOC entry 3259 (class 0 OID 42299)
 -- Dependencies: 228
 -- Data for Name: y_vendors; Type: TABLE DATA; Schema: public; Owner: postgres
 --
@@ -2480,10 +2946,12 @@ INSERT INTO public.y_vendors VALUES (17, 'LBSL');
 INSERT INTO public.y_vendors VALUES (18, 'LAMATA');
 INSERT INTO public.y_vendors VALUES (19, 'PRIMERO LBR');
 INSERT INTO public.y_vendors VALUES (14, 'Primero TSL');
+INSERT INTO public.y_vendors VALUES (20, 'U-Lot Media');
+INSERT INTO public.y_vendors VALUES (21, 'N-Gauge');
 
 
 --
--- TOC entry 3261 (class 0 OID 42427)
+-- TOC entry 3268 (class 0 OID 42427)
 -- Dependencies: 237
 -- Data for Name: z_core_settings; Type: TABLE DATA; Schema: public; Owner: postgres
 --
@@ -2664,27 +3132,12 @@ INSERT INTO public.z_core_settings VALUES (8, 'campaign_approved', '<p>Hello [x_
 
 
 --
--- TOC entry 3259 (class 0 OID 42414)
+-- TOC entry 3266 (class 0 OID 42414)
 -- Dependencies: 235
 -- Data for Name: z_email_settings; Type: TABLE DATA; Schema: public; Owner: postgres
 --
 
 INSERT INTO public.z_email_settings VALUES (1, 'updates_to_campaign_operator', 'Print & Payment Approved. Send mail to Primero', 'jeleel.atunwa@primerotsl.com', NULL, NULL);
-INSERT INTO public.z_email_settings VALUES (2, 'updates_to_campaign_vendor', '1.	Campaign Denied
-2.	Print Approved
-3.	Print Denied
-4.	Payment Approved', NULL, 'info@transitmedia.com.ng', 'ope.senbanjo@transitmedia.com.ng,
-toyosi.aramide@transitmedia.com.ng,
-johnson.udoeka@transitmedia.com.ng,
-victoria.onuoha@transitmedia.com.ng,
-tamitope.lawal@transitmedia.com.ng');
-INSERT INTO public.z_email_settings VALUES (3, 'new_campaign_vendor', 'New Exterior Campaign
-
-VENDOR NOTIFICATION', NULL, 'info@transitmedia.com.ng', 'ope.senbanjo@transitmedia.com.ng,
-toyosi.aramide@transitmedia.com.ng,
-johnson.udoeka@transitmedia.com.ng,
-victoria.onuoha@transitmedia.com.ng,
-tamitope.lawal@transitmedia.com.ng');
 INSERT INTO public.z_email_settings VALUES (4, 'new_campaign_transitmedia', 'New Exterior Campaign
 
 TM NOTIFICATION', 'info@transitmedia.com.ng', NULL, NULL);
@@ -2698,273 +3151,136 @@ PENDING APPROVAL - PRINT & PAYMENT CONFIRMATION ({$vendor}) - TRANSIT MEDIA', 'j
 INSERT INTO public.z_email_settings VALUES (7, 'branders_pass', 'Sending the branders pass', NULL, 'jeleel.atunwa@primerotsl.com, tamitope.lawal@transitmedia.com.ng', 'johnson.udoeka@transitmedia.com.ng');
 INSERT INTO public.z_email_settings VALUES (8, 'new_report_vendor', 'Report Notification sent to Vendor', NULL, 'victoria.onuoha@transitmedia.com.ng,
 info@transitmedia.com.ng', NULL);
+INSERT INTO public.z_email_settings VALUES (3, 'new_campaign_vendor', 'New Exterior Campaign
+
+VENDOR NOTIFICATION', NULL, 'info@transitmedia.com.ng', NULL);
+INSERT INTO public.z_email_settings VALUES (2, 'updates_to_campaign_vendor', '1.	Campaign Denied
+2.	Print Approved
+3.	Print Denied
+4.	Payment Approved', NULL, 'info@transitmedia.com.ng', 'toyosi.aramide@transitmedia.com.ng,
+johnson.udoeka@transitmedia.com.ng');
 
 
 --
--- TOC entry 3228 (class 0 OID 33943)
+-- TOC entry 3235 (class 0 OID 33943)
 -- Dependencies: 203
 -- Data for Name: z_price_settings; Type: TABLE DATA; Schema: public; Owner: postgres
 --
 
-INSERT INTO public.z_price_settings VALUES (3, 2, 1, 1, 2, 'per month per bus', NULL, NULL, 150000, 5000, 35000, 75000, 5000, 20000);
-INSERT INTO public.z_price_settings VALUES (4, 2, 1, 2, 2, 'per month per bus', NULL, NULL, 125000, 5000, 35000, 75000, 5000, 0);
-INSERT INTO public.z_price_settings VALUES (5, 2, 2, 1, 1, 'per month per bus', NULL, NULL, 80000, 5000, 20000, 40000, 0, 15000);
-INSERT INTO public.z_price_settings VALUES (6, 2, 2, 2, 1, 'per month per bus', NULL, NULL, 80000, 5000, 20000, 40000, 0, 15000);
-INSERT INTO public.z_price_settings VALUES (7, 2, 2, 1, 2, 'per month per bus', NULL, NULL, 80000, 5000, 20000, 40000, 0, 15000);
-INSERT INTO public.z_price_settings VALUES (8, 2, 2, 2, 2, 'per month per bus', NULL, NULL, 80000, 5000, 20000, 40000, 0, 15000);
-INSERT INTO public.z_price_settings VALUES (9, 1, 1, 1, 1, 'per month per bus', NULL, NULL, 130000, 80000, 17000, 5000, 2500, 23000);
-INSERT INTO public.z_price_settings VALUES (10, 1, 1, 2, 1, 'per month per bus', NULL, NULL, 130000, 80000, 17000, 5000, 2500, 0);
-INSERT INTO public.z_price_settings VALUES (11, 1, 2, 1, 1, 'per month per bus', NULL, NULL, 50000, 20000, 15000, 0, 0, 15000);
-INSERT INTO public.z_price_settings VALUES (12, 1, 2, 2, 1, 'per month per bus', NULL, NULL, 50000, 20000, 15000, 0, 0, 15000);
-INSERT INTO public.z_price_settings VALUES (17, 1, 3, 1, 1, 'Standard Package - per fleet - (20 spots every 36mins)', NULL, NULL, 1000000, NULL, NULL, NULL, NULL, NULL);
-INSERT INTO public.z_price_settings VALUES (18, 1, 3, 1, 1, 'Medium Package - per fleet - (30 spots every 24mins)', NULL, NULL, 1500000, NULL, NULL, NULL, NULL, NULL);
-INSERT INTO public.z_price_settings VALUES (19, 1, 3, 1, 1, 'High Package - per fleet - (40 spots every 18mins)', NULL, NULL, 2000000, NULL, NULL, NULL, NULL, NULL);
-INSERT INTO public.z_price_settings VALUES (20, 1, 3, 1, 1, 'Very High Package - per fleet - (50 spots every 14mins)', NULL, NULL, 2500000, NULL, NULL, NULL, NULL, NULL);
-INSERT INTO public.z_price_settings VALUES (21, 1, 3, 1, 1, 'Maximum Package - per fleet - (60 spots every 12mins)', NULL, NULL, 3000000, NULL, NULL, NULL, NULL, NULL);
-INSERT INTO public.z_price_settings VALUES (13, 2, 3, 1, 1, 'per month per bus (10 - 49 buses)', 49, 10, 40000, 20000, 10000, 0, 0, 0);
-INSERT INTO public.z_price_settings VALUES (14, 2, 3, 1, 1, 'per month per bus (50 - 99 buses)', 99, 50, 30000, 15000, 10000, 0, 0, 0);
-INSERT INTO public.z_price_settings VALUES (15, 2, 3, 1, 1, 'per month per bus (100 - 149 buses)', 149, 100, 20000, 10000, 5000, 0, 0, 0);
-INSERT INTO public.z_price_settings VALUES (16, 2, 3, 1, 1, 'per month per bus (150 - 199 buses)', 199, 150, 10000, 5000, 2500, 0, 0, 0);
-INSERT INTO public.z_price_settings VALUES (1, 2, 1, 1, 1, 'per month per bus', NULL, NULL, 220000, 10000, 50000, 110000, 5000, 30000);
-INSERT INTO public.z_price_settings VALUES (2, 2, 1, 2, 1, 'per month per bus', NULL, NULL, 185000, 20000, 30000, 100000, 5000, 0);
-
-
---
--- TOC entry 3309 (class 0 OID 0)
--- Dependencies: 219
--- Name: allocation_id_seq; Type: SEQUENCE SET; Schema: public; Owner: postgres
---
-
-SELECT pg_catalog.setval('public.allocation_id_seq', 4, true);
-
-
---
--- TOC entry 3310 (class 0 OID 0)
--- Dependencies: 213
--- Name: bus_depot_id_seq; Type: SEQUENCE SET; Schema: public; Owner: postgres
---
-
-SELECT pg_catalog.setval('public.bus_depot_id_seq', 2, true);
-
-
---
--- TOC entry 3311 (class 0 OID 0)
--- Dependencies: 208
--- Name: bus_sizes_id_seq; Type: SEQUENCE SET; Schema: public; Owner: postgres
---
-
-SELECT pg_catalog.setval('public.bus_sizes_id_seq', 2, true);
-
-
---
--- TOC entry 3312 (class 0 OID 0)
--- Dependencies: 215
--- Name: bus_status_id_seq; Type: SEQUENCE SET; Schema: public; Owner: postgres
---
-
-SELECT pg_catalog.setval('public.bus_status_id_seq', 1, true);
-
-
---
--- TOC entry 3313 (class 0 OID 0)
--- Dependencies: 217
--- Name: buses_id_seq; Type: SEQUENCE SET; Schema: public; Owner: postgres
---
-
-SELECT pg_catalog.setval('public.buses_id_seq', 61, true);
-
-
---
--- TOC entry 3314 (class 0 OID 0)
--- Dependencies: 225
--- Name: campaign_status_id_seq; Type: SEQUENCE SET; Schema: public; Owner: postgres
---
-
-SELECT pg_catalog.setval('public.campaign_status_id_seq', 5, true);
+INSERT INTO public.z_price_settings VALUES (4, 2, 1, 2, 2, 'per month per bus', NULL, NULL, 125000, 5000, 35000, 75000, 5000, 0, false, '2020-11-14 09:29:16.631181+00');
+INSERT INTO public.z_price_settings VALUES (5, 2, 2, 1, 1, 'per month per bus', NULL, NULL, 80000, 5000, 20000, 40000, 0, 15000, false, '2020-11-14 09:29:16.631181+00');
+INSERT INTO public.z_price_settings VALUES (6, 2, 2, 2, 1, 'per month per bus', NULL, NULL, 80000, 5000, 20000, 40000, 0, 15000, false, '2020-11-14 09:29:16.631181+00');
+INSERT INTO public.z_price_settings VALUES (7, 2, 2, 1, 2, 'per month per bus', NULL, NULL, 80000, 5000, 20000, 40000, 0, 15000, false, '2020-11-14 09:29:16.631181+00');
+INSERT INTO public.z_price_settings VALUES (8, 2, 2, 2, 2, 'per month per bus', NULL, NULL, 80000, 5000, 20000, 40000, 0, 15000, false, '2020-11-14 09:29:16.631181+00');
+INSERT INTO public.z_price_settings VALUES (23, 2, 1, 2, 1, 'per month per bus', NULL, NULL, 185000, 33000, 35000, 88000, 10000, 0, true, '2020-11-14 00:00:00+00');
+INSERT INTO public.z_price_settings VALUES (24, 2, 1, 1, 2, 'per month per bus', NULL, NULL, 150000, 22500, 27500, 60000, 5000, 25000, true, '2020-11-14 00:00:00+00');
+INSERT INTO public.z_price_settings VALUES (9, 1, 1, 1, 1, 'per month per bus', NULL, NULL, 130000, 80000, 17000, 5000, 2500, 23000, true, '2020-11-14 09:29:16.631181+00');
+INSERT INTO public.z_price_settings VALUES (10, 1, 1, 2, 1, 'per month per bus', NULL, NULL, 130000, 80000, 17000, 5000, 2500, 0, true, '2020-11-14 09:29:16.631181+00');
+INSERT INTO public.z_price_settings VALUES (11, 1, 2, 1, 1, 'per month per bus', NULL, NULL, 50000, 20000, 15000, 0, 0, 15000, true, '2020-11-14 09:29:16.631181+00');
+INSERT INTO public.z_price_settings VALUES (12, 1, 2, 2, 1, 'per month per bus', NULL, NULL, 50000, 20000, 15000, 0, 0, 15000, true, '2020-11-14 09:29:16.631181+00');
+INSERT INTO public.z_price_settings VALUES (17, 1, 3, 1, 1, 'Standard Package - per fleet - (20 spots every 36mins)', NULL, NULL, 1000000, NULL, NULL, NULL, NULL, NULL, true, '2020-11-14 09:29:16.631181+00');
+INSERT INTO public.z_price_settings VALUES (18, 1, 3, 1, 1, 'Medium Package - per fleet - (30 spots every 24mins)', NULL, NULL, 1500000, NULL, NULL, NULL, NULL, NULL, true, '2020-11-14 09:29:16.631181+00');
+INSERT INTO public.z_price_settings VALUES (19, 1, 3, 1, 1, 'High Package - per fleet - (40 spots every 18mins)', NULL, NULL, 2000000, NULL, NULL, NULL, NULL, NULL, true, '2020-11-14 09:29:16.631181+00');
+INSERT INTO public.z_price_settings VALUES (20, 1, 3, 1, 1, 'Very High Package - per fleet - (50 spots every 14mins)', NULL, NULL, 2500000, NULL, NULL, NULL, NULL, NULL, true, '2020-11-14 09:29:16.631181+00');
+INSERT INTO public.z_price_settings VALUES (21, 1, 3, 1, 1, 'Maximum Package - per fleet - (60 spots every 12mins)', NULL, NULL, 3000000, NULL, NULL, NULL, NULL, NULL, true, '2020-11-14 09:29:16.631181+00');
+INSERT INTO public.z_price_settings VALUES (13, 2, 3, 1, 1, 'per month per bus (10 - 49 buses)', 49, 10, 40000, 20000, 10000, 0, 0, 0, true, '2020-11-14 09:29:16.631181+00');
+INSERT INTO public.z_price_settings VALUES (25, 2, 1, 2, 2, 'per month per bus', NULL, NULL, 125000, 22500, 27500, 60000, 5000, 0, true, '2020-11-14 00:00:00+00');
+INSERT INTO public.z_price_settings VALUES (26, 2, 2, 1, 1, 'per month per bus', NULL, NULL, 80000, 12000, 21000, 32000, 0, 15000, true, '2020-11-14 00:00:00+00');
+INSERT INTO public.z_price_settings VALUES (27, 2, 2, 2, 1, 'per month per bus', NULL, NULL, 65000, 12000, 21000, 32000, 0, 0, true, '2020-11-14 00:00:00+00');
+INSERT INTO public.z_price_settings VALUES (28, 2, 2, 1, 2, 'per month per bus', NULL, NULL, 50000, 7500, 12500, 32000, 0, 10000, true, '2020-11-14 00:00:00+00');
+INSERT INTO public.z_price_settings VALUES (29, 2, 2, 2, 2, 'per month per bus', NULL, NULL, 35000, 7500, 7500, 20000, 0, 0, true, '2020-11-14 00:00:00+00');
+INSERT INTO public.z_price_settings VALUES (22, 2, 1, 1, 1, 'per month per bus', NULL, NULL, 220000, 33000, 40000, 88000, 10000, 30000, true, '2020-11-14 00:00:00+00');
+INSERT INTO public.z_price_settings VALUES (14, 2, 3, 1, 1, 'per month per bus (50 - 99 buses)', 99, 50, 30000, 15000, 10000, 0, 0, 0, true, '2020-11-14 09:29:16.631181+00');
+INSERT INTO public.z_price_settings VALUES (15, 2, 3, 1, 1, 'per month per bus (100 - 149 buses)', 149, 100, 20000, 10000, 5000, 0, 0, 0, true, '2020-11-14 09:29:16.631181+00');
+INSERT INTO public.z_price_settings VALUES (16, 2, 3, 1, 1, 'per month per bus (150 - 199 buses)', 199, 150, 10000, 5000, 2500, 0, 0, 0, true, '2020-11-14 09:29:16.631181+00');
+INSERT INTO public.z_price_settings VALUES (1, 2, 1, 1, 1, 'per month per bus', NULL, NULL, 220000, 10000, 50000, 110000, 5000, 30000, false, '2020-11-14 09:29:16.631181+00');
+INSERT INTO public.z_price_settings VALUES (2, 2, 1, 2, 1, 'per month per bus', NULL, NULL, 185000, 20000, 30000, 100000, 5000, 0, false, '2020-11-14 09:29:16.631181+00');
+INSERT INTO public.z_price_settings VALUES (3, 2, 1, 1, 2, 'per month per bus', NULL, NULL, 150000, 5000, 35000, 75000, 5000, 20000, false, '2020-11-14 09:29:16.631181+00');
 
 
 --
 -- TOC entry 3315 (class 0 OID 0)
--- Dependencies: 236
--- Name: core_settings_id_seq; Type: SEQUENCE SET; Schema: public; Owner: postgres
+-- Dependencies: 217
+-- Name: main_buses_id_seq; Type: SEQUENCE SET; Schema: public; Owner: postgres
 --
 
-SELECT pg_catalog.setval('public.core_settings_id_seq', 18, true);
+SELECT pg_catalog.setval('public.main_buses_id_seq', 536, true);
 
 
 --
 -- TOC entry 3316 (class 0 OID 0)
--- Dependencies: 234
--- Name: email_settings_id_seq; Type: SEQUENCE SET; Schema: public; Owner: postgres
+-- Dependencies: 210
+-- Name: main_campaigns_id_seq; Type: SEQUENCE SET; Schema: public; Owner: postgres
 --
 
-SELECT pg_catalog.setval('public.email_settings_id_seq', 1, false);
+SELECT pg_catalog.setval('public.main_campaigns_id_seq', 206, true);
 
 
 --
 -- TOC entry 3317 (class 0 OID 0)
--- Dependencies: 232
--- Name: exterior_reports_id_seq; Type: SEQUENCE SET; Schema: public; Owner: postgres
+-- Dependencies: 269
+-- Name: main_print_orders_id_seq; Type: SEQUENCE SET; Schema: public; Owner: postgres
 --
 
-SELECT pg_catalog.setval('public.exterior_reports_id_seq', 3, true);
+SELECT pg_catalog.setval('public.main_print_orders_id_seq', 2, true);
 
 
 --
 -- TOC entry 3318 (class 0 OID 0)
--- Dependencies: 204
--- Name: inventory_id_seq; Type: SEQUENCE SET; Schema: public; Owner: postgres
+-- Dependencies: 232
+-- Name: main_reports_id_seq; Type: SEQUENCE SET; Schema: public; Owner: postgres
 --
 
-SELECT pg_catalog.setval('public.inventory_id_seq', 3, true);
+SELECT pg_catalog.setval('public.main_reports_id_seq', 3, true);
 
 
 --
 -- TOC entry 3319 (class 0 OID 0)
--- Dependencies: 210
--- Name: new_campaign_id_seq; Type: SEQUENCE SET; Schema: public; Owner: postgres
+-- Dependencies: 238
+-- Name: main_transactions_id_seq; Type: SEQUENCE SET; Schema: public; Owner: postgres
 --
 
-SELECT pg_catalog.setval('public.new_campaign_id_seq', 202, true);
+SELECT pg_catalog.setval('public.main_transactions_id_seq', 29, true);
 
 
 --
 -- TOC entry 3320 (class 0 OID 0)
--- Dependencies: 200
--- Name: operators_id_seq; Type: SEQUENCE SET; Schema: public; Owner: postgres
+-- Dependencies: 196
+-- Name: main_users_id_seq; Type: SEQUENCE SET; Schema: public; Owner: postgres
 --
 
-SELECT pg_catalog.setval('public.operators_id_seq', 4, true);
+SELECT pg_catalog.setval('public.main_users_id_seq', 25, true);
 
 
 --
 -- TOC entry 3321 (class 0 OID 0)
--- Dependencies: 223
--- Name: payment_status_id_seq; Type: SEQUENCE SET; Schema: public; Owner: postgres
+-- Dependencies: 219
+-- Name: sub_media_allocation_id_seq; Type: SEQUENCE SET; Schema: public; Owner: postgres
 --
 
-SELECT pg_catalog.setval('public.payment_status_id_seq', 1, false);
+SELECT pg_catalog.setval('public.sub_media_allocation_id_seq', 4, true);
 
 
 --
 -- TOC entry 3322 (class 0 OID 0)
--- Dependencies: 198
--- Name: platforms_id_seq; Type: SEQUENCE SET; Schema: public; Owner: postgres
+-- Dependencies: 240
+-- Name: sub_renewal_requests_id_seq; Type: SEQUENCE SET; Schema: public; Owner: postgres
 --
 
-SELECT pg_catalog.setval('public.platforms_id_seq', 2, true);
+SELECT pg_catalog.setval('public.sub_renewal_requests_id_seq', 1, false);
 
 
 --
 -- TOC entry 3323 (class 0 OID 0)
--- Dependencies: 202
--- Name: pricing_id_seq; Type: SEQUENCE SET; Schema: public; Owner: postgres
+-- Dependencies: 242
+-- Name: sub_transaction_details_id_seq; Type: SEQUENCE SET; Schema: public; Owner: postgres
 --
 
-SELECT pg_catalog.setval('public.pricing_id_seq', 21, true);
+SELECT pg_catalog.setval('public.sub_transaction_details_id_seq', 27, true);
 
 
 --
 -- TOC entry 3324 (class 0 OID 0)
--- Dependencies: 269
--- Name: print_orders_id_seq; Type: SEQUENCE SET; Schema: public; Owner: postgres
---
-
-SELECT pg_catalog.setval('public.print_orders_id_seq', 1, true);
-
-
---
--- TOC entry 3325 (class 0 OID 0)
--- Dependencies: 206
--- Name: print_stage_id_seq; Type: SEQUENCE SET; Schema: public; Owner: postgres
---
-
-SELECT pg_catalog.setval('public.print_stage_id_seq', 2, true);
-
-
---
--- TOC entry 3326 (class 0 OID 0)
--- Dependencies: 221
--- Name: print_status_id_seq; Type: SEQUENCE SET; Schema: public; Owner: postgres
---
-
-SELECT pg_catalog.setval('public.print_status_id_seq', 1, false);
-
-
---
--- TOC entry 3327 (class 0 OID 0)
--- Dependencies: 267
--- Name: printers_id_seq; Type: SEQUENCE SET; Schema: public; Owner: postgres
---
-
-SELECT pg_catalog.setval('public.printers_id_seq', 1, false);
-
-
---
--- TOC entry 3328 (class 0 OID 0)
--- Dependencies: 240
--- Name: renewal_requests_id_seq; Type: SEQUENCE SET; Schema: public; Owner: postgres
---
-
-SELECT pg_catalog.setval('public.renewal_requests_id_seq', 1, false);
-
-
---
--- TOC entry 3329 (class 0 OID 0)
--- Dependencies: 244
--- Name: renewal_stage_id_seq; Type: SEQUENCE SET; Schema: public; Owner: postgres
---
-
-SELECT pg_catalog.setval('public.renewal_stage_id_seq', 6, true);
-
-
---
--- TOC entry 3330 (class 0 OID 0)
--- Dependencies: 242
--- Name: transaction_details_id_seq; Type: SEQUENCE SET; Schema: public; Owner: postgres
---
-
-SELECT pg_catalog.setval('public.transaction_details_id_seq', 27, true);
-
-
---
--- TOC entry 3331 (class 0 OID 0)
--- Dependencies: 238
--- Name: transactions_id_seq; Type: SEQUENCE SET; Schema: public; Owner: postgres
---
-
-SELECT pg_catalog.setval('public.transactions_id_seq', 25, true);
-
-
---
--- TOC entry 3332 (class 0 OID 0)
--- Dependencies: 229
--- Name: user_types_id_seq; Type: SEQUENCE SET; Schema: public; Owner: postgres
---
-
-SELECT pg_catalog.setval('public.user_types_id_seq', 6, true);
-
-
---
--- TOC entry 3333 (class 0 OID 0)
--- Dependencies: 196
--- Name: users_id_seq; Type: SEQUENCE SET; Schema: public; Owner: postgres
---
-
-SELECT pg_catalog.setval('public.users_id_seq', 18, true);
-
-
---
--- TOC entry 3334 (class 0 OID 0)
--- Dependencies: 227
--- Name: vendors_id_seq; Type: SEQUENCE SET; Schema: public; Owner: postgres
---
-
-SELECT pg_catalog.setval('public.vendors_id_seq', 19, true);
-
-
---
--- TOC entry 3335 (class 0 OID 0)
 -- Dependencies: 260
 -- Name: w_vendors_operators_id_seq; Type: SEQUENCE SET; Schema: public; Owner: postgres
 --
@@ -2973,7 +3289,160 @@ SELECT pg_catalog.setval('public.w_vendors_operators_id_seq', 7, true);
 
 
 --
--- TOC entry 3024 (class 2606 OID 34200)
+-- TOC entry 3325 (class 0 OID 0)
+-- Dependencies: 213
+-- Name: x_bus_depot_id_seq; Type: SEQUENCE SET; Schema: public; Owner: postgres
+--
+
+SELECT pg_catalog.setval('public.x_bus_depot_id_seq', 5, true);
+
+
+--
+-- TOC entry 3326 (class 0 OID 0)
+-- Dependencies: 208
+-- Name: x_bus_sizes_id_seq; Type: SEQUENCE SET; Schema: public; Owner: postgres
+--
+
+SELECT pg_catalog.setval('public.x_bus_sizes_id_seq', 2, true);
+
+
+--
+-- TOC entry 3327 (class 0 OID 0)
+-- Dependencies: 215
+-- Name: x_bus_status_id_seq; Type: SEQUENCE SET; Schema: public; Owner: postgres
+--
+
+SELECT pg_catalog.setval('public.x_bus_status_id_seq', 1, true);
+
+
+--
+-- TOC entry 3328 (class 0 OID 0)
+-- Dependencies: 223
+-- Name: x_payment_status_id_seq; Type: SEQUENCE SET; Schema: public; Owner: postgres
+--
+
+SELECT pg_catalog.setval('public.x_payment_status_id_seq', 1, false);
+
+
+--
+-- TOC entry 3329 (class 0 OID 0)
+-- Dependencies: 206
+-- Name: x_print_stage_id_seq; Type: SEQUENCE SET; Schema: public; Owner: postgres
+--
+
+SELECT pg_catalog.setval('public.x_print_stage_id_seq', 2, true);
+
+
+--
+-- TOC entry 3330 (class 0 OID 0)
+-- Dependencies: 221
+-- Name: x_print_status_id_seq; Type: SEQUENCE SET; Schema: public; Owner: postgres
+--
+
+SELECT pg_catalog.setval('public.x_print_status_id_seq', 1, false);
+
+
+--
+-- TOC entry 3331 (class 0 OID 0)
+-- Dependencies: 244
+-- Name: x_renewal_stage_id_seq; Type: SEQUENCE SET; Schema: public; Owner: postgres
+--
+
+SELECT pg_catalog.setval('public.x_renewal_stage_id_seq', 6, true);
+
+
+--
+-- TOC entry 3332 (class 0 OID 0)
+-- Dependencies: 225
+-- Name: x_transaction_status_id_seq; Type: SEQUENCE SET; Schema: public; Owner: postgres
+--
+
+SELECT pg_catalog.setval('public.x_transaction_status_id_seq', 5, true);
+
+
+--
+-- TOC entry 3333 (class 0 OID 0)
+-- Dependencies: 229
+-- Name: x_user_types_id_seq; Type: SEQUENCE SET; Schema: public; Owner: postgres
+--
+
+SELECT pg_catalog.setval('public.x_user_types_id_seq', 7, true);
+
+
+--
+-- TOC entry 3334 (class 0 OID 0)
+-- Dependencies: 204
+-- Name: y_inventory_id_seq; Type: SEQUENCE SET; Schema: public; Owner: postgres
+--
+
+SELECT pg_catalog.setval('public.y_inventory_id_seq', 3, true);
+
+
+--
+-- TOC entry 3335 (class 0 OID 0)
+-- Dependencies: 200
+-- Name: y_operators_id_seq; Type: SEQUENCE SET; Schema: public; Owner: postgres
+--
+
+SELECT pg_catalog.setval('public.y_operators_id_seq', 4, true);
+
+
+--
+-- TOC entry 3336 (class 0 OID 0)
+-- Dependencies: 198
+-- Name: y_platforms_id_seq; Type: SEQUENCE SET; Schema: public; Owner: postgres
+--
+
+SELECT pg_catalog.setval('public.y_platforms_id_seq', 2, true);
+
+
+--
+-- TOC entry 3337 (class 0 OID 0)
+-- Dependencies: 267
+-- Name: y_printers_id_seq; Type: SEQUENCE SET; Schema: public; Owner: postgres
+--
+
+SELECT pg_catalog.setval('public.y_printers_id_seq', 1, false);
+
+
+--
+-- TOC entry 3338 (class 0 OID 0)
+-- Dependencies: 227
+-- Name: y_vendors_id_seq; Type: SEQUENCE SET; Schema: public; Owner: postgres
+--
+
+SELECT pg_catalog.setval('public.y_vendors_id_seq', 21, true);
+
+
+--
+-- TOC entry 3339 (class 0 OID 0)
+-- Dependencies: 236
+-- Name: z_core_settings_id_seq; Type: SEQUENCE SET; Schema: public; Owner: postgres
+--
+
+SELECT pg_catalog.setval('public.z_core_settings_id_seq', 18, true);
+
+
+--
+-- TOC entry 3340 (class 0 OID 0)
+-- Dependencies: 234
+-- Name: z_email_settings_id_seq; Type: SEQUENCE SET; Schema: public; Owner: postgres
+--
+
+SELECT pg_catalog.setval('public.z_email_settings_id_seq', 1, false);
+
+
+--
+-- TOC entry 3341 (class 0 OID 0)
+-- Dependencies: 202
+-- Name: z_price_settings_id_seq; Type: SEQUENCE SET; Schema: public; Owner: postgres
+--
+
+SELECT pg_catalog.setval('public.z_price_settings_id_seq', 29, true);
+
+
+--
+-- TOC entry 3030 (class 2606 OID 34200)
 -- Name: sub_media_allocation allocation_bus_campaign_uk; Type: CONSTRAINT; Schema: public; Owner: postgres
 --
 
@@ -2982,259 +3451,97 @@ ALTER TABLE ONLY public.sub_media_allocation
 
 
 --
--- TOC entry 3026 (class 2606 OID 34188)
--- Name: sub_media_allocation allocation_id_pk; Type: CONSTRAINT; Schema: public; Owner: postgres
---
-
-ALTER TABLE ONLY public.sub_media_allocation
-    ADD CONSTRAINT allocation_id_pk PRIMARY KEY (id);
-
-
---
--- TOC entry 3011 (class 2606 OID 34118)
--- Name: x_bus_depot bus_depot_pk; Type: CONSTRAINT; Schema: public; Owner: postgres
---
-
-ALTER TABLE ONLY public.x_bus_depot
-    ADD CONSTRAINT bus_depot_pk PRIMARY KEY (id);
-
-
---
--- TOC entry 3013 (class 2606 OID 34120)
--- Name: x_bus_depot bus_depot_unique; Type: CONSTRAINT; Schema: public; Owner: postgres
---
-
-ALTER TABLE ONLY public.x_bus_depot
-    ADD CONSTRAINT bus_depot_unique UNIQUE (name);
-
-
---
--- TOC entry 3007 (class 2606 OID 33986)
--- Name: x_bus_sizes bus_sizes_id_pk; Type: CONSTRAINT; Schema: public; Owner: postgres
---
-
-ALTER TABLE ONLY public.x_bus_sizes
-    ADD CONSTRAINT bus_sizes_id_pk PRIMARY KEY (id);
-
-
---
--- TOC entry 3015 (class 2606 OID 34133)
--- Name: x_bus_status bus_status_name_key; Type: CONSTRAINT; Schema: public; Owner: postgres
---
-
-ALTER TABLE ONLY public.x_bus_status
-    ADD CONSTRAINT bus_status_name_key UNIQUE (name);
-
-
---
--- TOC entry 3017 (class 2606 OID 34131)
--- Name: x_bus_status bus_status_pk; Type: CONSTRAINT; Schema: public; Owner: postgres
---
-
-ALTER TABLE ONLY public.x_bus_status
-    ADD CONSTRAINT bus_status_pk PRIMARY KEY (id);
-
-
---
--- TOC entry 3019 (class 2606 OID 34149)
--- Name: main_buses buses_number_key; Type: CONSTRAINT; Schema: public; Owner: postgres
+-- TOC entry 3026 (class 2606 OID 34147)
+-- Name: main_buses main_buses_id_pk; Type: CONSTRAINT; Schema: public; Owner: postgres
 --
 
 ALTER TABLE ONLY public.main_buses
-    ADD CONSTRAINT buses_number_key UNIQUE (number);
+    ADD CONSTRAINT main_buses_id_pk PRIMARY KEY (id);
 
 
 --
--- TOC entry 3021 (class 2606 OID 34147)
--- Name: main_buses buses_pk; Type: CONSTRAINT; Schema: public; Owner: postgres
+-- TOC entry 3028 (class 2606 OID 34149)
+-- Name: main_buses main_buses_number_uk; Type: CONSTRAINT; Schema: public; Owner: postgres
 --
 
 ALTER TABLE ONLY public.main_buses
-    ADD CONSTRAINT buses_pk PRIMARY KEY (id);
+    ADD CONSTRAINT main_buses_number_uk UNIQUE (number);
 
 
 --
--- TOC entry 3036 (class 2606 OID 42289)
--- Name: x_transaction_status campaign_status_pk; Type: CONSTRAINT; Schema: public; Owner: postgres
---
-
-ALTER TABLE ONLY public.x_transaction_status
-    ADD CONSTRAINT campaign_status_pk PRIMARY KEY (id);
-
-
---
--- TOC entry 3046 (class 2606 OID 42424)
--- Name: z_email_settings email_settings_name_uk; Type: CONSTRAINT; Schema: public; Owner: postgres
---
-
-ALTER TABLE ONLY public.z_email_settings
-    ADD CONSTRAINT email_settings_name_uk UNIQUE (name);
-
-
---
--- TOC entry 3048 (class 2606 OID 42422)
--- Name: z_email_settings email_settings_pk; Type: CONSTRAINT; Schema: public; Owner: postgres
---
-
-ALTER TABLE ONLY public.z_email_settings
-    ADD CONSTRAINT email_settings_pk PRIMARY KEY (id);
-
-
---
--- TOC entry 3044 (class 2606 OID 42401)
--- Name: main_reports exterior_reports_pk; Type: CONSTRAINT; Schema: public; Owner: postgres
---
-
-ALTER TABLE ONLY public.main_reports
-    ADD CONSTRAINT exterior_reports_pk PRIMARY KEY (id);
-
-
---
--- TOC entry 3003 (class 2606 OID 33964)
--- Name: y_inventory inventory_id_pk; Type: CONSTRAINT; Schema: public; Owner: postgres
---
-
-ALTER TABLE ONLY public.y_inventory
-    ADD CONSTRAINT inventory_id_pk PRIMARY KEY (id);
-
-
---
--- TOC entry 3052 (class 2606 OID 50605)
--- Name: main_transactions main_transactions_pkey; Type: CONSTRAINT; Schema: public; Owner: postgres
---
-
-ALTER TABLE ONLY public.main_transactions
-    ADD CONSTRAINT main_transactions_pkey PRIMARY KEY (id);
-
-
---
--- TOC entry 3009 (class 2606 OID 34006)
--- Name: main_campaigns new_campaign_id_pk; Type: CONSTRAINT; Schema: public; Owner: postgres
+-- TOC entry 3015 (class 2606 OID 34006)
+-- Name: main_campaigns main_campaigns_id_pk; Type: CONSTRAINT; Schema: public; Owner: postgres
 --
 
 ALTER TABLE ONLY public.main_campaigns
-    ADD CONSTRAINT new_campaign_id_pk PRIMARY KEY (id);
+    ADD CONSTRAINT main_campaigns_id_pk PRIMARY KEY (id);
 
 
 --
--- TOC entry 2999 (class 2606 OID 33935)
--- Name: y_operators operator_id_pk; Type: CONSTRAINT; Schema: public; Owner: postgres
+-- TOC entry 3050 (class 2606 OID 42401)
+-- Name: main_reports main_exterior_reports_id_pk; Type: CONSTRAINT; Schema: public; Owner: postgres
 --
 
-ALTER TABLE ONLY public.y_operators
-    ADD CONSTRAINT operator_id_pk PRIMARY KEY (id);
-
-
---
--- TOC entry 3032 (class 2606 OID 42278)
--- Name: x_payment_status payment_status_name_key; Type: CONSTRAINT; Schema: public; Owner: postgres
---
-
-ALTER TABLE ONLY public.x_payment_status
-    ADD CONSTRAINT payment_status_name_key UNIQUE (name);
+ALTER TABLE ONLY public.main_reports
+    ADD CONSTRAINT main_exterior_reports_id_pk PRIMARY KEY (id);
 
 
 --
--- TOC entry 3034 (class 2606 OID 42276)
--- Name: x_payment_status payment_status_pk; Type: CONSTRAINT; Schema: public; Owner: postgres
+-- TOC entry 3070 (class 2606 OID 50825)
+-- Name: main_print_orders main_print_orders_pk; Type: CONSTRAINT; Schema: public; Owner: postgres
 --
 
-ALTER TABLE ONLY public.x_payment_status
-    ADD CONSTRAINT payment_status_pk PRIMARY KEY (id);
-
-
---
--- TOC entry 2997 (class 2606 OID 33924)
--- Name: y_platforms platform_id_pk; Type: CONSTRAINT; Schema: public; Owner: postgres
---
-
-ALTER TABLE ONLY public.y_platforms
-    ADD CONSTRAINT platform_id_pk PRIMARY KEY (id);
+ALTER TABLE ONLY public.main_print_orders
+    ADD CONSTRAINT main_print_orders_pk PRIMARY KEY (id);
 
 
 --
--- TOC entry 3001 (class 2606 OID 33951)
--- Name: z_price_settings pricing_id_pk; Type: CONSTRAINT; Schema: public; Owner: postgres
+-- TOC entry 3058 (class 2606 OID 50605)
+-- Name: main_transactions main_transactions_id_pk; Type: CONSTRAINT; Schema: public; Owner: postgres
 --
 
-ALTER TABLE ONLY public.z_price_settings
-    ADD CONSTRAINT pricing_id_pk PRIMARY KEY (id);
-
-
---
--- TOC entry 3064 (class 2606 OID 50825)
--- Name: print_orders print_orders_pk0; Type: CONSTRAINT; Schema: public; Owner: postgres
---
-
-ALTER TABLE ONLY public.print_orders
-    ADD CONSTRAINT print_orders_pk0 PRIMARY KEY (id);
+ALTER TABLE ONLY public.main_transactions
+    ADD CONSTRAINT main_transactions_id_pk PRIMARY KEY (id);
 
 
 --
--- TOC entry 3005 (class 2606 OID 33975)
--- Name: x_print_stage print_stage_id_pk; Type: CONSTRAINT; Schema: public; Owner: postgres
---
-
-ALTER TABLE ONLY public.x_print_stage
-    ADD CONSTRAINT print_stage_id_pk PRIMARY KEY (id);
-
-
---
--- TOC entry 3028 (class 2606 OID 42265)
--- Name: x_print_status print_status_name_key; Type: CONSTRAINT; Schema: public; Owner: postgres
---
-
-ALTER TABLE ONLY public.x_print_status
-    ADD CONSTRAINT print_status_name_key UNIQUE (name);
-
-
---
--- TOC entry 3030 (class 2606 OID 42263)
--- Name: x_print_status print_status_pk; Type: CONSTRAINT; Schema: public; Owner: postgres
---
-
-ALTER TABLE ONLY public.x_print_status
-    ADD CONSTRAINT print_status_pk PRIMARY KEY (id);
-
-
---
--- TOC entry 3062 (class 2606 OID 50811)
--- Name: printers printers_pkey; Type: CONSTRAINT; Schema: public; Owner: postgres
---
-
-ALTER TABLE ONLY public.printers
-    ADD CONSTRAINT printers_pkey PRIMARY KEY (id);
-
-
---
--- TOC entry 3054 (class 2606 OID 42453)
--- Name: sub_renewal_requests renewal_requests_id_pk; Type: CONSTRAINT; Schema: public; Owner: postgres
---
-
-ALTER TABLE ONLY public.sub_renewal_requests
-    ADD CONSTRAINT renewal_requests_id_pk PRIMARY KEY (id);
-
-
---
--- TOC entry 3056 (class 2606 OID 50607)
--- Name: sub_transaction_details sub_tran_details_id_pk; Type: CONSTRAINT; Schema: public; Owner: postgres
---
-
-ALTER TABLE ONLY public.sub_transaction_details
-    ADD CONSTRAINT sub_tran_details_id_pk PRIMARY KEY (id);
-
-
---
--- TOC entry 2995 (class 2606 OID 33878)
--- Name: main_users test_id_pk; Type: CONSTRAINT; Schema: public; Owner: postgres
+-- TOC entry 3001 (class 2606 OID 33878)
+-- Name: main_users main_users_id_pk; Type: CONSTRAINT; Schema: public; Owner: postgres
 --
 
 ALTER TABLE ONLY public.main_users
-    ADD CONSTRAINT test_id_pk PRIMARY KEY (id);
+    ADD CONSTRAINT main_users_id_pk PRIMARY KEY (id);
 
 
 --
--- TOC entry 3060 (class 2606 OID 50756)
+-- TOC entry 3032 (class 2606 OID 34188)
+-- Name: sub_media_allocation sub_media_allocation_id_pk; Type: CONSTRAINT; Schema: public; Owner: postgres
+--
+
+ALTER TABLE ONLY public.sub_media_allocation
+    ADD CONSTRAINT sub_media_allocation_id_pk PRIMARY KEY (id);
+
+
+--
+-- TOC entry 3060 (class 2606 OID 42453)
+-- Name: sub_renewal_requests sub_renewal_requests_id_pk; Type: CONSTRAINT; Schema: public; Owner: postgres
+--
+
+ALTER TABLE ONLY public.sub_renewal_requests
+    ADD CONSTRAINT sub_renewal_requests_id_pk PRIMARY KEY (id);
+
+
+--
+-- TOC entry 3062 (class 2606 OID 50607)
+-- Name: sub_transaction_details sub_transaction_details_id_pk; Type: CONSTRAINT; Schema: public; Owner: postgres
+--
+
+ALTER TABLE ONLY public.sub_transaction_details
+    ADD CONSTRAINT sub_transaction_details_id_pk PRIMARY KEY (id);
+
+
+--
+-- TOC entry 3066 (class 2606 OID 50756)
 -- Name: w_vendors_operators w_vendors_operators_id_pk; Type: CONSTRAINT; Schema: public; Owner: postgres
 --
 
@@ -3243,7 +3550,106 @@ ALTER TABLE ONLY public.w_vendors_operators
 
 
 --
--- TOC entry 3058 (class 2606 OID 50711)
+-- TOC entry 3017 (class 2606 OID 34118)
+-- Name: x_bus_depot x_bus_depot_pk; Type: CONSTRAINT; Schema: public; Owner: postgres
+--
+
+ALTER TABLE ONLY public.x_bus_depot
+    ADD CONSTRAINT x_bus_depot_pk PRIMARY KEY (id);
+
+
+--
+-- TOC entry 3019 (class 2606 OID 34120)
+-- Name: x_bus_depot x_bus_depot_unique; Type: CONSTRAINT; Schema: public; Owner: postgres
+--
+
+ALTER TABLE ONLY public.x_bus_depot
+    ADD CONSTRAINT x_bus_depot_unique UNIQUE (name);
+
+
+--
+-- TOC entry 3013 (class 2606 OID 33986)
+-- Name: x_bus_sizes x_bus_sizes_id_pk; Type: CONSTRAINT; Schema: public; Owner: postgres
+--
+
+ALTER TABLE ONLY public.x_bus_sizes
+    ADD CONSTRAINT x_bus_sizes_id_pk PRIMARY KEY (id);
+
+
+--
+-- TOC entry 3021 (class 2606 OID 34133)
+-- Name: x_bus_status x_bus_status_name_key; Type: CONSTRAINT; Schema: public; Owner: postgres
+--
+
+ALTER TABLE ONLY public.x_bus_status
+    ADD CONSTRAINT x_bus_status_name_key UNIQUE (name);
+
+
+--
+-- TOC entry 3023 (class 2606 OID 34131)
+-- Name: x_bus_status x_bus_status_pk; Type: CONSTRAINT; Schema: public; Owner: postgres
+--
+
+ALTER TABLE ONLY public.x_bus_status
+    ADD CONSTRAINT x_bus_status_pk PRIMARY KEY (id);
+
+
+--
+-- TOC entry 3042 (class 2606 OID 42289)
+-- Name: x_transaction_status x_campaign_status_pk; Type: CONSTRAINT; Schema: public; Owner: postgres
+--
+
+ALTER TABLE ONLY public.x_transaction_status
+    ADD CONSTRAINT x_campaign_status_pk PRIMARY KEY (id);
+
+
+--
+-- TOC entry 3038 (class 2606 OID 42278)
+-- Name: x_payment_status x_payment_status_name_key; Type: CONSTRAINT; Schema: public; Owner: postgres
+--
+
+ALTER TABLE ONLY public.x_payment_status
+    ADD CONSTRAINT x_payment_status_name_key UNIQUE (name);
+
+
+--
+-- TOC entry 3040 (class 2606 OID 42276)
+-- Name: x_payment_status x_payment_status_pk; Type: CONSTRAINT; Schema: public; Owner: postgres
+--
+
+ALTER TABLE ONLY public.x_payment_status
+    ADD CONSTRAINT x_payment_status_pk PRIMARY KEY (id);
+
+
+--
+-- TOC entry 3011 (class 2606 OID 33975)
+-- Name: x_print_stage x_print_stage_id_pk; Type: CONSTRAINT; Schema: public; Owner: postgres
+--
+
+ALTER TABLE ONLY public.x_print_stage
+    ADD CONSTRAINT x_print_stage_id_pk PRIMARY KEY (id);
+
+
+--
+-- TOC entry 3034 (class 2606 OID 42265)
+-- Name: x_print_status x_print_status_name_key; Type: CONSTRAINT; Schema: public; Owner: postgres
+--
+
+ALTER TABLE ONLY public.x_print_status
+    ADD CONSTRAINT x_print_status_name_key UNIQUE (name);
+
+
+--
+-- TOC entry 3036 (class 2606 OID 42263)
+-- Name: x_print_status x_print_status_pk; Type: CONSTRAINT; Schema: public; Owner: postgres
+--
+
+ALTER TABLE ONLY public.x_print_status
+    ADD CONSTRAINT x_print_status_pk PRIMARY KEY (id);
+
+
+--
+-- TOC entry 3064 (class 2606 OID 50711)
 -- Name: x_renewal_stage x_renewal_stage_pkey; Type: CONSTRAINT; Schema: public; Owner: postgres
 --
 
@@ -3252,7 +3658,7 @@ ALTER TABLE ONLY public.x_renewal_stage
 
 
 --
--- TOC entry 3042 (class 2606 OID 50721)
+-- TOC entry 3048 (class 2606 OID 50721)
 -- Name: x_report_types x_report_types_pkey; Type: CONSTRAINT; Schema: public; Owner: postgres
 --
 
@@ -3261,7 +3667,7 @@ ALTER TABLE ONLY public.x_report_types
 
 
 --
--- TOC entry 3040 (class 2606 OID 50717)
+-- TOC entry 3046 (class 2606 OID 50717)
 -- Name: x_user_types x_user_types_pkey; Type: CONSTRAINT; Schema: public; Owner: postgres
 --
 
@@ -3270,7 +3676,43 @@ ALTER TABLE ONLY public.x_user_types
 
 
 --
--- TOC entry 3038 (class 2606 OID 50719)
+-- TOC entry 3009 (class 2606 OID 33964)
+-- Name: y_inventory y_inventory_id_pk; Type: CONSTRAINT; Schema: public; Owner: postgres
+--
+
+ALTER TABLE ONLY public.y_inventory
+    ADD CONSTRAINT y_inventory_id_pk PRIMARY KEY (id);
+
+
+--
+-- TOC entry 3005 (class 2606 OID 33935)
+-- Name: y_operators y_operator_id_pk; Type: CONSTRAINT; Schema: public; Owner: postgres
+--
+
+ALTER TABLE ONLY public.y_operators
+    ADD CONSTRAINT y_operator_id_pk PRIMARY KEY (id);
+
+
+--
+-- TOC entry 3003 (class 2606 OID 33924)
+-- Name: y_platforms y_platform_id_pk; Type: CONSTRAINT; Schema: public; Owner: postgres
+--
+
+ALTER TABLE ONLY public.y_platforms
+    ADD CONSTRAINT y_platform_id_pk PRIMARY KEY (id);
+
+
+--
+-- TOC entry 3068 (class 2606 OID 50811)
+-- Name: y_printers y_printers_pkey; Type: CONSTRAINT; Schema: public; Owner: postgres
+--
+
+ALTER TABLE ONLY public.y_printers
+    ADD CONSTRAINT y_printers_pkey PRIMARY KEY (id);
+
+
+--
+-- TOC entry 3044 (class 2606 OID 50719)
 -- Name: y_vendors y_vendors_pkey; Type: CONSTRAINT; Schema: public; Owner: postgres
 --
 
@@ -3279,7 +3721,7 @@ ALTER TABLE ONLY public.y_vendors
 
 
 --
--- TOC entry 3050 (class 2606 OID 50676)
+-- TOC entry 3056 (class 2606 OID 50676)
 -- Name: z_core_settings z_core_settings_pkey; Type: CONSTRAINT; Schema: public; Owner: postgres
 --
 
@@ -3288,15 +3730,42 @@ ALTER TABLE ONLY public.z_core_settings
 
 
 --
--- TOC entry 3022 (class 1259 OID 34180)
--- Name: fki_buses_depot_fk; Type: INDEX; Schema: public; Owner: postgres
+-- TOC entry 3052 (class 2606 OID 42424)
+-- Name: z_email_settings z_email_settings_name_uk; Type: CONSTRAINT; Schema: public; Owner: postgres
 --
 
-CREATE INDEX fki_buses_depot_fk ON public.main_buses USING btree (bus_depot_id);
+ALTER TABLE ONLY public.z_email_settings
+    ADD CONSTRAINT z_email_settings_name_uk UNIQUE (name);
 
 
 --
--- TOC entry 3212 (class 2618 OID 50702)
+-- TOC entry 3054 (class 2606 OID 42422)
+-- Name: z_email_settings z_email_settings_pk; Type: CONSTRAINT; Schema: public; Owner: postgres
+--
+
+ALTER TABLE ONLY public.z_email_settings
+    ADD CONSTRAINT z_email_settings_pk PRIMARY KEY (id);
+
+
+--
+-- TOC entry 3007 (class 2606 OID 33951)
+-- Name: z_price_settings z_pricing_id_pk; Type: CONSTRAINT; Schema: public; Owner: postgres
+--
+
+ALTER TABLE ONLY public.z_price_settings
+    ADD CONSTRAINT z_pricing_id_pk PRIMARY KEY (id);
+
+
+--
+-- TOC entry 3024 (class 1259 OID 34180)
+-- Name: fki_main_buses_depot_fk; Type: INDEX; Schema: public; Owner: postgres
+--
+
+CREATE INDEX fki_main_buses_depot_fk ON public.main_buses USING btree (bus_depot_id);
+
+
+--
+-- TOC entry 3218 (class 2618 OID 50702)
 -- Name: view_campaign_status _RETURN; Type: RULE; Schema: public; Owner: postgres
 --
 
@@ -3341,7 +3810,7 @@ CREATE OR REPLACE VIEW public.view_campaign_status AS
 
 
 --
--- TOC entry 3076 (class 2606 OID 34189)
+-- TOC entry 3082 (class 2606 OID 34189)
 -- Name: sub_media_allocation allocation_bus_id_fk; Type: FK CONSTRAINT; Schema: public; Owner: postgres
 --
 
@@ -3350,7 +3819,7 @@ ALTER TABLE ONLY public.sub_media_allocation
 
 
 --
--- TOC entry 3077 (class 2606 OID 34194)
+-- TOC entry 3083 (class 2606 OID 34194)
 -- Name: sub_media_allocation allocation_campaign_id_fk; Type: FK CONSTRAINT; Schema: public; Owner: postgres
 --
 
@@ -3359,7 +3828,7 @@ ALTER TABLE ONLY public.sub_media_allocation
 
 
 --
--- TOC entry 3068 (class 2606 OID 34022)
+-- TOC entry 3074 (class 2606 OID 34022)
 -- Name: main_campaigns bus_size_id_fk; Type: FK CONSTRAINT; Schema: public; Owner: postgres
 --
 
@@ -3368,61 +3837,7 @@ ALTER TABLE ONLY public.main_campaigns
 
 
 --
--- TOC entry 3070 (class 2606 OID 34150)
--- Name: main_buses buses_depot_fk; Type: FK CONSTRAINT; Schema: public; Owner: postgres
---
-
-ALTER TABLE ONLY public.main_buses
-    ADD CONSTRAINT buses_depot_fk FOREIGN KEY (bus_depot_id) REFERENCES public.x_bus_depot(id);
-
-
---
--- TOC entry 3072 (class 2606 OID 34160)
--- Name: main_buses buses_fk0; Type: FK CONSTRAINT; Schema: public; Owner: postgres
---
-
-ALTER TABLE ONLY public.main_buses
-    ADD CONSTRAINT buses_fk0 FOREIGN KEY (operator_id) REFERENCES public.y_operators(id);
-
-
---
--- TOC entry 3073 (class 2606 OID 34165)
--- Name: main_buses buses_fk1; Type: FK CONSTRAINT; Schema: public; Owner: postgres
---
-
-ALTER TABLE ONLY public.main_buses
-    ADD CONSTRAINT buses_fk1 FOREIGN KEY (exterior_campaign_id) REFERENCES public.main_campaigns(id) ON DELETE SET NULL;
-
-
---
--- TOC entry 3074 (class 2606 OID 34170)
--- Name: main_buses buses_fk2; Type: FK CONSTRAINT; Schema: public; Owner: postgres
---
-
-ALTER TABLE ONLY public.main_buses
-    ADD CONSTRAINT buses_fk2 FOREIGN KEY (interior_campaign_id) REFERENCES public.main_campaigns(id);
-
-
---
--- TOC entry 3075 (class 2606 OID 34175)
--- Name: main_buses buses_fk3; Type: FK CONSTRAINT; Schema: public; Owner: postgres
---
-
-ALTER TABLE ONLY public.main_buses
-    ADD CONSTRAINT buses_fk3 FOREIGN KEY (bus_status_id) REFERENCES public.x_bus_status(id);
-
-
---
--- TOC entry 3071 (class 2606 OID 34155)
--- Name: main_buses buses_fk4; Type: FK CONSTRAINT; Schema: public; Owner: postgres
---
-
-ALTER TABLE ONLY public.main_buses
-    ADD CONSTRAINT buses_fk4 FOREIGN KEY (operator_id) REFERENCES public.y_operators(id);
-
-
---
--- TOC entry 3078 (class 2606 OID 42402)
+-- TOC entry 3084 (class 2606 OID 42402)
 -- Name: main_reports exterior_reports_fk1; Type: FK CONSTRAINT; Schema: public; Owner: postgres
 --
 
@@ -3431,7 +3846,7 @@ ALTER TABLE ONLY public.main_reports
 
 
 --
--- TOC entry 3079 (class 2606 OID 42407)
+-- TOC entry 3085 (class 2606 OID 42407)
 -- Name: main_reports exterior_reports_fk2; Type: FK CONSTRAINT; Schema: public; Owner: postgres
 --
 
@@ -3440,7 +3855,7 @@ ALTER TABLE ONLY public.main_reports
 
 
 --
--- TOC entry 3067 (class 2606 OID 34012)
+-- TOC entry 3073 (class 2606 OID 34012)
 -- Name: main_campaigns inventory_id_fk; Type: FK CONSTRAINT; Schema: public; Owner: postgres
 --
 
@@ -3449,7 +3864,61 @@ ALTER TABLE ONLY public.main_campaigns
 
 
 --
--- TOC entry 3065 (class 2606 OID 33936)
+-- TOC entry 3076 (class 2606 OID 34150)
+-- Name: main_buses main_buses_depot_fk; Type: FK CONSTRAINT; Schema: public; Owner: postgres
+--
+
+ALTER TABLE ONLY public.main_buses
+    ADD CONSTRAINT main_buses_depot_fk FOREIGN KEY (bus_depot_id) REFERENCES public.x_bus_depot(id);
+
+
+--
+-- TOC entry 3081 (class 2606 OID 34160)
+-- Name: main_buses main_buses_fk0; Type: FK CONSTRAINT; Schema: public; Owner: postgres
+--
+
+ALTER TABLE ONLY public.main_buses
+    ADD CONSTRAINT main_buses_fk0 FOREIGN KEY (operator_id) REFERENCES public.y_operators(id);
+
+
+--
+-- TOC entry 3080 (class 2606 OID 34165)
+-- Name: main_buses main_buses_fk1; Type: FK CONSTRAINT; Schema: public; Owner: postgres
+--
+
+ALTER TABLE ONLY public.main_buses
+    ADD CONSTRAINT main_buses_fk1 FOREIGN KEY (exterior_campaign_id) REFERENCES public.main_campaigns(id) ON DELETE SET NULL;
+
+
+--
+-- TOC entry 3079 (class 2606 OID 34170)
+-- Name: main_buses main_buses_fk2; Type: FK CONSTRAINT; Schema: public; Owner: postgres
+--
+
+ALTER TABLE ONLY public.main_buses
+    ADD CONSTRAINT main_buses_fk2 FOREIGN KEY (interior_campaign_id) REFERENCES public.main_campaigns(id);
+
+
+--
+-- TOC entry 3078 (class 2606 OID 34175)
+-- Name: main_buses main_buses_fk3; Type: FK CONSTRAINT; Schema: public; Owner: postgres
+--
+
+ALTER TABLE ONLY public.main_buses
+    ADD CONSTRAINT main_buses_fk3 FOREIGN KEY (bus_status_id) REFERENCES public.x_bus_status(id);
+
+
+--
+-- TOC entry 3077 (class 2606 OID 34155)
+-- Name: main_buses main_buses_fk4; Type: FK CONSTRAINT; Schema: public; Owner: postgres
+--
+
+ALTER TABLE ONLY public.main_buses
+    ADD CONSTRAINT main_buses_fk4 FOREIGN KEY (operator_id) REFERENCES public.y_operators(id);
+
+
+--
+-- TOC entry 3071 (class 2606 OID 33936)
 -- Name: y_operators operator_platorm_id_fk; Type: FK CONSTRAINT; Schema: public; Owner: postgres
 --
 
@@ -3458,7 +3927,7 @@ ALTER TABLE ONLY public.y_operators
 
 
 --
--- TOC entry 3066 (class 2606 OID 34007)
+-- TOC entry 3072 (class 2606 OID 34007)
 -- Name: main_campaigns platform_id_fk; Type: FK CONSTRAINT; Schema: public; Owner: postgres
 --
 
@@ -3467,7 +3936,7 @@ ALTER TABLE ONLY public.main_campaigns
 
 
 --
--- TOC entry 3069 (class 2606 OID 34027)
+-- TOC entry 3075 (class 2606 OID 34027)
 -- Name: main_campaigns pricing_id_fk; Type: FK CONSTRAINT; Schema: public; Owner: postgres
 --
 
@@ -3475,7 +3944,7 @@ ALTER TABLE ONLY public.main_campaigns
     ADD CONSTRAINT pricing_id_fk FOREIGN KEY (price_id) REFERENCES public.z_price_settings(id);
 
 
--- Completed on 2020-11-12 18:15:45
+-- Completed on 2020-12-09 09:32:46
 
 --
 -- PostgreSQL database dump complete

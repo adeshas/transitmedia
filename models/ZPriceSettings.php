@@ -42,6 +42,8 @@ class ZPriceSettings extends DbTable
     public $lamata_fee;
     public $lasaa_fee;
     public $printers_fee;
+    public $active;
+    public $ts_created;
 
     // Page ID
     public $PageID = ""; // To be overridden by subclass
@@ -179,6 +181,23 @@ class ZPriceSettings extends DbTable
         $this->printers_fee->Sortable = true; // Allow sort
         $this->printers_fee->DefaultErrorMessage = $Language->phrase("IncorrectInteger");
         $this->Fields['printers_fee'] = &$this->printers_fee;
+
+        // active
+        $this->active = new DbField('z_price_settings', 'z_price_settings', 'x_active', 'active', '"active"', 'CAST("active" AS varchar(255))', 11, 1, -1, false, '"active"', false, false, false, 'FORMATTED TEXT', 'CHECKBOX');
+        $this->active->Nullable = false; // NOT NULL field
+        $this->active->Sortable = true; // Allow sort
+        $this->active->DataType = DATATYPE_BOOLEAN;
+        $this->active->Lookup = new Lookup('active', 'z_price_settings', false, '', ["","","",""], [], [], [], [], [], [], '', '');
+        $this->active->OptionCount = 2;
+        $this->Fields['active'] = &$this->active;
+
+        // ts_created
+        $this->ts_created = new DbField('z_price_settings', 'z_price_settings', 'x_ts_created', 'ts_created', '"ts_created"', CastDateFieldForLike("\"ts_created\"", 0, "DB"), 135, 8, 0, false, '"ts_created"', false, false, false, 'FORMATTED TEXT', 'TEXT');
+        $this->ts_created->Nullable = false; // NOT NULL field
+        $this->ts_created->Required = true; // Required field
+        $this->ts_created->Sortable = true; // Allow sort
+        $this->ts_created->DefaultErrorMessage = str_replace("%s", $GLOBALS["DATE_FORMAT"], $Language->phrase("IncorrectDate"));
+        $this->Fields['ts_created'] = &$this->ts_created;
     }
 
     // Field Visibility
@@ -503,7 +522,7 @@ class ZPriceSettings extends DbTable
         $success = $this->insertSql($rs)->execute();
         if ($success) {
             // Get insert id if necessary
-            $this->id->setDbValue($conn->fetchColumn("SELECT currval('pricing_id_seq'::regclass)"));
+            $this->id->setDbValue($conn->fetchColumn("SELECT currval('public.z_price_settings_id_seq'::regclass)"));
             $rs['id'] = $this->id->DbValue;
         }
         return $success;
@@ -603,6 +622,8 @@ class ZPriceSettings extends DbTable
         $this->lamata_fee->DbValue = $row['lamata_fee'];
         $this->lasaa_fee->DbValue = $row['lasaa_fee'];
         $this->printers_fee->DbValue = $row['printers_fee'];
+        $this->active->DbValue = (ConvertToBool($row['active']) ? "1" : "0");
+        $this->ts_created->DbValue = $row['ts_created'];
     }
 
     // Delete uploaded files
@@ -667,18 +688,17 @@ class ZPriceSettings extends DbTable
     // Return page URL
     public function getReturnUrl()
     {
+        $referUrl = ReferUrl();
+        $referPageName = ReferPageName();
         $name = PROJECT_NAME . "_" . $this->TableVar . "_" . Config("TABLE_RETURN_URL");
         // Get referer URL automatically
-        if (ReferUrl() != "" && ReferPageName() != CurrentPageName() && ReferPageName() != "login") { // Referer not same page or login page
-            $_SESSION[$name] = ReferUrl(); // Save to Session
+        if ($referUrl != "" && $referPageName != CurrentPageName() && $referPageName != "login") { // Referer not same page or login page
+            $_SESSION[$name] = $referUrl; // Save to Session
         }
-        if (@$_SESSION[$name] != "") {
-            return $_SESSION[$name];
-        } else {
-            return GetUrl("zpricesettingslist");
-        }
+        return $_SESSION[$name] ?? GetUrl("zpricesettingslist");
     }
 
+    // Set return page URL
     public function setReturnUrl($v)
     {
         $_SESSION[PROJECT_NAME . "_" . $this->TableVar . "_" . Config("TABLE_RETURN_URL")] = $v;
@@ -938,6 +958,8 @@ SORTHTML;
         $this->lamata_fee->setDbValue($row['lamata_fee']);
         $this->lasaa_fee->setDbValue($row['lasaa_fee']);
         $this->printers_fee->setDbValue($row['printers_fee']);
+        $this->active->setDbValue(ConvertToBool($row['active']) ? "1" : "0");
+        $this->ts_created->setDbValue($row['ts_created']);
     }
 
     // Render list row values
@@ -978,6 +1000,10 @@ SORTHTML;
 
         // printers_fee
 
+        // active
+
+        // ts_created
+
         // id
         $this->id->ViewValue = $this->id->CurrentValue;
         $this->id->ViewCustomAttributes = "";
@@ -988,7 +1014,7 @@ SORTHTML;
             $this->platform_id->ViewValue = $this->platform_id->lookupCacheOption($curVal);
             if ($this->platform_id->ViewValue === null) { // Lookup from database
                 $filterWrk = "\"id\"" . SearchString("=", $curVal, DATATYPE_NUMBER, "");
-                $sqlWrk = $this->platform_id->Lookup->getSql(false, $filterWrk, '', $this, true);
+                $sqlWrk = $this->platform_id->Lookup->getSql(false, $filterWrk, '', $this, true, true);
                 $rswrk = Conn()->executeQuery($sqlWrk)->fetchAll(\PDO::FETCH_BOTH);
                 $ari = count($rswrk);
                 if ($ari > 0) { // Lookup values found
@@ -1009,7 +1035,7 @@ SORTHTML;
             $this->inventory_id->ViewValue = $this->inventory_id->lookupCacheOption($curVal);
             if ($this->inventory_id->ViewValue === null) { // Lookup from database
                 $filterWrk = "\"id\"" . SearchString("=", $curVal, DATATYPE_NUMBER, "");
-                $sqlWrk = $this->inventory_id->Lookup->getSql(false, $filterWrk, '', $this, true);
+                $sqlWrk = $this->inventory_id->Lookup->getSql(false, $filterWrk, '', $this, true, true);
                 $rswrk = Conn()->executeQuery($sqlWrk)->fetchAll(\PDO::FETCH_BOTH);
                 $ari = count($rswrk);
                 if ($ari > 0) { // Lookup values found
@@ -1030,7 +1056,7 @@ SORTHTML;
             $this->print_stage_id->ViewValue = $this->print_stage_id->lookupCacheOption($curVal);
             if ($this->print_stage_id->ViewValue === null) { // Lookup from database
                 $filterWrk = "\"id\"" . SearchString("=", $curVal, DATATYPE_NUMBER, "");
-                $sqlWrk = $this->print_stage_id->Lookup->getSql(false, $filterWrk, '', $this, true);
+                $sqlWrk = $this->print_stage_id->Lookup->getSql(false, $filterWrk, '', $this, true, true);
                 $rswrk = Conn()->executeQuery($sqlWrk)->fetchAll(\PDO::FETCH_BOTH);
                 $ari = count($rswrk);
                 if ($ari > 0) { // Lookup values found
@@ -1051,7 +1077,7 @@ SORTHTML;
             $this->bus_size_id->ViewValue = $this->bus_size_id->lookupCacheOption($curVal);
             if ($this->bus_size_id->ViewValue === null) { // Lookup from database
                 $filterWrk = "\"id\"" . SearchString("=", $curVal, DATATYPE_NUMBER, "");
-                $sqlWrk = $this->bus_size_id->Lookup->getSql(false, $filterWrk, '', $this, true);
+                $sqlWrk = $this->bus_size_id->Lookup->getSql(false, $filterWrk, '', $this, true, true);
                 $rswrk = Conn()->executeQuery($sqlWrk)->fetchAll(\PDO::FETCH_BOTH);
                 $ari = count($rswrk);
                 if ($ari > 0) { // Lookup values found
@@ -1109,6 +1135,19 @@ SORTHTML;
         $this->printers_fee->ViewValue = $this->printers_fee->CurrentValue;
         $this->printers_fee->ViewValue = FormatNumber($this->printers_fee->ViewValue, 0, -2, -2, -2);
         $this->printers_fee->ViewCustomAttributes = "";
+
+        // active
+        if (ConvertToBool($this->active->CurrentValue)) {
+            $this->active->ViewValue = $this->active->tagCaption(1) != "" ? $this->active->tagCaption(1) : "Yes";
+        } else {
+            $this->active->ViewValue = $this->active->tagCaption(2) != "" ? $this->active->tagCaption(2) : "No";
+        }
+        $this->active->ViewCustomAttributes = "";
+
+        // ts_created
+        $this->ts_created->ViewValue = $this->ts_created->CurrentValue;
+        $this->ts_created->ViewValue = FormatDateTime($this->ts_created->ViewValue, 0);
+        $this->ts_created->ViewCustomAttributes = "";
 
         // id
         $this->id->LinkCustomAttributes = "";
@@ -1179,6 +1218,16 @@ SORTHTML;
         $this->printers_fee->LinkCustomAttributes = "";
         $this->printers_fee->HrefValue = "";
         $this->printers_fee->TooltipValue = "";
+
+        // active
+        $this->active->LinkCustomAttributes = "";
+        $this->active->HrefValue = "";
+        $this->active->TooltipValue = "";
+
+        // ts_created
+        $this->ts_created->LinkCustomAttributes = "";
+        $this->ts_created->HrefValue = "";
+        $this->ts_created->TooltipValue = "";
 
         // Call Row Rendered event
         $this->rowRendered();
@@ -1275,6 +1324,17 @@ SORTHTML;
         $this->printers_fee->EditValue = $this->printers_fee->CurrentValue;
         $this->printers_fee->PlaceHolder = RemoveHtml($this->printers_fee->caption());
 
+        // active
+        $this->active->EditCustomAttributes = "";
+        $this->active->EditValue = $this->active->options(false);
+        $this->active->PlaceHolder = RemoveHtml($this->active->caption());
+
+        // ts_created
+        $this->ts_created->EditAttrs["class"] = "form-control";
+        $this->ts_created->EditCustomAttributes = "";
+        $this->ts_created->EditValue = FormatDateTime($this->ts_created->CurrentValue, 8);
+        $this->ts_created->PlaceHolder = RemoveHtml($this->ts_created->caption());
+
         // Call Row Rendered event
         $this->rowRendered();
     }
@@ -1317,12 +1377,15 @@ SORTHTML;
                     $doc->exportCaption($this->lamata_fee);
                     $doc->exportCaption($this->lasaa_fee);
                     $doc->exportCaption($this->printers_fee);
+                    $doc->exportCaption($this->active);
+                    $doc->exportCaption($this->ts_created);
                 } else {
                     $doc->exportCaption($this->id);
                     $doc->exportCaption($this->platform_id);
                     $doc->exportCaption($this->inventory_id);
                     $doc->exportCaption($this->print_stage_id);
                     $doc->exportCaption($this->bus_size_id);
+                    $doc->exportCaption($this->details);
                     $doc->exportCaption($this->max_limit);
                     $doc->exportCaption($this->min_limit);
                     $doc->exportCaption($this->price);
@@ -1331,6 +1394,8 @@ SORTHTML;
                     $doc->exportCaption($this->lamata_fee);
                     $doc->exportCaption($this->lasaa_fee);
                     $doc->exportCaption($this->printers_fee);
+                    $doc->exportCaption($this->active);
+                    $doc->exportCaption($this->ts_created);
                 }
                 $doc->endExportRow();
             }
@@ -1374,12 +1439,15 @@ SORTHTML;
                         $doc->exportField($this->lamata_fee);
                         $doc->exportField($this->lasaa_fee);
                         $doc->exportField($this->printers_fee);
+                        $doc->exportField($this->active);
+                        $doc->exportField($this->ts_created);
                     } else {
                         $doc->exportField($this->id);
                         $doc->exportField($this->platform_id);
                         $doc->exportField($this->inventory_id);
                         $doc->exportField($this->print_stage_id);
                         $doc->exportField($this->bus_size_id);
+                        $doc->exportField($this->details);
                         $doc->exportField($this->max_limit);
                         $doc->exportField($this->min_limit);
                         $doc->exportField($this->price);
@@ -1388,6 +1456,8 @@ SORTHTML;
                         $doc->exportField($this->lamata_fee);
                         $doc->exportField($this->lasaa_fee);
                         $doc->exportField($this->printers_fee);
+                        $doc->exportField($this->active);
+                        $doc->exportField($this->ts_created);
                     }
                     $doc->endExportRow($rowCnt);
                 }

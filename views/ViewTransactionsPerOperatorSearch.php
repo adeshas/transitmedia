@@ -44,7 +44,8 @@ loadjs.ready("head", function () {
         ["operator_id", [ew.Validators.integer], fields.operator_id.isInvalid],
         ["bus_size_id", [ew.Validators.integer], fields.bus_size_id.isInvalid],
         ["vendor_search_id", [ew.Validators.integer], fields.vendor_search_id.isInvalid],
-        ["vendor_search_name", [], fields.vendor_search_name.isInvalid]
+        ["vendor_search_name", [], fields.vendor_search_name.isInvalid],
+        ["download", [], fields.download.isInvalid]
     ]);
 
     // Set invalid fields
@@ -514,6 +515,22 @@ loadjs.ready("head", function() {
             <span id="el_view_transactions_per_operator_vendor_search_name" class="ew-search-field">
 <input type="<?= $Page->vendor_search_name->getInputTextType() ?>" data-table="view_transactions_per_operator" data-field="x_vendor_search_name" name="x_vendor_search_name" id="x_vendor_search_name" size="30" placeholder="<?= HtmlEncode($Page->vendor_search_name->getPlaceHolder()) ?>" value="<?= $Page->vendor_search_name->EditValue ?>"<?= $Page->vendor_search_name->editAttributes() ?>>
 <div class="invalid-feedback"><?= $Page->vendor_search_name->getErrorMessage(false) ?></div>
+</span>
+        </div></div>
+    </div>
+<?php } ?>
+<?php if ($Page->download->Visible) { // download ?>
+    <div id="r_download" class="form-group row">
+        <label for="x_download" class="<?= $Page->LeftColumnClass ?>"><span id="elh_view_transactions_per_operator_download"><?= $Page->download->caption() ?></span>
+        <span class="ew-search-operator">
+<?= $Language->phrase("LIKE") ?>
+<input type="hidden" name="z_download" id="z_download" value="LIKE">
+</span>
+        </label>
+        <div class="<?= $Page->RightColumnClass ?>"><div <?= $Page->download->cellAttributes() ?>>
+            <span id="el_view_transactions_per_operator_download" class="ew-search-field">
+<input type="<?= $Page->download->getInputTextType() ?>" data-table="view_transactions_per_operator" data-field="x_download" name="x_download" id="x_download" size="35" placeholder="<?= HtmlEncode($Page->download->getPlaceHolder()) ?>" value="<?= $Page->download->EditValue ?>"<?= $Page->download->editAttributes() ?>>
+<div class="invalid-feedback"><?= $Page->download->getErrorMessage(false) ?></div>
 </span>
         </div></div>
     </div>

@@ -53,11 +53,17 @@ $Page->showMessage();
 <?php if ($Page->payment_date->Visible) { // payment_date ?>
         <th class="<?= $Page->payment_date->headerCellClass() ?>"><span id="elh_main_transactions_payment_date" class="main_transactions_payment_date"><?= $Page->payment_date->caption() ?></span></th>
 <?php } ?>
+<?php if ($Page->vendor_id->Visible) { // vendor_id ?>
+        <th class="<?= $Page->vendor_id->headerCellClass() ?>"><span id="elh_main_transactions_vendor_id" class="main_transactions_vendor_id"><?= $Page->vendor_id->caption() ?></span></th>
+<?php } ?>
 <?php if ($Page->price_id->Visible) { // price_id ?>
         <th class="<?= $Page->price_id->headerCellClass() ?>"><span id="elh_main_transactions_price_id" class="main_transactions_price_id"><?= $Page->price_id->caption() ?></span></th>
 <?php } ?>
 <?php if ($Page->quantity->Visible) { // quantity ?>
         <th class="<?= $Page->quantity->headerCellClass() ?>"><span id="elh_main_transactions_quantity" class="main_transactions_quantity"><?= $Page->quantity->caption() ?></span></th>
+<?php } ?>
+<?php if ($Page->assigned_buses->Visible) { // assigned_buses ?>
+        <th class="<?= $Page->assigned_buses->headerCellClass() ?>"><span id="elh_main_transactions_assigned_buses" class="main_transactions_assigned_buses"><?= $Page->assigned_buses->caption() ?></span></th>
 <?php } ?>
 <?php if ($Page->start_date->Visible) { // start_date ?>
         <th class="<?= $Page->start_date->headerCellClass() ?>"><span id="elh_main_transactions_start_date" class="main_transactions_start_date"><?= $Page->start_date->caption() ?></span></th>
@@ -133,6 +139,14 @@ while (!$Page->Recordset->EOF) {
 </span>
 </td>
 <?php } ?>
+<?php if ($Page->vendor_id->Visible) { // vendor_id ?>
+        <td <?= $Page->vendor_id->cellAttributes() ?>>
+<span id="el<?= $Page->RowCount ?>_main_transactions_vendor_id" class="main_transactions_vendor_id">
+<span<?= $Page->vendor_id->viewAttributes() ?>>
+<?= $Page->vendor_id->getViewValue() ?></span>
+</span>
+</td>
+<?php } ?>
 <?php if ($Page->price_id->Visible) { // price_id ?>
         <td <?= $Page->price_id->cellAttributes() ?>>
 <span id="el<?= $Page->RowCount ?>_main_transactions_price_id" class="main_transactions_price_id">
@@ -146,6 +160,14 @@ while (!$Page->Recordset->EOF) {
 <span id="el<?= $Page->RowCount ?>_main_transactions_quantity" class="main_transactions_quantity">
 <span<?= $Page->quantity->viewAttributes() ?>>
 <?= $Page->quantity->getViewValue() ?></span>
+</span>
+</td>
+<?php } ?>
+<?php if ($Page->assigned_buses->Visible) { // assigned_buses ?>
+        <td <?= $Page->assigned_buses->cellAttributes() ?>>
+<span id="el<?= $Page->RowCount ?>_main_transactions_assigned_buses" class="main_transactions_assigned_buses">
+<span<?= $Page->assigned_buses->viewAttributes() ?>>
+<?= $Page->assigned_buses->getViewValue() ?></span>
 </span>
 </td>
 <?php } ?>
@@ -169,7 +191,12 @@ while (!$Page->Recordset->EOF) {
         <td <?= $Page->visible_status_id->cellAttributes() ?>>
 <span id="el<?= $Page->RowCount ?>_main_transactions_visible_status_id" class="main_transactions_visible_status_id">
 <span<?= $Page->visible_status_id->viewAttributes() ?>>
-<?= $Page->visible_status_id->getViewValue() ?></span>
+<?php if (!EmptyString($Page->visible_status_id->getViewValue()) && $Page->visible_status_id->linkAttributes() != "") { ?>
+<a<?= $Page->visible_status_id->linkAttributes() ?>><?= $Page->visible_status_id->getViewValue() ?></a>
+<?php } else { ?>
+<?= $Page->visible_status_id->getViewValue() ?>
+<?php } ?>
+</span>
 </span>
 </td>
 <?php } ?>
@@ -177,7 +204,12 @@ while (!$Page->Recordset->EOF) {
         <td <?= $Page->status_id->cellAttributes() ?>>
 <span id="el<?= $Page->RowCount ?>_main_transactions_status_id" class="main_transactions_status_id">
 <span<?= $Page->status_id->viewAttributes() ?>>
-<?= $Page->status_id->getViewValue() ?></span>
+<?php if (!EmptyString($Page->status_id->getViewValue()) && $Page->status_id->linkAttributes() != "") { ?>
+<a<?= $Page->status_id->linkAttributes() ?>><?= $Page->status_id->getViewValue() ?></a>
+<?php } else { ?>
+<?= $Page->status_id->getViewValue() ?>
+<?php } ?>
+</span>
 </span>
 </td>
 <?php } ?>
@@ -185,7 +217,12 @@ while (!$Page->Recordset->EOF) {
         <td <?= $Page->print_status_id->cellAttributes() ?>>
 <span id="el<?= $Page->RowCount ?>_main_transactions_print_status_id" class="main_transactions_print_status_id">
 <span<?= $Page->print_status_id->viewAttributes() ?>>
-<?= $Page->print_status_id->getViewValue() ?></span>
+<?php if (!EmptyString($Page->print_status_id->getViewValue()) && $Page->print_status_id->linkAttributes() != "") { ?>
+<a<?= $Page->print_status_id->linkAttributes() ?>><?= $Page->print_status_id->getViewValue() ?></a>
+<?php } else { ?>
+<?= $Page->print_status_id->getViewValue() ?>
+<?php } ?>
+</span>
 </span>
 </td>
 <?php } ?>
@@ -193,7 +230,12 @@ while (!$Page->Recordset->EOF) {
         <td <?= $Page->payment_status_id->cellAttributes() ?>>
 <span id="el<?= $Page->RowCount ?>_main_transactions_payment_status_id" class="main_transactions_payment_status_id">
 <span<?= $Page->payment_status_id->viewAttributes() ?>>
-<?= $Page->payment_status_id->getViewValue() ?></span>
+<?php if (!EmptyString($Page->payment_status_id->getViewValue()) && $Page->payment_status_id->linkAttributes() != "") { ?>
+<a<?= $Page->payment_status_id->linkAttributes() ?>><?= $Page->payment_status_id->getViewValue() ?></a>
+<?php } else { ?>
+<?= $Page->payment_status_id->getViewValue() ?>
+<?php } ?>
+</span>
 </span>
 </td>
 <?php } ?>
@@ -217,7 +259,7 @@ $Page->Recordset->close();
 </div>
 <div>
 <button class="btn btn-primary ew-btn" name="btn-action" id="btn-action" type="submit"><?= $Language->phrase("DeleteBtn") ?></button>
-<button class="btn btn-default ew-btn" name="btn-cancel" id="btn-cancel" type="button" data-href="<?= GetUrl($Page->getReturnUrl()) ?>"><?= $Language->phrase("CancelBtn") ?></button>
+<button class="btn btn-default ew-btn" name="btn-cancel" id="btn-cancel" type="button" data-href="<?= HtmlEncode(GetUrl($Page->getReturnUrl())) ?>"><?= $Language->phrase("CancelBtn") ?></button>
 </div>
 </form>
 <?php

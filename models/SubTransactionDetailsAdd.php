@@ -442,6 +442,7 @@ class SubTransactionDetailsAdd extends SubTransactionDetails
         $this->created_by->Visible = false;
         $this->ts_created->Visible = false;
         $this->ts_last_update->Visible = false;
+        $this->vendor_id->Visible = false;
         $this->hideFieldsForAddEdit();
 
         // Do not use lookup cache
@@ -458,6 +459,7 @@ class SubTransactionDetailsAdd extends SubTransactionDetails
         // Set up lookup cache
         $this->setupLookupOptions($this->transaction_id);
         $this->setupLookupOptions($this->bus_id);
+        $this->setupLookupOptions($this->vendor_id);
 
         // Check modal
         if ($this->IsModal) {
@@ -610,6 +612,7 @@ class SubTransactionDetailsAdd extends SubTransactionDetails
         $this->ts_created->OldValue = $this->ts_created->CurrentValue;
         $this->ts_last_update->CurrentValue = null;
         $this->ts_last_update->OldValue = $this->ts_last_update->CurrentValue;
+        $this->vendor_id->CurrentValue = CurrentUserID();
     }
 
     // Load form values
@@ -673,6 +676,15 @@ class SubTransactionDetailsAdd extends SubTransactionDetails
             $res = true;
             $this->loadRowValues($row); // Load row values
         }
+
+        // Check if valid User ID
+        if ($res) {
+            $res = $this->showOptionLink("add");
+            if (!$res) {
+                $userIdMsg = DeniedMessage();
+                $this->setFailureMessage($userIdMsg);
+            }
+        }
         return $res;
     }
 
@@ -708,6 +720,7 @@ class SubTransactionDetailsAdd extends SubTransactionDetails
         $this->created_by->setDbValue($row['created_by']);
         $this->ts_created->setDbValue($row['ts_created']);
         $this->ts_last_update->setDbValue($row['ts_last_update']);
+        $this->vendor_id->setDbValue($row['vendor_id']);
     }
 
     // Return a row with default values
@@ -721,6 +734,7 @@ class SubTransactionDetailsAdd extends SubTransactionDetails
         $row['created_by'] = $this->created_by->CurrentValue;
         $row['ts_created'] = $this->ts_created->CurrentValue;
         $row['ts_last_update'] = $this->ts_last_update->CurrentValue;
+        $row['vendor_id'] = $this->vendor_id->CurrentValue;
         return $row;
     }
 
@@ -763,6 +777,8 @@ class SubTransactionDetailsAdd extends SubTransactionDetails
         // ts_created
 
         // ts_last_update
+
+        // vendor_id
         if ($this->RowType == ROWTYPE_VIEW) {
             // id
             $this->id->ViewValue = $this->id->CurrentValue;
@@ -775,7 +791,7 @@ class SubTransactionDetailsAdd extends SubTransactionDetails
                 $this->transaction_id->ViewValue = $this->transaction_id->lookupCacheOption($curVal);
                 if ($this->transaction_id->ViewValue === null) { // Lookup from database
                     $filterWrk = "\"id\"" . SearchString("=", $curVal, DATATYPE_NUMBER, "");
-                    $sqlWrk = $this->transaction_id->Lookup->getSql(false, $filterWrk, '', $this, true);
+                    $sqlWrk = $this->transaction_id->Lookup->getSql(false, $filterWrk, '', $this, true, true);
                     $rswrk = Conn()->executeQuery($sqlWrk)->fetchAll(\PDO::FETCH_BOTH);
                     $ari = count($rswrk);
                     if ($ari > 0) { // Lookup values found
@@ -799,7 +815,7 @@ class SubTransactionDetailsAdd extends SubTransactionDetails
                     $this->bus_id->ViewValue = $this->bus_id->lookupCacheOption($curVal);
                     if ($this->bus_id->ViewValue === null) { // Lookup from database
                         $filterWrk = "\"bus_id\"" . SearchString("=", $curVal, DATATYPE_NUMBER, "");
-                        $sqlWrk = $this->bus_id->Lookup->getSql(false, $filterWrk, '', $this, true);
+                        $sqlWrk = $this->bus_id->Lookup->getSql(false, $filterWrk, '', $this, true, true);
                         $rswrk = Conn()->executeQuery($sqlWrk)->fetchAll(\PDO::FETCH_BOTH);
                         $ari = count($rswrk);
                         if ($ari > 0) { // Lookup values found
@@ -830,6 +846,28 @@ class SubTransactionDetailsAdd extends SubTransactionDetails
             $this->ts_last_update->ViewValue = FormatDateTime($this->ts_last_update->ViewValue, 0);
             $this->ts_last_update->ViewCustomAttributes = "";
 
+            // vendor_id
+            $this->vendor_id->ViewValue = $this->vendor_id->CurrentValue;
+            $curVal = strval($this->vendor_id->CurrentValue);
+            if ($curVal != "") {
+                $this->vendor_id->ViewValue = $this->vendor_id->lookupCacheOption($curVal);
+                if ($this->vendor_id->ViewValue === null) { // Lookup from database
+                    $filterWrk = "\"id\"" . SearchString("=", $curVal, DATATYPE_NUMBER, "");
+                    $sqlWrk = $this->vendor_id->Lookup->getSql(false, $filterWrk, '', $this, true, true);
+                    $rswrk = Conn()->executeQuery($sqlWrk)->fetchAll(\PDO::FETCH_BOTH);
+                    $ari = count($rswrk);
+                    if ($ari > 0) { // Lookup values found
+                        $arwrk = $this->vendor_id->Lookup->renderViewRow($rswrk[0]);
+                        $this->vendor_id->ViewValue = $this->vendor_id->displayValue($arwrk);
+                    } else {
+                        $this->vendor_id->ViewValue = $this->vendor_id->CurrentValue;
+                    }
+                }
+            } else {
+                $this->vendor_id->ViewValue = null;
+            }
+            $this->vendor_id->ViewCustomAttributes = "";
+
             // transaction_id
             $this->transaction_id->LinkCustomAttributes = "";
             $this->transaction_id->HrefValue = "";
@@ -850,7 +888,7 @@ class SubTransactionDetailsAdd extends SubTransactionDetails
                     $this->transaction_id->ViewValue = $this->transaction_id->lookupCacheOption($curVal);
                     if ($this->transaction_id->ViewValue === null) { // Lookup from database
                         $filterWrk = "\"id\"" . SearchString("=", $curVal, DATATYPE_NUMBER, "");
-                        $sqlWrk = $this->transaction_id->Lookup->getSql(false, $filterWrk, '', $this, true);
+                        $sqlWrk = $this->transaction_id->Lookup->getSql(false, $filterWrk, '', $this, true, true);
                         $rswrk = Conn()->executeQuery($sqlWrk)->fetchAll(\PDO::FETCH_BOTH);
                         $ari = count($rswrk);
                         if ($ari > 0) { // Lookup values found
@@ -879,7 +917,7 @@ class SubTransactionDetailsAdd extends SubTransactionDetails
                     } else {
                         $filterWrk = "\"id\"" . SearchString("=", $this->transaction_id->CurrentValue, DATATYPE_NUMBER, "");
                     }
-                    $sqlWrk = $this->transaction_id->Lookup->getSql(true, $filterWrk, '', $this);
+                    $sqlWrk = $this->transaction_id->Lookup->getSql(true, $filterWrk, '', $this, false, true);
                     $rswrk = Conn()->executeQuery($sqlWrk)->fetchAll(\PDO::FETCH_BOTH);
                     $ari = count($rswrk);
                     $arwrk = $rswrk;
@@ -893,54 +931,27 @@ class SubTransactionDetailsAdd extends SubTransactionDetails
             // bus_id
             $this->bus_id->EditAttrs["class"] = "form-control";
             $this->bus_id->EditCustomAttributes = "";
-            if ($this->bus_id->getSessionValue() != "") {
-                $this->bus_id->CurrentValue = GetForeignKeyValue($this->bus_id->getSessionValue());
-                if ($this->bus_id->VirtualValue != "") {
-                    $this->bus_id->ViewValue = $this->bus_id->VirtualValue;
-                } else {
-                    $curVal = strval($this->bus_id->CurrentValue);
-                    if ($curVal != "") {
-                        $this->bus_id->ViewValue = $this->bus_id->lookupCacheOption($curVal);
-                        if ($this->bus_id->ViewValue === null) { // Lookup from database
-                            $filterWrk = "\"bus_id\"" . SearchString("=", $curVal, DATATYPE_NUMBER, "");
-                            $sqlWrk = $this->bus_id->Lookup->getSql(false, $filterWrk, '', $this, true);
-                            $rswrk = Conn()->executeQuery($sqlWrk)->fetchAll(\PDO::FETCH_BOTH);
-                            $ari = count($rswrk);
-                            if ($ari > 0) { // Lookup values found
-                                $arwrk = $this->bus_id->Lookup->renderViewRow($rswrk[0]);
-                                $this->bus_id->ViewValue = $this->bus_id->displayValue($arwrk);
-                            } else {
-                                $this->bus_id->ViewValue = $this->bus_id->CurrentValue;
-                            }
-                        }
-                    } else {
-                        $this->bus_id->ViewValue = null;
-                    }
-                }
-                $this->bus_id->ViewCustomAttributes = "";
+            $curVal = trim(strval($this->bus_id->CurrentValue));
+            if ($curVal != "") {
+                $this->bus_id->ViewValue = $this->bus_id->lookupCacheOption($curVal);
             } else {
-                $curVal = trim(strval($this->bus_id->CurrentValue));
-                if ($curVal != "") {
-                    $this->bus_id->ViewValue = $this->bus_id->lookupCacheOption($curVal);
-                } else {
-                    $this->bus_id->ViewValue = $this->bus_id->Lookup !== null && is_array($this->bus_id->Lookup->Options) ? $curVal : null;
-                }
-                if ($this->bus_id->ViewValue !== null) { // Load from cache
-                    $this->bus_id->EditValue = array_values($this->bus_id->Lookup->Options);
-                } else { // Lookup from database
-                    if ($curVal == "") {
-                        $filterWrk = "0=1";
-                    } else {
-                        $filterWrk = "\"bus_id\"" . SearchString("=", $this->bus_id->CurrentValue, DATATYPE_NUMBER, "");
-                    }
-                    $sqlWrk = $this->bus_id->Lookup->getSql(true, $filterWrk, '', $this);
-                    $rswrk = Conn()->executeQuery($sqlWrk)->fetchAll(\PDO::FETCH_BOTH);
-                    $ari = count($rswrk);
-                    $arwrk = $rswrk;
-                    $this->bus_id->EditValue = $arwrk;
-                }
-                $this->bus_id->PlaceHolder = RemoveHtml($this->bus_id->caption());
+                $this->bus_id->ViewValue = $this->bus_id->Lookup !== null && is_array($this->bus_id->Lookup->Options) ? $curVal : null;
             }
+            if ($this->bus_id->ViewValue !== null) { // Load from cache
+                $this->bus_id->EditValue = array_values($this->bus_id->Lookup->Options);
+            } else { // Lookup from database
+                if ($curVal == "") {
+                    $filterWrk = "0=1";
+                } else {
+                    $filterWrk = "\"bus_id\"" . SearchString("=", $this->bus_id->CurrentValue, DATATYPE_NUMBER, "");
+                }
+                $sqlWrk = $this->bus_id->Lookup->getSql(true, $filterWrk, '', $this, false, true);
+                $rswrk = Conn()->executeQuery($sqlWrk)->fetchAll(\PDO::FETCH_BOTH);
+                $ari = count($rswrk);
+                $arwrk = $rswrk;
+                $this->bus_id->EditValue = $arwrk;
+            }
+            $this->bus_id->PlaceHolder = RemoveHtml($this->bus_id->caption());
 
             // Add refer script
 
@@ -998,6 +1009,62 @@ class SubTransactionDetailsAdd extends SubTransactionDetails
     protected function addRow($rsold = null)
     {
         global $Language, $Security;
+
+        // Check if valid User ID
+        $validUser = false;
+        if ($Security->currentUserID() != "" && !EmptyValue($this->vendor_id->CurrentValue) && !$Security->isAdmin()) { // Non system admin
+            $validUser = $Security->isValidUserID($this->vendor_id->CurrentValue);
+            if (!$validUser) {
+                $userIdMsg = str_replace("%c", CurrentUserID(), $Language->phrase("UnAuthorizedUserID"));
+                $userIdMsg = str_replace("%u", $this->vendor_id->CurrentValue, $userIdMsg);
+                $this->setFailureMessage($userIdMsg);
+                return false;
+            }
+        }
+
+        // Check if valid key values for master user
+        if ($Security->currentUserID() != "" && !$Security->isAdmin()) { // Non system admin
+            $masterFilter = $this->sqlMasterFilter_main_transactions();
+            if (strval($this->transaction_id->CurrentValue) != "") {
+                $masterFilter = str_replace("@id@", AdjustSql($this->transaction_id->CurrentValue, "DB"), $masterFilter);
+            } else {
+                $masterFilter = "";
+            }
+            if ($masterFilter != "") {
+                $rsmaster = Container("main_transactions")->loadRs($masterFilter)->fetch(\PDO::FETCH_ASSOC);
+                $this->MasterRecordExists = $rsmaster !== false;
+                $validMasterKey = true;
+                if ($this->MasterRecordExists) {
+                    $validMasterKey = $Security->isValidUserID($rsmaster['vendor_id']);
+                } elseif ($this->getCurrentMasterTable() == "main_transactions") {
+                    $validMasterKey = false;
+                }
+                if (!$validMasterKey) {
+                    $masterUserIdMsg = str_replace("%c", CurrentUserID(), $Language->phrase("UnAuthorizedMasterUserID"));
+                    $masterUserIdMsg = str_replace("%f", $masterFilter, $masterUserIdMsg);
+                    $this->setFailureMessage($masterUserIdMsg);
+                    return false;
+                }
+            }
+        }
+
+        // Check referential integrity for master table 'sub_transaction_details'
+        $validMasterRecord = true;
+        $masterFilter = $this->sqlMasterFilter_main_transactions();
+        if (strval($this->transaction_id->CurrentValue) != "") {
+            $masterFilter = str_replace("@id@", AdjustSql($this->transaction_id->CurrentValue, "DB"), $masterFilter);
+        } else {
+            $validMasterRecord = false;
+        }
+        if ($validMasterRecord) {
+            $rsmaster = Container("main_transactions")->loadRs($masterFilter)->fetch();
+            $validMasterRecord = $rsmaster !== false;
+        }
+        if (!$validMasterRecord) {
+            $relatedRecordMsg = str_replace("%t", "main_transactions", $Language->phrase("RelatedRecordRequired"));
+            $this->setFailureMessage($relatedRecordMsg);
+            return false;
+        }
         $conn = $this->getConnection();
 
         // Load db values from rsold
@@ -1011,6 +1078,11 @@ class SubTransactionDetailsAdd extends SubTransactionDetails
 
         // bus_id
         $this->bus_id->setDbValueDef($rsnew, $this->bus_id->CurrentValue, 0, false);
+
+        // vendor_id
+        if (!$Security->isAdmin() && $Security->isLoggedIn()) { // Non system admin
+            $rsnew['vendor_id'] = CurrentUserID();
+        }
 
         // Call Row Inserting event
         $insertRow = $this->rowInserting($rsold, $rsnew);
@@ -1046,6 +1118,16 @@ class SubTransactionDetailsAdd extends SubTransactionDetails
         return $addRow;
     }
 
+    // Show link optionally based on User ID
+    protected function showOptionLink($id = "")
+    {
+        global $Security;
+        if ($Security->isLoggedIn() && !$Security->isAdmin() && !$this->userIDAllow($id)) {
+            return $Security->isValidUserID($this->vendor_id->CurrentValue);
+        }
+        return true;
+    }
+
     // Set up master/detail based on QueryString
     protected function setupMasterParms()
     {
@@ -1057,20 +1139,6 @@ class SubTransactionDetailsAdd extends SubTransactionDetails
                 $validMaster = true;
                 $this->DbMasterFilter = "";
                 $this->DbDetailFilter = "";
-            }
-            if ($masterTblVar == "main_buses") {
-                $validMaster = true;
-                $masterTbl = Container("main_buses");
-                if (($parm = Get("fk_id", Get("bus_id"))) !== null) {
-                    $masterTbl->id->setQueryStringValue($parm);
-                    $this->bus_id->setQueryStringValue($masterTbl->id->QueryStringValue);
-                    $this->bus_id->setSessionValue($this->bus_id->QueryStringValue);
-                    if (!is_numeric($masterTbl->id->QueryStringValue)) {
-                        $validMaster = false;
-                    }
-                } else {
-                    $validMaster = false;
-                }
             }
             if ($masterTblVar == "main_transactions") {
                 $validMaster = true;
@@ -1092,20 +1160,6 @@ class SubTransactionDetailsAdd extends SubTransactionDetails
                     $validMaster = true;
                     $this->DbMasterFilter = "";
                     $this->DbDetailFilter = "";
-            }
-            if ($masterTblVar == "main_buses") {
-                $validMaster = true;
-                $masterTbl = Container("main_buses");
-                if (($parm = Post("fk_id", Post("bus_id"))) !== null) {
-                    $masterTbl->id->setFormValue($parm);
-                    $this->bus_id->setFormValue($masterTbl->id->FormValue);
-                    $this->bus_id->setSessionValue($this->bus_id->FormValue);
-                    if (!is_numeric($masterTbl->id->FormValue)) {
-                        $validMaster = false;
-                    }
-                } else {
-                    $validMaster = false;
-                }
             }
             if ($masterTblVar == "main_transactions") {
                 $validMaster = true;
@@ -1133,11 +1187,6 @@ class SubTransactionDetailsAdd extends SubTransactionDetails
             }
 
             // Clear previous master key from Session
-            if ($masterTblVar != "main_buses") {
-                if ($this->bus_id->CurrentValue == "") {
-                    $this->bus_id->setSessionValue("");
-                }
-            }
             if ($masterTblVar != "main_transactions") {
                 if ($this->transaction_id->CurrentValue == "") {
                     $this->transaction_id->setSessionValue("");
@@ -1175,6 +1224,8 @@ class SubTransactionDetailsAdd extends SubTransactionDetails
                 case "x_transaction_id":
                     break;
                 case "x_bus_id":
+                    break;
+                case "x_vendor_id":
                     break;
                 default:
                     $lookupFilter = "";

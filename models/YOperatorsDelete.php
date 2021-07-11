@@ -581,7 +581,7 @@ class YOperatorsDelete extends YOperators
                 $this->platform_id->ViewValue = $this->platform_id->lookupCacheOption($curVal);
                 if ($this->platform_id->ViewValue === null) { // Lookup from database
                     $filterWrk = "\"id\"" . SearchString("=", $curVal, DATATYPE_NUMBER, "");
-                    $sqlWrk = $this->platform_id->Lookup->getSql(false, $filterWrk, '', $this, true);
+                    $sqlWrk = $this->platform_id->Lookup->getSql(false, $filterWrk, '', $this, true, true);
                     $rswrk = Conn()->executeQuery($sqlWrk)->fetchAll(\PDO::FETCH_BOTH);
                     $ari = count($rswrk);
                     if ($ari > 0) { // Lookup values found
@@ -656,6 +656,14 @@ class YOperatorsDelete extends YOperators
         if (count($rows) == 0) {
             $this->setFailureMessage($Language->phrase("NoRecord")); // No record found
             return false;
+        }
+        foreach ($rows as $row) {
+            $rsdetail = Container("main_transactions")->loadRs("\"operator_id\" = " . QuotedValue($row['id'], DATATYPE_NUMBER, 'DB'))->fetch();
+            if ($rsdetail !== false) {
+                $relatedRecordMsg = str_replace("%t", "main_transactions", $Language->phrase("RelatedRecordExists"));
+                $this->setFailureMessage($relatedRecordMsg);
+                return false;
+            }
         }
         $conn->beginTransaction();
 

@@ -70,10 +70,10 @@ class MainCampaigns extends DbTable
         $this->ExportExcelPageSize = ""; // Page size (PhpSpreadsheet only)
         $this->ExportWordPageOrientation = "portrait"; // Page orientation (PHPWord only)
         $this->ExportWordColumnWidth = null; // Cell width (PHPWord only)
-        $this->DetailAdd = true; // Allow detail add
-        $this->DetailEdit = true; // Allow detail edit
-        $this->DetailView = true; // Allow detail view
-        $this->ShowMultipleDetails = true; // Show multiple details
+        $this->DetailAdd = false; // Allow detail add
+        $this->DetailEdit = false; // Allow detail edit
+        $this->DetailView = false; // Allow detail view
+        $this->ShowMultipleDetails = false; // Show multiple details
         $this->GridAddRowCount = 5;
         $this->AllowAddDeleteRow = true; // Allow add/delete row
         $this->BasicSearch = new BasicSearch($this->TableVar);
@@ -112,7 +112,7 @@ class MainCampaigns extends DbTable
         $this->platform_id->Sortable = true; // Allow sort
         $this->platform_id->UsePleaseSelect = true; // Use PleaseSelect by default
         $this->platform_id->PleaseSelectText = $Language->phrase("PleaseSelect"); // "PleaseSelect" text
-        $this->platform_id->Lookup = new Lookup('platform_id', 'view_pricing_initial', true, 'platform_id', ["platform","","",""], ["x_inventory_id"], ["x_bus_size_id","x_price_id"], ["inventory_id"], ["x_inventory_id"], [], [], '', '');
+        $this->platform_id->Lookup = new Lookup('platform_id', 'view_pricing_initial', true, 'platform_id', ["platform","","",""], ["x_inventory_id"], ["x_bus_size_id","x_price_id"], ["inventory_id"], ["x_inventory_id"], [], [], '"platform" ASC', '');
         $this->platform_id->DefaultErrorMessage = $Language->phrase("IncorrectInteger");
         $this->Fields['platform_id'] = &$this->platform_id;
 
@@ -251,7 +251,7 @@ class MainCampaigns extends DbTable
     // Current master table name
     public function getCurrentMasterTable()
     {
-        return @$_SESSION[PROJECT_NAME . "_" . $this->TableVar . "_" . Config("TABLE_MASTER_TABLE")];
+        return Session(PROJECT_NAME . "_" . $this->TableVar . "_" . Config("TABLE_MASTER_TABLE"));
     }
 
     public function setCurrentMasterTable($v)
@@ -353,7 +353,7 @@ class MainCampaigns extends DbTable
     // Current detail table name
     public function getCurrentDetailTable()
     {
-        return @$_SESSION[PROJECT_NAME . "_" . $this->TableVar . "_" . Config("TABLE_DETAIL_TABLE")];
+        return Session(PROJECT_NAME . "_" . $this->TableVar . "_" . Config("TABLE_DETAIL_TABLE"));
     }
 
     public function setCurrentDetailTable($v)
@@ -368,11 +368,6 @@ class MainCampaigns extends DbTable
         $detailUrl = "";
         if ($this->getCurrentDetailTable() == "sub_media_allocation") {
             $detailUrl = Container("sub_media_allocation")->getListUrl() . "?" . Config("TABLE_SHOW_MASTER") . "=" . $this->TableVar;
-            $detailUrl .= "&" . GetForeignKeyUrl("fk_id", $this->id->CurrentValue);
-        }
-        if ($this->getCurrentDetailTable() == "main_buses") {
-            $detailUrl = Container("main_buses")->getListUrl() . "?" . Config("TABLE_SHOW_MASTER") . "=" . $this->TableVar;
-            $detailUrl .= "&" . GetForeignKeyUrl("fk_id", $this->id->CurrentValue);
             $detailUrl .= "&" . GetForeignKeyUrl("fk_id", $this->id->CurrentValue);
         }
         if ($this->getCurrentDetailTable() == "main_transactions") {
@@ -675,7 +670,7 @@ class MainCampaigns extends DbTable
         $success = $this->insertSql($rs)->execute();
         if ($success) {
             // Get insert id if necessary
-            $this->id->setDbValue($conn->fetchColumn("SELECT currval('new_campaign_id_seq'::regclass)"));
+            $this->id->setDbValue($conn->fetchColumn("SELECT currval('public.main_campaigns_id_seq'::regclass)"));
             $rs['id'] = $this->id->DbValue;
         }
         return $success;
@@ -714,37 +709,6 @@ class MainCampaigns extends DbTable
     // Update
     public function update(&$rs, $where = "", $rsold = null, $curfilter = true)
     {
-        // Cascade Update detail table 'main_buses'
-        $cascadeUpdate = false;
-        $rscascade = [];
-        if ($rsold && (isset($rs['id']) && $rsold['id'] != $rs['id'])) { // Update detail field 'exterior_campaign_id'
-            $cascadeUpdate = true;
-            $rscascade['exterior_campaign_id'] = $rs['id'];
-        }
-        if ($rsold && (isset($rs['id']) && $rsold['id'] != $rs['id'])) { // Update detail field 'interior_campaign_id'
-            $cascadeUpdate = true;
-            $rscascade['interior_campaign_id'] = $rs['id'];
-        }
-        if ($cascadeUpdate) {
-            $rswrk = Container("main_buses")->loadRs("\"exterior_campaign_id\" = " . QuotedValue($rsold['id'], DATATYPE_NUMBER, 'DB') . " AND " . "\"interior_campaign_id\" = " . QuotedValue($rsold['id'], DATATYPE_NUMBER, 'DB'))->fetchAll(\PDO::FETCH_ASSOC);
-            foreach ($rswrk as $rsdtlold) {
-                $rskey = [];
-                $fldname = 'id';
-                $rskey[$fldname] = $rsdtlold[$fldname];
-                $rsdtlnew = array_merge($rsdtlold, $rscascade);
-                // Call Row_Updating event
-                $success = Container("main_buses")->rowUpdating($rsdtlold, $rsdtlnew);
-                if ($success) {
-                    $success = Container("main_buses")->update($rscascade, $rskey, $rsdtlold);
-                }
-                if (!$success) {
-                    return false;
-                }
-                // Call Row_Updated event
-                Container("main_buses")->rowUpdated($rsdtlold, $rsdtlnew);
-            }
-        }
-
         // If no field is updated, execute may return 0. Treat as success
         $success = $this->updateSql($rs, $where, $curfilter)->execute();
         $success = ($success > 0) ? $success : true;
@@ -871,18 +835,17 @@ class MainCampaigns extends DbTable
     // Return page URL
     public function getReturnUrl()
     {
+        $referUrl = ReferUrl();
+        $referPageName = ReferPageName();
         $name = PROJECT_NAME . "_" . $this->TableVar . "_" . Config("TABLE_RETURN_URL");
         // Get referer URL automatically
-        if (ReferUrl() != "" && ReferPageName() != CurrentPageName() && ReferPageName() != "login") { // Referer not same page or login page
-            $_SESSION[$name] = ReferUrl(); // Save to Session
+        if ($referUrl != "" && $referPageName != CurrentPageName() && $referPageName != "login") { // Referer not same page or login page
+            $_SESSION[$name] = $referUrl; // Save to Session
         }
-        if (@$_SESSION[$name] != "") {
-            return $_SESSION[$name];
-        } else {
-            return GetUrl("maincampaignslist");
-        }
+        return $_SESSION[$name] ?? GetUrl("maincampaignslist");
     }
 
+    // Set return page URL
     public function setReturnUrl($v)
     {
         $_SESSION[PROJECT_NAME . "_" . $this->TableVar . "_" . Config("TABLE_RETURN_URL")] = $v;
@@ -1178,6 +1141,7 @@ SORTHTML;
         // id
 
         // name
+        $this->name->CellCssStyle = "white-space: nowrap;";
 
         // inventory_id
 
@@ -1211,13 +1175,6 @@ SORTHTML;
 
         // name
         $this->name->ViewValue = $this->name->CurrentValue;
-        $arwrk = [];
-        $arwrk["df"] = $this->name->CurrentValue;
-        $arwrk = $this->name->Lookup->renderViewRow($arwrk, $this);
-        $dispVal = $this->name->displayValue($arwrk);
-        if ($dispVal != "") {
-            $this->name->ViewValue = $dispVal;
-        }
         $this->name->CssClass = "font-weight-bold";
         $this->name->ViewCustomAttributes = "";
 
@@ -1227,7 +1184,7 @@ SORTHTML;
             $this->inventory_id->ViewValue = $this->inventory_id->lookupCacheOption($curVal);
             if ($this->inventory_id->ViewValue === null) { // Lookup from database
                 $filterWrk = "\"inventory_id\"" . SearchString("=", $curVal, DATATYPE_NUMBER, "");
-                $sqlWrk = $this->inventory_id->Lookup->getSql(false, $filterWrk, '', $this, true);
+                $sqlWrk = $this->inventory_id->Lookup->getSql(false, $filterWrk, '', $this, true, true);
                 $rswrk = Conn()->executeQuery($sqlWrk)->fetchAll(\PDO::FETCH_BOTH);
                 $ari = count($rswrk);
                 if ($ari > 0) { // Lookup values found
@@ -1248,7 +1205,7 @@ SORTHTML;
             $this->platform_id->ViewValue = $this->platform_id->lookupCacheOption($curVal);
             if ($this->platform_id->ViewValue === null) { // Lookup from database
                 $filterWrk = "\"platform_id\"" . SearchString("=", $curVal, DATATYPE_NUMBER, "");
-                $sqlWrk = $this->platform_id->Lookup->getSql(false, $filterWrk, '', $this, true);
+                $sqlWrk = $this->platform_id->Lookup->getSql(false, $filterWrk, '', $this, true, true);
                 $rswrk = Conn()->executeQuery($sqlWrk)->fetchAll(\PDO::FETCH_BOTH);
                 $ari = count($rswrk);
                 if ($ari > 0) { // Lookup values found
@@ -1269,7 +1226,7 @@ SORTHTML;
             $this->bus_size_id->ViewValue = $this->bus_size_id->lookupCacheOption($curVal);
             if ($this->bus_size_id->ViewValue === null) { // Lookup from database
                 $filterWrk = "\"bus_size_id\"" . SearchString("=", $curVal, DATATYPE_NUMBER, "");
-                $sqlWrk = $this->bus_size_id->Lookup->getSql(false, $filterWrk, '', $this, true);
+                $sqlWrk = $this->bus_size_id->Lookup->getSql(false, $filterWrk, '', $this, true, true);
                 $rswrk = Conn()->executeQuery($sqlWrk)->fetchAll(\PDO::FETCH_BOTH);
                 $ari = count($rswrk);
                 if ($ari > 0) { // Lookup values found
@@ -1290,7 +1247,11 @@ SORTHTML;
             $this->price_id->ViewValue = $this->price_id->lookupCacheOption($curVal);
             if ($this->price_id->ViewValue === null) { // Lookup from database
                 $filterWrk = "\"id\"" . SearchString("=", $curVal, DATATYPE_NUMBER, "");
-                $sqlWrk = $this->price_id->Lookup->getSql(false, $filterWrk, '', $this, true);
+                $lookupFilter = function() {
+                    return "\"active\" = true";
+                };
+                $lookupFilter = $lookupFilter->bindTo($this);
+                $sqlWrk = $this->price_id->Lookup->getSql(false, $filterWrk, $lookupFilter, $this, true, true);
                 $rswrk = Conn()->executeQuery($sqlWrk)->fetchAll(\PDO::FETCH_BOTH);
                 $ari = count($rswrk);
                 if ($ari > 0) { // Lookup values found
@@ -1331,11 +1292,7 @@ SORTHTML;
             $this->vendor_id->ViewValue = $this->vendor_id->lookupCacheOption($curVal);
             if ($this->vendor_id->ViewValue === null) { // Lookup from database
                 $filterWrk = "\"id\"" . SearchString("=", $curVal, DATATYPE_NUMBER, "");
-                $lookupFilter = function() {
-                    return ((!IsAdmin())? " id = ".Profile()->vendor_id:"");
-                };
-                $lookupFilter = $lookupFilter->bindTo($this);
-                $sqlWrk = $this->vendor_id->Lookup->getSql(false, $filterWrk, $lookupFilter, $this, true);
+                $sqlWrk = $this->vendor_id->Lookup->getSql(false, $filterWrk, '', $this, true, true);
                 $rswrk = Conn()->executeQuery($sqlWrk)->fetchAll(\PDO::FETCH_BOTH);
                 $ari = count($rswrk);
                 if ($ari > 0) { // Lookup values found
@@ -1366,7 +1323,7 @@ SORTHTML;
             $this->renewal_stage_id->ViewValue = $this->renewal_stage_id->lookupCacheOption($curVal);
             if ($this->renewal_stage_id->ViewValue === null) { // Lookup from database
                 $filterWrk = "\"id\"" . SearchString("=", $curVal, DATATYPE_NUMBER, "");
-                $sqlWrk = $this->renewal_stage_id->Lookup->getSql(false, $filterWrk, '', $this, true);
+                $sqlWrk = $this->renewal_stage_id->Lookup->getSql(false, $filterWrk, '', $this, true, true);
                 $rswrk = Conn()->executeQuery($sqlWrk)->fetchAll(\PDO::FETCH_BOTH);
                 $ari = count($rswrk);
                 if ($ari > 0) { // Lookup values found
@@ -1522,7 +1479,7 @@ SORTHTML;
                 $this->platform_id->ViewValue = $this->platform_id->lookupCacheOption($curVal);
                 if ($this->platform_id->ViewValue === null) { // Lookup from database
                     $filterWrk = "\"platform_id\"" . SearchString("=", $curVal, DATATYPE_NUMBER, "");
-                    $sqlWrk = $this->platform_id->Lookup->getSql(false, $filterWrk, '', $this, true);
+                    $sqlWrk = $this->platform_id->Lookup->getSql(false, $filterWrk, '', $this, true, true);
                     $rswrk = Conn()->executeQuery($sqlWrk)->fetchAll(\PDO::FETCH_BOTH);
                     $ari = count($rswrk);
                     if ($ari > 0) { // Lookup values found
@@ -1588,11 +1545,7 @@ SORTHTML;
                 $this->vendor_id->ViewValue = $this->vendor_id->lookupCacheOption($curVal);
                 if ($this->vendor_id->ViewValue === null) { // Lookup from database
                     $filterWrk = "\"id\"" . SearchString("=", $curVal, DATATYPE_NUMBER, "");
-                    $lookupFilter = function() {
-                        return ((!IsAdmin())? " id = ".Profile()->vendor_id:"");
-                    };
-                    $lookupFilter = $lookupFilter->bindTo($this);
-                    $sqlWrk = $this->vendor_id->Lookup->getSql(false, $filterWrk, $lookupFilter, $this, true);
+                    $sqlWrk = $this->vendor_id->Lookup->getSql(false, $filterWrk, '', $this, true, true);
                     $rswrk = Conn()->executeQuery($sqlWrk)->fetchAll(\PDO::FETCH_BOTH);
                     $ari = count($rswrk);
                     if ($ari > 0) { // Lookup values found
@@ -1814,7 +1767,7 @@ SORTHTML;
         }
 
         // Call User ID Filtering event
-        $this->userIDFiltering($filterWrk);
+        $this->userIdFiltering($filterWrk);
         AddFilter($filter, $filterWrk);
         return $filter;
     }
@@ -1942,12 +1895,12 @@ SORTHTML;
     	//echo "Row Inserted";
         $test = false;
         // GET SPECIAL FUNCTIONS
-        require_once 'views\PrivateFunctions.php';
+        require_once 'views/PrivateFunctions.php';
 
         // CHECK IF LINUX (PROD) OR WINDOWS (DEV) SERVER
-    	if (strpos($_SERVER['SERVER_NAME'], 'localhost') === false) {
-    		require_once 'emailrun.php';
-        }
+    	//if (strpos($_SERVER['SERVER_NAME'], 'localhost') === false) {
+    	//	require_once 'emailrun.php';
+        //}
 
         // LOG FILE
     	$file = 'emailpeople.txt';
@@ -2110,71 +2063,9 @@ SORTHTML;
     }
 
     // Row Updated event
-    public function rowUpdated($rsold, &$rsnew) {
-    /*
-    	//echo "Row Updated";
-    	require_once 'emailrun.php';
-    	$username = "Transit Media Vendor";
-    	$email = "";
-    	$msg = "";
-    	$msgtxt = "";
-    	$subject = "";
-    	$camp_id = $rsold["id"];
-    	$sql = "select name, quantity, start_date, end_date, (end_date::timestamp - start_date::timestamp) as duration, 
-    to_char(
-    (quantity * (select substring(value from '[0-9]+') from core_settings where name = 'exterior_campaign_price')::int ) 
-    , 'N999,999,999,990'::text) as amount,
-    (select value from core_settings where name = 'ext_account_details' ) as account_details,
-    (select name from vendors v where v.id = vendor_id) as vendor
-    from exterior_campaigns where id = {$camp_id};
-    ";
-    	$camp_details = ExecuteRow($sql);
-    	$rows = ExecuteRows("select email from users where vendor_id = (select vendor_id from exterior_campaigns where id = " . $camp_id . ");");
-    	foreach ($rows as $val) {
-    		$email = $val['email'];
-    		$vendor = $camp_details['vendor'];
-    		$username = $vendor;
-    		if ($rsold["status_id"] != 2 && $rsnew["status_id"] == 2) {
-    //Campaign Approved
-    			$msg = "Hello {$vendor},<br/><br/>Your Campaign Request has been <b>approved</b>.<br/><br/>";
-    			$msg .= "Your request for " . $camp_details['quantity'] . " Buses (Exterior Campaign / Bus Wraps) [" . $camp_details['name'] . "] has been approved for " . $camp_details['duration'] . ". <br/><br/>Kindly make payment of " . $camp_details['amount'] . " to [" . $camp_details['account_details'] . "].
-    <br/><br/>Please send payment notification once payment has been made to info@transitmedia.com.ng";
-    			$msgtxt = "Hello {$vendor},\n\nYour Campaign Request has been approved.";
-    			$msgtxt .= "Your request for " . $camp_details['quantity'] . " Buses (Exterior Campaign / Bus Wraps) [" . $camp_details['name'] . "] has been approved for " . $camp_details['duration'] . ". \n\nKindly make payment of " . $camp_details['amount'] . " to [" . $camp_details['account_details'] . "].
-    \n\nPlease send payment notification once payment has been made to info@transitmedia.com.ng";
-    			$subject = "APPROVED CAMPAIGN REQUEST ({$vendor}) - TRANSIT MEDIA ADMIN";
-    			sendTMmail('admin@transitmedia.com.ng', $email, $subject, $msg, $msgtxt);
-    		}
-    		if ($rsold["status_id"] != 3 && $rsnew["status_id"] == 3) {
-    //Campaign Denied
-    			$msg = "Hello {$vendor},<br/>Unfortunately, Your Campaign Request has been <b>Denied</b>.";
-    			$msgtxt = "Hello {$vendor},\nUnfortunately, Your Campaign Request has been Denied.";
-    			$subject = "DENIED CAMPAIGN REQUEST ({$vendor}) - TRANSIT MEDIA ADMIN";
-    			sendTMmail('admin@transitmedia.com.ng', $email, $subject, $msg, $msgtxt);
-    		}
-    		if ($rsold["print_status_id"] != 2 && $rsnew["print_status_id"] == 2) {
-    //Print Approved
-    			$msg = "Hello {$vendor},<br/>Your Print Request has been <b>Approved</b>.";
-    			$msgtxt = "Hello {$vendor},\nYour Print Request has been Approved.";
-    			$subject = "PRINT APPROVAL ({$vendor}) - TRANSIT MEDIA ADMIN";
-    			sendTMmail('admin@transitmedia.com.ng', $email, $subject, $msg, $msgtxt);
-    		}
-    		if ($rsold["print_status_id"] != 3 && $rsnew["print_status_id"] == 3) {
-    //Print Denied
-    			$msg = "Hello {$vendor},<br/>Unfortunately, Your Print Request has been <b>Denied</b>.";
-    			$msgtxt = "Hello {$vendor},\nUnfortunately, Your Print Request has been Denied.";
-    			$subject = "PRINT REFUSAL ({$vendor}) - TRANSIT MEDIA ADMIN";
-    			sendTMmail('admin@transitmedia.com.ng', $email, $subject, $msg, $msgtxt);
-    		}
-    		if ($rsold["payment_status_id"] != 2 && $rsnew["payment_status_id"] == 2) {
-    //Payment Approved
-    			$msg = "Hello {$vendor},<br/> Payment for your Campaign has been <b>Confirmed</b>. <br /><br />Your campaign is scheduled to start within 48hrs of your payment confirmation and print approval. <br /><br /><b>Note: Proof of posting would be sent to you once the buses have been branded</b>.";
-    			$msgtxt = "Hello {$vendor},\nPayment for your Campaign has been Confirmed. \n\nYour campaign is scheduled to start within 48hrs of your payment confirmation and print approval. \n\n<b>Note: Proof of posting would be sent to you once the buses have been branded</b>.";
-    			$subject = "PAYMENT CONFIRMATION ({$vendor}) - TRANSIT MEDIA ADMIN";
-    			sendTMmail('admin@transitmedia.com.ng', $email, $subject, $msg, $msgtxt);
-    		}
-    	}
-    	*/
+    public function rowUpdated($rsold, &$rsnew)
+    {
+        //Log("Row Updated");
     }
 
     // Row Update Conflict event

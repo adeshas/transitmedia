@@ -32,8 +32,10 @@ class MainTransactions extends DbTable
     public $campaign_id;
     public $operator_id;
     public $payment_date;
+    public $vendor_id;
     public $price_id;
     public $quantity;
+    public $assigned_buses;
     public $start_date;
     public $end_date;
     public $visible_status_id;
@@ -71,13 +73,12 @@ class MainTransactions extends DbTable
         $this->ExportExcelPageSize = ""; // Page size (PhpSpreadsheet only)
         $this->ExportWordPageOrientation = "portrait"; // Page orientation (PHPWord only)
         $this->ExportWordColumnWidth = null; // Cell width (PHPWord only)
-        $this->DetailAdd = true; // Allow detail add
-        $this->DetailEdit = true; // Allow detail edit
-        $this->DetailView = true; // Allow detail view
+        $this->DetailAdd = false; // Allow detail add
+        $this->DetailEdit = false; // Allow detail edit
+        $this->DetailView = false; // Allow detail view
         $this->ShowMultipleDetails = false; // Show multiple details
         $this->GridAddRowCount = 5;
         $this->AllowAddDeleteRow = true; // Allow add/delete row
-        $this->UserIDAllowSecurity = Config("DEFAULT_USER_ID_ALLOW_SECURITY"); // Default User ID allowed permissions
         $this->BasicSearch = new BasicSearch($this->TableVar);
 
         // id
@@ -98,7 +99,7 @@ class MainTransactions extends DbTable
         $this->campaign_id->Sortable = true; // Allow sort
         $this->campaign_id->UsePleaseSelect = true; // Use PleaseSelect by default
         $this->campaign_id->PleaseSelectText = $Language->phrase("PleaseSelect"); // "PleaseSelect" text
-        $this->campaign_id->Lookup = new Lookup('campaign_id', 'main_campaigns', false, 'id', ["name","quantity","bus_size_id","end_date"], [], ["x_operator_id","x_price_id"], [], [], [], [], '"id" DESC', '');
+        $this->campaign_id->Lookup = new Lookup('campaign_id', 'main_campaigns', false, 'id', ["name","quantity","bus_size_id","start_date"], [], ["x_operator_id","x_price_id"], [], [], [], [], '"id" DESC', '');
         $this->campaign_id->DefaultErrorMessage = $Language->phrase("IncorrectInteger");
         $this->Fields['campaign_id'] = &$this->campaign_id;
 
@@ -120,6 +121,14 @@ class MainTransactions extends DbTable
         $this->payment_date->DefaultErrorMessage = str_replace("%s", $GLOBALS["DATE_SEPARATOR"], $Language->phrase("IncorrectDateYMD"));
         $this->Fields['payment_date'] = &$this->payment_date;
 
+        // vendor_id
+        $this->vendor_id = new DbField('main_transactions', 'main_transactions', 'x_vendor_id', 'vendor_id', '(select main_campaigns.vendor_id from main_campaigns where main_transactions.campaign_id = main_campaigns.id)', 'CAST((select main_campaigns.vendor_id from main_campaigns where main_transactions.campaign_id = main_campaigns.id) AS varchar(255))', 3, 4, -1, false, '(select main_campaigns.vendor_id from main_campaigns where main_transactions.campaign_id = main_campaigns.id)', false, false, false, 'FORMATTED TEXT', 'TEXT');
+        $this->vendor_id->IsCustom = true; // Custom field
+        $this->vendor_id->Sortable = true; // Allow sort
+        $this->vendor_id->Lookup = new Lookup('vendor_id', 'y_vendors', false, 'id', ["name","","",""], [], [], [], [], [], [], '', '');
+        $this->vendor_id->DefaultErrorMessage = $Language->phrase("IncorrectInteger");
+        $this->Fields['vendor_id'] = &$this->vendor_id;
+
         // price_id
         $this->price_id = new DbField('main_transactions', 'main_transactions', 'x_price_id', 'price_id', '"price_id"', 'CAST("price_id" AS varchar(255))', 3, 4, -1, false, '"EV__price_id"', true, true, true, 'FORMATTED TEXT', 'SELECT');
         $this->price_id->Required = true; // Required field
@@ -137,6 +146,13 @@ class MainTransactions extends DbTable
         $this->quantity->Sortable = true; // Allow sort
         $this->quantity->DefaultErrorMessage = $Language->phrase("IncorrectInteger");
         $this->Fields['quantity'] = &$this->quantity;
+
+        // assigned_buses
+        $this->assigned_buses = new DbField('main_transactions', 'main_transactions', 'x_assigned_buses', 'assigned_buses', '(select count(*) from sub_transaction_details where sub_transaction_details.transaction_id = main_transactions.id)', 'CAST((select count(*) from sub_transaction_details where sub_transaction_details.transaction_id = main_transactions.id) AS varchar(255))', 20, 8, -1, false, '(select count(*) from sub_transaction_details where sub_transaction_details.transaction_id = main_transactions.id)', false, false, false, 'FORMATTED TEXT', 'TEXT');
+        $this->assigned_buses->IsCustom = true; // Custom field
+        $this->assigned_buses->Sortable = true; // Allow sort
+        $this->assigned_buses->DefaultErrorMessage = $Language->phrase("IncorrectInteger");
+        $this->Fields['assigned_buses'] = &$this->assigned_buses;
 
         // start_date
         $this->start_date = new DbField('main_transactions', 'main_transactions', 'x_start_date', 'start_date', '"start_date"', CastDateFieldForLike("\"start_date\"", 5, "DB"), 133, 4, 5, false, '"start_date"', false, false, false, 'FORMATTED TEXT', 'TEXT');
@@ -268,7 +284,7 @@ class MainTransactions extends DbTable
     // Session ORDER BY for List page
     public function getSessionOrderByList()
     {
-        return @$_SESSION[PROJECT_NAME . "_" . $this->TableVar . "_" . Config("TABLE_ORDER_BY_LIST")];
+        return Session(PROJECT_NAME . "_" . $this->TableVar . "_" . Config("TABLE_ORDER_BY_LIST"));
     }
 
     public function setSessionOrderByList($v)
@@ -279,7 +295,7 @@ class MainTransactions extends DbTable
     // Current master table name
     public function getCurrentMasterTable()
     {
-        return @$_SESSION[PROJECT_NAME . "_" . $this->TableVar . "_" . Config("TABLE_MASTER_TABLE")];
+        return Session(PROJECT_NAME . "_" . $this->TableVar . "_" . Config("TABLE_MASTER_TABLE"));
     }
 
     public function setCurrentMasterTable($v)
@@ -356,7 +372,7 @@ class MainTransactions extends DbTable
     // Current detail table name
     public function getCurrentDetailTable()
     {
-        return @$_SESSION[PROJECT_NAME . "_" . $this->TableVar . "_" . Config("TABLE_DETAIL_TABLE")];
+        return Session(PROJECT_NAME . "_" . $this->TableVar . "_" . Config("TABLE_DETAIL_TABLE"));
     }
 
     public function setCurrentDetailTable($v)
@@ -397,7 +413,7 @@ class MainTransactions extends DbTable
 
     public function getSqlSelect() // Select
     {
-        return $this->SqlSelect ?? $this->getQueryBuilder()->select("*, status_id AS \"visible_status_id\", quantity * (select v.price from view_pricing_all v where v.id = price_id) AS \"total\"");
+        return $this->SqlSelect ?? $this->getQueryBuilder()->select("*, (select main_campaigns.vendor_id from main_campaigns where main_transactions.campaign_id = main_campaigns.id) AS \"vendor_id\", (select count(*) from sub_transaction_details where sub_transaction_details.transaction_id = main_transactions.id) AS \"assigned_buses\", status_id AS \"visible_status_id\", quantity * (select v.price from view_pricing_all v where v.id = price_id) AS \"total\"");
     }
 
     public function sqlSelect() // For backward compatibility
@@ -415,7 +431,7 @@ class MainTransactions extends DbTable
         if ($this->SqlSelectList) {
             return $this->SqlSelectList;
         }
-        $from = "(SELECT *, status_id AS \"visible_status_id\", quantity * (select v.price from view_pricing_all v where v.id = price_id) AS \"total\", (SELECT \"name\" || '" . ValueSeparator(1, $this->campaign_id) . "' || \"quantity\" || '" . ValueSeparator(2, $this->campaign_id) . "' || \"bus_size_id\" || '" . ValueSeparator(3, $this->campaign_id) . "' || \"end_date\" FROM \"main_campaigns\" \"TMP_LOOKUPTABLE\" WHERE \"TMP_LOOKUPTABLE\".\"id\" = \"main_transactions\".\"campaign_id\" LIMIT 1) AS \"EV__campaign_id\", (SELECT \"price_details\" || '" . ValueSeparator(1, $this->price_id) . "' || \"platform_inventory\" FROM \"view_pricing_options\" \"TMP_LOOKUPTABLE\" WHERE \"TMP_LOOKUPTABLE\".\"price_id\" = \"main_transactions\".\"price_id\" LIMIT 1) AS \"EV__price_id\", (SELECT \"admin_name\" FROM \"x_transaction_status\" \"TMP_LOOKUPTABLE\" WHERE \"TMP_LOOKUPTABLE\".\"id\" = \"main_transactions\".\"status_id\" LIMIT 1) AS \"EV__status_id\", (SELECT \"name\" FROM \"x_print_status\" \"TMP_LOOKUPTABLE\" WHERE \"TMP_LOOKUPTABLE\".\"id\" = \"main_transactions\".\"print_status_id\" LIMIT 1) AS \"EV__print_status_id\", (SELECT \"name\" FROM \"x_payment_status\" \"TMP_LOOKUPTABLE\" WHERE \"TMP_LOOKUPTABLE\".\"id\" = \"main_transactions\".\"payment_status_id\" LIMIT 1) AS \"EV__payment_status_id\" FROM \"main_transactions\")";
+        $from = "(SELECT *, (select main_campaigns.vendor_id from main_campaigns where main_transactions.campaign_id = main_campaigns.id) AS \"vendor_id\", (select count(*) from sub_transaction_details where sub_transaction_details.transaction_id = main_transactions.id) AS \"assigned_buses\", status_id AS \"visible_status_id\", quantity * (select v.price from view_pricing_all v where v.id = price_id) AS \"total\", (SELECT \"name\" || '" . ValueSeparator(1, $this->campaign_id) . "' || \"quantity\" || '" . ValueSeparator(2, $this->campaign_id) . "' || \"bus_size_id\" || '" . ValueSeparator(3, $this->campaign_id) . "' || \"start_date\" FROM \"main_campaigns\" \"TMP_LOOKUPTABLE\" WHERE \"TMP_LOOKUPTABLE\".\"id\" = \"main_transactions\".\"campaign_id\" LIMIT 1) AS \"EV__campaign_id\", (SELECT \"price_details\" || '" . ValueSeparator(1, $this->price_id) . "' || \"platform_inventory\" FROM \"view_pricing_options\" \"TMP_LOOKUPTABLE\" WHERE \"TMP_LOOKUPTABLE\".\"price_id\" = \"main_transactions\".\"price_id\" LIMIT 1) AS \"EV__price_id\", (SELECT \"admin_name\" FROM \"x_transaction_status\" \"TMP_LOOKUPTABLE\" WHERE \"TMP_LOOKUPTABLE\".\"id\" = \"main_transactions\".\"status_id\" LIMIT 1) AS \"EV__status_id\", (SELECT \"name\" FROM \"x_print_status\" \"TMP_LOOKUPTABLE\" WHERE \"TMP_LOOKUPTABLE\".\"id\" = \"main_transactions\".\"print_status_id\" LIMIT 1) AS \"EV__print_status_id\", (SELECT \"name\" FROM \"x_payment_status\" \"TMP_LOOKUPTABLE\" WHERE \"TMP_LOOKUPTABLE\".\"id\" = \"main_transactions\".\"payment_status_id\" LIMIT 1) AS \"EV__payment_status_id\" FROM \"main_transactions\")";
         return $from . " \"TMP_TABLE\"";
     }
 
@@ -498,12 +514,7 @@ class MainTransactions extends DbTable
         global $Security;
         // Add User ID filter
         if ($Security->currentUserID() != "" && !$Security->isAdmin()) { // Non system admin
-            if ($this->getCurrentMasterTable() == "main_campaigns" || $this->getCurrentMasterTable() == "") {
-                $filter = $this->addDetailUserIDFilter($filter, "main_campaigns"); // Add detail User ID filter
-            }
-            if ($this->getCurrentMasterTable() == "y_operators" || $this->getCurrentMasterTable() == "") {
-                $filter = $this->addDetailUserIDFilter($filter, "y_operators"); // Add detail User ID filter
-            }
+            $filter = $this->addUserIDFilter($filter);
         }
         return $filter;
     }
@@ -653,6 +664,9 @@ class MainTransactions extends DbTable
         if ($orderBy != "") {
             $orderBy = " " . str_replace(["(", ")"], ["", ""], $orderBy) . " ";
         }
+        if ($this->BasicSearch->getKeyword() != "") {
+            return true;
+        }
         if (
             $this->campaign_id->AdvancedSearch->SearchValue != "" ||
             $this->campaign_id->AdvancedSearch->SearchValue2 != "" ||
@@ -767,7 +781,7 @@ class MainTransactions extends DbTable
         $success = $this->insertSql($rs)->execute();
         if ($success) {
             // Get insert id if necessary
-            $this->id->setDbValue($conn->fetchColumn("SELECT currval('transactions_id_seq'::regclass)"));
+            $this->id->setDbValue($conn->fetchColumn("SELECT currval('public.main_transactions_id_seq'::regclass)"));
             $rs['id'] = $this->id->DbValue;
         }
         return $success;
@@ -806,6 +820,33 @@ class MainTransactions extends DbTable
     // Update
     public function update(&$rs, $where = "", $rsold = null, $curfilter = true)
     {
+        // Cascade Update detail table 'sub_transaction_details'
+        $cascadeUpdate = false;
+        $rscascade = [];
+        if ($rsold && (isset($rs['id']) && $rsold['id'] != $rs['id'])) { // Update detail field 'transaction_id'
+            $cascadeUpdate = true;
+            $rscascade['transaction_id'] = $rs['id'];
+        }
+        if ($cascadeUpdate) {
+            $rswrk = Container("sub_transaction_details")->loadRs("\"transaction_id\" = " . QuotedValue($rsold['id'], DATATYPE_NUMBER, 'DB'))->fetchAll(\PDO::FETCH_ASSOC);
+            foreach ($rswrk as $rsdtlold) {
+                $rskey = [];
+                $fldname = 'id';
+                $rskey[$fldname] = $rsdtlold[$fldname];
+                $rsdtlnew = array_merge($rsdtlold, $rscascade);
+                // Call Row_Updating event
+                $success = Container("sub_transaction_details")->rowUpdating($rsdtlold, $rsdtlnew);
+                if ($success) {
+                    $success = Container("sub_transaction_details")->update($rscascade, $rskey, $rsdtlold);
+                }
+                if (!$success) {
+                    return false;
+                }
+                // Call Row_Updated event
+                Container("sub_transaction_details")->rowUpdated($rsdtlold, $rsdtlnew);
+            }
+        }
+
         // If no field is updated, execute may return 0. Treat as success
         $success = $this->updateSql($rs, $where, $curfilter)->execute();
         $success = ($success > 0) ? $success : true;
@@ -841,6 +882,30 @@ class MainTransactions extends DbTable
     public function delete(&$rs, $where = "", $curfilter = false)
     {
         $success = true;
+
+        // Cascade delete detail table 'sub_transaction_details'
+        $dtlrows = Container("sub_transaction_details")->loadRs("\"transaction_id\" = " . QuotedValue($rs['id'], DATATYPE_NUMBER, "DB"))->fetchAll(\PDO::FETCH_ASSOC);
+        // Call Row Deleting event
+        foreach ($dtlrows as $dtlrow) {
+            $success = Container("sub_transaction_details")->rowDeleting($dtlrow);
+            if (!$success) {
+                break;
+            }
+        }
+        if ($success) {
+            foreach ($dtlrows as $dtlrow) {
+                $success = Container("sub_transaction_details")->delete($dtlrow); // Delete
+                if (!$success) {
+                    break;
+                }
+            }
+        }
+        // Call Row Deleted event
+        if ($success) {
+            foreach ($dtlrows as $dtlrow) {
+                Container("sub_transaction_details")->rowDeleted($dtlrow);
+            }
+        }
         if ($success) {
             $success = $this->deleteSql($rs, $where, $curfilter)->execute();
         }
@@ -857,8 +922,10 @@ class MainTransactions extends DbTable
         $this->campaign_id->DbValue = $row['campaign_id'];
         $this->operator_id->DbValue = $row['operator_id'];
         $this->payment_date->DbValue = $row['payment_date'];
+        $this->vendor_id->DbValue = $row['vendor_id'];
         $this->price_id->DbValue = $row['price_id'];
         $this->quantity->DbValue = $row['quantity'];
+        $this->assigned_buses->DbValue = $row['assigned_buses'];
         $this->start_date->DbValue = $row['start_date'];
         $this->end_date->DbValue = $row['end_date'];
         $this->visible_status_id->DbValue = $row['visible_status_id'];
@@ -933,18 +1000,17 @@ class MainTransactions extends DbTable
     // Return page URL
     public function getReturnUrl()
     {
+        $referUrl = ReferUrl();
+        $referPageName = ReferPageName();
         $name = PROJECT_NAME . "_" . $this->TableVar . "_" . Config("TABLE_RETURN_URL");
         // Get referer URL automatically
-        if (ReferUrl() != "" && ReferPageName() != CurrentPageName() && ReferPageName() != "login") { // Referer not same page or login page
-            $_SESSION[$name] = ReferUrl(); // Save to Session
+        if ($referUrl != "" && $referPageName != CurrentPageName() && $referPageName != "login") { // Referer not same page or login page
+            $_SESSION[$name] = $referUrl; // Save to Session
         }
-        if (@$_SESSION[$name] != "") {
-            return $_SESSION[$name];
-        } else {
-            return GetUrl("maintransactionslist");
-        }
+        return $_SESSION[$name] ?? GetUrl("maintransactionslist");
     }
 
+    // Set return page URL
     public function setReturnUrl($v)
     {
         $_SESSION[PROJECT_NAME . "_" . $this->TableVar . "_" . Config("TABLE_RETURN_URL")] = $v;
@@ -1210,8 +1276,10 @@ SORTHTML;
         $this->campaign_id->setDbValue($row['campaign_id']);
         $this->operator_id->setDbValue($row['operator_id']);
         $this->payment_date->setDbValue($row['payment_date']);
+        $this->vendor_id->setDbValue($row['vendor_id']);
         $this->price_id->setDbValue($row['price_id']);
         $this->quantity->setDbValue($row['quantity']);
+        $this->assigned_buses->setDbValue($row['assigned_buses']);
         $this->start_date->setDbValue($row['start_date']);
         $this->end_date->setDbValue($row['end_date']);
         $this->visible_status_id->setDbValue($row['visible_status_id']);
@@ -1237,14 +1305,23 @@ SORTHTML;
         // id
 
         // campaign_id
+        $this->campaign_id->CellCssStyle = "white-space: nowrap;";
 
         // operator_id
 
         // payment_date
 
+        // vendor_id
+        $this->vendor_id->CellCssStyle = "white-space: nowrap;";
+
         // price_id
+        $this->price_id->CellCssStyle = "white-space: nowrap;";
 
         // quantity
+        $this->quantity->CellCssStyle = "white-space: nowrap;";
+
+        // assigned_buses
+        $this->assigned_buses->CellCssStyle = "white-space: nowrap;";
 
         // start_date
 
@@ -1265,6 +1342,7 @@ SORTHTML;
         // ts_last_update
 
         // total
+        $this->total->CellCssStyle = "white-space: nowrap;";
 
         // id
         $this->id->ViewValue = $this->id->CurrentValue;
@@ -1280,7 +1358,7 @@ SORTHTML;
                 $this->campaign_id->ViewValue = $this->campaign_id->lookupCacheOption($curVal);
                 if ($this->campaign_id->ViewValue === null) { // Lookup from database
                     $filterWrk = "\"id\"" . SearchString("=", $curVal, DATATYPE_NUMBER, "");
-                    $sqlWrk = $this->campaign_id->Lookup->getSql(false, $filterWrk, '', $this, true);
+                    $sqlWrk = $this->campaign_id->Lookup->getSql(false, $filterWrk, '', $this, true, true);
                     $rswrk = Conn()->executeQuery($sqlWrk)->fetchAll(\PDO::FETCH_BOTH);
                     $ari = count($rswrk);
                     if ($ari > 0) { // Lookup values found
@@ -1294,6 +1372,7 @@ SORTHTML;
                 $this->campaign_id->ViewValue = null;
             }
         }
+        $this->campaign_id->CssClass = "font-weight-bold";
         $this->campaign_id->ViewCustomAttributes = "";
 
         // operator_id
@@ -1302,7 +1381,7 @@ SORTHTML;
             $this->operator_id->ViewValue = $this->operator_id->lookupCacheOption($curVal);
             if ($this->operator_id->ViewValue === null) { // Lookup from database
                 $filterWrk = "\"operator_id\"" . SearchString("=", $curVal, DATATYPE_NUMBER, "");
-                $sqlWrk = $this->operator_id->Lookup->getSql(false, $filterWrk, '', $this, true);
+                $sqlWrk = $this->operator_id->Lookup->getSql(false, $filterWrk, '', $this, true, true);
                 $rswrk = Conn()->executeQuery($sqlWrk)->fetchAll(\PDO::FETCH_BOTH);
                 $ari = count($rswrk);
                 if ($ari > 0) { // Lookup values found
@@ -1322,6 +1401,28 @@ SORTHTML;
         $this->payment_date->ViewValue = FormatDateTime($this->payment_date->ViewValue, 5);
         $this->payment_date->ViewCustomAttributes = "";
 
+        // vendor_id
+        $this->vendor_id->ViewValue = $this->vendor_id->CurrentValue;
+        $curVal = strval($this->vendor_id->CurrentValue);
+        if ($curVal != "") {
+            $this->vendor_id->ViewValue = $this->vendor_id->lookupCacheOption($curVal);
+            if ($this->vendor_id->ViewValue === null) { // Lookup from database
+                $filterWrk = "\"id\"" . SearchString("=", $curVal, DATATYPE_NUMBER, "");
+                $sqlWrk = $this->vendor_id->Lookup->getSql(false, $filterWrk, '', $this, true, true);
+                $rswrk = Conn()->executeQuery($sqlWrk)->fetchAll(\PDO::FETCH_BOTH);
+                $ari = count($rswrk);
+                if ($ari > 0) { // Lookup values found
+                    $arwrk = $this->vendor_id->Lookup->renderViewRow($rswrk[0]);
+                    $this->vendor_id->ViewValue = $this->vendor_id->displayValue($arwrk);
+                } else {
+                    $this->vendor_id->ViewValue = $this->vendor_id->CurrentValue;
+                }
+            }
+        } else {
+            $this->vendor_id->ViewValue = null;
+        }
+        $this->vendor_id->ViewCustomAttributes = "";
+
         // price_id
         if ($this->price_id->VirtualValue != "") {
             $this->price_id->ViewValue = $this->price_id->VirtualValue;
@@ -1331,7 +1432,7 @@ SORTHTML;
                 $this->price_id->ViewValue = $this->price_id->lookupCacheOption($curVal);
                 if ($this->price_id->ViewValue === null) { // Lookup from database
                     $filterWrk = "\"price_id\"" . SearchString("=", $curVal, DATATYPE_NUMBER, "");
-                    $sqlWrk = $this->price_id->Lookup->getSql(false, $filterWrk, '', $this, true);
+                    $sqlWrk = $this->price_id->Lookup->getSql(false, $filterWrk, '', $this, true, true);
                     $rswrk = Conn()->executeQuery($sqlWrk)->fetchAll(\PDO::FETCH_BOTH);
                     $ari = count($rswrk);
                     if ($ari > 0) { // Lookup values found
@@ -1350,7 +1451,16 @@ SORTHTML;
         // quantity
         $this->quantity->ViewValue = $this->quantity->CurrentValue;
         $this->quantity->ViewValue = FormatNumber($this->quantity->ViewValue, 0, -2, -2, -2);
+        $this->quantity->CssClass = "font-weight-bold";
+        $this->quantity->CellCssStyle .= "text-align: right;";
         $this->quantity->ViewCustomAttributes = "";
+
+        // assigned_buses
+        $this->assigned_buses->ViewValue = $this->assigned_buses->CurrentValue;
+        $this->assigned_buses->ViewValue = FormatNumber($this->assigned_buses->ViewValue, 0, -2, -2, -2);
+        $this->assigned_buses->CssClass = "font-weight-bold";
+        $this->assigned_buses->CellCssStyle .= "text-align: right;";
+        $this->assigned_buses->ViewCustomAttributes = "";
 
         // start_date
         $this->start_date->ViewValue = $this->start_date->CurrentValue;
@@ -1368,7 +1478,7 @@ SORTHTML;
             $this->visible_status_id->ViewValue = $this->visible_status_id->lookupCacheOption($curVal);
             if ($this->visible_status_id->ViewValue === null) { // Lookup from database
                 $filterWrk = "\"id\"" . SearchString("=", $curVal, DATATYPE_NUMBER, "");
-                $sqlWrk = $this->visible_status_id->Lookup->getSql(false, $filterWrk, '', $this, true);
+                $sqlWrk = $this->visible_status_id->Lookup->getSql(false, $filterWrk, '', $this, true, true);
                 $rswrk = Conn()->executeQuery($sqlWrk)->fetchAll(\PDO::FETCH_BOTH);
                 $ari = count($rswrk);
                 if ($ari > 0) { // Lookup values found
@@ -1392,7 +1502,7 @@ SORTHTML;
                 $this->status_id->ViewValue = $this->status_id->lookupCacheOption($curVal);
                 if ($this->status_id->ViewValue === null) { // Lookup from database
                     $filterWrk = "\"id\"" . SearchString("=", $curVal, DATATYPE_NUMBER, "");
-                    $sqlWrk = $this->status_id->Lookup->getSql(false, $filterWrk, '', $this, true);
+                    $sqlWrk = $this->status_id->Lookup->getSql(false, $filterWrk, '', $this, true, true);
                     $rswrk = Conn()->executeQuery($sqlWrk)->fetchAll(\PDO::FETCH_BOTH);
                     $ari = count($rswrk);
                     if ($ari > 0) { // Lookup values found
@@ -1406,6 +1516,7 @@ SORTHTML;
                 $this->status_id->ViewValue = null;
             }
         }
+        $this->status_id->CellCssStyle .= "text-align: center;";
         $this->status_id->ViewCustomAttributes = "";
 
         // print_status_id
@@ -1417,7 +1528,7 @@ SORTHTML;
                 $this->print_status_id->ViewValue = $this->print_status_id->lookupCacheOption($curVal);
                 if ($this->print_status_id->ViewValue === null) { // Lookup from database
                     $filterWrk = "\"id\"" . SearchString("=", $curVal, DATATYPE_NUMBER, "");
-                    $sqlWrk = $this->print_status_id->Lookup->getSql(false, $filterWrk, '', $this, true);
+                    $sqlWrk = $this->print_status_id->Lookup->getSql(false, $filterWrk, '', $this, true, true);
                     $rswrk = Conn()->executeQuery($sqlWrk)->fetchAll(\PDO::FETCH_BOTH);
                     $ari = count($rswrk);
                     if ($ari > 0) { // Lookup values found
@@ -1431,6 +1542,7 @@ SORTHTML;
                 $this->print_status_id->ViewValue = null;
             }
         }
+        $this->print_status_id->CellCssStyle .= "text-align: center;";
         $this->print_status_id->ViewCustomAttributes = "";
 
         // payment_status_id
@@ -1442,7 +1554,7 @@ SORTHTML;
                 $this->payment_status_id->ViewValue = $this->payment_status_id->lookupCacheOption($curVal);
                 if ($this->payment_status_id->ViewValue === null) { // Lookup from database
                     $filterWrk = "\"id\"" . SearchString("=", $curVal, DATATYPE_NUMBER, "");
-                    $sqlWrk = $this->payment_status_id->Lookup->getSql(false, $filterWrk, '', $this, true);
+                    $sqlWrk = $this->payment_status_id->Lookup->getSql(false, $filterWrk, '', $this, true, true);
                     $rswrk = Conn()->executeQuery($sqlWrk)->fetchAll(\PDO::FETCH_BOTH);
                     $ari = count($rswrk);
                     if ($ari > 0) { // Lookup values found
@@ -1456,6 +1568,7 @@ SORTHTML;
                 $this->payment_status_id->ViewValue = null;
             }
         }
+        $this->payment_status_id->CellCssStyle .= "text-align: center;";
         $this->payment_status_id->ViewCustomAttributes = "";
 
         // created_by
@@ -1464,7 +1577,7 @@ SORTHTML;
             $this->created_by->ViewValue = $this->created_by->lookupCacheOption($curVal);
             if ($this->created_by->ViewValue === null) { // Lookup from database
                 $filterWrk = "\"id\"" . SearchString("=", $curVal, DATATYPE_NUMBER, "");
-                $sqlWrk = $this->created_by->Lookup->getSql(false, $filterWrk, '', $this, true);
+                $sqlWrk = $this->created_by->Lookup->getSql(false, $filterWrk, '', $this, true, true);
                 $rswrk = Conn()->executeQuery($sqlWrk)->fetchAll(\PDO::FETCH_BOTH);
                 $ari = count($rswrk);
                 if ($ari > 0) { // Lookup values found
@@ -1492,6 +1605,8 @@ SORTHTML;
         // total
         $this->total->ViewValue = $this->total->CurrentValue;
         $this->total->ViewValue = FormatNumber($this->total->ViewValue, 0, -2, -2, -2);
+        $this->total->CssClass = "font-weight-bold";
+        $this->total->CellCssStyle .= "text-align: right;";
         $this->total->ViewCustomAttributes = "";
 
         // id
@@ -1514,6 +1629,11 @@ SORTHTML;
         $this->payment_date->HrefValue = "";
         $this->payment_date->TooltipValue = "";
 
+        // vendor_id
+        $this->vendor_id->LinkCustomAttributes = "";
+        $this->vendor_id->HrefValue = "";
+        $this->vendor_id->TooltipValue = "";
+
         // price_id
         $this->price_id->LinkCustomAttributes = "";
         $this->price_id->HrefValue = "";
@@ -1523,6 +1643,11 @@ SORTHTML;
         $this->quantity->LinkCustomAttributes = "";
         $this->quantity->HrefValue = "";
         $this->quantity->TooltipValue = "";
+
+        // assigned_buses
+        $this->assigned_buses->LinkCustomAttributes = "";
+        $this->assigned_buses->HrefValue = "";
+        $this->assigned_buses->TooltipValue = "";
 
         // start_date
         $this->start_date->LinkCustomAttributes = "";
@@ -1536,22 +1661,54 @@ SORTHTML;
 
         // visible_status_id
         $this->visible_status_id->LinkCustomAttributes = "";
-        $this->visible_status_id->HrefValue = "";
+        if (!EmptyValue($this->visible_status_id->CurrentValue)) {
+            $this->visible_status_id->HrefValue = "#" . (!empty($this->visible_status_id->ViewValue) && !is_array($this->visible_status_id->ViewValue) ? RemoveHtml($this->visible_status_id->ViewValue) : $this->visible_status_id->CurrentValue); // Add prefix/suffix
+            $this->visible_status_id->LinkAttrs["target"] = ""; // Add target
+            if ($this->isExport()) {
+                $this->visible_status_id->HrefValue = FullUrl($this->visible_status_id->HrefValue, "href");
+            }
+        } else {
+            $this->visible_status_id->HrefValue = "";
+        }
         $this->visible_status_id->TooltipValue = "";
 
         // status_id
         $this->status_id->LinkCustomAttributes = "";
-        $this->status_id->HrefValue = "";
+        if (!EmptyValue($this->status_id->CurrentValue)) {
+            $this->status_id->HrefValue = "#" . (!empty($this->status_id->ViewValue) && !is_array($this->status_id->ViewValue) ? RemoveHtml($this->status_id->ViewValue) : $this->status_id->CurrentValue); // Add prefix/suffix
+            $this->status_id->LinkAttrs["target"] = ""; // Add target
+            if ($this->isExport()) {
+                $this->status_id->HrefValue = FullUrl($this->status_id->HrefValue, "href");
+            }
+        } else {
+            $this->status_id->HrefValue = "";
+        }
         $this->status_id->TooltipValue = "";
 
         // print_status_id
         $this->print_status_id->LinkCustomAttributes = "";
-        $this->print_status_id->HrefValue = "";
+        if (!EmptyValue($this->print_status_id->CurrentValue)) {
+            $this->print_status_id->HrefValue = "#" . (!empty($this->print_status_id->ViewValue) && !is_array($this->print_status_id->ViewValue) ? RemoveHtml($this->print_status_id->ViewValue) : $this->print_status_id->CurrentValue); // Add prefix/suffix
+            $this->print_status_id->LinkAttrs["target"] = ""; // Add target
+            if ($this->isExport()) {
+                $this->print_status_id->HrefValue = FullUrl($this->print_status_id->HrefValue, "href");
+            }
+        } else {
+            $this->print_status_id->HrefValue = "";
+        }
         $this->print_status_id->TooltipValue = "";
 
         // payment_status_id
         $this->payment_status_id->LinkCustomAttributes = "";
-        $this->payment_status_id->HrefValue = "";
+        if (!EmptyValue($this->payment_status_id->CurrentValue)) {
+            $this->payment_status_id->HrefValue = "#" . (!empty($this->payment_status_id->ViewValue) && !is_array($this->payment_status_id->ViewValue) ? RemoveHtml($this->payment_status_id->ViewValue) : $this->payment_status_id->CurrentValue); // Add prefix/suffix
+            $this->payment_status_id->LinkAttrs["target"] = ""; // Add target
+            if ($this->isExport()) {
+                $this->payment_status_id->HrefValue = FullUrl($this->payment_status_id->HrefValue, "href");
+            }
+        } else {
+            $this->payment_status_id->HrefValue = "";
+        }
         $this->payment_status_id->TooltipValue = "";
 
         // created_by
@@ -1609,7 +1766,7 @@ SORTHTML;
                     $this->campaign_id->ViewValue = $this->campaign_id->lookupCacheOption($curVal);
                     if ($this->campaign_id->ViewValue === null) { // Lookup from database
                         $filterWrk = "\"id\"" . SearchString("=", $curVal, DATATYPE_NUMBER, "");
-                        $sqlWrk = $this->campaign_id->Lookup->getSql(false, $filterWrk, '', $this, true);
+                        $sqlWrk = $this->campaign_id->Lookup->getSql(false, $filterWrk, '', $this, true, true);
                         $rswrk = Conn()->executeQuery($sqlWrk)->fetchAll(\PDO::FETCH_BOTH);
                         $ari = count($rswrk);
                         if ($ari > 0) { // Lookup values found
@@ -1623,6 +1780,7 @@ SORTHTML;
                     $this->campaign_id->ViewValue = null;
                 }
             }
+            $this->campaign_id->CssClass = "font-weight-bold";
             $this->campaign_id->ViewCustomAttributes = "";
         } else {
             $this->campaign_id->PlaceHolder = RemoveHtml($this->campaign_id->caption());
@@ -1638,7 +1796,7 @@ SORTHTML;
                 $this->operator_id->ViewValue = $this->operator_id->lookupCacheOption($curVal);
                 if ($this->operator_id->ViewValue === null) { // Lookup from database
                     $filterWrk = "\"operator_id\"" . SearchString("=", $curVal, DATATYPE_NUMBER, "");
-                    $sqlWrk = $this->operator_id->Lookup->getSql(false, $filterWrk, '', $this, true);
+                    $sqlWrk = $this->operator_id->Lookup->getSql(false, $filterWrk, '', $this, true, true);
                     $rswrk = Conn()->executeQuery($sqlWrk)->fetchAll(\PDO::FETCH_BOTH);
                     $ari = count($rswrk);
                     if ($ari > 0) { // Lookup values found
@@ -1662,6 +1820,15 @@ SORTHTML;
         $this->payment_date->EditValue = FormatDateTime($this->payment_date->CurrentValue, 5);
         $this->payment_date->PlaceHolder = RemoveHtml($this->payment_date->caption());
 
+        // vendor_id
+        $this->vendor_id->EditAttrs["class"] = "form-control";
+        $this->vendor_id->EditCustomAttributes = "";
+        if (!$Security->isAdmin() && $Security->isLoggedIn() && !$this->userIDAllow("info")) { // Non system admin
+        } else {
+            $this->vendor_id->EditValue = $this->vendor_id->CurrentValue;
+            $this->vendor_id->PlaceHolder = RemoveHtml($this->vendor_id->caption());
+        }
+
         // price_id
         $this->price_id->EditAttrs["class"] = "form-control";
         $this->price_id->EditCustomAttributes = "";
@@ -1673,15 +1840,21 @@ SORTHTML;
         $this->quantity->EditValue = $this->quantity->CurrentValue;
         $this->quantity->PlaceHolder = RemoveHtml($this->quantity->caption());
 
+        // assigned_buses
+        $this->assigned_buses->EditAttrs["class"] = "form-control";
+        $this->assigned_buses->EditCustomAttributes = "";
+        $this->assigned_buses->EditValue = $this->assigned_buses->CurrentValue;
+        $this->assigned_buses->PlaceHolder = RemoveHtml($this->assigned_buses->caption());
+
         // start_date
         $this->start_date->EditAttrs["class"] = "form-control";
-        $this->start_date->EditCustomAttributes = "";
+        $this->start_date->EditCustomAttributes = 'readonly="readonly"';
         $this->start_date->EditValue = FormatDateTime($this->start_date->CurrentValue, 5);
         $this->start_date->PlaceHolder = RemoveHtml($this->start_date->caption());
 
         // end_date
         $this->end_date->EditAttrs["class"] = "form-control";
-        $this->end_date->EditCustomAttributes = "";
+        $this->end_date->EditCustomAttributes = 'readonly="readonly"';
         $this->end_date->EditValue = FormatDateTime($this->end_date->CurrentValue, 5);
         $this->end_date->PlaceHolder = RemoveHtml($this->end_date->caption());
 
@@ -1749,11 +1922,15 @@ SORTHTML;
             $this->quantity->CurrentValue = $this->quantity->Total;
             $this->quantity->ViewValue = $this->quantity->CurrentValue;
             $this->quantity->ViewValue = FormatNumber($this->quantity->ViewValue, 0, -2, -2, -2);
+            $this->quantity->CssClass = "font-weight-bold";
+            $this->quantity->CellCssStyle .= "text-align: right;";
             $this->quantity->ViewCustomAttributes = "";
             $this->quantity->HrefValue = ""; // Clear href value
             $this->total->CurrentValue = $this->total->Total;
             $this->total->ViewValue = $this->total->CurrentValue;
             $this->total->ViewValue = FormatNumber($this->total->ViewValue, 0, -2, -2, -2);
+            $this->total->CssClass = "font-weight-bold";
+            $this->total->CellCssStyle .= "text-align: right;";
             $this->total->ViewCustomAttributes = "";
             $this->total->HrefValue = ""; // Clear href value
 
@@ -1777,8 +1954,10 @@ SORTHTML;
                     $doc->exportCaption($this->campaign_id);
                     $doc->exportCaption($this->operator_id);
                     $doc->exportCaption($this->payment_date);
+                    $doc->exportCaption($this->vendor_id);
                     $doc->exportCaption($this->price_id);
                     $doc->exportCaption($this->quantity);
+                    $doc->exportCaption($this->assigned_buses);
                     $doc->exportCaption($this->start_date);
                     $doc->exportCaption($this->end_date);
                     $doc->exportCaption($this->visible_status_id);
@@ -1794,8 +1973,10 @@ SORTHTML;
                     $doc->exportCaption($this->campaign_id);
                     $doc->exportCaption($this->operator_id);
                     $doc->exportCaption($this->payment_date);
+                    $doc->exportCaption($this->vendor_id);
                     $doc->exportCaption($this->price_id);
                     $doc->exportCaption($this->quantity);
+                    $doc->exportCaption($this->assigned_buses);
                     $doc->exportCaption($this->start_date);
                     $doc->exportCaption($this->end_date);
                     $doc->exportCaption($this->visible_status_id);
@@ -1840,8 +2021,10 @@ SORTHTML;
                         $doc->exportField($this->campaign_id);
                         $doc->exportField($this->operator_id);
                         $doc->exportField($this->payment_date);
+                        $doc->exportField($this->vendor_id);
                         $doc->exportField($this->price_id);
                         $doc->exportField($this->quantity);
+                        $doc->exportField($this->assigned_buses);
                         $doc->exportField($this->start_date);
                         $doc->exportField($this->end_date);
                         $doc->exportField($this->visible_status_id);
@@ -1857,8 +2040,10 @@ SORTHTML;
                         $doc->exportField($this->campaign_id);
                         $doc->exportField($this->operator_id);
                         $doc->exportField($this->payment_date);
+                        $doc->exportField($this->vendor_id);
                         $doc->exportField($this->price_id);
                         $doc->exportField($this->quantity);
+                        $doc->exportField($this->assigned_buses);
                         $doc->exportField($this->start_date);
                         $doc->exportField($this->end_date);
                         $doc->exportField($this->visible_status_id);
@@ -1892,8 +2077,10 @@ SORTHTML;
                 $doc->exportAggregate($this->campaign_id, '');
                 $doc->exportAggregate($this->operator_id, '');
                 $doc->exportAggregate($this->payment_date, '');
+                $doc->exportAggregate($this->vendor_id, '');
                 $doc->exportAggregate($this->price_id, '');
                 $doc->exportAggregate($this->quantity, 'TOTAL');
+                $doc->exportAggregate($this->assigned_buses, '');
                 $doc->exportAggregate($this->start_date, '');
                 $doc->exportAggregate($this->end_date, '');
                 $doc->exportAggregate($this->visible_status_id, '');
@@ -1910,6 +2097,53 @@ SORTHTML;
         if (!$doc->ExportCustom) {
             $doc->exportTableFooter();
         }
+    }
+
+    // Add User ID filter
+    public function addUserIDFilter($filter = "")
+    {
+        global $Security;
+        $filterWrk = "";
+        $id = (CurrentPageID() == "list") ? $this->CurrentAction : CurrentPageID();
+        if (!$this->userIDAllow($id) && !$Security->isAdmin()) {
+            $filterWrk = $Security->userIdList();
+            if ($filterWrk != "") {
+                $filterWrk = '(select main_campaigns.vendor_id from main_campaigns where main_transactions.campaign_id = main_campaigns.id) IN (' . $filterWrk . ')';
+            }
+        }
+
+        // Call User ID Filtering event
+        $this->userIdFiltering($filterWrk);
+        AddFilter($filter, $filterWrk);
+        return $filter;
+    }
+
+    // User ID subquery
+    public function getUserIDSubquery(&$fld, &$masterfld)
+    {
+        global $UserTable;
+        $wrk = "";
+        $sql = "SELECT " . $masterfld->Expression . " FROM \"main_transactions\"";
+        $filter = $this->addUserIDFilter("");
+        if ($filter != "") {
+            $sql .= " WHERE " . $filter;
+        }
+
+        // List all values
+        if ($rs = Conn($UserTable->Dbid)->executeQuery($sql)->fetchAll(\PDO::FETCH_NUM)) {
+            foreach ($rs as $row) {
+                if ($wrk != "") {
+                    $wrk .= ",";
+                }
+                $wrk .= QuotedValue($row[0], $masterfld->DataType, Config("USER_TABLE_DBID"));
+            }
+        }
+        if ($wrk != "") {
+            $wrk = $fld->Expression . " IN (" . $wrk . ")";
+        } else { // No User ID value found
+            $wrk = "0=1";
+        }
+        return $wrk;
     }
 
     // Add master User ID filter
@@ -1989,7 +2223,59 @@ SORTHTML;
         // To cancel, set return value to false
         $rsnew["created_by"] = IsAdmin() ? CurrentUserID():Profile()->id;
         //Log(IsAdmin() ? CurrentUserID():Profile()->id);
-        return true;
+            require_once 'views/PrivateFunctions.php';
+            // Enter your code here
+            // To cancel, set return value to false
+            $rsnew["created_by"] = IsAdmin() ? CurrentUserID():Profile()->id;
+            //Log(IsAdmin() ? CurrentUserID():Profile()->id);
+            $sql = "select *,(select name from y_vendors v where v.id = vendor_id) as vendor from main_campaigns where id = {$rsnew['campaign_id']};";
+            $camp_details = ExecuteRow($sql);
+            $rowssql = "select email from main_users where vendor_id in ";
+            $rowssql .= "(select vendor_id from main_campaigns where id in (select campaign_id from main_transactions where id = " . $rsnew['campaign_id'] . "));";
+            $rows = ExecuteRows($rowssql);
+            $emailslist_array = [];
+            foreach ($rows as $v) {
+                if(strlen($v['email']) > 2 ){
+                    $emailslist_array[] = $v['email'];
+                }
+            }
+            $emailslist = implode(',', $emailslist_array);
+            $email = $emailslist;
+            $vendor = $camp_details['vendor'];
+            $username = $vendor;
+            $search_replace = [
+                '[x_campaign]' => $camp_details['name'],
+                '[x_quantity]' => $camp_details['quantity'],
+                '[x_vendor]' => $vendor,
+                '[x_supportemail] ' => 'info@transitmedia.com.ng',
+            ];
+            $search = array_keys($search_replace);
+            $replace = array_values($search_replace);
+
+            // $x_camp_name = $camp_details['name'];
+            $sql_msg = "select value from z_core_settings where name = 'new_transaction_created';";
+    		$editmsg = ExecuteScalar($sql_msg);
+    		$msg = str_replace($search, $replace, $editmsg);
+    		$msgtxt = strip_tags($msg);
+    		$subject = "NEW TRANSACTION CREATED ({$vendor}) - TRANSIT MEDIA ADMIN";
+    		$subject = $camp_details['name']." - ({$vendor}) - TRANSIT MEDIA ADMIN";
+    		#===============================================================
+    		$emailpayload = getEmailPayload('new_transaction_created');
+    		$exposed_emails = get_emails($emailpayload, $email);
+    		extract($exposed_emails);
+    		$email = $final_to;
+    		$cc = $final_cc;
+    		$bcc = $final_bcc;
+            #===============================================================
+    		if (strpos($_SERVER['SERVER_NAME'], 'localhost') === false) {
+    			sendTMmail('admin@transitmedia.com.ng', $email, $subject, $msg, $msgtxt, null, $cc, $bcc);
+    		} else {
+    			sendTMmail('admin@transitmedia.com.ng', $email, $subject, $msg, $msgtxt, null, $cc, $bcc);
+    			echo "\n<br>====================================<br>\n";
+    			echo "sendTMmail('admin@transitmedia.com.ng', $email, $subject, $msg, $msgtxt,NULL,$cc,$bcc);";
+    			echo "\n<br>====================================<br>\n";
+            }
+            return true;
     }
 
     // Row Inserted event
@@ -2010,7 +2296,7 @@ SORTHTML;
     public function rowUpdated($rsold, &$rsnew)
     {
     	//echo "Row Updated";
-    	require_once 'views\PrivateFunctions.php';
+    	require_once 'views/PrivateFunctions.php';
 
     	//if (strpos($_SERVER['SERVER_NAME'], 'localhost') === false) {
     	//	require_once 'emailrun.php';
@@ -2280,6 +2566,23 @@ SORTHTML;
     {
         // To view properties of field class, use:
         //var_dump($this-><FieldName>);
+    	require_once 'views/PrivateFunctions.php';
+
+    		// PAYMENT
+            $class1 = buttonStyle($this->payment_status_id->CurrentValue);
+            $this->payment_status_id->LinkCustomAttributes = "class='{$class1}'";
+
+            // TRANSACTION
+            $class2 = buttonStyle($this->status_id->CurrentValue);
+            $this->status_id->LinkCustomAttributes = "class='{$class2}'";
+
+            // TRANSACTION VISIBLE
+            $class3 = buttonStyle($this->visible_status_id->CurrentValue);
+            $this->visible_status_id->LinkCustomAttributes = "class='{$class3}'";
+
+            // PRINT
+            $class4 = buttonStyle($this->print_status_id->CurrentValue);
+            $this->print_status_id->LinkCustomAttributes = "class='{$class4}'";
     }
 
     // User ID Filtering event

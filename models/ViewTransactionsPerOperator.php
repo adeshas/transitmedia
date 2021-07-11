@@ -51,6 +51,7 @@ class ViewTransactionsPerOperator extends DbTable
     public $bus_size_id;
     public $vendor_search_id;
     public $vendor_search_name;
+    public $download;
 
     // Page ID
     public $PageID = ""; // To be overridden by subclass
@@ -72,7 +73,7 @@ class ViewTransactionsPerOperator extends DbTable
         $this->Dbid = 'DB';
         $this->ExportAll = true;
         $this->ExportPageBreakCount = 0; // Page break per every n record (PDF only)
-        $this->ExportPageOrientation = "portrait"; // Page orientation (PDF only)
+        $this->ExportPageOrientation = "landscape"; // Page orientation (PDF only)
         $this->ExportPageSize = "a4"; // Page size (PDF only)
         $this->ExportExcelPageOrientation = ""; // Page orientation (PhpSpreadsheet only)
         $this->ExportExcelPageSize = ""; // Page size (PhpSpreadsheet only)
@@ -215,6 +216,12 @@ class ViewTransactionsPerOperator extends DbTable
         $this->vendor_search_name = new DbField('view_transactions_per_operator', 'view_transactions_per_operator', 'x_vendor_search_name', 'vendor_search_name', '"vendor_search_name"', '"vendor_search_name"', 200, 0, -1, false, '"vendor_search_name"', false, false, false, 'FORMATTED TEXT', 'TEXT');
         $this->vendor_search_name->Sortable = true; // Allow sort
         $this->Fields['vendor_search_name'] = &$this->vendor_search_name;
+
+        // download
+        $this->download = new DbField('view_transactions_per_operator', 'view_transactions_per_operator', 'x_download', 'download', '\'DOWNLOAD P/O\'', '\'DOWNLOAD P/O\'', 201, 0, -1, false, '\'DOWNLOAD P/O\'', false, false, false, 'FORMATTED TEXT', 'TEXTAREA');
+        $this->download->IsCustom = true; // Custom field
+        $this->download->Sortable = true; // Allow sort
+        $this->Fields['download'] = &$this->download;
     }
 
     // Field Visibility
@@ -272,7 +279,7 @@ class ViewTransactionsPerOperator extends DbTable
 
     public function getSqlSelect() // Select
     {
-        return $this->SqlSelect ?? $this->getQueryBuilder()->select("*, quantity * operator_fee AS \"total\"");
+        return $this->SqlSelect ?? $this->getQueryBuilder()->select("*, quantity * operator_fee AS \"total\", 'DOWNLOAD P/O' AS \"download\"");
     }
 
     public function sqlSelect() // For backward compatibility
@@ -647,6 +654,7 @@ class ViewTransactionsPerOperator extends DbTable
         $this->bus_size_id->DbValue = $row['bus_size_id'];
         $this->vendor_search_id->DbValue = $row['vendor_search_id'];
         $this->vendor_search_name->DbValue = $row['vendor_search_name'];
+        $this->download->DbValue = $row['download'];
     }
 
     // Delete uploaded files
@@ -687,18 +695,17 @@ class ViewTransactionsPerOperator extends DbTable
     // Return page URL
     public function getReturnUrl()
     {
+        $referUrl = ReferUrl();
+        $referPageName = ReferPageName();
         $name = PROJECT_NAME . "_" . $this->TableVar . "_" . Config("TABLE_RETURN_URL");
         // Get referer URL automatically
-        if (ReferUrl() != "" && ReferPageName() != CurrentPageName() && ReferPageName() != "login") { // Referer not same page or login page
-            $_SESSION[$name] = ReferUrl(); // Save to Session
+        if ($referUrl != "" && $referPageName != CurrentPageName() && $referPageName != "login") { // Referer not same page or login page
+            $_SESSION[$name] = $referUrl; // Save to Session
         }
-        if (@$_SESSION[$name] != "") {
-            return $_SESSION[$name];
-        } else {
-            return GetUrl("viewtransactionsperoperatorlist");
-        }
+        return $_SESSION[$name] ?? GetUrl("viewtransactionsperoperatorlist");
     }
 
+    // Set return page URL
     public function setReturnUrl($v)
     {
         $_SESSION[PROJECT_NAME . "_" . $this->TableVar . "_" . Config("TABLE_RETURN_URL")] = $v;
@@ -945,6 +952,7 @@ SORTHTML;
         $this->bus_size_id->setDbValue($row['bus_size_id']);
         $this->vendor_search_id->setDbValue($row['vendor_search_id']);
         $this->vendor_search_name->setDbValue($row['vendor_search_name']);
+        $this->download->setDbValue($row['download']);
     }
 
     // Render list row values
@@ -1026,6 +1034,9 @@ SORTHTML;
         // vendor_search_name
         $this->vendor_search_name->CellCssStyle = "white-space: nowrap;";
 
+        // download
+        $this->download->CellCssStyle = "white-space: nowrap;";
+
         // transaction_id
         $this->transaction_id->ViewValue = $this->transaction_id->CurrentValue;
         $this->transaction_id->ViewValue = FormatNumber($this->transaction_id->ViewValue, 0, -2, -2, -2);
@@ -1067,6 +1078,7 @@ SORTHTML;
 
         // transaction_status
         $this->transaction_status->ViewValue = $this->transaction_status->CurrentValue;
+        $this->transaction_status->CellCssStyle .= "text-align: center;";
         $this->transaction_status->ViewCustomAttributes = 'class="badge bg-success"';
 
         // quantity
@@ -1136,6 +1148,10 @@ SORTHTML;
         // vendor_search_name
         $this->vendor_search_name->ViewValue = $this->vendor_search_name->CurrentValue;
         $this->vendor_search_name->ViewCustomAttributes = "";
+
+        // download
+        $this->download->ViewValue = $this->download->CurrentValue;
+        $this->download->ViewCustomAttributes = "";
 
         // transaction_id
         $this->transaction_id->LinkCustomAttributes = "";
@@ -1260,6 +1276,19 @@ SORTHTML;
         $this->vendor_search_name->LinkCustomAttributes = "";
         $this->vendor_search_name->HrefValue = "";
         $this->vendor_search_name->TooltipValue = "";
+
+        // download
+        $this->download->LinkCustomAttributes = "class='btn btn-block btn-info'";
+        if (!EmptyValue($this->transaction_id->CurrentValue)) {
+            $this->download->HrefValue = "download.php?v=v3.2&id=" . $this->transaction_id->CurrentValue; // Add prefix/suffix
+            $this->download->LinkAttrs["target"] = "_blank"; // Add target
+            if ($this->isExport()) {
+                $this->download->HrefValue = FullUrl($this->download->HrefValue, "href");
+            }
+        } else {
+            $this->download->HrefValue = "";
+        }
+        $this->download->TooltipValue = "";
 
         // Call Row Rendered event
         $this->rowRendered();
@@ -1432,6 +1461,12 @@ SORTHTML;
         $this->vendor_search_name->EditValue = $this->vendor_search_name->CurrentValue;
         $this->vendor_search_name->PlaceHolder = RemoveHtml($this->vendor_search_name->caption());
 
+        // download
+        $this->download->EditAttrs["class"] = "form-control";
+        $this->download->EditCustomAttributes = "";
+        $this->download->EditValue = $this->download->CurrentValue;
+        $this->download->PlaceHolder = RemoveHtml($this->download->caption());
+
         // Call Row Rendered event
         $this->rowRendered();
     }
@@ -1506,16 +1541,17 @@ SORTHTML;
                     $doc->exportCaption($this->end_date);
                 } else {
                     $doc->exportCaption($this->transaction_id);
+                    $doc->exportCaption($this->campaign);
                     $doc->exportCaption($this->payment_date);
+                    $doc->exportCaption($this->inventory);
+                    $doc->exportCaption($this->bus_size);
+                    $doc->exportCaption($this->print_stage);
                     $doc->exportCaption($this->vendor);
                     $doc->exportCaption($this->operator);
                     $doc->exportCaption($this->platform);
-                    $doc->exportCaption($this->transaction_status);
                     $doc->exportCaption($this->quantity);
                     $doc->exportCaption($this->operator_fee);
                     $doc->exportCaption($this->total);
-                    $doc->exportCaption($this->start_date);
-                    $doc->exportCaption($this->end_date);
                 }
                 $doc->endExportRow();
             }
@@ -1563,16 +1599,17 @@ SORTHTML;
                         $doc->exportField($this->end_date);
                     } else {
                         $doc->exportField($this->transaction_id);
+                        $doc->exportField($this->campaign);
                         $doc->exportField($this->payment_date);
+                        $doc->exportField($this->inventory);
+                        $doc->exportField($this->bus_size);
+                        $doc->exportField($this->print_stage);
                         $doc->exportField($this->vendor);
                         $doc->exportField($this->operator);
                         $doc->exportField($this->platform);
-                        $doc->exportField($this->transaction_status);
                         $doc->exportField($this->quantity);
                         $doc->exportField($this->operator_fee);
                         $doc->exportField($this->total);
-                        $doc->exportField($this->start_date);
-                        $doc->exportField($this->end_date);
                     }
                     $doc->endExportRow($rowCnt);
                 }
@@ -1593,16 +1630,17 @@ SORTHTML;
             if (!$doc->ExportCustom) {
                 $doc->beginExportRow(-1);
                 $doc->exportAggregate($this->transaction_id, '');
+                $doc->exportAggregate($this->campaign, '');
                 $doc->exportAggregate($this->payment_date, '');
+                $doc->exportAggregate($this->inventory, '');
+                $doc->exportAggregate($this->bus_size, '');
+                $doc->exportAggregate($this->print_stage, '');
                 $doc->exportAggregate($this->vendor, '');
                 $doc->exportAggregate($this->operator, '');
                 $doc->exportAggregate($this->platform, '');
-                $doc->exportAggregate($this->transaction_status, '');
                 $doc->exportAggregate($this->quantity, 'TOTAL');
                 $doc->exportAggregate($this->operator_fee, 'TOTAL');
                 $doc->exportAggregate($this->total, 'TOTAL');
-                $doc->exportAggregate($this->start_date, '');
-                $doc->exportAggregate($this->end_date, '');
                 $doc->endExportRow();
             }
         }
@@ -1625,7 +1663,7 @@ SORTHTML;
         }
 
         // Call User ID Filtering event
-        $this->userIDFiltering($filterWrk);
+        $this->userIdFiltering($filterWrk);
         AddFilter($filter, $filterWrk);
         return $filter;
     }

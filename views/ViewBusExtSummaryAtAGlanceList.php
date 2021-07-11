@@ -17,6 +17,18 @@ loadjs.ready("head", function () {
     fview_bus_ext_summary_at_a_glancelist.formKeyCountName = '<?= $Page->FormKeyCountName ?>';
     loadjs.done("fview_bus_ext_summary_at_a_glancelist");
 });
+var fview_bus_ext_summary_at_a_glancelistsrch, currentSearchForm, currentAdvancedSearchForm;
+loadjs.ready("head", function () {
+    var $ = jQuery;
+    // Form object for search
+    fview_bus_ext_summary_at_a_glancelistsrch = currentSearchForm = new ew.Form("fview_bus_ext_summary_at_a_glancelistsrch");
+
+    // Dynamic selection lists
+
+    // Filters
+    fview_bus_ext_summary_at_a_glancelistsrch.filterList = <?= $Page->getFilterList() ?>;
+    loadjs.done("fview_bus_ext_summary_at_a_glancelistsrch");
+});
 </script>
 <script>
 loadjs.ready("head", function () {
@@ -32,12 +44,46 @@ loadjs.ready("head", function () {
 <?php if ($Page->ImportOptions->visible()) { ?>
 <?php $Page->ImportOptions->render("body") ?>
 <?php } ?>
+<?php if ($Page->SearchOptions->visible()) { ?>
+<?php $Page->SearchOptions->render("body") ?>
+<?php } ?>
+<?php if ($Page->FilterOptions->visible()) { ?>
+<?php $Page->FilterOptions->render("body") ?>
+<?php } ?>
 <div class="clearfix"></div>
 </div>
 <?php } ?>
 <?php
 $Page->renderOtherOptions();
 ?>
+<?php if ($Security->canSearch()) { ?>
+<?php if (!$Page->isExport() && !$Page->CurrentAction) { ?>
+<form name="fview_bus_ext_summary_at_a_glancelistsrch" id="fview_bus_ext_summary_at_a_glancelistsrch" class="form-inline ew-form ew-ext-search-form" action="<?= CurrentPageUrl() ?>">
+<div id="fview_bus_ext_summary_at_a_glancelistsrch-search-panel" class="<?= $Page->SearchPanelClass ?>">
+<input type="hidden" name="cmd" value="search">
+<input type="hidden" name="t" value="view_bus_ext_summary_at_a_glance">
+    <div class="ew-extended-search">
+<div id="xsr_<?= $Page->SearchRowCount + 1 ?>" class="ew-row d-sm-flex">
+    <div class="ew-quick-search input-group">
+        <input type="text" name="<?= Config("TABLE_BASIC_SEARCH") ?>" id="<?= Config("TABLE_BASIC_SEARCH") ?>" class="form-control" value="<?= HtmlEncode($Page->BasicSearch->getKeyword()) ?>" placeholder="<?= HtmlEncode($Language->phrase("Search")) ?>">
+        <input type="hidden" name="<?= Config("TABLE_BASIC_SEARCH_TYPE") ?>" id="<?= Config("TABLE_BASIC_SEARCH_TYPE") ?>" value="<?= HtmlEncode($Page->BasicSearch->getType()) ?>">
+        <div class="input-group-append">
+            <button class="btn btn-primary" name="btn-submit" id="btn-submit" type="submit"><?= $Language->phrase("SearchBtn") ?></button>
+            <button type="button" data-toggle="dropdown" class="btn btn-primary dropdown-toggle dropdown-toggle-split" aria-haspopup="true" aria-expanded="false"><span id="searchtype"><?= $Page->BasicSearch->getTypeNameShort() ?></span></button>
+            <div class="dropdown-menu dropdown-menu-right">
+                <a class="dropdown-item<?php if ($Page->BasicSearch->getType() == "") { ?> active<?php } ?>" href="#" onclick="return ew.setSearchType(this);"><?= $Language->phrase("QuickSearchAuto") ?></a>
+                <a class="dropdown-item<?php if ($Page->BasicSearch->getType() == "=") { ?> active<?php } ?>" href="#" onclick="return ew.setSearchType(this, '=');"><?= $Language->phrase("QuickSearchExact") ?></a>
+                <a class="dropdown-item<?php if ($Page->BasicSearch->getType() == "AND") { ?> active<?php } ?>" href="#" onclick="return ew.setSearchType(this, 'AND');"><?= $Language->phrase("QuickSearchAll") ?></a>
+                <a class="dropdown-item<?php if ($Page->BasicSearch->getType() == "OR") { ?> active<?php } ?>" href="#" onclick="return ew.setSearchType(this, 'OR');"><?= $Language->phrase("QuickSearchAny") ?></a>
+            </div>
+        </div>
+    </div>
+</div>
+    </div><!-- /.ew-extended-search -->
+</div><!-- /.ew-search-panel -->
+</form>
+<?php } ?>
+<?php } ?>
 <?php $Page->showPageHeader(); ?>
 <?php
 $Page->showMessage();
@@ -78,6 +124,9 @@ $Page->renderListOptions();
 // Render list options (header, left)
 $Page->ListOptions->render("header", "left");
 ?>
+<?php if ($Page->brand_status->Visible) { // brand_status ?>
+        <th data-name="brand_status" class="<?= $Page->brand_status->headerCellClass() ?>"><div id="elh_view_bus_ext_summary_at_a_glance_brand_status" class="view_bus_ext_summary_at_a_glance_brand_status"><?= $Page->renderSort($Page->brand_status) ?></div></th>
+<?php } ?>
 <?php if ($Page->active->Visible) { // active ?>
         <th data-name="active" class="<?= $Page->active->headerCellClass() ?>"><div id="elh_view_bus_ext_summary_at_a_glance_active" class="view_bus_ext_summary_at_a_glance_active"><?= $Page->renderSort($Page->active) ?></div></th>
 <?php } ?>
@@ -86,6 +135,15 @@ $Page->ListOptions->render("header", "left");
 <?php } ?>
 <?php if ($Page->total->Visible) { // total ?>
         <th data-name="total" class="<?= $Page->total->headerCellClass() ?>"><div id="elh_view_bus_ext_summary_at_a_glance_total" class="view_bus_ext_summary_at_a_glance_total"><?= $Page->renderSort($Page->total) ?></div></th>
+<?php } ?>
+<?php if ($Page->last_updated_at->Visible) { // last_updated_at ?>
+        <th data-name="last_updated_at" class="<?= $Page->last_updated_at->headerCellClass() ?>"><div id="elh_view_bus_ext_summary_at_a_glance_last_updated_at" class="view_bus_ext_summary_at_a_glance_last_updated_at"><?= $Page->renderSort($Page->last_updated_at) ?></div></th>
+<?php } ?>
+<?php if ($Page->platform_id->Visible) { // platform_id ?>
+        <th data-name="platform_id" class="<?= $Page->platform_id->headerCellClass() ?>"><div id="elh_view_bus_ext_summary_at_a_glance_platform_id" class="view_bus_ext_summary_at_a_glance_platform_id"><?= $Page->renderSort($Page->platform_id) ?></div></th>
+<?php } ?>
+<?php if ($Page->operator_id->Visible) { // operator_id ?>
+        <th data-name="operator_id" class="<?= $Page->operator_id->headerCellClass() ?>"><div id="elh_view_bus_ext_summary_at_a_glance_operator_id" class="view_bus_ext_summary_at_a_glance_operator_id"><?= $Page->renderSort($Page->operator_id) ?></div></th>
 <?php } ?>
 <?php
 // Render list options (header, right)
@@ -154,6 +212,14 @@ while ($Page->RecordCount < $Page->StopRecord) {
 // Render list options (body, left)
 $Page->ListOptions->render("body", "left", $Page->RowCount);
 ?>
+    <?php if ($Page->brand_status->Visible) { // brand_status ?>
+        <td data-name="brand_status" <?= $Page->brand_status->cellAttributes() ?>>
+<span id="el<?= $Page->RowCount ?>_view_bus_ext_summary_at_a_glance_brand_status">
+<span<?= $Page->brand_status->viewAttributes() ?>>
+<?= $Page->brand_status->getViewValue() ?></span>
+</span>
+</td>
+    <?php } ?>
     <?php if ($Page->active->Visible) { // active ?>
         <td data-name="active" <?= $Page->active->cellAttributes() ?>>
 <span id="el<?= $Page->RowCount ?>_view_bus_ext_summary_at_a_glance_active">
@@ -178,6 +244,30 @@ $Page->ListOptions->render("body", "left", $Page->RowCount);
 </span>
 </td>
     <?php } ?>
+    <?php if ($Page->last_updated_at->Visible) { // last_updated_at ?>
+        <td data-name="last_updated_at" <?= $Page->last_updated_at->cellAttributes() ?>>
+<span id="el<?= $Page->RowCount ?>_view_bus_ext_summary_at_a_glance_last_updated_at">
+<span<?= $Page->last_updated_at->viewAttributes() ?>>
+<?= $Page->last_updated_at->getViewValue() ?></span>
+</span>
+</td>
+    <?php } ?>
+    <?php if ($Page->platform_id->Visible) { // platform_id ?>
+        <td data-name="platform_id" <?= $Page->platform_id->cellAttributes() ?>>
+<span id="el<?= $Page->RowCount ?>_view_bus_ext_summary_at_a_glance_platform_id">
+<span<?= $Page->platform_id->viewAttributes() ?>>
+<?= $Page->platform_id->getViewValue() ?></span>
+</span>
+</td>
+    <?php } ?>
+    <?php if ($Page->operator_id->Visible) { // operator_id ?>
+        <td data-name="operator_id" <?= $Page->operator_id->cellAttributes() ?>>
+<span id="el<?= $Page->RowCount ?>_view_bus_ext_summary_at_a_glance_operator_id">
+<span<?= $Page->operator_id->viewAttributes() ?>>
+<?= $Page->operator_id->getViewValue() ?></span>
+</span>
+</td>
+    <?php } ?>
 <?php
 // Render list options (body, right)
 $Page->ListOptions->render("body", "right", $Page->RowCount);
@@ -191,6 +281,67 @@ $Page->ListOptions->render("body", "right", $Page->RowCount);
 }
 ?>
 </tbody>
+<?php
+// Render aggregate row
+$Page->RowType = ROWTYPE_AGGREGATE;
+$Page->resetAttributes();
+$Page->renderRow();
+?>
+<?php if ($Page->TotalRecords > 0 && !$Page->isGridAdd() && !$Page->isGridEdit()) { ?>
+<tfoot><!-- Table footer -->
+    <tr class="ew-table-footer">
+<?php
+// Render list options
+$Page->renderListOptions();
+
+// Render list options (footer, left)
+$Page->ListOptions->render("footer", "left");
+?>
+    <?php if ($Page->brand_status->Visible) { // brand_status ?>
+        <td data-name="brand_status" class="<?= $Page->brand_status->footerCellClass() ?>"><span id="elf_view_bus_ext_summary_at_a_glance_brand_status" class="view_bus_ext_summary_at_a_glance_brand_status">
+        &nbsp;
+        </span></td>
+    <?php } ?>
+    <?php if ($Page->active->Visible) { // active ?>
+        <td data-name="active" class="<?= $Page->active->footerCellClass() ?>"><span id="elf_view_bus_ext_summary_at_a_glance_active" class="view_bus_ext_summary_at_a_glance_active">
+        <span class="ew-aggregate"><?= $Language->phrase("TOTAL") ?></span><span class="ew-aggregate-value">
+        <?= $Page->active->ViewValue ?></span>
+        </span></td>
+    <?php } ?>
+    <?php if ($Page->maintenance->Visible) { // maintenance ?>
+        <td data-name="maintenance" class="<?= $Page->maintenance->footerCellClass() ?>"><span id="elf_view_bus_ext_summary_at_a_glance_maintenance" class="view_bus_ext_summary_at_a_glance_maintenance">
+        <span class="ew-aggregate"><?= $Language->phrase("TOTAL") ?></span><span class="ew-aggregate-value">
+        <?= $Page->maintenance->ViewValue ?></span>
+        </span></td>
+    <?php } ?>
+    <?php if ($Page->total->Visible) { // total ?>
+        <td data-name="total" class="<?= $Page->total->footerCellClass() ?>"><span id="elf_view_bus_ext_summary_at_a_glance_total" class="view_bus_ext_summary_at_a_glance_total">
+        <span class="ew-aggregate"><?= $Language->phrase("TOTAL") ?></span><span class="ew-aggregate-value">
+        <?= $Page->total->ViewValue ?></span>
+        </span></td>
+    <?php } ?>
+    <?php if ($Page->last_updated_at->Visible) { // last_updated_at ?>
+        <td data-name="last_updated_at" class="<?= $Page->last_updated_at->footerCellClass() ?>"><span id="elf_view_bus_ext_summary_at_a_glance_last_updated_at" class="view_bus_ext_summary_at_a_glance_last_updated_at">
+        &nbsp;
+        </span></td>
+    <?php } ?>
+    <?php if ($Page->platform_id->Visible) { // platform_id ?>
+        <td data-name="platform_id" class="<?= $Page->platform_id->footerCellClass() ?>"><span id="elf_view_bus_ext_summary_at_a_glance_platform_id" class="view_bus_ext_summary_at_a_glance_platform_id">
+        &nbsp;
+        </span></td>
+    <?php } ?>
+    <?php if ($Page->operator_id->Visible) { // operator_id ?>
+        <td data-name="operator_id" class="<?= $Page->operator_id->footerCellClass() ?>"><span id="elf_view_bus_ext_summary_at_a_glance_operator_id" class="view_bus_ext_summary_at_a_glance_operator_id">
+        &nbsp;
+        </span></td>
+    <?php } ?>
+<?php
+// Render list options (footer, right)
+$Page->ListOptions->render("footer", "right");
+?>
+    </tr>
+</tfoot>
+<?php } ?>
 </table><!-- /.ew-table -->
 <?php } ?>
 </div><!-- /.ew-grid-middle-panel -->

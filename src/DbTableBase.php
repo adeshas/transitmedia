@@ -194,7 +194,7 @@ class DbTableBase
     {
         $values = [];
         foreach ($this->Fields as $fldname => $fld) {
-            if (in_array($fld->DataType, Config("CUSTOM_TEMPLATE_DATATYPES"))) {
+            if (in_array($fld->DataType, Config("CUSTOM_TEMPLATE_DATATYPES")) && $fld->Visible) {
                 if (is_string($fld->DbValue) && strlen($fld->DbValue) > Config("DATA_STRING_MAX_LENGTH")) {
                     $values[$fld->Param] = substr($fld->DbValue, 0, Config("DATA_STRING_MAX_LENGTH"));
                 } else {

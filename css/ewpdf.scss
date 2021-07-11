@@ -3,25 +3,25 @@
 @import "variables"; //***
 
 // Report
-$ThemeRptGrpColor1: #F5F5F5;
+$ThemeRptGrpColor1: inherit;
 $ThemeRptGrpTextColor1: inherit;
-$ThemeRptGrpSummaryColor1: #F5F5F5;
+$ThemeRptGrpSummaryColor1: #7F9DBF;
 $ThemeRptGrpSummaryTextColor1: inherit;
 $ThemeRptGrpColor2: inherit;
 $ThemeRptGrpTextColor2: inherit;
 $ThemeRptGrpSummaryColor2: inherit;
 $ThemeRptGrpSummaryTextColor2: inherit;
 $ThemeRptGrpColor3: inherit;
-$ThemeRptGrpTextColor3: #F5F5F5;
-$ThemeRptGrpSummaryColor3: #F5F5F5;
+$ThemeRptGrpTextColor3: inherit;
+$ThemeRptGrpSummaryColor3: #7F9DBF;
 $ThemeRptGrpSummaryTextColor3: inherit;
 $ThemeRptGrpColor4: inherit;
 $ThemeRptGrpTextColor4: inherit;
 $ThemeRptGrpSummaryColor4: inherit;
 $ThemeRptGrpSummaryTextColor4: inherit;
-$ThemeRptGrpColor5: #F5F5F5;
+$ThemeRptGrpColor5: inherit;
 $ThemeRptGrpTextColor5: inherit;
-$ThemeRptGrpSummaryColor5: #F5F5F5;
+$ThemeRptGrpSummaryColor5: #7F9DBF;
 $ThemeRptGrpSummaryTextColor5: inherit;
 $ThemeRptGrpColor6: inherit;
 $ThemeRptGrpTextColor6: inherit;
@@ -49,36 +49,36 @@ body {
 .ew-table td, .ew-table th {
     padding: 3px; // cell padding
     border: 0.5px solid;
-    border-color: inherit; // border color
+    border-color: #CFCFCF; // border color
 }
 .no-border td, .no-border th {
     border: 0;
 }
 .ew-table .ew-table-header td, .ew-table .ew-table-header th {
     background-image: none; // remove header bg image
-    background-color: inherit; // header bgcolor
-    color: inherit; // header font color
+    background-color: #40546A; // header bgcolor
+    color: #FFFFFF; // header font color
     vertical-align: top;
 }
 
 // row color
 .ew-table .ew-table-row, .ew-table .ew-table-row td {
-    background-color: inherit; // alt row color 1
+    background-color: #FFFFFF; // alt row color 1
 }
 
 // alternate row color
 .ew-table .ew-table-alt-row, .ew-table .ew-table-alt-row td {
-    background-color: inherit; // alt row color 2
+    background-color: #F7F6F3; // alt row color 2
 }
 
 // main table footer
 .ew-table .ew-table-footer td {
-    background-color: inherit; // footer color
+    background-color: #EAEAEA; // footer color
 }
 
 // crosstab column row
 .ew-table .ew-table-column-row {
-    background-color: inherit; // alt row color 2
+    background-color: #F7F6F3; // alt row color 2
 }
 
 // groups
@@ -123,13 +123,13 @@ body {
 
 // for crosstab report only
 .ew-rpt-col-summary {
-    background-color: inherit; // column summary
-    color: inherit;
+    background-color: #40546A; // column summary
+    color: #FFFFFF;
     border: 0;
 }
 .ew-rpt-col-header {
-    background-color: inherit; // column heading background color
-    color: inherit; // column heading text color
+    background-color: #40546A; // column heading background color
+    color: #FFFFFF; // column heading text color
     border: 0;
 }
 

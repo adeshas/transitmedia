@@ -504,6 +504,8 @@ class ZPriceSettingsView extends ZPriceSettings
         $this->lamata_fee->setVisibility();
         $this->lasaa_fee->setVisibility();
         $this->printers_fee->setVisibility();
+        $this->active->setVisibility();
+        $this->ts_created->setVisibility();
         $this->hideFieldsForAddEdit();
 
         // Do not use lookup cache
@@ -625,6 +627,16 @@ class ZPriceSettingsView extends ZPriceSettings
         $options = &$this->OtherOptions;
         $option = $options["action"];
 
+        // Edit
+        $item = &$option->add("edit");
+        $editcaption = HtmlTitle($Language->phrase("ViewPageEditLink"));
+        if ($this->IsModal) {
+            $item->Body = "<a class=\"ew-action ew-edit\" title=\"" . $editcaption . "\" data-caption=\"" . $editcaption . "\" href=\"#\" onclick=\"return ew.modalDialogShow({lnk:this,url:'" . HtmlEncode(GetUrl($this->EditUrl)) . "'});\">" . $Language->phrase("ViewPageEditLink") . "</a>";
+        } else {
+            $item->Body = "<a class=\"ew-action ew-edit\" title=\"" . $editcaption . "\" data-caption=\"" . $editcaption . "\" href=\"" . HtmlEncode(GetUrl($this->EditUrl)) . "\">" . $Language->phrase("ViewPageEditLink") . "</a>";
+        }
+        $item->Visible = ($this->EditUrl != "" && $Security->canEdit());
+
         // Set up action default
         $option = $options["action"];
         $option->DropDownButtonPhrase = $Language->phrase("ButtonActions");
@@ -696,6 +708,8 @@ class ZPriceSettingsView extends ZPriceSettings
         $this->lamata_fee->setDbValue($row['lamata_fee']);
         $this->lasaa_fee->setDbValue($row['lasaa_fee']);
         $this->printers_fee->setDbValue($row['printers_fee']);
+        $this->active->setDbValue((ConvertToBool($row['active']) ? "1" : "0"));
+        $this->ts_created->setDbValue($row['ts_created']);
     }
 
     // Return a row with default values
@@ -716,6 +730,8 @@ class ZPriceSettingsView extends ZPriceSettings
         $row['lamata_fee'] = null;
         $row['lasaa_fee'] = null;
         $row['printers_fee'] = null;
+        $row['active'] = null;
+        $row['ts_created'] = null;
         return $row;
     }
 
@@ -764,6 +780,10 @@ class ZPriceSettingsView extends ZPriceSettings
         // lasaa_fee
 
         // printers_fee
+
+        // active
+
+        // ts_created
         if ($this->RowType == ROWTYPE_VIEW) {
             // id
             $this->id->ViewValue = $this->id->CurrentValue;
@@ -775,7 +795,7 @@ class ZPriceSettingsView extends ZPriceSettings
                 $this->platform_id->ViewValue = $this->platform_id->lookupCacheOption($curVal);
                 if ($this->platform_id->ViewValue === null) { // Lookup from database
                     $filterWrk = "\"id\"" . SearchString("=", $curVal, DATATYPE_NUMBER, "");
-                    $sqlWrk = $this->platform_id->Lookup->getSql(false, $filterWrk, '', $this, true);
+                    $sqlWrk = $this->platform_id->Lookup->getSql(false, $filterWrk, '', $this, true, true);
                     $rswrk = Conn()->executeQuery($sqlWrk)->fetchAll(\PDO::FETCH_BOTH);
                     $ari = count($rswrk);
                     if ($ari > 0) { // Lookup values found
@@ -796,7 +816,7 @@ class ZPriceSettingsView extends ZPriceSettings
                 $this->inventory_id->ViewValue = $this->inventory_id->lookupCacheOption($curVal);
                 if ($this->inventory_id->ViewValue === null) { // Lookup from database
                     $filterWrk = "\"id\"" . SearchString("=", $curVal, DATATYPE_NUMBER, "");
-                    $sqlWrk = $this->inventory_id->Lookup->getSql(false, $filterWrk, '', $this, true);
+                    $sqlWrk = $this->inventory_id->Lookup->getSql(false, $filterWrk, '', $this, true, true);
                     $rswrk = Conn()->executeQuery($sqlWrk)->fetchAll(\PDO::FETCH_BOTH);
                     $ari = count($rswrk);
                     if ($ari > 0) { // Lookup values found
@@ -817,7 +837,7 @@ class ZPriceSettingsView extends ZPriceSettings
                 $this->print_stage_id->ViewValue = $this->print_stage_id->lookupCacheOption($curVal);
                 if ($this->print_stage_id->ViewValue === null) { // Lookup from database
                     $filterWrk = "\"id\"" . SearchString("=", $curVal, DATATYPE_NUMBER, "");
-                    $sqlWrk = $this->print_stage_id->Lookup->getSql(false, $filterWrk, '', $this, true);
+                    $sqlWrk = $this->print_stage_id->Lookup->getSql(false, $filterWrk, '', $this, true, true);
                     $rswrk = Conn()->executeQuery($sqlWrk)->fetchAll(\PDO::FETCH_BOTH);
                     $ari = count($rswrk);
                     if ($ari > 0) { // Lookup values found
@@ -838,7 +858,7 @@ class ZPriceSettingsView extends ZPriceSettings
                 $this->bus_size_id->ViewValue = $this->bus_size_id->lookupCacheOption($curVal);
                 if ($this->bus_size_id->ViewValue === null) { // Lookup from database
                     $filterWrk = "\"id\"" . SearchString("=", $curVal, DATATYPE_NUMBER, "");
-                    $sqlWrk = $this->bus_size_id->Lookup->getSql(false, $filterWrk, '', $this, true);
+                    $sqlWrk = $this->bus_size_id->Lookup->getSql(false, $filterWrk, '', $this, true, true);
                     $rswrk = Conn()->executeQuery($sqlWrk)->fetchAll(\PDO::FETCH_BOTH);
                     $ari = count($rswrk);
                     if ($ari > 0) { // Lookup values found
@@ -896,6 +916,19 @@ class ZPriceSettingsView extends ZPriceSettings
             $this->printers_fee->ViewValue = $this->printers_fee->CurrentValue;
             $this->printers_fee->ViewValue = FormatNumber($this->printers_fee->ViewValue, 0, -2, -2, -2);
             $this->printers_fee->ViewCustomAttributes = "";
+
+            // active
+            if (ConvertToBool($this->active->CurrentValue)) {
+                $this->active->ViewValue = $this->active->tagCaption(1) != "" ? $this->active->tagCaption(1) : "Yes";
+            } else {
+                $this->active->ViewValue = $this->active->tagCaption(2) != "" ? $this->active->tagCaption(2) : "No";
+            }
+            $this->active->ViewCustomAttributes = "";
+
+            // ts_created
+            $this->ts_created->ViewValue = $this->ts_created->CurrentValue;
+            $this->ts_created->ViewValue = FormatDateTime($this->ts_created->ViewValue, 0);
+            $this->ts_created->ViewCustomAttributes = "";
 
             // id
             $this->id->LinkCustomAttributes = "";
@@ -966,6 +999,16 @@ class ZPriceSettingsView extends ZPriceSettings
             $this->printers_fee->LinkCustomAttributes = "";
             $this->printers_fee->HrefValue = "";
             $this->printers_fee->TooltipValue = "";
+
+            // active
+            $this->active->LinkCustomAttributes = "";
+            $this->active->HrefValue = "";
+            $this->active->TooltipValue = "";
+
+            // ts_created
+            $this->ts_created->LinkCustomAttributes = "";
+            $this->ts_created->HrefValue = "";
+            $this->ts_created->TooltipValue = "";
         }
 
         // Call Row Rendered event
@@ -1005,6 +1048,8 @@ class ZPriceSettingsView extends ZPriceSettings
                 case "x_print_stage_id":
                     break;
                 case "x_bus_size_id":
+                    break;
+                case "x_active":
                     break;
                 default:
                     $lookupFilter = "";

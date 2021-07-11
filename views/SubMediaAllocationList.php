@@ -134,16 +134,16 @@ loadjs.ready("head", function () {
 <?php } ?>
 <?php if (!$Page->isExport() || Config("EXPORT_MASTER_RECORD") && $Page->isExport("print")) { ?>
 <?php
-if ($Page->DbMasterFilter != "" && $Page->getCurrentMasterTable() == "main_buses") {
+if ($Page->DbMasterFilter != "" && $Page->getCurrentMasterTable() == "main_campaigns") {
     if ($Page->MasterRecordExists) {
-        include_once "views/MainBusesMaster.php";
+        include_once "views/MainCampaignsMaster.php";
     }
 }
 ?>
 <?php
-if ($Page->DbMasterFilter != "" && $Page->getCurrentMasterTable() == "main_campaigns") {
+if ($Page->DbMasterFilter != "" && $Page->getCurrentMasterTable() == "main_buses") {
     if ($Page->MasterRecordExists) {
-        include_once "views/MainCampaignsMaster.php";
+        include_once "views/MainBusesMaster.php";
     }
 }
 ?>
@@ -176,13 +176,13 @@ $Page->showMessage();
 <input type="hidden" name="<?= $TokenValueKey ?>" value="<?= $TokenValue ?>"><!-- CSRF token value -->
 <?php } ?>
 <input type="hidden" name="t" value="sub_media_allocation">
-<?php if ($Page->getCurrentMasterTable() == "main_buses" && $Page->CurrentAction) { ?>
-<input type="hidden" name="<?= Config("TABLE_SHOW_MASTER") ?>" value="main_buses">
-<input type="hidden" name="fk_id" value="<?= HtmlEncode($Page->bus_id->getSessionValue()) ?>">
-<?php } ?>
 <?php if ($Page->getCurrentMasterTable() == "main_campaigns" && $Page->CurrentAction) { ?>
 <input type="hidden" name="<?= Config("TABLE_SHOW_MASTER") ?>" value="main_campaigns">
 <input type="hidden" name="fk_id" value="<?= HtmlEncode($Page->campaign_id->getSessionValue()) ?>">
+<?php } ?>
+<?php if ($Page->getCurrentMasterTable() == "main_buses" && $Page->CurrentAction) { ?>
+<input type="hidden" name="<?= Config("TABLE_SHOW_MASTER") ?>" value="main_buses">
+<input type="hidden" name="fk_id" value="<?= HtmlEncode($Page->bus_id->getSessionValue()) ?>">
 <?php } ?>
 <div id="gmp_sub_media_allocation" class="<?= ResponsiveTableClass() ?>card-body ew-grid-middle-panel">
 <?php if ($Page->TotalRecords > 0 || $Page->isAdd() || $Page->isCopy() || $Page->isGridEdit()) { ?>
@@ -576,6 +576,8 @@ $Page->ListOptions->render("body", "left", $Page->RowCount);
 </span>
 <?php } ?>
 </td>
+    <?php } else { ?>
+            <input type="hidden" data-table="sub_media_allocation" data-field="x_id" data-hidden="1" name="x<?= $Page->RowIndex ?>_id" id="x<?= $Page->RowIndex ?>_id" value="<?= HtmlEncode($Page->id->CurrentValue) ?>">
     <?php } ?>
     <?php if ($Page->bus_id->Visible) { // bus_id ?>
         <td data-name="bus_id" <?= $Page->bus_id->cellAttributes() ?>>
