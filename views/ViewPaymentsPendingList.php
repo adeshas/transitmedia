@@ -130,15 +130,6 @@ $Page->ListOptions->render("header", "left");
 <?php if ($Page->campaign_id->Visible) { // campaign_id ?>
         <th data-name="campaign_id" class="<?= $Page->campaign_id->headerCellClass() ?>"><div id="elh_view_payments_pending_campaign_id" class="view_payments_pending_campaign_id"><?= $Page->renderSort($Page->campaign_id) ?></div></th>
 <?php } ?>
-<?php if ($Page->quantity->Visible) { // quantity ?>
-        <th data-name="quantity" class="<?= $Page->quantity->headerCellClass() ?>"><div id="elh_view_payments_pending_quantity" class="view_payments_pending_quantity"><?= $Page->renderSort($Page->quantity) ?></div></th>
-<?php } ?>
-<?php if ($Page->transaction_status->Visible) { // transaction_status ?>
-        <th data-name="transaction_status" class="<?= $Page->transaction_status->headerCellClass() ?>"><div id="elh_view_payments_pending_transaction_status" class="view_payments_pending_transaction_status"><?= $Page->renderSort($Page->transaction_status) ?></div></th>
-<?php } ?>
-<?php if ($Page->print_status->Visible) { // print_status ?>
-        <th data-name="print_status" class="<?= $Page->print_status->headerCellClass() ?>"><div id="elh_view_payments_pending_print_status" class="view_payments_pending_print_status"><?= $Page->renderSort($Page->print_status) ?></div></th>
-<?php } ?>
 <?php if ($Page->payment_status->Visible) { // payment_status ?>
         <th data-name="payment_status" class="<?= $Page->payment_status->headerCellClass() ?>"><div id="elh_view_payments_pending_payment_status" class="view_payments_pending_payment_status"><?= $Page->renderSort($Page->payment_status) ?></div></th>
 <?php } ?>
@@ -157,6 +148,15 @@ $Page->ListOptions->render("header", "left");
 <?php if ($Page->platform->Visible) { // platform ?>
         <th data-name="platform" class="<?= $Page->platform->headerCellClass() ?>"><div id="elh_view_payments_pending_platform" class="view_payments_pending_platform"><?= $Page->renderSort($Page->platform) ?></div></th>
 <?php } ?>
+<?php if ($Page->inventory->Visible) { // inventory ?>
+        <th data-name="inventory" class="<?= $Page->inventory->headerCellClass() ?>"><div id="elh_view_payments_pending_inventory" class="view_payments_pending_inventory"><?= $Page->renderSort($Page->inventory) ?></div></th>
+<?php } ?>
+<?php if ($Page->bus_size->Visible) { // bus_size ?>
+        <th data-name="bus_size" class="<?= $Page->bus_size->headerCellClass() ?>"><div id="elh_view_payments_pending_bus_size" class="view_payments_pending_bus_size"><?= $Page->renderSort($Page->bus_size) ?></div></th>
+<?php } ?>
+<?php if ($Page->quantity->Visible) { // quantity ?>
+        <th data-name="quantity" class="<?= $Page->quantity->headerCellClass() ?>"><div id="elh_view_payments_pending_quantity" class="view_payments_pending_quantity"><?= $Page->renderSort($Page->quantity) ?></div></th>
+<?php } ?>
 <?php if ($Page->price->Visible) { // price ?>
         <th data-name="price" class="<?= $Page->price->headerCellClass() ?>"><div id="elh_view_payments_pending_price" class="view_payments_pending_price"><?= $Page->renderSort($Page->price) ?></div></th>
 <?php } ?>
@@ -174,6 +174,30 @@ $Page->ListOptions->render("header", "left");
 <?php } ?>
 <?php if ($Page->printers_fee->Visible) { // printers_fee ?>
         <th data-name="printers_fee" class="<?= $Page->printers_fee->headerCellClass() ?>"><div id="elh_view_payments_pending_printers_fee" class="view_payments_pending_printers_fee"><?= $Page->renderSort($Page->printers_fee) ?></div></th>
+<?php } ?>
+<?php if ($Page->operator_total->Visible) { // operator_total ?>
+        <th data-name="operator_total" class="<?= $Page->operator_total->headerCellClass() ?>"><div id="elh_view_payments_pending_operator_total" class="view_payments_pending_operator_total"><?= $Page->renderSort($Page->operator_total) ?></div></th>
+<?php } ?>
+<?php if ($Page->agency_total->Visible) { // agency_total ?>
+        <th data-name="agency_total" class="<?= $Page->agency_total->headerCellClass() ?>"><div id="elh_view_payments_pending_agency_total" class="view_payments_pending_agency_total"><?= $Page->renderSort($Page->agency_total) ?></div></th>
+<?php } ?>
+<?php if ($Page->lamata_total->Visible) { // lamata_total ?>
+        <th data-name="lamata_total" class="<?= $Page->lamata_total->headerCellClass() ?>"><div id="elh_view_payments_pending_lamata_total" class="view_payments_pending_lamata_total"><?= $Page->renderSort($Page->lamata_total) ?></div></th>
+<?php } ?>
+<?php if ($Page->lasaa_total->Visible) { // lasaa_total ?>
+        <th data-name="lasaa_total" class="<?= $Page->lasaa_total->headerCellClass() ?>"><div id="elh_view_payments_pending_lasaa_total" class="view_payments_pending_lasaa_total"><?= $Page->renderSort($Page->lasaa_total) ?></div></th>
+<?php } ?>
+<?php if ($Page->printers_total->Visible) { // printers_total ?>
+        <th data-name="printers_total" class="<?= $Page->printers_total->headerCellClass() ?>"><div id="elh_view_payments_pending_printers_total" class="view_payments_pending_printers_total"><?= $Page->renderSort($Page->printers_total) ?></div></th>
+<?php } ?>
+<?php if ($Page->price_total->Visible) { // price_total ?>
+        <th data-name="price_total" class="<?= $Page->price_total->headerCellClass() ?>"><div id="elh_view_payments_pending_price_total" class="view_payments_pending_price_total"><?= $Page->renderSort($Page->price_total) ?></div></th>
+<?php } ?>
+<?php if ($Page->transaction_status->Visible) { // transaction_status ?>
+        <th data-name="transaction_status" class="<?= $Page->transaction_status->headerCellClass() ?>"><div id="elh_view_payments_pending_transaction_status" class="view_payments_pending_transaction_status"><?= $Page->renderSort($Page->transaction_status) ?></div></th>
+<?php } ?>
+<?php if ($Page->print_status->Visible) { // print_status ?>
+        <th data-name="print_status" class="<?= $Page->print_status->headerCellClass() ?>"><div id="elh_view_payments_pending_print_status" class="view_payments_pending_print_status"><?= $Page->renderSort($Page->print_status) ?></div></th>
 <?php } ?>
 <?php
 // Render list options (header, right)
@@ -258,35 +282,16 @@ $Page->ListOptions->render("body", "left", $Page->RowCount);
 </span>
 </td>
     <?php } ?>
-    <?php if ($Page->quantity->Visible) { // quantity ?>
-        <td data-name="quantity" <?= $Page->quantity->cellAttributes() ?>>
-<span id="el<?= $Page->RowCount ?>_view_payments_pending_quantity">
-<span<?= $Page->quantity->viewAttributes() ?>>
-<?= $Page->quantity->getViewValue() ?></span>
-</span>
-</td>
-    <?php } ?>
-    <?php if ($Page->transaction_status->Visible) { // transaction_status ?>
-        <td data-name="transaction_status" <?= $Page->transaction_status->cellAttributes() ?>>
-<span id="el<?= $Page->RowCount ?>_view_payments_pending_transaction_status">
-<span<?= $Page->transaction_status->viewAttributes() ?>>
-<?= $Page->transaction_status->getViewValue() ?></span>
-</span>
-</td>
-    <?php } ?>
-    <?php if ($Page->print_status->Visible) { // print_status ?>
-        <td data-name="print_status" <?= $Page->print_status->cellAttributes() ?>>
-<span id="el<?= $Page->RowCount ?>_view_payments_pending_print_status">
-<span<?= $Page->print_status->viewAttributes() ?>>
-<?= $Page->print_status->getViewValue() ?></span>
-</span>
-</td>
-    <?php } ?>
     <?php if ($Page->payment_status->Visible) { // payment_status ?>
         <td data-name="payment_status" <?= $Page->payment_status->cellAttributes() ?>>
 <span id="el<?= $Page->RowCount ?>_view_payments_pending_payment_status">
 <span<?= $Page->payment_status->viewAttributes() ?>>
-<?= $Page->payment_status->getViewValue() ?></span>
+<?php if (!EmptyString($Page->payment_status->getViewValue()) && $Page->payment_status->linkAttributes() != "") { ?>
+<a<?= $Page->payment_status->linkAttributes() ?>><?= $Page->payment_status->getViewValue() ?></a>
+<?php } else { ?>
+<?= $Page->payment_status->getViewValue() ?>
+<?php } ?>
+</span>
 </span>
 </td>
     <?php } ?>
@@ -327,6 +332,30 @@ $Page->ListOptions->render("body", "left", $Page->RowCount);
 <span id="el<?= $Page->RowCount ?>_view_payments_pending_platform">
 <span<?= $Page->platform->viewAttributes() ?>>
 <?= $Page->platform->getViewValue() ?></span>
+</span>
+</td>
+    <?php } ?>
+    <?php if ($Page->inventory->Visible) { // inventory ?>
+        <td data-name="inventory" <?= $Page->inventory->cellAttributes() ?>>
+<span id="el<?= $Page->RowCount ?>_view_payments_pending_inventory">
+<span<?= $Page->inventory->viewAttributes() ?>>
+<?= $Page->inventory->getViewValue() ?></span>
+</span>
+</td>
+    <?php } ?>
+    <?php if ($Page->bus_size->Visible) { // bus_size ?>
+        <td data-name="bus_size" <?= $Page->bus_size->cellAttributes() ?>>
+<span id="el<?= $Page->RowCount ?>_view_payments_pending_bus_size">
+<span<?= $Page->bus_size->viewAttributes() ?>>
+<?= $Page->bus_size->getViewValue() ?></span>
+</span>
+</td>
+    <?php } ?>
+    <?php if ($Page->quantity->Visible) { // quantity ?>
+        <td data-name="quantity" <?= $Page->quantity->cellAttributes() ?>>
+<span id="el<?= $Page->RowCount ?>_view_payments_pending_quantity">
+<span<?= $Page->quantity->viewAttributes() ?>>
+<?= $Page->quantity->getViewValue() ?></span>
 </span>
 </td>
     <?php } ?>
@@ -375,6 +404,70 @@ $Page->ListOptions->render("body", "left", $Page->RowCount);
 <span id="el<?= $Page->RowCount ?>_view_payments_pending_printers_fee">
 <span<?= $Page->printers_fee->viewAttributes() ?>>
 <?= $Page->printers_fee->getViewValue() ?></span>
+</span>
+</td>
+    <?php } ?>
+    <?php if ($Page->operator_total->Visible) { // operator_total ?>
+        <td data-name="operator_total" <?= $Page->operator_total->cellAttributes() ?>>
+<span id="el<?= $Page->RowCount ?>_view_payments_pending_operator_total">
+<span<?= $Page->operator_total->viewAttributes() ?>>
+<?= $Page->operator_total->getViewValue() ?></span>
+</span>
+</td>
+    <?php } ?>
+    <?php if ($Page->agency_total->Visible) { // agency_total ?>
+        <td data-name="agency_total" <?= $Page->agency_total->cellAttributes() ?>>
+<span id="el<?= $Page->RowCount ?>_view_payments_pending_agency_total">
+<span<?= $Page->agency_total->viewAttributes() ?>>
+<?= $Page->agency_total->getViewValue() ?></span>
+</span>
+</td>
+    <?php } ?>
+    <?php if ($Page->lamata_total->Visible) { // lamata_total ?>
+        <td data-name="lamata_total" <?= $Page->lamata_total->cellAttributes() ?>>
+<span id="el<?= $Page->RowCount ?>_view_payments_pending_lamata_total">
+<span<?= $Page->lamata_total->viewAttributes() ?>>
+<?= $Page->lamata_total->getViewValue() ?></span>
+</span>
+</td>
+    <?php } ?>
+    <?php if ($Page->lasaa_total->Visible) { // lasaa_total ?>
+        <td data-name="lasaa_total" <?= $Page->lasaa_total->cellAttributes() ?>>
+<span id="el<?= $Page->RowCount ?>_view_payments_pending_lasaa_total">
+<span<?= $Page->lasaa_total->viewAttributes() ?>>
+<?= $Page->lasaa_total->getViewValue() ?></span>
+</span>
+</td>
+    <?php } ?>
+    <?php if ($Page->printers_total->Visible) { // printers_total ?>
+        <td data-name="printers_total" <?= $Page->printers_total->cellAttributes() ?>>
+<span id="el<?= $Page->RowCount ?>_view_payments_pending_printers_total">
+<span<?= $Page->printers_total->viewAttributes() ?>>
+<?= $Page->printers_total->getViewValue() ?></span>
+</span>
+</td>
+    <?php } ?>
+    <?php if ($Page->price_total->Visible) { // price_total ?>
+        <td data-name="price_total" <?= $Page->price_total->cellAttributes() ?>>
+<span id="el<?= $Page->RowCount ?>_view_payments_pending_price_total">
+<span<?= $Page->price_total->viewAttributes() ?>>
+<?= $Page->price_total->getViewValue() ?></span>
+</span>
+</td>
+    <?php } ?>
+    <?php if ($Page->transaction_status->Visible) { // transaction_status ?>
+        <td data-name="transaction_status" <?= $Page->transaction_status->cellAttributes() ?>>
+<span id="el<?= $Page->RowCount ?>_view_payments_pending_transaction_status">
+<span<?= $Page->transaction_status->viewAttributes() ?>>
+<?= $Page->transaction_status->getViewValue() ?></span>
+</span>
+</td>
+    <?php } ?>
+    <?php if ($Page->print_status->Visible) { // print_status ?>
+        <td data-name="print_status" <?= $Page->print_status->cellAttributes() ?>>
+<span id="el<?= $Page->RowCount ?>_view_payments_pending_print_status">
+<span<?= $Page->print_status->viewAttributes() ?>>
+<?= $Page->print_status->getViewValue() ?></span>
 </span>
 </td>
     <?php } ?>

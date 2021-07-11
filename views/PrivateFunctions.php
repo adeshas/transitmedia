@@ -274,7 +274,7 @@ function sendTMmail($from, $to, $subject, $msg, $msgtxt="", $attach = null, $cc 
 		$email->Content = $msg;
 
 		//COMMENT FOR LIVE EMAIL 
-		$debugme = deubgEmail($email,TRUE);
+		//$debugme = deubgEmail($email,TRUE);
 
         $email->Content = beautify_email($msg);
         $email->AltBody = $msgtxt;
@@ -287,7 +287,7 @@ function sendTMmail($from, $to, $subject, $msg, $msgtxt="", $attach = null, $cc 
 		// exit;
 
 		//COMMENT FOR DEBUG EMAIL
-        //$email->send();
+        $email->send();
 
 
 }
