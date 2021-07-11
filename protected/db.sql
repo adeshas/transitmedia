@@ -1,6 +1,6 @@
 --
 -- PostgreSQL database dump
---
+-- Demola
 
 -- Dumped from database version 11.2
 -- Dumped by pg_dump version 11.2
