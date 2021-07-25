@@ -18,7 +18,7 @@ $email->Subject = 'Test Trial';
 $email->Content = '<p>Email works</p>'; 
 $email->Format = 'HTML'; 
 $email->Charset = '';
-//$email->send();
+$email->send();
 
 #$zip = new ZipArchive();
 #print_r($zip);
@@ -26,6 +26,4 @@ $email->Charset = '';
 
 ?>
 
-<?php
-echo GetDebugMessage();
-?>
+<?= GetDebugMessage() ?>

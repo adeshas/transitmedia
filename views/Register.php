@@ -6,7 +6,6 @@ namespace PHPMaker2021\test;
 $Register = &$Page;
 ?>
 <script>
-if (!ew.vars.tables.main_users) ew.vars.tables.main_users = <?= JsonEncode(GetClientVar("tables", "main_users")) ?>;
 var currentForm, currentPageID;
 var fregister;
 loadjs.ready("head", function () {
@@ -16,13 +15,16 @@ loadjs.ready("head", function () {
     fregister = currentForm = new ew.Form("fregister", "register");
 
     // Add fields
-    var fields = ew.vars.tables.main_users.fields;
+    var currentTable = <?= JsonEncode(GetClientVar("tables", "main_users")) ?>,
+        fields = currentTable.fields;
+    if (!ew.vars.tables.main_users)
+        ew.vars.tables.main_users = currentTable;
     fregister.addFields([
-        ["name", [fields.name.required ? ew.Validators.required(fields.name.caption) : null], fields.name.isInvalid],
-        ["_username", [fields._username.required ? ew.Validators.required(fields._username.caption) : null], fields._username.isInvalid],
+        ["name", [fields.name.visible && fields.name.required ? ew.Validators.required(fields.name.caption) : null], fields.name.isInvalid],
+        ["_username", [fields._username.visible && fields._username.required ? ew.Validators.required(fields._username.caption) : null], fields._username.isInvalid],
         ["c__password", [ew.Validators.required(ew.language.phrase("ConfirmPassword")), ew.Validators.mismatchPassword], fields._password.isInvalid],
-        ["_password", [fields._password.required ? ew.Validators.required(fields._password.caption) : null, ew.Validators.password(fields._password.raw)], fields._password.isInvalid],
-        ["_email", [fields._email.required ? ew.Validators.required(fields._email.caption) : null, ew.Validators.email], fields._email.isInvalid]
+        ["_password", [fields._password.visible && fields._password.required ? ew.Validators.required(fields._password.caption) : null, ew.Validators.password(fields._password.raw)], fields._password.isInvalid],
+        ["_email", [fields._email.visible && fields._email.required ? ew.Validators.required(fields._email.caption) : null, ew.Validators.email], fields._email.isInvalid]
     ]);
 
     // Set invalid fields
@@ -91,7 +93,7 @@ loadjs.ready("head", function () {
 <?php
 $Page->showMessage();
 ?>
-<form name="fregister" id="fregister" class="<?= $Page->FormClassName ?>" action="<?= CurrentPageUrl() ?>" method="post">
+<form name="fregister" id="fregister" class="<?= $Page->FormClassName ?>" action="<?= CurrentPageUrl(false) ?>" method="post">
 <?php if (Config("CHECK_TOKEN")) { ?>
 <input type="hidden" name="<?= $TokenNameKey ?>" value="<?= $TokenName ?>"><!-- CSRF token name -->
 <input type="hidden" name="<?= $TokenValueKey ?>" value="<?= $TokenValue ?>"><!-- CSRF token value -->

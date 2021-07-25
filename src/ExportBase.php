@@ -173,7 +173,7 @@ class ExportBase
         $header = "<html><head>\r\n";
         $header .= $this->charsetMetaTag();
         if (Config("EXPORT_CSS_STYLES") && Config("PROJECT_STYLESHEET_FILENAME") != "") {
-            $header .= "<style type=\"text/css\">" . file_get_contents(Config("PROJECT_STYLESHEET_FILENAME")) . "</style>\r\n";
+            $header .= "<style>" . file_get_contents(Config("PROJECT_STYLESHEET_FILENAME")) . "</style>\r\n";
         }
         $header .= "</" . "head>\r\n<body>\r\n";
         $this->Text = $header . $this->Text . "</body></html>";

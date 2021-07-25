@@ -80,6 +80,7 @@ class MainUsers extends DbTable
         $this->id->Nullable = false; // NOT NULL field
         $this->id->Sortable = true; // Allow sort
         $this->id->DefaultErrorMessage = $Language->phrase("IncorrectInteger");
+        $this->id->CustomMsg = $Language->FieldPhrase($this->TableVar, $this->id->Param, "CustomMsg");
         $this->Fields['id'] = &$this->id;
 
         // name
@@ -87,6 +88,7 @@ class MainUsers extends DbTable
         $this->name->Nullable = false; // NOT NULL field
         $this->name->Required = true; // Required field
         $this->name->Sortable = true; // Allow sort
+        $this->name->CustomMsg = $Language->FieldPhrase($this->TableVar, $this->name->Param, "CustomMsg");
         $this->Fields['name'] = &$this->name;
 
         // username
@@ -94,6 +96,7 @@ class MainUsers extends DbTable
         $this->_username->Nullable = false; // NOT NULL field
         $this->_username->Required = true; // Required field
         $this->_username->Sortable = true; // Allow sort
+        $this->_username->CustomMsg = $Language->FieldPhrase($this->TableVar, $this->_username->Param, "CustomMsg");
         $this->Fields['username'] = &$this->_username;
 
         // password
@@ -104,6 +107,7 @@ class MainUsers extends DbTable
         $this->_password->Nullable = false; // NOT NULL field
         $this->_password->Required = true; // Required field
         $this->_password->Sortable = true; // Allow sort
+        $this->_password->CustomMsg = $Language->FieldPhrase($this->TableVar, $this->_password->Param, "CustomMsg");
         $this->Fields['password'] = &$this->_password;
 
         // email
@@ -111,6 +115,7 @@ class MainUsers extends DbTable
         $this->_email->Required = true; // Required field
         $this->_email->Sortable = true; // Allow sort
         $this->_email->DefaultErrorMessage = $Language->phrase("IncorrectEmail");
+        $this->_email->CustomMsg = $Language->FieldPhrase($this->TableVar, $this->_email->Param, "CustomMsg");
         $this->Fields['email'] = &$this->_email;
 
         // user_type
@@ -121,6 +126,7 @@ class MainUsers extends DbTable
         $this->user_type->Lookup = new Lookup('user_type', 'main_users', false, '', ["","","",""], [], [], [], [], [], [], '', '');
         $this->user_type->OptionCount = 10;
         $this->user_type->DefaultErrorMessage = $Language->phrase("IncorrectInteger");
+        $this->user_type->CustomMsg = $Language->FieldPhrase($this->TableVar, $this->user_type->Param, "CustomMsg");
         $this->Fields['user_type'] = &$this->user_type;
 
         // vendor_id
@@ -131,6 +137,7 @@ class MainUsers extends DbTable
         $this->vendor_id->PleaseSelectText = $Language->phrase("PleaseSelect"); // "PleaseSelect" text
         $this->vendor_id->Lookup = new Lookup('vendor_id', 'y_vendors', false, 'id', ["name","","",""], [], [], [], [], [], [], '', '');
         $this->vendor_id->DefaultErrorMessage = $Language->phrase("IncorrectInteger");
+        $this->vendor_id->CustomMsg = $Language->FieldPhrase($this->TableVar, $this->vendor_id->Param, "CustomMsg");
         $this->Fields['vendor_id'] = &$this->vendor_id;
 
         // reportsto
@@ -140,12 +147,14 @@ class MainUsers extends DbTable
         $this->reportsto->PleaseSelectText = $Language->phrase("PleaseSelect"); // "PleaseSelect" text
         $this->reportsto->Lookup = new Lookup('reportsto', 'y_vendors', false, 'id', ["name","","",""], [], [], [], [], [], [], '', '');
         $this->reportsto->DefaultErrorMessage = $Language->phrase("IncorrectInteger");
+        $this->reportsto->CustomMsg = $Language->FieldPhrase($this->TableVar, $this->reportsto->Param, "CustomMsg");
         $this->Fields['reportsto'] = &$this->reportsto;
 
         // ts
         $this->ts = new DbField('main_users', 'main_users', 'x_ts', 'ts', '"ts"', CastDateFieldForLike("\"ts\"", 0, "DB"), 135, 8, 0, false, '"ts"', false, false, false, 'FORMATTED TEXT', 'TEXT');
         $this->ts->Sortable = true; // Allow sort
         $this->ts->DefaultErrorMessage = str_replace("%s", $GLOBALS["DATE_FORMAT"], $Language->phrase("IncorrectDate"));
+        $this->ts->CustomMsg = $Language->FieldPhrase($this->TableVar, $this->ts->Param, "CustomMsg");
         $this->Fields['ts'] = &$this->ts;
     }
 
@@ -409,18 +418,21 @@ class MainUsers extends DbTable
         $cnt = -1;
         $rs = null;
         if ($sql instanceof \Doctrine\DBAL\Query\QueryBuilder) { // Query builder
-            $sql = $sql->resetQueryPart("orderBy")->getSQL();
+            $sqlwrk = clone $sql;
+            $sqlwrk = $sqlwrk->resetQueryPart("orderBy")->getSQL();
+        } else {
+            $sqlwrk = $sql;
         }
         $pattern = '/^SELECT\s([\s\S]+)\sFROM\s/i';
         // Skip Custom View / SubQuery / SELECT DISTINCT / ORDER BY
         if (
             ($this->TableType == 'TABLE' || $this->TableType == 'VIEW' || $this->TableType == 'LINKTABLE') &&
-            preg_match($pattern, $sql) && !preg_match('/\(\s*(SELECT[^)]+)\)/i', $sql) &&
-            !preg_match('/^\s*select\s+distinct\s+/i', $sql) && !preg_match('/\s+order\s+by\s+/i', $sql)
+            preg_match($pattern, $sqlwrk) && !preg_match('/\(\s*(SELECT[^)]+)\)/i', $sqlwrk) &&
+            !preg_match('/^\s*select\s+distinct\s+/i', $sqlwrk) && !preg_match('/\s+order\s+by\s+/i', $sqlwrk)
         ) {
-            $sqlwrk = "SELECT COUNT(*) FROM " . preg_replace($pattern, "", $sql);
+            $sqlwrk = "SELECT COUNT(*) FROM " . preg_replace($pattern, "", $sqlwrk);
         } else {
-            $sqlwrk = "SELECT COUNT(*) FROM (" . $sql . ") COUNT_TABLE";
+            $sqlwrk = "SELECT COUNT(*) FROM (" . $sqlwrk . ") COUNT_TABLE";
         }
         $conn = $c ?? $this->getConnection();
         $rs = $conn->executeQuery($sqlwrk);
@@ -847,7 +859,7 @@ class MainUsers extends DbTable
     {
         if ($this->getCurrentMasterTable() == "y_vendors" && !ContainsString($url, Config("TABLE_SHOW_MASTER") . "=")) {
             $url .= (ContainsString($url, "?") ? "&" : "?") . Config("TABLE_SHOW_MASTER") . "=" . $this->getCurrentMasterTable();
-            $url .= "&" . GetForeignKeyUrl("fk_id", $this->vendor_id->CurrentValue);
+            $url .= "&" . GetForeignKeyUrl("fk_id", $this->vendor_id->CurrentValue ?? $this->vendor_id->getSessionValue());
         }
         return $url;
     }
@@ -1062,7 +1074,7 @@ SORTHTML;
         $this->user_type->ViewCustomAttributes = "";
 
         // vendor_id
-        $curVal = strval($this->vendor_id->CurrentValue);
+        $curVal = trim(strval($this->vendor_id->CurrentValue));
         if ($curVal != "") {
             $this->vendor_id->ViewValue = $this->vendor_id->lookupCacheOption($curVal);
             if ($this->vendor_id->ViewValue === null) { // Lookup from database
@@ -1083,7 +1095,7 @@ SORTHTML;
         $this->vendor_id->ViewCustomAttributes = "";
 
         // reportsto
-        $curVal = strval($this->reportsto->CurrentValue);
+        $curVal = trim(strval($this->reportsto->CurrentValue));
         if ($curVal != "") {
             $this->reportsto->ViewValue = $this->reportsto->lookupCacheOption($curVal);
             if ($this->reportsto->ViewValue === null) { // Lookup from database
@@ -1216,7 +1228,7 @@ SORTHTML;
         $this->vendor_id->EditCustomAttributes = "";
         if ($this->vendor_id->getSessionValue() != "") {
             $this->vendor_id->CurrentValue = GetForeignKeyValue($this->vendor_id->getSessionValue());
-            $curVal = strval($this->vendor_id->CurrentValue);
+            $curVal = trim(strval($this->vendor_id->CurrentValue));
             if ($curVal != "") {
                 $this->vendor_id->ViewValue = $this->vendor_id->lookupCacheOption($curVal);
                 if ($this->vendor_id->ViewValue === null) { // Lookup from database
@@ -1245,7 +1257,7 @@ SORTHTML;
         $this->reportsto->EditCustomAttributes = "";
         if (!$Security->isAdmin() && $Security->isLoggedIn()) { // Non system admin
             if (SameString($this->vendor_id->CurrentValue, CurrentUserID())) {
-                $curVal = strval($this->reportsto->CurrentValue);
+                $curVal = trim(strval($this->reportsto->CurrentValue));
                 if ($curVal != "") {
                     $this->reportsto->EditValue = $this->reportsto->lookupCacheOption($curVal);
                     if ($this->reportsto->EditValue === null) { // Lookup from database

@@ -89,68 +89,81 @@ class ViewAllBuses extends DbTable
         $this->id->IsPrimaryKey = true; // Primary key field
         $this->id->Sortable = true; // Allow sort
         $this->id->DefaultErrorMessage = $Language->phrase("IncorrectInteger");
+        $this->id->CustomMsg = $Language->FieldPhrase($this->TableVar, $this->id->Param, "CustomMsg");
         $this->Fields['id'] = &$this->id;
 
         // number
         $this->number = new DbField('view_all_buses', 'view_all_buses', 'x_number', 'number', '"number"', '"number"', 200, 0, -1, false, '"number"', false, false, false, 'FORMATTED TEXT', 'TEXT');
         $this->number->Sortable = true; // Allow sort
+        $this->number->CustomMsg = $Language->FieldPhrase($this->TableVar, $this->number->Param, "CustomMsg");
         $this->Fields['number'] = &$this->number;
 
         // platform
         $this->platform = new DbField('view_all_buses', 'view_all_buses', 'x_platform', 'platform', '"platform"', '"platform"', 200, 50, -1, false, '"platform"', false, false, false, 'FORMATTED TEXT', 'TEXT');
         $this->platform->Sortable = true; // Allow sort
+        $this->platform->CustomMsg = $Language->FieldPhrase($this->TableVar, $this->platform->Param, "CustomMsg");
         $this->Fields['platform'] = &$this->platform;
 
         // operator
         $this->operator = new DbField('view_all_buses', 'view_all_buses', 'x_operator', 'operator', '"operator"', '"operator"', 200, 50, -1, false, '"operator"', false, false, false, 'FORMATTED TEXT', 'TEXT');
         $this->operator->Sortable = true; // Allow sort
+        $this->operator->CustomMsg = $Language->FieldPhrase($this->TableVar, $this->operator->Param, "CustomMsg");
         $this->Fields['operator'] = &$this->operator;
 
         // exterior_campaign
         $this->exterior_campaign = new DbField('view_all_buses', 'view_all_buses', 'x_exterior_campaign', 'exterior_campaign', '"exterior_campaign"', '"exterior_campaign"', 201, 0, -1, false, '"exterior_campaign"', false, false, false, 'FORMATTED TEXT', 'TEXTAREA');
         $this->exterior_campaign->Sortable = true; // Allow sort
+        $this->exterior_campaign->CustomMsg = $Language->FieldPhrase($this->TableVar, $this->exterior_campaign->Param, "CustomMsg");
         $this->Fields['exterior_campaign'] = &$this->exterior_campaign;
 
         // exterior_campaign_vendor
         $this->exterior_campaign_vendor = new DbField('view_all_buses', 'view_all_buses', 'x_exterior_campaign_vendor', 'exterior_campaign_vendor', '"exterior_campaign_vendor"', '"exterior_campaign_vendor"', 200, 0, -1, false, '"exterior_campaign_vendor"', false, false, false, 'FORMATTED TEXT', 'TEXT');
         $this->exterior_campaign_vendor->Sortable = true; // Allow sort
+        $this->exterior_campaign_vendor->CustomMsg = $Language->FieldPhrase($this->TableVar, $this->exterior_campaign_vendor->Param, "CustomMsg");
         $this->Fields['exterior_campaign_vendor'] = &$this->exterior_campaign_vendor;
 
         // interior_campaign
         $this->interior_campaign = new DbField('view_all_buses', 'view_all_buses', 'x_interior_campaign', 'interior_campaign', '"interior_campaign"', '"interior_campaign"', 201, 0, -1, false, '"interior_campaign"', false, false, false, 'FORMATTED TEXT', 'TEXTAREA');
         $this->interior_campaign->Sortable = true; // Allow sort
+        $this->interior_campaign->CustomMsg = $Language->FieldPhrase($this->TableVar, $this->interior_campaign->Param, "CustomMsg");
         $this->Fields['interior_campaign'] = &$this->interior_campaign;
 
         // interior_campaign_vendor
         $this->interior_campaign_vendor = new DbField('view_all_buses', 'view_all_buses', 'x_interior_campaign_vendor', 'interior_campaign_vendor', '"interior_campaign_vendor"', '"interior_campaign_vendor"', 200, 0, -1, false, '"interior_campaign_vendor"', false, false, false, 'FORMATTED TEXT', 'TEXT');
         $this->interior_campaign_vendor->Sortable = true; // Allow sort
+        $this->interior_campaign_vendor->CustomMsg = $Language->FieldPhrase($this->TableVar, $this->interior_campaign_vendor->Param, "CustomMsg");
         $this->Fields['interior_campaign_vendor'] = &$this->interior_campaign_vendor;
 
         // bus_status
         $this->bus_status = new DbField('view_all_buses', 'view_all_buses', 'x_bus_status', 'bus_status', '"bus_status"', '"bus_status"', 200, 0, -1, false, '"bus_status"', false, false, false, 'FORMATTED TEXT', 'TEXT');
         $this->bus_status->Sortable = true; // Allow sort
+        $this->bus_status->CustomMsg = $Language->FieldPhrase($this->TableVar, $this->bus_status->Param, "CustomMsg");
         $this->Fields['bus_status'] = &$this->bus_status;
 
         // bus_size
         $this->bus_size = new DbField('view_all_buses', 'view_all_buses', 'x_bus_size', 'bus_size', '"bus_size"', '"bus_size"', 201, 0, -1, false, '"bus_size"', false, false, false, 'FORMATTED TEXT', 'TEXTAREA');
         $this->bus_size->Sortable = true; // Allow sort
+        $this->bus_size->CustomMsg = $Language->FieldPhrase($this->TableVar, $this->bus_size->Param, "CustomMsg");
         $this->Fields['bus_size'] = &$this->bus_size;
 
         // bus_depot
         $this->bus_depot = new DbField('view_all_buses', 'view_all_buses', 'x_bus_depot', 'bus_depot', '"bus_depot"', '"bus_depot"', 201, 0, -1, false, '"bus_depot"', false, false, false, 'FORMATTED TEXT', 'TEXTAREA');
         $this->bus_depot->Sortable = true; // Allow sort
+        $this->bus_depot->CustomMsg = $Language->FieldPhrase($this->TableVar, $this->bus_depot->Param, "CustomMsg");
         $this->Fields['bus_depot'] = &$this->bus_depot;
 
         // ts_created
         $this->ts_created = new DbField('view_all_buses', 'view_all_buses', 'x_ts_created', 'ts_created', '"ts_created"', CastDateFieldForLike("\"ts_created\"", 0, "DB"), 135, 8, 0, false, '"ts_created"', false, false, false, 'FORMATTED TEXT', 'TEXT');
         $this->ts_created->Sortable = true; // Allow sort
         $this->ts_created->DefaultErrorMessage = str_replace("%s", $GLOBALS["DATE_FORMAT"], $Language->phrase("IncorrectDate"));
+        $this->ts_created->CustomMsg = $Language->FieldPhrase($this->TableVar, $this->ts_created->Param, "CustomMsg");
         $this->Fields['ts_created'] = &$this->ts_created;
 
         // ts_last_update
         $this->ts_last_update = new DbField('view_all_buses', 'view_all_buses', 'x_ts_last_update', 'ts_last_update', '"ts_last_update"', CastDateFieldForLike("\"ts_last_update\"", 0, "DB"), 135, 8, 0, false, '"ts_last_update"', false, false, false, 'FORMATTED TEXT', 'TEXT');
         $this->ts_last_update->Sortable = true; // Allow sort
         $this->ts_last_update->DefaultErrorMessage = str_replace("%s", $GLOBALS["DATE_FORMAT"], $Language->phrase("IncorrectDate"));
+        $this->ts_last_update->CustomMsg = $Language->FieldPhrase($this->TableVar, $this->ts_last_update->Param, "CustomMsg");
         $this->Fields['ts_last_update'] = &$this->ts_last_update;
 
         // bus_status_id
@@ -160,6 +173,7 @@ class ViewAllBuses extends DbTable
         $this->bus_status_id->PleaseSelectText = $Language->phrase("PleaseSelect"); // "PleaseSelect" text
         $this->bus_status_id->Lookup = new Lookup('bus_status_id', 'x_bus_status', false, 'id', ["name","availability","",""], [], [], [], [], [], [], '', '');
         $this->bus_status_id->DefaultErrorMessage = $Language->phrase("IncorrectInteger");
+        $this->bus_status_id->CustomMsg = $Language->FieldPhrase($this->TableVar, $this->bus_status_id->Param, "CustomMsg");
         $this->Fields['bus_status_id'] = &$this->bus_status_id;
 
         // bus_size_id
@@ -169,6 +183,7 @@ class ViewAllBuses extends DbTable
         $this->bus_size_id->PleaseSelectText = $Language->phrase("PleaseSelect"); // "PleaseSelect" text
         $this->bus_size_id->Lookup = new Lookup('bus_size_id', 'x_bus_sizes', false, 'id', ["name","","",""], [], [], [], [], [], [], '', '');
         $this->bus_size_id->DefaultErrorMessage = $Language->phrase("IncorrectInteger");
+        $this->bus_size_id->CustomMsg = $Language->FieldPhrase($this->TableVar, $this->bus_size_id->Param, "CustomMsg");
         $this->Fields['bus_size_id'] = &$this->bus_size_id;
 
         // bus_depot_id
@@ -178,6 +193,7 @@ class ViewAllBuses extends DbTable
         $this->bus_depot_id->PleaseSelectText = $Language->phrase("PleaseSelect"); // "PleaseSelect" text
         $this->bus_depot_id->Lookup = new Lookup('bus_depot_id', 'x_bus_depot', false, 'id', ["name","","",""], [], [], [], [], [], [], '', '');
         $this->bus_depot_id->DefaultErrorMessage = $Language->phrase("IncorrectInteger");
+        $this->bus_depot_id->CustomMsg = $Language->FieldPhrase($this->TableVar, $this->bus_depot_id->Param, "CustomMsg");
         $this->Fields['bus_depot_id'] = &$this->bus_depot_id;
 
         // platform_id
@@ -187,6 +203,7 @@ class ViewAllBuses extends DbTable
         $this->platform_id->PleaseSelectText = $Language->phrase("PleaseSelect"); // "PleaseSelect" text
         $this->platform_id->Lookup = new Lookup('platform_id', 'y_platforms', false, 'id', ["name","","",""], [], ["x_operator_id"], [], [], [], [], '', '');
         $this->platform_id->DefaultErrorMessage = $Language->phrase("IncorrectInteger");
+        $this->platform_id->CustomMsg = $Language->FieldPhrase($this->TableVar, $this->platform_id->Param, "CustomMsg");
         $this->Fields['platform_id'] = &$this->platform_id;
 
         // operator_id
@@ -196,6 +213,7 @@ class ViewAllBuses extends DbTable
         $this->operator_id->PleaseSelectText = $Language->phrase("PleaseSelect"); // "PleaseSelect" text
         $this->operator_id->Lookup = new Lookup('operator_id', 'y_operators', false, 'id', ["name","platform_id","",""], ["x_platform_id"], [], ["platform_id"], ["x_platform_id"], [], [], '', '');
         $this->operator_id->DefaultErrorMessage = $Language->phrase("IncorrectInteger");
+        $this->operator_id->CustomMsg = $Language->FieldPhrase($this->TableVar, $this->operator_id->Param, "CustomMsg");
         $this->Fields['operator_id'] = &$this->operator_id;
 
         // exterior_campaign_id
@@ -205,6 +223,7 @@ class ViewAllBuses extends DbTable
         $this->exterior_campaign_id->PleaseSelectText = $Language->phrase("PleaseSelect"); // "PleaseSelect" text
         $this->exterior_campaign_id->Lookup = new Lookup('exterior_campaign_id', 'main_campaigns', false, 'id', ["name","quantity","vendor_id",""], ["main_buses x_platform_id"], [], ["platform_id"], ["x_platform_id"], [], [], '"id" DESC', '');
         $this->exterior_campaign_id->DefaultErrorMessage = $Language->phrase("IncorrectInteger");
+        $this->exterior_campaign_id->CustomMsg = $Language->FieldPhrase($this->TableVar, $this->exterior_campaign_id->Param, "CustomMsg");
         $this->Fields['exterior_campaign_id'] = &$this->exterior_campaign_id;
 
         // interior_campaign_id
@@ -214,6 +233,7 @@ class ViewAllBuses extends DbTable
         $this->interior_campaign_id->PleaseSelectText = $Language->phrase("PleaseSelect"); // "PleaseSelect" text
         $this->interior_campaign_id->Lookup = new Lookup('interior_campaign_id', 'main_campaigns', false, 'id', ["name","inventory_id","vendor_id",""], ["main_buses x_platform_id"], [], ["platform_id"], ["x_platform_id"], [], [], '', '');
         $this->interior_campaign_id->DefaultErrorMessage = $Language->phrase("IncorrectInteger");
+        $this->interior_campaign_id->CustomMsg = $Language->FieldPhrase($this->TableVar, $this->interior_campaign_id->Param, "CustomMsg");
         $this->Fields['interior_campaign_id'] = &$this->interior_campaign_id;
     }
 
@@ -394,18 +414,21 @@ class ViewAllBuses extends DbTable
         $cnt = -1;
         $rs = null;
         if ($sql instanceof \Doctrine\DBAL\Query\QueryBuilder) { // Query builder
-            $sql = $sql->resetQueryPart("orderBy")->getSQL();
+            $sqlwrk = clone $sql;
+            $sqlwrk = $sqlwrk->resetQueryPart("orderBy")->getSQL();
+        } else {
+            $sqlwrk = $sql;
         }
         $pattern = '/^SELECT\s([\s\S]+)\sFROM\s/i';
         // Skip Custom View / SubQuery / SELECT DISTINCT / ORDER BY
         if (
             ($this->TableType == 'TABLE' || $this->TableType == 'VIEW' || $this->TableType == 'LINKTABLE') &&
-            preg_match($pattern, $sql) && !preg_match('/\(\s*(SELECT[^)]+)\)/i', $sql) &&
-            !preg_match('/^\s*select\s+distinct\s+/i', $sql) && !preg_match('/\s+order\s+by\s+/i', $sql)
+            preg_match($pattern, $sqlwrk) && !preg_match('/\(\s*(SELECT[^)]+)\)/i', $sqlwrk) &&
+            !preg_match('/^\s*select\s+distinct\s+/i', $sqlwrk) && !preg_match('/\s+order\s+by\s+/i', $sqlwrk)
         ) {
-            $sqlwrk = "SELECT COUNT(*) FROM " . preg_replace($pattern, "", $sql);
+            $sqlwrk = "SELECT COUNT(*) FROM " . preg_replace($pattern, "", $sqlwrk);
         } else {
-            $sqlwrk = "SELECT COUNT(*) FROM (" . $sql . ") COUNT_TABLE";
+            $sqlwrk = "SELECT COUNT(*) FROM (" . $sqlwrk . ") COUNT_TABLE";
         }
         $conn = $c ?? $this->getConnection();
         $rs = $conn->executeQuery($sqlwrk);
@@ -1108,7 +1131,7 @@ SORTHTML;
         $this->ts_last_update->ViewCustomAttributes = "";
 
         // bus_status_id
-        $curVal = strval($this->bus_status_id->CurrentValue);
+        $curVal = trim(strval($this->bus_status_id->CurrentValue));
         if ($curVal != "") {
             $this->bus_status_id->ViewValue = $this->bus_status_id->lookupCacheOption($curVal);
             if ($this->bus_status_id->ViewValue === null) { // Lookup from database
@@ -1129,7 +1152,7 @@ SORTHTML;
         $this->bus_status_id->ViewCustomAttributes = "";
 
         // bus_size_id
-        $curVal = strval($this->bus_size_id->CurrentValue);
+        $curVal = trim(strval($this->bus_size_id->CurrentValue));
         if ($curVal != "") {
             $this->bus_size_id->ViewValue = $this->bus_size_id->lookupCacheOption($curVal);
             if ($this->bus_size_id->ViewValue === null) { // Lookup from database
@@ -1150,7 +1173,7 @@ SORTHTML;
         $this->bus_size_id->ViewCustomAttributes = "";
 
         // bus_depot_id
-        $curVal = strval($this->bus_depot_id->CurrentValue);
+        $curVal = trim(strval($this->bus_depot_id->CurrentValue));
         if ($curVal != "") {
             $this->bus_depot_id->ViewValue = $this->bus_depot_id->lookupCacheOption($curVal);
             if ($this->bus_depot_id->ViewValue === null) { // Lookup from database
@@ -1171,7 +1194,7 @@ SORTHTML;
         $this->bus_depot_id->ViewCustomAttributes = "";
 
         // platform_id
-        $curVal = strval($this->platform_id->CurrentValue);
+        $curVal = trim(strval($this->platform_id->CurrentValue));
         if ($curVal != "") {
             $this->platform_id->ViewValue = $this->platform_id->lookupCacheOption($curVal);
             if ($this->platform_id->ViewValue === null) { // Lookup from database
@@ -1192,7 +1215,7 @@ SORTHTML;
         $this->platform_id->ViewCustomAttributes = "";
 
         // operator_id
-        $curVal = strval($this->operator_id->CurrentValue);
+        $curVal = trim(strval($this->operator_id->CurrentValue));
         if ($curVal != "") {
             $this->operator_id->ViewValue = $this->operator_id->lookupCacheOption($curVal);
             if ($this->operator_id->ViewValue === null) { // Lookup from database
@@ -1213,7 +1236,7 @@ SORTHTML;
         $this->operator_id->ViewCustomAttributes = "";
 
         // exterior_campaign_id
-        $curVal = strval($this->exterior_campaign_id->CurrentValue);
+        $curVal = trim(strval($this->exterior_campaign_id->CurrentValue));
         if ($curVal != "") {
             $this->exterior_campaign_id->ViewValue = $this->exterior_campaign_id->lookupCacheOption($curVal);
             if ($this->exterior_campaign_id->ViewValue === null) { // Lookup from database
@@ -1238,7 +1261,7 @@ SORTHTML;
         $this->exterior_campaign_id->ViewCustomAttributes = "";
 
         // interior_campaign_id
-        $curVal = strval($this->interior_campaign_id->CurrentValue);
+        $curVal = trim(strval($this->interior_campaign_id->CurrentValue));
         if ($curVal != "") {
             $this->interior_campaign_id->ViewValue = $this->interior_campaign_id->lookupCacheOption($curVal);
             if ($this->interior_campaign_id->ViewValue === null) { // Lookup from database

@@ -273,7 +273,7 @@ class AdvancedSearch
      * Check if search operator is valid
      *
      * @param string $opr Search operator, e.g. '<', '>'
-     * @return boolean
+     * @return bool
      */
     protected function isValidOperator($opr)
     {

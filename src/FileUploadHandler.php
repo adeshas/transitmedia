@@ -359,7 +359,9 @@ class FileUploadHandler
             'max_height' => $Language->phrase("UploadErrMsgMaxHeight"),
             'min_height' => $Language->phrase("UploadErrMsgMinHeight")
         ];
-        ob_end_clean();
+        if (ob_get_length()) {
+            ob_end_clean();
+        }
         $upload_handler = new UploadHandler($uploadId, $uploadTable, $sessionId, $options, true, $error_messages);
 
         // Close connection

@@ -21,11 +21,14 @@ loadjs.ready("head", function () {
     // Write your table-specific client script here, no need to add script tags.
 });
 </script>
+<script>
+if (!ew.vars.tables.w_managers_platform) ew.vars.tables.w_managers_platform = <?= JsonEncode(GetClientVar("tables", "w_managers_platform")) ?>;
+</script>
 <?php $Page->showPageHeader(); ?>
 <?php
 $Page->showMessage();
 ?>
-<form name="fw_managers_platformdelete" id="fw_managers_platformdelete" class="form-inline ew-form ew-delete-form" action="<?= CurrentPageUrl() ?>" method="post">
+<form name="fw_managers_platformdelete" id="fw_managers_platformdelete" class="form-inline ew-form ew-delete-form" action="<?= CurrentPageUrl(false) ?>" method="post">
 <?php if (Config("CHECK_TOKEN")) { ?>
 <input type="hidden" name="<?= $TokenNameKey ?>" value="<?= $TokenName ?>"><!-- CSRF token name -->
 <input type="hidden" name="<?= $TokenValueKey ?>" value="<?= $TokenValue ?>"><!-- CSRF token value -->

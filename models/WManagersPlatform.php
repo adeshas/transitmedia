@@ -74,6 +74,7 @@ class WManagersPlatform extends DbTable
         $this->id->Nullable = false; // NOT NULL field
         $this->id->Sortable = true; // Allow sort
         $this->id->DefaultErrorMessage = $Language->phrase("IncorrectInteger");
+        $this->id->CustomMsg = $Language->FieldPhrase($this->TableVar, $this->id->Param, "CustomMsg");
         $this->Fields['id'] = &$this->id;
 
         // platform_id
@@ -83,6 +84,7 @@ class WManagersPlatform extends DbTable
         $this->platform_id->PleaseSelectText = $Language->phrase("PleaseSelect"); // "PleaseSelect" text
         $this->platform_id->Lookup = new Lookup('platform_id', 'y_platforms', false, 'id', ["name","","",""], [], [], [], [], [], [], '', '');
         $this->platform_id->DefaultErrorMessage = $Language->phrase("IncorrectInteger");
+        $this->platform_id->CustomMsg = $Language->FieldPhrase($this->TableVar, $this->platform_id->Param, "CustomMsg");
         $this->Fields['platform_id'] = &$this->platform_id;
 
         // user_id
@@ -92,6 +94,7 @@ class WManagersPlatform extends DbTable
         $this->user_id->PleaseSelectText = $Language->phrase("PleaseSelect"); // "PleaseSelect" text
         $this->user_id->Lookup = new Lookup('user_id', 'main_users', false, 'id', ["name","username","email","user_type"], [], [], [], [], [], [], '', '');
         $this->user_id->DefaultErrorMessage = $Language->phrase("IncorrectInteger");
+        $this->user_id->CustomMsg = $Language->FieldPhrase($this->TableVar, $this->user_id->Param, "CustomMsg");
         $this->Fields['user_id'] = &$this->user_id;
     }
 
@@ -272,18 +275,21 @@ class WManagersPlatform extends DbTable
         $cnt = -1;
         $rs = null;
         if ($sql instanceof \Doctrine\DBAL\Query\QueryBuilder) { // Query builder
-            $sql = $sql->resetQueryPart("orderBy")->getSQL();
+            $sqlwrk = clone $sql;
+            $sqlwrk = $sqlwrk->resetQueryPart("orderBy")->getSQL();
+        } else {
+            $sqlwrk = $sql;
         }
         $pattern = '/^SELECT\s([\s\S]+)\sFROM\s/i';
         // Skip Custom View / SubQuery / SELECT DISTINCT / ORDER BY
         if (
             ($this->TableType == 'TABLE' || $this->TableType == 'VIEW' || $this->TableType == 'LINKTABLE') &&
-            preg_match($pattern, $sql) && !preg_match('/\(\s*(SELECT[^)]+)\)/i', $sql) &&
-            !preg_match('/^\s*select\s+distinct\s+/i', $sql) && !preg_match('/\s+order\s+by\s+/i', $sql)
+            preg_match($pattern, $sqlwrk) && !preg_match('/\(\s*(SELECT[^)]+)\)/i', $sqlwrk) &&
+            !preg_match('/^\s*select\s+distinct\s+/i', $sqlwrk) && !preg_match('/\s+order\s+by\s+/i', $sqlwrk)
         ) {
-            $sqlwrk = "SELECT COUNT(*) FROM " . preg_replace($pattern, "", $sql);
+            $sqlwrk = "SELECT COUNT(*) FROM " . preg_replace($pattern, "", $sqlwrk);
         } else {
-            $sqlwrk = "SELECT COUNT(*) FROM (" . $sql . ") COUNT_TABLE";
+            $sqlwrk = "SELECT COUNT(*) FROM (" . $sqlwrk . ") COUNT_TABLE";
         }
         $conn = $c ?? $this->getConnection();
         $rs = $conn->executeQuery($sqlwrk);
@@ -852,7 +858,7 @@ SORTHTML;
         $this->id->ViewCustomAttributes = "";
 
         // platform_id
-        $curVal = strval($this->platform_id->CurrentValue);
+        $curVal = trim(strval($this->platform_id->CurrentValue));
         if ($curVal != "") {
             $this->platform_id->ViewValue = $this->platform_id->lookupCacheOption($curVal);
             if ($this->platform_id->ViewValue === null) { // Lookup from database
@@ -873,7 +879,7 @@ SORTHTML;
         $this->platform_id->ViewCustomAttributes = "";
 
         // user_id
-        $curVal = strval($this->user_id->CurrentValue);
+        $curVal = trim(strval($this->user_id->CurrentValue));
         if ($curVal != "") {
             $this->user_id->ViewValue = $this->user_id->lookupCacheOption($curVal);
             if ($this->user_id->ViewValue === null) { // Lookup from database

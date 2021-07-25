@@ -137,7 +137,7 @@ class NumericPager extends Pager
     {
         global $Language;
         $html = "";
-        $href = CurrentPageUrl();
+        $href = CurrentPageUrl(false);
         if ($this->isVisible()) {
             if ($this->FirstButton->Enabled) {
                 $html .= '<li class="page-item"><a class="page-link" href="' . $href . '?start=' . $this->FirstButton->Start . '">' . $Language->phrase("PagerFirst") . '</a></li>';

@@ -152,7 +152,6 @@ class ZPriceSettingsView extends ZPriceSettings
 
         // Initialize
         $GLOBALS["Page"] = &$this;
-        $this->TokenTimeout = SessionTimeoutTime();
 
         // Language object
         $Language = Container("language");
@@ -216,6 +215,30 @@ class ZPriceSettingsView extends ZPriceSettings
         return is_object($Response) ? $Response->getBody() : ob_get_clean();
     }
 
+    // Is lookup
+    public function isLookup()
+    {
+        return SameText(Route(0), Config("API_LOOKUP_ACTION"));
+    }
+
+    // Is AutoFill
+    public function isAutoFill()
+    {
+        return $this->isLookup() && SameText(Post("ajax"), "autofill");
+    }
+
+    // Is AutoSuggest
+    public function isAutoSuggest()
+    {
+        return $this->isLookup() && SameText(Post("ajax"), "autosuggest");
+    }
+
+    // Is modal lookup
+    public function isModalLookup()
+    {
+        return $this->isLookup() && SameText(Post("ajax"), "modal");
+    }
+
     // Is terminated
     public function isTerminated()
     {
@@ -233,7 +256,7 @@ class ZPriceSettingsView extends ZPriceSettings
         if ($this->terminated) {
             return;
         }
-        global $ExportFileName, $TempImages, $DashboardReport;
+        global $ExportFileName, $TempImages, $DashboardReport, $Response;
 
         // Page is terminated
         $this->terminated = true;
@@ -279,6 +302,11 @@ class ZPriceSettingsView extends ZPriceSettings
                 WriteJson(array_merge(["success" => false], $this->getMessages()));
             }
             return;
+        } else { // Check if response is JSON
+            if (StartsString("application/json", $Response->getHeaderLine("Content-type")) && $Response->getBody()->getSize()) { // With JSON response
+                $this->clearMessages();
+                return;
+            }
         }
 
         // Go to URL if specified
@@ -602,7 +630,7 @@ class ZPriceSettingsView extends ZPriceSettings
         // Set LoginStatus / Page_Rendering / Page_Render
         if (!IsApi() && !$this->isTerminated()) {
             // Pass table and field properties to client side
-            $this->toClientVar(["tableCaption"], ["caption", "Required", "IsInvalid", "Raw"]);
+            $this->toClientVar(["tableCaption"], ["caption", "Visible", "Required", "IsInvalid", "Raw"]);
 
             // Setup login status
             SetupLoginStatus();
@@ -613,7 +641,7 @@ class ZPriceSettingsView extends ZPriceSettings
             // Global Page Rendering event (in userfn*.php)
             Page_Rendering();
 
-            // Page Rendering event
+            // Page Render event
             if (method_exists($this, "pageRender")) {
                 $this->pageRender();
             }
@@ -790,7 +818,7 @@ class ZPriceSettingsView extends ZPriceSettings
             $this->id->ViewCustomAttributes = "";
 
             // platform_id
-            $curVal = strval($this->platform_id->CurrentValue);
+            $curVal = trim(strval($this->platform_id->CurrentValue));
             if ($curVal != "") {
                 $this->platform_id->ViewValue = $this->platform_id->lookupCacheOption($curVal);
                 if ($this->platform_id->ViewValue === null) { // Lookup from database
@@ -811,7 +839,7 @@ class ZPriceSettingsView extends ZPriceSettings
             $this->platform_id->ViewCustomAttributes = "";
 
             // inventory_id
-            $curVal = strval($this->inventory_id->CurrentValue);
+            $curVal = trim(strval($this->inventory_id->CurrentValue));
             if ($curVal != "") {
                 $this->inventory_id->ViewValue = $this->inventory_id->lookupCacheOption($curVal);
                 if ($this->inventory_id->ViewValue === null) { // Lookup from database
@@ -832,7 +860,7 @@ class ZPriceSettingsView extends ZPriceSettings
             $this->inventory_id->ViewCustomAttributes = "";
 
             // print_stage_id
-            $curVal = strval($this->print_stage_id->CurrentValue);
+            $curVal = trim(strval($this->print_stage_id->CurrentValue));
             if ($curVal != "") {
                 $this->print_stage_id->ViewValue = $this->print_stage_id->lookupCacheOption($curVal);
                 if ($this->print_stage_id->ViewValue === null) { // Lookup from database
@@ -853,7 +881,7 @@ class ZPriceSettingsView extends ZPriceSettings
             $this->print_stage_id->ViewCustomAttributes = "";
 
             // bus_size_id
-            $curVal = strval($this->bus_size_id->CurrentValue);
+            $curVal = trim(strval($this->bus_size_id->CurrentValue));
             if ($curVal != "") {
                 $this->bus_size_id->ViewValue = $this->bus_size_id->lookupCacheOption($curVal);
                 if ($this->bus_size_id->ViewValue === null) { // Lookup from database

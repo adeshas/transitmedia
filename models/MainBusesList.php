@@ -158,7 +158,6 @@ class MainBusesList extends MainBuses
 
         // Initialize
         $GLOBALS["Page"] = &$this;
-        $this->TokenTimeout = SessionTimeoutTime();
 
         // Language object
         $Language = Container("language");
@@ -244,6 +243,30 @@ class MainBusesList extends MainBuses
         return is_object($Response) ? $Response->getBody() : ob_get_clean();
     }
 
+    // Is lookup
+    public function isLookup()
+    {
+        return SameText(Route(0), Config("API_LOOKUP_ACTION"));
+    }
+
+    // Is AutoFill
+    public function isAutoFill()
+    {
+        return $this->isLookup() && SameText(Post("ajax"), "autofill");
+    }
+
+    // Is AutoSuggest
+    public function isAutoSuggest()
+    {
+        return $this->isLookup() && SameText(Post("ajax"), "autosuggest");
+    }
+
+    // Is modal lookup
+    public function isModalLookup()
+    {
+        return $this->isLookup() && SameText(Post("ajax"), "modal");
+    }
+
     // Is terminated
     public function isTerminated()
     {
@@ -261,7 +284,7 @@ class MainBusesList extends MainBuses
         if ($this->terminated) {
             return;
         }
-        global $ExportFileName, $TempImages, $DashboardReport;
+        global $ExportFileName, $TempImages, $DashboardReport, $Response;
 
         // Page is terminated
         $this->terminated = true;
@@ -307,6 +330,11 @@ class MainBusesList extends MainBuses
                 WriteJson(array_merge(["success" => false], $this->getMessages()));
             }
             return;
+        } else { // Check if response is JSON
+            if (StartsString("application/json", $Response->getHeaderLine("Content-type")) && $Response->getBody()->getSize()) { // With JSON response
+                $this->clearMessages();
+                return;
+            }
         }
 
         // Go to URL if specified
@@ -518,6 +546,7 @@ class MainBusesList extends MainBuses
     public $MultiSelectKey;
     public $Command;
     public $RestoreSearch = false;
+    public $HashValue; // Hash value
     public $DetailPages;
     public $OldRecordset;
 
@@ -934,8 +963,8 @@ class MainBusesList extends MainBuses
             }
         }
 
-        // Search/sort options
-        $this->setupSearchSortOptions();
+        // Search options
+        $this->setupSearchOptions();
 
         // Set up search panel class
         if ($this->SearchWhere != "") {
@@ -957,7 +986,7 @@ class MainBusesList extends MainBuses
         // Set LoginStatus / Page_Rendering / Page_Render
         if (!IsApi() && !$this->isTerminated()) {
             // Pass table and field properties to client side
-            $this->toClientVar(["tableCaption"], ["caption", "Required", "IsInvalid", "Raw"]);
+            $this->toClientVar(["tableCaption"], ["caption", "Visible", "Required", "IsInvalid", "Raw"]);
 
             // Setup login status
             SetupLoginStatus();
@@ -968,7 +997,7 @@ class MainBusesList extends MainBuses
             // Global Page Rendering event (in userfn*.php)
             Page_Rendering();
 
-            // Page Rendering event
+            // Page Render event
             if (method_exists($this, "pageRender")) {
                 $this->pageRender();
             }
@@ -2150,7 +2179,7 @@ class MainBusesList extends MainBuses
                 $option->UseDropDownButton = false;
                 // Add grid insert
                 $item = &$option->add("gridinsert");
-                $item->Body = "<a class=\"ew-action ew-grid-insert\" title=\"" . HtmlTitle($Language->phrase("GridInsertLink")) . "\" data-caption=\"" . HtmlTitle($Language->phrase("GridInsertLink")) . "\" href=\"#\" onclick=\"return ew.forms.get(this).submit(event, '" . $this->pageName() . "');\">" . $Language->phrase("GridInsertLink") . "</a>";
+                $item->Body = "<a class=\"ew-action ew-grid-insert\" title=\"" . HtmlTitle($Language->phrase("GridInsertLink")) . "\" data-caption=\"" . HtmlTitle($Language->phrase("GridInsertLink")) . "\" href=\"#\" onclick=\"ew.forms.get(this).submit(event, '" . $this->pageName() . "'); return false;\">" . $Language->phrase("GridInsertLink") . "</a>";
                 // Add grid cancel
                 $item = &$option->add("gridcancel");
                 $cancelurl = $this->addMasterUrl($pageUrl . "action=cancel");
@@ -2170,7 +2199,7 @@ class MainBusesList extends MainBuses
                 $option = $options["action"];
                 $option->UseDropDownButton = false;
                     $item = &$option->add("gridsave");
-                    $item->Body = "<a class=\"ew-action ew-grid-save\" title=\"" . HtmlTitle($Language->phrase("GridSaveLink")) . "\" data-caption=\"" . HtmlTitle($Language->phrase("GridSaveLink")) . "\" href=\"#\" onclick=\"return ew.forms.get(this).submit(event, '" . $this->pageName() . "');\">" . $Language->phrase("GridSaveLink") . "</a>";
+                    $item->Body = "<a class=\"ew-action ew-grid-save\" title=\"" . HtmlTitle($Language->phrase("GridSaveLink")) . "\" data-caption=\"" . HtmlTitle($Language->phrase("GridSaveLink")) . "\" href=\"#\" onclick=\"ew.forms.get(this).submit(event, '" . $this->pageName() . "'); return false;\">" . $Language->phrase("GridSaveLink") . "</a>";
                     $item = &$option->add("gridcancel");
                     $cancelurl = $this->addMasterUrl($pageUrl . "action=cancel");
                     $item->Body = "<a class=\"ew-action ew-grid-cancel\" title=\"" . HtmlTitle($Language->phrase("GridCancelLink")) . "\" data-caption=\"" . HtmlTitle($Language->phrase("GridCancelLink")) . "\" href=\"" . $cancelurl . "\">" . $Language->phrase("GridCancelLink") . "</a>";
@@ -2627,7 +2656,7 @@ class MainBusesList extends MainBuses
             $this->number->ViewCustomAttributes = "";
 
             // platform_id
-            $curVal = strval($this->platform_id->CurrentValue);
+            $curVal = trim(strval($this->platform_id->CurrentValue));
             if ($curVal != "") {
                 $this->platform_id->ViewValue = $this->platform_id->lookupCacheOption($curVal);
                 if ($this->platform_id->ViewValue === null) { // Lookup from database
@@ -2648,7 +2677,7 @@ class MainBusesList extends MainBuses
             $this->platform_id->ViewCustomAttributes = "";
 
             // operator_id
-            $curVal = strval($this->operator_id->CurrentValue);
+            $curVal = trim(strval($this->operator_id->CurrentValue));
             if ($curVal != "") {
                 $this->operator_id->ViewValue = $this->operator_id->lookupCacheOption($curVal);
                 if ($this->operator_id->ViewValue === null) { // Lookup from database
@@ -2669,7 +2698,7 @@ class MainBusesList extends MainBuses
             $this->operator_id->ViewCustomAttributes = "";
 
             // exterior_campaign_id
-            $curVal = strval($this->exterior_campaign_id->CurrentValue);
+            $curVal = trim(strval($this->exterior_campaign_id->CurrentValue));
             if ($curVal != "") {
                 $this->exterior_campaign_id->ViewValue = $this->exterior_campaign_id->lookupCacheOption($curVal);
                 if ($this->exterior_campaign_id->ViewValue === null) { // Lookup from database
@@ -2694,7 +2723,7 @@ class MainBusesList extends MainBuses
             $this->exterior_campaign_id->ViewCustomAttributes = "";
 
             // interior_campaign_id
-            $curVal = strval($this->interior_campaign_id->CurrentValue);
+            $curVal = trim(strval($this->interior_campaign_id->CurrentValue));
             if ($curVal != "") {
                 $this->interior_campaign_id->ViewValue = $this->interior_campaign_id->lookupCacheOption($curVal);
                 if ($this->interior_campaign_id->ViewValue === null) { // Lookup from database
@@ -2719,7 +2748,7 @@ class MainBusesList extends MainBuses
             $this->interior_campaign_id->ViewCustomAttributes = "";
 
             // bus_status_id
-            $curVal = strval($this->bus_status_id->CurrentValue);
+            $curVal = trim(strval($this->bus_status_id->CurrentValue));
             if ($curVal != "") {
                 $this->bus_status_id->ViewValue = $this->bus_status_id->lookupCacheOption($curVal);
                 if ($this->bus_status_id->ViewValue === null) { // Lookup from database
@@ -2740,7 +2769,7 @@ class MainBusesList extends MainBuses
             $this->bus_status_id->ViewCustomAttributes = "";
 
             // bus_size_id
-            $curVal = strval($this->bus_size_id->CurrentValue);
+            $curVal = trim(strval($this->bus_size_id->CurrentValue));
             if ($curVal != "") {
                 $this->bus_size_id->ViewValue = $this->bus_size_id->lookupCacheOption($curVal);
                 if ($this->bus_size_id->ViewValue === null) { // Lookup from database
@@ -2761,7 +2790,7 @@ class MainBusesList extends MainBuses
             $this->bus_size_id->ViewCustomAttributes = "";
 
             // bus_depot_id
-            $curVal = strval($this->bus_depot_id->CurrentValue);
+            $curVal = trim(strval($this->bus_depot_id->CurrentValue));
             if ($curVal != "") {
                 $this->bus_depot_id->ViewValue = $this->bus_depot_id->lookupCacheOption($curVal);
                 if ($this->bus_depot_id->ViewValue === null) { // Lookup from database
@@ -2975,7 +3004,7 @@ class MainBusesList extends MainBuses
             if ($this->bus_status_id->getSessionValue() != "") {
                 $this->bus_status_id->CurrentValue = GetForeignKeyValue($this->bus_status_id->getSessionValue());
                 $this->bus_status_id->OldValue = $this->bus_status_id->CurrentValue;
-                $curVal = strval($this->bus_status_id->CurrentValue);
+                $curVal = trim(strval($this->bus_status_id->CurrentValue));
                 if ($curVal != "") {
                     $this->bus_status_id->ViewValue = $this->bus_status_id->lookupCacheOption($curVal);
                     if ($this->bus_status_id->ViewValue === null) { // Lookup from database
@@ -3024,7 +3053,7 @@ class MainBusesList extends MainBuses
             if ($this->bus_size_id->getSessionValue() != "") {
                 $this->bus_size_id->CurrentValue = GetForeignKeyValue($this->bus_size_id->getSessionValue());
                 $this->bus_size_id->OldValue = $this->bus_size_id->CurrentValue;
-                $curVal = strval($this->bus_size_id->CurrentValue);
+                $curVal = trim(strval($this->bus_size_id->CurrentValue));
                 if ($curVal != "") {
                     $this->bus_size_id->ViewValue = $this->bus_size_id->lookupCacheOption($curVal);
                     if ($this->bus_size_id->ViewValue === null) { // Lookup from database
@@ -3073,7 +3102,7 @@ class MainBusesList extends MainBuses
             if ($this->bus_depot_id->getSessionValue() != "") {
                 $this->bus_depot_id->CurrentValue = GetForeignKeyValue($this->bus_depot_id->getSessionValue());
                 $this->bus_depot_id->OldValue = $this->bus_depot_id->CurrentValue;
-                $curVal = strval($this->bus_depot_id->CurrentValue);
+                $curVal = trim(strval($this->bus_depot_id->CurrentValue));
                 if ($curVal != "") {
                     $this->bus_depot_id->ViewValue = $this->bus_depot_id->lookupCacheOption($curVal);
                     if ($this->bus_depot_id->ViewValue === null) { // Lookup from database
@@ -3299,7 +3328,7 @@ class MainBusesList extends MainBuses
             if ($this->bus_status_id->getSessionValue() != "") {
                 $this->bus_status_id->CurrentValue = GetForeignKeyValue($this->bus_status_id->getSessionValue());
                 $this->bus_status_id->OldValue = $this->bus_status_id->CurrentValue;
-                $curVal = strval($this->bus_status_id->CurrentValue);
+                $curVal = trim(strval($this->bus_status_id->CurrentValue));
                 if ($curVal != "") {
                     $this->bus_status_id->ViewValue = $this->bus_status_id->lookupCacheOption($curVal);
                     if ($this->bus_status_id->ViewValue === null) { // Lookup from database
@@ -3348,7 +3377,7 @@ class MainBusesList extends MainBuses
             if ($this->bus_size_id->getSessionValue() != "") {
                 $this->bus_size_id->CurrentValue = GetForeignKeyValue($this->bus_size_id->getSessionValue());
                 $this->bus_size_id->OldValue = $this->bus_size_id->CurrentValue;
-                $curVal = strval($this->bus_size_id->CurrentValue);
+                $curVal = trim(strval($this->bus_size_id->CurrentValue));
                 if ($curVal != "") {
                     $this->bus_size_id->ViewValue = $this->bus_size_id->lookupCacheOption($curVal);
                     if ($this->bus_size_id->ViewValue === null) { // Lookup from database
@@ -3397,7 +3426,7 @@ class MainBusesList extends MainBuses
             if ($this->bus_depot_id->getSessionValue() != "") {
                 $this->bus_depot_id->CurrentValue = GetForeignKeyValue($this->bus_depot_id->getSessionValue());
                 $this->bus_depot_id->OldValue = $this->bus_depot_id->CurrentValue;
-                $curVal = strval($this->bus_depot_id->CurrentValue);
+                $curVal = trim(strval($this->bus_depot_id->CurrentValue));
                 if ($curVal != "") {
                     $this->bus_depot_id->ViewValue = $this->bus_depot_id->lookupCacheOption($curVal);
                     if ($this->bus_depot_id->ViewValue === null) { // Lookup from database
@@ -3677,6 +3706,7 @@ class MainBusesList extends MainBuses
         $this->CurrentFilter = $filter;
         $sql = $this->getCurrentSql();
         $rsold = $conn->fetchAssoc($sql);
+        $editRow = false;
         if (!$rsold) {
             $this->setFailureMessage($Language->phrase("NoRecord")); // Set no record message
             $editRow = false; // Update Failed
@@ -3725,7 +3755,11 @@ class MainBusesList extends MainBuses
             $updateRow = $this->rowUpdating($rsold, $rsnew);
             if ($updateRow) {
                 if (count($rsnew) > 0) {
-                    $editRow = $this->update($rsnew, "", $rsold);
+                    try {
+                        $editRow = $this->update($rsnew, "", $rsold);
+                    } catch (\Exception $e) {
+                        $this->setFailureMessage($e->getMessage());
+                    }
                 } else {
                     $editRow = true; // No field to update
                 }
@@ -3765,7 +3799,7 @@ class MainBusesList extends MainBuses
      * Import file
      *
      * @param string $filetoken File token to locate the uploaded import file
-     * @return boolean
+     * @return bool
      */
     public function import($filetoken)
     {
@@ -3870,6 +3904,14 @@ class MainBusesList extends MainBuses
                 WriteJson($res);
                 return false;
             }
+            $checkValue = true; // Clear blank header values at end
+            $headers = array_reverse(array_reduce(array_reverse($headers), function ($res, $name) use ($checkValue) {
+                if (!EmptyValue($name) || !$checkValue) {
+                    $res[] = $name;
+                    $checkValue = false; // Skip further checking
+                }
+                return $res;
+            }, []));
             foreach ($headers as $name) {
                 if (!array_key_exists($name, $this->Fields)) { // Unidentified field, not header row
                     $res["error"] = str_replace('%f', $name, $Language->phrase("ImportMessageInvalidFieldName"));
@@ -3911,6 +3953,9 @@ class MainBusesList extends MainBuses
             foreach ($records as $values) {
                 $importSuccess = false;
                 try {
+                    if (count($values) > count($headers)) { // Make sure headers / values count matched
+                        array_splice($values, count($headers));
+                    }
                     $row = array_combine($headers, $values);
                     $cnt++;
                     $res["count"] = $cnt;
@@ -3982,7 +4027,7 @@ class MainBusesList extends MainBuses
      * Get import header
      *
      * @param object $ws PhpSpreadsheet worksheet
-     * @param integer $rowIdx Row index for header row (1-based)
+     * @param int $rowIdx Row index for header row (1-based)
      * @param string $endColName End column Name (e.g. "F")
      * @return array
      */
@@ -3996,8 +4041,8 @@ class MainBusesList extends MainBuses
      * Get import records
      *
      * @param object $ws PhpSpreadsheet worksheet
-     * @param integer $startRowIdx Start row index
-     * @param integer $endRowIdx End row index
+     * @param int $startRowIdx Start row index
+     * @param int $endRowIdx End row index
      * @param string $endColName End column Name (e.g. "F")
      * @return array
      */
@@ -4011,8 +4056,8 @@ class MainBusesList extends MainBuses
      * Import a row
      *
      * @param array $row
-     * @param integer $cnt
-     * @return boolean
+     * @param int $cnt
+     * @return bool
      */
     protected function importRow($row, $cnt)
     {
@@ -4046,7 +4091,7 @@ class MainBusesList extends MainBuses
      *
      * @param object $fld Field object
      * @param object $value
-     * @return boolean
+     * @return bool
      */
     protected function checkValue($fld, $value)
     {
@@ -4155,8 +4200,13 @@ class MainBusesList extends MainBuses
 
         // Call Row Inserting event
         $insertRow = $this->rowInserting($rsold, $rsnew);
+        $addRow = false;
         if ($insertRow) {
-            $addRow = $this->insert($rsnew);
+            try {
+                $addRow = $this->insert($rsnew);
+            } catch (\Exception $e) {
+                $this->setFailureMessage($e->getMessage());
+            }
             if ($addRow) {
             }
         } else {
@@ -4283,8 +4333,8 @@ class MainBusesList extends MainBuses
         $item->Visible = false;
     }
 
-    // Set up search/sort options
-    protected function setupSearchSortOptions()
+    // Set up search options
+    protected function setupSearchOptions()
     {
         global $Language, $Security;
         $pageUrl = $this->pageUrl();
@@ -4349,7 +4399,7 @@ class MainBusesList extends MainBuses
     /**
     * Export data in HTML/CSV/Word/Excel/XML/Email/PDF format
     *
-    * @param boolean $return Return the data rather than output it
+    * @param bool $return Return the data rather than output it
     * @return mixed
     */
     public function exportData($return = false)
@@ -4363,7 +4413,9 @@ class MainBusesList extends MainBuses
 
         // Export all
         if ($this->ExportAll) {
-            set_time_limit(Config("EXPORT_ALL_TIME_LIMIT"));
+            if (Config("EXPORT_ALL_TIME_LIMIT") >= 0) {
+                @set_time_limit(Config("EXPORT_ALL_TIME_LIMIT"));
+            }
             $this->DisplayRecords = $this->TotalRecords;
             $this->StopRecord = $this->TotalRecords;
         } else { // Export one page only

@@ -58,7 +58,7 @@ $Page->renderOtherOptions();
 ?>
 <?php if ($Security->canSearch()) { ?>
 <?php if (!$Page->isExport() && !$Page->CurrentAction) { ?>
-<form name="fview_payments_pendinglistsrch" id="fview_payments_pendinglistsrch" class="form-inline ew-form ew-ext-search-form" action="<?= CurrentPageUrl() ?>">
+<form name="fview_payments_pendinglistsrch" id="fview_payments_pendinglistsrch" class="form-inline ew-form ew-ext-search-form" action="<?= CurrentPageUrl(false) ?>">
 <div id="fview_payments_pendinglistsrch-search-panel" class="<?= $Page->SearchPanelClass ?>">
 <input type="hidden" name="cmd" value="search">
 <input type="hidden" name="t" value="view_payments_pending">
@@ -93,7 +93,7 @@ $Page->showMessage();
 <?php if (!$Page->isExport()) { ?>
 <div class="card-header ew-grid-upper-panel">
 <?php if (!$Page->isGridAdd()) { ?>
-<form name="ew-pager-form" class="form-inline ew-form ew-pager-form" action="<?= CurrentPageUrl() ?>">
+<form name="ew-pager-form" class="form-inline ew-form ew-pager-form" action="<?= CurrentPageUrl(false) ?>">
 <?= $Page->Pager->render() ?>
 </form>
 <?php } ?>
@@ -103,7 +103,7 @@ $Page->showMessage();
 <div class="clearfix"></div>
 </div>
 <?php } ?>
-<form name="fview_payments_pendinglist" id="fview_payments_pendinglist" class="form-inline ew-form ew-list-form" action="<?= CurrentPageUrl() ?>" method="post">
+<form name="fview_payments_pendinglist" id="fview_payments_pendinglist" class="form-inline ew-form ew-list-form" action="<?= CurrentPageUrl(false) ?>" method="post">
 <?php if (Config("CHECK_TOKEN")) { ?>
 <input type="hidden" name="<?= $TokenNameKey ?>" value="<?= $TokenName ?>"><!-- CSRF token name -->
 <input type="hidden" name="<?= $TokenValueKey ?>" value="<?= $TokenValue ?>"><!-- CSRF token value -->
@@ -129,6 +129,9 @@ $Page->ListOptions->render("header", "left");
 <?php } ?>
 <?php if ($Page->campaign_id->Visible) { // campaign_id ?>
         <th data-name="campaign_id" class="<?= $Page->campaign_id->headerCellClass() ?>"><div id="elh_view_payments_pending_campaign_id" class="view_payments_pending_campaign_id"><?= $Page->renderSort($Page->campaign_id) ?></div></th>
+<?php } ?>
+<?php if ($Page->campaign_name->Visible) { // campaign_name ?>
+        <th data-name="campaign_name" class="<?= $Page->campaign_name->headerCellClass() ?>"><div id="elh_view_payments_pending_campaign_name" class="view_payments_pending_campaign_name"><?= $Page->renderSort($Page->campaign_name) ?></div></th>
 <?php } ?>
 <?php if ($Page->payment_status->Visible) { // payment_status ?>
         <th data-name="payment_status" class="<?= $Page->payment_status->headerCellClass() ?>"><div id="elh_view_payments_pending_payment_status" class="view_payments_pending_payment_status"><?= $Page->renderSort($Page->payment_status) ?></div></th>
@@ -279,6 +282,14 @@ $Page->ListOptions->render("body", "left", $Page->RowCount);
 <span id="el<?= $Page->RowCount ?>_view_payments_pending_campaign_id">
 <span<?= $Page->campaign_id->viewAttributes() ?>>
 <?= $Page->campaign_id->getViewValue() ?></span>
+</span>
+</td>
+    <?php } ?>
+    <?php if ($Page->campaign_name->Visible) { // campaign_name ?>
+        <td data-name="campaign_name" <?= $Page->campaign_name->cellAttributes() ?>>
+<span id="el<?= $Page->RowCount ?>_view_payments_pending_campaign_name">
+<span<?= $Page->campaign_name->viewAttributes() ?>>
+<?= $Page->campaign_name->getViewValue() ?></span>
 </span>
 </td>
     <?php } ?>
@@ -500,7 +511,7 @@ if ($Page->Recordset) {
 <?php if (!$Page->isExport()) { ?>
 <div class="card-footer ew-grid-lower-panel">
 <?php if (!$Page->isGridAdd()) { ?>
-<form name="ew-pager-form" class="form-inline ew-form ew-pager-form" action="<?= CurrentPageUrl() ?>">
+<form name="ew-pager-form" class="form-inline ew-form ew-pager-form" action="<?= CurrentPageUrl(false) ?>">
 <?= $Page->Pager->render() ?>
 </form>
 <?php } ?>

@@ -82,78 +82,92 @@ class ViewBusTransOptions extends DbTable
         $this->bus_id = new DbField('view_bus_trans_options', 'view_bus_trans_options', 'x_bus_id', 'bus_id', '"bus_id"', 'CAST("bus_id" AS varchar(255))', 3, 4, -1, false, '"bus_id"', false, false, false, 'FORMATTED TEXT', 'TEXT');
         $this->bus_id->Sortable = true; // Allow sort
         $this->bus_id->DefaultErrorMessage = $Language->phrase("IncorrectInteger");
+        $this->bus_id->CustomMsg = $Language->FieldPhrase($this->TableVar, $this->bus_id->Param, "CustomMsg");
         $this->Fields['bus_id'] = &$this->bus_id;
 
         // transaction_id
         $this->transaction_id = new DbField('view_bus_trans_options', 'view_bus_trans_options', 'x_transaction_id', 'transaction_id', '"transaction_id"', 'CAST("transaction_id" AS varchar(255))', 3, 4, -1, false, '"transaction_id"', false, false, false, 'FORMATTED TEXT', 'TEXT');
         $this->transaction_id->Sortable = true; // Allow sort
         $this->transaction_id->DefaultErrorMessage = $Language->phrase("IncorrectInteger");
+        $this->transaction_id->CustomMsg = $Language->FieldPhrase($this->TableVar, $this->transaction_id->Param, "CustomMsg");
         $this->Fields['transaction_id'] = &$this->transaction_id;
 
         // number
         $this->number = new DbField('view_bus_trans_options', 'view_bus_trans_options', 'x_number', 'number', '"number"', '"number"', 200, 0, -1, false, '"number"', false, false, false, 'FORMATTED TEXT', 'TEXT');
         $this->number->Sortable = true; // Allow sort
+        $this->number->CustomMsg = $Language->FieldPhrase($this->TableVar, $this->number->Param, "CustomMsg");
         $this->Fields['number'] = &$this->number;
 
         // platform_id
         $this->platform_id = new DbField('view_bus_trans_options', 'view_bus_trans_options', 'x_platform_id', 'platform_id', '"platform_id"', 'CAST("platform_id" AS varchar(255))', 3, 4, -1, false, '"platform_id"', false, false, false, 'FORMATTED TEXT', 'TEXT');
         $this->platform_id->Sortable = true; // Allow sort
         $this->platform_id->DefaultErrorMessage = $Language->phrase("IncorrectInteger");
+        $this->platform_id->CustomMsg = $Language->FieldPhrase($this->TableVar, $this->platform_id->Param, "CustomMsg");
         $this->Fields['platform_id'] = &$this->platform_id;
 
         // platform
         $this->platform = new DbField('view_bus_trans_options', 'view_bus_trans_options', 'x_platform', 'platform', '"platform"', '"platform"', 200, 50, -1, false, '"platform"', false, false, false, 'FORMATTED TEXT', 'TEXT');
         $this->platform->Sortable = true; // Allow sort
+        $this->platform->CustomMsg = $Language->FieldPhrase($this->TableVar, $this->platform->Param, "CustomMsg");
         $this->Fields['platform'] = &$this->platform;
 
         // operator_id
         $this->operator_id = new DbField('view_bus_trans_options', 'view_bus_trans_options', 'x_operator_id', 'operator_id', '"operator_id"', 'CAST("operator_id" AS varchar(255))', 3, 4, -1, false, '"operator_id"', false, false, false, 'FORMATTED TEXT', 'TEXT');
         $this->operator_id->Sortable = true; // Allow sort
         $this->operator_id->DefaultErrorMessage = $Language->phrase("IncorrectInteger");
+        $this->operator_id->CustomMsg = $Language->FieldPhrase($this->TableVar, $this->operator_id->Param, "CustomMsg");
         $this->Fields['operator_id'] = &$this->operator_id;
 
         // operator
         $this->operator = new DbField('view_bus_trans_options', 'view_bus_trans_options', 'x_operator', 'operator', '"operator"', '"operator"', 200, 50, -1, false, '"operator"', false, false, false, 'FORMATTED TEXT', 'TEXT');
         $this->operator->Sortable = true; // Allow sort
+        $this->operator->CustomMsg = $Language->FieldPhrase($this->TableVar, $this->operator->Param, "CustomMsg");
         $this->Fields['operator'] = &$this->operator;
 
         // bus_status_id
         $this->bus_status_id = new DbField('view_bus_trans_options', 'view_bus_trans_options', 'x_bus_status_id', 'bus_status_id', '"bus_status_id"', 'CAST("bus_status_id" AS varchar(255))', 3, 4, -1, false, '"bus_status_id"', false, false, false, 'FORMATTED TEXT', 'TEXT');
         $this->bus_status_id->Sortable = true; // Allow sort
         $this->bus_status_id->DefaultErrorMessage = $Language->phrase("IncorrectInteger");
+        $this->bus_status_id->CustomMsg = $Language->FieldPhrase($this->TableVar, $this->bus_status_id->Param, "CustomMsg");
         $this->Fields['bus_status_id'] = &$this->bus_status_id;
 
         // bus_status
         $this->bus_status = new DbField('view_bus_trans_options', 'view_bus_trans_options', 'x_bus_status', 'bus_status', '"bus_status"', '"bus_status"', 200, 0, -1, false, '"bus_status"', false, false, false, 'FORMATTED TEXT', 'TEXT');
         $this->bus_status->Sortable = true; // Allow sort
+        $this->bus_status->CustomMsg = $Language->FieldPhrase($this->TableVar, $this->bus_status->Param, "CustomMsg");
         $this->Fields['bus_status'] = &$this->bus_status;
 
         // quantity
         $this->quantity = new DbField('view_bus_trans_options', 'view_bus_trans_options', 'x_quantity', 'quantity', '"quantity"', 'CAST("quantity" AS varchar(255))', 3, 4, -1, false, '"quantity"', false, false, false, 'FORMATTED TEXT', 'TEXT');
         $this->quantity->Sortable = true; // Allow sort
         $this->quantity->DefaultErrorMessage = $Language->phrase("IncorrectInteger");
+        $this->quantity->CustomMsg = $Language->FieldPhrase($this->TableVar, $this->quantity->Param, "CustomMsg");
         $this->Fields['quantity'] = &$this->quantity;
 
         // exterior_campaign_id
         $this->exterior_campaign_id = new DbField('view_bus_trans_options', 'view_bus_trans_options', 'x_exterior_campaign_id', 'exterior_campaign_id', '"exterior_campaign_id"', 'CAST("exterior_campaign_id" AS varchar(255))', 3, 4, -1, false, '"exterior_campaign_id"', false, false, false, 'FORMATTED TEXT', 'TEXT');
         $this->exterior_campaign_id->Sortable = true; // Allow sort
         $this->exterior_campaign_id->DefaultErrorMessage = $Language->phrase("IncorrectInteger");
+        $this->exterior_campaign_id->CustomMsg = $Language->FieldPhrase($this->TableVar, $this->exterior_campaign_id->Param, "CustomMsg");
         $this->Fields['exterior_campaign_id'] = &$this->exterior_campaign_id;
 
         // exterior_campaign
         $this->exterior_campaign = new DbField('view_bus_trans_options', 'view_bus_trans_options', 'x_exterior_campaign', 'exterior_campaign', '"exterior_campaign"', '"exterior_campaign"', 201, 0, -1, false, '"exterior_campaign"', false, false, false, 'FORMATTED TEXT', 'TEXTAREA');
         $this->exterior_campaign->Sortable = true; // Allow sort
+        $this->exterior_campaign->CustomMsg = $Language->FieldPhrase($this->TableVar, $this->exterior_campaign->Param, "CustomMsg");
         $this->Fields['exterior_campaign'] = &$this->exterior_campaign;
 
         // interior_campaign_id
         $this->interior_campaign_id = new DbField('view_bus_trans_options', 'view_bus_trans_options', 'x_interior_campaign_id', 'interior_campaign_id', '"interior_campaign_id"', 'CAST("interior_campaign_id" AS varchar(255))', 3, 4, -1, false, '"interior_campaign_id"', false, false, false, 'FORMATTED TEXT', 'TEXT');
         $this->interior_campaign_id->Sortable = true; // Allow sort
         $this->interior_campaign_id->DefaultErrorMessage = $Language->phrase("IncorrectInteger");
+        $this->interior_campaign_id->CustomMsg = $Language->FieldPhrase($this->TableVar, $this->interior_campaign_id->Param, "CustomMsg");
         $this->Fields['interior_campaign_id'] = &$this->interior_campaign_id;
 
         // interior_campaign
         $this->interior_campaign = new DbField('view_bus_trans_options', 'view_bus_trans_options', 'x_interior_campaign', 'interior_campaign', '"interior_campaign"', '"interior_campaign"', 201, 0, -1, false, '"interior_campaign"', false, false, false, 'FORMATTED TEXT', 'TEXTAREA');
         $this->interior_campaign->Sortable = true; // Allow sort
+        $this->interior_campaign->CustomMsg = $Language->FieldPhrase($this->TableVar, $this->interior_campaign->Param, "CustomMsg");
         $this->Fields['interior_campaign'] = &$this->interior_campaign;
     }
 
@@ -334,18 +348,21 @@ class ViewBusTransOptions extends DbTable
         $cnt = -1;
         $rs = null;
         if ($sql instanceof \Doctrine\DBAL\Query\QueryBuilder) { // Query builder
-            $sql = $sql->resetQueryPart("orderBy")->getSQL();
+            $sqlwrk = clone $sql;
+            $sqlwrk = $sqlwrk->resetQueryPart("orderBy")->getSQL();
+        } else {
+            $sqlwrk = $sql;
         }
         $pattern = '/^SELECT\s([\s\S]+)\sFROM\s/i';
         // Skip Custom View / SubQuery / SELECT DISTINCT / ORDER BY
         if (
             ($this->TableType == 'TABLE' || $this->TableType == 'VIEW' || $this->TableType == 'LINKTABLE') &&
-            preg_match($pattern, $sql) && !preg_match('/\(\s*(SELECT[^)]+)\)/i', $sql) &&
-            !preg_match('/^\s*select\s+distinct\s+/i', $sql) && !preg_match('/\s+order\s+by\s+/i', $sql)
+            preg_match($pattern, $sqlwrk) && !preg_match('/\(\s*(SELECT[^)]+)\)/i', $sqlwrk) &&
+            !preg_match('/^\s*select\s+distinct\s+/i', $sqlwrk) && !preg_match('/\s+order\s+by\s+/i', $sqlwrk)
         ) {
-            $sqlwrk = "SELECT COUNT(*) FROM " . preg_replace($pattern, "", $sql);
+            $sqlwrk = "SELECT COUNT(*) FROM " . preg_replace($pattern, "", $sqlwrk);
         } else {
-            $sqlwrk = "SELECT COUNT(*) FROM (" . $sql . ") COUNT_TABLE";
+            $sqlwrk = "SELECT COUNT(*) FROM (" . $sqlwrk . ") COUNT_TABLE";
         }
         $conn = $c ?? $this->getConnection();
         $rs = $conn->executeQuery($sqlwrk);

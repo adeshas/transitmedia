@@ -162,7 +162,7 @@ class DbChart
      */
     public function getParameters($key)
     {
-        return $this->Parameters->get($key) ?: [];
+        return $this->Parameters->has($key) ? $this->Parameters->get($key) : [];
     }
 
     /**
@@ -202,7 +202,7 @@ class DbChart
     // Load chart parameter
     public function loadParameter($key)
     {
-        return $this->Parameters->get($key);
+        return $this->Parameters->has($key) ? $this->Parameters->get($key) : null;
     }
 
     // Save chart parameter
@@ -921,7 +921,7 @@ class DbChart
                 '<div id="div_ctl_' . $chartDivName . '" class="ew-chart">';
             if ($this->RunTimeSort && !$isDashBoard && !$isDrillDown && $ExportType == "" && $this->hasData()) {
                 $html .= '<div class="ew-chart-sort mb-1">' .
-                    '<form class="form-inline" action="' . CurrentPageUrl() . '#cht_' . $chartDivName . '">' .
+                    '<form class="form-inline" action="' . CurrentPageUrl(false) . '#cht_' . $chartDivName . '">' .
                     $Language->phrase("ChartOrder") . '&nbsp;' .
                     '<select id="chartordertype" name="chartordertype" class="custom-select" onchange="this.form.submit();">' .
                     '<option value="1"' . ($this->SortType == '1' ? ' selected' : '') . '>' . $Language->phrase("ChartOrderXAsc") . '</option>' .

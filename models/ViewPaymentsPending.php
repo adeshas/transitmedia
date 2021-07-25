@@ -96,157 +96,185 @@ class ViewPaymentsPending extends DbTable
         $this->transaction_id = new DbField('view_payments_pending', 'view_payments_pending', 'x_transaction_id', 'transaction_id', '"transaction_id"', 'CAST("transaction_id" AS varchar(255))', 3, 4, -1, false, '"transaction_id"', false, false, false, 'FORMATTED TEXT', 'TEXT');
         $this->transaction_id->Sortable = true; // Allow sort
         $this->transaction_id->DefaultErrorMessage = $Language->phrase("IncorrectInteger");
+        $this->transaction_id->CustomMsg = $Language->FieldPhrase($this->TableVar, $this->transaction_id->Param, "CustomMsg");
         $this->Fields['transaction_id'] = &$this->transaction_id;
 
         // campaign_id
         $this->campaign_id = new DbField('view_payments_pending', 'view_payments_pending', 'x_campaign_id', 'campaign_id', '"campaign_id"', 'CAST("campaign_id" AS varchar(255))', 3, 4, -1, false, '"campaign_id"', false, false, false, 'FORMATTED TEXT', 'TEXT');
         $this->campaign_id->Sortable = true; // Allow sort
         $this->campaign_id->DefaultErrorMessage = $Language->phrase("IncorrectInteger");
+        $this->campaign_id->CustomMsg = $Language->FieldPhrase($this->TableVar, $this->campaign_id->Param, "CustomMsg");
         $this->Fields['campaign_id'] = &$this->campaign_id;
 
         // campaign_name
         $this->campaign_name = new DbField('view_payments_pending', 'view_payments_pending', 'x_campaign_name', 'campaign_name', '"campaign_name"', '"campaign_name"', 201, 0, -1, false, '"campaign_name"', false, false, false, 'FORMATTED TEXT', 'TEXTAREA');
         $this->campaign_name->Sortable = true; // Allow sort
+        $this->campaign_name->CustomMsg = $Language->FieldPhrase($this->TableVar, $this->campaign_name->Param, "CustomMsg");
         $this->Fields['campaign_name'] = &$this->campaign_name;
 
         // payment_status
         $this->payment_status = new DbField('view_payments_pending', 'view_payments_pending', 'x_payment_status', 'payment_status', '"payment_status"', '"payment_status"', 200, 0, -1, false, '"payment_status"', false, false, false, 'FORMATTED TEXT', 'TEXT');
         $this->payment_status->Sortable = true; // Allow sort
+        $this->payment_status->CustomMsg = $Language->FieldPhrase($this->TableVar, $this->payment_status->Param, "CustomMsg");
         $this->Fields['payment_status'] = &$this->payment_status;
 
         // start_date
         $this->start_date = new DbField('view_payments_pending', 'view_payments_pending', 'x_start_date', 'start_date', '"start_date"', CastDateFieldForLike("\"start_date\"", 0, "DB"), 133, 4, 0, false, '"start_date"', false, false, false, 'FORMATTED TEXT', 'TEXT');
         $this->start_date->Sortable = true; // Allow sort
         $this->start_date->DefaultErrorMessage = str_replace("%s", $GLOBALS["DATE_FORMAT"], $Language->phrase("IncorrectDate"));
+        $this->start_date->CustomMsg = $Language->FieldPhrase($this->TableVar, $this->start_date->Param, "CustomMsg");
         $this->Fields['start_date'] = &$this->start_date;
 
         // end_date
         $this->end_date = new DbField('view_payments_pending', 'view_payments_pending', 'x_end_date', 'end_date', '"end_date"', CastDateFieldForLike("\"end_date\"", 0, "DB"), 133, 4, 0, false, '"end_date"', false, false, false, 'FORMATTED TEXT', 'TEXT');
         $this->end_date->Sortable = true; // Allow sort
         $this->end_date->DefaultErrorMessage = str_replace("%s", $GLOBALS["DATE_FORMAT"], $Language->phrase("IncorrectDate"));
+        $this->end_date->CustomMsg = $Language->FieldPhrase($this->TableVar, $this->end_date->Param, "CustomMsg");
         $this->Fields['end_date'] = &$this->end_date;
 
         // vendor
         $this->vendor = new DbField('view_payments_pending', 'view_payments_pending', 'x_vendor', 'vendor', '"vendor"', '"vendor"', 200, 0, -1, false, '"vendor"', false, false, false, 'FORMATTED TEXT', 'TEXT');
         $this->vendor->Sortable = true; // Allow sort
+        $this->vendor->CustomMsg = $Language->FieldPhrase($this->TableVar, $this->vendor->Param, "CustomMsg");
         $this->Fields['vendor'] = &$this->vendor;
 
         // operator
         $this->operator = new DbField('view_payments_pending', 'view_payments_pending', 'x_operator', 'operator', '"operator"', '"operator"', 200, 50, -1, false, '"operator"', false, false, false, 'FORMATTED TEXT', 'TEXT');
         $this->operator->Sortable = true; // Allow sort
+        $this->operator->CustomMsg = $Language->FieldPhrase($this->TableVar, $this->operator->Param, "CustomMsg");
         $this->Fields['operator'] = &$this->operator;
 
         // platform
         $this->platform = new DbField('view_payments_pending', 'view_payments_pending', 'x_platform', 'platform', '"platform"', '"platform"', 200, 50, -1, false, '"platform"', false, false, false, 'FORMATTED TEXT', 'TEXT');
         $this->platform->Sortable = true; // Allow sort
+        $this->platform->CustomMsg = $Language->FieldPhrase($this->TableVar, $this->platform->Param, "CustomMsg");
         $this->Fields['platform'] = &$this->platform;
 
         // inventory
         $this->inventory = new DbField('view_payments_pending', 'view_payments_pending', 'x_inventory', 'inventory', '"inventory"', '"inventory"', 201, 0, -1, false, '"inventory"', false, false, false, 'FORMATTED TEXT', 'TEXTAREA');
         $this->inventory->Sortable = true; // Allow sort
+        $this->inventory->CustomMsg = $Language->FieldPhrase($this->TableVar, $this->inventory->Param, "CustomMsg");
         $this->Fields['inventory'] = &$this->inventory;
 
         // bus_size
         $this->bus_size = new DbField('view_payments_pending', 'view_payments_pending', 'x_bus_size', 'bus_size', '"bus_size"', '"bus_size"', 201, 0, -1, false, '"bus_size"', false, false, false, 'FORMATTED TEXT', 'TEXTAREA');
         $this->bus_size->Sortable = true; // Allow sort
+        $this->bus_size->CustomMsg = $Language->FieldPhrase($this->TableVar, $this->bus_size->Param, "CustomMsg");
         $this->Fields['bus_size'] = &$this->bus_size;
 
         // print_stage
         $this->print_stage = new DbField('view_payments_pending', 'view_payments_pending', 'x_print_stage', 'print_stage', '"print_stage"', '"print_stage"', 201, 0, -1, false, '"print_stage"', false, false, false, 'FORMATTED TEXT', 'TEXTAREA');
         $this->print_stage->Sortable = true; // Allow sort
+        $this->print_stage->CustomMsg = $Language->FieldPhrase($this->TableVar, $this->print_stage->Param, "CustomMsg");
         $this->Fields['print_stage'] = &$this->print_stage;
 
         // quantity
         $this->quantity = new DbField('view_payments_pending', 'view_payments_pending', 'x_quantity', 'quantity', '"quantity"', 'CAST("quantity" AS varchar(255))', 3, 4, -1, false, '"quantity"', false, false, false, 'FORMATTED TEXT', 'TEXT');
         $this->quantity->Sortable = true; // Allow sort
         $this->quantity->DefaultErrorMessage = $Language->phrase("IncorrectInteger");
+        $this->quantity->CustomMsg = $Language->FieldPhrase($this->TableVar, $this->quantity->Param, "CustomMsg");
         $this->Fields['quantity'] = &$this->quantity;
 
         // price
         $this->price = new DbField('view_payments_pending', 'view_payments_pending', 'x_price', 'price', '"price"', 'CAST("price" AS varchar(255))', 20, 8, -1, false, '"price"', false, false, false, 'FORMATTED TEXT', 'TEXT');
         $this->price->Sortable = true; // Allow sort
         $this->price->DefaultErrorMessage = $Language->phrase("IncorrectInteger");
+        $this->price->CustomMsg = $Language->FieldPhrase($this->TableVar, $this->price->Param, "CustomMsg");
         $this->Fields['price'] = &$this->price;
 
         // operator_fee
         $this->operator_fee = new DbField('view_payments_pending', 'view_payments_pending', 'x_operator_fee', 'operator_fee', '"operator_fee"', 'CAST("operator_fee" AS varchar(255))', 20, 8, -1, false, '"operator_fee"', false, false, false, 'FORMATTED TEXT', 'TEXT');
         $this->operator_fee->Sortable = true; // Allow sort
         $this->operator_fee->DefaultErrorMessage = $Language->phrase("IncorrectInteger");
+        $this->operator_fee->CustomMsg = $Language->FieldPhrase($this->TableVar, $this->operator_fee->Param, "CustomMsg");
         $this->Fields['operator_fee'] = &$this->operator_fee;
 
         // agency_fee
         $this->agency_fee = new DbField('view_payments_pending', 'view_payments_pending', 'x_agency_fee', 'agency_fee', '"agency_fee"', 'CAST("agency_fee" AS varchar(255))', 20, 8, -1, false, '"agency_fee"', false, false, false, 'FORMATTED TEXT', 'TEXT');
         $this->agency_fee->Sortable = true; // Allow sort
         $this->agency_fee->DefaultErrorMessage = $Language->phrase("IncorrectInteger");
+        $this->agency_fee->CustomMsg = $Language->FieldPhrase($this->TableVar, $this->agency_fee->Param, "CustomMsg");
         $this->Fields['agency_fee'] = &$this->agency_fee;
 
         // lamata_fee
         $this->lamata_fee = new DbField('view_payments_pending', 'view_payments_pending', 'x_lamata_fee', 'lamata_fee', '"lamata_fee"', 'CAST("lamata_fee" AS varchar(255))', 20, 8, -1, false, '"lamata_fee"', false, false, false, 'FORMATTED TEXT', 'TEXT');
         $this->lamata_fee->Sortable = true; // Allow sort
         $this->lamata_fee->DefaultErrorMessage = $Language->phrase("IncorrectInteger");
+        $this->lamata_fee->CustomMsg = $Language->FieldPhrase($this->TableVar, $this->lamata_fee->Param, "CustomMsg");
         $this->Fields['lamata_fee'] = &$this->lamata_fee;
 
         // lasaa_fee
         $this->lasaa_fee = new DbField('view_payments_pending', 'view_payments_pending', 'x_lasaa_fee', 'lasaa_fee', '"lasaa_fee"', 'CAST("lasaa_fee" AS varchar(255))', 20, 8, -1, false, '"lasaa_fee"', false, false, false, 'FORMATTED TEXT', 'TEXT');
         $this->lasaa_fee->Sortable = true; // Allow sort
         $this->lasaa_fee->DefaultErrorMessage = $Language->phrase("IncorrectInteger");
+        $this->lasaa_fee->CustomMsg = $Language->FieldPhrase($this->TableVar, $this->lasaa_fee->Param, "CustomMsg");
         $this->Fields['lasaa_fee'] = &$this->lasaa_fee;
 
         // printers_fee
         $this->printers_fee = new DbField('view_payments_pending', 'view_payments_pending', 'x_printers_fee', 'printers_fee', '"printers_fee"', 'CAST("printers_fee" AS varchar(255))', 20, 8, -1, false, '"printers_fee"', false, false, false, 'FORMATTED TEXT', 'TEXT');
         $this->printers_fee->Sortable = true; // Allow sort
         $this->printers_fee->DefaultErrorMessage = $Language->phrase("IncorrectInteger");
+        $this->printers_fee->CustomMsg = $Language->FieldPhrase($this->TableVar, $this->printers_fee->Param, "CustomMsg");
         $this->Fields['printers_fee'] = &$this->printers_fee;
 
         // operator_total
         $this->operator_total = new DbField('view_payments_pending', 'view_payments_pending', 'x_operator_total', 'operator_total', '"operator_total"', 'CAST("operator_total" AS varchar(255))', 20, 8, -1, false, '"operator_total"', false, false, false, 'FORMATTED TEXT', 'TEXT');
         $this->operator_total->Sortable = true; // Allow sort
         $this->operator_total->DefaultErrorMessage = $Language->phrase("IncorrectInteger");
+        $this->operator_total->CustomMsg = $Language->FieldPhrase($this->TableVar, $this->operator_total->Param, "CustomMsg");
         $this->Fields['operator_total'] = &$this->operator_total;
 
         // agency_total
         $this->agency_total = new DbField('view_payments_pending', 'view_payments_pending', 'x_agency_total', 'agency_total', '"agency_total"', 'CAST("agency_total" AS varchar(255))', 20, 8, -1, false, '"agency_total"', false, false, false, 'FORMATTED TEXT', 'TEXT');
         $this->agency_total->Sortable = true; // Allow sort
         $this->agency_total->DefaultErrorMessage = $Language->phrase("IncorrectInteger");
+        $this->agency_total->CustomMsg = $Language->FieldPhrase($this->TableVar, $this->agency_total->Param, "CustomMsg");
         $this->Fields['agency_total'] = &$this->agency_total;
 
         // lamata_total
         $this->lamata_total = new DbField('view_payments_pending', 'view_payments_pending', 'x_lamata_total', 'lamata_total', '"lamata_total"', 'CAST("lamata_total" AS varchar(255))', 20, 8, -1, false, '"lamata_total"', false, false, false, 'FORMATTED TEXT', 'TEXT');
         $this->lamata_total->Sortable = true; // Allow sort
         $this->lamata_total->DefaultErrorMessage = $Language->phrase("IncorrectInteger");
+        $this->lamata_total->CustomMsg = $Language->FieldPhrase($this->TableVar, $this->lamata_total->Param, "CustomMsg");
         $this->Fields['lamata_total'] = &$this->lamata_total;
 
         // lasaa_total
         $this->lasaa_total = new DbField('view_payments_pending', 'view_payments_pending', 'x_lasaa_total', 'lasaa_total', '"lasaa_total"', 'CAST("lasaa_total" AS varchar(255))', 20, 8, -1, false, '"lasaa_total"', false, false, false, 'FORMATTED TEXT', 'TEXT');
         $this->lasaa_total->Sortable = true; // Allow sort
         $this->lasaa_total->DefaultErrorMessage = $Language->phrase("IncorrectInteger");
+        $this->lasaa_total->CustomMsg = $Language->FieldPhrase($this->TableVar, $this->lasaa_total->Param, "CustomMsg");
         $this->Fields['lasaa_total'] = &$this->lasaa_total;
 
         // printers_total
         $this->printers_total = new DbField('view_payments_pending', 'view_payments_pending', 'x_printers_total', 'printers_total', '"printers_total"', 'CAST("printers_total" AS varchar(255))', 20, 8, -1, false, '"printers_total"', false, false, false, 'FORMATTED TEXT', 'TEXT');
         $this->printers_total->Sortable = true; // Allow sort
         $this->printers_total->DefaultErrorMessage = $Language->phrase("IncorrectInteger");
+        $this->printers_total->CustomMsg = $Language->FieldPhrase($this->TableVar, $this->printers_total->Param, "CustomMsg");
         $this->Fields['printers_total'] = &$this->printers_total;
 
         // price_total
         $this->price_total = new DbField('view_payments_pending', 'view_payments_pending', 'x_price_total', 'price_total', '"price_total"', 'CAST("price_total" AS varchar(255))', 20, 8, -1, false, '"price_total"', false, false, false, 'FORMATTED TEXT', 'TEXT');
         $this->price_total->Sortable = true; // Allow sort
         $this->price_total->DefaultErrorMessage = $Language->phrase("IncorrectInteger");
+        $this->price_total->CustomMsg = $Language->FieldPhrase($this->TableVar, $this->price_total->Param, "CustomMsg");
         $this->Fields['price_total'] = &$this->price_total;
 
         // price_details
         $this->price_details = new DbField('view_payments_pending', 'view_payments_pending', 'x_price_details', 'price_details', '"price_details"', '"price_details"', 201, 0, -1, false, '"price_details"', false, false, false, 'FORMATTED TEXT', 'TEXTAREA');
         $this->price_details->Sortable = true; // Allow sort
+        $this->price_details->CustomMsg = $Language->FieldPhrase($this->TableVar, $this->price_details->Param, "CustomMsg");
         $this->Fields['price_details'] = &$this->price_details;
 
         // transaction_status
         $this->transaction_status = new DbField('view_payments_pending', 'view_payments_pending', 'x_transaction_status', 'transaction_status', '"transaction_status"', '"transaction_status"', 200, 0, -1, false, '"transaction_status"', false, false, false, 'FORMATTED TEXT', 'TEXT');
         $this->transaction_status->Sortable = true; // Allow sort
+        $this->transaction_status->CustomMsg = $Language->FieldPhrase($this->TableVar, $this->transaction_status->Param, "CustomMsg");
         $this->Fields['transaction_status'] = &$this->transaction_status;
 
         // print_status
         $this->print_status = new DbField('view_payments_pending', 'view_payments_pending', 'x_print_status', 'print_status', '"print_status"', '"print_status"', 200, 0, -1, false, '"print_status"', false, false, false, 'FORMATTED TEXT', 'TEXT');
         $this->print_status->Sortable = true; // Allow sort
+        $this->print_status->CustomMsg = $Language->FieldPhrase($this->TableVar, $this->print_status->Param, "CustomMsg");
         $this->Fields['print_status'] = &$this->print_status;
     }
 
@@ -427,18 +455,21 @@ class ViewPaymentsPending extends DbTable
         $cnt = -1;
         $rs = null;
         if ($sql instanceof \Doctrine\DBAL\Query\QueryBuilder) { // Query builder
-            $sql = $sql->resetQueryPart("orderBy")->getSQL();
+            $sqlwrk = clone $sql;
+            $sqlwrk = $sqlwrk->resetQueryPart("orderBy")->getSQL();
+        } else {
+            $sqlwrk = $sql;
         }
         $pattern = '/^SELECT\s([\s\S]+)\sFROM\s/i';
         // Skip Custom View / SubQuery / SELECT DISTINCT / ORDER BY
         if (
             ($this->TableType == 'TABLE' || $this->TableType == 'VIEW' || $this->TableType == 'LINKTABLE') &&
-            preg_match($pattern, $sql) && !preg_match('/\(\s*(SELECT[^)]+)\)/i', $sql) &&
-            !preg_match('/^\s*select\s+distinct\s+/i', $sql) && !preg_match('/\s+order\s+by\s+/i', $sql)
+            preg_match($pattern, $sqlwrk) && !preg_match('/\(\s*(SELECT[^)]+)\)/i', $sqlwrk) &&
+            !preg_match('/^\s*select\s+distinct\s+/i', $sqlwrk) && !preg_match('/\s+order\s+by\s+/i', $sqlwrk)
         ) {
-            $sqlwrk = "SELECT COUNT(*) FROM " . preg_replace($pattern, "", $sql);
+            $sqlwrk = "SELECT COUNT(*) FROM " . preg_replace($pattern, "", $sqlwrk);
         } else {
-            $sqlwrk = "SELECT COUNT(*) FROM (" . $sql . ") COUNT_TABLE";
+            $sqlwrk = "SELECT COUNT(*) FROM (" . $sqlwrk . ") COUNT_TABLE";
         }
         $conn = $c ?? $this->getConnection();
         $rs = $conn->executeQuery($sqlwrk);
@@ -1610,6 +1641,7 @@ SORTHTML;
                 } else {
                     $doc->exportCaption($this->transaction_id);
                     $doc->exportCaption($this->campaign_id);
+                    $doc->exportCaption($this->campaign_name);
                     $doc->exportCaption($this->payment_status);
                     $doc->exportCaption($this->start_date);
                     $doc->exportCaption($this->end_date);
@@ -1693,6 +1725,7 @@ SORTHTML;
                     } else {
                         $doc->exportField($this->transaction_id);
                         $doc->exportField($this->campaign_id);
+                        $doc->exportField($this->campaign_name);
                         $doc->exportField($this->payment_status);
                         $doc->exportField($this->start_date);
                         $doc->exportField($this->end_date);

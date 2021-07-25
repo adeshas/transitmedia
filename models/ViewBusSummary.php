@@ -81,59 +81,70 @@ class ViewBusSummary extends DbTable
         $this->exterior_campaign_id = new DbField('view_bus_summary', 'view_bus_summary', 'x_exterior_campaign_id', 'exterior_campaign_id', '"exterior_campaign_id"', 'CAST("exterior_campaign_id" AS varchar(255))', 3, 4, -1, false, '"exterior_campaign_id"', false, false, false, 'FORMATTED TEXT', 'TEXT');
         $this->exterior_campaign_id->Sortable = true; // Allow sort
         $this->exterior_campaign_id->DefaultErrorMessage = $Language->phrase("IncorrectInteger");
+        $this->exterior_campaign_id->CustomMsg = $Language->FieldPhrase($this->TableVar, $this->exterior_campaign_id->Param, "CustomMsg");
         $this->Fields['exterior_campaign_id'] = &$this->exterior_campaign_id;
 
         // campaign_name
         $this->campaign_name = new DbField('view_bus_summary', 'view_bus_summary', 'x_campaign_name', 'campaign_name', '"campaign_name"', '"campaign_name"', 201, 0, -1, false, '"campaign_name"', false, false, false, 'FORMATTED TEXT', 'TEXTAREA');
         $this->campaign_name->Sortable = true; // Allow sort
+        $this->campaign_name->CustomMsg = $Language->FieldPhrase($this->TableVar, $this->campaign_name->Param, "CustomMsg");
         $this->Fields['campaign_name'] = &$this->campaign_name;
 
         // period
         $this->period = new DbField('view_bus_summary', 'view_bus_summary', 'x_period', 'period', '"period"', '"period"', 201, 0, -1, false, '"period"', false, false, false, 'FORMATTED TEXT', 'TEXTAREA');
         $this->period->Sortable = true; // Allow sort
+        $this->period->CustomMsg = $Language->FieldPhrase($this->TableVar, $this->period->Param, "CustomMsg");
         $this->Fields['period'] = &$this->period;
 
         // buses
         $this->buses = new DbField('view_bus_summary', 'view_bus_summary', 'x_buses', 'buses', '"buses"', 'CAST("buses" AS varchar(255))', 20, 8, -1, false, '"buses"', false, false, false, 'FORMATTED TEXT', 'TEXT');
         $this->buses->Sortable = true; // Allow sort
         $this->buses->DefaultErrorMessage = $Language->phrase("IncorrectInteger");
+        $this->buses->CustomMsg = $Language->FieldPhrase($this->TableVar, $this->buses->Param, "CustomMsg");
         $this->Fields['buses'] = &$this->buses;
 
         // active_working
         $this->active_working = new DbField('view_bus_summary', 'view_bus_summary', 'x_active_working', 'active_working', '"active_working"', 'CAST("active_working" AS varchar(255))', 20, 8, -1, false, '"active_working"', false, false, false, 'FORMATTED TEXT', 'TEXT');
         $this->active_working->Sortable = true; // Allow sort
         $this->active_working->DefaultErrorMessage = $Language->phrase("IncorrectInteger");
+        $this->active_working->CustomMsg = $Language->FieldPhrase($this->TableVar, $this->active_working->Param, "CustomMsg");
         $this->Fields['active_working'] = &$this->active_working;
 
         // requires_maintenance
         $this->requires_maintenance = new DbField('view_bus_summary', 'view_bus_summary', 'x_requires_maintenance', 'requires_maintenance', '"requires_maintenance"', 'CAST("requires_maintenance" AS varchar(255))', 20, 8, -1, false, '"requires_maintenance"', false, false, false, 'FORMATTED TEXT', 'TEXT');
         $this->requires_maintenance->Sortable = true; // Allow sort
         $this->requires_maintenance->DefaultErrorMessage = $Language->phrase("IncorrectInteger");
+        $this->requires_maintenance->CustomMsg = $Language->FieldPhrase($this->TableVar, $this->requires_maintenance->Param, "CustomMsg");
         $this->Fields['requires_maintenance'] = &$this->requires_maintenance;
 
         // issues
         $this->issues = new DbField('view_bus_summary', 'view_bus_summary', 'x_issues', 'issues', '"issues"', '"issues"', 201, 0, -1, false, '"issues"', false, false, false, 'FORMATTED TEXT', 'TEXTAREA');
         $this->issues->Sortable = true; // Allow sort
+        $this->issues->CustomMsg = $Language->FieldPhrase($this->TableVar, $this->issues->Param, "CustomMsg");
         $this->Fields['issues'] = &$this->issues;
 
         // good_bus_codes
         $this->good_bus_codes = new DbField('view_bus_summary', 'view_bus_summary', 'x_good_bus_codes', 'good_bus_codes', '"good_bus_codes"', '"good_bus_codes"', 201, 0, -1, false, '"good_bus_codes"', false, false, false, 'FORMATTED TEXT', 'TEXTAREA');
         $this->good_bus_codes->Sortable = true; // Allow sort
+        $this->good_bus_codes->CustomMsg = $Language->FieldPhrase($this->TableVar, $this->good_bus_codes->Param, "CustomMsg");
         $this->Fields['good_bus_codes'] = &$this->good_bus_codes;
 
         // bad_bus_codes
         $this->bad_bus_codes = new DbField('view_bus_summary', 'view_bus_summary', 'x_bad_bus_codes', 'bad_bus_codes', '"bad_bus_codes"', '"bad_bus_codes"', 201, 0, -1, false, '"bad_bus_codes"', false, false, false, 'FORMATTED TEXT', 'TEXTAREA');
         $this->bad_bus_codes->Sortable = true; // Allow sort
+        $this->bad_bus_codes->CustomMsg = $Language->FieldPhrase($this->TableVar, $this->bad_bus_codes->Param, "CustomMsg");
         $this->Fields['bad_bus_codes'] = &$this->bad_bus_codes;
 
         // bus_codes
         $this->bus_codes = new DbField('view_bus_summary', 'view_bus_summary', 'x_bus_codes', 'bus_codes', '"bus_codes"', '"bus_codes"', 201, 0, -1, false, '"bus_codes"', false, false, false, 'FORMATTED TEXT', 'TEXTAREA');
         $this->bus_codes->Sortable = true; // Allow sort
+        $this->bus_codes->CustomMsg = $Language->FieldPhrase($this->TableVar, $this->bus_codes->Param, "CustomMsg");
         $this->Fields['bus_codes'] = &$this->bus_codes;
 
         // last_updated_at
         $this->last_updated_at = new DbField('view_bus_summary', 'view_bus_summary', 'x_last_updated_at', 'last_updated_at', '"last_updated_at"', '"last_updated_at"', 201, 0, -1, false, '"last_updated_at"', false, false, false, 'FORMATTED TEXT', 'TEXTAREA');
         $this->last_updated_at->Sortable = true; // Allow sort
+        $this->last_updated_at->CustomMsg = $Language->FieldPhrase($this->TableVar, $this->last_updated_at->Param, "CustomMsg");
         $this->Fields['last_updated_at'] = &$this->last_updated_at;
 
         // platform_id
@@ -143,6 +154,7 @@ class ViewBusSummary extends DbTable
         $this->platform_id->PleaseSelectText = $Language->phrase("PleaseSelect"); // "PleaseSelect" text
         $this->platform_id->Lookup = new Lookup('platform_id', 'y_platforms', false, 'id', ["name","","",""], [], [], [], [], [], [], '', '');
         $this->platform_id->DefaultErrorMessage = $Language->phrase("IncorrectInteger");
+        $this->platform_id->CustomMsg = $Language->FieldPhrase($this->TableVar, $this->platform_id->Param, "CustomMsg");
         $this->Fields['platform_id'] = &$this->platform_id;
 
         // operator_id
@@ -152,6 +164,7 @@ class ViewBusSummary extends DbTable
         $this->operator_id->PleaseSelectText = $Language->phrase("PleaseSelect"); // "PleaseSelect" text
         $this->operator_id->Lookup = new Lookup('operator_id', 'y_operators', false, 'id', ["name","","",""], [], [], [], [], [], [], '', '');
         $this->operator_id->DefaultErrorMessage = $Language->phrase("IncorrectInteger");
+        $this->operator_id->CustomMsg = $Language->FieldPhrase($this->TableVar, $this->operator_id->Param, "CustomMsg");
         $this->Fields['operator_id'] = &$this->operator_id;
     }
 
@@ -332,18 +345,21 @@ class ViewBusSummary extends DbTable
         $cnt = -1;
         $rs = null;
         if ($sql instanceof \Doctrine\DBAL\Query\QueryBuilder) { // Query builder
-            $sql = $sql->resetQueryPart("orderBy")->getSQL();
+            $sqlwrk = clone $sql;
+            $sqlwrk = $sqlwrk->resetQueryPart("orderBy")->getSQL();
+        } else {
+            $sqlwrk = $sql;
         }
         $pattern = '/^SELECT\s([\s\S]+)\sFROM\s/i';
         // Skip Custom View / SubQuery / SELECT DISTINCT / ORDER BY
         if (
             ($this->TableType == 'TABLE' || $this->TableType == 'VIEW' || $this->TableType == 'LINKTABLE') &&
-            preg_match($pattern, $sql) && !preg_match('/\(\s*(SELECT[^)]+)\)/i', $sql) &&
-            !preg_match('/^\s*select\s+distinct\s+/i', $sql) && !preg_match('/\s+order\s+by\s+/i', $sql)
+            preg_match($pattern, $sqlwrk) && !preg_match('/\(\s*(SELECT[^)]+)\)/i', $sqlwrk) &&
+            !preg_match('/^\s*select\s+distinct\s+/i', $sqlwrk) && !preg_match('/\s+order\s+by\s+/i', $sqlwrk)
         ) {
-            $sqlwrk = "SELECT COUNT(*) FROM " . preg_replace($pattern, "", $sql);
+            $sqlwrk = "SELECT COUNT(*) FROM " . preg_replace($pattern, "", $sqlwrk);
         } else {
-            $sqlwrk = "SELECT COUNT(*) FROM (" . $sql . ") COUNT_TABLE";
+            $sqlwrk = "SELECT COUNT(*) FROM (" . $sqlwrk . ") COUNT_TABLE";
         }
         $conn = $c ?? $this->getConnection();
         $rs = $conn->executeQuery($sqlwrk);
@@ -945,7 +961,7 @@ SORTHTML;
         $this->last_updated_at->ViewCustomAttributes = "";
 
         // platform_id
-        $curVal = strval($this->platform_id->CurrentValue);
+        $curVal = trim(strval($this->platform_id->CurrentValue));
         if ($curVal != "") {
             $this->platform_id->ViewValue = $this->platform_id->lookupCacheOption($curVal);
             if ($this->platform_id->ViewValue === null) { // Lookup from database
@@ -966,7 +982,7 @@ SORTHTML;
         $this->platform_id->ViewCustomAttributes = "";
 
         // operator_id
-        $curVal = strval($this->operator_id->CurrentValue);
+        $curVal = trim(strval($this->operator_id->CurrentValue));
         if ($curVal != "") {
             $this->operator_id->ViewValue = $this->operator_id->lookupCacheOption($curVal);
             if ($this->operator_id->ViewValue === null) { // Lookup from database

@@ -79,6 +79,35 @@ class OthersController extends ControllerBase
     // Index
     public function index(Request $request, Response $response, array $args): Response
     {
-        return $response->withHeader("Location", "viewbusesexteriorlist")->withStatus(302);
+        global $Security, $USER_LEVEL_TABLES;
+        $url = "";
+        foreach ($USER_LEVEL_TABLES as $t) {
+            if ($t[0] == "view_buses_exterior") { // Check default table
+                if ($Security->allowList($t[4] . $t[0])) {
+                    $url = $t[5];
+                    break;
+                }
+            } elseif ($url == "") {
+                if ($t[5] && $Security->allowList($t[4] . $t[0])) {
+                    $url = $t[5];
+                }
+            }
+        }
+        if ($url === "" && !$Security->isLoggedIn()) {
+            $url = "login";
+        }
+        if ($url == "") {
+            $error = [
+                "statusCode" => "200",
+                "error" => [
+                    "class" => "text-warning",
+                    "type" => Container("language")->phrase("Error"),
+                    "description" => DeniedMessage()
+                ],
+            ];
+            Container("flash")->addMessage("error", $error);
+            return $response->withHeader("Location", GetUrl("error"))->withStatus(302); // Redirect to error page
+        }
+        return $response->withHeader("Location", $url)->withStatus(302);
     }
 }

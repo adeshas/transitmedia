@@ -20,6 +20,7 @@ echo $topMenu->toScript();
 
 // Sidebar menu
 $sideMenu = new Menu("menu", true, false);
+$sideMenu->addMenuItem(187, "mi_test", $MenuLanguage->MenuPhrase("187", "MenuText"), $MenuRelativePath . "test", -1, "", AllowListMenu('{7CA6B0F7-61EF-4DB7-A152-ED7AD2382C98}test.php'), false, false, "", "", false);
 $sideMenu->addMenuItem(20, "mi_welcome", $MenuLanguage->MenuPhrase("20", "MenuText"), $MenuRelativePath . "welcome", -1, "", AllowListMenu('{7CA6B0F7-61EF-4DB7-A152-ED7AD2382C98}welcome.php'), false, false, "fa-home", "", false);
 $sideMenu->addMenuItem(32, "mci_Campaigns", $MenuLanguage->MenuPhrase("32", "MenuText"), "", -1, "", IsLoggedIn(), false, true, "fa-ad", "", false);
 $sideMenu->addMenuItem(35, "mci_New_Campaign", $MenuLanguage->MenuPhrase("35", "MenuText"), $MenuRelativePath . "maincampaignsadd?showdetail=", 32, "", IsLoggedIn(), false, true, "fa-angle-double-right fas", "", false);

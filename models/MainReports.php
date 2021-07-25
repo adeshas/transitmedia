@@ -80,6 +80,7 @@ class MainReports extends DbTable
         $this->id->Nullable = false; // NOT NULL field
         $this->id->Sortable = true; // Allow sort
         $this->id->DefaultErrorMessage = $Language->phrase("IncorrectInteger");
+        $this->id->CustomMsg = $Language->FieldPhrase($this->TableVar, $this->id->Param, "CustomMsg");
         $this->Fields['id'] = &$this->id;
 
         // date
@@ -88,21 +89,25 @@ class MainReports extends DbTable
         $this->date->Required = true; // Required field
         $this->date->Sortable = true; // Allow sort
         $this->date->DefaultErrorMessage = str_replace("%s", $GLOBALS["DATE_FORMAT"], $Language->phrase("IncorrectDate"));
+        $this->date->CustomMsg = $Language->FieldPhrase($this->TableVar, $this->date->Param, "CustomMsg");
         $this->Fields['date'] = &$this->date;
 
         // image
         $this->image = new DbField('main_reports', 'main_reports', 'x_image', 'image', '"image"', '"image"', 201, 0, -1, false, '"image"', false, false, false, 'FORMATTED TEXT', 'TEXTAREA');
         $this->image->Sortable = true; // Allow sort
+        $this->image->CustomMsg = $Language->FieldPhrase($this->TableVar, $this->image->Param, "CustomMsg");
         $this->Fields['image'] = &$this->image;
 
         // video
         $this->video = new DbField('main_reports', 'main_reports', 'x_video', 'video', '"video"', '"video"', 201, 0, -1, false, '"video"', false, false, false, 'FORMATTED TEXT', 'TEXTAREA');
         $this->video->Sortable = true; // Allow sort
+        $this->video->CustomMsg = $Language->FieldPhrase($this->TableVar, $this->video->Param, "CustomMsg");
         $this->Fields['video'] = &$this->video;
 
         // comments
         $this->comments = new DbField('main_reports', 'main_reports', 'x_comments', 'comments', '"comments"', '"comments"', 201, 0, -1, false, '"comments"', false, false, false, 'FORMATTED TEXT', 'TEXTAREA');
         $this->comments->Sortable = true; // Allow sort
+        $this->comments->CustomMsg = $Language->FieldPhrase($this->TableVar, $this->comments->Param, "CustomMsg");
         $this->Fields['comments'] = &$this->comments;
 
         // type_id
@@ -112,6 +117,7 @@ class MainReports extends DbTable
         $this->type_id->PleaseSelectText = $Language->phrase("PleaseSelect"); // "PleaseSelect" text
         $this->type_id->Lookup = new Lookup('type_id', 'x_report_types', false, 'id', ["name","","",""], [], [], [], [], [], [], '', '');
         $this->type_id->DefaultErrorMessage = $Language->phrase("IncorrectInteger");
+        $this->type_id->CustomMsg = $Language->FieldPhrase($this->TableVar, $this->type_id->Param, "CustomMsg");
         $this->Fields['type_id'] = &$this->type_id;
 
         // campaign_id
@@ -123,6 +129,7 @@ class MainReports extends DbTable
         $this->campaign_id->PleaseSelectText = $Language->phrase("PleaseSelect"); // "PleaseSelect" text
         $this->campaign_id->Lookup = new Lookup('campaign_id', 'main_campaigns', false, 'id', ["name","","",""], [], [], [], [], [], [], '"id" DESC', '');
         $this->campaign_id->DefaultErrorMessage = $Language->phrase("IncorrectInteger");
+        $this->campaign_id->CustomMsg = $Language->FieldPhrase($this->TableVar, $this->campaign_id->Param, "CustomMsg");
         $this->Fields['campaign_id'] = &$this->campaign_id;
 
         // ref_bus_id
@@ -130,6 +137,7 @@ class MainReports extends DbTable
         $this->ref_bus_id->Sortable = true; // Allow sort
         $this->ref_bus_id->Lookup = new Lookup('ref_bus_id', 'main_buses', false, 'id', ["number","","",""], [], [], [], [], [], [], '', '');
         $this->ref_bus_id->DefaultErrorMessage = $Language->phrase("IncorrectInteger");
+        $this->ref_bus_id->CustomMsg = $Language->FieldPhrase($this->TableVar, $this->ref_bus_id->Param, "CustomMsg");
         $this->Fields['ref_bus_id'] = &$this->ref_bus_id;
 
         // ts_created
@@ -138,6 +146,7 @@ class MainReports extends DbTable
         $this->ts_created->Required = true; // Required field
         $this->ts_created->Sortable = true; // Allow sort
         $this->ts_created->DefaultErrorMessage = str_replace("%s", $GLOBALS["DATE_FORMAT"], $Language->phrase("IncorrectDate"));
+        $this->ts_created->CustomMsg = $Language->FieldPhrase($this->TableVar, $this->ts_created->Param, "CustomMsg");
         $this->Fields['ts_created'] = &$this->ts_created;
 
         // vendor_id
@@ -149,6 +158,7 @@ class MainReports extends DbTable
         $this->vendor_id->PleaseSelectText = $Language->phrase("PleaseSelect"); // "PleaseSelect" text
         $this->vendor_id->Lookup = new Lookup('vendor_id', 'y_vendors', false, 'id', ["name","","",""], [], [], [], [], [], [], '', '');
         $this->vendor_id->DefaultErrorMessage = $Language->phrase("IncorrectInteger");
+        $this->vendor_id->CustomMsg = $Language->FieldPhrase($this->TableVar, $this->vendor_id->Param, "CustomMsg");
         $this->Fields['vendor_id'] = &$this->vendor_id;
     }
 
@@ -367,18 +377,21 @@ class MainReports extends DbTable
         $cnt = -1;
         $rs = null;
         if ($sql instanceof \Doctrine\DBAL\Query\QueryBuilder) { // Query builder
-            $sql = $sql->resetQueryPart("orderBy")->getSQL();
+            $sqlwrk = clone $sql;
+            $sqlwrk = $sqlwrk->resetQueryPart("orderBy")->getSQL();
+        } else {
+            $sqlwrk = $sql;
         }
         $pattern = '/^SELECT\s([\s\S]+)\sFROM\s/i';
         // Skip Custom View / SubQuery / SELECT DISTINCT / ORDER BY
         if (
             ($this->TableType == 'TABLE' || $this->TableType == 'VIEW' || $this->TableType == 'LINKTABLE') &&
-            preg_match($pattern, $sql) && !preg_match('/\(\s*(SELECT[^)]+)\)/i', $sql) &&
-            !preg_match('/^\s*select\s+distinct\s+/i', $sql) && !preg_match('/\s+order\s+by\s+/i', $sql)
+            preg_match($pattern, $sqlwrk) && !preg_match('/\(\s*(SELECT[^)]+)\)/i', $sqlwrk) &&
+            !preg_match('/^\s*select\s+distinct\s+/i', $sqlwrk) && !preg_match('/\s+order\s+by\s+/i', $sqlwrk)
         ) {
-            $sqlwrk = "SELECT COUNT(*) FROM " . preg_replace($pattern, "", $sql);
+            $sqlwrk = "SELECT COUNT(*) FROM " . preg_replace($pattern, "", $sqlwrk);
         } else {
-            $sqlwrk = "SELECT COUNT(*) FROM (" . $sql . ") COUNT_TABLE";
+            $sqlwrk = "SELECT COUNT(*) FROM (" . $sqlwrk . ") COUNT_TABLE";
         }
         $conn = $c ?? $this->getConnection();
         $rs = $conn->executeQuery($sqlwrk);
@@ -1026,7 +1039,7 @@ SORTHTML;
         $this->comments->ViewCustomAttributes = "";
 
         // type_id
-        $curVal = strval($this->type_id->CurrentValue);
+        $curVal = trim(strval($this->type_id->CurrentValue));
         if ($curVal != "") {
             $this->type_id->ViewValue = $this->type_id->lookupCacheOption($curVal);
             if ($this->type_id->ViewValue === null) { // Lookup from database
@@ -1047,7 +1060,7 @@ SORTHTML;
         $this->type_id->ViewCustomAttributes = "";
 
         // campaign_id
-        $curVal = strval($this->campaign_id->CurrentValue);
+        $curVal = trim(strval($this->campaign_id->CurrentValue));
         if ($curVal != "") {
             $this->campaign_id->ViewValue = $this->campaign_id->lookupCacheOption($curVal);
             if ($this->campaign_id->ViewValue === null) { // Lookup from database
@@ -1072,7 +1085,7 @@ SORTHTML;
             $this->ref_bus_id->ViewValue = $this->ref_bus_id->VirtualValue;
         } else {
             $this->ref_bus_id->ViewValue = $this->ref_bus_id->CurrentValue;
-            $curVal = strval($this->ref_bus_id->CurrentValue);
+            $curVal = trim(strval($this->ref_bus_id->CurrentValue));
             if ($curVal != "") {
                 $this->ref_bus_id->ViewValue = $this->ref_bus_id->lookupCacheOption($curVal);
                 if ($this->ref_bus_id->ViewValue === null) { // Lookup from database
@@ -1099,7 +1112,7 @@ SORTHTML;
         $this->ts_created->ViewCustomAttributes = "";
 
         // vendor_id
-        $curVal = strval($this->vendor_id->CurrentValue);
+        $curVal = trim(strval($this->vendor_id->CurrentValue));
         if ($curVal != "") {
             $this->vendor_id->ViewValue = $this->vendor_id->lookupCacheOption($curVal);
             if ($this->vendor_id->ViewValue === null) { // Lookup from database
@@ -1240,7 +1253,7 @@ SORTHTML;
         // vendor_id
         $this->vendor_id->EditAttrs["class"] = "form-control";
         $this->vendor_id->EditCustomAttributes = "";
-        $curVal = strval($this->vendor_id->CurrentValue);
+        $curVal = trim(strval($this->vendor_id->CurrentValue));
         if ($curVal != "") {
             $this->vendor_id->EditValue = $this->vendor_id->lookupCacheOption($curVal);
             if ($this->vendor_id->EditValue === null) { // Lookup from database

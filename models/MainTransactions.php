@@ -89,6 +89,7 @@ class MainTransactions extends DbTable
         $this->id->Nullable = false; // NOT NULL field
         $this->id->Sortable = true; // Allow sort
         $this->id->DefaultErrorMessage = $Language->phrase("IncorrectInteger");
+        $this->id->CustomMsg = $Language->FieldPhrase($this->TableVar, $this->id->Param, "CustomMsg");
         $this->Fields['id'] = &$this->id;
 
         // campaign_id
@@ -101,6 +102,7 @@ class MainTransactions extends DbTable
         $this->campaign_id->PleaseSelectText = $Language->phrase("PleaseSelect"); // "PleaseSelect" text
         $this->campaign_id->Lookup = new Lookup('campaign_id', 'main_campaigns', false, 'id', ["name","quantity","bus_size_id","start_date"], [], ["x_operator_id","x_price_id"], [], [], [], [], '"id" DESC', '');
         $this->campaign_id->DefaultErrorMessage = $Language->phrase("IncorrectInteger");
+        $this->campaign_id->CustomMsg = $Language->FieldPhrase($this->TableVar, $this->campaign_id->Param, "CustomMsg");
         $this->Fields['campaign_id'] = &$this->campaign_id;
 
         // operator_id
@@ -113,12 +115,14 @@ class MainTransactions extends DbTable
         $this->operator_id->PleaseSelectText = $Language->phrase("PleaseSelect"); // "PleaseSelect" text
         $this->operator_id->Lookup = new Lookup('operator_id', 'view_operators_platforms', false, 'operator_id', ["operator_name","","",""], ["x_campaign_id"], [], ["campaign_id"], ["x_campaign_id"], [], [], '', '');
         $this->operator_id->DefaultErrorMessage = $Language->phrase("IncorrectInteger");
+        $this->operator_id->CustomMsg = $Language->FieldPhrase($this->TableVar, $this->operator_id->Param, "CustomMsg");
         $this->Fields['operator_id'] = &$this->operator_id;
 
         // payment_date
         $this->payment_date = new DbField('main_transactions', 'main_transactions', 'x_payment_date', 'payment_date', '"payment_date"', CastDateFieldForLike("\"payment_date\"", 5, "DB"), 133, 4, 5, false, '"payment_date"', false, false, false, 'FORMATTED TEXT', 'TEXT');
         $this->payment_date->Sortable = true; // Allow sort
         $this->payment_date->DefaultErrorMessage = str_replace("%s", $GLOBALS["DATE_SEPARATOR"], $Language->phrase("IncorrectDateYMD"));
+        $this->payment_date->CustomMsg = $Language->FieldPhrase($this->TableVar, $this->payment_date->Param, "CustomMsg");
         $this->Fields['payment_date'] = &$this->payment_date;
 
         // vendor_id
@@ -127,6 +131,7 @@ class MainTransactions extends DbTable
         $this->vendor_id->Sortable = true; // Allow sort
         $this->vendor_id->Lookup = new Lookup('vendor_id', 'y_vendors', false, 'id', ["name","","",""], [], [], [], [], [], [], '', '');
         $this->vendor_id->DefaultErrorMessage = $Language->phrase("IncorrectInteger");
+        $this->vendor_id->CustomMsg = $Language->FieldPhrase($this->TableVar, $this->vendor_id->Param, "CustomMsg");
         $this->Fields['vendor_id'] = &$this->vendor_id;
 
         // price_id
@@ -137,6 +142,7 @@ class MainTransactions extends DbTable
         $this->price_id->PleaseSelectText = $Language->phrase("PleaseSelect"); // "PleaseSelect" text
         $this->price_id->Lookup = new Lookup('price_id', 'view_pricing_options', false, 'price_id', ["price_details","platform_inventory","",""], ["x_campaign_id"], [], ["campaign_id"], ["x_campaign_id"], [], [], '', '');
         $this->price_id->DefaultErrorMessage = $Language->phrase("IncorrectInteger");
+        $this->price_id->CustomMsg = $Language->FieldPhrase($this->TableVar, $this->price_id->Param, "CustomMsg");
         $this->Fields['price_id'] = &$this->price_id;
 
         // quantity
@@ -145,6 +151,7 @@ class MainTransactions extends DbTable
         $this->quantity->Required = true; // Required field
         $this->quantity->Sortable = true; // Allow sort
         $this->quantity->DefaultErrorMessage = $Language->phrase("IncorrectInteger");
+        $this->quantity->CustomMsg = $Language->FieldPhrase($this->TableVar, $this->quantity->Param, "CustomMsg");
         $this->Fields['quantity'] = &$this->quantity;
 
         // assigned_buses
@@ -152,12 +159,14 @@ class MainTransactions extends DbTable
         $this->assigned_buses->IsCustom = true; // Custom field
         $this->assigned_buses->Sortable = true; // Allow sort
         $this->assigned_buses->DefaultErrorMessage = $Language->phrase("IncorrectInteger");
+        $this->assigned_buses->CustomMsg = $Language->FieldPhrase($this->TableVar, $this->assigned_buses->Param, "CustomMsg");
         $this->Fields['assigned_buses'] = &$this->assigned_buses;
 
         // start_date
         $this->start_date = new DbField('main_transactions', 'main_transactions', 'x_start_date', 'start_date', '"start_date"', CastDateFieldForLike("\"start_date\"", 5, "DB"), 133, 4, 5, false, '"start_date"', false, false, false, 'FORMATTED TEXT', 'TEXT');
         $this->start_date->Sortable = true; // Allow sort
         $this->start_date->DefaultErrorMessage = str_replace("%s", $GLOBALS["DATE_SEPARATOR"], $Language->phrase("IncorrectDateYMD"));
+        $this->start_date->CustomMsg = $Language->FieldPhrase($this->TableVar, $this->start_date->Param, "CustomMsg");
         $this->Fields['start_date'] = &$this->start_date;
 
         // end_date
@@ -175,6 +184,7 @@ class MainTransactions extends DbTable
         $this->visible_status_id->PleaseSelectText = $Language->phrase("PleaseSelect"); // "PleaseSelect" text
         $this->visible_status_id->Lookup = new Lookup('visible_status_id', 'x_transaction_status', false, 'id', ["name","","",""], [], [], [], [], [], [], '', '');
         $this->visible_status_id->DefaultErrorMessage = $Language->phrase("IncorrectInteger");
+        $this->visible_status_id->CustomMsg = $Language->FieldPhrase($this->TableVar, $this->visible_status_id->Param, "CustomMsg");
         $this->Fields['visible_status_id'] = &$this->visible_status_id;
 
         // status_id
@@ -185,6 +195,7 @@ class MainTransactions extends DbTable
         $this->status_id->PleaseSelectText = $Language->phrase("PleaseSelect"); // "PleaseSelect" text
         $this->status_id->Lookup = new Lookup('status_id', 'x_transaction_status', false, 'id', ["admin_name","","",""], [], [], [], [], [], [], '', '');
         $this->status_id->DefaultErrorMessage = $Language->phrase("IncorrectInteger");
+        $this->status_id->CustomMsg = $Language->FieldPhrase($this->TableVar, $this->status_id->Param, "CustomMsg");
         $this->Fields['status_id'] = &$this->status_id;
 
         // print_status_id
@@ -195,6 +206,7 @@ class MainTransactions extends DbTable
         $this->print_status_id->PleaseSelectText = $Language->phrase("PleaseSelect"); // "PleaseSelect" text
         $this->print_status_id->Lookup = new Lookup('print_status_id', 'x_print_status', false, 'id', ["name","","",""], [], [], [], [], [], [], '', '');
         $this->print_status_id->DefaultErrorMessage = $Language->phrase("IncorrectInteger");
+        $this->print_status_id->CustomMsg = $Language->FieldPhrase($this->TableVar, $this->print_status_id->Param, "CustomMsg");
         $this->Fields['print_status_id'] = &$this->print_status_id;
 
         // payment_status_id
@@ -205,6 +217,7 @@ class MainTransactions extends DbTable
         $this->payment_status_id->PleaseSelectText = $Language->phrase("PleaseSelect"); // "PleaseSelect" text
         $this->payment_status_id->Lookup = new Lookup('payment_status_id', 'x_payment_status', false, 'id', ["name","","",""], [], [], [], [], [], [], '', '');
         $this->payment_status_id->DefaultErrorMessage = $Language->phrase("IncorrectInteger");
+        $this->payment_status_id->CustomMsg = $Language->FieldPhrase($this->TableVar, $this->payment_status_id->Param, "CustomMsg");
         $this->Fields['payment_status_id'] = &$this->payment_status_id;
 
         // created_by
@@ -216,6 +229,7 @@ class MainTransactions extends DbTable
         $this->created_by->PleaseSelectText = $Language->phrase("PleaseSelect"); // "PleaseSelect" text
         $this->created_by->Lookup = new Lookup('created_by', 'main_users', false, 'id', ["name","","",""], [], [], [], [], [], [], '', '');
         $this->created_by->DefaultErrorMessage = $Language->phrase("IncorrectInteger");
+        $this->created_by->CustomMsg = $Language->FieldPhrase($this->TableVar, $this->created_by->Param, "CustomMsg");
         $this->Fields['created_by'] = &$this->created_by;
 
         // ts_created
@@ -224,6 +238,7 @@ class MainTransactions extends DbTable
         $this->ts_created->Required = true; // Required field
         $this->ts_created->Sortable = true; // Allow sort
         $this->ts_created->DefaultErrorMessage = str_replace("%s", $GLOBALS["DATE_FORMAT"], $Language->phrase("IncorrectDate"));
+        $this->ts_created->CustomMsg = $Language->FieldPhrase($this->TableVar, $this->ts_created->Param, "CustomMsg");
         $this->Fields['ts_created'] = &$this->ts_created;
 
         // ts_last_update
@@ -232,12 +247,14 @@ class MainTransactions extends DbTable
         $this->ts_last_update->Required = true; // Required field
         $this->ts_last_update->Sortable = true; // Allow sort
         $this->ts_last_update->DefaultErrorMessage = str_replace("%s", $GLOBALS["DATE_FORMAT"], $Language->phrase("IncorrectDate"));
+        $this->ts_last_update->CustomMsg = $Language->FieldPhrase($this->TableVar, $this->ts_last_update->Param, "CustomMsg");
         $this->Fields['ts_last_update'] = &$this->ts_last_update;
 
         // total
         $this->total = new DbField('main_transactions', 'main_transactions', 'x_total', 'total', 'quantity * (select v.price from view_pricing_all v where v.id = price_id)', 'CAST(quantity * (select v.price from view_pricing_all v where v.id = price_id) AS varchar(255))', 20, 8, -1, false, 'quantity * (select v.price from view_pricing_all v where v.id = price_id)', false, false, false, 'FORMATTED TEXT', 'TEXT');
         $this->total->IsCustom = true; // Custom field
         $this->total->Sortable = true; // Allow sort
+        $this->total->CustomMsg = $Language->FieldPhrase($this->TableVar, $this->total->Param, "CustomMsg");
         $this->Fields['total'] = &$this->total;
     }
 
@@ -559,18 +576,21 @@ class MainTransactions extends DbTable
         $cnt = -1;
         $rs = null;
         if ($sql instanceof \Doctrine\DBAL\Query\QueryBuilder) { // Query builder
-            $sql = $sql->resetQueryPart("orderBy")->getSQL();
+            $sqlwrk = clone $sql;
+            $sqlwrk = $sqlwrk->resetQueryPart("orderBy")->getSQL();
+        } else {
+            $sqlwrk = $sql;
         }
         $pattern = '/^SELECT\s([\s\S]+)\sFROM\s/i';
         // Skip Custom View / SubQuery / SELECT DISTINCT / ORDER BY
         if (
             ($this->TableType == 'TABLE' || $this->TableType == 'VIEW' || $this->TableType == 'LINKTABLE') &&
-            preg_match($pattern, $sql) && !preg_match('/\(\s*(SELECT[^)]+)\)/i', $sql) &&
-            !preg_match('/^\s*select\s+distinct\s+/i', $sql) && !preg_match('/\s+order\s+by\s+/i', $sql)
+            preg_match($pattern, $sqlwrk) && !preg_match('/\(\s*(SELECT[^)]+)\)/i', $sqlwrk) &&
+            !preg_match('/^\s*select\s+distinct\s+/i', $sqlwrk) && !preg_match('/\s+order\s+by\s+/i', $sqlwrk)
         ) {
-            $sqlwrk = "SELECT COUNT(*) FROM " . preg_replace($pattern, "", $sql);
+            $sqlwrk = "SELECT COUNT(*) FROM " . preg_replace($pattern, "", $sqlwrk);
         } else {
-            $sqlwrk = "SELECT COUNT(*) FROM (" . $sql . ") COUNT_TABLE";
+            $sqlwrk = "SELECT COUNT(*) FROM (" . $sqlwrk . ") COUNT_TABLE";
         }
         $conn = $c ?? $this->getConnection();
         $rs = $conn->executeQuery($sqlwrk);
@@ -1125,11 +1145,11 @@ class MainTransactions extends DbTable
     {
         if ($this->getCurrentMasterTable() == "main_campaigns" && !ContainsString($url, Config("TABLE_SHOW_MASTER") . "=")) {
             $url .= (ContainsString($url, "?") ? "&" : "?") . Config("TABLE_SHOW_MASTER") . "=" . $this->getCurrentMasterTable();
-            $url .= "&" . GetForeignKeyUrl("fk_id", $this->campaign_id->CurrentValue);
+            $url .= "&" . GetForeignKeyUrl("fk_id", $this->campaign_id->CurrentValue ?? $this->campaign_id->getSessionValue());
         }
         if ($this->getCurrentMasterTable() == "y_operators" && !ContainsString($url, Config("TABLE_SHOW_MASTER") . "=")) {
             $url .= (ContainsString($url, "?") ? "&" : "?") . Config("TABLE_SHOW_MASTER") . "=" . $this->getCurrentMasterTable();
-            $url .= "&" . GetForeignKeyUrl("fk_id", $this->operator_id->CurrentValue);
+            $url .= "&" . GetForeignKeyUrl("fk_id", $this->operator_id->CurrentValue ?? $this->operator_id->getSessionValue());
         }
         return $url;
     }
@@ -1353,7 +1373,7 @@ SORTHTML;
         if ($this->campaign_id->VirtualValue != "") {
             $this->campaign_id->ViewValue = $this->campaign_id->VirtualValue;
         } else {
-            $curVal = strval($this->campaign_id->CurrentValue);
+            $curVal = trim(strval($this->campaign_id->CurrentValue));
             if ($curVal != "") {
                 $this->campaign_id->ViewValue = $this->campaign_id->lookupCacheOption($curVal);
                 if ($this->campaign_id->ViewValue === null) { // Lookup from database
@@ -1376,7 +1396,7 @@ SORTHTML;
         $this->campaign_id->ViewCustomAttributes = "";
 
         // operator_id
-        $curVal = strval($this->operator_id->CurrentValue);
+        $curVal = trim(strval($this->operator_id->CurrentValue));
         if ($curVal != "") {
             $this->operator_id->ViewValue = $this->operator_id->lookupCacheOption($curVal);
             if ($this->operator_id->ViewValue === null) { // Lookup from database
@@ -1403,7 +1423,7 @@ SORTHTML;
 
         // vendor_id
         $this->vendor_id->ViewValue = $this->vendor_id->CurrentValue;
-        $curVal = strval($this->vendor_id->CurrentValue);
+        $curVal = trim(strval($this->vendor_id->CurrentValue));
         if ($curVal != "") {
             $this->vendor_id->ViewValue = $this->vendor_id->lookupCacheOption($curVal);
             if ($this->vendor_id->ViewValue === null) { // Lookup from database
@@ -1427,7 +1447,7 @@ SORTHTML;
         if ($this->price_id->VirtualValue != "") {
             $this->price_id->ViewValue = $this->price_id->VirtualValue;
         } else {
-            $curVal = strval($this->price_id->CurrentValue);
+            $curVal = trim(strval($this->price_id->CurrentValue));
             if ($curVal != "") {
                 $this->price_id->ViewValue = $this->price_id->lookupCacheOption($curVal);
                 if ($this->price_id->ViewValue === null) { // Lookup from database
@@ -1473,7 +1493,7 @@ SORTHTML;
         $this->end_date->ViewCustomAttributes = "";
 
         // visible_status_id
-        $curVal = strval($this->visible_status_id->CurrentValue);
+        $curVal = trim(strval($this->visible_status_id->CurrentValue));
         if ($curVal != "") {
             $this->visible_status_id->ViewValue = $this->visible_status_id->lookupCacheOption($curVal);
             if ($this->visible_status_id->ViewValue === null) { // Lookup from database
@@ -1497,7 +1517,7 @@ SORTHTML;
         if ($this->status_id->VirtualValue != "") {
             $this->status_id->ViewValue = $this->status_id->VirtualValue;
         } else {
-            $curVal = strval($this->status_id->CurrentValue);
+            $curVal = trim(strval($this->status_id->CurrentValue));
             if ($curVal != "") {
                 $this->status_id->ViewValue = $this->status_id->lookupCacheOption($curVal);
                 if ($this->status_id->ViewValue === null) { // Lookup from database
@@ -1523,7 +1543,7 @@ SORTHTML;
         if ($this->print_status_id->VirtualValue != "") {
             $this->print_status_id->ViewValue = $this->print_status_id->VirtualValue;
         } else {
-            $curVal = strval($this->print_status_id->CurrentValue);
+            $curVal = trim(strval($this->print_status_id->CurrentValue));
             if ($curVal != "") {
                 $this->print_status_id->ViewValue = $this->print_status_id->lookupCacheOption($curVal);
                 if ($this->print_status_id->ViewValue === null) { // Lookup from database
@@ -1549,7 +1569,7 @@ SORTHTML;
         if ($this->payment_status_id->VirtualValue != "") {
             $this->payment_status_id->ViewValue = $this->payment_status_id->VirtualValue;
         } else {
-            $curVal = strval($this->payment_status_id->CurrentValue);
+            $curVal = trim(strval($this->payment_status_id->CurrentValue));
             if ($curVal != "") {
                 $this->payment_status_id->ViewValue = $this->payment_status_id->lookupCacheOption($curVal);
                 if ($this->payment_status_id->ViewValue === null) { // Lookup from database
@@ -1572,7 +1592,7 @@ SORTHTML;
         $this->payment_status_id->ViewCustomAttributes = "";
 
         // created_by
-        $curVal = strval($this->created_by->CurrentValue);
+        $curVal = trim(strval($this->created_by->CurrentValue));
         if ($curVal != "") {
             $this->created_by->ViewValue = $this->created_by->lookupCacheOption($curVal);
             if ($this->created_by->ViewValue === null) { // Lookup from database
@@ -1761,7 +1781,7 @@ SORTHTML;
             if ($this->campaign_id->VirtualValue != "") {
                 $this->campaign_id->ViewValue = $this->campaign_id->VirtualValue;
             } else {
-                $curVal = strval($this->campaign_id->CurrentValue);
+                $curVal = trim(strval($this->campaign_id->CurrentValue));
                 if ($curVal != "") {
                     $this->campaign_id->ViewValue = $this->campaign_id->lookupCacheOption($curVal);
                     if ($this->campaign_id->ViewValue === null) { // Lookup from database
@@ -1791,7 +1811,7 @@ SORTHTML;
         $this->operator_id->EditCustomAttributes = "";
         if ($this->operator_id->getSessionValue() != "") {
             $this->operator_id->CurrentValue = GetForeignKeyValue($this->operator_id->getSessionValue());
-            $curVal = strval($this->operator_id->CurrentValue);
+            $curVal = trim(strval($this->operator_id->CurrentValue));
             if ($curVal != "") {
                 $this->operator_id->ViewValue = $this->operator_id->lookupCacheOption($curVal);
                 if ($this->operator_id->ViewValue === null) { // Lookup from database
@@ -2465,13 +2485,14 @@ SORTHTML;
 
     		// GET OPERATOR EMAIL
     		$sqloperator = "select o.name, o.email from main_transactions t, y_operators o where o.id = t.operator_id and t.id = {$camp_id} LIMIT 1;";
+    		$sqloperator = "select o.name, o.email, (select pp.email from y_operators oo,  y_platforms pp where pp.id = oo.platform_id and oo.id = o.id) as platform_email from main_transactions t, y_operators o where o.id = t.operator_id and t.id = {$camp_id} LIMIT 1;";
     		$operator_vals = ExecuteRow($sqloperator);
     		#===============================================================
     		$emailpayload = getEmailPayload('updates_to_campaign_operator');
     		$exposed_emails = get_emails($emailpayload);
     		extract($exposed_emails);
     		$email = $operator_vals['name'] . " <" . $operator_vals['email'] .">";
-    		$cc = $final_cc;
+    		$cc = $final_cc.$operator_vals['email'];
     		$bcc = $final_bcc;
     		#===============================================================
 

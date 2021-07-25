@@ -8,6 +8,7 @@ namespace PHPMaker2021\test;
 class ExportPdf extends ExportBase
 {
     public static $StreamOptions = ["Attachment" => 1]; // 0 to open in browser, 1 to download
+    public static $Options = [];
 
     // Table header
     public function exportTableHeader()
@@ -47,7 +48,9 @@ class ExportPdf extends ExportBase
         if ($this->Horizontal) {
             $this->Line .= "</tr>";
             $this->Text .= "</tr>";
-            $this->Header = $this->Line;
+            if ($rowCnt == 0) {
+                $this->Header = $this->Line;
+            }
         }
     }
 
@@ -57,8 +60,8 @@ class ExportPdf extends ExportBase
         if ($this->Horizontal) {
             $this->Text .= "</table>\r\n"; // End current table
             $this->Text .= "<p style=\"page-break-after:always;\">&nbsp;</p>\r\n"; // Page break
-            $this->Text .= "<table class=\"ew-table ew-table-border\">\r\n"; // New page header
-            $this->Text .= $this->Header;
+            $this->Text .= "<table class=\"ew-table\">\r\n"; // New table
+            $this->Text .= $this->Header; // Add table header
         }
     }
 
@@ -89,15 +92,26 @@ class ExportPdf extends ExportBase
         }
     }
 
+    // Get style tag
+    public static function styleTag()
+    {
+        $pdfcss = Config("PDF_STYLESHEET_FILENAME");
+        if ($pdfcss != "") {
+            $path = FullUrl(GetUrl($pdfcss));
+            $content = file_get_contents($path);
+            if ($content) {
+                return "<style>" . $content . "</style>\r\n";
+            }
+        }
+        return "";
+    }
+
     // Add HTML tags
     public function exportHeaderAndFooter()
     {
         $header = "<html><head>\r\n";
         $header .= $this->charsetMetaTag();
-        $pdfcss = FullUrl(Config("PDF_STYLESHEET_FILENAME"));
-        if ($pdfcss != "") {
-            $header .= "<style type=\"text/css\">" . file_get_contents($pdfcss) . "</style>\r\n";
-        }
+        $header .= self::styleTag();
         $header .= "</" . "head>\r\n<body>\r\n";
         $this->Text = $header . $this->Text . "</body></html>";
     }
@@ -107,14 +121,20 @@ class ExportPdf extends ExportBase
     {
         global $ExportFileName;
         @ini_set("memory_limit", Config("PDF_MEMORY_LIMIT"));
-        set_time_limit(Config("PDF_TIME_LIMIT"));
+        @set_time_limit(Config("PDF_TIME_LIMIT"));
         $txt = $this->Text;
         if (Config("DEBUG")) {
             $txt = str_replace("</body>", GetDebugMessage() . "</body>", $txt);
         }
-        $dompdf = new \Dompdf\Dompdf(["pdf_backend" => "CPDF"]);
-        $dompdf->load_html($txt);
-        $dompdf->set_paper($this->Table->ExportPageSize, $this->Table->ExportPageOrientation);
+        $options = new \Dompdf\Options(self::$Options);
+        $options->set("pdfBackend", "CPDF");
+        $chroot = $options->getChroot();
+        $chroot[] = UploadTempPath();
+        $chroot[] = dirname(CssFile(Config("PDF_STYLESHEET_FILENAME")));
+        $options->setChroot($chroot);
+        $dompdf = new \Dompdf\Dompdf($options);
+        $dompdf->loadHtml($txt);
+        $dompdf->setPaper($this->Table->ExportPageSize, $this->Table->ExportPageOrientation);
         $dompdf->render();
         if (!Config("DEBUG") && ob_get_length()) {
             ob_end_clean();

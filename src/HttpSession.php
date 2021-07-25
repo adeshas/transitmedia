@@ -213,7 +213,7 @@ class HttpSession implements \ArrayAccess, \Countable, \IteratorAggregate
      *
      * @param mixed $offset
      *
-     * @return boolean
+     * @return bool
      */
     public function offsetExists($offset)
     {

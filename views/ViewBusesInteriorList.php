@@ -7,7 +7,6 @@ $ViewBusesInteriorList = &$Page;
 ?>
 <?php if (!$Page->isExport()) { ?>
 <script>
-if (!ew.vars.tables.view_buses_interior) ew.vars.tables.view_buses_interior = <?= JsonEncode(GetClientVar("tables", "view_buses_interior")) ?>;
 var currentForm, currentPageID;
 var fview_buses_interiorlist;
 loadjs.ready("head", function () {
@@ -25,7 +24,8 @@ loadjs.ready("head", function () {
     fview_buses_interiorlistsrch = currentSearchForm = new ew.Form("fview_buses_interiorlistsrch");
 
     // Add fields
-    var fields = ew.vars.tables.view_buses_interior.fields;
+    var currentTable = <?= JsonEncode(GetClientVar("tables", "view_buses_interior")) ?>,
+        fields = currentTable.fields;
     fview_buses_interiorlistsrch.addFields([
         ["id", [], fields.id.isInvalid],
         ["number", [], fields.number.isInvalid],
@@ -110,7 +110,7 @@ $Page->renderOtherOptions();
 ?>
 <?php if ($Security->canSearch()) { ?>
 <?php if (!$Page->isExport() && !$Page->CurrentAction) { ?>
-<form name="fview_buses_interiorlistsrch" id="fview_buses_interiorlistsrch" class="form-inline ew-form ew-ext-search-form" action="<?= CurrentPageUrl() ?>">
+<form name="fview_buses_interiorlistsrch" id="fview_buses_interiorlistsrch" class="form-inline ew-form ew-ext-search-form" action="<?= CurrentPageUrl(false) ?>">
 <div id="fview_buses_interiorlistsrch-search-panel" class="<?= $Page->SearchPanelClass ?>">
 <input type="hidden" name="cmd" value="search">
 <input type="hidden" name="t" value="view_buses_interior">
@@ -297,7 +297,7 @@ $Page->showMessage();
 <?php if (!$Page->isExport()) { ?>
 <div class="card-header ew-grid-upper-panel">
 <?php if (!$Page->isGridAdd()) { ?>
-<form name="ew-pager-form" class="form-inline ew-form ew-pager-form" action="<?= CurrentPageUrl() ?>">
+<form name="ew-pager-form" class="form-inline ew-form ew-pager-form" action="<?= CurrentPageUrl(false) ?>">
 <?= $Page->Pager->render() ?>
 </form>
 <?php } ?>
@@ -307,7 +307,7 @@ $Page->showMessage();
 <div class="clearfix"></div>
 </div>
 <?php } ?>
-<form name="fview_buses_interiorlist" id="fview_buses_interiorlist" class="form-inline ew-form ew-list-form" action="<?= CurrentPageUrl() ?>" method="post">
+<form name="fview_buses_interiorlist" id="fview_buses_interiorlist" class="form-inline ew-form ew-list-form" action="<?= CurrentPageUrl(false) ?>" method="post">
 <?php if (Config("CHECK_TOKEN")) { ?>
 <input type="hidden" name="<?= $TokenNameKey ?>" value="<?= $TokenName ?>"><!-- CSRF token name -->
 <input type="hidden" name="<?= $TokenValueKey ?>" value="<?= $TokenValue ?>"><!-- CSRF token value -->
@@ -523,7 +523,7 @@ if ($Page->Recordset) {
 <?php if (!$Page->isExport()) { ?>
 <div class="card-footer ew-grid-lower-panel">
 <?php if (!$Page->isGridAdd()) { ?>
-<form name="ew-pager-form" class="form-inline ew-form ew-pager-form" action="<?= CurrentPageUrl() ?>">
+<form name="ew-pager-form" class="form-inline ew-form ew-pager-form" action="<?= CurrentPageUrl(false) ?>">
 <?= $Page->Pager->render() ?>
 </form>
 <?php } ?>

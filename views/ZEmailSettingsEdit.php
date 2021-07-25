@@ -6,7 +6,6 @@ namespace PHPMaker2021\test;
 $ZEmailSettingsEdit = &$Page;
 ?>
 <script>
-if (!ew.vars.tables.z_email_settings) ew.vars.tables.z_email_settings = <?= JsonEncode(GetClientVar("tables", "z_email_settings")) ?>;
 var currentForm, currentPageID;
 var fz_email_settingsedit;
 loadjs.ready("head", function () {
@@ -16,14 +15,17 @@ loadjs.ready("head", function () {
     fz_email_settingsedit = currentForm = new ew.Form("fz_email_settingsedit", "edit");
 
     // Add fields
-    var fields = ew.vars.tables.z_email_settings.fields;
+    var currentTable = <?= JsonEncode(GetClientVar("tables", "z_email_settings")) ?>,
+        fields = currentTable.fields;
+    if (!ew.vars.tables.z_email_settings)
+        ew.vars.tables.z_email_settings = currentTable;
     fz_email_settingsedit.addFields([
-        ["id", [fields.id.required ? ew.Validators.required(fields.id.caption) : null], fields.id.isInvalid],
-        ["name", [fields.name.required ? ew.Validators.required(fields.name.caption) : null], fields.name.isInvalid],
-        ["description", [fields.description.required ? ew.Validators.required(fields.description.caption) : null], fields.description.isInvalid],
-        ["to_value", [fields.to_value.required ? ew.Validators.required(fields.to_value.caption) : null], fields.to_value.isInvalid],
-        ["cc_value", [fields.cc_value.required ? ew.Validators.required(fields.cc_value.caption) : null], fields.cc_value.isInvalid],
-        ["bcc_value", [fields.bcc_value.required ? ew.Validators.required(fields.bcc_value.caption) : null], fields.bcc_value.isInvalid]
+        ["id", [fields.id.visible && fields.id.required ? ew.Validators.required(fields.id.caption) : null], fields.id.isInvalid],
+        ["name", [fields.name.visible && fields.name.required ? ew.Validators.required(fields.name.caption) : null], fields.name.isInvalid],
+        ["description", [fields.description.visible && fields.description.required ? ew.Validators.required(fields.description.caption) : null], fields.description.isInvalid],
+        ["to_value", [fields.to_value.visible && fields.to_value.required ? ew.Validators.required(fields.to_value.caption) : null], fields.to_value.isInvalid],
+        ["cc_value", [fields.cc_value.visible && fields.cc_value.required ? ew.Validators.required(fields.cc_value.caption) : null], fields.cc_value.isInvalid],
+        ["bcc_value", [fields.bcc_value.visible && fields.bcc_value.required ? ew.Validators.required(fields.bcc_value.caption) : null], fields.bcc_value.isInvalid]
     ]);
 
     // Set invalid fields
@@ -102,7 +104,7 @@ loadjs.ready("head", function () {
 <?php
 $Page->showMessage();
 ?>
-<form name="fz_email_settingsedit" id="fz_email_settingsedit" class="<?= $Page->FormClassName ?>" action="<?= CurrentPageUrl() ?>" method="post">
+<form name="fz_email_settingsedit" id="fz_email_settingsedit" class="<?= $Page->FormClassName ?>" action="<?= CurrentPageUrl(false) ?>" method="post">
 <?php if (Config("CHECK_TOKEN")) { ?>
 <input type="hidden" name="<?= $TokenNameKey ?>" value="<?= $TokenName ?>"><!-- CSRF token name -->
 <input type="hidden" name="<?= $TokenValueKey ?>" value="<?= $TokenValue ?>"><!-- CSRF token value -->

@@ -26,7 +26,7 @@ class HttpErrorHandler extends ErrorHandler
     // Respond
     protected function respond(): ResponseInterface
     {
-        global $Request, $Language, $Breadcrumb;
+        global $Request, $Language, $Breadcrumb, $Error;
         $exception = $this->exception;
         $statusCode = $exception->getCode();
         $Language = Container("language");
@@ -77,6 +77,7 @@ class HttpErrorHandler extends ErrorHandler
                 }
                 $description = $exception->getFile() . "(" . $exception->getLine() . "): " . $exception->getMessage();
                 $error["error"]["description"] = $description;
+                $error["error"]["trace"] = $exception->getTraceAsString();
             }
         }
 
@@ -88,10 +89,39 @@ class HttpErrorHandler extends ErrorHandler
         if (
             IsApi() || // API request
             $routeName === null || // No route context
-            preg_match('/(\-preview(\-2)?|^error)$/', $routeName) || // Preview page or Error page (Avoid infinite redirect)
+            preg_match('/\-preview(\-2)?$/', $routeName) || // Preview page
             $Request->getParam("modal") == "1" // Modal request
         ) {
             return $response->withJson(ConvertToUtf8($error), @$error["statusCode"] ?: null);
+        }
+
+        // Error page (Avoid infinite redirect)
+        if ($routeName == "error") {
+            if ($this->contentType == "text/html") { // HTML
+                $view = Container("view");
+                $Error = $error;
+                $title = $Language->phrase("Error");
+                $html = sprintf(
+                    '<html>' .
+                    '   <head>' .
+                    '       <meta charset="utf-8">' .
+                    '       <meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no">' .
+                    '       <title>%s</title>' .
+                    '       <link rel="stylesheet" href="adminlte3/css/' . CssFile("adminlte.css") . '">' .
+                    '       <link rel="stylesheet" href="plugins/fontawesome-free/css/all.min.css">' .
+                    '       <link rel="stylesheet" href="' . CssFile(Config("PROJECT_STYLESHEET_FILENAME")) . '">' .
+                    '   </' . 'head>' .
+                    '   <body class="container-fluid">' .
+                    '       <div>%s</div>' .
+                    '   </body>' .
+                    '</html>',
+                    $title,
+                    $view->fetch("Error.php", $GLOBALS)
+                );
+                return $response->write($html);
+            } else { // JSON
+                return $response->withJson(ConvertToUtf8($error), @$error["statusCode"] ?: null);
+            }
         }
 
         // Set flash message for next request

@@ -83,6 +83,7 @@ class MainPrintOrders extends DbTable
         $this->id->Nullable = false; // NOT NULL field
         $this->id->Sortable = true; // Allow sort
         $this->id->DefaultErrorMessage = $Language->phrase("IncorrectInteger");
+        $this->id->CustomMsg = $Language->FieldPhrase($this->TableVar, $this->id->Param, "CustomMsg");
         $this->Fields['id'] = &$this->id;
 
         // campaign_id
@@ -92,6 +93,7 @@ class MainPrintOrders extends DbTable
         $this->campaign_id->PleaseSelectText = $Language->phrase("PleaseSelect"); // "PleaseSelect" text
         $this->campaign_id->Lookup = new Lookup('campaign_id', 'main_campaigns', false, 'id', ["name","quantity","inventory_id","platform_id"], [], [], [], [], [], [], '"ts_created" DESC', '');
         $this->campaign_id->DefaultErrorMessage = $Language->phrase("IncorrectInteger");
+        $this->campaign_id->CustomMsg = $Language->FieldPhrase($this->TableVar, $this->campaign_id->Param, "CustomMsg");
         $this->Fields['campaign_id'] = &$this->campaign_id;
 
         // printer_id
@@ -101,6 +103,7 @@ class MainPrintOrders extends DbTable
         $this->printer_id->PleaseSelectText = $Language->phrase("PleaseSelect"); // "PleaseSelect" text
         $this->printer_id->Lookup = new Lookup('printer_id', 'y_printers', false, 'id', ["name","","",""], [], [], [], [], [], [], '"id" DESC', '');
         $this->printer_id->DefaultErrorMessage = $Language->phrase("IncorrectInteger");
+        $this->printer_id->CustomMsg = $Language->FieldPhrase($this->TableVar, $this->printer_id->Param, "CustomMsg");
         $this->Fields['printer_id'] = &$this->printer_id;
 
         // ts_created
@@ -109,11 +112,13 @@ class MainPrintOrders extends DbTable
         $this->ts_created->Required = true; // Required field
         $this->ts_created->Sortable = true; // Allow sort
         $this->ts_created->DefaultErrorMessage = str_replace("%s", $GLOBALS["DATE_FORMAT"], $Language->phrase("IncorrectDate"));
+        $this->ts_created->CustomMsg = $Language->FieldPhrase($this->TableVar, $this->ts_created->Param, "CustomMsg");
         $this->Fields['ts_created'] = &$this->ts_created;
 
         // link
         $this->link = new DbField('main_print_orders', 'main_print_orders', 'x_link', 'link', '"link"', '"link"', 201, 0, -1, false, '"link"', false, false, false, 'FORMATTED TEXT', 'TEXT');
         $this->link->Sortable = true; // Allow sort
+        $this->link->CustomMsg = $Language->FieldPhrase($this->TableVar, $this->link->Param, "CustomMsg");
         $this->Fields['link'] = &$this->link;
 
         // quantity
@@ -122,6 +127,7 @@ class MainPrintOrders extends DbTable
         $this->quantity->Required = true; // Required field
         $this->quantity->Sortable = true; // Allow sort
         $this->quantity->DefaultErrorMessage = $Language->phrase("IncorrectInteger");
+        $this->quantity->CustomMsg = $Language->FieldPhrase($this->TableVar, $this->quantity->Param, "CustomMsg");
         $this->Fields['quantity'] = &$this->quantity;
 
         // approved
@@ -130,34 +136,40 @@ class MainPrintOrders extends DbTable
         $this->approved->DataType = DATATYPE_BOOLEAN;
         $this->approved->Lookup = new Lookup('approved', 'main_print_orders', false, '', ["","","",""], [], [], [], [], [], [], '', '');
         $this->approved->OptionCount = 2;
+        $this->approved->CustomMsg = $Language->FieldPhrase($this->TableVar, $this->approved->Param, "CustomMsg");
         $this->Fields['approved'] = &$this->approved;
 
         // comments
         $this->comments = new DbField('main_print_orders', 'main_print_orders', 'x_comments', 'comments', '"comments"', '"comments"', 201, 0, -1, false, '"comments"', false, false, false, 'FORMATTED TEXT', 'TEXTAREA');
         $this->comments->Sortable = true; // Allow sort
+        $this->comments->CustomMsg = $Language->FieldPhrase($this->TableVar, $this->comments->Param, "CustomMsg");
         $this->Fields['comments'] = &$this->comments;
 
         // all_codes_assigned_in_campaign
         $this->all_codes_assigned_in_campaign = new DbField('main_print_orders', 'main_print_orders', 'x_all_codes_assigned_in_campaign', 'all_codes_assigned_in_campaign', '(select string_agg(cols,chr(10)||chr(10)) from ( select COALESCE((select name from x_bus_depot   where id = bus_depot_id),\'NO BUS ASSIGNED\') ||  chr(10) || string_agg(number,\',\') from main_buses  where exterior_campaign_id = campaign_id group by  (select name from x_bus_depot where id = bus_depot_id) ) rows(cols))', '(select string_agg(cols,chr(10)||chr(10)) from ( select COALESCE((select name from x_bus_depot   where id = bus_depot_id),\'NO BUS ASSIGNED\') ||  chr(10) || string_agg(number,\',\') from main_buses  where exterior_campaign_id = campaign_id group by  (select name from x_bus_depot where id = bus_depot_id) ) rows(cols))', 201, 0, -1, false, '(select string_agg(cols,chr(10)||chr(10)) from ( select COALESCE((select name from x_bus_depot   where id = bus_depot_id),\'NO BUS ASSIGNED\') ||  chr(10) || string_agg(number,\',\') from main_buses  where exterior_campaign_id = campaign_id group by  (select name from x_bus_depot where id = bus_depot_id) ) rows(cols))', false, false, false, 'FORMATTED TEXT', 'TEXTAREA');
         $this->all_codes_assigned_in_campaign->IsCustom = true; // Custom field
         $this->all_codes_assigned_in_campaign->Sortable = true; // Allow sort
+        $this->all_codes_assigned_in_campaign->CustomMsg = $Language->FieldPhrase($this->TableVar, $this->all_codes_assigned_in_campaign->Param, "CustomMsg");
         $this->Fields['all_codes_assigned_in_campaign'] = &$this->all_codes_assigned_in_campaign;
 
         // bus_codes
         $this->bus_codes = new DbField('main_print_orders', 'main_print_orders', 'x_bus_codes', 'bus_codes', '"bus_codes"', '"bus_codes"', 201, 0, -1, false, '"bus_codes"', false, false, false, 'FORMATTED TEXT', 'TEXTAREA');
         $this->bus_codes->Sortable = true; // Allow sort
+        $this->bus_codes->CustomMsg = $Language->FieldPhrase($this->TableVar, $this->bus_codes->Param, "CustomMsg");
         $this->Fields['bus_codes'] = &$this->bus_codes;
 
         // available_codes_to_be_assigned
         $this->available_codes_to_be_assigned = new DbField('main_print_orders', 'main_print_orders', 'x_available_codes_to_be_assigned', 'available_codes_to_be_assigned', '( select string_agg(col4,chr(10)||chr(10)) from ( select COALESCE((select name from x_bus_depot where id = bus_depot_id),\'NO BUS ASSIGNED\') || chr(10) || string_agg(number,\',\') from main_buses where number in ( ( select col3::text from ( ( ( select col1 from unnest(regexp_split_to_array( ( select regexp_replace( ( select string_agg(cols,chr(10)||chr(10)) from ( select COALESCE((select name from x_bus_depot where id = bus_depot_id),\'NO BUS ASSIGNED\') || chr(10) || string_agg(number,\',\') from main_buses where exterior_campaign_id = campaign_id group by (select name from x_bus_depot where id = bus_depot_id) ) rows(cols) ) ,\'^([A-Za-z][A-Za-z /,0-9]+)$\',\'\',\'mg\') ),\'[^0-9]+\') ) rows1(col1) where ascii(col1) <> 0) ) except ( ( select col2 from unnest(regexp_split_to_array( ( select regexp_replace( (select string_agg(bus_codes,\',\') from main_print_orders pp where pp.campaign_id = main_print_orders.campaign_id) ,\'^([A-Za-z][A-Za-z /,0-9]+)$\',\'\',\'mg\') ),\'[^0-9]+\') ) rows2(col2) where ascii(col2) <> 0 ) ) ) rows3(col3) ) ) group by (select name from x_bus_depot where id = bus_depot_id) ) rows(col4) )', '( select string_agg(col4,chr(10)||chr(10)) from ( select COALESCE((select name from x_bus_depot where id = bus_depot_id),\'NO BUS ASSIGNED\') || chr(10) || string_agg(number,\',\') from main_buses where number in ( ( select col3::text from ( ( ( select col1 from unnest(regexp_split_to_array( ( select regexp_replace( ( select string_agg(cols,chr(10)||chr(10)) from ( select COALESCE((select name from x_bus_depot where id = bus_depot_id),\'NO BUS ASSIGNED\') || chr(10) || string_agg(number,\',\') from main_buses where exterior_campaign_id = campaign_id group by (select name from x_bus_depot where id = bus_depot_id) ) rows(cols) ) ,\'^([A-Za-z][A-Za-z /,0-9]+)$\',\'\',\'mg\') ),\'[^0-9]+\') ) rows1(col1) where ascii(col1) <> 0) ) except ( ( select col2 from unnest(regexp_split_to_array( ( select regexp_replace( (select string_agg(bus_codes,\',\') from main_print_orders pp where pp.campaign_id = main_print_orders.campaign_id) ,\'^([A-Za-z][A-Za-z /,0-9]+)$\',\'\',\'mg\') ),\'[^0-9]+\') ) rows2(col2) where ascii(col2) <> 0 ) ) ) rows3(col3) ) ) group by (select name from x_bus_depot where id = bus_depot_id) ) rows(col4) )', 201, 0, -1, false, '( select string_agg(col4,chr(10)||chr(10)) from ( select COALESCE((select name from x_bus_depot where id = bus_depot_id),\'NO BUS ASSIGNED\') || chr(10) || string_agg(number,\',\') from main_buses where number in ( ( select col3::text from ( ( ( select col1 from unnest(regexp_split_to_array( ( select regexp_replace( ( select string_agg(cols,chr(10)||chr(10)) from ( select COALESCE((select name from x_bus_depot where id = bus_depot_id),\'NO BUS ASSIGNED\') || chr(10) || string_agg(number,\',\') from main_buses where exterior_campaign_id = campaign_id group by (select name from x_bus_depot where id = bus_depot_id) ) rows(cols) ) ,\'^([A-Za-z][A-Za-z /,0-9]+)$\',\'\',\'mg\') ),\'[^0-9]+\') ) rows1(col1) where ascii(col1) <> 0) ) except ( ( select col2 from unnest(regexp_split_to_array( ( select regexp_replace( (select string_agg(bus_codes,\',\') from main_print_orders pp where pp.campaign_id = main_print_orders.campaign_id) ,\'^([A-Za-z][A-Za-z /,0-9]+)$\',\'\',\'mg\') ),\'[^0-9]+\') ) rows2(col2) where ascii(col2) <> 0 ) ) ) rows3(col3) ) ) group by (select name from x_bus_depot where id = bus_depot_id) ) rows(col4) )', false, false, false, 'FORMATTED TEXT', 'TEXTAREA');
         $this->available_codes_to_be_assigned->IsCustom = true; // Custom field
         $this->available_codes_to_be_assigned->Sortable = true; // Allow sort
+        $this->available_codes_to_be_assigned->CustomMsg = $Language->FieldPhrase($this->TableVar, $this->available_codes_to_be_assigned->Param, "CustomMsg");
         $this->Fields['available_codes_to_be_assigned'] = &$this->available_codes_to_be_assigned;
 
         // tags
         $this->tags = new DbField('main_print_orders', 'main_print_orders', 'x_tags', 'tags', '((select name from main_campaigns where id = campaign_id) || \' | \' || (select name from y_printers where id = printer_id))', '((select name from main_campaigns where id = campaign_id) || \' | \' || (select name from y_printers where id = printer_id))', 201, 0, -1, false, '((select name from main_campaigns where id = campaign_id) || \' | \' || (select name from y_printers where id = printer_id))', false, false, false, 'FORMATTED TEXT', 'TEXTAREA');
         $this->tags->IsCustom = true; // Custom field
         $this->tags->Sortable = true; // Allow sort
+        $this->tags->CustomMsg = $Language->FieldPhrase($this->TableVar, $this->tags->Param, "CustomMsg");
         $this->Fields['tags'] = &$this->tags;
     }
 
@@ -338,18 +350,21 @@ class MainPrintOrders extends DbTable
         $cnt = -1;
         $rs = null;
         if ($sql instanceof \Doctrine\DBAL\Query\QueryBuilder) { // Query builder
-            $sql = $sql->resetQueryPart("orderBy")->getSQL();
+            $sqlwrk = clone $sql;
+            $sqlwrk = $sqlwrk->resetQueryPart("orderBy")->getSQL();
+        } else {
+            $sqlwrk = $sql;
         }
         $pattern = '/^SELECT\s([\s\S]+)\sFROM\s/i';
         // Skip Custom View / SubQuery / SELECT DISTINCT / ORDER BY
         if (
             ($this->TableType == 'TABLE' || $this->TableType == 'VIEW' || $this->TableType == 'LINKTABLE') &&
-            preg_match($pattern, $sql) && !preg_match('/\(\s*(SELECT[^)]+)\)/i', $sql) &&
-            !preg_match('/^\s*select\s+distinct\s+/i', $sql) && !preg_match('/\s+order\s+by\s+/i', $sql)
+            preg_match($pattern, $sqlwrk) && !preg_match('/\(\s*(SELECT[^)]+)\)/i', $sqlwrk) &&
+            !preg_match('/^\s*select\s+distinct\s+/i', $sqlwrk) && !preg_match('/\s+order\s+by\s+/i', $sqlwrk)
         ) {
-            $sqlwrk = "SELECT COUNT(*) FROM " . preg_replace($pattern, "", $sql);
+            $sqlwrk = "SELECT COUNT(*) FROM " . preg_replace($pattern, "", $sqlwrk);
         } else {
-            $sqlwrk = "SELECT COUNT(*) FROM (" . $sql . ") COUNT_TABLE";
+            $sqlwrk = "SELECT COUNT(*) FROM (" . $sqlwrk . ") COUNT_TABLE";
         }
         $conn = $c ?? $this->getConnection();
         $rs = $conn->executeQuery($sqlwrk);
@@ -954,7 +969,7 @@ SORTHTML;
         $this->id->ViewCustomAttributes = "";
 
         // campaign_id
-        $curVal = strval($this->campaign_id->CurrentValue);
+        $curVal = trim(strval($this->campaign_id->CurrentValue));
         if ($curVal != "") {
             $this->campaign_id->ViewValue = $this->campaign_id->lookupCacheOption($curVal);
             if ($this->campaign_id->ViewValue === null) { // Lookup from database
@@ -979,7 +994,7 @@ SORTHTML;
         $this->campaign_id->ViewCustomAttributes = "";
 
         // printer_id
-        $curVal = strval($this->printer_id->CurrentValue);
+        $curVal = trim(strval($this->printer_id->CurrentValue));
         if ($curVal != "") {
             $this->printer_id->ViewValue = $this->printer_id->lookupCacheOption($curVal);
             if ($this->printer_id->ViewValue === null) { // Lookup from database
@@ -1133,7 +1148,7 @@ SORTHTML;
         // campaign_id
         $this->campaign_id->EditAttrs["class"] = "form-control";
         $this->campaign_id->EditCustomAttributes = "";
-        $curVal = strval($this->campaign_id->CurrentValue);
+        $curVal = trim(strval($this->campaign_id->CurrentValue));
         if ($curVal != "") {
             $this->campaign_id->EditValue = $this->campaign_id->lookupCacheOption($curVal);
             if ($this->campaign_id->EditValue === null) { // Lookup from database
@@ -1160,7 +1175,7 @@ SORTHTML;
         // printer_id
         $this->printer_id->EditAttrs["class"] = "form-control";
         $this->printer_id->EditCustomAttributes = "";
-        $curVal = strval($this->printer_id->CurrentValue);
+        $curVal = trim(strval($this->printer_id->CurrentValue));
         if ($curVal != "") {
             $this->printer_id->EditValue = $this->printer_id->lookupCacheOption($curVal);
             if ($this->printer_id->EditValue === null) { // Lookup from database

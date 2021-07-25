@@ -101,7 +101,7 @@ return function (App $app) {
     );
 
     // spook
-    $app->any('/spook', SpookController::class)->add(PermissionMiddleware::class)->setName('spook-spook-custom'); // custom
+    $app->any('/spook[/{params:.*}]', SpookController::class)->add(PermissionMiddleware::class)->setName('spook-spook-custom'); // custom
 
     // main_print_orders
     $app->any('/mainprintorderslist[/{id}]', MainPrintOrdersController::class . ':list')->add(PermissionMiddleware::class)->setName('mainprintorderslist-main_print_orders-list'); // list
@@ -162,7 +162,7 @@ return function (App $app) {
     );
 
     // welcome
-    $app->any('/welcome', WelcomeController::class)->add(PermissionMiddleware::class)->setName('welcome-welcome-custom'); // custom
+    $app->any('/welcome[/{params:.*}]', WelcomeController::class)->add(PermissionMiddleware::class)->setName('welcome-welcome-custom'); // custom
 
     // sub_transaction_details
     $app->any('/subtransactiondetailslist[/{id}]', SubTransactionDetailsController::class . ':list')->add(PermissionMiddleware::class)->setName('subtransactiondetailslist-sub_transaction_details-list'); // list
@@ -486,7 +486,10 @@ return function (App $app) {
     );
 
     // private_functions
-    $app->any('/privatefunctions', PrivateFunctionsController::class)->add(PermissionMiddleware::class)->setName('privatefunctions-private_functions-custom'); // custom
+    $app->any('/privatefunctions[/{params:.*}]', PrivateFunctionsController::class)->add(PermissionMiddleware::class)->setName('privatefunctions-private_functions-custom'); // custom
+
+    // test
+    $app->any('/test[/{params:.*}]', TestController::class)->add(PermissionMiddleware::class)->setName('test-test-custom'); // custom
 
     // view_campaign_status
     $app->any('/viewcampaignstatuslist', ViewCampaignStatusController::class . ':list')->add(PermissionMiddleware::class)->setName('viewcampaignstatuslist-view_campaign_status-list'); // list
@@ -675,7 +678,9 @@ return function (App $app) {
     $app->get('/' . Config("SWAGGER_ACTION"), OthersController::class . ':swagger')->setName(Config("SWAGGER_ACTION")); // Swagger
 
     // Index
-    $app->any('/[index]', OthersController::class . ':index')->setName('index');
+    $app->any('/[index]', OthersController::class . ':index')->add(PermissionMiddleware::class)->setName('index');
+
+    // Route Action event
     if (function_exists(PROJECT_NAMESPACE . "Route_Action")) {
         Route_Action($app);
     }

@@ -87,103 +87,121 @@ class ViewPricingInitial extends DbTable
         $this->id = new DbField('view_pricing_initial', 'view_pricing_initial', 'x_id', 'id', '"id"', 'CAST("id" AS varchar(255))', 3, 4, -1, false, '"id"', false, false, false, 'FORMATTED TEXT', 'TEXT');
         $this->id->Sortable = true; // Allow sort
         $this->id->DefaultErrorMessage = $Language->phrase("IncorrectInteger");
+        $this->id->CustomMsg = $Language->FieldPhrase($this->TableVar, $this->id->Param, "CustomMsg");
         $this->Fields['id'] = &$this->id;
 
         // platform_id
         $this->platform_id = new DbField('view_pricing_initial', 'view_pricing_initial', 'x_platform_id', 'platform_id', '"platform_id"', 'CAST("platform_id" AS varchar(255))', 3, 4, -1, false, '"platform_id"', false, false, false, 'FORMATTED TEXT', 'TEXT');
         $this->platform_id->Sortable = true; // Allow sort
         $this->platform_id->DefaultErrorMessage = $Language->phrase("IncorrectInteger");
+        $this->platform_id->CustomMsg = $Language->FieldPhrase($this->TableVar, $this->platform_id->Param, "CustomMsg");
         $this->Fields['platform_id'] = &$this->platform_id;
 
         // inventory_id
         $this->inventory_id = new DbField('view_pricing_initial', 'view_pricing_initial', 'x_inventory_id', 'inventory_id', '"inventory_id"', 'CAST("inventory_id" AS varchar(255))', 3, 4, -1, false, '"inventory_id"', false, false, false, 'FORMATTED TEXT', 'TEXT');
         $this->inventory_id->Sortable = true; // Allow sort
         $this->inventory_id->DefaultErrorMessage = $Language->phrase("IncorrectInteger");
+        $this->inventory_id->CustomMsg = $Language->FieldPhrase($this->TableVar, $this->inventory_id->Param, "CustomMsg");
         $this->Fields['inventory_id'] = &$this->inventory_id;
 
         // print_stage_id
         $this->print_stage_id = new DbField('view_pricing_initial', 'view_pricing_initial', 'x_print_stage_id', 'print_stage_id', '"print_stage_id"', 'CAST("print_stage_id" AS varchar(255))', 3, 4, -1, false, '"print_stage_id"', false, false, false, 'FORMATTED TEXT', 'TEXT');
         $this->print_stage_id->Sortable = true; // Allow sort
         $this->print_stage_id->DefaultErrorMessage = $Language->phrase("IncorrectInteger");
+        $this->print_stage_id->CustomMsg = $Language->FieldPhrase($this->TableVar, $this->print_stage_id->Param, "CustomMsg");
         $this->Fields['print_stage_id'] = &$this->print_stage_id;
 
         // bus_size_id
         $this->bus_size_id = new DbField('view_pricing_initial', 'view_pricing_initial', 'x_bus_size_id', 'bus_size_id', '"bus_size_id"', 'CAST("bus_size_id" AS varchar(255))', 3, 4, -1, false, '"bus_size_id"', false, false, false, 'FORMATTED TEXT', 'TEXT');
         $this->bus_size_id->Sortable = true; // Allow sort
         $this->bus_size_id->DefaultErrorMessage = $Language->phrase("IncorrectInteger");
+        $this->bus_size_id->CustomMsg = $Language->FieldPhrase($this->TableVar, $this->bus_size_id->Param, "CustomMsg");
         $this->Fields['bus_size_id'] = &$this->bus_size_id;
 
         // platform
         $this->platform = new DbField('view_pricing_initial', 'view_pricing_initial', 'x_platform', 'platform', '"platform"', '"platform"', 200, 50, -1, false, '"platform"', false, false, false, 'FORMATTED TEXT', 'TEXT');
         $this->platform->Sortable = true; // Allow sort
+        $this->platform->CustomMsg = $Language->FieldPhrase($this->TableVar, $this->platform->Param, "CustomMsg");
         $this->Fields['platform'] = &$this->platform;
 
         // inventory
         $this->inventory = new DbField('view_pricing_initial', 'view_pricing_initial', 'x_inventory', 'inventory', '"inventory"', '"inventory"', 201, 0, -1, false, '"inventory"', false, false, false, 'FORMATTED TEXT', 'TEXTAREA');
         $this->inventory->Sortable = true; // Allow sort
+        $this->inventory->CustomMsg = $Language->FieldPhrase($this->TableVar, $this->inventory->Param, "CustomMsg");
         $this->Fields['inventory'] = &$this->inventory;
 
         // print_stage
         $this->print_stage = new DbField('view_pricing_initial', 'view_pricing_initial', 'x_print_stage', 'print_stage', '"print_stage"', '"print_stage"', 201, 0, -1, false, '"print_stage"', false, false, false, 'FORMATTED TEXT', 'TEXTAREA');
         $this->print_stage->Sortable = true; // Allow sort
+        $this->print_stage->CustomMsg = $Language->FieldPhrase($this->TableVar, $this->print_stage->Param, "CustomMsg");
         $this->Fields['print_stage'] = &$this->print_stage;
 
         // bus_size
         $this->bus_size = new DbField('view_pricing_initial', 'view_pricing_initial', 'x_bus_size', 'bus_size', '"bus_size"', '"bus_size"', 201, 0, -1, false, '"bus_size"', false, false, false, 'FORMATTED TEXT', 'TEXTAREA');
         $this->bus_size->Sortable = true; // Allow sort
+        $this->bus_size->CustomMsg = $Language->FieldPhrase($this->TableVar, $this->bus_size->Param, "CustomMsg");
         $this->Fields['bus_size'] = &$this->bus_size;
 
         // details
         $this->details = new DbField('view_pricing_initial', 'view_pricing_initial', 'x_details', 'details', '"details"', '"details"', 201, 0, -1, false, '"details"', false, false, false, 'FORMATTED TEXT', 'TEXTAREA');
         $this->details->Sortable = true; // Allow sort
+        $this->details->CustomMsg = $Language->FieldPhrase($this->TableVar, $this->details->Param, "CustomMsg");
         $this->Fields['details'] = &$this->details;
 
         // max_limit
         $this->max_limit = new DbField('view_pricing_initial', 'view_pricing_initial', 'x_max_limit', 'max_limit', '"max_limit"', 'CAST("max_limit" AS varchar(255))', 3, 4, -1, false, '"max_limit"', false, false, false, 'FORMATTED TEXT', 'TEXT');
         $this->max_limit->Sortable = true; // Allow sort
         $this->max_limit->DefaultErrorMessage = $Language->phrase("IncorrectInteger");
+        $this->max_limit->CustomMsg = $Language->FieldPhrase($this->TableVar, $this->max_limit->Param, "CustomMsg");
         $this->Fields['max_limit'] = &$this->max_limit;
 
         // min_limit
         $this->min_limit = new DbField('view_pricing_initial', 'view_pricing_initial', 'x_min_limit', 'min_limit', '"min_limit"', 'CAST("min_limit" AS varchar(255))', 3, 4, -1, false, '"min_limit"', false, false, false, 'FORMATTED TEXT', 'TEXT');
         $this->min_limit->Sortable = true; // Allow sort
         $this->min_limit->DefaultErrorMessage = $Language->phrase("IncorrectInteger");
+        $this->min_limit->CustomMsg = $Language->FieldPhrase($this->TableVar, $this->min_limit->Param, "CustomMsg");
         $this->Fields['min_limit'] = &$this->min_limit;
 
         // price
         $this->price = new DbField('view_pricing_initial', 'view_pricing_initial', 'x_price', 'price', '"price"', 'CAST("price" AS varchar(255))', 20, 8, -1, false, '"price"', false, false, false, 'FORMATTED TEXT', 'TEXT');
         $this->price->Sortable = true; // Allow sort
         $this->price->DefaultErrorMessage = $Language->phrase("IncorrectInteger");
+        $this->price->CustomMsg = $Language->FieldPhrase($this->TableVar, $this->price->Param, "CustomMsg");
         $this->Fields['price'] = &$this->price;
 
         // operator_fee
         $this->operator_fee = new DbField('view_pricing_initial', 'view_pricing_initial', 'x_operator_fee', 'operator_fee', '"operator_fee"', 'CAST("operator_fee" AS varchar(255))', 20, 8, -1, false, '"operator_fee"', false, false, false, 'FORMATTED TEXT', 'TEXT');
         $this->operator_fee->Sortable = true; // Allow sort
         $this->operator_fee->DefaultErrorMessage = $Language->phrase("IncorrectInteger");
+        $this->operator_fee->CustomMsg = $Language->FieldPhrase($this->TableVar, $this->operator_fee->Param, "CustomMsg");
         $this->Fields['operator_fee'] = &$this->operator_fee;
 
         // agency_fee
         $this->agency_fee = new DbField('view_pricing_initial', 'view_pricing_initial', 'x_agency_fee', 'agency_fee', '"agency_fee"', 'CAST("agency_fee" AS varchar(255))', 20, 8, -1, false, '"agency_fee"', false, false, false, 'FORMATTED TEXT', 'TEXT');
         $this->agency_fee->Sortable = true; // Allow sort
         $this->agency_fee->DefaultErrorMessage = $Language->phrase("IncorrectInteger");
+        $this->agency_fee->CustomMsg = $Language->FieldPhrase($this->TableVar, $this->agency_fee->Param, "CustomMsg");
         $this->Fields['agency_fee'] = &$this->agency_fee;
 
         // lamata_fee
         $this->lamata_fee = new DbField('view_pricing_initial', 'view_pricing_initial', 'x_lamata_fee', 'lamata_fee', '"lamata_fee"', 'CAST("lamata_fee" AS varchar(255))', 20, 8, -1, false, '"lamata_fee"', false, false, false, 'FORMATTED TEXT', 'TEXT');
         $this->lamata_fee->Sortable = true; // Allow sort
         $this->lamata_fee->DefaultErrorMessage = $Language->phrase("IncorrectInteger");
+        $this->lamata_fee->CustomMsg = $Language->FieldPhrase($this->TableVar, $this->lamata_fee->Param, "CustomMsg");
         $this->Fields['lamata_fee'] = &$this->lamata_fee;
 
         // lasaa_fee
         $this->lasaa_fee = new DbField('view_pricing_initial', 'view_pricing_initial', 'x_lasaa_fee', 'lasaa_fee', '"lasaa_fee"', 'CAST("lasaa_fee" AS varchar(255))', 20, 8, -1, false, '"lasaa_fee"', false, false, false, 'FORMATTED TEXT', 'TEXT');
         $this->lasaa_fee->Sortable = true; // Allow sort
         $this->lasaa_fee->DefaultErrorMessage = $Language->phrase("IncorrectInteger");
+        $this->lasaa_fee->CustomMsg = $Language->FieldPhrase($this->TableVar, $this->lasaa_fee->Param, "CustomMsg");
         $this->Fields['lasaa_fee'] = &$this->lasaa_fee;
 
         // printers_fee
         $this->printers_fee = new DbField('view_pricing_initial', 'view_pricing_initial', 'x_printers_fee', 'printers_fee', '"printers_fee"', 'CAST("printers_fee" AS varchar(255))', 20, 8, -1, false, '"printers_fee"', false, false, false, 'FORMATTED TEXT', 'TEXT');
         $this->printers_fee->Sortable = true; // Allow sort
         $this->printers_fee->DefaultErrorMessage = $Language->phrase("IncorrectInteger");
+        $this->printers_fee->CustomMsg = $Language->FieldPhrase($this->TableVar, $this->printers_fee->Param, "CustomMsg");
         $this->Fields['printers_fee'] = &$this->printers_fee;
 
         // active
@@ -192,6 +210,7 @@ class ViewPricingInitial extends DbTable
         $this->active->DataType = DATATYPE_BOOLEAN;
         $this->active->Lookup = new Lookup('active', 'view_pricing_initial', false, '', ["","","",""], [], [], [], [], [], [], '', '');
         $this->active->OptionCount = 2;
+        $this->active->CustomMsg = $Language->FieldPhrase($this->TableVar, $this->active->Param, "CustomMsg");
         $this->Fields['active'] = &$this->active;
     }
 
@@ -372,18 +391,21 @@ class ViewPricingInitial extends DbTable
         $cnt = -1;
         $rs = null;
         if ($sql instanceof \Doctrine\DBAL\Query\QueryBuilder) { // Query builder
-            $sql = $sql->resetQueryPart("orderBy")->getSQL();
+            $sqlwrk = clone $sql;
+            $sqlwrk = $sqlwrk->resetQueryPart("orderBy")->getSQL();
+        } else {
+            $sqlwrk = $sql;
         }
         $pattern = '/^SELECT\s([\s\S]+)\sFROM\s/i';
         // Skip Custom View / SubQuery / SELECT DISTINCT / ORDER BY
         if (
             ($this->TableType == 'TABLE' || $this->TableType == 'VIEW' || $this->TableType == 'LINKTABLE') &&
-            preg_match($pattern, $sql) && !preg_match('/\(\s*(SELECT[^)]+)\)/i', $sql) &&
-            !preg_match('/^\s*select\s+distinct\s+/i', $sql) && !preg_match('/\s+order\s+by\s+/i', $sql)
+            preg_match($pattern, $sqlwrk) && !preg_match('/\(\s*(SELECT[^)]+)\)/i', $sqlwrk) &&
+            !preg_match('/^\s*select\s+distinct\s+/i', $sqlwrk) && !preg_match('/\s+order\s+by\s+/i', $sqlwrk)
         ) {
-            $sqlwrk = "SELECT COUNT(*) FROM " . preg_replace($pattern, "", $sql);
+            $sqlwrk = "SELECT COUNT(*) FROM " . preg_replace($pattern, "", $sqlwrk);
         } else {
-            $sqlwrk = "SELECT COUNT(*) FROM (" . $sql . ") COUNT_TABLE";
+            $sqlwrk = "SELECT COUNT(*) FROM (" . $sqlwrk . ") COUNT_TABLE";
         }
         $conn = $c ?? $this->getConnection();
         $rs = $conn->executeQuery($sqlwrk);

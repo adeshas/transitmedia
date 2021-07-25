@@ -6,7 +6,6 @@ namespace PHPMaker2021\test;
 $WVendorsOperatorsAdd = &$Page;
 ?>
 <script>
-if (!ew.vars.tables.w_vendors_operators) ew.vars.tables.w_vendors_operators = <?= JsonEncode(GetClientVar("tables", "w_vendors_operators")) ?>;
 var currentForm, currentPageID;
 var fw_vendors_operatorsadd;
 loadjs.ready("head", function () {
@@ -16,10 +15,13 @@ loadjs.ready("head", function () {
     fw_vendors_operatorsadd = currentForm = new ew.Form("fw_vendors_operatorsadd", "add");
 
     // Add fields
-    var fields = ew.vars.tables.w_vendors_operators.fields;
+    var currentTable = <?= JsonEncode(GetClientVar("tables", "w_vendors_operators")) ?>,
+        fields = currentTable.fields;
+    if (!ew.vars.tables.w_vendors_operators)
+        ew.vars.tables.w_vendors_operators = currentTable;
     fw_vendors_operatorsadd.addFields([
-        ["vendor_id", [fields.vendor_id.required ? ew.Validators.required(fields.vendor_id.caption) : null], fields.vendor_id.isInvalid],
-        ["operator_id", [fields.operator_id.required ? ew.Validators.required(fields.operator_id.caption) : null], fields.operator_id.isInvalid]
+        ["vendor_id", [fields.vendor_id.visible && fields.vendor_id.required ? ew.Validators.required(fields.vendor_id.caption) : null], fields.vendor_id.isInvalid],
+        ["operator_id", [fields.operator_id.visible && fields.operator_id.required ? ew.Validators.required(fields.operator_id.caption) : null], fields.operator_id.isInvalid]
     ]);
 
     // Set invalid fields
@@ -100,7 +102,7 @@ loadjs.ready("head", function () {
 <?php
 $Page->showMessage();
 ?>
-<form name="fw_vendors_operatorsadd" id="fw_vendors_operatorsadd" class="<?= $Page->FormClassName ?>" action="<?= CurrentPageUrl() ?>" method="post">
+<form name="fw_vendors_operatorsadd" id="fw_vendors_operatorsadd" class="<?= $Page->FormClassName ?>" action="<?= CurrentPageUrl(false) ?>" method="post">
 <?php if (Config("CHECK_TOKEN")) { ?>
 <input type="hidden" name="<?= $TokenNameKey ?>" value="<?= $TokenName ?>"><!-- CSRF token name -->
 <input type="hidden" name="<?= $TokenValueKey ?>" value="<?= $TokenValue ?>"><!-- CSRF token value -->

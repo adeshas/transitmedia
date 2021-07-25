@@ -74,29 +74,34 @@ class ViewBusExtSummaryAtAGlance extends DbTable
         // brand_status
         $this->brand_status = new DbField('view_bus_ext_summary_at_a_glance', 'view_bus_ext_summary_at_a_glance', 'x_brand_status', 'brand_status', '"brand_status"', '"brand_status"', 201, 0, -1, false, '"brand_status"', false, false, false, 'FORMATTED TEXT', 'TEXTAREA');
         $this->brand_status->Sortable = true; // Allow sort
+        $this->brand_status->CustomMsg = $Language->FieldPhrase($this->TableVar, $this->brand_status->Param, "CustomMsg");
         $this->Fields['brand_status'] = &$this->brand_status;
 
         // active
         $this->active = new DbField('view_bus_ext_summary_at_a_glance', 'view_bus_ext_summary_at_a_glance', 'x_active', 'active', '"active"', 'CAST("active" AS varchar(255))', 20, 8, -1, false, '"active"', false, false, false, 'FORMATTED TEXT', 'TEXT');
         $this->active->Sortable = true; // Allow sort
         $this->active->DefaultErrorMessage = $Language->phrase("IncorrectInteger");
+        $this->active->CustomMsg = $Language->FieldPhrase($this->TableVar, $this->active->Param, "CustomMsg");
         $this->Fields['active'] = &$this->active;
 
         // maintenance
         $this->maintenance = new DbField('view_bus_ext_summary_at_a_glance', 'view_bus_ext_summary_at_a_glance', 'x_maintenance', 'maintenance', '"maintenance"', 'CAST("maintenance" AS varchar(255))', 20, 8, -1, false, '"maintenance"', false, false, false, 'FORMATTED TEXT', 'TEXT');
         $this->maintenance->Sortable = true; // Allow sort
         $this->maintenance->DefaultErrorMessage = $Language->phrase("IncorrectInteger");
+        $this->maintenance->CustomMsg = $Language->FieldPhrase($this->TableVar, $this->maintenance->Param, "CustomMsg");
         $this->Fields['maintenance'] = &$this->maintenance;
 
         // total
         $this->total = new DbField('view_bus_ext_summary_at_a_glance', 'view_bus_ext_summary_at_a_glance', 'x_total', 'total', '"total"', 'CAST("total" AS varchar(255))', 20, 8, -1, false, '"total"', false, false, false, 'FORMATTED TEXT', 'TEXT');
         $this->total->Sortable = true; // Allow sort
         $this->total->DefaultErrorMessage = $Language->phrase("IncorrectInteger");
+        $this->total->CustomMsg = $Language->FieldPhrase($this->TableVar, $this->total->Param, "CustomMsg");
         $this->Fields['total'] = &$this->total;
 
         // last_updated_at
         $this->last_updated_at = new DbField('view_bus_ext_summary_at_a_glance', 'view_bus_ext_summary_at_a_glance', 'x_last_updated_at', 'last_updated_at', '"last_updated_at"', '"last_updated_at"', 201, 0, -1, false, '"last_updated_at"', false, false, false, 'FORMATTED TEXT', 'TEXTAREA');
         $this->last_updated_at->Sortable = true; // Allow sort
+        $this->last_updated_at->CustomMsg = $Language->FieldPhrase($this->TableVar, $this->last_updated_at->Param, "CustomMsg");
         $this->Fields['last_updated_at'] = &$this->last_updated_at;
 
         // platform_id
@@ -106,6 +111,7 @@ class ViewBusExtSummaryAtAGlance extends DbTable
         $this->platform_id->PleaseSelectText = $Language->phrase("PleaseSelect"); // "PleaseSelect" text
         $this->platform_id->Lookup = new Lookup('platform_id', 'y_platforms', false, 'id', ["name","","",""], [], [], [], [], [], [], '', '');
         $this->platform_id->DefaultErrorMessage = $Language->phrase("IncorrectInteger");
+        $this->platform_id->CustomMsg = $Language->FieldPhrase($this->TableVar, $this->platform_id->Param, "CustomMsg");
         $this->Fields['platform_id'] = &$this->platform_id;
 
         // operator_id
@@ -115,6 +121,7 @@ class ViewBusExtSummaryAtAGlance extends DbTable
         $this->operator_id->PleaseSelectText = $Language->phrase("PleaseSelect"); // "PleaseSelect" text
         $this->operator_id->Lookup = new Lookup('operator_id', 'y_operators', false, 'id', ["name","","",""], [], [], [], [], [], [], '', '');
         $this->operator_id->DefaultErrorMessage = $Language->phrase("IncorrectInteger");
+        $this->operator_id->CustomMsg = $Language->FieldPhrase($this->TableVar, $this->operator_id->Param, "CustomMsg");
         $this->Fields['operator_id'] = &$this->operator_id;
     }
 
@@ -295,18 +302,21 @@ class ViewBusExtSummaryAtAGlance extends DbTable
         $cnt = -1;
         $rs = null;
         if ($sql instanceof \Doctrine\DBAL\Query\QueryBuilder) { // Query builder
-            $sql = $sql->resetQueryPart("orderBy")->getSQL();
+            $sqlwrk = clone $sql;
+            $sqlwrk = $sqlwrk->resetQueryPart("orderBy")->getSQL();
+        } else {
+            $sqlwrk = $sql;
         }
         $pattern = '/^SELECT\s([\s\S]+)\sFROM\s/i';
         // Skip Custom View / SubQuery / SELECT DISTINCT / ORDER BY
         if (
             ($this->TableType == 'TABLE' || $this->TableType == 'VIEW' || $this->TableType == 'LINKTABLE') &&
-            preg_match($pattern, $sql) && !preg_match('/\(\s*(SELECT[^)]+)\)/i', $sql) &&
-            !preg_match('/^\s*select\s+distinct\s+/i', $sql) && !preg_match('/\s+order\s+by\s+/i', $sql)
+            preg_match($pattern, $sqlwrk) && !preg_match('/\(\s*(SELECT[^)]+)\)/i', $sqlwrk) &&
+            !preg_match('/^\s*select\s+distinct\s+/i', $sqlwrk) && !preg_match('/\s+order\s+by\s+/i', $sqlwrk)
         ) {
-            $sqlwrk = "SELECT COUNT(*) FROM " . preg_replace($pattern, "", $sql);
+            $sqlwrk = "SELECT COUNT(*) FROM " . preg_replace($pattern, "", $sqlwrk);
         } else {
-            $sqlwrk = "SELECT COUNT(*) FROM (" . $sql . ") COUNT_TABLE";
+            $sqlwrk = "SELECT COUNT(*) FROM (" . $sqlwrk . ") COUNT_TABLE";
         }
         $conn = $c ?? $this->getConnection();
         $rs = $conn->executeQuery($sqlwrk);
@@ -860,7 +870,7 @@ SORTHTML;
         $this->last_updated_at->ViewCustomAttributes = "";
 
         // platform_id
-        $curVal = strval($this->platform_id->CurrentValue);
+        $curVal = trim(strval($this->platform_id->CurrentValue));
         if ($curVal != "") {
             $this->platform_id->ViewValue = $this->platform_id->lookupCacheOption($curVal);
             if ($this->platform_id->ViewValue === null) { // Lookup from database
@@ -881,7 +891,7 @@ SORTHTML;
         $this->platform_id->ViewCustomAttributes = "";
 
         // operator_id
-        $curVal = strval($this->operator_id->CurrentValue);
+        $curVal = trim(strval($this->operator_id->CurrentValue));
         if ($curVal != "") {
             $this->operator_id->ViewValue = $this->operator_id->lookupCacheOption($curVal);
             if ($this->operator_id->ViewValue === null) { // Lookup from database

@@ -33,6 +33,4 @@ where id =  ".$_GET['id'];
 
 </div>
 
-<?php
-echo GetDebugMessage();
-?>
+<?= GetDebugMessage() ?>

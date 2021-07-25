@@ -120,7 +120,6 @@ class MainBusesDelete extends MainBuses
 
         // Initialize
         $GLOBALS["Page"] = &$this;
-        $this->TokenTimeout = SessionTimeoutTime();
 
         // Language object
         $Language = Container("language");
@@ -161,6 +160,30 @@ class MainBusesDelete extends MainBuses
         return is_object($Response) ? $Response->getBody() : ob_get_clean();
     }
 
+    // Is lookup
+    public function isLookup()
+    {
+        return SameText(Route(0), Config("API_LOOKUP_ACTION"));
+    }
+
+    // Is AutoFill
+    public function isAutoFill()
+    {
+        return $this->isLookup() && SameText(Post("ajax"), "autofill");
+    }
+
+    // Is AutoSuggest
+    public function isAutoSuggest()
+    {
+        return $this->isLookup() && SameText(Post("ajax"), "autosuggest");
+    }
+
+    // Is modal lookup
+    public function isModalLookup()
+    {
+        return $this->isLookup() && SameText(Post("ajax"), "modal");
+    }
+
     // Is terminated
     public function isTerminated()
     {
@@ -178,7 +201,7 @@ class MainBusesDelete extends MainBuses
         if ($this->terminated) {
             return;
         }
-        global $ExportFileName, $TempImages, $DashboardReport;
+        global $ExportFileName, $TempImages, $DashboardReport, $Response;
 
         // Page is terminated
         $this->terminated = true;
@@ -224,6 +247,11 @@ class MainBusesDelete extends MainBuses
                 WriteJson(array_merge(["success" => false], $this->getMessages()));
             }
             return;
+        } else { // Check if response is JSON
+            if (StartsString("application/json", $Response->getHeaderLine("Content-type")) && $Response->getBody()->getSize()) { // With JSON response
+                $this->clearMessages();
+                return;
+            }
         }
 
         // Go to URL if specified
@@ -443,7 +471,7 @@ class MainBusesDelete extends MainBuses
         // Set LoginStatus / Page_Rendering / Page_Render
         if (!IsApi() && !$this->isTerminated()) {
             // Pass table and field properties to client side
-            $this->toClientVar(["tableCaption"], ["caption", "Required", "IsInvalid", "Raw"]);
+            $this->toClientVar(["tableCaption"], ["caption", "Visible", "Required", "IsInvalid", "Raw"]);
 
             // Setup login status
             SetupLoginStatus();
@@ -454,7 +482,7 @@ class MainBusesDelete extends MainBuses
             // Global Page Rendering event (in userfn*.php)
             Page_Rendering();
 
-            // Page Rendering event
+            // Page Render event
             if (method_exists($this, "pageRender")) {
                 $this->pageRender();
             }
@@ -605,7 +633,7 @@ class MainBusesDelete extends MainBuses
             $this->number->ViewCustomAttributes = "";
 
             // platform_id
-            $curVal = strval($this->platform_id->CurrentValue);
+            $curVal = trim(strval($this->platform_id->CurrentValue));
             if ($curVal != "") {
                 $this->platform_id->ViewValue = $this->platform_id->lookupCacheOption($curVal);
                 if ($this->platform_id->ViewValue === null) { // Lookup from database
@@ -626,7 +654,7 @@ class MainBusesDelete extends MainBuses
             $this->platform_id->ViewCustomAttributes = "";
 
             // operator_id
-            $curVal = strval($this->operator_id->CurrentValue);
+            $curVal = trim(strval($this->operator_id->CurrentValue));
             if ($curVal != "") {
                 $this->operator_id->ViewValue = $this->operator_id->lookupCacheOption($curVal);
                 if ($this->operator_id->ViewValue === null) { // Lookup from database
@@ -647,7 +675,7 @@ class MainBusesDelete extends MainBuses
             $this->operator_id->ViewCustomAttributes = "";
 
             // exterior_campaign_id
-            $curVal = strval($this->exterior_campaign_id->CurrentValue);
+            $curVal = trim(strval($this->exterior_campaign_id->CurrentValue));
             if ($curVal != "") {
                 $this->exterior_campaign_id->ViewValue = $this->exterior_campaign_id->lookupCacheOption($curVal);
                 if ($this->exterior_campaign_id->ViewValue === null) { // Lookup from database
@@ -672,7 +700,7 @@ class MainBusesDelete extends MainBuses
             $this->exterior_campaign_id->ViewCustomAttributes = "";
 
             // interior_campaign_id
-            $curVal = strval($this->interior_campaign_id->CurrentValue);
+            $curVal = trim(strval($this->interior_campaign_id->CurrentValue));
             if ($curVal != "") {
                 $this->interior_campaign_id->ViewValue = $this->interior_campaign_id->lookupCacheOption($curVal);
                 if ($this->interior_campaign_id->ViewValue === null) { // Lookup from database
@@ -697,7 +725,7 @@ class MainBusesDelete extends MainBuses
             $this->interior_campaign_id->ViewCustomAttributes = "";
 
             // bus_status_id
-            $curVal = strval($this->bus_status_id->CurrentValue);
+            $curVal = trim(strval($this->bus_status_id->CurrentValue));
             if ($curVal != "") {
                 $this->bus_status_id->ViewValue = $this->bus_status_id->lookupCacheOption($curVal);
                 if ($this->bus_status_id->ViewValue === null) { // Lookup from database
@@ -718,7 +746,7 @@ class MainBusesDelete extends MainBuses
             $this->bus_status_id->ViewCustomAttributes = "";
 
             // bus_size_id
-            $curVal = strval($this->bus_size_id->CurrentValue);
+            $curVal = trim(strval($this->bus_size_id->CurrentValue));
             if ($curVal != "") {
                 $this->bus_size_id->ViewValue = $this->bus_size_id->lookupCacheOption($curVal);
                 if ($this->bus_size_id->ViewValue === null) { // Lookup from database
@@ -739,7 +767,7 @@ class MainBusesDelete extends MainBuses
             $this->bus_size_id->ViewCustomAttributes = "";
 
             // bus_depot_id
-            $curVal = strval($this->bus_depot_id->CurrentValue);
+            $curVal = trim(strval($this->bus_depot_id->CurrentValue));
             if ($curVal != "") {
                 $this->bus_depot_id->ViewValue = $this->bus_depot_id->lookupCacheOption($curVal);
                 if ($this->bus_depot_id->ViewValue === null) { // Lookup from database

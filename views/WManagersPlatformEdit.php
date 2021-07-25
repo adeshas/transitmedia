@@ -6,7 +6,6 @@ namespace PHPMaker2021\test;
 $WManagersPlatformEdit = &$Page;
 ?>
 <script>
-if (!ew.vars.tables.w_managers_platform) ew.vars.tables.w_managers_platform = <?= JsonEncode(GetClientVar("tables", "w_managers_platform")) ?>;
 var currentForm, currentPageID;
 var fw_managers_platformedit;
 loadjs.ready("head", function () {
@@ -16,11 +15,14 @@ loadjs.ready("head", function () {
     fw_managers_platformedit = currentForm = new ew.Form("fw_managers_platformedit", "edit");
 
     // Add fields
-    var fields = ew.vars.tables.w_managers_platform.fields;
+    var currentTable = <?= JsonEncode(GetClientVar("tables", "w_managers_platform")) ?>,
+        fields = currentTable.fields;
+    if (!ew.vars.tables.w_managers_platform)
+        ew.vars.tables.w_managers_platform = currentTable;
     fw_managers_platformedit.addFields([
-        ["id", [fields.id.required ? ew.Validators.required(fields.id.caption) : null], fields.id.isInvalid],
-        ["platform_id", [fields.platform_id.required ? ew.Validators.required(fields.platform_id.caption) : null], fields.platform_id.isInvalid],
-        ["user_id", [fields.user_id.required ? ew.Validators.required(fields.user_id.caption) : null], fields.user_id.isInvalid]
+        ["id", [fields.id.visible && fields.id.required ? ew.Validators.required(fields.id.caption) : null], fields.id.isInvalid],
+        ["platform_id", [fields.platform_id.visible && fields.platform_id.required ? ew.Validators.required(fields.platform_id.caption) : null], fields.platform_id.isInvalid],
+        ["user_id", [fields.user_id.visible && fields.user_id.required ? ew.Validators.required(fields.user_id.caption) : null], fields.user_id.isInvalid]
     ]);
 
     // Set invalid fields
@@ -101,7 +103,7 @@ loadjs.ready("head", function () {
 <?php
 $Page->showMessage();
 ?>
-<form name="fw_managers_platformedit" id="fw_managers_platformedit" class="<?= $Page->FormClassName ?>" action="<?= CurrentPageUrl() ?>" method="post">
+<form name="fw_managers_platformedit" id="fw_managers_platformedit" class="<?= $Page->FormClassName ?>" action="<?= CurrentPageUrl(false) ?>" method="post">
 <?php if (Config("CHECK_TOKEN")) { ?>
 <input type="hidden" name="<?= $TokenNameKey ?>" value="<?= $TokenName ?>"><!-- CSRF token name -->
 <input type="hidden" name="<?= $TokenValueKey ?>" value="<?= $TokenValue ?>"><!-- CSRF token value -->

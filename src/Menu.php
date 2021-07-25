@@ -186,7 +186,7 @@ class Menu
         $menu = [];
         $url = CurrentUrl();
         $checkUrl = function ($item) use ($url) {
-            if (!$item->IsCustomUrl && CurrentPageName() == GetPageName($item->Url) || $item->IsCustomUrl && $url == $item->Url) { // Active
+            if (!$item->IsCustomUrl && CurrentPageName() == GetPageName($item->Url) || $item->IsCustomUrl && $url == GetUrl($item->Url)) { // Active
                 $item->Active = true;
                 $item->Url = "#";
                 $item->setAttribute("onclick", "return false;");

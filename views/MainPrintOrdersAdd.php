@@ -6,7 +6,6 @@ namespace PHPMaker2021\test;
 $MainPrintOrdersAdd = &$Page;
 ?>
 <script>
-if (!ew.vars.tables.main_print_orders) ew.vars.tables.main_print_orders = <?= JsonEncode(GetClientVar("tables", "main_print_orders")) ?>;
 var currentForm, currentPageID;
 var fmain_print_ordersadd;
 loadjs.ready("head", function () {
@@ -16,14 +15,17 @@ loadjs.ready("head", function () {
     fmain_print_ordersadd = currentForm = new ew.Form("fmain_print_ordersadd", "add");
 
     // Add fields
-    var fields = ew.vars.tables.main_print_orders.fields;
+    var currentTable = <?= JsonEncode(GetClientVar("tables", "main_print_orders")) ?>,
+        fields = currentTable.fields;
+    if (!ew.vars.tables.main_print_orders)
+        ew.vars.tables.main_print_orders = currentTable;
     fmain_print_ordersadd.addFields([
-        ["campaign_id", [fields.campaign_id.required ? ew.Validators.required(fields.campaign_id.caption) : null], fields.campaign_id.isInvalid],
-        ["printer_id", [fields.printer_id.required ? ew.Validators.required(fields.printer_id.caption) : null], fields.printer_id.isInvalid],
-        ["quantity", [fields.quantity.required ? ew.Validators.required(fields.quantity.caption) : null, ew.Validators.integer], fields.quantity.isInvalid],
-        ["comments", [fields.comments.required ? ew.Validators.required(fields.comments.caption) : null], fields.comments.isInvalid],
-        ["available_codes_to_be_assigned", [fields.available_codes_to_be_assigned.required ? ew.Validators.required(fields.available_codes_to_be_assigned.caption) : null], fields.available_codes_to_be_assigned.isInvalid],
-        ["tags", [fields.tags.required ? ew.Validators.required(fields.tags.caption) : null], fields.tags.isInvalid]
+        ["campaign_id", [fields.campaign_id.visible && fields.campaign_id.required ? ew.Validators.required(fields.campaign_id.caption) : null], fields.campaign_id.isInvalid],
+        ["printer_id", [fields.printer_id.visible && fields.printer_id.required ? ew.Validators.required(fields.printer_id.caption) : null], fields.printer_id.isInvalid],
+        ["quantity", [fields.quantity.visible && fields.quantity.required ? ew.Validators.required(fields.quantity.caption) : null, ew.Validators.integer], fields.quantity.isInvalid],
+        ["comments", [fields.comments.visible && fields.comments.required ? ew.Validators.required(fields.comments.caption) : null], fields.comments.isInvalid],
+        ["available_codes_to_be_assigned", [fields.available_codes_to_be_assigned.visible && fields.available_codes_to_be_assigned.required ? ew.Validators.required(fields.available_codes_to_be_assigned.caption) : null], fields.available_codes_to_be_assigned.isInvalid],
+        ["tags", [fields.tags.visible && fields.tags.required ? ew.Validators.required(fields.tags.caption) : null], fields.tags.isInvalid]
     ]);
 
     // Set invalid fields
@@ -104,7 +106,7 @@ loadjs.ready("head", function () {
 <?php
 $Page->showMessage();
 ?>
-<form name="fmain_print_ordersadd" id="fmain_print_ordersadd" class="<?= $Page->FormClassName ?>" action="<?= CurrentPageUrl() ?>" method="post">
+<form name="fmain_print_ordersadd" id="fmain_print_ordersadd" class="<?= $Page->FormClassName ?>" action="<?= CurrentPageUrl(false) ?>" method="post">
 <?php if (Config("CHECK_TOKEN")) { ?>
 <input type="hidden" name="<?= $TokenNameKey ?>" value="<?= $TokenName ?>"><!-- CSRF token name -->
 <input type="hidden" name="<?= $TokenValueKey ?>" value="<?= $TokenValue ?>"><!-- CSRF token value -->

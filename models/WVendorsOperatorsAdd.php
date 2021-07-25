@@ -120,7 +120,6 @@ class WVendorsOperatorsAdd extends WVendorsOperators
 
         // Initialize
         $GLOBALS["Page"] = &$this;
-        $this->TokenTimeout = SessionTimeoutTime();
 
         // Language object
         $Language = Container("language");
@@ -161,6 +160,30 @@ class WVendorsOperatorsAdd extends WVendorsOperators
         return is_object($Response) ? $Response->getBody() : ob_get_clean();
     }
 
+    // Is lookup
+    public function isLookup()
+    {
+        return SameText(Route(0), Config("API_LOOKUP_ACTION"));
+    }
+
+    // Is AutoFill
+    public function isAutoFill()
+    {
+        return $this->isLookup() && SameText(Post("ajax"), "autofill");
+    }
+
+    // Is AutoSuggest
+    public function isAutoSuggest()
+    {
+        return $this->isLookup() && SameText(Post("ajax"), "autosuggest");
+    }
+
+    // Is modal lookup
+    public function isModalLookup()
+    {
+        return $this->isLookup() && SameText(Post("ajax"), "modal");
+    }
+
     // Is terminated
     public function isTerminated()
     {
@@ -178,7 +201,7 @@ class WVendorsOperatorsAdd extends WVendorsOperators
         if ($this->terminated) {
             return;
         }
-        global $ExportFileName, $TempImages, $DashboardReport;
+        global $ExportFileName, $TempImages, $DashboardReport, $Response;
 
         // Page is terminated
         $this->terminated = true;
@@ -224,6 +247,11 @@ class WVendorsOperatorsAdd extends WVendorsOperators
                 WriteJson(array_merge(["success" => false], $this->getMessages()));
             }
             return;
+        } else { // Check if response is JSON
+            if (StartsString("application/json", $Response->getHeaderLine("Content-type")) && $Response->getBody()->getSize()) { // With JSON response
+                $this->clearMessages();
+                return;
+            }
         }
 
         // Go to URL if specified
@@ -560,7 +588,7 @@ class WVendorsOperatorsAdd extends WVendorsOperators
         // Set LoginStatus / Page_Rendering / Page_Render
         if (!IsApi() && !$this->isTerminated()) {
             // Pass table and field properties to client side
-            $this->toClientVar(["tableCaption"], ["caption", "Required", "IsInvalid", "Raw"]);
+            $this->toClientVar(["tableCaption"], ["caption", "Visible", "Required", "IsInvalid", "Raw"]);
 
             // Setup login status
             SetupLoginStatus();
@@ -571,7 +599,7 @@ class WVendorsOperatorsAdd extends WVendorsOperators
             // Global Page Rendering event (in userfn*.php)
             Page_Rendering();
 
-            // Page Rendering event
+            // Page Render event
             if (method_exists($this, "pageRender")) {
                 $this->pageRender();
             }
@@ -735,7 +763,7 @@ class WVendorsOperatorsAdd extends WVendorsOperators
             $this->id->ViewCustomAttributes = "";
 
             // vendor_id
-            $curVal = strval($this->vendor_id->CurrentValue);
+            $curVal = trim(strval($this->vendor_id->CurrentValue));
             if ($curVal != "") {
                 $this->vendor_id->ViewValue = $this->vendor_id->lookupCacheOption($curVal);
                 if ($this->vendor_id->ViewValue === null) { // Lookup from database
@@ -760,7 +788,7 @@ class WVendorsOperatorsAdd extends WVendorsOperators
             $this->vendor_id->ViewCustomAttributes = "";
 
             // operator_id
-            $curVal = strval($this->operator_id->CurrentValue);
+            $curVal = trim(strval($this->operator_id->CurrentValue));
             if ($curVal != "") {
                 $this->operator_id->ViewValue = $this->operator_id->lookupCacheOption($curVal);
                 if ($this->operator_id->ViewValue === null) { // Lookup from database
@@ -916,8 +944,13 @@ class WVendorsOperatorsAdd extends WVendorsOperators
 
         // Call Row Inserting event
         $insertRow = $this->rowInserting($rsold, $rsnew);
+        $addRow = false;
         if ($insertRow) {
-            $addRow = $this->insert($rsnew);
+            try {
+                $addRow = $this->insert($rsnew);
+            } catch (\Exception $e) {
+                $this->setFailureMessage($e->getMessage());
+            }
             if ($addRow) {
             }
         } else {

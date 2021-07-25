@@ -120,7 +120,6 @@ class MainPrintOrdersDelete extends MainPrintOrders
 
         // Initialize
         $GLOBALS["Page"] = &$this;
-        $this->TokenTimeout = SessionTimeoutTime();
 
         // Language object
         $Language = Container("language");
@@ -161,6 +160,30 @@ class MainPrintOrdersDelete extends MainPrintOrders
         return is_object($Response) ? $Response->getBody() : ob_get_clean();
     }
 
+    // Is lookup
+    public function isLookup()
+    {
+        return SameText(Route(0), Config("API_LOOKUP_ACTION"));
+    }
+
+    // Is AutoFill
+    public function isAutoFill()
+    {
+        return $this->isLookup() && SameText(Post("ajax"), "autofill");
+    }
+
+    // Is AutoSuggest
+    public function isAutoSuggest()
+    {
+        return $this->isLookup() && SameText(Post("ajax"), "autosuggest");
+    }
+
+    // Is modal lookup
+    public function isModalLookup()
+    {
+        return $this->isLookup() && SameText(Post("ajax"), "modal");
+    }
+
     // Is terminated
     public function isTerminated()
     {
@@ -178,7 +201,7 @@ class MainPrintOrdersDelete extends MainPrintOrders
         if ($this->terminated) {
             return;
         }
-        global $ExportFileName, $TempImages, $DashboardReport;
+        global $ExportFileName, $TempImages, $DashboardReport, $Response;
 
         // Page is terminated
         $this->terminated = true;
@@ -224,6 +247,11 @@ class MainPrintOrdersDelete extends MainPrintOrders
                 WriteJson(array_merge(["success" => false], $this->getMessages()));
             }
             return;
+        } else { // Check if response is JSON
+            if (StartsString("application/json", $Response->getHeaderLine("Content-type")) && $Response->getBody()->getSize()) { // With JSON response
+                $this->clearMessages();
+                return;
+            }
         }
 
         // Go to URL if specified
@@ -436,7 +464,7 @@ class MainPrintOrdersDelete extends MainPrintOrders
         // Set LoginStatus / Page_Rendering / Page_Render
         if (!IsApi() && !$this->isTerminated()) {
             // Pass table and field properties to client side
-            $this->toClientVar(["tableCaption"], ["caption", "Required", "IsInvalid", "Raw"]);
+            $this->toClientVar(["tableCaption"], ["caption", "Visible", "Required", "IsInvalid", "Raw"]);
 
             // Setup login status
             SetupLoginStatus();
@@ -447,7 +475,7 @@ class MainPrintOrdersDelete extends MainPrintOrders
             // Global Page Rendering event (in userfn*.php)
             Page_Rendering();
 
-            // Page Rendering event
+            // Page Render event
             if (method_exists($this, "pageRender")) {
                 $this->pageRender();
             }
@@ -596,7 +624,7 @@ class MainPrintOrdersDelete extends MainPrintOrders
             $this->id->ViewCustomAttributes = "";
 
             // campaign_id
-            $curVal = strval($this->campaign_id->CurrentValue);
+            $curVal = trim(strval($this->campaign_id->CurrentValue));
             if ($curVal != "") {
                 $this->campaign_id->ViewValue = $this->campaign_id->lookupCacheOption($curVal);
                 if ($this->campaign_id->ViewValue === null) { // Lookup from database
@@ -621,7 +649,7 @@ class MainPrintOrdersDelete extends MainPrintOrders
             $this->campaign_id->ViewCustomAttributes = "";
 
             // printer_id
-            $curVal = strval($this->printer_id->CurrentValue);
+            $curVal = trim(strval($this->printer_id->CurrentValue));
             if ($curVal != "") {
                 $this->printer_id->ViewValue = $this->printer_id->lookupCacheOption($curVal);
                 if ($this->printer_id->ViewValue === null) { // Lookup from database

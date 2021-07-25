@@ -62,15 +62,15 @@ class ChartTypes
     /**
      * Default type ID
      *
-     * @var integer
+     * @var int
      */
     public static $DefaultType = 1001; // Default
 
     /**
      * Get chart type name
      *
-     * @param integer $id Chart type ID
-     * @param boolean $scroll Whether chart is scrollable
+     * @param int $id Chart type ID
+     * @param bool $scroll Whether chart is scrollable
      * @return string Chart type name
      */
     public static function getName($id, $scroll = false)
@@ -86,7 +86,7 @@ class ChartTypes
     /**
      * Get chart renderer class
      *
-     * @param integer $id Chart type ID
+     * @param int $id Chart type ID
      * @return string Chart renderer class name
      */
     public static function getRendererClass($id)

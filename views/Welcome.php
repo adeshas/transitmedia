@@ -336,6 +336,4 @@ order by platform_id desc, inventory_id, bus_size";
 
 
 
-<?php
-echo GetDebugMessage();
-?>
+<?= GetDebugMessage() ?>

@@ -147,7 +147,7 @@ $Error = null;
 $API_ACTIONS = [];
 
 // User level
-include_once $RELATIVE_PATH . "src/userlevelsettings.php";
+require_once __DIR__ . "/userlevelsettings.php";
 
 /**
  * Config
@@ -171,7 +171,7 @@ $CONFIG = [
 
     // General
     "UNFORMAT_YEAR" => 50, // Unformat year
-    "RANDOM_KEY" => 'ZTfvs0A8ZdyxV7uk', // Random key for encryption
+    "RANDOM_KEY" => 'hN4EvkHg4WGUHtK4', // Random key for encryption
     "ENCRYPTION_KEY" => '', // Encryption key for data protection
     "PROJECT_STYLESHEET_FILENAME" => "css/test.css", // Project stylesheet file name
     "PROJECT_CHARSET" => "utf-8", // Project charset
@@ -184,7 +184,7 @@ $CONFIG = [
     "LAZY_LOAD" => true, // Lazy loading of images
     "BODY_CLASS" => "hold-transition layout-fixed",
     "SIDEBAR_CLASS" => "main-sidebar sidebar-dark-primary",
-    "NAVBAR_CLASS" => "main-header navbar navbar-expand navbar-primary navbar-dark",
+    "NAVBAR_CLASS" => "main-header navbar navbar-expand navbar-primary navbar-dark border-bottom-0",
 
     // Check Token
     "CHECK_TOKEN" => true,
@@ -202,7 +202,7 @@ $CONFIG = [
     "CONTROLLER_PATH" => "controllers/", // With trailing delimiter
 
     // Font path
-    "FONT_PATH" => realpath($RELATIVE_PATH . "font"), // No trailing delimiter
+    "FONT_PATH" => __DIR__ . "/../font", // No trailing delimiter
 
     // External JavaScripts
     "JAVASCRIPT_FILES" => [],
@@ -276,9 +276,9 @@ $CONFIG = [
     "SESSION_TIMEOUT_COUNTDOWN" => 60, // Session timeout count down interval (seconds)
 
     // Language settings
-    "LANGUAGE_FOLDER" => $RELATIVE_PATH . "lang/",
+    "LANGUAGE_FOLDER" => __DIR__ . "/../lang/",
     "LANGUAGE_DEFAULT_ID" => "en",
-    "LOCALE_FOLDER" => $RELATIVE_PATH . "locale/",
+    "LOCALE_FOLDER" => __DIR__ . "/../locale/",
     "CUSTOM_TEMPLATE_DATATYPES" => [DATATYPE_NUMBER, DATATYPE_DATE, DATATYPE_STRING, DATATYPE_BOOLEAN, DATATYPE_TIME], // Data to be passed to Custom Template
     "DATA_STRING_MAX_LENGTH" => 512,
 
@@ -330,7 +330,8 @@ $CONFIG = [
     "ALLOW_LOGIN_BY_URL" => false, // Allow login by URL
     "ALLOW_LOGIN_BY_SESSION" => false, // Allow login by session variables
     "PHPASS_ITERATION_COUNT_LOG2" => [10, 8], // For PasswordHash
-    "PASSWORD_HASH" => false, // Use PHP 5.5+ password hashing functions
+    "PASSWORD_HASH" => false, // Use PHP password hashing functions
+    "USE_MODAL_LOGIN" => false, // Use modal login
 
     // Default User ID allowed permissions
     "DEFAULT_USER_ID_ALLOW_SECURITY" => 360,
@@ -410,6 +411,9 @@ $CONFIG = [
     "DELETE_UPLOADED_FILES" => false, // Delete uploaded file on deleting record
     "FILE_NOT_FOUND" => "/9j/4AAQSkZJRgABAQAAAQABAAD/7QAuUGhvdG9zaG9wIDMuMAA4QklNBAQAAAAAABIcAigADEZpbGVOb3RGb3VuZAD/2wBDAAgGBgcGBQgHBwcJCQgKDBQNDAsLDBkSEw8UHRofHh0aHBwgJC4nICIsIxwcKDcpLDAxNDQ0Hyc5PTgyPC4zNDL/2wBDAQkJCQwLDBgNDRgyIRwhMjIyMjIyMjIyMjIyMjIyMjIyMjIyMjIyMjIyMjIyMjIyMjIyMjIyMjIyMjIyMjIyMjL/wgARCAABAAEDAREAAhEBAxEB/8QAFAABAAAAAAAAAAAAAAAAAAAACP/EABQBAQAAAAAAAAAAAAAAAAAAAAD/2gAMAwEAAhADEAAAAD+f/8QAFBABAAAAAAAAAAAAAAAAAAAAAP/aAAgBAQABPwB//8QAFBEBAAAAAAAAAAAAAAAAAAAAAP/aAAgBAgEBPwB//8QAFBEBAAAAAAAAAAAAAAAAAAAAAP/aAAgBAwEBPwB//9k=", // 1x1 jpeg with IPTC data "2#040"="FileNotFound"
 
+    // Save file options
+    "SAVE_FILE_OPTIONS" => LOCK_EX,
+
     // Table actions
     "LIST_ACTION" => "list", // Table list action
     "VIEW_ACTION" => "view", // Table view action
@@ -466,7 +470,7 @@ $CONFIG = [
     "RESIZE_OPTIONS" => ["keepAspectRatio" => false, "resizeUp" => !true, "jpegQuality" => 100],
 
     // Audit trail
-    "AUDIT_TRAIL_PATH" => "", // Audit trail path (relative to app root)
+    "AUDIT_TRAIL_PATH" => "audit/", // Audit trail path (relative to app root)
 
     // Import records
     "IMPORT_CSV_DELIMITER" => ",", // Import to CSV delimiter

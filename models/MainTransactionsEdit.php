@@ -120,7 +120,6 @@ class MainTransactionsEdit extends MainTransactions
 
         // Initialize
         $GLOBALS["Page"] = &$this;
-        $this->TokenTimeout = SessionTimeoutTime();
 
         // Language object
         $Language = Container("language");
@@ -161,6 +160,30 @@ class MainTransactionsEdit extends MainTransactions
         return is_object($Response) ? $Response->getBody() : ob_get_clean();
     }
 
+    // Is lookup
+    public function isLookup()
+    {
+        return SameText(Route(0), Config("API_LOOKUP_ACTION"));
+    }
+
+    // Is AutoFill
+    public function isAutoFill()
+    {
+        return $this->isLookup() && SameText(Post("ajax"), "autofill");
+    }
+
+    // Is AutoSuggest
+    public function isAutoSuggest()
+    {
+        return $this->isLookup() && SameText(Post("ajax"), "autosuggest");
+    }
+
+    // Is modal lookup
+    public function isModalLookup()
+    {
+        return $this->isLookup() && SameText(Post("ajax"), "modal");
+    }
+
     // Is terminated
     public function isTerminated()
     {
@@ -178,7 +201,7 @@ class MainTransactionsEdit extends MainTransactions
         if ($this->terminated) {
             return;
         }
-        global $ExportFileName, $TempImages, $DashboardReport;
+        global $ExportFileName, $TempImages, $DashboardReport, $Response;
 
         // Page is terminated
         $this->terminated = true;
@@ -224,6 +247,11 @@ class MainTransactionsEdit extends MainTransactions
                 WriteJson(array_merge(["success" => false], $this->getMessages()));
             }
             return;
+        } else { // Check if response is JSON
+            if (StartsString("application/json", $Response->getHeaderLine("Content-type")) && $Response->getBody()->getSize()) { // With JSON response
+                $this->clearMessages();
+                return;
+            }
         }
 
         // Go to URL if specified
@@ -415,6 +443,13 @@ class MainTransactionsEdit extends MainTransactions
     public $IsMobileOrModal = false;
     public $DbMasterFilter;
     public $DbDetailFilter;
+    public $HashValue; // Hash Value
+    public $DisplayRecords = 1;
+    public $StartRecord;
+    public $StopRecord;
+    public $TotalRecords = 0;
+    public $RecordRange = 10;
+    public $RecordCount;
 
     /**
      * Page run
@@ -629,7 +664,7 @@ class MainTransactionsEdit extends MainTransactions
         // Set LoginStatus / Page_Rendering / Page_Render
         if (!IsApi() && !$this->isTerminated()) {
             // Pass table and field properties to client side
-            $this->toClientVar(["tableCaption"], ["caption", "Required", "IsInvalid", "Raw"]);
+            $this->toClientVar(["tableCaption"], ["caption", "Visible", "Required", "IsInvalid", "Raw"]);
 
             // Setup login status
             SetupLoginStatus();
@@ -640,7 +675,7 @@ class MainTransactionsEdit extends MainTransactions
             // Global Page Rendering event (in userfn*.php)
             Page_Rendering();
 
-            // Page Rendering event
+            // Page Render event
             if (method_exists($this, "pageRender")) {
                 $this->pageRender();
             }
@@ -1011,7 +1046,7 @@ class MainTransactionsEdit extends MainTransactions
             if ($this->campaign_id->VirtualValue != "") {
                 $this->campaign_id->ViewValue = $this->campaign_id->VirtualValue;
             } else {
-                $curVal = strval($this->campaign_id->CurrentValue);
+                $curVal = trim(strval($this->campaign_id->CurrentValue));
                 if ($curVal != "") {
                     $this->campaign_id->ViewValue = $this->campaign_id->lookupCacheOption($curVal);
                     if ($this->campaign_id->ViewValue === null) { // Lookup from database
@@ -1034,7 +1069,7 @@ class MainTransactionsEdit extends MainTransactions
             $this->campaign_id->ViewCustomAttributes = "";
 
             // operator_id
-            $curVal = strval($this->operator_id->CurrentValue);
+            $curVal = trim(strval($this->operator_id->CurrentValue));
             if ($curVal != "") {
                 $this->operator_id->ViewValue = $this->operator_id->lookupCacheOption($curVal);
                 if ($this->operator_id->ViewValue === null) { // Lookup from database
@@ -1061,7 +1096,7 @@ class MainTransactionsEdit extends MainTransactions
 
             // vendor_id
             $this->vendor_id->ViewValue = $this->vendor_id->CurrentValue;
-            $curVal = strval($this->vendor_id->CurrentValue);
+            $curVal = trim(strval($this->vendor_id->CurrentValue));
             if ($curVal != "") {
                 $this->vendor_id->ViewValue = $this->vendor_id->lookupCacheOption($curVal);
                 if ($this->vendor_id->ViewValue === null) { // Lookup from database
@@ -1085,7 +1120,7 @@ class MainTransactionsEdit extends MainTransactions
             if ($this->price_id->VirtualValue != "") {
                 $this->price_id->ViewValue = $this->price_id->VirtualValue;
             } else {
-                $curVal = strval($this->price_id->CurrentValue);
+                $curVal = trim(strval($this->price_id->CurrentValue));
                 if ($curVal != "") {
                     $this->price_id->ViewValue = $this->price_id->lookupCacheOption($curVal);
                     if ($this->price_id->ViewValue === null) { // Lookup from database
@@ -1131,7 +1166,7 @@ class MainTransactionsEdit extends MainTransactions
             $this->end_date->ViewCustomAttributes = "";
 
             // visible_status_id
-            $curVal = strval($this->visible_status_id->CurrentValue);
+            $curVal = trim(strval($this->visible_status_id->CurrentValue));
             if ($curVal != "") {
                 $this->visible_status_id->ViewValue = $this->visible_status_id->lookupCacheOption($curVal);
                 if ($this->visible_status_id->ViewValue === null) { // Lookup from database
@@ -1155,7 +1190,7 @@ class MainTransactionsEdit extends MainTransactions
             if ($this->status_id->VirtualValue != "") {
                 $this->status_id->ViewValue = $this->status_id->VirtualValue;
             } else {
-                $curVal = strval($this->status_id->CurrentValue);
+                $curVal = trim(strval($this->status_id->CurrentValue));
                 if ($curVal != "") {
                     $this->status_id->ViewValue = $this->status_id->lookupCacheOption($curVal);
                     if ($this->status_id->ViewValue === null) { // Lookup from database
@@ -1181,7 +1216,7 @@ class MainTransactionsEdit extends MainTransactions
             if ($this->print_status_id->VirtualValue != "") {
                 $this->print_status_id->ViewValue = $this->print_status_id->VirtualValue;
             } else {
-                $curVal = strval($this->print_status_id->CurrentValue);
+                $curVal = trim(strval($this->print_status_id->CurrentValue));
                 if ($curVal != "") {
                     $this->print_status_id->ViewValue = $this->print_status_id->lookupCacheOption($curVal);
                     if ($this->print_status_id->ViewValue === null) { // Lookup from database
@@ -1207,7 +1242,7 @@ class MainTransactionsEdit extends MainTransactions
             if ($this->payment_status_id->VirtualValue != "") {
                 $this->payment_status_id->ViewValue = $this->payment_status_id->VirtualValue;
             } else {
-                $curVal = strval($this->payment_status_id->CurrentValue);
+                $curVal = trim(strval($this->payment_status_id->CurrentValue));
                 if ($curVal != "") {
                     $this->payment_status_id->ViewValue = $this->payment_status_id->lookupCacheOption($curVal);
                     if ($this->payment_status_id->ViewValue === null) { // Lookup from database
@@ -1230,7 +1265,7 @@ class MainTransactionsEdit extends MainTransactions
             $this->payment_status_id->ViewCustomAttributes = "";
 
             // created_by
-            $curVal = strval($this->created_by->CurrentValue);
+            $curVal = trim(strval($this->created_by->CurrentValue));
             if ($curVal != "") {
                 $this->created_by->ViewValue = $this->created_by->lookupCacheOption($curVal);
                 if ($this->created_by->ViewValue === null) { // Lookup from database
@@ -1367,7 +1402,7 @@ class MainTransactionsEdit extends MainTransactions
                 if ($this->campaign_id->VirtualValue != "") {
                     $this->campaign_id->ViewValue = $this->campaign_id->VirtualValue;
                 } else {
-                    $curVal = strval($this->campaign_id->CurrentValue);
+                    $curVal = trim(strval($this->campaign_id->CurrentValue));
                     if ($curVal != "") {
                         $this->campaign_id->ViewValue = $this->campaign_id->lookupCacheOption($curVal);
                         if ($this->campaign_id->ViewValue === null) { // Lookup from database
@@ -1419,7 +1454,7 @@ class MainTransactionsEdit extends MainTransactions
             $this->operator_id->EditCustomAttributes = "";
             if ($this->operator_id->getSessionValue() != "") {
                 $this->operator_id->CurrentValue = GetForeignKeyValue($this->operator_id->getSessionValue());
-                $curVal = strval($this->operator_id->CurrentValue);
+                $curVal = trim(strval($this->operator_id->CurrentValue));
                 if ($curVal != "") {
                     $this->operator_id->ViewValue = $this->operator_id->lookupCacheOption($curVal);
                     if ($this->operator_id->ViewValue === null) { // Lookup from database
@@ -1820,6 +1855,7 @@ class MainTransactionsEdit extends MainTransactions
         $this->CurrentFilter = $filter;
         $sql = $this->getCurrentSql();
         $rsold = $conn->fetchAssoc($sql);
+        $editRow = false;
         if (!$rsold) {
             $this->setFailureMessage($Language->phrase("NoRecord")); // Set no record message
             $editRow = false; // Update Failed
@@ -1898,7 +1934,11 @@ class MainTransactionsEdit extends MainTransactions
             $updateRow = $this->rowUpdating($rsold, $rsnew);
             if ($updateRow) {
                 if (count($rsnew) > 0) {
-                    $editRow = $this->update($rsnew, "", $rsold);
+                    try {
+                        $editRow = $this->update($rsnew, "", $rsold);
+                    } catch (\Exception $e) {
+                        $this->setFailureMessage($e->getMessage());
+                    }
                 } else {
                     $editRow = true; // No field to update
                 }

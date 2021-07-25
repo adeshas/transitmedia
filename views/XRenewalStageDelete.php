@@ -21,11 +21,14 @@ loadjs.ready("head", function () {
     // Write your table-specific client script here, no need to add script tags.
 });
 </script>
+<script>
+if (!ew.vars.tables.x_renewal_stage) ew.vars.tables.x_renewal_stage = <?= JsonEncode(GetClientVar("tables", "x_renewal_stage")) ?>;
+</script>
 <?php $Page->showPageHeader(); ?>
 <?php
 $Page->showMessage();
 ?>
-<form name="fx_renewal_stagedelete" id="fx_renewal_stagedelete" class="form-inline ew-form ew-delete-form" action="<?= CurrentPageUrl() ?>" method="post">
+<form name="fx_renewal_stagedelete" id="fx_renewal_stagedelete" class="form-inline ew-form ew-delete-form" action="<?= CurrentPageUrl(false) ?>" method="post">
 <?php if (Config("CHECK_TOKEN")) { ?>
 <input type="hidden" name="<?= $TokenNameKey ?>" value="<?= $TokenName ?>"><!-- CSRF token name -->
 <input type="hidden" name="<?= $TokenValueKey ?>" value="<?= $TokenValue ?>"><!-- CSRF token value -->

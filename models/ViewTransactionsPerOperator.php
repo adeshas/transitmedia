@@ -91,64 +91,76 @@ class ViewTransactionsPerOperator extends DbTable
         $this->transaction_id = new DbField('view_transactions_per_operator', 'view_transactions_per_operator', 'x_transaction_id', 'transaction_id', '"transaction_id"', 'CAST("transaction_id" AS varchar(255))', 3, 4, -1, false, '"transaction_id"', false, false, false, 'FORMATTED TEXT', 'TEXT');
         $this->transaction_id->Sortable = true; // Allow sort
         $this->transaction_id->DefaultErrorMessage = $Language->phrase("IncorrectInteger");
+        $this->transaction_id->CustomMsg = $Language->FieldPhrase($this->TableVar, $this->transaction_id->Param, "CustomMsg");
         $this->Fields['transaction_id'] = &$this->transaction_id;
 
         // campaign
         $this->campaign = new DbField('view_transactions_per_operator', 'view_transactions_per_operator', 'x_campaign', 'campaign', '"campaign"', '"campaign"', 201, 0, -1, false, '"campaign"', false, false, false, 'FORMATTED TEXT', 'TEXTAREA');
         $this->campaign->Sortable = true; // Allow sort
+        $this->campaign->CustomMsg = $Language->FieldPhrase($this->TableVar, $this->campaign->Param, "CustomMsg");
         $this->Fields['campaign'] = &$this->campaign;
 
         // payment_date
         $this->payment_date = new DbField('view_transactions_per_operator', 'view_transactions_per_operator', 'x_payment_date', 'payment_date', '"payment_date"', CastDateFieldForLike("\"payment_date\"", 0, "DB"), 133, 4, 0, false, '"payment_date"', false, false, false, 'FORMATTED TEXT', 'TEXT');
         $this->payment_date->Sortable = true; // Allow sort
         $this->payment_date->DefaultErrorMessage = str_replace("%s", $GLOBALS["DATE_FORMAT"], $Language->phrase("IncorrectDate"));
+        $this->payment_date->CustomMsg = $Language->FieldPhrase($this->TableVar, $this->payment_date->Param, "CustomMsg");
         $this->Fields['payment_date'] = &$this->payment_date;
 
         // inventory
         $this->inventory = new DbField('view_transactions_per_operator', 'view_transactions_per_operator', 'x_inventory', 'inventory', '"inventory"', '"inventory"', 201, 0, -1, false, '"inventory"', false, false, false, 'FORMATTED TEXT', 'TEXTAREA');
         $this->inventory->Sortable = true; // Allow sort
+        $this->inventory->CustomMsg = $Language->FieldPhrase($this->TableVar, $this->inventory->Param, "CustomMsg");
         $this->Fields['inventory'] = &$this->inventory;
 
         // bus_size
         $this->bus_size = new DbField('view_transactions_per_operator', 'view_transactions_per_operator', 'x_bus_size', 'bus_size', '"bus_size"', '"bus_size"', 201, 0, -1, false, '"bus_size"', false, false, false, 'FORMATTED TEXT', 'TEXTAREA');
         $this->bus_size->Sortable = true; // Allow sort
+        $this->bus_size->CustomMsg = $Language->FieldPhrase($this->TableVar, $this->bus_size->Param, "CustomMsg");
         $this->Fields['bus_size'] = &$this->bus_size;
 
         // print_stage
         $this->print_stage = new DbField('view_transactions_per_operator', 'view_transactions_per_operator', 'x_print_stage', 'print_stage', '"print_stage"', '"print_stage"', 201, 0, -1, false, '"print_stage"', false, false, false, 'FORMATTED TEXT', 'TEXTAREA');
         $this->print_stage->Sortable = true; // Allow sort
+        $this->print_stage->CustomMsg = $Language->FieldPhrase($this->TableVar, $this->print_stage->Param, "CustomMsg");
         $this->Fields['print_stage'] = &$this->print_stage;
 
         // vendor
         $this->vendor = new DbField('view_transactions_per_operator', 'view_transactions_per_operator', 'x_vendor', 'vendor', '"vendor"', '"vendor"', 200, 0, -1, false, '"vendor"', false, false, false, 'FORMATTED TEXT', 'TEXT');
         $this->vendor->Sortable = true; // Allow sort
+        $this->vendor->CustomMsg = $Language->FieldPhrase($this->TableVar, $this->vendor->Param, "CustomMsg");
         $this->Fields['vendor'] = &$this->vendor;
 
         // operator
         $this->operator = new DbField('view_transactions_per_operator', 'view_transactions_per_operator', 'x_operator', 'operator', '"operator"', '"operator"', 200, 50, -1, false, '"operator"', false, false, false, 'FORMATTED TEXT', 'TEXT');
         $this->operator->Sortable = true; // Allow sort
+        $this->operator->CustomMsg = $Language->FieldPhrase($this->TableVar, $this->operator->Param, "CustomMsg");
         $this->Fields['operator'] = &$this->operator;
 
         // platform
         $this->platform = new DbField('view_transactions_per_operator', 'view_transactions_per_operator', 'x_platform', 'platform', '"platform"', '"platform"', 200, 50, -1, false, '"platform"', false, false, false, 'FORMATTED TEXT', 'TEXT');
         $this->platform->Sortable = true; // Allow sort
+        $this->platform->CustomMsg = $Language->FieldPhrase($this->TableVar, $this->platform->Param, "CustomMsg");
         $this->Fields['platform'] = &$this->platform;
 
         // transaction_status
         $this->transaction_status = new DbField('view_transactions_per_operator', 'view_transactions_per_operator', 'x_transaction_status', 'transaction_status', '"transaction_status"', '"transaction_status"', 200, 0, -1, false, '"transaction_status"', false, false, false, 'FORMATTED TEXT', 'TEXT');
         $this->transaction_status->Sortable = true; // Allow sort
+        $this->transaction_status->CustomMsg = $Language->FieldPhrase($this->TableVar, $this->transaction_status->Param, "CustomMsg");
         $this->Fields['transaction_status'] = &$this->transaction_status;
 
         // quantity
         $this->quantity = new DbField('view_transactions_per_operator', 'view_transactions_per_operator', 'x_quantity', 'quantity', '"quantity"', 'CAST("quantity" AS varchar(255))', 3, 4, -1, false, '"quantity"', false, false, false, 'FORMATTED TEXT', 'TEXT');
         $this->quantity->Sortable = true; // Allow sort
         $this->quantity->DefaultErrorMessage = $Language->phrase("IncorrectInteger");
+        $this->quantity->CustomMsg = $Language->FieldPhrase($this->TableVar, $this->quantity->Param, "CustomMsg");
         $this->Fields['quantity'] = &$this->quantity;
 
         // operator_fee
         $this->operator_fee = new DbField('view_transactions_per_operator', 'view_transactions_per_operator', 'x_operator_fee', 'operator_fee', '"operator_fee"', 'CAST("operator_fee" AS varchar(255))', 20, 8, -1, false, '"operator_fee"', false, false, false, 'FORMATTED TEXT', 'TEXT');
         $this->operator_fee->Sortable = true; // Allow sort
         $this->operator_fee->DefaultErrorMessage = $Language->phrase("IncorrectInteger");
+        $this->operator_fee->CustomMsg = $Language->FieldPhrase($this->TableVar, $this->operator_fee->Param, "CustomMsg");
         $this->Fields['operator_fee'] = &$this->operator_fee;
 
         // total
@@ -156,71 +168,83 @@ class ViewTransactionsPerOperator extends DbTable
         $this->total->IsCustom = true; // Custom field
         $this->total->Sortable = true; // Allow sort
         $this->total->DefaultErrorMessage = $Language->phrase("IncorrectInteger");
+        $this->total->CustomMsg = $Language->FieldPhrase($this->TableVar, $this->total->Param, "CustomMsg");
         $this->Fields['total'] = &$this->total;
 
         // start_date
         $this->start_date = new DbField('view_transactions_per_operator', 'view_transactions_per_operator', 'x_start_date', 'start_date', '"start_date"', CastDateFieldForLike("\"start_date\"", 0, "DB"), 133, 4, 0, false, '"start_date"', false, false, false, 'FORMATTED TEXT', 'TEXT');
         $this->start_date->Sortable = true; // Allow sort
         $this->start_date->DefaultErrorMessage = str_replace("%s", $GLOBALS["DATE_FORMAT"], $Language->phrase("IncorrectDate"));
+        $this->start_date->CustomMsg = $Language->FieldPhrase($this->TableVar, $this->start_date->Param, "CustomMsg");
         $this->Fields['start_date'] = &$this->start_date;
 
         // end_date
         $this->end_date = new DbField('view_transactions_per_operator', 'view_transactions_per_operator', 'x_end_date', 'end_date', '"end_date"', CastDateFieldForLike("\"end_date\"", 0, "DB"), 133, 4, 0, false, '"end_date"', false, false, false, 'FORMATTED TEXT', 'TEXT');
         $this->end_date->Sortable = true; // Allow sort
         $this->end_date->DefaultErrorMessage = str_replace("%s", $GLOBALS["DATE_FORMAT"], $Language->phrase("IncorrectDate"));
+        $this->end_date->CustomMsg = $Language->FieldPhrase($this->TableVar, $this->end_date->Param, "CustomMsg");
         $this->Fields['end_date'] = &$this->end_date;
 
         // status_id
         $this->status_id = new DbField('view_transactions_per_operator', 'view_transactions_per_operator', 'x_status_id', 'status_id', '"status_id"', 'CAST("status_id" AS varchar(255))', 3, 4, -1, false, '"status_id"', false, false, false, 'FORMATTED TEXT', 'TEXT');
         $this->status_id->Sortable = true; // Allow sort
         $this->status_id->DefaultErrorMessage = $Language->phrase("IncorrectInteger");
+        $this->status_id->CustomMsg = $Language->FieldPhrase($this->TableVar, $this->status_id->Param, "CustomMsg");
         $this->Fields['status_id'] = &$this->status_id;
 
         // vendor_id
         $this->vendor_id = new DbField('view_transactions_per_operator', 'view_transactions_per_operator', 'x_vendor_id', 'vendor_id', '"vendor_id"', 'CAST("vendor_id" AS varchar(255))', 3, 4, -1, false, '"vendor_id"', false, false, false, 'FORMATTED TEXT', 'TEXT');
         $this->vendor_id->Sortable = true; // Allow sort
         $this->vendor_id->DefaultErrorMessage = $Language->phrase("IncorrectInteger");
+        $this->vendor_id->CustomMsg = $Language->FieldPhrase($this->TableVar, $this->vendor_id->Param, "CustomMsg");
         $this->Fields['vendor_id'] = &$this->vendor_id;
 
         // inventory_id
         $this->inventory_id = new DbField('view_transactions_per_operator', 'view_transactions_per_operator', 'x_inventory_id', 'inventory_id', '"inventory_id"', 'CAST("inventory_id" AS varchar(255))', 3, 4, -1, false, '"inventory_id"', false, false, false, 'FORMATTED TEXT', 'TEXT');
         $this->inventory_id->Sortable = true; // Allow sort
         $this->inventory_id->DefaultErrorMessage = $Language->phrase("IncorrectInteger");
+        $this->inventory_id->CustomMsg = $Language->FieldPhrase($this->TableVar, $this->inventory_id->Param, "CustomMsg");
         $this->Fields['inventory_id'] = &$this->inventory_id;
 
         // platform_id
         $this->platform_id = new DbField('view_transactions_per_operator', 'view_transactions_per_operator', 'x_platform_id', 'platform_id', '"platform_id"', 'CAST("platform_id" AS varchar(255))', 3, 4, -1, false, '"platform_id"', false, false, false, 'FORMATTED TEXT', 'TEXT');
         $this->platform_id->Sortable = true; // Allow sort
         $this->platform_id->DefaultErrorMessage = $Language->phrase("IncorrectInteger");
+        $this->platform_id->CustomMsg = $Language->FieldPhrase($this->TableVar, $this->platform_id->Param, "CustomMsg");
         $this->Fields['platform_id'] = &$this->platform_id;
 
         // operator_id
         $this->operator_id = new DbField('view_transactions_per_operator', 'view_transactions_per_operator', 'x_operator_id', 'operator_id', '"operator_id"', 'CAST("operator_id" AS varchar(255))', 3, 4, -1, false, '"operator_id"', false, false, false, 'FORMATTED TEXT', 'TEXT');
         $this->operator_id->Sortable = true; // Allow sort
         $this->operator_id->DefaultErrorMessage = $Language->phrase("IncorrectInteger");
+        $this->operator_id->CustomMsg = $Language->FieldPhrase($this->TableVar, $this->operator_id->Param, "CustomMsg");
         $this->Fields['operator_id'] = &$this->operator_id;
 
         // bus_size_id
         $this->bus_size_id = new DbField('view_transactions_per_operator', 'view_transactions_per_operator', 'x_bus_size_id', 'bus_size_id', '"bus_size_id"', 'CAST("bus_size_id" AS varchar(255))', 3, 4, -1, false, '"bus_size_id"', false, false, false, 'FORMATTED TEXT', 'TEXT');
         $this->bus_size_id->Sortable = true; // Allow sort
         $this->bus_size_id->DefaultErrorMessage = $Language->phrase("IncorrectInteger");
+        $this->bus_size_id->CustomMsg = $Language->FieldPhrase($this->TableVar, $this->bus_size_id->Param, "CustomMsg");
         $this->Fields['bus_size_id'] = &$this->bus_size_id;
 
         // vendor_search_id
         $this->vendor_search_id = new DbField('view_transactions_per_operator', 'view_transactions_per_operator', 'x_vendor_search_id', 'vendor_search_id', '"vendor_search_id"', 'CAST("vendor_search_id" AS varchar(255))', 3, 4, -1, false, '"vendor_search_id"', false, false, false, 'FORMATTED TEXT', 'TEXT');
         $this->vendor_search_id->Sortable = true; // Allow sort
         $this->vendor_search_id->DefaultErrorMessage = $Language->phrase("IncorrectInteger");
+        $this->vendor_search_id->CustomMsg = $Language->FieldPhrase($this->TableVar, $this->vendor_search_id->Param, "CustomMsg");
         $this->Fields['vendor_search_id'] = &$this->vendor_search_id;
 
         // vendor_search_name
         $this->vendor_search_name = new DbField('view_transactions_per_operator', 'view_transactions_per_operator', 'x_vendor_search_name', 'vendor_search_name', '"vendor_search_name"', '"vendor_search_name"', 200, 0, -1, false, '"vendor_search_name"', false, false, false, 'FORMATTED TEXT', 'TEXT');
         $this->vendor_search_name->Sortable = true; // Allow sort
+        $this->vendor_search_name->CustomMsg = $Language->FieldPhrase($this->TableVar, $this->vendor_search_name->Param, "CustomMsg");
         $this->Fields['vendor_search_name'] = &$this->vendor_search_name;
 
         // download
         $this->download = new DbField('view_transactions_per_operator', 'view_transactions_per_operator', 'x_download', 'download', '\'DOWNLOAD P/O\'', '\'DOWNLOAD P/O\'', 201, 0, -1, false, '\'DOWNLOAD P/O\'', false, false, false, 'FORMATTED TEXT', 'TEXTAREA');
         $this->download->IsCustom = true; // Custom field
         $this->download->Sortable = true; // Allow sort
+        $this->download->CustomMsg = $Language->FieldPhrase($this->TableVar, $this->download->Param, "CustomMsg");
         $this->Fields['download'] = &$this->download;
     }
 
@@ -406,18 +430,21 @@ class ViewTransactionsPerOperator extends DbTable
         $cnt = -1;
         $rs = null;
         if ($sql instanceof \Doctrine\DBAL\Query\QueryBuilder) { // Query builder
-            $sql = $sql->resetQueryPart("orderBy")->getSQL();
+            $sqlwrk = clone $sql;
+            $sqlwrk = $sqlwrk->resetQueryPart("orderBy")->getSQL();
+        } else {
+            $sqlwrk = $sql;
         }
         $pattern = '/^SELECT\s([\s\S]+)\sFROM\s/i';
         // Skip Custom View / SubQuery / SELECT DISTINCT / ORDER BY
         if (
             ($this->TableType == 'TABLE' || $this->TableType == 'VIEW' || $this->TableType == 'LINKTABLE') &&
-            preg_match($pattern, $sql) && !preg_match('/\(\s*(SELECT[^)]+)\)/i', $sql) &&
-            !preg_match('/^\s*select\s+distinct\s+/i', $sql) && !preg_match('/\s+order\s+by\s+/i', $sql)
+            preg_match($pattern, $sqlwrk) && !preg_match('/\(\s*(SELECT[^)]+)\)/i', $sqlwrk) &&
+            !preg_match('/^\s*select\s+distinct\s+/i', $sqlwrk) && !preg_match('/\s+order\s+by\s+/i', $sqlwrk)
         ) {
-            $sqlwrk = "SELECT COUNT(*) FROM " . preg_replace($pattern, "", $sql);
+            $sqlwrk = "SELECT COUNT(*) FROM " . preg_replace($pattern, "", $sqlwrk);
         } else {
-            $sqlwrk = "SELECT COUNT(*) FROM (" . $sql . ") COUNT_TABLE";
+            $sqlwrk = "SELECT COUNT(*) FROM (" . $sqlwrk . ") COUNT_TABLE";
         }
         $conn = $c ?? $this->getConnection();
         $rs = $conn->executeQuery($sqlwrk);

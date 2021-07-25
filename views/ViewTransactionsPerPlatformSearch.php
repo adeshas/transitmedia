@@ -6,7 +6,6 @@ namespace PHPMaker2021\test;
 $ViewTransactionsPerPlatformSearch = &$Page;
 ?>
 <script>
-if (!ew.vars.tables.view_transactions_per_platform) ew.vars.tables.view_transactions_per_platform = <?= JsonEncode(GetClientVar("tables", "view_transactions_per_platform")) ?>;
 var currentForm, currentPageID;
 var fview_transactions_per_platformsearch, currentSearchForm, currentAdvancedSearchForm;
 loadjs.ready("head", function () {
@@ -20,7 +19,8 @@ loadjs.ready("head", function () {
     currentPageID = ew.PAGE_ID = "search";
 
     // Add fields
-    var fields = ew.vars.tables.view_transactions_per_platform.fields;
+    var currentTable = <?= JsonEncode(GetClientVar("tables", "view_transactions_per_platform")) ?>,
+        fields = currentTable.fields;
     fview_transactions_per_platformsearch.addFields([
         ["transaction_id", [ew.Validators.integer], fields.transaction_id.isInvalid],
         ["campaign", [], fields.campaign.isInvalid],
@@ -99,7 +99,7 @@ loadjs.ready("head", function () {
 <?php
 $Page->showMessage();
 ?>
-<form name="fview_transactions_per_platformsearch" id="fview_transactions_per_platformsearch" class="<?= $Page->FormClassName ?>" action="<?= CurrentPageUrl() ?>" method="post">
+<form name="fview_transactions_per_platformsearch" id="fview_transactions_per_platformsearch" class="<?= $Page->FormClassName ?>" action="<?= CurrentPageUrl(false) ?>" method="post">
 <?php if (Config("CHECK_TOKEN")) { ?>
 <input type="hidden" name="<?= $TokenNameKey ?>" value="<?= $TokenName ?>"><!-- CSRF token name -->
 <input type="hidden" name="<?= $TokenValueKey ?>" value="<?= $TokenValue ?>"><!-- CSRF token value -->
@@ -117,7 +117,7 @@ $Page->showMessage();
 </span>
         </label>
         <div class="<?= $Page->RightColumnClass ?>"><div <?= $Page->transaction_id->cellAttributes() ?>>
-            <span id="el_view_transactions_per_platform_transaction_id" class="ew-search-field">
+            <span id="el_view_transactions_per_platform_transaction_id" class="ew-search-field ew-search-field-single">
 <input type="<?= $Page->transaction_id->getInputTextType() ?>" data-table="view_transactions_per_platform" data-field="x_transaction_id" name="x_transaction_id" id="x_transaction_id" size="30" placeholder="<?= HtmlEncode($Page->transaction_id->getPlaceHolder()) ?>" value="<?= $Page->transaction_id->EditValue ?>"<?= $Page->transaction_id->editAttributes() ?>>
 <div class="invalid-feedback"><?= $Page->transaction_id->getErrorMessage(false) ?></div>
 </span>
@@ -133,7 +133,7 @@ $Page->showMessage();
 </span>
         </label>
         <div class="<?= $Page->RightColumnClass ?>"><div <?= $Page->campaign->cellAttributes() ?>>
-            <span id="el_view_transactions_per_platform_campaign" class="ew-search-field">
+            <span id="el_view_transactions_per_platform_campaign" class="ew-search-field ew-search-field-single">
 <input type="<?= $Page->campaign->getInputTextType() ?>" data-table="view_transactions_per_platform" data-field="x_campaign" name="x_campaign" id="x_campaign" size="35" placeholder="<?= HtmlEncode($Page->campaign->getPlaceHolder()) ?>" value="<?= $Page->campaign->EditValue ?>"<?= $Page->campaign->editAttributes() ?>>
 <div class="invalid-feedback"><?= $Page->campaign->getErrorMessage(false) ?></div>
 </span>
@@ -149,7 +149,7 @@ $Page->showMessage();
 </span>
         </label>
         <div class="<?= $Page->RightColumnClass ?>"><div <?= $Page->payment_date->cellAttributes() ?>>
-            <span id="el_view_transactions_per_platform_payment_date" class="ew-search-field">
+            <span id="el_view_transactions_per_platform_payment_date" class="ew-search-field ew-search-field-single">
 <input type="<?= $Page->payment_date->getInputTextType() ?>" data-table="view_transactions_per_platform" data-field="x_payment_date" name="x_payment_date" id="x_payment_date" placeholder="<?= HtmlEncode($Page->payment_date->getPlaceHolder()) ?>" value="<?= $Page->payment_date->EditValue ?>"<?= $Page->payment_date->editAttributes() ?>>
 <div class="invalid-feedback"><?= $Page->payment_date->getErrorMessage(false) ?></div>
 <?php if (!$Page->payment_date->ReadOnly && !$Page->payment_date->Disabled && !isset($Page->payment_date->EditAttrs["readonly"]) && !isset($Page->payment_date->EditAttrs["disabled"])) { ?>
@@ -172,7 +172,7 @@ loadjs.ready(["fview_transactions_per_platformsearch", "datetimepicker"], functi
 </span>
         </label>
         <div class="<?= $Page->RightColumnClass ?>"><div <?= $Page->inventory->cellAttributes() ?>>
-            <span id="el_view_transactions_per_platform_inventory" class="ew-search-field">
+            <span id="el_view_transactions_per_platform_inventory" class="ew-search-field ew-search-field-single">
 <input type="<?= $Page->inventory->getInputTextType() ?>" data-table="view_transactions_per_platform" data-field="x_inventory" name="x_inventory" id="x_inventory" size="35" placeholder="<?= HtmlEncode($Page->inventory->getPlaceHolder()) ?>" value="<?= $Page->inventory->EditValue ?>"<?= $Page->inventory->editAttributes() ?>>
 <div class="invalid-feedback"><?= $Page->inventory->getErrorMessage(false) ?></div>
 </span>
@@ -188,7 +188,7 @@ loadjs.ready(["fview_transactions_per_platformsearch", "datetimepicker"], functi
 </span>
         </label>
         <div class="<?= $Page->RightColumnClass ?>"><div <?= $Page->bus_size->cellAttributes() ?>>
-            <span id="el_view_transactions_per_platform_bus_size" class="ew-search-field">
+            <span id="el_view_transactions_per_platform_bus_size" class="ew-search-field ew-search-field-single">
 <input type="<?= $Page->bus_size->getInputTextType() ?>" data-table="view_transactions_per_platform" data-field="x_bus_size" name="x_bus_size" id="x_bus_size" size="35" placeholder="<?= HtmlEncode($Page->bus_size->getPlaceHolder()) ?>" value="<?= $Page->bus_size->EditValue ?>"<?= $Page->bus_size->editAttributes() ?>>
 <div class="invalid-feedback"><?= $Page->bus_size->getErrorMessage(false) ?></div>
 </span>
@@ -204,7 +204,7 @@ loadjs.ready(["fview_transactions_per_platformsearch", "datetimepicker"], functi
 </span>
         </label>
         <div class="<?= $Page->RightColumnClass ?>"><div <?= $Page->print_stage->cellAttributes() ?>>
-            <span id="el_view_transactions_per_platform_print_stage" class="ew-search-field">
+            <span id="el_view_transactions_per_platform_print_stage" class="ew-search-field ew-search-field-single">
 <input type="<?= $Page->print_stage->getInputTextType() ?>" data-table="view_transactions_per_platform" data-field="x_print_stage" name="x_print_stage" id="x_print_stage" size="35" placeholder="<?= HtmlEncode($Page->print_stage->getPlaceHolder()) ?>" value="<?= $Page->print_stage->EditValue ?>"<?= $Page->print_stage->editAttributes() ?>>
 <div class="invalid-feedback"><?= $Page->print_stage->getErrorMessage(false) ?></div>
 </span>
@@ -220,7 +220,7 @@ loadjs.ready(["fview_transactions_per_platformsearch", "datetimepicker"], functi
 </span>
         </label>
         <div class="<?= $Page->RightColumnClass ?>"><div <?= $Page->vendor->cellAttributes() ?>>
-            <span id="el_view_transactions_per_platform_vendor" class="ew-search-field">
+            <span id="el_view_transactions_per_platform_vendor" class="ew-search-field ew-search-field-single">
 <input type="<?= $Page->vendor->getInputTextType() ?>" data-table="view_transactions_per_platform" data-field="x_vendor" name="x_vendor" id="x_vendor" size="30" placeholder="<?= HtmlEncode($Page->vendor->getPlaceHolder()) ?>" value="<?= $Page->vendor->EditValue ?>"<?= $Page->vendor->editAttributes() ?>>
 <div class="invalid-feedback"><?= $Page->vendor->getErrorMessage(false) ?></div>
 </span>
@@ -236,7 +236,7 @@ loadjs.ready(["fview_transactions_per_platformsearch", "datetimepicker"], functi
 </span>
         </label>
         <div class="<?= $Page->RightColumnClass ?>"><div <?= $Page->operator->cellAttributes() ?>>
-            <span id="el_view_transactions_per_platform_operator" class="ew-search-field">
+            <span id="el_view_transactions_per_platform_operator" class="ew-search-field ew-search-field-single">
 <input type="<?= $Page->operator->getInputTextType() ?>" data-table="view_transactions_per_platform" data-field="x_operator" name="x_operator" id="x_operator" size="30" maxlength="50" placeholder="<?= HtmlEncode($Page->operator->getPlaceHolder()) ?>" value="<?= $Page->operator->EditValue ?>"<?= $Page->operator->editAttributes() ?>>
 <div class="invalid-feedback"><?= $Page->operator->getErrorMessage(false) ?></div>
 </span>
@@ -252,7 +252,7 @@ loadjs.ready(["fview_transactions_per_platformsearch", "datetimepicker"], functi
 </span>
         </label>
         <div class="<?= $Page->RightColumnClass ?>"><div <?= $Page->transaction_status->cellAttributes() ?>>
-            <span id="el_view_transactions_per_platform_transaction_status" class="ew-search-field">
+            <span id="el_view_transactions_per_platform_transaction_status" class="ew-search-field ew-search-field-single">
 <input type="<?= $Page->transaction_status->getInputTextType() ?>" data-table="view_transactions_per_platform" data-field="x_transaction_status" name="x_transaction_status" id="x_transaction_status" size="30" placeholder="<?= HtmlEncode($Page->transaction_status->getPlaceHolder()) ?>" value="<?= $Page->transaction_status->EditValue ?>"<?= $Page->transaction_status->editAttributes() ?>>
 <div class="invalid-feedback"><?= $Page->transaction_status->getErrorMessage(false) ?></div>
 </span>
@@ -268,7 +268,7 @@ loadjs.ready(["fview_transactions_per_platformsearch", "datetimepicker"], functi
 </span>
         </label>
         <div class="<?= $Page->RightColumnClass ?>"><div <?= $Page->start_date->cellAttributes() ?>>
-            <span id="el_view_transactions_per_platform_start_date" class="ew-search-field">
+            <span id="el_view_transactions_per_platform_start_date" class="ew-search-field ew-search-field-single">
 <input type="<?= $Page->start_date->getInputTextType() ?>" data-table="view_transactions_per_platform" data-field="x_start_date" name="x_start_date" id="x_start_date" placeholder="<?= HtmlEncode($Page->start_date->getPlaceHolder()) ?>" value="<?= $Page->start_date->EditValue ?>"<?= $Page->start_date->editAttributes() ?>>
 <div class="invalid-feedback"><?= $Page->start_date->getErrorMessage(false) ?></div>
 <?php if (!$Page->start_date->ReadOnly && !$Page->start_date->Disabled && !isset($Page->start_date->EditAttrs["readonly"]) && !isset($Page->start_date->EditAttrs["disabled"])) { ?>
@@ -291,7 +291,7 @@ loadjs.ready(["fview_transactions_per_platformsearch", "datetimepicker"], functi
 </span>
         </label>
         <div class="<?= $Page->RightColumnClass ?>"><div <?= $Page->end_date->cellAttributes() ?>>
-            <span id="el_view_transactions_per_platform_end_date" class="ew-search-field">
+            <span id="el_view_transactions_per_platform_end_date" class="ew-search-field ew-search-field-single">
 <input type="<?= $Page->end_date->getInputTextType() ?>" data-table="view_transactions_per_platform" data-field="x_end_date" name="x_end_date" id="x_end_date" placeholder="<?= HtmlEncode($Page->end_date->getPlaceHolder()) ?>" value="<?= $Page->end_date->EditValue ?>"<?= $Page->end_date->editAttributes() ?>>
 <div class="invalid-feedback"><?= $Page->end_date->getErrorMessage(false) ?></div>
 <?php if (!$Page->end_date->ReadOnly && !$Page->end_date->Disabled && !isset($Page->end_date->EditAttrs["readonly"]) && !isset($Page->end_date->EditAttrs["disabled"])) { ?>
@@ -314,7 +314,7 @@ loadjs.ready(["fview_transactions_per_platformsearch", "datetimepicker"], functi
 </span>
         </label>
         <div class="<?= $Page->RightColumnClass ?>"><div <?= $Page->platform->cellAttributes() ?>>
-            <span id="el_view_transactions_per_platform_platform" class="ew-search-field">
+            <span id="el_view_transactions_per_platform_platform" class="ew-search-field ew-search-field-single">
 <input type="<?= $Page->platform->getInputTextType() ?>" data-table="view_transactions_per_platform" data-field="x_platform" name="x_platform" id="x_platform" size="30" maxlength="50" placeholder="<?= HtmlEncode($Page->platform->getPlaceHolder()) ?>" value="<?= $Page->platform->EditValue ?>"<?= $Page->platform->editAttributes() ?>>
 <div class="invalid-feedback"><?= $Page->platform->getErrorMessage(false) ?></div>
 </span>
@@ -330,7 +330,7 @@ loadjs.ready(["fview_transactions_per_platformsearch", "datetimepicker"], functi
 </span>
         </label>
         <div class="<?= $Page->RightColumnClass ?>"><div <?= $Page->status_id->cellAttributes() ?>>
-            <span id="el_view_transactions_per_platform_status_id" class="ew-search-field">
+            <span id="el_view_transactions_per_platform_status_id" class="ew-search-field ew-search-field-single">
 <input type="<?= $Page->status_id->getInputTextType() ?>" data-table="view_transactions_per_platform" data-field="x_status_id" name="x_status_id" id="x_status_id" size="30" placeholder="<?= HtmlEncode($Page->status_id->getPlaceHolder()) ?>" value="<?= $Page->status_id->EditValue ?>"<?= $Page->status_id->editAttributes() ?>>
 <div class="invalid-feedback"><?= $Page->status_id->getErrorMessage(false) ?></div>
 </span>
@@ -346,7 +346,7 @@ loadjs.ready(["fview_transactions_per_platformsearch", "datetimepicker"], functi
 </span>
         </label>
         <div class="<?= $Page->RightColumnClass ?>"><div <?= $Page->vendor_id->cellAttributes() ?>>
-            <span id="el_view_transactions_per_platform_vendor_id" class="ew-search-field">
+            <span id="el_view_transactions_per_platform_vendor_id" class="ew-search-field ew-search-field-single">
 <input type="<?= $Page->vendor_id->getInputTextType() ?>" data-table="view_transactions_per_platform" data-field="x_vendor_id" name="x_vendor_id" id="x_vendor_id" size="30" placeholder="<?= HtmlEncode($Page->vendor_id->getPlaceHolder()) ?>" value="<?= $Page->vendor_id->EditValue ?>"<?= $Page->vendor_id->editAttributes() ?>>
 <div class="invalid-feedback"><?= $Page->vendor_id->getErrorMessage(false) ?></div>
 </span>
@@ -362,7 +362,7 @@ loadjs.ready(["fview_transactions_per_platformsearch", "datetimepicker"], functi
 </span>
         </label>
         <div class="<?= $Page->RightColumnClass ?>"><div <?= $Page->inventory_id->cellAttributes() ?>>
-            <span id="el_view_transactions_per_platform_inventory_id" class="ew-search-field">
+            <span id="el_view_transactions_per_platform_inventory_id" class="ew-search-field ew-search-field-single">
 <input type="<?= $Page->inventory_id->getInputTextType() ?>" data-table="view_transactions_per_platform" data-field="x_inventory_id" name="x_inventory_id" id="x_inventory_id" size="30" placeholder="<?= HtmlEncode($Page->inventory_id->getPlaceHolder()) ?>" value="<?= $Page->inventory_id->EditValue ?>"<?= $Page->inventory_id->editAttributes() ?>>
 <div class="invalid-feedback"><?= $Page->inventory_id->getErrorMessage(false) ?></div>
 </span>
@@ -378,7 +378,7 @@ loadjs.ready(["fview_transactions_per_platformsearch", "datetimepicker"], functi
 </span>
         </label>
         <div class="<?= $Page->RightColumnClass ?>"><div <?= $Page->platform_id->cellAttributes() ?>>
-            <span id="el_view_transactions_per_platform_platform_id" class="ew-search-field">
+            <span id="el_view_transactions_per_platform_platform_id" class="ew-search-field ew-search-field-single">
 <input type="<?= $Page->platform_id->getInputTextType() ?>" data-table="view_transactions_per_platform" data-field="x_platform_id" name="x_platform_id" id="x_platform_id" size="30" placeholder="<?= HtmlEncode($Page->platform_id->getPlaceHolder()) ?>" value="<?= $Page->platform_id->EditValue ?>"<?= $Page->platform_id->editAttributes() ?>>
 <div class="invalid-feedback"><?= $Page->platform_id->getErrorMessage(false) ?></div>
 </span>
@@ -394,7 +394,7 @@ loadjs.ready(["fview_transactions_per_platformsearch", "datetimepicker"], functi
 </span>
         </label>
         <div class="<?= $Page->RightColumnClass ?>"><div <?= $Page->operator_id->cellAttributes() ?>>
-            <span id="el_view_transactions_per_platform_operator_id" class="ew-search-field">
+            <span id="el_view_transactions_per_platform_operator_id" class="ew-search-field ew-search-field-single">
 <input type="<?= $Page->operator_id->getInputTextType() ?>" data-table="view_transactions_per_platform" data-field="x_operator_id" name="x_operator_id" id="x_operator_id" size="30" placeholder="<?= HtmlEncode($Page->operator_id->getPlaceHolder()) ?>" value="<?= $Page->operator_id->EditValue ?>"<?= $Page->operator_id->editAttributes() ?>>
 <div class="invalid-feedback"><?= $Page->operator_id->getErrorMessage(false) ?></div>
 </span>
@@ -410,7 +410,7 @@ loadjs.ready(["fview_transactions_per_platformsearch", "datetimepicker"], functi
 </span>
         </label>
         <div class="<?= $Page->RightColumnClass ?>"><div <?= $Page->bus_size_id->cellAttributes() ?>>
-            <span id="el_view_transactions_per_platform_bus_size_id" class="ew-search-field">
+            <span id="el_view_transactions_per_platform_bus_size_id" class="ew-search-field ew-search-field-single">
 <input type="<?= $Page->bus_size_id->getInputTextType() ?>" data-table="view_transactions_per_platform" data-field="x_bus_size_id" name="x_bus_size_id" id="x_bus_size_id" size="30" placeholder="<?= HtmlEncode($Page->bus_size_id->getPlaceHolder()) ?>" value="<?= $Page->bus_size_id->EditValue ?>"<?= $Page->bus_size_id->editAttributes() ?>>
 <div class="invalid-feedback"><?= $Page->bus_size_id->getErrorMessage(false) ?></div>
 </span>
@@ -426,7 +426,7 @@ loadjs.ready(["fview_transactions_per_platformsearch", "datetimepicker"], functi
 </span>
         </label>
         <div class="<?= $Page->RightColumnClass ?>"><div <?= $Page->vendor_search_id->cellAttributes() ?>>
-            <span id="el_view_transactions_per_platform_vendor_search_id" class="ew-search-field">
+            <span id="el_view_transactions_per_platform_vendor_search_id" class="ew-search-field ew-search-field-single">
 <input type="<?= $Page->vendor_search_id->getInputTextType() ?>" data-table="view_transactions_per_platform" data-field="x_vendor_search_id" name="x_vendor_search_id" id="x_vendor_search_id" size="30" placeholder="<?= HtmlEncode($Page->vendor_search_id->getPlaceHolder()) ?>" value="<?= $Page->vendor_search_id->EditValue ?>"<?= $Page->vendor_search_id->editAttributes() ?>>
 <div class="invalid-feedback"><?= $Page->vendor_search_id->getErrorMessage(false) ?></div>
 </span>
@@ -442,7 +442,7 @@ loadjs.ready(["fview_transactions_per_platformsearch", "datetimepicker"], functi
 </span>
         </label>
         <div class="<?= $Page->RightColumnClass ?>"><div <?= $Page->vendor_search_name->cellAttributes() ?>>
-            <span id="el_view_transactions_per_platform_vendor_search_name" class="ew-search-field">
+            <span id="el_view_transactions_per_platform_vendor_search_name" class="ew-search-field ew-search-field-single">
 <input type="<?= $Page->vendor_search_name->getInputTextType() ?>" data-table="view_transactions_per_platform" data-field="x_vendor_search_name" name="x_vendor_search_name" id="x_vendor_search_name" size="30" placeholder="<?= HtmlEncode($Page->vendor_search_name->getPlaceHolder()) ?>" value="<?= $Page->vendor_search_name->EditValue ?>"<?= $Page->vendor_search_name->editAttributes() ?>>
 <div class="invalid-feedback"><?= $Page->vendor_search_name->getErrorMessage(false) ?></div>
 </span>
@@ -458,7 +458,7 @@ loadjs.ready(["fview_transactions_per_platformsearch", "datetimepicker"], functi
 </span>
         </label>
         <div class="<?= $Page->RightColumnClass ?>"><div <?= $Page->price->cellAttributes() ?>>
-            <span id="el_view_transactions_per_platform_price" class="ew-search-field">
+            <span id="el_view_transactions_per_platform_price" class="ew-search-field ew-search-field-single">
 <input type="<?= $Page->price->getInputTextType() ?>" data-table="view_transactions_per_platform" data-field="x_price" name="x_price" id="x_price" size="30" placeholder="<?= HtmlEncode($Page->price->getPlaceHolder()) ?>" value="<?= $Page->price->EditValue ?>"<?= $Page->price->editAttributes() ?>>
 <div class="invalid-feedback"><?= $Page->price->getErrorMessage(false) ?></div>
 </span>
@@ -474,7 +474,7 @@ loadjs.ready(["fview_transactions_per_platformsearch", "datetimepicker"], functi
 </span>
         </label>
         <div class="<?= $Page->RightColumnClass ?>"><div <?= $Page->quantity->cellAttributes() ?>>
-            <span id="el_view_transactions_per_platform_quantity" class="ew-search-field">
+            <span id="el_view_transactions_per_platform_quantity" class="ew-search-field ew-search-field-single">
 <input type="<?= $Page->quantity->getInputTextType() ?>" data-table="view_transactions_per_platform" data-field="x_quantity" name="x_quantity" id="x_quantity" size="30" placeholder="<?= HtmlEncode($Page->quantity->getPlaceHolder()) ?>" value="<?= $Page->quantity->EditValue ?>"<?= $Page->quantity->editAttributes() ?>>
 <div class="invalid-feedback"><?= $Page->quantity->getErrorMessage(false) ?></div>
 </span>
@@ -490,7 +490,7 @@ loadjs.ready(["fview_transactions_per_platformsearch", "datetimepicker"], functi
 </span>
         </label>
         <div class="<?= $Page->RightColumnClass ?>"><div <?= $Page->amount_paid->cellAttributes() ?>>
-            <span id="el_view_transactions_per_platform_amount_paid" class="ew-search-field">
+            <span id="el_view_transactions_per_platform_amount_paid" class="ew-search-field ew-search-field-single">
 <input type="<?= $Page->amount_paid->getInputTextType() ?>" data-table="view_transactions_per_platform" data-field="x_amount_paid" name="x_amount_paid" id="x_amount_paid" size="30" placeholder="<?= HtmlEncode($Page->amount_paid->getPlaceHolder()) ?>" value="<?= $Page->amount_paid->EditValue ?>"<?= $Page->amount_paid->editAttributes() ?>>
 <div class="invalid-feedback"><?= $Page->amount_paid->getErrorMessage(false) ?></div>
 </span>
@@ -506,7 +506,7 @@ loadjs.ready(["fview_transactions_per_platformsearch", "datetimepicker"], functi
 </span>
         </label>
         <div class="<?= $Page->RightColumnClass ?>"><div <?= $Page->transitmedia_fee->cellAttributes() ?>>
-            <span id="el_view_transactions_per_platform_transitmedia_fee" class="ew-search-field">
+            <span id="el_view_transactions_per_platform_transitmedia_fee" class="ew-search-field ew-search-field-single">
 <input type="<?= $Page->transitmedia_fee->getInputTextType() ?>" data-table="view_transactions_per_platform" data-field="x_transitmedia_fee" name="x_transitmedia_fee" id="x_transitmedia_fee" size="30" placeholder="<?= HtmlEncode($Page->transitmedia_fee->getPlaceHolder()) ?>" value="<?= $Page->transitmedia_fee->EditValue ?>"<?= $Page->transitmedia_fee->editAttributes() ?>>
 <div class="invalid-feedback"><?= $Page->transitmedia_fee->getErrorMessage(false) ?></div>
 </span>
@@ -522,7 +522,7 @@ loadjs.ready(["fview_transactions_per_platformsearch", "datetimepicker"], functi
 </span>
         </label>
         <div class="<?= $Page->RightColumnClass ?>"><div <?= $Page->lasaa_fee->cellAttributes() ?>>
-            <span id="el_view_transactions_per_platform_lasaa_fee" class="ew-search-field">
+            <span id="el_view_transactions_per_platform_lasaa_fee" class="ew-search-field ew-search-field-single">
 <input type="<?= $Page->lasaa_fee->getInputTextType() ?>" data-table="view_transactions_per_platform" data-field="x_lasaa_fee" name="x_lasaa_fee" id="x_lasaa_fee" size="30" placeholder="<?= HtmlEncode($Page->lasaa_fee->getPlaceHolder()) ?>" value="<?= $Page->lasaa_fee->EditValue ?>"<?= $Page->lasaa_fee->editAttributes() ?>>
 <div class="invalid-feedback"><?= $Page->lasaa_fee->getErrorMessage(false) ?></div>
 </span>
@@ -538,7 +538,7 @@ loadjs.ready(["fview_transactions_per_platformsearch", "datetimepicker"], functi
 </span>
         </label>
         <div class="<?= $Page->RightColumnClass ?>"><div <?= $Page->operator_fee->cellAttributes() ?>>
-            <span id="el_view_transactions_per_platform_operator_fee" class="ew-search-field">
+            <span id="el_view_transactions_per_platform_operator_fee" class="ew-search-field ew-search-field-single">
 <input type="<?= $Page->operator_fee->getInputTextType() ?>" data-table="view_transactions_per_platform" data-field="x_operator_fee" name="x_operator_fee" id="x_operator_fee" size="30" placeholder="<?= HtmlEncode($Page->operator_fee->getPlaceHolder()) ?>" value="<?= $Page->operator_fee->EditValue ?>"<?= $Page->operator_fee->editAttributes() ?>>
 <div class="invalid-feedback"><?= $Page->operator_fee->getErrorMessage(false) ?></div>
 </span>
@@ -554,7 +554,7 @@ loadjs.ready(["fview_transactions_per_platformsearch", "datetimepicker"], functi
 </span>
         </label>
         <div class="<?= $Page->RightColumnClass ?>"><div <?= $Page->lamata_fee->cellAttributes() ?>>
-            <span id="el_view_transactions_per_platform_lamata_fee" class="ew-search-field">
+            <span id="el_view_transactions_per_platform_lamata_fee" class="ew-search-field ew-search-field-single">
 <input type="<?= $Page->lamata_fee->getInputTextType() ?>" data-table="view_transactions_per_platform" data-field="x_lamata_fee" name="x_lamata_fee" id="x_lamata_fee" size="30" placeholder="<?= HtmlEncode($Page->lamata_fee->getPlaceHolder()) ?>" value="<?= $Page->lamata_fee->EditValue ?>"<?= $Page->lamata_fee->editAttributes() ?>>
 <div class="invalid-feedback"><?= $Page->lamata_fee->getErrorMessage(false) ?></div>
 </span>

@@ -138,7 +138,6 @@ class SubMediaAllocationGrid extends SubMediaAllocation
         $this->FormBlankRowName .= "_" . $this->FormName;
         $this->FormKeyCountName .= "_" . $this->FormName;
         $GLOBALS["Grid"] = &$this;
-        $this->TokenTimeout = SessionTimeoutTime();
 
         // Language object
         $Language = Container("language");
@@ -191,6 +190,30 @@ class SubMediaAllocationGrid extends SubMediaAllocation
         return is_object($Response) ? $Response->getBody() : ob_get_clean();
     }
 
+    // Is lookup
+    public function isLookup()
+    {
+        return SameText(Route(0), Config("API_LOOKUP_ACTION"));
+    }
+
+    // Is AutoFill
+    public function isAutoFill()
+    {
+        return $this->isLookup() && SameText(Post("ajax"), "autofill");
+    }
+
+    // Is AutoSuggest
+    public function isAutoSuggest()
+    {
+        return $this->isLookup() && SameText(Post("ajax"), "autosuggest");
+    }
+
+    // Is modal lookup
+    public function isModalLookup()
+    {
+        return $this->isLookup() && SameText(Post("ajax"), "modal");
+    }
+
     // Is terminated
     public function isTerminated()
     {
@@ -208,7 +231,7 @@ class SubMediaAllocationGrid extends SubMediaAllocation
         if ($this->terminated) {
             return;
         }
-        global $ExportFileName, $TempImages, $DashboardReport;
+        global $ExportFileName, $TempImages, $DashboardReport, $Response;
 
         // Page is terminated
         $this->terminated = true;
@@ -247,6 +270,11 @@ class SubMediaAllocationGrid extends SubMediaAllocation
                 WriteJson(array_merge(["success" => false], $this->getMessages()));
             }
             return;
+        } else { // Check if response is JSON
+            if (StartsString("application/json", $Response->getHeaderLine("Content-type")) && $Response->getBody()->getSize()) { // With JSON response
+                $this->clearMessages();
+                return;
+            }
         }
 
         // Go to URL if specified
@@ -456,6 +484,7 @@ class SubMediaAllocationGrid extends SubMediaAllocation
     public $MultiSelectKey;
     public $Command;
     public $RestoreSearch = false;
+    public $HashValue; // Hash value
     public $DetailPages;
     public $OldRecordset;
 
@@ -652,7 +681,7 @@ class SubMediaAllocationGrid extends SubMediaAllocation
         // Set LoginStatus / Page_Rendering / Page_Render
         if (!IsApi() && !$this->isTerminated()) {
             // Pass table and field properties to client side
-            $this->toClientVar(["tableCaption"], ["caption", "Required", "IsInvalid", "Raw"]);
+            $this->toClientVar(["tableCaption"], ["caption", "Visible", "Required", "IsInvalid", "Raw"]);
 
             // Setup login status
             SetupLoginStatus();
@@ -663,7 +692,7 @@ class SubMediaAllocationGrid extends SubMediaAllocation
             // Global Page Rendering event (in userfn*.php)
             Page_Rendering();
 
-            // Page Rendering event
+            // Page Render event
             if (method_exists($this, "pageRender")) {
                 $this->pageRender();
             }
@@ -1545,7 +1574,7 @@ class SubMediaAllocationGrid extends SubMediaAllocation
             $this->id->ViewCustomAttributes = "";
 
             // bus_id
-            $curVal = strval($this->bus_id->CurrentValue);
+            $curVal = trim(strval($this->bus_id->CurrentValue));
             if ($curVal != "") {
                 $this->bus_id->ViewValue = $this->bus_id->lookupCacheOption($curVal);
                 if ($this->bus_id->ViewValue === null) { // Lookup from database
@@ -1566,7 +1595,7 @@ class SubMediaAllocationGrid extends SubMediaAllocation
             $this->bus_id->ViewCustomAttributes = "";
 
             // campaign_id
-            $curVal = strval($this->campaign_id->CurrentValue);
+            $curVal = trim(strval($this->campaign_id->CurrentValue));
             if ($curVal != "") {
                 $this->campaign_id->ViewValue = $this->campaign_id->lookupCacheOption($curVal);
                 if ($this->campaign_id->ViewValue === null) { // Lookup from database
@@ -1655,7 +1684,7 @@ class SubMediaAllocationGrid extends SubMediaAllocation
             if ($this->bus_id->getSessionValue() != "") {
                 $this->bus_id->CurrentValue = GetForeignKeyValue($this->bus_id->getSessionValue());
                 $this->bus_id->OldValue = $this->bus_id->CurrentValue;
-                $curVal = strval($this->bus_id->CurrentValue);
+                $curVal = trim(strval($this->bus_id->CurrentValue));
                 if ($curVal != "") {
                     $this->bus_id->ViewValue = $this->bus_id->lookupCacheOption($curVal);
                     if ($this->bus_id->ViewValue === null) { // Lookup from database
@@ -1706,7 +1735,7 @@ class SubMediaAllocationGrid extends SubMediaAllocation
             if ($this->campaign_id->getSessionValue() != "") {
                 $this->campaign_id->CurrentValue = GetForeignKeyValue($this->campaign_id->getSessionValue());
                 $this->campaign_id->OldValue = $this->campaign_id->CurrentValue;
-                $curVal = strval($this->campaign_id->CurrentValue);
+                $curVal = trim(strval($this->campaign_id->CurrentValue));
                 if ($curVal != "") {
                     $this->campaign_id->ViewValue = $this->campaign_id->lookupCacheOption($curVal);
                     if ($this->campaign_id->ViewValue === null) { // Lookup from database
@@ -1823,7 +1852,7 @@ class SubMediaAllocationGrid extends SubMediaAllocation
             if ($this->bus_id->getSessionValue() != "") {
                 $this->bus_id->CurrentValue = GetForeignKeyValue($this->bus_id->getSessionValue());
                 $this->bus_id->OldValue = $this->bus_id->CurrentValue;
-                $curVal = strval($this->bus_id->CurrentValue);
+                $curVal = trim(strval($this->bus_id->CurrentValue));
                 if ($curVal != "") {
                     $this->bus_id->ViewValue = $this->bus_id->lookupCacheOption($curVal);
                     if ($this->bus_id->ViewValue === null) { // Lookup from database
@@ -1874,7 +1903,7 @@ class SubMediaAllocationGrid extends SubMediaAllocation
             if ($this->campaign_id->getSessionValue() != "") {
                 $this->campaign_id->CurrentValue = GetForeignKeyValue($this->campaign_id->getSessionValue());
                 $this->campaign_id->OldValue = $this->campaign_id->CurrentValue;
-                $curVal = strval($this->campaign_id->CurrentValue);
+                $curVal = trim(strval($this->campaign_id->CurrentValue));
                 if ($curVal != "") {
                     $this->campaign_id->ViewValue = $this->campaign_id->lookupCacheOption($curVal);
                     if ($this->campaign_id->ViewValue === null) { // Lookup from database
@@ -2139,6 +2168,7 @@ class SubMediaAllocationGrid extends SubMediaAllocation
         $this->CurrentFilter = $filter;
         $sql = $this->getCurrentSql();
         $rsold = $conn->fetchAssoc($sql);
+        $editRow = false;
         if (!$rsold) {
             $this->setFailureMessage($Language->phrase("NoRecord")); // Set no record message
             $editRow = false; // Update Failed
@@ -2175,7 +2205,11 @@ class SubMediaAllocationGrid extends SubMediaAllocation
             $updateRow = $this->rowUpdating($rsold, $rsnew);
             if ($updateRow) {
                 if (count($rsnew) > 0) {
-                    $editRow = $this->update($rsnew, "", $rsold);
+                    try {
+                        $editRow = $this->update($rsnew, "", $rsold);
+                    } catch (\Exception $e) {
+                        $this->setFailureMessage($e->getMessage());
+                    }
                 } else {
                     $editRow = true; // No field to update
                 }
@@ -2226,9 +2260,9 @@ class SubMediaAllocationGrid extends SubMediaAllocation
             }
             if ($masterFilter != "") {
                 $rsmaster = Container("main_campaigns")->loadRs($masterFilter)->fetch(\PDO::FETCH_ASSOC);
-                $this->MasterRecordExists = $rsmaster !== false;
+                $masterRecordExists = $rsmaster !== false;
                 $validMasterKey = true;
-                if ($this->MasterRecordExists) {
+                if ($masterRecordExists) {
                     $validMasterKey = $Security->isValidUserID($rsmaster['vendor_id']);
                 } elseif ($this->getCurrentMasterTable() == "main_campaigns") {
                     $validMasterKey = false;
@@ -2277,8 +2311,13 @@ class SubMediaAllocationGrid extends SubMediaAllocation
 
         // Call Row Inserting event
         $insertRow = $this->rowInserting($rsold, $rsnew);
+        $addRow = false;
         if ($insertRow) {
-            $addRow = $this->insert($rsnew);
+            try {
+                $addRow = $this->insert($rsnew);
+            } catch (\Exception $e) {
+                $this->setFailureMessage($e->getMessage());
+            }
             if ($addRow) {
             }
         } else {

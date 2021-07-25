@@ -34,6 +34,4 @@ FROM main_transactions t
 
 </div>
 
-<?php
-echo GetDebugMessage();
-?>
+<?= GetDebugMessage() ?>

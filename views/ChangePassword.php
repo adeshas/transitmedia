@@ -65,7 +65,7 @@ loadjs.ready("head", function() {
 <?php
 $Page->showMessage();
 ?>
-<form name="fchange_password" id="fchange_password" class="ew-form ew-change-pwd-form" action="<?= CurrentPageUrl() ?>" method="post">
+<form name="fchange_password" id="fchange_password" class="ew-form ew-change-pwd-form" action="<?= CurrentPageUrl(false) ?>" method="post">
 <?php if (Config("CHECK_TOKEN")) { ?>
 <input type="hidden" name="<?= $TokenNameKey ?>" value="<?= $TokenName ?>"><!-- CSRF token name -->
 <input type="hidden" name="<?= $TokenValueKey ?>" value="<?= $TokenValue ?>"><!-- CSRF token value -->
