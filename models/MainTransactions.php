@@ -2345,7 +2345,7 @@ SORTHTML;
     	$search_replace = [
     		'[x_campaign]' => $camp_details['name'],
     		'[x_quantity]' => $camp_details['quantity'],
-    		'[x_vendor]' => $vendor,
+    		'[x_vendor]' => " $vendor ",
     		'[x_supportemail] ' => 'info@transitmedia.com.ng',
     	];
     	$search = array_keys($search_replace);
@@ -2469,7 +2469,7 @@ SORTHTML;
     		$operator_vals = ExecuteRow($sqloperator);
     		#===============================================================
     		$emailpayload = getEmailPayload('updates_to_campaign_operator');
-    		$exposed_emails = get_emails($emailpayload);
+    		$exposed_emails = get_emails($emailpayload,"",$operator_vals['email']);
     		extract($exposed_emails);
     		$email = $operator_vals['name'] . " <" . $operator_vals['email'] .">";
     		$cc = $final_cc; //.$operator_vals['email'];
