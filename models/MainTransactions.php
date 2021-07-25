@@ -2465,13 +2465,14 @@ SORTHTML;
 
     		// GET OPERATOR EMAIL
     		$sqloperator = "select o.name, o.email from main_transactions t, y_operators o where o.id = t.operator_id and t.id = {$camp_id} LIMIT 1;";
+		$sqloperator = "select o.name, o.email, (select pp.email from y_operators oo,  y_platforms pp where pp.id = oo.platform_id and oo.id = o.id) as platform_email from main_transactions t, y_operators o where o.id = t.operator_id and t.id = {$camp_id} LIMIT 1;";
     		$operator_vals = ExecuteRow($sqloperator);
     		#===============================================================
     		$emailpayload = getEmailPayload('updates_to_campaign_operator');
     		$exposed_emails = get_emails($emailpayload);
     		extract($exposed_emails);
     		$email = $operator_vals['name'] . " <" . $operator_vals['email'] .">";
-    		$cc = $final_cc;
+    		$cc = $final_cc; //.$operator_vals['email'];
     		$bcc = $final_bcc;
     		#===============================================================
 
