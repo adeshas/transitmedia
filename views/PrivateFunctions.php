@@ -271,10 +271,17 @@ function sendTMmail($from, $to, $subject, $msg, $msgtxt="", $attach = null, $cc 
         $msg = str_replace("&nbsp;", "", $string);
         $msg = html_entity_decode($msg);
 		
-		$email->Content = $msg;
+	$email->Content = $msg;
+	
+	// TRUE FOR DEBUG MODE, FALSE FOR LIVE MODE
+	$xsendmode = 'debug_only'; //debug_only, live_only, debug_live
 
-		//COMMENT FOR LIVE EMAIL 
-		//$debugme = deubgEmail($email,TRUE);
+
+        if($xsendmode === 'debug_only' || $xsendmode === 'debug_live'){
+          $debugme = deubgEmail($email,TRUE);
+        }
+        //COMMENT FOR LIVE EMAIL 
+        //$debugme = deubgEmail($email,TRUE);
 
         $email->Content = beautify_email($msg);
         $email->AltBody = $msgtxt;
@@ -286,9 +293,9 @@ function sendTMmail($from, $to, $subject, $msg, $msgtxt="", $attach = null, $cc 
 		// var_dump($email->Recipient);		
 		// exit;
 
-		//COMMENT FOR DEBUG EMAIL
-        $sent = $email->send();
-        if(!$sent){
+	if($xsendmode === 'live_only' || $xsendmode === 'debug_live'){
+		$email->send();
+    if(!$sent){
                 //echo 'Message could not be sent.';
                 //print_r($email->SendErrDescription);
                 file_put_contents('abc-error.log', 'Message could not be sent.'."\n".$email->SendErrDescription."\n".json_encode($email) . "\n", FILE_APPEND | LOCK_EX);
@@ -301,6 +308,7 @@ function sendTMmail($from, $to, $subject, $msg, $msgtxt="", $attach = null, $cc 
          }else{
          		echo 'Message has been sent';
 		}
+  }
 
 
 
