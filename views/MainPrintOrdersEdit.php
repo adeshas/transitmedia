@@ -6,7 +6,6 @@ namespace PHPMaker2021\test;
 $MainPrintOrdersEdit = &$Page;
 ?>
 <script>
-if (!ew.vars.tables.main_print_orders) ew.vars.tables.main_print_orders = <?= JsonEncode(GetClientVar("tables", "main_print_orders")) ?>;
 var currentForm, currentPageID;
 var fmain_print_ordersedit;
 loadjs.ready("head", function () {
@@ -16,17 +15,20 @@ loadjs.ready("head", function () {
     fmain_print_ordersedit = currentForm = new ew.Form("fmain_print_ordersedit", "edit");
 
     // Add fields
-    var fields = ew.vars.tables.main_print_orders.fields;
+    var currentTable = <?= JsonEncode(GetClientVar("tables", "main_print_orders")) ?>,
+        fields = currentTable.fields;
+    if (!ew.vars.tables.main_print_orders)
+        ew.vars.tables.main_print_orders = currentTable;
     fmain_print_ordersedit.addFields([
-        ["campaign_id", [fields.campaign_id.required ? ew.Validators.required(fields.campaign_id.caption) : null], fields.campaign_id.isInvalid],
-        ["printer_id", [fields.printer_id.required ? ew.Validators.required(fields.printer_id.caption) : null], fields.printer_id.isInvalid],
-        ["quantity", [fields.quantity.required ? ew.Validators.required(fields.quantity.caption) : null], fields.quantity.isInvalid],
-        ["approved", [fields.approved.required ? ew.Validators.required(fields.approved.caption) : null], fields.approved.isInvalid],
-        ["comments", [fields.comments.required ? ew.Validators.required(fields.comments.caption) : null], fields.comments.isInvalid],
-        ["all_codes_assigned_in_campaign", [fields.all_codes_assigned_in_campaign.required ? ew.Validators.required(fields.all_codes_assigned_in_campaign.caption) : null], fields.all_codes_assigned_in_campaign.isInvalid],
-        ["bus_codes", [fields.bus_codes.required ? ew.Validators.required(fields.bus_codes.caption) : null], fields.bus_codes.isInvalid],
-        ["available_codes_to_be_assigned", [fields.available_codes_to_be_assigned.required ? ew.Validators.required(fields.available_codes_to_be_assigned.caption) : null], fields.available_codes_to_be_assigned.isInvalid],
-        ["tags", [fields.tags.required ? ew.Validators.required(fields.tags.caption) : null], fields.tags.isInvalid]
+        ["campaign_id", [fields.campaign_id.visible && fields.campaign_id.required ? ew.Validators.required(fields.campaign_id.caption) : null], fields.campaign_id.isInvalid],
+        ["printer_id", [fields.printer_id.visible && fields.printer_id.required ? ew.Validators.required(fields.printer_id.caption) : null], fields.printer_id.isInvalid],
+        ["quantity", [fields.quantity.visible && fields.quantity.required ? ew.Validators.required(fields.quantity.caption) : null], fields.quantity.isInvalid],
+        ["approved", [fields.approved.visible && fields.approved.required ? ew.Validators.required(fields.approved.caption) : null], fields.approved.isInvalid],
+        ["comments", [fields.comments.visible && fields.comments.required ? ew.Validators.required(fields.comments.caption) : null], fields.comments.isInvalid],
+        ["all_codes_assigned_in_campaign", [fields.all_codes_assigned_in_campaign.visible && fields.all_codes_assigned_in_campaign.required ? ew.Validators.required(fields.all_codes_assigned_in_campaign.caption) : null], fields.all_codes_assigned_in_campaign.isInvalid],
+        ["bus_codes", [fields.bus_codes.visible && fields.bus_codes.required ? ew.Validators.required(fields.bus_codes.caption) : null], fields.bus_codes.isInvalid],
+        ["available_codes_to_be_assigned", [fields.available_codes_to_be_assigned.visible && fields.available_codes_to_be_assigned.required ? ew.Validators.required(fields.available_codes_to_be_assigned.caption) : null], fields.available_codes_to_be_assigned.isInvalid],
+        ["tags", [fields.tags.visible && fields.tags.required ? ew.Validators.required(fields.tags.caption) : null], fields.tags.isInvalid]
     ]);
 
     // Set invalid fields
@@ -106,7 +108,7 @@ loadjs.ready("head", function () {
 <?php
 $Page->showMessage();
 ?>
-<form name="fmain_print_ordersedit" id="fmain_print_ordersedit" class="<?= $Page->FormClassName ?>" action="<?= CurrentPageUrl() ?>" method="post">
+<form name="fmain_print_ordersedit" id="fmain_print_ordersedit" class="<?= $Page->FormClassName ?>" action="<?= CurrentPageUrl(false) ?>" method="post">
 <?php if (Config("CHECK_TOKEN")) { ?>
 <input type="hidden" name="<?= $TokenNameKey ?>" value="<?= $TokenName ?>"><!-- CSRF token name -->
 <input type="hidden" name="<?= $TokenValueKey ?>" value="<?= $TokenValue ?>"><!-- CSRF token value -->
@@ -158,8 +160,8 @@ $Page->showMessage();
         <div class="<?= $Page->RightColumnClass ?>"><div <?= $Page->approved->cellAttributes() ?>>
 <span id="el_main_print_orders_approved">
 <div class="custom-control custom-checkbox d-inline-block">
-    <input type="checkbox" class="custom-control-input<?= $Page->approved->isInvalidClass() ?>" data-table="main_print_orders" data-field="x_approved" name="x_approved[]" id="x_approved_477648" value="1"<?= ConvertToBool($Page->approved->CurrentValue) ? " checked" : "" ?><?= $Page->approved->editAttributes() ?> aria-describedby="x_approved_help">
-    <label class="custom-control-label" for="x_approved_477648"></label>
+    <input type="checkbox" class="custom-control-input<?= $Page->approved->isInvalidClass() ?>" data-table="main_print_orders" data-field="x_approved" name="x_approved[]" id="x_approved_916684" value="1"<?= ConvertToBool($Page->approved->CurrentValue) ? " checked" : "" ?><?= $Page->approved->editAttributes() ?> aria-describedby="x_approved_help">
+    <label class="custom-control-label" for="x_approved_916684"></label>
 </div>
 <?= $Page->approved->getCustomMessage() ?>
 <div class="invalid-feedback"><?= $Page->approved->getErrorMessage() ?></div>

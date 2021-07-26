@@ -18,6 +18,4 @@ echo $output;
 
 ?>
 
-<?php
-echo GetDebugMessage();
-?>
+<?= GetDebugMessage() ?>

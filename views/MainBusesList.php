@@ -7,7 +7,6 @@ $MainBusesList = &$Page;
 ?>
 <?php if (!$Page->isExport()) { ?>
 <script>
-if (!ew.vars.tables.main_buses) ew.vars.tables.main_buses = <?= JsonEncode(GetClientVar("tables", "main_buses")) ?>;
 var currentForm, currentPageID;
 var fmain_buseslist;
 loadjs.ready("head", function () {
@@ -18,18 +17,21 @@ loadjs.ready("head", function () {
     fmain_buseslist.formKeyCountName = '<?= $Page->FormKeyCountName ?>';
 
     // Add fields
-    var fields = ew.vars.tables.main_buses.fields;
+    var currentTable = <?= JsonEncode(GetClientVar("tables", "main_buses")) ?>,
+        fields = currentTable.fields;
+    if (!ew.vars.tables.main_buses)
+        ew.vars.tables.main_buses = currentTable;
     fmain_buseslist.addFields([
-        ["id", [fields.id.required ? ew.Validators.required(fields.id.caption) : null], fields.id.isInvalid],
-        ["number", [fields.number.required ? ew.Validators.required(fields.number.caption) : null], fields.number.isInvalid],
-        ["platform_id", [fields.platform_id.required ? ew.Validators.required(fields.platform_id.caption) : null], fields.platform_id.isInvalid],
-        ["operator_id", [fields.operator_id.required ? ew.Validators.required(fields.operator_id.caption) : null], fields.operator_id.isInvalid],
-        ["exterior_campaign_id", [fields.exterior_campaign_id.required ? ew.Validators.required(fields.exterior_campaign_id.caption) : null], fields.exterior_campaign_id.isInvalid],
-        ["interior_campaign_id", [fields.interior_campaign_id.required ? ew.Validators.required(fields.interior_campaign_id.caption) : null], fields.interior_campaign_id.isInvalid],
-        ["bus_status_id", [fields.bus_status_id.required ? ew.Validators.required(fields.bus_status_id.caption) : null], fields.bus_status_id.isInvalid],
-        ["bus_size_id", [fields.bus_size_id.required ? ew.Validators.required(fields.bus_size_id.caption) : null], fields.bus_size_id.isInvalid],
-        ["bus_depot_id", [fields.bus_depot_id.required ? ew.Validators.required(fields.bus_depot_id.caption) : null], fields.bus_depot_id.isInvalid],
-        ["ts_last_update", [fields.ts_last_update.required ? ew.Validators.required(fields.ts_last_update.caption) : null, ew.Validators.datetime(1)], fields.ts_last_update.isInvalid]
+        ["id", [fields.id.visible && fields.id.required ? ew.Validators.required(fields.id.caption) : null], fields.id.isInvalid],
+        ["number", [fields.number.visible && fields.number.required ? ew.Validators.required(fields.number.caption) : null], fields.number.isInvalid],
+        ["platform_id", [fields.platform_id.visible && fields.platform_id.required ? ew.Validators.required(fields.platform_id.caption) : null], fields.platform_id.isInvalid],
+        ["operator_id", [fields.operator_id.visible && fields.operator_id.required ? ew.Validators.required(fields.operator_id.caption) : null], fields.operator_id.isInvalid],
+        ["exterior_campaign_id", [fields.exterior_campaign_id.visible && fields.exterior_campaign_id.required ? ew.Validators.required(fields.exterior_campaign_id.caption) : null], fields.exterior_campaign_id.isInvalid],
+        ["interior_campaign_id", [fields.interior_campaign_id.visible && fields.interior_campaign_id.required ? ew.Validators.required(fields.interior_campaign_id.caption) : null], fields.interior_campaign_id.isInvalid],
+        ["bus_status_id", [fields.bus_status_id.visible && fields.bus_status_id.required ? ew.Validators.required(fields.bus_status_id.caption) : null], fields.bus_status_id.isInvalid],
+        ["bus_size_id", [fields.bus_size_id.visible && fields.bus_size_id.required ? ew.Validators.required(fields.bus_size_id.caption) : null], fields.bus_size_id.isInvalid],
+        ["bus_depot_id", [fields.bus_depot_id.visible && fields.bus_depot_id.required ? ew.Validators.required(fields.bus_depot_id.caption) : null], fields.bus_depot_id.isInvalid],
+        ["ts_last_update", [fields.ts_last_update.visible && fields.ts_last_update.required ? ew.Validators.required(fields.ts_last_update.caption) : null, ew.Validators.datetime(1)], fields.ts_last_update.isInvalid]
     ]);
 
     // Set invalid fields
@@ -198,7 +200,7 @@ $Page->renderOtherOptions();
 ?>
 <?php if ($Security->canSearch()) { ?>
 <?php if (!$Page->isExport() && !$Page->CurrentAction) { ?>
-<form name="fmain_buseslistsrch" id="fmain_buseslistsrch" class="form-inline ew-form ew-ext-search-form" action="<?= CurrentPageUrl() ?>">
+<form name="fmain_buseslistsrch" id="fmain_buseslistsrch" class="form-inline ew-form ew-ext-search-form" action="<?= CurrentPageUrl(false) ?>">
 <div id="fmain_buseslistsrch-search-panel" class="<?= $Page->SearchPanelClass ?>">
 <input type="hidden" name="cmd" value="search">
 <input type="hidden" name="t" value="main_buses">
@@ -233,7 +235,7 @@ $Page->showMessage();
 <?php if (!$Page->isExport()) { ?>
 <div class="card-header ew-grid-upper-panel">
 <?php if (!$Page->isGridAdd()) { ?>
-<form name="ew-pager-form" class="form-inline ew-form ew-pager-form" action="<?= CurrentPageUrl() ?>">
+<form name="ew-pager-form" class="form-inline ew-form ew-pager-form" action="<?= CurrentPageUrl(false) ?>">
 <?= $Page->Pager->render() ?>
 </form>
 <?php } ?>
@@ -243,7 +245,7 @@ $Page->showMessage();
 <div class="clearfix"></div>
 </div>
 <?php } ?>
-<form name="fmain_buseslist" id="fmain_buseslist" class="form-inline ew-form ew-list-form" action="<?= CurrentPageUrl() ?>" method="post">
+<form name="fmain_buseslist" id="fmain_buseslist" class="form-inline ew-form ew-list-form" action="<?= CurrentPageUrl(false) ?>" method="post">
 <?php if (Config("CHECK_TOKEN")) { ?>
 <input type="hidden" name="<?= $TokenNameKey ?>" value="<?= $TokenName ?>"><!-- CSRF token name -->
 <input type="hidden" name="<?= $TokenValueKey ?>" value="<?= $TokenValue ?>"><!-- CSRF token value -->
@@ -1360,7 +1362,7 @@ if ($Page->Recordset) {
 <?php if (!$Page->isExport()) { ?>
 <div class="card-footer ew-grid-lower-panel">
 <?php if (!$Page->isGridAdd()) { ?>
-<form name="ew-pager-form" class="form-inline ew-form ew-pager-form" action="<?= CurrentPageUrl() ?>">
+<form name="ew-pager-form" class="form-inline ew-form ew-pager-form" action="<?= CurrentPageUrl(false) ?>">
 <?= $Page->Pager->render() ?>
 </form>
 <?php } ?>

@@ -72,29 +72,34 @@ class ViewPricingOptions extends DbTable
         // platform_inventory
         $this->platform_inventory = new DbField('view_pricing_options', 'view_pricing_options', 'x_platform_inventory', 'platform_inventory', '"platform_inventory"', '"platform_inventory"', 201, 0, -1, false, '"platform_inventory"', false, false, false, 'FORMATTED TEXT', 'TEXTAREA');
         $this->platform_inventory->Sortable = true; // Allow sort
+        $this->platform_inventory->CustomMsg = $Language->FieldPhrase($this->TableVar, $this->platform_inventory->Param, "CustomMsg");
         $this->Fields['platform_inventory'] = &$this->platform_inventory;
 
         // price_details
         $this->price_details = new DbField('view_pricing_options', 'view_pricing_options', 'x_price_details', 'price_details', '"price_details"', '"price_details"', 201, 0, -1, false, '"price_details"', false, false, false, 'FORMATTED TEXT', 'TEXTAREA');
         $this->price_details->Sortable = true; // Allow sort
+        $this->price_details->CustomMsg = $Language->FieldPhrase($this->TableVar, $this->price_details->Param, "CustomMsg");
         $this->Fields['price_details'] = &$this->price_details;
 
         // price_id
         $this->price_id = new DbField('view_pricing_options', 'view_pricing_options', 'x_price_id', 'price_id', '"price_id"', 'CAST("price_id" AS varchar(255))', 3, 4, -1, false, '"price_id"', false, false, false, 'FORMATTED TEXT', 'TEXT');
         $this->price_id->Sortable = true; // Allow sort
         $this->price_id->DefaultErrorMessage = $Language->phrase("IncorrectInteger");
+        $this->price_id->CustomMsg = $Language->FieldPhrase($this->TableVar, $this->price_id->Param, "CustomMsg");
         $this->Fields['price_id'] = &$this->price_id;
 
         // requested_price_id
         $this->requested_price_id = new DbField('view_pricing_options', 'view_pricing_options', 'x_requested_price_id', 'requested_price_id', '"requested_price_id"', 'CAST("requested_price_id" AS varchar(255))', 3, 4, -1, false, '"requested_price_id"', false, false, false, 'FORMATTED TEXT', 'TEXT');
         $this->requested_price_id->Sortable = true; // Allow sort
         $this->requested_price_id->DefaultErrorMessage = $Language->phrase("IncorrectInteger");
+        $this->requested_price_id->CustomMsg = $Language->FieldPhrase($this->TableVar, $this->requested_price_id->Param, "CustomMsg");
         $this->Fields['requested_price_id'] = &$this->requested_price_id;
 
         // campaign_id
         $this->campaign_id = new DbField('view_pricing_options', 'view_pricing_options', 'x_campaign_id', 'campaign_id', '"campaign_id"', 'CAST("campaign_id" AS varchar(255))', 3, 4, -1, false, '"campaign_id"', false, false, false, 'FORMATTED TEXT', 'TEXT');
         $this->campaign_id->Sortable = true; // Allow sort
         $this->campaign_id->DefaultErrorMessage = $Language->phrase("IncorrectInteger");
+        $this->campaign_id->CustomMsg = $Language->FieldPhrase($this->TableVar, $this->campaign_id->Param, "CustomMsg");
         $this->Fields['campaign_id'] = &$this->campaign_id;
     }
 
@@ -275,18 +280,21 @@ class ViewPricingOptions extends DbTable
         $cnt = -1;
         $rs = null;
         if ($sql instanceof \Doctrine\DBAL\Query\QueryBuilder) { // Query builder
-            $sql = $sql->resetQueryPart("orderBy")->getSQL();
+            $sqlwrk = clone $sql;
+            $sqlwrk = $sqlwrk->resetQueryPart("orderBy")->getSQL();
+        } else {
+            $sqlwrk = $sql;
         }
         $pattern = '/^SELECT\s([\s\S]+)\sFROM\s/i';
         // Skip Custom View / SubQuery / SELECT DISTINCT / ORDER BY
         if (
             ($this->TableType == 'TABLE' || $this->TableType == 'VIEW' || $this->TableType == 'LINKTABLE') &&
-            preg_match($pattern, $sql) && !preg_match('/\(\s*(SELECT[^)]+)\)/i', $sql) &&
-            !preg_match('/^\s*select\s+distinct\s+/i', $sql) && !preg_match('/\s+order\s+by\s+/i', $sql)
+            preg_match($pattern, $sqlwrk) && !preg_match('/\(\s*(SELECT[^)]+)\)/i', $sqlwrk) &&
+            !preg_match('/^\s*select\s+distinct\s+/i', $sqlwrk) && !preg_match('/\s+order\s+by\s+/i', $sqlwrk)
         ) {
-            $sqlwrk = "SELECT COUNT(*) FROM " . preg_replace($pattern, "", $sql);
+            $sqlwrk = "SELECT COUNT(*) FROM " . preg_replace($pattern, "", $sqlwrk);
         } else {
-            $sqlwrk = "SELECT COUNT(*) FROM (" . $sql . ") COUNT_TABLE";
+            $sqlwrk = "SELECT COUNT(*) FROM (" . $sqlwrk . ") COUNT_TABLE";
         }
         $conn = $c ?? $this->getConnection();
         $rs = $conn->executeQuery($sqlwrk);

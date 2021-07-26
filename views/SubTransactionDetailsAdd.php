@@ -6,7 +6,6 @@ namespace PHPMaker2021\test;
 $SubTransactionDetailsAdd = &$Page;
 ?>
 <script>
-if (!ew.vars.tables.sub_transaction_details) ew.vars.tables.sub_transaction_details = <?= JsonEncode(GetClientVar("tables", "sub_transaction_details")) ?>;
 var currentForm, currentPageID;
 var fsub_transaction_detailsadd;
 loadjs.ready("head", function () {
@@ -16,10 +15,13 @@ loadjs.ready("head", function () {
     fsub_transaction_detailsadd = currentForm = new ew.Form("fsub_transaction_detailsadd", "add");
 
     // Add fields
-    var fields = ew.vars.tables.sub_transaction_details.fields;
+    var currentTable = <?= JsonEncode(GetClientVar("tables", "sub_transaction_details")) ?>,
+        fields = currentTable.fields;
+    if (!ew.vars.tables.sub_transaction_details)
+        ew.vars.tables.sub_transaction_details = currentTable;
     fsub_transaction_detailsadd.addFields([
-        ["transaction_id", [fields.transaction_id.required ? ew.Validators.required(fields.transaction_id.caption) : null], fields.transaction_id.isInvalid],
-        ["bus_id", [fields.bus_id.required ? ew.Validators.required(fields.bus_id.caption) : null], fields.bus_id.isInvalid]
+        ["transaction_id", [fields.transaction_id.visible && fields.transaction_id.required ? ew.Validators.required(fields.transaction_id.caption) : null], fields.transaction_id.isInvalid],
+        ["bus_id", [fields.bus_id.visible && fields.bus_id.required ? ew.Validators.required(fields.bus_id.caption) : null], fields.bus_id.isInvalid]
     ]);
 
     // Set invalid fields
@@ -100,7 +102,7 @@ loadjs.ready("head", function () {
 <?php
 $Page->showMessage();
 ?>
-<form name="fsub_transaction_detailsadd" id="fsub_transaction_detailsadd" class="<?= $Page->FormClassName ?>" action="<?= CurrentPageUrl() ?>" method="post">
+<form name="fsub_transaction_detailsadd" id="fsub_transaction_detailsadd" class="<?= $Page->FormClassName ?>" action="<?= CurrentPageUrl(false) ?>" method="post">
 <?php if (Config("CHECK_TOKEN")) { ?>
 <input type="hidden" name="<?= $TokenNameKey ?>" value="<?= $TokenName ?>"><!-- CSRF token name -->
 <input type="hidden" name="<?= $TokenValueKey ?>" value="<?= $TokenValue ?>"><!-- CSRF token value -->

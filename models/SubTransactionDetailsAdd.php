@@ -120,7 +120,6 @@ class SubTransactionDetailsAdd extends SubTransactionDetails
 
         // Initialize
         $GLOBALS["Page"] = &$this;
-        $this->TokenTimeout = SessionTimeoutTime();
 
         // Language object
         $Language = Container("language");
@@ -161,6 +160,30 @@ class SubTransactionDetailsAdd extends SubTransactionDetails
         return is_object($Response) ? $Response->getBody() : ob_get_clean();
     }
 
+    // Is lookup
+    public function isLookup()
+    {
+        return SameText(Route(0), Config("API_LOOKUP_ACTION"));
+    }
+
+    // Is AutoFill
+    public function isAutoFill()
+    {
+        return $this->isLookup() && SameText(Post("ajax"), "autofill");
+    }
+
+    // Is AutoSuggest
+    public function isAutoSuggest()
+    {
+        return $this->isLookup() && SameText(Post("ajax"), "autosuggest");
+    }
+
+    // Is modal lookup
+    public function isModalLookup()
+    {
+        return $this->isLookup() && SameText(Post("ajax"), "modal");
+    }
+
     // Is terminated
     public function isTerminated()
     {
@@ -178,7 +201,7 @@ class SubTransactionDetailsAdd extends SubTransactionDetails
         if ($this->terminated) {
             return;
         }
-        global $ExportFileName, $TempImages, $DashboardReport;
+        global $ExportFileName, $TempImages, $DashboardReport, $Response;
 
         // Page is terminated
         $this->terminated = true;
@@ -224,6 +247,11 @@ class SubTransactionDetailsAdd extends SubTransactionDetails
                 WriteJson(array_merge(["success" => false], $this->getMessages()));
             }
             return;
+        } else { // Check if response is JSON
+            if (StartsString("application/json", $Response->getHeaderLine("Content-type")) && $Response->getBody()->getSize()) { // With JSON response
+                $this->clearMessages();
+                return;
+            }
         }
 
         // Go to URL if specified
@@ -573,7 +601,7 @@ class SubTransactionDetailsAdd extends SubTransactionDetails
         // Set LoginStatus / Page_Rendering / Page_Render
         if (!IsApi() && !$this->isTerminated()) {
             // Pass table and field properties to client side
-            $this->toClientVar(["tableCaption"], ["caption", "Required", "IsInvalid", "Raw"]);
+            $this->toClientVar(["tableCaption"], ["caption", "Visible", "Required", "IsInvalid", "Raw"]);
 
             // Setup login status
             SetupLoginStatus();
@@ -584,7 +612,7 @@ class SubTransactionDetailsAdd extends SubTransactionDetails
             // Global Page Rendering event (in userfn*.php)
             Page_Rendering();
 
-            // Page Rendering event
+            // Page Render event
             if (method_exists($this, "pageRender")) {
                 $this->pageRender();
             }
@@ -786,7 +814,7 @@ class SubTransactionDetailsAdd extends SubTransactionDetails
             $this->id->ViewCustomAttributes = "";
 
             // transaction_id
-            $curVal = strval($this->transaction_id->CurrentValue);
+            $curVal = trim(strval($this->transaction_id->CurrentValue));
             if ($curVal != "") {
                 $this->transaction_id->ViewValue = $this->transaction_id->lookupCacheOption($curVal);
                 if ($this->transaction_id->ViewValue === null) { // Lookup from database
@@ -810,7 +838,7 @@ class SubTransactionDetailsAdd extends SubTransactionDetails
             if ($this->bus_id->VirtualValue != "") {
                 $this->bus_id->ViewValue = $this->bus_id->VirtualValue;
             } else {
-                $curVal = strval($this->bus_id->CurrentValue);
+                $curVal = trim(strval($this->bus_id->CurrentValue));
                 if ($curVal != "") {
                     $this->bus_id->ViewValue = $this->bus_id->lookupCacheOption($curVal);
                     if ($this->bus_id->ViewValue === null) { // Lookup from database
@@ -848,7 +876,7 @@ class SubTransactionDetailsAdd extends SubTransactionDetails
 
             // vendor_id
             $this->vendor_id->ViewValue = $this->vendor_id->CurrentValue;
-            $curVal = strval($this->vendor_id->CurrentValue);
+            $curVal = trim(strval($this->vendor_id->CurrentValue));
             if ($curVal != "") {
                 $this->vendor_id->ViewValue = $this->vendor_id->lookupCacheOption($curVal);
                 if ($this->vendor_id->ViewValue === null) { // Lookup from database
@@ -883,7 +911,7 @@ class SubTransactionDetailsAdd extends SubTransactionDetails
             $this->transaction_id->EditCustomAttributes = "";
             if ($this->transaction_id->getSessionValue() != "") {
                 $this->transaction_id->CurrentValue = GetForeignKeyValue($this->transaction_id->getSessionValue());
-                $curVal = strval($this->transaction_id->CurrentValue);
+                $curVal = trim(strval($this->transaction_id->CurrentValue));
                 if ($curVal != "") {
                     $this->transaction_id->ViewValue = $this->transaction_id->lookupCacheOption($curVal);
                     if ($this->transaction_id->ViewValue === null) { // Lookup from database
@@ -1032,9 +1060,9 @@ class SubTransactionDetailsAdd extends SubTransactionDetails
             }
             if ($masterFilter != "") {
                 $rsmaster = Container("main_transactions")->loadRs($masterFilter)->fetch(\PDO::FETCH_ASSOC);
-                $this->MasterRecordExists = $rsmaster !== false;
+                $masterRecordExists = $rsmaster !== false;
                 $validMasterKey = true;
-                if ($this->MasterRecordExists) {
+                if ($masterRecordExists) {
                     $validMasterKey = $Security->isValidUserID($rsmaster['vendor_id']);
                 } elseif ($this->getCurrentMasterTable() == "main_transactions") {
                     $validMasterKey = false;
@@ -1086,8 +1114,13 @@ class SubTransactionDetailsAdd extends SubTransactionDetails
 
         // Call Row Inserting event
         $insertRow = $this->rowInserting($rsold, $rsnew);
+        $addRow = false;
         if ($insertRow) {
-            $addRow = $this->insert($rsnew);
+            try {
+                $addRow = $this->insert($rsnew);
+            } catch (\Exception $e) {
+                $this->setFailureMessage($e->getMessage());
+            }
             if ($addRow) {
             }
         } else {

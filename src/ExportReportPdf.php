@@ -8,20 +8,41 @@ namespace PHPMaker2021\test;
 class ExportReportPdf
 {
     public static $StreamOptions = ["Attachment" => 1]; // 0 to open in browser, 1 to download
+    public static $Options = [];
+
+    // Get style tag
+    public static function styleTag()
+    {
+        $pdfcss = Config("PDF_STYLESHEET_FILENAME");
+        if ($pdfcss != "") {
+            $path = FullUrl(GetUrl($pdfcss));
+            $content = file_get_contents($path);
+            if ($content) {
+                return "<style>" . $content . "</style>\r\n";
+            }
+        }
+        return "";
+    }
 
     // Export
     public function __invoke($page, $html)
     {
         global $ExportFileName;
         @ini_set("memory_limit", Config("PDF_MEMORY_LIMIT"));
-        set_time_limit(Config("PDF_TIME_LIMIT"));
+        @set_time_limit(Config("PDF_TIME_LIMIT"));
         $html = CheckHtml($html);
+        $html = str_replace("</head>", self::styleTag() . "</head>", $html);
         if (Config("DEBUG")) {
             $html = str_replace("</body>", GetDebugMessage() . "</body>", $html);
         }
-        $dompdf = new \Dompdf\Dompdf(["pdf_backend" => "CPDF"]);
+        $options = new \Dompdf\Options(self::$Options);
+        $options->set("pdfBackend", "CPDF");
+        $chroot = $options->getChroot();
+        $chroot[] = UploadTempPath();
+        $options->setChroot($chroot);
+        $dompdf = new \Dompdf\Dompdf($options);
         $doc = new \DOMDocument("1.0", "utf-8");
-        @$doc->loadHTML('<?xml encoding="uft-8">' . ConvertToUtf8($html)); // Convert to utf-8
+        @$doc->loadHTML('<?xml encoding="utf-8">' . ConvertToUtf8($html)); // Convert to utf-8
         $spans = $doc->getElementsByTagName("span");
         foreach ($spans as $span) {
             $classNames = $span->getAttribute("class");
@@ -57,8 +78,8 @@ class ExportReportPdf
         }
         $html = $doc->saveHTML();
         $html = ConvertFromUtf8($html);
-        $dompdf->load_html($html);
-        $dompdf->set_paper($pageSize, $pageOrientation);
+        $dompdf->loadHtml($html);
+        $dompdf->setPaper($pageSize, $pageOrientation);
         $dompdf->render();
         $exportFile = EndsText(".pdf", $ExportFileName) ? $ExportFileName : $ExportFileName . ".pdf";
         $dompdf->stream($exportFile, self::$StreamOptions); // 0 to open in browser, 1 to download

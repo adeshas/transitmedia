@@ -6,7 +6,6 @@ namespace PHPMaker2021\test;
 $ZPriceSettingsUpdate = &$Page;
 ?>
 <script>
-if (!ew.vars.tables.z_price_settings) ew.vars.tables.z_price_settings = <?= JsonEncode(GetClientVar("tables", "z_price_settings")) ?>;
 var currentForm, currentPageID;
 var fz_price_settingsupdate;
 loadjs.ready("head", function () {
@@ -16,23 +15,26 @@ loadjs.ready("head", function () {
     fz_price_settingsupdate = currentForm = new ew.Form("fz_price_settingsupdate", "update");
 
     // Add fields
-    var fields = ew.vars.tables.z_price_settings.fields;
+    var currentTable = <?= JsonEncode(GetClientVar("tables", "z_price_settings")) ?>,
+        fields = currentTable.fields;
+    if (!ew.vars.tables.z_price_settings)
+        ew.vars.tables.z_price_settings = currentTable;
     fz_price_settingsupdate.addFields([
-        ["platform_id", [fields.platform_id.required ? ew.Validators.required(fields.platform_id.caption) : null], fields.platform_id.isInvalid],
-        ["inventory_id", [fields.inventory_id.required ? ew.Validators.required(fields.inventory_id.caption) : null], fields.inventory_id.isInvalid],
-        ["print_stage_id", [fields.print_stage_id.required ? ew.Validators.required(fields.print_stage_id.caption) : null], fields.print_stage_id.isInvalid],
-        ["bus_size_id", [fields.bus_size_id.required ? ew.Validators.required(fields.bus_size_id.caption) : null], fields.bus_size_id.isInvalid],
-        ["details", [fields.details.required ? ew.Validators.required(fields.details.caption) : null], fields.details.isInvalid],
-        ["max_limit", [fields.max_limit.required ? ew.Validators.required(fields.max_limit.caption) : null, ew.Validators.integer, ew.Validators.selected], fields.max_limit.isInvalid],
-        ["min_limit", [fields.min_limit.required ? ew.Validators.required(fields.min_limit.caption) : null, ew.Validators.integer, ew.Validators.selected], fields.min_limit.isInvalid],
-        ["price", [fields.price.required ? ew.Validators.required(fields.price.caption) : null, ew.Validators.integer, ew.Validators.selected], fields.price.isInvalid],
-        ["operator_fee", [fields.operator_fee.required ? ew.Validators.required(fields.operator_fee.caption) : null, ew.Validators.integer, ew.Validators.selected], fields.operator_fee.isInvalid],
-        ["agency_fee", [fields.agency_fee.required ? ew.Validators.required(fields.agency_fee.caption) : null, ew.Validators.integer, ew.Validators.selected], fields.agency_fee.isInvalid],
-        ["lamata_fee", [fields.lamata_fee.required ? ew.Validators.required(fields.lamata_fee.caption) : null, ew.Validators.integer, ew.Validators.selected], fields.lamata_fee.isInvalid],
-        ["lasaa_fee", [fields.lasaa_fee.required ? ew.Validators.required(fields.lasaa_fee.caption) : null, ew.Validators.integer, ew.Validators.selected], fields.lasaa_fee.isInvalid],
-        ["printers_fee", [fields.printers_fee.required ? ew.Validators.required(fields.printers_fee.caption) : null, ew.Validators.integer, ew.Validators.selected], fields.printers_fee.isInvalid],
-        ["active", [fields.active.required ? ew.Validators.required(fields.active.caption) : null], fields.active.isInvalid],
-        ["ts_created", [fields.ts_created.required ? ew.Validators.required(fields.ts_created.caption) : null, ew.Validators.datetime(0), ew.Validators.selected], fields.ts_created.isInvalid]
+        ["platform_id", [fields.platform_id.visible && fields.platform_id.required ? ew.Validators.required(fields.platform_id.caption) : null], fields.platform_id.isInvalid],
+        ["inventory_id", [fields.inventory_id.visible && fields.inventory_id.required ? ew.Validators.required(fields.inventory_id.caption) : null], fields.inventory_id.isInvalid],
+        ["print_stage_id", [fields.print_stage_id.visible && fields.print_stage_id.required ? ew.Validators.required(fields.print_stage_id.caption) : null], fields.print_stage_id.isInvalid],
+        ["bus_size_id", [fields.bus_size_id.visible && fields.bus_size_id.required ? ew.Validators.required(fields.bus_size_id.caption) : null], fields.bus_size_id.isInvalid],
+        ["details", [fields.details.visible && fields.details.required ? ew.Validators.required(fields.details.caption) : null], fields.details.isInvalid],
+        ["max_limit", [fields.max_limit.visible && fields.max_limit.required ? ew.Validators.required(fields.max_limit.caption) : null, ew.Validators.integer, ew.Validators.selected], fields.max_limit.isInvalid],
+        ["min_limit", [fields.min_limit.visible && fields.min_limit.required ? ew.Validators.required(fields.min_limit.caption) : null, ew.Validators.integer, ew.Validators.selected], fields.min_limit.isInvalid],
+        ["price", [fields.price.visible && fields.price.required ? ew.Validators.required(fields.price.caption) : null, ew.Validators.integer, ew.Validators.selected], fields.price.isInvalid],
+        ["operator_fee", [fields.operator_fee.visible && fields.operator_fee.required ? ew.Validators.required(fields.operator_fee.caption) : null, ew.Validators.integer, ew.Validators.selected], fields.operator_fee.isInvalid],
+        ["agency_fee", [fields.agency_fee.visible && fields.agency_fee.required ? ew.Validators.required(fields.agency_fee.caption) : null, ew.Validators.integer, ew.Validators.selected], fields.agency_fee.isInvalid],
+        ["lamata_fee", [fields.lamata_fee.visible && fields.lamata_fee.required ? ew.Validators.required(fields.lamata_fee.caption) : null, ew.Validators.integer, ew.Validators.selected], fields.lamata_fee.isInvalid],
+        ["lasaa_fee", [fields.lasaa_fee.visible && fields.lasaa_fee.required ? ew.Validators.required(fields.lasaa_fee.caption) : null, ew.Validators.integer, ew.Validators.selected], fields.lasaa_fee.isInvalid],
+        ["printers_fee", [fields.printers_fee.visible && fields.printers_fee.required ? ew.Validators.required(fields.printers_fee.caption) : null, ew.Validators.integer, ew.Validators.selected], fields.printers_fee.isInvalid],
+        ["active", [fields.active.visible && fields.active.required ? ew.Validators.required(fields.active.caption) : null], fields.active.isInvalid],
+        ["ts_created", [fields.ts_created.visible && fields.ts_created.required ? ew.Validators.required(fields.ts_created.caption) : null, ew.Validators.datetime(0), ew.Validators.selected], fields.ts_created.isInvalid]
     ]);
 
     // Set invalid fields
@@ -110,7 +112,7 @@ loadjs.ready("head", function () {
 <?php
 $Page->showMessage();
 ?>
-<form name="fz_price_settingsupdate" id="fz_price_settingsupdate" class="<?= $Page->FormClassName ?>" action="<?= CurrentPageUrl() ?>" method="post">
+<form name="fz_price_settingsupdate" id="fz_price_settingsupdate" class="<?= $Page->FormClassName ?>" action="<?= CurrentPageUrl(false) ?>" method="post">
 <?php if (Config("CHECK_TOKEN")) { ?>
 <input type="hidden" name="<?= $TokenNameKey ?>" value="<?= $TokenName ?>"><!-- CSRF token name -->
 <input type="hidden" name="<?= $TokenValueKey ?>" value="<?= $TokenValue ?>"><!-- CSRF token value -->
@@ -651,8 +653,8 @@ $Page->showMessage();
                 <?php if (!$Page->isConfirm()) { ?>
                 <span id="el_z_price_settings_active">
                 <div class="custom-control custom-checkbox d-inline-block">
-                    <input type="checkbox" class="custom-control-input<?= $Page->active->isInvalidClass() ?>" data-table="z_price_settings" data-field="x_active" name="x_active[]" id="x_active_939518" value="1"<?= ConvertToBool($Page->active->CurrentValue) ? " checked" : "" ?><?= $Page->active->editAttributes() ?> aria-describedby="x_active_help">
-                    <label class="custom-control-label" for="x_active_939518"></label>
+                    <input type="checkbox" class="custom-control-input<?= $Page->active->isInvalidClass() ?>" data-table="z_price_settings" data-field="x_active" name="x_active[]" id="x_active_389516" value="1"<?= ConvertToBool($Page->active->CurrentValue) ? " checked" : "" ?><?= $Page->active->editAttributes() ?> aria-describedby="x_active_help">
+                    <label class="custom-control-label" for="x_active_389516"></label>
                 </div>
                 <?= $Page->active->getCustomMessage() ?>
                 <div class="invalid-feedback"><?= $Page->active->getErrorMessage() ?></div>

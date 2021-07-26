@@ -6,7 +6,6 @@ namespace PHPMaker2021\test;
 $ZCoreSettingsAdd = &$Page;
 ?>
 <script>
-if (!ew.vars.tables.z_core_settings) ew.vars.tables.z_core_settings = <?= JsonEncode(GetClientVar("tables", "z_core_settings")) ?>;
 var currentForm, currentPageID;
 var fz_core_settingsadd;
 loadjs.ready("head", function () {
@@ -16,10 +15,13 @@ loadjs.ready("head", function () {
     fz_core_settingsadd = currentForm = new ew.Form("fz_core_settingsadd", "add");
 
     // Add fields
-    var fields = ew.vars.tables.z_core_settings.fields;
+    var currentTable = <?= JsonEncode(GetClientVar("tables", "z_core_settings")) ?>,
+        fields = currentTable.fields;
+    if (!ew.vars.tables.z_core_settings)
+        ew.vars.tables.z_core_settings = currentTable;
     fz_core_settingsadd.addFields([
-        ["name", [fields.name.required ? ew.Validators.required(fields.name.caption) : null], fields.name.isInvalid],
-        ["value", [fields.value.required ? ew.Validators.required(fields.value.caption) : null], fields.value.isInvalid]
+        ["name", [fields.name.visible && fields.name.required ? ew.Validators.required(fields.name.caption) : null], fields.name.isInvalid],
+        ["value", [fields.value.visible && fields.value.required ? ew.Validators.required(fields.value.caption) : null], fields.value.isInvalid]
     ]);
 
     // Set invalid fields
@@ -98,7 +100,7 @@ loadjs.ready("head", function () {
 <?php
 $Page->showMessage();
 ?>
-<form name="fz_core_settingsadd" id="fz_core_settingsadd" class="<?= $Page->FormClassName ?>" action="<?= CurrentPageUrl() ?>" method="post">
+<form name="fz_core_settingsadd" id="fz_core_settingsadd" class="<?= $Page->FormClassName ?>" action="<?= CurrentPageUrl(false) ?>" method="post">
 <?php if (Config("CHECK_TOKEN")) { ?>
 <input type="hidden" name="<?= $TokenNameKey ?>" value="<?= $TokenName ?>"><!-- CSRF token name -->
 <input type="hidden" name="<?= $TokenValueKey ?>" value="<?= $TokenValue ?>"><!-- CSRF token value -->

@@ -158,7 +158,6 @@ class WVendorsOperatorsList extends WVendorsOperators
 
         // Initialize
         $GLOBALS["Page"] = &$this;
-        $this->TokenTimeout = SessionTimeoutTime();
 
         // Language object
         $Language = Container("language");
@@ -244,6 +243,30 @@ class WVendorsOperatorsList extends WVendorsOperators
         return is_object($Response) ? $Response->getBody() : ob_get_clean();
     }
 
+    // Is lookup
+    public function isLookup()
+    {
+        return SameText(Route(0), Config("API_LOOKUP_ACTION"));
+    }
+
+    // Is AutoFill
+    public function isAutoFill()
+    {
+        return $this->isLookup() && SameText(Post("ajax"), "autofill");
+    }
+
+    // Is AutoSuggest
+    public function isAutoSuggest()
+    {
+        return $this->isLookup() && SameText(Post("ajax"), "autosuggest");
+    }
+
+    // Is modal lookup
+    public function isModalLookup()
+    {
+        return $this->isLookup() && SameText(Post("ajax"), "modal");
+    }
+
     // Is terminated
     public function isTerminated()
     {
@@ -261,7 +284,7 @@ class WVendorsOperatorsList extends WVendorsOperators
         if ($this->terminated) {
             return;
         }
-        global $ExportFileName, $TempImages, $DashboardReport;
+        global $ExportFileName, $TempImages, $DashboardReport, $Response;
 
         // Page is terminated
         $this->terminated = true;
@@ -307,6 +330,11 @@ class WVendorsOperatorsList extends WVendorsOperators
                 WriteJson(array_merge(["success" => false], $this->getMessages()));
             }
             return;
+        } else { // Check if response is JSON
+            if (StartsString("application/json", $Response->getHeaderLine("Content-type")) && $Response->getBody()->getSize()) { // With JSON response
+                $this->clearMessages();
+                return;
+            }
         }
 
         // Go to URL if specified
@@ -518,6 +546,7 @@ class WVendorsOperatorsList extends WVendorsOperators
     public $MultiSelectKey;
     public $Command;
     public $RestoreSearch = false;
+    public $HashValue; // Hash value
     public $DetailPages;
     public $OldRecordset;
 
@@ -806,8 +835,8 @@ class WVendorsOperatorsList extends WVendorsOperators
             }
         }
 
-        // Search/sort options
-        $this->setupSearchSortOptions();
+        // Search options
+        $this->setupSearchOptions();
 
         // Set up search panel class
         if ($this->SearchWhere != "") {
@@ -829,7 +858,7 @@ class WVendorsOperatorsList extends WVendorsOperators
         // Set LoginStatus / Page_Rendering / Page_Render
         if (!IsApi() && !$this->isTerminated()) {
             // Pass table and field properties to client side
-            $this->toClientVar(["tableCaption"], ["caption", "Required", "IsInvalid", "Raw"]);
+            $this->toClientVar(["tableCaption"], ["caption", "Visible", "Required", "IsInvalid", "Raw"]);
 
             // Setup login status
             SetupLoginStatus();
@@ -840,7 +869,7 @@ class WVendorsOperatorsList extends WVendorsOperators
             // Global Page Rendering event (in userfn*.php)
             Page_Rendering();
 
-            // Page Rendering event
+            // Page Render event
             if (method_exists($this, "pageRender")) {
                 $this->pageRender();
             }
@@ -1571,7 +1600,7 @@ class WVendorsOperatorsList extends WVendorsOperators
                 $option->UseDropDownButton = false;
                 // Add grid insert
                 $item = &$option->add("gridinsert");
-                $item->Body = "<a class=\"ew-action ew-grid-insert\" title=\"" . HtmlTitle($Language->phrase("GridInsertLink")) . "\" data-caption=\"" . HtmlTitle($Language->phrase("GridInsertLink")) . "\" href=\"#\" onclick=\"return ew.forms.get(this).submit(event, '" . $this->pageName() . "');\">" . $Language->phrase("GridInsertLink") . "</a>";
+                $item->Body = "<a class=\"ew-action ew-grid-insert\" title=\"" . HtmlTitle($Language->phrase("GridInsertLink")) . "\" data-caption=\"" . HtmlTitle($Language->phrase("GridInsertLink")) . "\" href=\"#\" onclick=\"ew.forms.get(this).submit(event, '" . $this->pageName() . "'); return false;\">" . $Language->phrase("GridInsertLink") . "</a>";
                 // Add grid cancel
                 $item = &$option->add("gridcancel");
                 $cancelurl = $this->addMasterUrl($pageUrl . "action=cancel");
@@ -1591,7 +1620,7 @@ class WVendorsOperatorsList extends WVendorsOperators
                 $option = $options["action"];
                 $option->UseDropDownButton = false;
                     $item = &$option->add("gridsave");
-                    $item->Body = "<a class=\"ew-action ew-grid-save\" title=\"" . HtmlTitle($Language->phrase("GridSaveLink")) . "\" data-caption=\"" . HtmlTitle($Language->phrase("GridSaveLink")) . "\" href=\"#\" onclick=\"return ew.forms.get(this).submit(event, '" . $this->pageName() . "');\">" . $Language->phrase("GridSaveLink") . "</a>";
+                    $item->Body = "<a class=\"ew-action ew-grid-save\" title=\"" . HtmlTitle($Language->phrase("GridSaveLink")) . "\" data-caption=\"" . HtmlTitle($Language->phrase("GridSaveLink")) . "\" href=\"#\" onclick=\"ew.forms.get(this).submit(event, '" . $this->pageName() . "'); return false;\">" . $Language->phrase("GridSaveLink") . "</a>";
                     $item = &$option->add("gridcancel");
                     $cancelurl = $this->addMasterUrl($pageUrl . "action=cancel");
                     $item->Body = "<a class=\"ew-action ew-grid-cancel\" title=\"" . HtmlTitle($Language->phrase("GridCancelLink")) . "\" data-caption=\"" . HtmlTitle($Language->phrase("GridCancelLink")) . "\" href=\"" . $cancelurl . "\">" . $Language->phrase("GridCancelLink") . "</a>";
@@ -1884,7 +1913,7 @@ class WVendorsOperatorsList extends WVendorsOperators
             $this->id->ViewCustomAttributes = "";
 
             // vendor_id
-            $curVal = strval($this->vendor_id->CurrentValue);
+            $curVal = trim(strval($this->vendor_id->CurrentValue));
             if ($curVal != "") {
                 $this->vendor_id->ViewValue = $this->vendor_id->lookupCacheOption($curVal);
                 if ($this->vendor_id->ViewValue === null) { // Lookup from database
@@ -1909,7 +1938,7 @@ class WVendorsOperatorsList extends WVendorsOperators
             $this->vendor_id->ViewCustomAttributes = "";
 
             // operator_id
-            $curVal = strval($this->operator_id->CurrentValue);
+            $curVal = trim(strval($this->operator_id->CurrentValue));
             if ($curVal != "") {
                 $this->operator_id->ViewValue = $this->operator_id->lookupCacheOption($curVal);
                 if ($this->operator_id->ViewValue === null) { // Lookup from database
@@ -2222,6 +2251,7 @@ class WVendorsOperatorsList extends WVendorsOperators
         $this->CurrentFilter = $filter;
         $sql = $this->getCurrentSql();
         $rsold = $conn->fetchAssoc($sql);
+        $editRow = false;
         if (!$rsold) {
             $this->setFailureMessage($Language->phrase("NoRecord")); // Set no record message
             $editRow = false; // Update Failed
@@ -2240,7 +2270,11 @@ class WVendorsOperatorsList extends WVendorsOperators
             $updateRow = $this->rowUpdating($rsold, $rsnew);
             if ($updateRow) {
                 if (count($rsnew) > 0) {
-                    $editRow = $this->update($rsnew, "", $rsold);
+                    try {
+                        $editRow = $this->update($rsnew, "", $rsold);
+                    } catch (\Exception $e) {
+                        $this->setFailureMessage($e->getMessage());
+                    }
                 } else {
                     $editRow = true; // No field to update
                 }
@@ -2322,8 +2356,13 @@ class WVendorsOperatorsList extends WVendorsOperators
 
         // Call Row Inserting event
         $insertRow = $this->rowInserting($rsold, $rsnew);
+        $addRow = false;
         if ($insertRow) {
-            $addRow = $this->insert($rsnew);
+            try {
+                $addRow = $this->insert($rsnew);
+            } catch (\Exception $e) {
+                $this->setFailureMessage($e->getMessage());
+            }
             if ($addRow) {
             }
         } else {
@@ -2450,8 +2489,8 @@ class WVendorsOperatorsList extends WVendorsOperators
         $item->Visible = false;
     }
 
-    // Set up search/sort options
-    protected function setupSearchSortOptions()
+    // Set up search options
+    protected function setupSearchOptions()
     {
         global $Language, $Security;
         $pageUrl = $this->pageUrl();
@@ -2481,7 +2520,7 @@ class WVendorsOperatorsList extends WVendorsOperators
     /**
     * Export data in HTML/CSV/Word/Excel/XML/Email/PDF format
     *
-    * @param boolean $return Return the data rather than output it
+    * @param bool $return Return the data rather than output it
     * @return mixed
     */
     public function exportData($return = false)
@@ -2495,7 +2534,9 @@ class WVendorsOperatorsList extends WVendorsOperators
 
         // Export all
         if ($this->ExportAll) {
-            set_time_limit(Config("EXPORT_ALL_TIME_LIMIT"));
+            if (Config("EXPORT_ALL_TIME_LIMIT") >= 0) {
+                @set_time_limit(Config("EXPORT_ALL_TIME_LIMIT"));
+            }
             $this->DisplayRecords = $this->TotalRecords;
             $this->StopRecord = $this->TotalRecords;
         } else { // Export one page only

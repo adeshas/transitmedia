@@ -1347,19 +1347,8 @@ class GD extends PHPThumb
      */
     protected function determineFormat()
     {
-        $formatInfo = getimagesize($this->fileName);
-
-        // non-image files will return false
-        if ($formatInfo === false) {
-            if ($this->remoteImage) {
-                throw new \Exception("Could not determine format of remote image: {$this->fileName}");
-            } else {
-                throw new \Exception("File is not a valid image: {$this->fileName}");
-            }
-        }
-
-        $mimeType = isset($formatInfo['mime']) ? $formatInfo['mime'] : null;
-
+        $finfo = finfo_open(FILEINFO_MIME_TYPE);
+        $mimeType = finfo_file($finfo, $this->fileName);
         switch ($mimeType) {
             case 'image/gif':
                 $this->format = 'GIF';

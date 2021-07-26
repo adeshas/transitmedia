@@ -158,7 +158,6 @@ class SubTransactionDetailsList extends SubTransactionDetails
 
         // Initialize
         $GLOBALS["Page"] = &$this;
-        $this->TokenTimeout = SessionTimeoutTime();
 
         // Language object
         $Language = Container("language");
@@ -244,6 +243,30 @@ class SubTransactionDetailsList extends SubTransactionDetails
         return is_object($Response) ? $Response->getBody() : ob_get_clean();
     }
 
+    // Is lookup
+    public function isLookup()
+    {
+        return SameText(Route(0), Config("API_LOOKUP_ACTION"));
+    }
+
+    // Is AutoFill
+    public function isAutoFill()
+    {
+        return $this->isLookup() && SameText(Post("ajax"), "autofill");
+    }
+
+    // Is AutoSuggest
+    public function isAutoSuggest()
+    {
+        return $this->isLookup() && SameText(Post("ajax"), "autosuggest");
+    }
+
+    // Is modal lookup
+    public function isModalLookup()
+    {
+        return $this->isLookup() && SameText(Post("ajax"), "modal");
+    }
+
     // Is terminated
     public function isTerminated()
     {
@@ -261,7 +284,7 @@ class SubTransactionDetailsList extends SubTransactionDetails
         if ($this->terminated) {
             return;
         }
-        global $ExportFileName, $TempImages, $DashboardReport;
+        global $ExportFileName, $TempImages, $DashboardReport, $Response;
 
         // Page is terminated
         $this->terminated = true;
@@ -307,6 +330,11 @@ class SubTransactionDetailsList extends SubTransactionDetails
                 WriteJson(array_merge(["success" => false], $this->getMessages()));
             }
             return;
+        } else { // Check if response is JSON
+            if (StartsString("application/json", $Response->getHeaderLine("Content-type")) && $Response->getBody()->getSize()) { // With JSON response
+                $this->clearMessages();
+                return;
+            }
         }
 
         // Go to URL if specified
@@ -518,6 +546,7 @@ class SubTransactionDetailsList extends SubTransactionDetails
     public $MultiSelectKey;
     public $Command;
     public $RestoreSearch = false;
+    public $HashValue; // Hash value
     public $DetailPages;
     public $OldRecordset;
 
@@ -913,8 +942,8 @@ class SubTransactionDetailsList extends SubTransactionDetails
             }
         }
 
-        // Search/sort options
-        $this->setupSearchSortOptions();
+        // Search options
+        $this->setupSearchOptions();
 
         // Set up search panel class
         if ($this->SearchWhere != "") {
@@ -936,7 +965,7 @@ class SubTransactionDetailsList extends SubTransactionDetails
         // Set LoginStatus / Page_Rendering / Page_Render
         if (!IsApi() && !$this->isTerminated()) {
             // Pass table and field properties to client side
-            $this->toClientVar(["tableCaption"], ["caption", "Required", "IsInvalid", "Raw"]);
+            $this->toClientVar(["tableCaption"], ["caption", "Visible", "Required", "IsInvalid", "Raw"]);
 
             // Setup login status
             SetupLoginStatus();
@@ -947,7 +976,7 @@ class SubTransactionDetailsList extends SubTransactionDetails
             // Global Page Rendering event (in userfn*.php)
             Page_Rendering();
 
-            // Page Rendering event
+            // Page Render event
             if (method_exists($this, "pageRender")) {
                 $this->pageRender();
             }
@@ -1913,7 +1942,7 @@ class SubTransactionDetailsList extends SubTransactionDetails
             $this->ListOptions->CustomItem = "copy"; // Show copy column only
             $cancelurl = $this->addMasterUrl($pageUrl . "action=cancel");
             $opt->Body = "<div" . (($opt->OnLeft) ? " class=\"text-right\"" : "") . ">" .
-            "<a class=\"ew-grid-link ew-inline-insert\" title=\"" . HtmlTitle($Language->phrase("InsertLink")) . "\" data-caption=\"" . HtmlTitle($Language->phrase("InsertLink")) . "\" href=\"#\" onclick=\"return ew.forms.get(this).submit(event, '" . $this->pageName() . "');\">" . $Language->phrase("InsertLink") . "</a>&nbsp;" .
+            "<a class=\"ew-grid-link ew-inline-insert\" title=\"" . HtmlTitle($Language->phrase("InsertLink")) . "\" data-caption=\"" . HtmlTitle($Language->phrase("InsertLink")) . "\" href=\"#\" onclick=\"ew.forms.get(this).submit(event, '" . $this->pageName() . "'); return false;\">" . $Language->phrase("InsertLink") . "</a>&nbsp;" .
             "<a class=\"ew-grid-link ew-inline-cancel\" title=\"" . HtmlTitle($Language->phrase("CancelLink")) . "\" data-caption=\"" . HtmlTitle($Language->phrase("CancelLink")) . "\" href=\"" . $cancelurl . "\">" . $Language->phrase("CancelLink") . "</a>" .
             "<input type=\"hidden\" name=\"action\" id=\"action\" value=\"insert\"></div>";
             return;
@@ -1925,7 +1954,7 @@ class SubTransactionDetailsList extends SubTransactionDetails
             $this->ListOptions->CustomItem = "edit"; // Show edit column only
             $cancelurl = $this->addMasterUrl($pageUrl . "action=cancel");
                 $opt->Body = "<div" . (($opt->OnLeft) ? " class=\"text-right\"" : "") . ">" .
-                "<a class=\"ew-grid-link ew-inline-update\" title=\"" . HtmlTitle($Language->phrase("UpdateLink")) . "\" data-caption=\"" . HtmlTitle($Language->phrase("UpdateLink")) . "\" href=\"#\" onclick=\"return ew.forms.get(this).submit(event, '" . UrlAddHash($this->pageName(), "r" . $this->RowCount . "_" . $this->TableVar) . "');\">" . $Language->phrase("UpdateLink") . "</a>&nbsp;" .
+                "<a class=\"ew-grid-link ew-inline-update\" title=\"" . HtmlTitle($Language->phrase("UpdateLink")) . "\" data-caption=\"" . HtmlTitle($Language->phrase("UpdateLink")) . "\" href=\"#\" onclick=\"ew.forms.get(this).submit(event, '" . UrlAddHash($this->pageName(), "r" . $this->RowCount . "_" . $this->TableVar) . "'); return false;\">" . $Language->phrase("UpdateLink") . "</a>&nbsp;" .
                 "<a class=\"ew-grid-link ew-inline-cancel\" title=\"" . HtmlTitle($Language->phrase("CancelLink")) . "\" data-caption=\"" . HtmlTitle($Language->phrase("CancelLink")) . "\" href=\"" . $cancelurl . "\">" . $Language->phrase("CancelLink") . "</a>" .
                 "<input type=\"hidden\" name=\"action\" id=\"action\" value=\"update\"></div>";
             $opt->Body .= "<input type=\"hidden\" name=\"k" . $this->RowIndex . "_key\" id=\"k" . $this->RowIndex . "_key\" value=\"" . HtmlEncode($this->id->CurrentValue) . "\">";
@@ -2107,7 +2136,7 @@ class SubTransactionDetailsList extends SubTransactionDetails
                 $option->UseDropDownButton = false;
                 // Add grid insert
                 $item = &$option->add("gridinsert");
-                $item->Body = "<a class=\"ew-action ew-grid-insert\" title=\"" . HtmlTitle($Language->phrase("GridInsertLink")) . "\" data-caption=\"" . HtmlTitle($Language->phrase("GridInsertLink")) . "\" href=\"#\" onclick=\"return ew.forms.get(this).submit(event, '" . $this->pageName() . "');\">" . $Language->phrase("GridInsertLink") . "</a>";
+                $item->Body = "<a class=\"ew-action ew-grid-insert\" title=\"" . HtmlTitle($Language->phrase("GridInsertLink")) . "\" data-caption=\"" . HtmlTitle($Language->phrase("GridInsertLink")) . "\" href=\"#\" onclick=\"ew.forms.get(this).submit(event, '" . $this->pageName() . "'); return false;\">" . $Language->phrase("GridInsertLink") . "</a>";
                 // Add grid cancel
                 $item = &$option->add("gridcancel");
                 $cancelurl = $this->addMasterUrl($pageUrl . "action=cancel");
@@ -2127,7 +2156,7 @@ class SubTransactionDetailsList extends SubTransactionDetails
                 $option = $options["action"];
                 $option->UseDropDownButton = false;
                     $item = &$option->add("gridsave");
-                    $item->Body = "<a class=\"ew-action ew-grid-save\" title=\"" . HtmlTitle($Language->phrase("GridSaveLink")) . "\" data-caption=\"" . HtmlTitle($Language->phrase("GridSaveLink")) . "\" href=\"#\" onclick=\"return ew.forms.get(this).submit(event, '" . $this->pageName() . "');\">" . $Language->phrase("GridSaveLink") . "</a>";
+                    $item->Body = "<a class=\"ew-action ew-grid-save\" title=\"" . HtmlTitle($Language->phrase("GridSaveLink")) . "\" data-caption=\"" . HtmlTitle($Language->phrase("GridSaveLink")) . "\" href=\"#\" onclick=\"ew.forms.get(this).submit(event, '" . $this->pageName() . "'); return false;\">" . $Language->phrase("GridSaveLink") . "</a>";
                     $item = &$option->add("gridcancel");
                     $cancelurl = $this->addMasterUrl($pageUrl . "action=cancel");
                     $item->Body = "<a class=\"ew-action ew-grid-cancel\" title=\"" . HtmlTitle($Language->phrase("GridCancelLink")) . "\" data-caption=\"" . HtmlTitle($Language->phrase("GridCancelLink")) . "\" href=\"" . $cancelurl . "\">" . $Language->phrase("GridCancelLink") . "</a>";
@@ -2474,7 +2503,7 @@ class SubTransactionDetailsList extends SubTransactionDetails
             $this->id->ViewCustomAttributes = "";
 
             // transaction_id
-            $curVal = strval($this->transaction_id->CurrentValue);
+            $curVal = trim(strval($this->transaction_id->CurrentValue));
             if ($curVal != "") {
                 $this->transaction_id->ViewValue = $this->transaction_id->lookupCacheOption($curVal);
                 if ($this->transaction_id->ViewValue === null) { // Lookup from database
@@ -2498,7 +2527,7 @@ class SubTransactionDetailsList extends SubTransactionDetails
             if ($this->bus_id->VirtualValue != "") {
                 $this->bus_id->ViewValue = $this->bus_id->VirtualValue;
             } else {
-                $curVal = strval($this->bus_id->CurrentValue);
+                $curVal = trim(strval($this->bus_id->CurrentValue));
                 if ($curVal != "") {
                     $this->bus_id->ViewValue = $this->bus_id->lookupCacheOption($curVal);
                     if ($this->bus_id->ViewValue === null) { // Lookup from database
@@ -2536,7 +2565,7 @@ class SubTransactionDetailsList extends SubTransactionDetails
 
             // vendor_id
             $this->vendor_id->ViewValue = $this->vendor_id->CurrentValue;
-            $curVal = strval($this->vendor_id->CurrentValue);
+            $curVal = trim(strval($this->vendor_id->CurrentValue));
             if ($curVal != "") {
                 $this->vendor_id->ViewValue = $this->vendor_id->lookupCacheOption($curVal);
                 if ($this->vendor_id->ViewValue === null) { // Lookup from database
@@ -2577,7 +2606,7 @@ class SubTransactionDetailsList extends SubTransactionDetails
             if ($this->transaction_id->getSessionValue() != "") {
                 $this->transaction_id->CurrentValue = GetForeignKeyValue($this->transaction_id->getSessionValue());
                 $this->transaction_id->OldValue = $this->transaction_id->CurrentValue;
-                $curVal = strval($this->transaction_id->CurrentValue);
+                $curVal = trim(strval($this->transaction_id->CurrentValue));
                 if ($curVal != "") {
                     $this->transaction_id->ViewValue = $this->transaction_id->lookupCacheOption($curVal);
                     if ($this->transaction_id->ViewValue === null) { // Lookup from database
@@ -2662,7 +2691,7 @@ class SubTransactionDetailsList extends SubTransactionDetails
                 $this->vendor_id->EditValue = $arwrk;
             } else {
                 $this->vendor_id->EditValue = HtmlEncode($this->vendor_id->CurrentValue);
-                $curVal = strval($this->vendor_id->CurrentValue);
+                $curVal = trim(strval($this->vendor_id->CurrentValue));
                 if ($curVal != "") {
                     $this->vendor_id->EditValue = $this->vendor_id->lookupCacheOption($curVal);
                     if ($this->vendor_id->EditValue === null) { // Lookup from database
@@ -2703,7 +2732,7 @@ class SubTransactionDetailsList extends SubTransactionDetails
             if ($this->transaction_id->getSessionValue() != "") {
                 $this->transaction_id->CurrentValue = GetForeignKeyValue($this->transaction_id->getSessionValue());
                 $this->transaction_id->OldValue = $this->transaction_id->CurrentValue;
-                $curVal = strval($this->transaction_id->CurrentValue);
+                $curVal = trim(strval($this->transaction_id->CurrentValue));
                 if ($curVal != "") {
                     $this->transaction_id->ViewValue = $this->transaction_id->lookupCacheOption($curVal);
                     if ($this->transaction_id->ViewValue === null) { // Lookup from database
@@ -2788,7 +2817,7 @@ class SubTransactionDetailsList extends SubTransactionDetails
                 $this->vendor_id->EditValue = $arwrk;
             } else {
                 $this->vendor_id->EditValue = HtmlEncode($this->vendor_id->CurrentValue);
-                $curVal = strval($this->vendor_id->CurrentValue);
+                $curVal = trim(strval($this->vendor_id->CurrentValue));
                 if ($curVal != "") {
                     $this->vendor_id->EditValue = $this->vendor_id->lookupCacheOption($curVal);
                     if ($this->vendor_id->EditValue === null) { // Lookup from database
@@ -2960,6 +2989,7 @@ class SubTransactionDetailsList extends SubTransactionDetails
         $this->CurrentFilter = $filter;
         $sql = $this->getCurrentSql();
         $rsold = $conn->fetchAssoc($sql);
+        $editRow = false;
         if (!$rsold) {
             $this->setFailureMessage($Language->phrase("NoRecord")); // Set no record message
             $editRow = false; // Update Failed
@@ -3003,7 +3033,11 @@ class SubTransactionDetailsList extends SubTransactionDetails
             $updateRow = $this->rowUpdating($rsold, $rsnew);
             if ($updateRow) {
                 if (count($rsnew) > 0) {
-                    $editRow = $this->update($rsnew, "", $rsold);
+                    try {
+                        $editRow = $this->update($rsnew, "", $rsold);
+                    } catch (\Exception $e) {
+                        $this->setFailureMessage($e->getMessage());
+                    }
                 } else {
                     $editRow = true; // No field to update
                 }
@@ -3093,9 +3127,9 @@ class SubTransactionDetailsList extends SubTransactionDetails
             }
             if ($masterFilter != "") {
                 $rsmaster = Container("main_transactions")->loadRs($masterFilter)->fetch(\PDO::FETCH_ASSOC);
-                $this->MasterRecordExists = $rsmaster !== false;
+                $masterRecordExists = $rsmaster !== false;
                 $validMasterKey = true;
-                if ($this->MasterRecordExists) {
+                if ($masterRecordExists) {
                     $validMasterKey = $Security->isValidUserID($rsmaster['vendor_id']);
                 } elseif ($this->getCurrentMasterTable() == "main_transactions") {
                     $validMasterKey = false;
@@ -3145,8 +3179,13 @@ class SubTransactionDetailsList extends SubTransactionDetails
 
         // Call Row Inserting event
         $insertRow = $this->rowInserting($rsold, $rsnew);
+        $addRow = false;
         if ($insertRow) {
-            $addRow = $this->insert($rsnew);
+            try {
+                $addRow = $this->insert($rsnew);
+            } catch (\Exception $e) {
+                $this->setFailureMessage($e->getMessage());
+            }
             if ($addRow) {
             }
         } else {
@@ -3273,8 +3312,8 @@ class SubTransactionDetailsList extends SubTransactionDetails
         $item->Visible = false;
     }
 
-    // Set up search/sort options
-    protected function setupSearchSortOptions()
+    // Set up search options
+    protected function setupSearchOptions()
     {
         global $Language, $Security;
         $pageUrl = $this->pageUrl();
@@ -3315,7 +3354,7 @@ class SubTransactionDetailsList extends SubTransactionDetails
     /**
     * Export data in HTML/CSV/Word/Excel/XML/Email/PDF format
     *
-    * @param boolean $return Return the data rather than output it
+    * @param bool $return Return the data rather than output it
     * @return mixed
     */
     public function exportData($return = false)
@@ -3329,7 +3368,9 @@ class SubTransactionDetailsList extends SubTransactionDetails
 
         // Export all
         if ($this->ExportAll) {
-            set_time_limit(Config("EXPORT_ALL_TIME_LIMIT"));
+            if (Config("EXPORT_ALL_TIME_LIMIT") >= 0) {
+                @set_time_limit(Config("EXPORT_ALL_TIME_LIMIT"));
+            }
             $this->DisplayRecords = $this->TotalRecords;
             $this->StopRecord = $this->TotalRecords;
         } else { // Export one page only

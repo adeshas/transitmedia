@@ -75,6 +75,7 @@ class XTransactionStatus extends DbTable
         $this->id->Nullable = false; // NOT NULL field
         $this->id->Sortable = true; // Allow sort
         $this->id->DefaultErrorMessage = $Language->phrase("IncorrectInteger");
+        $this->id->CustomMsg = $Language->FieldPhrase($this->TableVar, $this->id->Param, "CustomMsg");
         $this->Fields['id'] = &$this->id;
 
         // name
@@ -82,16 +83,19 @@ class XTransactionStatus extends DbTable
         $this->name->Nullable = false; // NOT NULL field
         $this->name->Required = true; // Required field
         $this->name->Sortable = true; // Allow sort
+        $this->name->CustomMsg = $Language->FieldPhrase($this->TableVar, $this->name->Param, "CustomMsg");
         $this->Fields['name'] = &$this->name;
 
         // admin_name
         $this->admin_name = new DbField('x_transaction_status', 'x_transaction_status', 'x_admin_name', 'admin_name', '"admin_name"', '"admin_name"', 200, 0, -1, false, '"admin_name"', false, false, false, 'FORMATTED TEXT', 'TEXT');
         $this->admin_name->Sortable = true; // Allow sort
+        $this->admin_name->CustomMsg = $Language->FieldPhrase($this->TableVar, $this->admin_name->Param, "CustomMsg");
         $this->Fields['admin_name'] = &$this->admin_name;
 
         // operator_name
         $this->operator_name = new DbField('x_transaction_status', 'x_transaction_status', 'x_operator_name', 'operator_name', '"operator_name"', '"operator_name"', 200, 0, -1, false, '"operator_name"', false, false, false, 'FORMATTED TEXT', 'TEXT');
         $this->operator_name->Sortable = true; // Allow sort
+        $this->operator_name->CustomMsg = $Language->FieldPhrase($this->TableVar, $this->operator_name->Param, "CustomMsg");
         $this->Fields['operator_name'] = &$this->operator_name;
     }
 
@@ -272,18 +276,21 @@ class XTransactionStatus extends DbTable
         $cnt = -1;
         $rs = null;
         if ($sql instanceof \Doctrine\DBAL\Query\QueryBuilder) { // Query builder
-            $sql = $sql->resetQueryPart("orderBy")->getSQL();
+            $sqlwrk = clone $sql;
+            $sqlwrk = $sqlwrk->resetQueryPart("orderBy")->getSQL();
+        } else {
+            $sqlwrk = $sql;
         }
         $pattern = '/^SELECT\s([\s\S]+)\sFROM\s/i';
         // Skip Custom View / SubQuery / SELECT DISTINCT / ORDER BY
         if (
             ($this->TableType == 'TABLE' || $this->TableType == 'VIEW' || $this->TableType == 'LINKTABLE') &&
-            preg_match($pattern, $sql) && !preg_match('/\(\s*(SELECT[^)]+)\)/i', $sql) &&
-            !preg_match('/^\s*select\s+distinct\s+/i', $sql) && !preg_match('/\s+order\s+by\s+/i', $sql)
+            preg_match($pattern, $sqlwrk) && !preg_match('/\(\s*(SELECT[^)]+)\)/i', $sqlwrk) &&
+            !preg_match('/^\s*select\s+distinct\s+/i', $sqlwrk) && !preg_match('/\s+order\s+by\s+/i', $sqlwrk)
         ) {
-            $sqlwrk = "SELECT COUNT(*) FROM " . preg_replace($pattern, "", $sql);
+            $sqlwrk = "SELECT COUNT(*) FROM " . preg_replace($pattern, "", $sqlwrk);
         } else {
-            $sqlwrk = "SELECT COUNT(*) FROM (" . $sql . ") COUNT_TABLE";
+            $sqlwrk = "SELECT COUNT(*) FROM (" . $sqlwrk . ") COUNT_TABLE";
         }
         $conn = $c ?? $this->getConnection();
         $rs = $conn->executeQuery($sqlwrk);

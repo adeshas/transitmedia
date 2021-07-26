@@ -111,6 +111,7 @@ class DbField
     public $ExportOriginalValue;
     public $ExportFieldImage;
     public $DefaultDecimalPrecision;
+    public $Options;
 
     // Constructor
     public function __construct($tblvar, $tblname, $fldvar, $fldname, $fldexp, $fldbsexp, $fldtype, $fldsize, $flddtfmt, $upload, $fldvirtualexp, $fldvirtual, $forceselect, $fldvirtualsrch, $fldviewtag = "", $fldhtmltag = "")
@@ -484,7 +485,7 @@ class DbField
     /**
      * Get display field value separator
      *
-     * @param integer $idx Display field index (1|2|3)
+     * @param int $idx Display field index (1|2|3)
      * @return string
      */
     protected function getDisplayValueSeparator($idx)
@@ -809,11 +810,11 @@ class DbField
                             $wrkdata = ResizeFileToBinary($imagefn, $wrkwidth, $wrkheight);
                             return TempImage($wrkdata);
                         } else {
-                            if (IsRemote($imagefn)) {
-                                return TempImage(file_get_contents($imagefn));
-                            } else {
-                                return $this->UploadPath . $wrkfile;
-                            }
+                            // if (IsRemote($imagefn)) {
+                                return TempImage(file_get_contents($imagefn)); // Use global upload path to make sure the path is in dompdf's "chroot"
+                            // } else {
+                            //     return $this->UploadPath . $wrkfile; // Do not use $this->UploadPath which may not be in dompdf's "chroot"
+                            // }
                         }
                     }
                 } else {
@@ -837,11 +838,11 @@ class DbField
                                 if ($tmpimage != "") {
                                     $tmpimage .= ",";
                                 }
-                                if (IsRemote($imagefn)) {
-                                    $tmpimage .= TempImage(file_get_contents($imagefn));
-                                } else {
-                                    $tmpimage .= $this->UploadPath . $tmpfile;
-                                }
+                                // if (IsRemote($imagefn)) {
+                                    $tmpimage .= TempImage(file_get_contents($imagefn)); // Use global upload path to make sure the path is in dompdf's "chroot"
+                                // } else {
+                                //     $tmpimage .= $this->UploadPath . $tmpfile; // Do not use $this->UploadPath which may not be in dompdf's "chroot"
+                                // }
                             }
                         }
                     }
@@ -1023,6 +1024,18 @@ class DbField
     }
 
     /**
+     * Get options
+     *
+     * @return array
+     */
+    public function getOptions()
+    {
+        return $this->Options ?? (($this->OptionCount > 0)
+            ? $this->options(false, true) // User values
+            : $this->lookupOptions()); // Lookup table
+    }
+
+    /**
      * Output client side list as JSON
      *
      * @return string
@@ -1031,11 +1044,10 @@ class DbField
     {
         $ar = [];
         if ($this->Lookup) {
-            $ar = $this->Lookup->toClientList($currentPage);
-            $options = ($this->OptionCount > 0)
-                ? $this->options(false, true) // User values
-                : $this->lookupOptions(); // Lookup table
-            $ar = array_merge($ar, [ "lookupOptions" => $options, "multiple" => $this->isMultiSelect() ]);
+            $ar = array_merge($this->Lookup->toClientList($currentPage), [
+                "lookupOptions" => $this->getOptions(),
+                "multiple" => $this->isMultiSelect()
+            ]);
         }
         return ArrayToJson($ar);
     }

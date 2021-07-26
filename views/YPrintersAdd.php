@@ -6,7 +6,6 @@ namespace PHPMaker2021\test;
 $YPrintersAdd = &$Page;
 ?>
 <script>
-if (!ew.vars.tables.y_printers) ew.vars.tables.y_printers = <?= JsonEncode(GetClientVar("tables", "y_printers")) ?>;
 var currentForm, currentPageID;
 var fy_printersadd;
 loadjs.ready("head", function () {
@@ -16,11 +15,14 @@ loadjs.ready("head", function () {
     fy_printersadd = currentForm = new ew.Form("fy_printersadd", "add");
 
     // Add fields
-    var fields = ew.vars.tables.y_printers.fields;
+    var currentTable = <?= JsonEncode(GetClientVar("tables", "y_printers")) ?>,
+        fields = currentTable.fields;
+    if (!ew.vars.tables.y_printers)
+        ew.vars.tables.y_printers = currentTable;
     fy_printersadd.addFields([
-        ["name", [fields.name.required ? ew.Validators.required(fields.name.caption) : null], fields.name.isInvalid],
-        ["passcode", [fields.passcode.required ? ew.Validators.required(fields.passcode.caption) : null], fields.passcode.isInvalid],
-        ["_email", [fields._email.required ? ew.Validators.required(fields._email.caption) : null], fields._email.isInvalid]
+        ["name", [fields.name.visible && fields.name.required ? ew.Validators.required(fields.name.caption) : null], fields.name.isInvalid],
+        ["passcode", [fields.passcode.visible && fields.passcode.required ? ew.Validators.required(fields.passcode.caption) : null], fields.passcode.isInvalid],
+        ["_email", [fields._email.visible && fields._email.required ? ew.Validators.required(fields._email.caption) : null], fields._email.isInvalid]
     ]);
 
     // Set invalid fields
@@ -99,7 +101,7 @@ loadjs.ready("head", function () {
 <?php
 $Page->showMessage();
 ?>
-<form name="fy_printersadd" id="fy_printersadd" class="<?= $Page->FormClassName ?>" action="<?= CurrentPageUrl() ?>" method="post">
+<form name="fy_printersadd" id="fy_printersadd" class="<?= $Page->FormClassName ?>" action="<?= CurrentPageUrl(false) ?>" method="post">
 <?php if (Config("CHECK_TOKEN")) { ?>
 <input type="hidden" name="<?= $TokenNameKey ?>" value="<?= $TokenName ?>"><!-- CSRF token name -->
 <input type="hidden" name="<?= $TokenValueKey ?>" value="<?= $TokenValue ?>"><!-- CSRF token value -->

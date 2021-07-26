@@ -8,7 +8,6 @@ $Grid->run();
 ?>
 <?php if (!$Grid->isExport()) { ?>
 <script>
-if (!ew.vars.tables.y_operators) ew.vars.tables.y_operators = <?= JsonEncode(GetClientVar("tables", "y_operators")) ?>;
 var currentForm, currentPageID;
 var fy_operatorsgrid;
 loadjs.ready("head", function () {
@@ -18,14 +17,17 @@ loadjs.ready("head", function () {
     fy_operatorsgrid.formKeyCountName = '<?= $Grid->FormKeyCountName ?>';
 
     // Add fields
-    var fields = ew.vars.tables.y_operators.fields;
+    var currentTable = <?= JsonEncode(GetClientVar("tables", "y_operators")) ?>,
+        fields = currentTable.fields;
+    if (!ew.vars.tables.y_operators)
+        ew.vars.tables.y_operators = currentTable;
     fy_operatorsgrid.addFields([
-        ["id", [fields.id.required ? ew.Validators.required(fields.id.caption) : null], fields.id.isInvalid],
-        ["name", [fields.name.required ? ew.Validators.required(fields.name.caption) : null], fields.name.isInvalid],
-        ["shortname", [fields.shortname.required ? ew.Validators.required(fields.shortname.caption) : null], fields.shortname.isInvalid],
-        ["platform_id", [fields.platform_id.required ? ew.Validators.required(fields.platform_id.caption) : null], fields.platform_id.isInvalid],
-        ["_email", [fields._email.required ? ew.Validators.required(fields._email.caption) : null], fields._email.isInvalid],
-        ["contact_name", [fields.contact_name.required ? ew.Validators.required(fields.contact_name.caption) : null], fields.contact_name.isInvalid]
+        ["id", [fields.id.visible && fields.id.required ? ew.Validators.required(fields.id.caption) : null], fields.id.isInvalid],
+        ["name", [fields.name.visible && fields.name.required ? ew.Validators.required(fields.name.caption) : null], fields.name.isInvalid],
+        ["shortname", [fields.shortname.visible && fields.shortname.required ? ew.Validators.required(fields.shortname.caption) : null], fields.shortname.isInvalid],
+        ["platform_id", [fields.platform_id.visible && fields.platform_id.required ? ew.Validators.required(fields.platform_id.caption) : null], fields.platform_id.isInvalid],
+        ["_email", [fields._email.visible && fields._email.required ? ew.Validators.required(fields._email.caption) : null], fields._email.isInvalid],
+        ["contact_name", [fields.contact_name.visible && fields.contact_name.required ? ew.Validators.required(fields.contact_name.caption) : null], fields.contact_name.isInvalid]
     ]);
 
     // Set invalid fields

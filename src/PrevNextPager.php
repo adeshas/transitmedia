@@ -132,7 +132,7 @@ PAGER;
         if ($this->Modal) {
             return ' data-start="' . $start . '"';
         } else {
-            return ' href="' . CurrentPageUrl() . '?start=' . $start . '"';
+            return ' href="' . CurrentPageUrl(false) . '?start=' . $start . '"';
         }
     }
 }

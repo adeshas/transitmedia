@@ -276,28 +276,39 @@ function sendTMmail($from, $to, $subject, $msg, $msgtxt="", $attach = null, $cc 
 	// TRUE FOR DEBUG MODE, FALSE FOR LIVE MODE
 	$xsendmode = 'debug_only'; //debug_only, live_only, debug_live
 
-	if($xsendmode === 'debug_only' || $xsendmode === 'debug_live'){
-		$debugme = deubgEmail($email,TRUE);
-	}
-	//COMMENT FOR LIVE EMAIL 
-	//$debugme = deubgEmail($email,TRUE);
+
+        if($xsendmode === 'debug_only' || $xsendmode === 'debug_live'){
+          $debugme = deubgEmail($email,TRUE);
+        }
+        //COMMENT FOR LIVE EMAIL 
+        //$debugme = deubgEmail($email,TRUE);
 
         $email->Content = beautify_email($msg);
         $email->AltBody = $msgtxt;
 
-        // file_put_contents('abc.log', json_encode($mail) . "\n", FILE_APPEND | LOCK_EX);
+        file_put_contents('abc-true.log', json_encode($mail) . "\n", FILE_APPEND | LOCK_EX);
 
 
 		
 		// var_dump($email->Recipient);		
 		// exit;
 
-	//COMMENT FOR DEBUG EMAIL
-        //$email->send();
-
 	if($xsendmode === 'live_only' || $xsendmode === 'debug_live'){
 		$email->send();
-        }
+    if(!$sent){
+                //echo 'Message could not be sent.';
+                //print_r($email->SendErrDescription);
+                file_put_contents('abc-error.log', 'Message could not be sent.'."\n".$email->SendErrDescription."\n".json_encode($email) . "\n", FILE_APPEND | LOCK_EX);
+                $code = 'B$SKREBHEKE2PK7NXb%DfZ3ZjYEBsdawsyH94hYRu#NKKuWNq%kMyA4^ZZRZ%yZm9@U5eXu&7NmA$YvXmQn8Fb3xkG!*hFS!B!B';
+                $msg = $email->SendErrDescription;
+                $url = 'http://new.transitmedia.com.ng/notification.php?mailcmd='.urlencode($code).'&msg='.urlencode($msg);
+
+                file_get_contents($url);
+
+         }else{
+         		echo 'Message has been sent';
+		}
+  }
 
 
 
@@ -430,6 +441,4 @@ filter for Vendor ID on campaign table
 
 ?>
 
-<?php
-echo GetDebugMessage();
-?>
+<?= GetDebugMessage() ?>

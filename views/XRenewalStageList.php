@@ -7,7 +7,6 @@ $XRenewalStageList = &$Page;
 ?>
 <?php if (!$Page->isExport()) { ?>
 <script>
-if (!ew.vars.tables.x_renewal_stage) ew.vars.tables.x_renewal_stage = <?= JsonEncode(GetClientVar("tables", "x_renewal_stage")) ?>;
 var currentForm, currentPageID;
 var fx_renewal_stagelist;
 loadjs.ready("head", function () {
@@ -18,10 +17,13 @@ loadjs.ready("head", function () {
     fx_renewal_stagelist.formKeyCountName = '<?= $Page->FormKeyCountName ?>';
 
     // Add fields
-    var fields = ew.vars.tables.x_renewal_stage.fields;
+    var currentTable = <?= JsonEncode(GetClientVar("tables", "x_renewal_stage")) ?>,
+        fields = currentTable.fields;
+    if (!ew.vars.tables.x_renewal_stage)
+        ew.vars.tables.x_renewal_stage = currentTable;
     fx_renewal_stagelist.addFields([
-        ["id", [fields.id.required ? ew.Validators.required(fields.id.caption) : null], fields.id.isInvalid],
-        ["name", [fields.name.required ? ew.Validators.required(fields.name.caption) : null], fields.name.isInvalid]
+        ["id", [fields.id.visible && fields.id.required ? ew.Validators.required(fields.id.caption) : null], fields.id.isInvalid],
+        ["name", [fields.name.visible && fields.name.required ? ew.Validators.required(fields.name.caption) : null], fields.name.isInvalid]
     ]);
 
     // Set invalid fields
@@ -121,7 +123,7 @@ $Page->renderOtherOptions();
 ?>
 <?php if ($Security->canSearch()) { ?>
 <?php if (!$Page->isExport() && !$Page->CurrentAction) { ?>
-<form name="fx_renewal_stagelistsrch" id="fx_renewal_stagelistsrch" class="form-inline ew-form ew-ext-search-form" action="<?= CurrentPageUrl() ?>">
+<form name="fx_renewal_stagelistsrch" id="fx_renewal_stagelistsrch" class="form-inline ew-form ew-ext-search-form" action="<?= CurrentPageUrl(false) ?>">
 <div id="fx_renewal_stagelistsrch-search-panel" class="<?= $Page->SearchPanelClass ?>">
 <input type="hidden" name="cmd" value="search">
 <input type="hidden" name="t" value="x_renewal_stage">
@@ -156,7 +158,7 @@ $Page->showMessage();
 <?php if (!$Page->isExport()) { ?>
 <div class="card-header ew-grid-upper-panel">
 <?php if (!$Page->isGridAdd()) { ?>
-<form name="ew-pager-form" class="form-inline ew-form ew-pager-form" action="<?= CurrentPageUrl() ?>">
+<form name="ew-pager-form" class="form-inline ew-form ew-pager-form" action="<?= CurrentPageUrl(false) ?>">
 <?= $Page->Pager->render() ?>
 </form>
 <?php } ?>
@@ -166,7 +168,7 @@ $Page->showMessage();
 <div class="clearfix"></div>
 </div>
 <?php } ?>
-<form name="fx_renewal_stagelist" id="fx_renewal_stagelist" class="form-inline ew-form ew-list-form" action="<?= CurrentPageUrl() ?>" method="post">
+<form name="fx_renewal_stagelist" id="fx_renewal_stagelist" class="form-inline ew-form ew-list-form" action="<?= CurrentPageUrl(false) ?>" method="post">
 <?php if (Config("CHECK_TOKEN")) { ?>
 <input type="hidden" name="<?= $TokenNameKey ?>" value="<?= $TokenName ?>"><!-- CSRF token name -->
 <input type="hidden" name="<?= $TokenValueKey ?>" value="<?= $TokenValue ?>"><!-- CSRF token value -->
@@ -441,7 +443,7 @@ if ($Page->Recordset) {
 <?php if (!$Page->isExport()) { ?>
 <div class="card-footer ew-grid-lower-panel">
 <?php if (!$Page->isGridAdd()) { ?>
-<form name="ew-pager-form" class="form-inline ew-form ew-pager-form" action="<?= CurrentPageUrl() ?>">
+<form name="ew-pager-form" class="form-inline ew-form ew-pager-form" action="<?= CurrentPageUrl(false) ?>">
 <?= $Page->Pager->render() ?>
 </form>
 <?php } ?>

@@ -1,5 +1,5 @@
 ﻿<?xml version="1.0" encoding="utf-8" standalone="yes"?>
-<ew-language date="2021/1/9" version="17.0.5" id="en" name="English" desc="English" author="e.World Technology Limited">
+<ew-language date="2021/7/25" version="17.0.5" id="en" name="English" desc="English" author="e.World Technology Limited">
   <!--
     *** Important Notes:
     1. Language ID should follow: https://developers.google.com/recaptcha/docs/language,
@@ -925,6 +925,9 @@
   <project>
     <phrase id="bodytitle" value="Transit Media Vendor Portal" />
     <phrase id="footertext" value="&amp;copy;2020 Transit Media Ltd. All rights reserved." />
+    <menu id="207">
+      <phrase id="menutext" value="Notifications" />
+    </menu>
     <menu id="205">
       <phrase id="menutext" value="Download Branders Pass" />
     </menu>
@@ -2098,70 +2101,88 @@
     <table id="view_payments_pending">
       <phrase id="tblcaption" value="Pending Payments" />
       <field id="transaction_id">
-        <phrase id="fldcaption" value="transaction id" />
+        <phrase id="fldcaption" value="Transaction ID" />
       </field>
       <field id="campaign_id">
-        <phrase id="fldcaption" value="campaign id" />
+        <phrase id="fldcaption" value="Campaign ID" />
       </field>
       <field id="campaign_name">
-        <phrase id="fldcaption" value="campaign name" />
-      </field>
-      <field id="quantity">
-        <phrase id="fldcaption" value="quantity" />
-      </field>
-      <field id="transaction_status">
-        <phrase id="fldcaption" value="transaction status" />
-      </field>
-      <field id="print_status">
-        <phrase id="fldcaption" value="print status" />
+        <phrase id="fldcaption" value="Campaign Name" />
       </field>
       <field id="payment_status">
-        <phrase id="fldcaption" value="payment status" />
+        <phrase id="fldcaption" value="Payment Status" />
       </field>
       <field id="start_date">
-        <phrase id="fldcaption" value="start date" />
+        <phrase id="fldcaption" value="Start Date" />
       </field>
       <field id="end_date">
-        <phrase id="fldcaption" value="end date" />
+        <phrase id="fldcaption" value="End Date" />
       </field>
       <field id="vendor">
-        <phrase id="fldcaption" value="vendor" />
+        <phrase id="fldcaption" value="Vendor" />
       </field>
       <field id="operator">
-        <phrase id="fldcaption" value="operator" />
+        <phrase id="fldcaption" value="Operator" />
       </field>
       <field id="platform">
-        <phrase id="fldcaption" value="platform" />
+        <phrase id="fldcaption" value="Platform" />
       </field>
       <field id="inventory">
-        <phrase id="fldcaption" value="inventory" />
+        <phrase id="fldcaption" value="Inventory" />
       </field>
       <field id="bus_size">
-        <phrase id="fldcaption" value="bus size" />
+        <phrase id="fldcaption" value="Bus Size" />
       </field>
       <field id="print_stage">
-        <phrase id="fldcaption" value="print stage" />
+        <phrase id="fldcaption" value="Print Stage" />
+      </field>
+      <field id="quantity">
+        <phrase id="fldcaption" value="Quantity" />
       </field>
       <field id="price">
-        <phrase id="fldcaption" value="price" />
+        <phrase id="fldcaption" value="Unit Price" />
       </field>
       <field id="operator_fee">
-        <phrase id="fldcaption" value="operator fee" />
+        <phrase id="fldcaption" value="Operator Fee" />
       </field>
       <field id="agency_fee">
-        <phrase id="fldcaption" value="agency fee" />
+        <phrase id="fldcaption" value="Agency Fee" />
       </field>
       <field id="lamata_fee">
-        <phrase id="fldcaption" value="lamata fee" />
+        <phrase id="fldcaption" value="Lamata Fee" />
       </field>
       <field id="lasaa_fee">
-        <phrase id="fldcaption" value="lasaa fee" />
+        <phrase id="fldcaption" value="Lasaa Fee" />
       </field>
       <field id="printers_fee">
-        <phrase id="fldcaption" value="printers fee" />
+        <phrase id="fldcaption" value="Printers Fee" />
+      </field>
+      <field id="operator_total">
+        <phrase id="fldcaption" value="Operator Total" />
+      </field>
+      <field id="agency_total">
+        <phrase id="fldcaption" value="Agency Total" />
+      </field>
+      <field id="lamata_total">
+        <phrase id="fldcaption" value="Lamata Total" />
+      </field>
+      <field id="lasaa_total">
+        <phrase id="fldcaption" value="Lasaa Total" />
+      </field>
+      <field id="printers_total">
+        <phrase id="fldcaption" value="Printers Total" />
+      </field>
+      <field id="price_total">
+        <phrase id="fldcaption" value="Price Total" />
       </field>
       <field id="price_details">
-        <phrase id="fldcaption" value="price details" />
+        <phrase id="fldcaption" value="Price Details" />
+      </field>
+      <field id="transaction_status">
+        <phrase id="fldcaption" value="Transaction Status" />
+      </field>
+      <field id="print_status">
+        <phrase id="fldcaption" value="Print Status" />
       </field>
     </table>
     <table id="renewalhandler">
@@ -2707,6 +2728,9 @@
       <field id="user_id">
         <phrase id="fldcaption" value="User" />
       </field>
+    </table>
+    <table id="notifications">
+      <phrase id="tblcaption" value="Notifications" />
     </table>
   </project>
 </ew-language>

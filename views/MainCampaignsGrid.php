@@ -8,7 +8,6 @@ $Grid->run();
 ?>
 <?php if (!$Grid->isExport()) { ?>
 <script>
-if (!ew.vars.tables.main_campaigns) ew.vars.tables.main_campaigns = <?= JsonEncode(GetClientVar("tables", "main_campaigns")) ?>;
 var currentForm, currentPageID;
 var fmain_campaignsgrid;
 loadjs.ready("head", function () {
@@ -18,19 +17,22 @@ loadjs.ready("head", function () {
     fmain_campaignsgrid.formKeyCountName = '<?= $Grid->FormKeyCountName ?>';
 
     // Add fields
-    var fields = ew.vars.tables.main_campaigns.fields;
+    var currentTable = <?= JsonEncode(GetClientVar("tables", "main_campaigns")) ?>,
+        fields = currentTable.fields;
+    if (!ew.vars.tables.main_campaigns)
+        ew.vars.tables.main_campaigns = currentTable;
     fmain_campaignsgrid.addFields([
-        ["id", [fields.id.required ? ew.Validators.required(fields.id.caption) : null, ew.Validators.integer], fields.id.isInvalid],
-        ["name", [fields.name.required ? ew.Validators.required(fields.name.caption) : null], fields.name.isInvalid],
-        ["inventory_id", [fields.inventory_id.required ? ew.Validators.required(fields.inventory_id.caption) : null], fields.inventory_id.isInvalid],
-        ["platform_id", [fields.platform_id.required ? ew.Validators.required(fields.platform_id.caption) : null], fields.platform_id.isInvalid],
-        ["bus_size_id", [fields.bus_size_id.required ? ew.Validators.required(fields.bus_size_id.caption) : null], fields.bus_size_id.isInvalid],
-        ["quantity", [fields.quantity.required ? ew.Validators.required(fields.quantity.caption) : null, ew.Validators.integer], fields.quantity.isInvalid],
-        ["start_date", [fields.start_date.required ? ew.Validators.required(fields.start_date.caption) : null, ew.Validators.datetime(0)], fields.start_date.isInvalid],
-        ["end_date", [fields.end_date.required ? ew.Validators.required(fields.end_date.caption) : null, ew.Validators.datetime(0)], fields.end_date.isInvalid],
-        ["vendor_id", [fields.vendor_id.required ? ew.Validators.required(fields.vendor_id.caption) : null], fields.vendor_id.isInvalid],
-        ["renewal_stage_id", [fields.renewal_stage_id.required ? ew.Validators.required(fields.renewal_stage_id.caption) : null], fields.renewal_stage_id.isInvalid],
-        ["check_status", [fields.check_status.required ? ew.Validators.required(fields.check_status.caption) : null], fields.check_status.isInvalid]
+        ["id", [fields.id.visible && fields.id.required ? ew.Validators.required(fields.id.caption) : null, ew.Validators.integer], fields.id.isInvalid],
+        ["name", [fields.name.visible && fields.name.required ? ew.Validators.required(fields.name.caption) : null], fields.name.isInvalid],
+        ["inventory_id", [fields.inventory_id.visible && fields.inventory_id.required ? ew.Validators.required(fields.inventory_id.caption) : null], fields.inventory_id.isInvalid],
+        ["platform_id", [fields.platform_id.visible && fields.platform_id.required ? ew.Validators.required(fields.platform_id.caption) : null], fields.platform_id.isInvalid],
+        ["bus_size_id", [fields.bus_size_id.visible && fields.bus_size_id.required ? ew.Validators.required(fields.bus_size_id.caption) : null], fields.bus_size_id.isInvalid],
+        ["quantity", [fields.quantity.visible && fields.quantity.required ? ew.Validators.required(fields.quantity.caption) : null, ew.Validators.integer], fields.quantity.isInvalid],
+        ["start_date", [fields.start_date.visible && fields.start_date.required ? ew.Validators.required(fields.start_date.caption) : null, ew.Validators.datetime(0)], fields.start_date.isInvalid],
+        ["end_date", [fields.end_date.visible && fields.end_date.required ? ew.Validators.required(fields.end_date.caption) : null, ew.Validators.datetime(0)], fields.end_date.isInvalid],
+        ["vendor_id", [fields.vendor_id.visible && fields.vendor_id.required ? ew.Validators.required(fields.vendor_id.caption) : null], fields.vendor_id.isInvalid],
+        ["renewal_stage_id", [fields.renewal_stage_id.visible && fields.renewal_stage_id.required ? ew.Validators.required(fields.renewal_stage_id.caption) : null], fields.renewal_stage_id.isInvalid],
+        ["check_status", [fields.check_status.visible && fields.check_status.required ? ew.Validators.required(fields.check_status.caption) : null], fields.check_status.isInvalid]
     ]);
 
     // Set invalid fields

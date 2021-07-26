@@ -81,7 +81,6 @@ class PrivateFunctions
 
         // Initialize
         $GLOBALS["Page"] = &$this;
-        $this->TokenTimeout = SessionTimeoutTime();
 
         // Language object
         $Language = Container("language");
@@ -111,6 +110,30 @@ class PrivateFunctions
         return is_object($Response) ? $Response->getBody() : ob_get_clean();
     }
 
+    // Is lookup
+    public function isLookup()
+    {
+        return SameText(Route(0), Config("API_LOOKUP_ACTION"));
+    }
+
+    // Is AutoFill
+    public function isAutoFill()
+    {
+        return $this->isLookup() && SameText(Post("ajax"), "autofill");
+    }
+
+    // Is AutoSuggest
+    public function isAutoSuggest()
+    {
+        return $this->isLookup() && SameText(Post("ajax"), "autosuggest");
+    }
+
+    // Is modal lookup
+    public function isModalLookup()
+    {
+        return $this->isLookup() && SameText(Post("ajax"), "modal");
+    }
+
     // Is terminated
     public function isTerminated()
     {
@@ -128,10 +151,15 @@ class PrivateFunctions
         if ($this->terminated) {
             return;
         }
-        global $ExportFileName, $TempImages, $DashboardReport;
+        global $ExportFileName, $TempImages, $DashboardReport, $Response;
 
         // Page is terminated
         $this->terminated = true;
+
+         // Page Unload event
+        if (method_exists($this, "pageUnload")) {
+            $this->pageUnload();
+        }
 
         // Global Page Unloaded event (in userfn*.php)
         Page_Unloaded();
@@ -148,6 +176,11 @@ class PrivateFunctions
                 WriteJson(array_merge(["success" => false], $this->getMessages()));
             }
             return;
+        } else { // Check if response is JSON
+            if (StartsString("application/json", $Response->getHeaderLine("Content-type")) && $Response->getBody()->getSize()) { // With JSON response
+                $this->clearMessages();
+                return;
+            }
         }
 
         // Go to URL if specified
@@ -176,6 +209,11 @@ class PrivateFunctions
         // Global Page Loading event (in userfn*.php)
         Page_Loading();
 
+        // Page Load event
+        if (method_exists($this, "pageLoad")) {
+            $this->pageLoad();
+        }
+
         // Set up Breadcrumb
         $this->setupBreadcrumb();
 
@@ -190,7 +228,7 @@ class PrivateFunctions
             // Global Page Rendering event (in userfn*.php)
             Page_Rendering();
 
-            // Page Rendering event
+            // Page Render event
             if (method_exists($this, "pageRender")) {
                 $this->pageRender();
             }
@@ -204,5 +242,23 @@ class PrivateFunctions
         $Breadcrumb = new Breadcrumb("index");
         $Breadcrumb->add("custom", "private_functions", CurrentUrl(), "", "private_functions", true);
         $this->Heading = $Language->TablePhrase("private_functions", "TblCaption");
+    }
+
+    // Page Load event
+    public function pageLoad()
+    {
+        //Log("Page Load");
+    }
+
+    // Page Unload event
+    public function pageUnload()
+    {
+        //Log("Page Unload");
+    }
+
+    // Page Render event
+    public function pageRender()
+    {
+        //Log("Page Render");
     }
 }

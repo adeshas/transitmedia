@@ -77,6 +77,7 @@ class SubTransactionDetails extends DbTable
         $this->id->Nullable = false; // NOT NULL field
         $this->id->Sortable = true; // Allow sort
         $this->id->DefaultErrorMessage = $Language->phrase("IncorrectInteger");
+        $this->id->CustomMsg = $Language->FieldPhrase($this->TableVar, $this->id->Param, "CustomMsg");
         $this->Fields['id'] = &$this->id;
 
         // transaction_id
@@ -89,6 +90,7 @@ class SubTransactionDetails extends DbTable
         $this->transaction_id->PleaseSelectText = $Language->phrase("PleaseSelect"); // "PleaseSelect" text
         $this->transaction_id->Lookup = new Lookup('transaction_id', 'main_transactions', true, 'id', ["campaign_id","operator_id","",""], [], ["x_bus_id"], [], [], [], [], '', '');
         $this->transaction_id->DefaultErrorMessage = $Language->phrase("IncorrectInteger");
+        $this->transaction_id->CustomMsg = $Language->FieldPhrase($this->TableVar, $this->transaction_id->Param, "CustomMsg");
         $this->Fields['transaction_id'] = &$this->transaction_id;
 
         // bus_id
@@ -100,6 +102,7 @@ class SubTransactionDetails extends DbTable
         $this->bus_id->PleaseSelectText = $Language->phrase("PleaseSelect"); // "PleaseSelect" text
         $this->bus_id->Lookup = new Lookup('bus_id', 'view_bus_trans_options', false, 'bus_id', ["number","operator","exterior_campaign","interior_campaign"], ["x_transaction_id"], [], ["transaction_id"], ["x_transaction_id"], [], [], '', '');
         $this->bus_id->DefaultErrorMessage = $Language->phrase("IncorrectInteger");
+        $this->bus_id->CustomMsg = $Language->FieldPhrase($this->TableVar, $this->bus_id->Param, "CustomMsg");
         $this->Fields['bus_id'] = &$this->bus_id;
 
         // created_by
@@ -107,6 +110,7 @@ class SubTransactionDetails extends DbTable
         $this->created_by->Nullable = false; // NOT NULL field
         $this->created_by->Sortable = true; // Allow sort
         $this->created_by->DefaultErrorMessage = $Language->phrase("IncorrectInteger");
+        $this->created_by->CustomMsg = $Language->FieldPhrase($this->TableVar, $this->created_by->Param, "CustomMsg");
         $this->Fields['created_by'] = &$this->created_by;
 
         // ts_created
@@ -115,6 +119,7 @@ class SubTransactionDetails extends DbTable
         $this->ts_created->Required = true; // Required field
         $this->ts_created->Sortable = true; // Allow sort
         $this->ts_created->DefaultErrorMessage = str_replace("%s", $GLOBALS["DATE_FORMAT"], $Language->phrase("IncorrectDate"));
+        $this->ts_created->CustomMsg = $Language->FieldPhrase($this->TableVar, $this->ts_created->Param, "CustomMsg");
         $this->Fields['ts_created'] = &$this->ts_created;
 
         // ts_last_update
@@ -123,6 +128,7 @@ class SubTransactionDetails extends DbTable
         $this->ts_last_update->Required = true; // Required field
         $this->ts_last_update->Sortable = true; // Allow sort
         $this->ts_last_update->DefaultErrorMessage = str_replace("%s", $GLOBALS["DATE_FORMAT"], $Language->phrase("IncorrectDate"));
+        $this->ts_last_update->CustomMsg = $Language->FieldPhrase($this->TableVar, $this->ts_last_update->Param, "CustomMsg");
         $this->Fields['ts_last_update'] = &$this->ts_last_update;
 
         // vendor_id
@@ -149,6 +155,7 @@ class SubTransactionDetails extends DbTable
         $this->vendor_id->Sortable = true; // Allow sort
         $this->vendor_id->Lookup = new Lookup('vendor_id', 'y_vendors', false, 'id', ["name","","",""], [], [], [], [], [], [], '', '');
         $this->vendor_id->DefaultErrorMessage = $Language->phrase("IncorrectInteger");
+        $this->vendor_id->CustomMsg = $Language->FieldPhrase($this->TableVar, $this->vendor_id->Param, "CustomMsg");
         $this->Fields['vendor_id'] = &$this->vendor_id;
     }
 
@@ -431,18 +438,21 @@ class SubTransactionDetails extends DbTable
         $cnt = -1;
         $rs = null;
         if ($sql instanceof \Doctrine\DBAL\Query\QueryBuilder) { // Query builder
-            $sql = $sql->resetQueryPart("orderBy")->getSQL();
+            $sqlwrk = clone $sql;
+            $sqlwrk = $sqlwrk->resetQueryPart("orderBy")->getSQL();
+        } else {
+            $sqlwrk = $sql;
         }
         $pattern = '/^SELECT\s([\s\S]+)\sFROM\s/i';
         // Skip Custom View / SubQuery / SELECT DISTINCT / ORDER BY
         if (
             ($this->TableType == 'TABLE' || $this->TableType == 'VIEW' || $this->TableType == 'LINKTABLE') &&
-            preg_match($pattern, $sql) && !preg_match('/\(\s*(SELECT[^)]+)\)/i', $sql) &&
-            !preg_match('/^\s*select\s+distinct\s+/i', $sql) && !preg_match('/\s+order\s+by\s+/i', $sql)
+            preg_match($pattern, $sqlwrk) && !preg_match('/\(\s*(SELECT[^)]+)\)/i', $sqlwrk) &&
+            !preg_match('/^\s*select\s+distinct\s+/i', $sqlwrk) && !preg_match('/\s+order\s+by\s+/i', $sqlwrk)
         ) {
-            $sqlwrk = "SELECT COUNT(*) FROM " . preg_replace($pattern, "", $sql);
+            $sqlwrk = "SELECT COUNT(*) FROM " . preg_replace($pattern, "", $sqlwrk);
         } else {
-            $sqlwrk = "SELECT COUNT(*) FROM (" . $sql . ") COUNT_TABLE";
+            $sqlwrk = "SELECT COUNT(*) FROM (" . $sqlwrk . ") COUNT_TABLE";
         }
         $conn = $c ?? $this->getConnection();
         $rs = $conn->executeQuery($sqlwrk);
@@ -887,7 +897,7 @@ class SubTransactionDetails extends DbTable
     {
         if ($this->getCurrentMasterTable() == "main_transactions" && !ContainsString($url, Config("TABLE_SHOW_MASTER") . "=")) {
             $url .= (ContainsString($url, "?") ? "&" : "?") . Config("TABLE_SHOW_MASTER") . "=" . $this->getCurrentMasterTable();
-            $url .= "&" . GetForeignKeyUrl("fk_id", $this->transaction_id->CurrentValue);
+            $url .= "&" . GetForeignKeyUrl("fk_id", $this->transaction_id->CurrentValue ?? $this->transaction_id->getSessionValue());
         }
         return $url;
     }
@@ -1069,7 +1079,7 @@ SORTHTML;
         $this->id->ViewCustomAttributes = "";
 
         // transaction_id
-        $curVal = strval($this->transaction_id->CurrentValue);
+        $curVal = trim(strval($this->transaction_id->CurrentValue));
         if ($curVal != "") {
             $this->transaction_id->ViewValue = $this->transaction_id->lookupCacheOption($curVal);
             if ($this->transaction_id->ViewValue === null) { // Lookup from database
@@ -1093,7 +1103,7 @@ SORTHTML;
         if ($this->bus_id->VirtualValue != "") {
             $this->bus_id->ViewValue = $this->bus_id->VirtualValue;
         } else {
-            $curVal = strval($this->bus_id->CurrentValue);
+            $curVal = trim(strval($this->bus_id->CurrentValue));
             if ($curVal != "") {
                 $this->bus_id->ViewValue = $this->bus_id->lookupCacheOption($curVal);
                 if ($this->bus_id->ViewValue === null) { // Lookup from database
@@ -1131,7 +1141,7 @@ SORTHTML;
 
         // vendor_id
         $this->vendor_id->ViewValue = $this->vendor_id->CurrentValue;
-        $curVal = strval($this->vendor_id->CurrentValue);
+        $curVal = trim(strval($this->vendor_id->CurrentValue));
         if ($curVal != "") {
             $this->vendor_id->ViewValue = $this->vendor_id->lookupCacheOption($curVal);
             if ($this->vendor_id->ViewValue === null) { // Lookup from database
@@ -1213,7 +1223,7 @@ SORTHTML;
         $this->transaction_id->EditCustomAttributes = "";
         if ($this->transaction_id->getSessionValue() != "") {
             $this->transaction_id->CurrentValue = GetForeignKeyValue($this->transaction_id->getSessionValue());
-            $curVal = strval($this->transaction_id->CurrentValue);
+            $curVal = trim(strval($this->transaction_id->CurrentValue));
             if ($curVal != "") {
                 $this->transaction_id->ViewValue = $this->transaction_id->lookupCacheOption($curVal);
                 if ($this->transaction_id->ViewValue === null) { // Lookup from database

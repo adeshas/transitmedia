@@ -8,7 +8,6 @@ $Grid->run();
 ?>
 <?php if (!$Grid->isExport()) { ?>
 <script>
-if (!ew.vars.tables.sub_media_allocation) ew.vars.tables.sub_media_allocation = <?= JsonEncode(GetClientVar("tables", "sub_media_allocation")) ?>;
 var currentForm, currentPageID;
 var fsub_media_allocationgrid;
 loadjs.ready("head", function () {
@@ -18,15 +17,18 @@ loadjs.ready("head", function () {
     fsub_media_allocationgrid.formKeyCountName = '<?= $Grid->FormKeyCountName ?>';
 
     // Add fields
-    var fields = ew.vars.tables.sub_media_allocation.fields;
+    var currentTable = <?= JsonEncode(GetClientVar("tables", "sub_media_allocation")) ?>,
+        fields = currentTable.fields;
+    if (!ew.vars.tables.sub_media_allocation)
+        ew.vars.tables.sub_media_allocation = currentTable;
     fsub_media_allocationgrid.addFields([
-        ["id", [fields.id.required ? ew.Validators.required(fields.id.caption) : null], fields.id.isInvalid],
-        ["bus_id", [fields.bus_id.required ? ew.Validators.required(fields.bus_id.caption) : null], fields.bus_id.isInvalid],
-        ["campaign_id", [fields.campaign_id.required ? ew.Validators.required(fields.campaign_id.caption) : null], fields.campaign_id.isInvalid],
-        ["active", [fields.active.required ? ew.Validators.required(fields.active.caption) : null], fields.active.isInvalid],
-        ["created_by", [fields.created_by.required ? ew.Validators.required(fields.created_by.caption) : null], fields.created_by.isInvalid],
-        ["ts_created", [fields.ts_created.required ? ew.Validators.required(fields.ts_created.caption) : null, ew.Validators.datetime(0)], fields.ts_created.isInvalid],
-        ["ts_last_update", [fields.ts_last_update.required ? ew.Validators.required(fields.ts_last_update.caption) : null, ew.Validators.datetime(0)], fields.ts_last_update.isInvalid]
+        ["id", [fields.id.visible && fields.id.required ? ew.Validators.required(fields.id.caption) : null], fields.id.isInvalid],
+        ["bus_id", [fields.bus_id.visible && fields.bus_id.required ? ew.Validators.required(fields.bus_id.caption) : null], fields.bus_id.isInvalid],
+        ["campaign_id", [fields.campaign_id.visible && fields.campaign_id.required ? ew.Validators.required(fields.campaign_id.caption) : null], fields.campaign_id.isInvalid],
+        ["active", [fields.active.visible && fields.active.required ? ew.Validators.required(fields.active.caption) : null], fields.active.isInvalid],
+        ["created_by", [fields.created_by.visible && fields.created_by.required ? ew.Validators.required(fields.created_by.caption) : null], fields.created_by.isInvalid],
+        ["ts_created", [fields.ts_created.visible && fields.ts_created.required ? ew.Validators.required(fields.ts_created.caption) : null, ew.Validators.datetime(0)], fields.ts_created.isInvalid],
+        ["ts_last_update", [fields.ts_last_update.visible && fields.ts_last_update.required ? ew.Validators.required(fields.ts_last_update.caption) : null, ew.Validators.datetime(0)], fields.ts_last_update.isInvalid]
     ]);
 
     // Set invalid fields

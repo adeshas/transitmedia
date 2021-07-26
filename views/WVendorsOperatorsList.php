@@ -7,7 +7,6 @@ $WVendorsOperatorsList = &$Page;
 ?>
 <?php if (!$Page->isExport()) { ?>
 <script>
-if (!ew.vars.tables.w_vendors_operators) ew.vars.tables.w_vendors_operators = <?= JsonEncode(GetClientVar("tables", "w_vendors_operators")) ?>;
 var currentForm, currentPageID;
 var fw_vendors_operatorslist;
 loadjs.ready("head", function () {
@@ -18,11 +17,14 @@ loadjs.ready("head", function () {
     fw_vendors_operatorslist.formKeyCountName = '<?= $Page->FormKeyCountName ?>';
 
     // Add fields
-    var fields = ew.vars.tables.w_vendors_operators.fields;
+    var currentTable = <?= JsonEncode(GetClientVar("tables", "w_vendors_operators")) ?>,
+        fields = currentTable.fields;
+    if (!ew.vars.tables.w_vendors_operators)
+        ew.vars.tables.w_vendors_operators = currentTable;
     fw_vendors_operatorslist.addFields([
-        ["id", [fields.id.required ? ew.Validators.required(fields.id.caption) : null], fields.id.isInvalid],
-        ["vendor_id", [fields.vendor_id.required ? ew.Validators.required(fields.vendor_id.caption) : null], fields.vendor_id.isInvalid],
-        ["operator_id", [fields.operator_id.required ? ew.Validators.required(fields.operator_id.caption) : null], fields.operator_id.isInvalid]
+        ["id", [fields.id.visible && fields.id.required ? ew.Validators.required(fields.id.caption) : null], fields.id.isInvalid],
+        ["vendor_id", [fields.vendor_id.visible && fields.vendor_id.required ? ew.Validators.required(fields.vendor_id.caption) : null], fields.vendor_id.isInvalid],
+        ["operator_id", [fields.operator_id.visible && fields.operator_id.required ? ew.Validators.required(fields.operator_id.caption) : null], fields.operator_id.isInvalid]
     ]);
 
     // Set invalid fields
@@ -131,7 +133,7 @@ $Page->showMessage();
 <?php if (!$Page->isExport()) { ?>
 <div class="card-header ew-grid-upper-panel">
 <?php if (!$Page->isGridAdd()) { ?>
-<form name="ew-pager-form" class="form-inline ew-form ew-pager-form" action="<?= CurrentPageUrl() ?>">
+<form name="ew-pager-form" class="form-inline ew-form ew-pager-form" action="<?= CurrentPageUrl(false) ?>">
 <?= $Page->Pager->render() ?>
 </form>
 <?php } ?>
@@ -141,7 +143,7 @@ $Page->showMessage();
 <div class="clearfix"></div>
 </div>
 <?php } ?>
-<form name="fw_vendors_operatorslist" id="fw_vendors_operatorslist" class="form-inline ew-form ew-list-form" action="<?= CurrentPageUrl() ?>" method="post">
+<form name="fw_vendors_operatorslist" id="fw_vendors_operatorslist" class="form-inline ew-form ew-list-form" action="<?= CurrentPageUrl(false) ?>" method="post">
 <?php if (Config("CHECK_TOKEN")) { ?>
 <input type="hidden" name="<?= $TokenNameKey ?>" value="<?= $TokenName ?>"><!-- CSRF token name -->
 <input type="hidden" name="<?= $TokenValueKey ?>" value="<?= $TokenValue ?>"><!-- CSRF token value -->
@@ -590,7 +592,7 @@ if ($Page->Recordset) {
 <?php if (!$Page->isExport()) { ?>
 <div class="card-footer ew-grid-lower-panel">
 <?php if (!$Page->isGridAdd()) { ?>
-<form name="ew-pager-form" class="form-inline ew-form ew-pager-form" action="<?= CurrentPageUrl() ?>">
+<form name="ew-pager-form" class="form-inline ew-form ew-pager-form" action="<?= CurrentPageUrl(false) ?>">
 <?= $Page->Pager->render() ?>
 </form>
 <?php } ?>

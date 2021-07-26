@@ -6,7 +6,6 @@ namespace PHPMaker2021\test;
 $XUserTypesAdd = &$Page;
 ?>
 <script>
-if (!ew.vars.tables.x_user_types) ew.vars.tables.x_user_types = <?= JsonEncode(GetClientVar("tables", "x_user_types")) ?>;
 var currentForm, currentPageID;
 var fx_user_typesadd;
 loadjs.ready("head", function () {
@@ -16,9 +15,12 @@ loadjs.ready("head", function () {
     fx_user_typesadd = currentForm = new ew.Form("fx_user_typesadd", "add");
 
     // Add fields
-    var fields = ew.vars.tables.x_user_types.fields;
+    var currentTable = <?= JsonEncode(GetClientVar("tables", "x_user_types")) ?>,
+        fields = currentTable.fields;
+    if (!ew.vars.tables.x_user_types)
+        ew.vars.tables.x_user_types = currentTable;
     fx_user_typesadd.addFields([
-        ["name", [fields.name.required ? ew.Validators.required(fields.name.caption) : null], fields.name.isInvalid]
+        ["name", [fields.name.visible && fields.name.required ? ew.Validators.required(fields.name.caption) : null], fields.name.isInvalid]
     ]);
 
     // Set invalid fields
@@ -97,7 +99,7 @@ loadjs.ready("head", function () {
 <?php
 $Page->showMessage();
 ?>
-<form name="fx_user_typesadd" id="fx_user_typesadd" class="<?= $Page->FormClassName ?>" action="<?= CurrentPageUrl() ?>" method="post">
+<form name="fx_user_typesadd" id="fx_user_typesadd" class="<?= $Page->FormClassName ?>" action="<?= CurrentPageUrl(false) ?>" method="post">
 <?php if (Config("CHECK_TOKEN")) { ?>
 <input type="hidden" name="<?= $TokenNameKey ?>" value="<?= $TokenName ?>"><!-- CSRF token name -->
 <input type="hidden" name="<?= $TokenValueKey ?>" value="<?= $TokenValue ?>"><!-- CSRF token value -->

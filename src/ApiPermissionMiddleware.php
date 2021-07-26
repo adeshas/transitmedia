@@ -81,7 +81,10 @@ class ApiPermissionMiddleware
         if (
             in_array($action, $checkTokenActions) || // Token checked
             in_array($action, array_keys($GLOBALS["API_ACTIONS"])) || // Custom actions (deprecated)
-            in_array($action, [Config("API_UPLOAD_ACTION"), Config("API_PERMISSIONS_ACTION"), Config("API_REGISTER_ACTION")]) // Upload/Permissions/Register
+            $action == Config("API_REGISTER_ACTION") || // Register
+            $action == Config("API_PERMISSIONS_ACTION") && $request->getMethod() == "GET" || // Permissions (GET)
+            $action == Config("API_PERMISSIONS_ACTION") && $request->getMethod() == "POST" && $Security->isAdmin() || // Permissions (POST)
+            $action == Config("API_UPLOAD_ACTION") && $Security->isLoggedIn() // Upload
         ) {
             $authorised = true;
         } elseif (in_array($action, $apiTableActions) && $table != "") { // Table actions

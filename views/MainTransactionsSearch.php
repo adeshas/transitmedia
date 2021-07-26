@@ -6,7 +6,6 @@ namespace PHPMaker2021\test;
 $MainTransactionsSearch = &$Page;
 ?>
 <script>
-if (!ew.vars.tables.main_transactions) ew.vars.tables.main_transactions = <?= JsonEncode(GetClientVar("tables", "main_transactions")) ?>;
 var currentForm, currentPageID;
 var fmain_transactionssearch, currentSearchForm, currentAdvancedSearchForm;
 loadjs.ready("head", function () {
@@ -20,7 +19,8 @@ loadjs.ready("head", function () {
     currentPageID = ew.PAGE_ID = "search";
 
     // Add fields
-    var fields = ew.vars.tables.main_transactions.fields;
+    var currentTable = <?= JsonEncode(GetClientVar("tables", "main_transactions")) ?>,
+        fields = currentTable.fields;
     fmain_transactionssearch.addFields([
         ["id", [ew.Validators.integer], fields.id.isInvalid],
         ["campaign_id", [], fields.campaign_id.isInvalid],
@@ -102,7 +102,7 @@ loadjs.ready("head", function () {
 <?php
 $Page->showMessage();
 ?>
-<form name="fmain_transactionssearch" id="fmain_transactionssearch" class="<?= $Page->FormClassName ?>" action="<?= CurrentPageUrl() ?>" method="post">
+<form name="fmain_transactionssearch" id="fmain_transactionssearch" class="<?= $Page->FormClassName ?>" action="<?= CurrentPageUrl(false) ?>" method="post">
 <?php if (Config("CHECK_TOKEN")) { ?>
 <input type="hidden" name="<?= $TokenNameKey ?>" value="<?= $TokenName ?>"><!-- CSRF token name -->
 <input type="hidden" name="<?= $TokenValueKey ?>" value="<?= $TokenValue ?>"><!-- CSRF token value -->
@@ -120,7 +120,7 @@ $Page->showMessage();
 </span>
         </label>
         <div class="<?= $Page->RightColumnClass ?>"><div <?= $Page->id->cellAttributes() ?>>
-            <span id="el_main_transactions_id" class="ew-search-field">
+            <span id="el_main_transactions_id" class="ew-search-field ew-search-field-single">
 <input type="<?= $Page->id->getInputTextType() ?>" data-table="main_transactions" data-field="x_id" name="x_id" id="x_id" size="30" placeholder="<?= HtmlEncode($Page->id->getPlaceHolder()) ?>" value="<?= $Page->id->EditValue ?>"<?= $Page->id->editAttributes() ?>>
 <div class="invalid-feedback"><?= $Page->id->getErrorMessage(false) ?></div>
 </span>
@@ -136,7 +136,7 @@ $Page->showMessage();
 </span>
         </label>
         <div class="<?= $Page->RightColumnClass ?>"><div <?= $Page->campaign_id->cellAttributes() ?>>
-            <span id="el_main_transactions_campaign_id" class="ew-search-field">
+            <span id="el_main_transactions_campaign_id" class="ew-search-field ew-search-field-single">
 <input type="<?= $Page->campaign_id->getInputTextType() ?>" data-table="main_transactions" data-field="x_campaign_id" name="x_campaign_id" id="x_campaign_id" size="30" placeholder="<?= HtmlEncode($Page->campaign_id->getPlaceHolder()) ?>" value="<?= $Page->campaign_id->EditValue ?>"<?= $Page->campaign_id->editAttributes() ?>>
 <div class="invalid-feedback"><?= $Page->campaign_id->getErrorMessage(false) ?></div>
 <?= $Page->campaign_id->Lookup->getParamTag($Page, "p_x_campaign_id") ?>
@@ -153,7 +153,7 @@ $Page->showMessage();
 </span>
         </label>
         <div class="<?= $Page->RightColumnClass ?>"><div <?= $Page->operator_id->cellAttributes() ?>>
-            <span id="el_main_transactions_operator_id" class="ew-search-field">
+            <span id="el_main_transactions_operator_id" class="ew-search-field ew-search-field-single">
     <select
         id="x_operator_id"
         name="x_operator_id"
@@ -225,7 +225,7 @@ loadjs.ready(["fmain_transactionssearch", "datetimepicker"], function() {
 </span>
         </label>
         <div class="<?= $Page->RightColumnClass ?>"><div <?= $Page->vendor_id->cellAttributes() ?>>
-            <span id="el_main_transactions_vendor_id" class="ew-search-field">
+            <span id="el_main_transactions_vendor_id" class="ew-search-field ew-search-field-single">
 <?php if (!$Security->isAdmin() && $Security->isLoggedIn() && !$Page->userIDAllow("search")) { // Non system admin ?>
     <select
         id="x_vendor_id"
@@ -281,7 +281,7 @@ loadjs.ready(["fmain_transactionssearch"], function() {
 </span>
         </label>
         <div class="<?= $Page->RightColumnClass ?>"><div <?= $Page->price_id->cellAttributes() ?>>
-            <span id="el_main_transactions_price_id" class="ew-search-field">
+            <span id="el_main_transactions_price_id" class="ew-search-field ew-search-field-single">
 <input type="<?= $Page->price_id->getInputTextType() ?>" data-table="main_transactions" data-field="x_price_id" name="x_price_id" id="x_price_id" size="30" placeholder="<?= HtmlEncode($Page->price_id->getPlaceHolder()) ?>" value="<?= $Page->price_id->EditValue ?>"<?= $Page->price_id->editAttributes() ?>>
 <div class="invalid-feedback"><?= $Page->price_id->getErrorMessage(false) ?></div>
 <?= $Page->price_id->Lookup->getParamTag($Page, "p_x_price_id") ?>
@@ -298,7 +298,7 @@ loadjs.ready(["fmain_transactionssearch"], function() {
 </span>
         </label>
         <div class="<?= $Page->RightColumnClass ?>"><div <?= $Page->quantity->cellAttributes() ?>>
-            <span id="el_main_transactions_quantity" class="ew-search-field">
+            <span id="el_main_transactions_quantity" class="ew-search-field ew-search-field-single">
 <input type="<?= $Page->quantity->getInputTextType() ?>" data-table="main_transactions" data-field="x_quantity" name="x_quantity" id="x_quantity" size="30" placeholder="<?= HtmlEncode($Page->quantity->getPlaceHolder()) ?>" value="<?= $Page->quantity->EditValue ?>"<?= $Page->quantity->editAttributes() ?>>
 <div class="invalid-feedback"><?= $Page->quantity->getErrorMessage(false) ?></div>
 </span>
@@ -314,7 +314,7 @@ loadjs.ready(["fmain_transactionssearch"], function() {
 </span>
         </label>
         <div class="<?= $Page->RightColumnClass ?>"><div <?= $Page->assigned_buses->cellAttributes() ?>>
-            <span id="el_main_transactions_assigned_buses" class="ew-search-field">
+            <span id="el_main_transactions_assigned_buses" class="ew-search-field ew-search-field-single">
 <input type="<?= $Page->assigned_buses->getInputTextType() ?>" data-table="main_transactions" data-field="x_assigned_buses" name="x_assigned_buses" id="x_assigned_buses" size="30" placeholder="<?= HtmlEncode($Page->assigned_buses->getPlaceHolder()) ?>" value="<?= $Page->assigned_buses->EditValue ?>"<?= $Page->assigned_buses->editAttributes() ?>>
 <div class="invalid-feedback"><?= $Page->assigned_buses->getErrorMessage(false) ?></div>
 </span>
@@ -400,7 +400,7 @@ loadjs.ready(["fmain_transactionssearch", "datetimepicker"], function() {
 </span>
         </label>
         <div class="<?= $Page->RightColumnClass ?>"><div <?= $Page->visible_status_id->cellAttributes() ?>>
-            <span id="el_main_transactions_visible_status_id" class="ew-search-field">
+            <span id="el_main_transactions_visible_status_id" class="ew-search-field ew-search-field-single">
     <select
         id="x_visible_status_id"
         name="x_visible_status_id"
@@ -437,7 +437,7 @@ loadjs.ready("head", function() {
 </span>
         </label>
         <div class="<?= $Page->RightColumnClass ?>"><div <?= $Page->status_id->cellAttributes() ?>>
-            <span id="el_main_transactions_status_id" class="ew-search-field">
+            <span id="el_main_transactions_status_id" class="ew-search-field ew-search-field-single">
 <input type="<?= $Page->status_id->getInputTextType() ?>" data-table="main_transactions" data-field="x_status_id" name="x_status_id" id="x_status_id" size="30" placeholder="<?= HtmlEncode($Page->status_id->getPlaceHolder()) ?>" value="<?= $Page->status_id->EditValue ?>"<?= $Page->status_id->editAttributes() ?>>
 <div class="invalid-feedback"><?= $Page->status_id->getErrorMessage(false) ?></div>
 <?= $Page->status_id->Lookup->getParamTag($Page, "p_x_status_id") ?>
@@ -454,7 +454,7 @@ loadjs.ready("head", function() {
 </span>
         </label>
         <div class="<?= $Page->RightColumnClass ?>"><div <?= $Page->print_status_id->cellAttributes() ?>>
-            <span id="el_main_transactions_print_status_id" class="ew-search-field">
+            <span id="el_main_transactions_print_status_id" class="ew-search-field ew-search-field-single">
 <input type="<?= $Page->print_status_id->getInputTextType() ?>" data-table="main_transactions" data-field="x_print_status_id" name="x_print_status_id" id="x_print_status_id" size="30" placeholder="<?= HtmlEncode($Page->print_status_id->getPlaceHolder()) ?>" value="<?= $Page->print_status_id->EditValue ?>"<?= $Page->print_status_id->editAttributes() ?>>
 <div class="invalid-feedback"><?= $Page->print_status_id->getErrorMessage(false) ?></div>
 <?= $Page->print_status_id->Lookup->getParamTag($Page, "p_x_print_status_id") ?>
@@ -471,7 +471,7 @@ loadjs.ready("head", function() {
 </span>
         </label>
         <div class="<?= $Page->RightColumnClass ?>"><div <?= $Page->payment_status_id->cellAttributes() ?>>
-            <span id="el_main_transactions_payment_status_id" class="ew-search-field">
+            <span id="el_main_transactions_payment_status_id" class="ew-search-field ew-search-field-single">
 <input type="<?= $Page->payment_status_id->getInputTextType() ?>" data-table="main_transactions" data-field="x_payment_status_id" name="x_payment_status_id" id="x_payment_status_id" size="30" placeholder="<?= HtmlEncode($Page->payment_status_id->getPlaceHolder()) ?>" value="<?= $Page->payment_status_id->EditValue ?>"<?= $Page->payment_status_id->editAttributes() ?>>
 <div class="invalid-feedback"><?= $Page->payment_status_id->getErrorMessage(false) ?></div>
 <?= $Page->payment_status_id->Lookup->getParamTag($Page, "p_x_payment_status_id") ?>
@@ -488,7 +488,7 @@ loadjs.ready("head", function() {
 </span>
         </label>
         <div class="<?= $Page->RightColumnClass ?>"><div <?= $Page->created_by->cellAttributes() ?>>
-            <span id="el_main_transactions_created_by" class="ew-search-field">
+            <span id="el_main_transactions_created_by" class="ew-search-field ew-search-field-single">
     <select
         id="x_created_by"
         name="x_created_by"
@@ -525,7 +525,7 @@ loadjs.ready("head", function() {
 </span>
         </label>
         <div class="<?= $Page->RightColumnClass ?>"><div <?= $Page->ts_created->cellAttributes() ?>>
-            <span id="el_main_transactions_ts_created" class="ew-search-field">
+            <span id="el_main_transactions_ts_created" class="ew-search-field ew-search-field-single">
 <input type="<?= $Page->ts_created->getInputTextType() ?>" data-table="main_transactions" data-field="x_ts_created" name="x_ts_created" id="x_ts_created" placeholder="<?= HtmlEncode($Page->ts_created->getPlaceHolder()) ?>" value="<?= $Page->ts_created->EditValue ?>"<?= $Page->ts_created->editAttributes() ?>>
 <div class="invalid-feedback"><?= $Page->ts_created->getErrorMessage(false) ?></div>
 <?php if (!$Page->ts_created->ReadOnly && !$Page->ts_created->Disabled && !isset($Page->ts_created->EditAttrs["readonly"]) && !isset($Page->ts_created->EditAttrs["disabled"])) { ?>
@@ -548,7 +548,7 @@ loadjs.ready(["fmain_transactionssearch", "datetimepicker"], function() {
 </span>
         </label>
         <div class="<?= $Page->RightColumnClass ?>"><div <?= $Page->ts_last_update->cellAttributes() ?>>
-            <span id="el_main_transactions_ts_last_update" class="ew-search-field">
+            <span id="el_main_transactions_ts_last_update" class="ew-search-field ew-search-field-single">
 <input type="<?= $Page->ts_last_update->getInputTextType() ?>" data-table="main_transactions" data-field="x_ts_last_update" name="x_ts_last_update" id="x_ts_last_update" placeholder="<?= HtmlEncode($Page->ts_last_update->getPlaceHolder()) ?>" value="<?= $Page->ts_last_update->EditValue ?>"<?= $Page->ts_last_update->editAttributes() ?>>
 <div class="invalid-feedback"><?= $Page->ts_last_update->getErrorMessage(false) ?></div>
 <?php if (!$Page->ts_last_update->ReadOnly && !$Page->ts_last_update->Disabled && !isset($Page->ts_last_update->EditAttrs["readonly"]) && !isset($Page->ts_last_update->EditAttrs["disabled"])) { ?>
@@ -571,7 +571,7 @@ loadjs.ready(["fmain_transactionssearch", "datetimepicker"], function() {
 </span>
         </label>
         <div class="<?= $Page->RightColumnClass ?>"><div <?= $Page->total->cellAttributes() ?>>
-            <span id="el_main_transactions_total" class="ew-search-field">
+            <span id="el_main_transactions_total" class="ew-search-field ew-search-field-single">
 <input type="<?= $Page->total->getInputTextType() ?>" data-table="main_transactions" data-field="x_total" name="x_total" id="x_total" size="30" placeholder="<?= HtmlEncode($Page->total->getPlaceHolder()) ?>" value="<?= $Page->total->EditValue ?>"<?= $Page->total->editAttributes() ?>>
 <div class="invalid-feedback"><?= $Page->total->getErrorMessage(false) ?></div>
 </span>

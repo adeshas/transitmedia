@@ -20,6 +20,7 @@ echo $topMenu->toScript();
 
 // Sidebar menu
 $sideMenu = new Menu("menu", true, false);
+$sideMenu->addMenuItem(187, "mi_test", $MenuLanguage->MenuPhrase("187", "MenuText"), $MenuRelativePath . "test", -1, "", AllowListMenu('{7CA6B0F7-61EF-4DB7-A152-ED7AD2382C98}test.php'), false, false, "", "", false);
 $sideMenu->addMenuItem(20, "mi_welcome", $MenuLanguage->MenuPhrase("20", "MenuText"), $MenuRelativePath . "welcome", -1, "", AllowListMenu('{7CA6B0F7-61EF-4DB7-A152-ED7AD2382C98}welcome.php'), false, false, "fa-home", "", false);
 $sideMenu->addMenuItem(32, "mci_Campaigns", $MenuLanguage->MenuPhrase("32", "MenuText"), "", -1, "", IsLoggedIn(), false, true, "fa-ad", "", false);
 $sideMenu->addMenuItem(35, "mci_New_Campaign", $MenuLanguage->MenuPhrase("35", "MenuText"), $MenuRelativePath . "maincampaignsadd?showdetail=", 32, "", IsLoggedIn(), false, true, "fa-angle-double-right fas", "", false);
@@ -35,7 +36,7 @@ $sideMenu->addMenuItem(98, "mci_Transactions", $MenuLanguage->MenuPhrase("98", "
 $sideMenu->addMenuItem(174, "mci_New_Transaction", $MenuLanguage->MenuPhrase("174", "MenuText"), $MenuRelativePath . "maintransactionsadd", 98, "", IsLoggedIn(), false, true, "fa-angle-double-right fas", "", false);
 $sideMenu->addMenuItem(63, "mi_main_transactions", $MenuLanguage->MenuPhrase("63", "MenuText"), $MenuRelativePath . "maintransactionslist?cmd=resetall", 98, "", AllowListMenu('{7CA6B0F7-61EF-4DB7-A152-ED7AD2382C98}main_transactions'), false, false, "fa-angle-double-right fas", "", false);
 $sideMenu->addMenuItem(65, "mi_sub_transaction_details", $MenuLanguage->MenuPhrase("65", "MenuText"), $MenuRelativePath . "subtransactiondetailslist?cmd=resetall", 98, "", AllowListMenu('{7CA6B0F7-61EF-4DB7-A152-ED7AD2382C98}sub_transaction_details'), false, false, "fa-angle-double-right fas", "", false);
-$sideMenu->addMenuItem(190, "mi_view_payments_pending", $MenuLanguage->MenuPhrase("190", "MenuText"), $MenuRelativePath . "viewpaymentspendinglist", 98, "", AllowListMenu('{7CA6B0F7-61EF-4DB7-A152-ED7AD2382C98}view_payments_pending'), false, false, "", "", false);
+$sideMenu->addMenuItem(190, "mi_view_payments_pending", $MenuLanguage->MenuPhrase("190", "MenuText"), $MenuRelativePath . "viewpaymentspendinglist", 98, "", AllowListMenu('{7CA6B0F7-61EF-4DB7-A152-ED7AD2382C98}view_payments_pending'), false, false, "fa-angle-double-right fas", "", false);
 $sideMenu->addMenuItem(201, "mi_main_print_orders", $MenuLanguage->MenuPhrase("201", "MenuText"), $MenuRelativePath . "mainprintorderslist", 98, "", AllowListMenu('{7CA6B0F7-61EF-4DB7-A152-ED7AD2382C98}main_print_orders'), false, false, "fa-angle-double-right fas", "", false);
 $sideMenu->addMenuItem(197, "mi_view_transactions_per_platform", $MenuLanguage->MenuPhrase("197", "MenuText"), $MenuRelativePath . "viewtransactionsperplatformlist", 98, "", AllowListMenu('{7CA6B0F7-61EF-4DB7-A152-ED7AD2382C98}view_transactions_per_platform'), false, false, "fa-angle-double-right fas", "", false);
 $sideMenu->addMenuItem(195, "mi_view_transactions_per_operator", $MenuLanguage->MenuPhrase("195", "MenuText"), $MenuRelativePath . "viewtransactionsperoperatorlist", 98, "", AllowListMenu('{7CA6B0F7-61EF-4DB7-A152-ED7AD2382C98}view_transactions_per_operator'), false, false, "fa-angle-double-right fas", "", false);

@@ -21,11 +21,14 @@ loadjs.ready("head", function () {
     // Write your table-specific client script here, no need to add script tags.
 });
 </script>
+<script>
+if (!ew.vars.tables.w_vendors_operators) ew.vars.tables.w_vendors_operators = <?= JsonEncode(GetClientVar("tables", "w_vendors_operators")) ?>;
+</script>
 <?php $Page->showPageHeader(); ?>
 <?php
 $Page->showMessage();
 ?>
-<form name="fw_vendors_operatorsdelete" id="fw_vendors_operatorsdelete" class="form-inline ew-form ew-delete-form" action="<?= CurrentPageUrl() ?>" method="post">
+<form name="fw_vendors_operatorsdelete" id="fw_vendors_operatorsdelete" class="form-inline ew-form ew-delete-form" action="<?= CurrentPageUrl(false) ?>" method="post">
 <?php if (Config("CHECK_TOKEN")) { ?>
 <input type="hidden" name="<?= $TokenNameKey ?>" value="<?= $TokenName ?>"><!-- CSRF token name -->
 <input type="hidden" name="<?= $TokenValueKey ?>" value="<?= $TokenValue ?>"><!-- CSRF token value -->

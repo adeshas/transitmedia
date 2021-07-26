@@ -7,7 +7,6 @@ $ZPriceSettingsList = &$Page;
 ?>
 <?php if (!$Page->isExport()) { ?>
 <script>
-if (!ew.vars.tables.z_price_settings) ew.vars.tables.z_price_settings = <?= JsonEncode(GetClientVar("tables", "z_price_settings")) ?>;
 var currentForm, currentPageID;
 var fz_price_settingslist;
 loadjs.ready("head", function () {
@@ -18,24 +17,27 @@ loadjs.ready("head", function () {
     fz_price_settingslist.formKeyCountName = '<?= $Page->FormKeyCountName ?>';
 
     // Add fields
-    var fields = ew.vars.tables.z_price_settings.fields;
+    var currentTable = <?= JsonEncode(GetClientVar("tables", "z_price_settings")) ?>,
+        fields = currentTable.fields;
+    if (!ew.vars.tables.z_price_settings)
+        ew.vars.tables.z_price_settings = currentTable;
     fz_price_settingslist.addFields([
-        ["id", [fields.id.required ? ew.Validators.required(fields.id.caption) : null], fields.id.isInvalid],
-        ["platform_id", [fields.platform_id.required ? ew.Validators.required(fields.platform_id.caption) : null], fields.platform_id.isInvalid],
-        ["inventory_id", [fields.inventory_id.required ? ew.Validators.required(fields.inventory_id.caption) : null], fields.inventory_id.isInvalid],
-        ["print_stage_id", [fields.print_stage_id.required ? ew.Validators.required(fields.print_stage_id.caption) : null], fields.print_stage_id.isInvalid],
-        ["bus_size_id", [fields.bus_size_id.required ? ew.Validators.required(fields.bus_size_id.caption) : null], fields.bus_size_id.isInvalid],
-        ["details", [fields.details.required ? ew.Validators.required(fields.details.caption) : null], fields.details.isInvalid],
-        ["max_limit", [fields.max_limit.required ? ew.Validators.required(fields.max_limit.caption) : null, ew.Validators.integer], fields.max_limit.isInvalid],
-        ["min_limit", [fields.min_limit.required ? ew.Validators.required(fields.min_limit.caption) : null, ew.Validators.integer], fields.min_limit.isInvalid],
-        ["price", [fields.price.required ? ew.Validators.required(fields.price.caption) : null, ew.Validators.integer], fields.price.isInvalid],
-        ["operator_fee", [fields.operator_fee.required ? ew.Validators.required(fields.operator_fee.caption) : null, ew.Validators.integer], fields.operator_fee.isInvalid],
-        ["agency_fee", [fields.agency_fee.required ? ew.Validators.required(fields.agency_fee.caption) : null, ew.Validators.integer], fields.agency_fee.isInvalid],
-        ["lamata_fee", [fields.lamata_fee.required ? ew.Validators.required(fields.lamata_fee.caption) : null, ew.Validators.integer], fields.lamata_fee.isInvalid],
-        ["lasaa_fee", [fields.lasaa_fee.required ? ew.Validators.required(fields.lasaa_fee.caption) : null, ew.Validators.integer], fields.lasaa_fee.isInvalid],
-        ["printers_fee", [fields.printers_fee.required ? ew.Validators.required(fields.printers_fee.caption) : null, ew.Validators.integer], fields.printers_fee.isInvalid],
-        ["active", [fields.active.required ? ew.Validators.required(fields.active.caption) : null], fields.active.isInvalid],
-        ["ts_created", [fields.ts_created.required ? ew.Validators.required(fields.ts_created.caption) : null, ew.Validators.datetime(0)], fields.ts_created.isInvalid]
+        ["id", [fields.id.visible && fields.id.required ? ew.Validators.required(fields.id.caption) : null], fields.id.isInvalid],
+        ["platform_id", [fields.platform_id.visible && fields.platform_id.required ? ew.Validators.required(fields.platform_id.caption) : null], fields.platform_id.isInvalid],
+        ["inventory_id", [fields.inventory_id.visible && fields.inventory_id.required ? ew.Validators.required(fields.inventory_id.caption) : null], fields.inventory_id.isInvalid],
+        ["print_stage_id", [fields.print_stage_id.visible && fields.print_stage_id.required ? ew.Validators.required(fields.print_stage_id.caption) : null], fields.print_stage_id.isInvalid],
+        ["bus_size_id", [fields.bus_size_id.visible && fields.bus_size_id.required ? ew.Validators.required(fields.bus_size_id.caption) : null], fields.bus_size_id.isInvalid],
+        ["details", [fields.details.visible && fields.details.required ? ew.Validators.required(fields.details.caption) : null], fields.details.isInvalid],
+        ["max_limit", [fields.max_limit.visible && fields.max_limit.required ? ew.Validators.required(fields.max_limit.caption) : null, ew.Validators.integer], fields.max_limit.isInvalid],
+        ["min_limit", [fields.min_limit.visible && fields.min_limit.required ? ew.Validators.required(fields.min_limit.caption) : null, ew.Validators.integer], fields.min_limit.isInvalid],
+        ["price", [fields.price.visible && fields.price.required ? ew.Validators.required(fields.price.caption) : null, ew.Validators.integer], fields.price.isInvalid],
+        ["operator_fee", [fields.operator_fee.visible && fields.operator_fee.required ? ew.Validators.required(fields.operator_fee.caption) : null, ew.Validators.integer], fields.operator_fee.isInvalid],
+        ["agency_fee", [fields.agency_fee.visible && fields.agency_fee.required ? ew.Validators.required(fields.agency_fee.caption) : null, ew.Validators.integer], fields.agency_fee.isInvalid],
+        ["lamata_fee", [fields.lamata_fee.visible && fields.lamata_fee.required ? ew.Validators.required(fields.lamata_fee.caption) : null, ew.Validators.integer], fields.lamata_fee.isInvalid],
+        ["lasaa_fee", [fields.lasaa_fee.visible && fields.lasaa_fee.required ? ew.Validators.required(fields.lasaa_fee.caption) : null, ew.Validators.integer], fields.lasaa_fee.isInvalid],
+        ["printers_fee", [fields.printers_fee.visible && fields.printers_fee.required ? ew.Validators.required(fields.printers_fee.caption) : null, ew.Validators.integer], fields.printers_fee.isInvalid],
+        ["active", [fields.active.visible && fields.active.required ? ew.Validators.required(fields.active.caption) : null], fields.active.isInvalid],
+        ["ts_created", [fields.ts_created.visible && fields.ts_created.required ? ew.Validators.required(fields.ts_created.caption) : null, ew.Validators.datetime(0)], fields.ts_created.isInvalid]
     ]);
 
     // Set invalid fields
@@ -150,7 +152,8 @@ loadjs.ready("head", function () {
     fz_price_settingslistsrch = currentSearchForm = new ew.Form("fz_price_settingslistsrch");
 
     // Add fields
-    var fields = ew.vars.tables.z_price_settings.fields;
+    var currentTable = <?= JsonEncode(GetClientVar("tables", "z_price_settings")) ?>,
+        fields = currentTable.fields;
     fz_price_settingslistsrch.addFields([
         ["id", [ew.Validators.integer], fields.id.isInvalid],
         ["platform_id", [], fields.platform_id.isInvalid],
@@ -245,7 +248,7 @@ $Page->renderOtherOptions();
 ?>
 <?php if ($Security->canSearch()) { ?>
 <?php if (!$Page->isExport() && !$Page->CurrentAction) { ?>
-<form name="fz_price_settingslistsrch" id="fz_price_settingslistsrch" class="form-inline ew-form ew-ext-search-form" action="<?= CurrentPageUrl() ?>">
+<form name="fz_price_settingslistsrch" id="fz_price_settingslistsrch" class="form-inline ew-form ew-ext-search-form" action="<?= CurrentPageUrl(false) ?>">
 <div id="fz_price_settingslistsrch-search-panel" class="<?= $Page->SearchPanelClass ?>">
 <input type="hidden" name="cmd" value="search">
 <input type="hidden" name="t" value="z_price_settings">
@@ -483,8 +486,8 @@ loadjs.ready("head", function() {
 </span>
         <span id="el_z_price_settings_active" class="ew-search-field">
 <div class="custom-control custom-checkbox d-inline-block">
-    <input type="checkbox" class="custom-control-input<?= $Page->active->isInvalidClass() ?>" data-table="z_price_settings" data-field="x_active" name="x_active[]" id="x_active_353017" value="1"<?= ConvertToBool($Page->active->AdvancedSearch->SearchValue) ? " checked" : "" ?><?= $Page->active->editAttributes() ?>>
-    <label class="custom-control-label" for="x_active_353017"></label>
+    <input type="checkbox" class="custom-control-input<?= $Page->active->isInvalidClass() ?>" data-table="z_price_settings" data-field="x_active" name="x_active[]" id="x_active_223374" value="1"<?= ConvertToBool($Page->active->AdvancedSearch->SearchValue) ? " checked" : "" ?><?= $Page->active->editAttributes() ?>>
+    <label class="custom-control-label" for="x_active_223374"></label>
 </div>
 <div class="invalid-feedback"><?= $Page->active->getErrorMessage(false) ?></div>
 </span>
@@ -558,7 +561,7 @@ $Page->showMessage();
 <?php if (!$Page->isExport()) { ?>
 <div class="card-header ew-grid-upper-panel">
 <?php if (!$Page->isGridAdd()) { ?>
-<form name="ew-pager-form" class="form-inline ew-form ew-pager-form" action="<?= CurrentPageUrl() ?>">
+<form name="ew-pager-form" class="form-inline ew-form ew-pager-form" action="<?= CurrentPageUrl(false) ?>">
 <?= $Page->Pager->render() ?>
 </form>
 <?php } ?>
@@ -568,7 +571,7 @@ $Page->showMessage();
 <div class="clearfix"></div>
 </div>
 <?php } ?>
-<form name="fz_price_settingslist" id="fz_price_settingslist" class="form-inline ew-form ew-list-form" action="<?= CurrentPageUrl() ?>" method="post">
+<form name="fz_price_settingslist" id="fz_price_settingslist" class="form-inline ew-form ew-list-form" action="<?= CurrentPageUrl(false) ?>" method="post">
 <?php if (Config("CHECK_TOKEN")) { ?>
 <input type="hidden" name="<?= $TokenNameKey ?>" value="<?= $TokenName ?>"><!-- CSRF token name -->
 <input type="hidden" name="<?= $TokenValueKey ?>" value="<?= $TokenValue ?>"><!-- CSRF token value -->
@@ -1260,8 +1263,8 @@ loadjs.ready("head", function() {
 <?php if ($Page->RowType == ROWTYPE_ADD) { // Add record ?>
 <span id="el<?= $Page->RowCount ?>_z_price_settings_active" class="form-group">
 <div class="custom-control custom-checkbox d-inline-block">
-    <input type="checkbox" class="custom-control-input<?= $Page->active->isInvalidClass() ?>" data-table="z_price_settings" data-field="x_active" name="x<?= $Page->RowIndex ?>_active[]" id="x<?= $Page->RowIndex ?>_active_897186" value="1"<?= ConvertToBool($Page->active->CurrentValue) ? " checked" : "" ?><?= $Page->active->editAttributes() ?>>
-    <label class="custom-control-label" for="x<?= $Page->RowIndex ?>_active_897186"></label>
+    <input type="checkbox" class="custom-control-input<?= $Page->active->isInvalidClass() ?>" data-table="z_price_settings" data-field="x_active" name="x<?= $Page->RowIndex ?>_active[]" id="x<?= $Page->RowIndex ?>_active_446675" value="1"<?= ConvertToBool($Page->active->CurrentValue) ? " checked" : "" ?><?= $Page->active->editAttributes() ?>>
+    <label class="custom-control-label" for="x<?= $Page->RowIndex ?>_active_446675"></label>
 </div>
 <div class="invalid-feedback"><?= $Page->active->getErrorMessage() ?></div>
 </span>
@@ -1270,8 +1273,8 @@ loadjs.ready("head", function() {
 <?php if ($Page->RowType == ROWTYPE_EDIT) { // Edit record ?>
 <span id="el<?= $Page->RowCount ?>_z_price_settings_active" class="form-group">
 <div class="custom-control custom-checkbox d-inline-block">
-    <input type="checkbox" class="custom-control-input<?= $Page->active->isInvalidClass() ?>" data-table="z_price_settings" data-field="x_active" name="x<?= $Page->RowIndex ?>_active[]" id="x<?= $Page->RowIndex ?>_active_216509" value="1"<?= ConvertToBool($Page->active->CurrentValue) ? " checked" : "" ?><?= $Page->active->editAttributes() ?>>
-    <label class="custom-control-label" for="x<?= $Page->RowIndex ?>_active_216509"></label>
+    <input type="checkbox" class="custom-control-input<?= $Page->active->isInvalidClass() ?>" data-table="z_price_settings" data-field="x_active" name="x<?= $Page->RowIndex ?>_active[]" id="x<?= $Page->RowIndex ?>_active_455667" value="1"<?= ConvertToBool($Page->active->CurrentValue) ? " checked" : "" ?><?= $Page->active->editAttributes() ?>>
+    <label class="custom-control-label" for="x<?= $Page->RowIndex ?>_active_455667"></label>
 </div>
 <div class="invalid-feedback"><?= $Page->active->getErrorMessage() ?></div>
 </span>
@@ -1579,8 +1582,8 @@ loadjs.ready("head", function() {
         <td data-name="active">
 <span id="el$rowindex$_z_price_settings_active" class="form-group z_price_settings_active">
 <div class="custom-control custom-checkbox d-inline-block">
-    <input type="checkbox" class="custom-control-input<?= $Page->active->isInvalidClass() ?>" data-table="z_price_settings" data-field="x_active" name="x<?= $Page->RowIndex ?>_active[]" id="x<?= $Page->RowIndex ?>_active_389889" value="1"<?= ConvertToBool($Page->active->CurrentValue) ? " checked" : "" ?><?= $Page->active->editAttributes() ?>>
-    <label class="custom-control-label" for="x<?= $Page->RowIndex ?>_active_389889"></label>
+    <input type="checkbox" class="custom-control-input<?= $Page->active->isInvalidClass() ?>" data-table="z_price_settings" data-field="x_active" name="x<?= $Page->RowIndex ?>_active[]" id="x<?= $Page->RowIndex ?>_active_259729" value="1"<?= ConvertToBool($Page->active->CurrentValue) ? " checked" : "" ?><?= $Page->active->editAttributes() ?>>
+    <label class="custom-control-label" for="x<?= $Page->RowIndex ?>_active_259729"></label>
 </div>
 <div class="invalid-feedback"><?= $Page->active->getErrorMessage() ?></div>
 </span>
@@ -1647,7 +1650,7 @@ if ($Page->Recordset) {
 <?php if (!$Page->isExport()) { ?>
 <div class="card-footer ew-grid-lower-panel">
 <?php if (!$Page->isGridAdd()) { ?>
-<form name="ew-pager-form" class="form-inline ew-form ew-pager-form" action="<?= CurrentPageUrl() ?>">
+<form name="ew-pager-form" class="form-inline ew-form ew-pager-form" action="<?= CurrentPageUrl(false) ?>">
 <?= $Page->Pager->render() ?>
 </form>
 <?php } ?>

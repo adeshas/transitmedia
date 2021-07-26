@@ -81,7 +81,7 @@ class Guard implements MiddlewareInterface
      *
      * @var array|null
      */
-    protected $keyPair;
+    protected $keyPair = null;
 
     /**
      * @param ResponseFactoryInterface  $responseFactory
@@ -102,20 +102,18 @@ class Guard implements MiddlewareInterface
         int $strength = 16,
         bool $persistentTokenMode = false
     ) {
-        $this->responseFactory = $responseFactory;
-        $this->prefix = rtrim($prefix, '_');
-
         if ($strength < 16) {
             throw new RuntimeException('CSRF middleware instantiation failed. Minimum strength is 16.');
         }
+
+        $this->responseFactory = $responseFactory;
+        $this->prefix = rtrim($prefix, '_');
         $this->strength = $strength;
 
         $this->setStorage($storage);
         $this->setFailureHandler($failureHandler);
         $this->setStorageLimit($storageLimit);
         $this->setPersistentTokenMode($persistentTokenMode);
-
-        $this->keyPair = null;
     }
 
     /**
@@ -226,19 +224,17 @@ class Guard implements MiddlewareInterface
      */
     public function validateToken(string $name, string $value): bool
     {
-        $valid = false;
-
-        if (isset($this->storage[$name])) {
-            $token = $this->storage[$name];
-
-            if (function_exists('hash_equals')) {
-                $valid = hash_equals($token, $value);
-            } else {
-                $valid = $token === $value;
-            }
+        if (!isset($this->storage[$name])) {
+            return false;
         }
 
-        return $valid;
+        $token = $this->storage[$name];
+
+        if (function_exists('hash_equals')) {
+            return hash_equals($token, $value);
+        }
+
+        return $token === $value;
     }
 
     /**
@@ -293,10 +289,22 @@ class Guard implements MiddlewareInterface
             return null;
         }
 
-        end($this->storage);
-        $name = key($this->storage);
-        $value = $this->storage[$name];
-        reset($this->storage);
+        $name = null;
+        $value = null;
+        if (is_array($this->storage)) {
+            end($this->storage);
+            $name = key($this->storage);
+            $value = $this->storage[$name];
+            reset($this->storage);
+        } elseif ($this->storage instanceof Iterator) {
+            $this->storage->rewind();
+            while ($this->storage->valid()) {
+                $name = $this->storage->key();
+                $value = $this->storage->current();
+                $this->storage->next();
+            }
+            $this->storage->rewind();
+        }
 
         return $name !== null && $value !== null
             ? [
@@ -332,7 +340,7 @@ class Guard implements MiddlewareInterface
      *
      * @param  string $name CSRF token name
      */
-    protected function removeTokenFromStorage(string $name): void
+    public function removeTokenFromStorage(string $name): void
     {
         $this->storage[$name] = '';
         unset($this->storage[$name]);
@@ -347,20 +355,26 @@ class Guard implements MiddlewareInterface
      */
     protected function enforceStorageLimit(): void
     {
-        if ($this->storageLimit > 0
-            && (is_array($this->storage)
-                || ($this->storage instanceof Countable && $this->storage instanceof Iterator)
+        if ($this->storageLimit === 0
+            || (
+                !is_array($this->storage)
+                && !($this->storage instanceof Countable && $this->storage instanceof Iterator)
             )
         ) {
-            if (is_array($this->storage)) {
-                while (count($this->storage) > $this->storageLimit) {
-                    array_shift($this->storage);
-                }
-            } elseif ($this->storage instanceof Iterator) {
-                while (count($this->storage) > $this->storageLimit) {
-                    $this->storage->rewind();
-                    unset($this->storage[$this->storage->key()]);
-                }
+            return;
+        }
+
+        if (is_array($this->storage)) {
+            while (count($this->storage) > $this->storageLimit) {
+                array_shift($this->storage);
+            }
+            return;
+        }
+
+        if ($this->storage instanceof Iterator) {
+            while (count($this->storage) > $this->storageLimit) {
+                $this->storage->rewind();
+                unset($this->storage[$this->storage->key()]);
             }
         }
     }
@@ -403,25 +417,29 @@ class Guard implements MiddlewareInterface
      */
     public function process(ServerRequestInterface $request, RequestHandlerInterface $handler): ResponseInterface
     {
-        if (in_array($request->getMethod(), ['POST', 'PUT', 'DELETE', 'PATCH'])) {
-            $body = $request->getParsedBody();
-            $name = null;
-            $value = null;
+        $body = $request->getParsedBody();
+        $name = null;
+        $value = null;
 
-            if (is_array($body)) {
-                $name = $body[$this->getTokenNameKey()] ?? null;
-                $value = $body[$this->getTokenValueKey()] ?? null;
+        if (is_array($body)) {
+            $name = $body[$this->getTokenNameKey()] ?? null;
+            $value = $body[$this->getTokenValueKey()] ?? null;
+        }
+
+        if (in_array($request->getMethod(), ['POST', 'PUT', 'DELETE', 'PATCH'])) {
+            $isValid = $this->validateToken((string) $name, (string) $value);
+            if ($isValid && !$this->persistentTokenMode) {
+                // successfully validated token, so delete it if not in persistentTokenMode
+                $this->removeTokenFromStorage($name);
             }
 
-            if ($name === null
-                || $value === null
-                || !$this->validateToken((string) $name, (string) $value)
-            ) {
-                if (!$this->persistentTokenMode && is_string($name)) {
-                    $this->removeTokenFromStorage($name);
-                }
-
+            if ($name === null || $value === null || !$isValid) {
                 $request = $this->appendNewTokenToRequest($request);
+                return $this->handleFailure($request, $handler);
+            }
+        } else {
+            // Method is GET/OPTIONS/HEAD/etc, so do not accept the token in the body of this request
+            if ($name !== null) {
                 return $this->handleFailure($request, $handler);
             }
         }

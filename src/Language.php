@@ -176,9 +176,12 @@ class Language
     }
 
     // Set phrase
-    public function setPhrase($id, $value)
+    public function setPhrase($id, $value, $client = false)
     {
         $this->setPhraseAttr($id, "value", $value);
+        if ($client === true) {
+            $this->setPhraseAttr($id, "client", true);
+        }
     }
 
     // Get project phrase

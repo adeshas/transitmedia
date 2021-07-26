@@ -80,10 +80,10 @@ $ResponseFactory = $app->getResponseFactory();
 $errorHandler = new HttpErrorHandler($callableResolver, $ResponseFactory);
 
 // Create shutdown handler
-if (!$isDebug) {
-    $shutdownHandler = new ShutdownHandler($Request, $errorHandler, $displayErrorDetails);
-    register_shutdown_function($shutdownHandler);
-}
+// if (!$isDebug) {
+//     $shutdownHandler = new ShutdownHandler($Request, $errorHandler, $displayErrorDetails);
+//     register_shutdown_function($shutdownHandler);
+// }
 
 // Add body parsing middleware
 $app->addBodyParsingMiddleware();
@@ -110,7 +110,7 @@ if (UseSession($Request)) {
     $cookieConfiguration->httpOnly = Config("COOKIE_HTTP_ONLY");
     $cookieConfiguration->secure = Config("COOKIE_SECURE");
     $app->add(new SameSiteCookieMiddleware($cookieConfiguration));
-    $app->add(new SameSiteSessionMiddleware($cookieConfiguration));
+    $app->add(new SameSiteSessionMiddleware());
 }
 
 // Add error handling middleware

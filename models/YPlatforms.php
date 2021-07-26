@@ -76,21 +76,25 @@ class YPlatforms extends DbTable
         $this->id->Nullable = false; // NOT NULL field
         $this->id->Sortable = true; // Allow sort
         $this->id->DefaultErrorMessage = $Language->phrase("IncorrectInteger");
+        $this->id->CustomMsg = $Language->FieldPhrase($this->TableVar, $this->id->Param, "CustomMsg");
         $this->Fields['id'] = &$this->id;
 
         // name
         $this->name = new DbField('y_platforms', 'y_platforms', 'x_name', 'name', '"name"', '"name"', 200, 50, -1, false, '"name"', false, false, false, 'FORMATTED TEXT', 'TEXT');
         $this->name->Sortable = true; // Allow sort
+        $this->name->CustomMsg = $Language->FieldPhrase($this->TableVar, $this->name->Param, "CustomMsg");
         $this->Fields['name'] = &$this->name;
 
         // shortname
         $this->shortname = new DbField('y_platforms', 'y_platforms', 'x_shortname', 'shortname', '"shortname"', '"shortname"', 200, 50, -1, false, '"shortname"', false, false, false, 'FORMATTED TEXT', 'TEXT');
         $this->shortname->Sortable = true; // Allow sort
+        $this->shortname->CustomMsg = $Language->FieldPhrase($this->TableVar, $this->shortname->Param, "CustomMsg");
         $this->Fields['shortname'] = &$this->shortname;
 
         // email
         $this->_email = new DbField('y_platforms', 'y_platforms', 'x__email', 'email', '"email"', '"email"', 200, 0, -1, false, '"email"', false, false, false, 'FORMATTED TEXT', 'TEXT');
         $this->_email->Sortable = true; // Allow sort
+        $this->_email->CustomMsg = $Language->FieldPhrase($this->TableVar, $this->_email->Param, "CustomMsg");
         $this->Fields['email'] = &$this->_email;
     }
 
@@ -301,18 +305,21 @@ class YPlatforms extends DbTable
         $cnt = -1;
         $rs = null;
         if ($sql instanceof \Doctrine\DBAL\Query\QueryBuilder) { // Query builder
-            $sql = $sql->resetQueryPart("orderBy")->getSQL();
+            $sqlwrk = clone $sql;
+            $sqlwrk = $sqlwrk->resetQueryPart("orderBy")->getSQL();
+        } else {
+            $sqlwrk = $sql;
         }
         $pattern = '/^SELECT\s([\s\S]+)\sFROM\s/i';
         // Skip Custom View / SubQuery / SELECT DISTINCT / ORDER BY
         if (
             ($this->TableType == 'TABLE' || $this->TableType == 'VIEW' || $this->TableType == 'LINKTABLE') &&
-            preg_match($pattern, $sql) && !preg_match('/\(\s*(SELECT[^)]+)\)/i', $sql) &&
-            !preg_match('/^\s*select\s+distinct\s+/i', $sql) && !preg_match('/\s+order\s+by\s+/i', $sql)
+            preg_match($pattern, $sqlwrk) && !preg_match('/\(\s*(SELECT[^)]+)\)/i', $sqlwrk) &&
+            !preg_match('/^\s*select\s+distinct\s+/i', $sqlwrk) && !preg_match('/\s+order\s+by\s+/i', $sqlwrk)
         ) {
-            $sqlwrk = "SELECT COUNT(*) FROM " . preg_replace($pattern, "", $sql);
+            $sqlwrk = "SELECT COUNT(*) FROM " . preg_replace($pattern, "", $sqlwrk);
         } else {
-            $sqlwrk = "SELECT COUNT(*) FROM (" . $sql . ") COUNT_TABLE";
+            $sqlwrk = "SELECT COUNT(*) FROM (" . $sqlwrk . ") COUNT_TABLE";
         }
         $conn = $c ?? $this->getConnection();
         $rs = $conn->executeQuery($sqlwrk);

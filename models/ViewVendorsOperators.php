@@ -71,17 +71,20 @@ class ViewVendorsOperators extends DbTable
         $this->vendor_id = new DbField('view_vendors_operators', 'view_vendors_operators', 'x_vendor_id', 'vendor_id', '"vendor_id"', 'CAST("vendor_id" AS varchar(255))', 3, 4, -1, false, '"vendor_id"', false, false, false, 'FORMATTED TEXT', 'TEXT');
         $this->vendor_id->Sortable = true; // Allow sort
         $this->vendor_id->DefaultErrorMessage = $Language->phrase("IncorrectInteger");
+        $this->vendor_id->CustomMsg = $Language->FieldPhrase($this->TableVar, $this->vendor_id->Param, "CustomMsg");
         $this->Fields['vendor_id'] = &$this->vendor_id;
 
         // operator_id
         $this->operator_id = new DbField('view_vendors_operators', 'view_vendors_operators', 'x_operator_id', 'operator_id', '"operator_id"', 'CAST("operator_id" AS varchar(255))', 3, 4, -1, false, '"operator_id"', false, false, false, 'FORMATTED TEXT', 'TEXT');
         $this->operator_id->Sortable = true; // Allow sort
         $this->operator_id->DefaultErrorMessage = $Language->phrase("IncorrectInteger");
+        $this->operator_id->CustomMsg = $Language->FieldPhrase($this->TableVar, $this->operator_id->Param, "CustomMsg");
         $this->Fields['operator_id'] = &$this->operator_id;
 
         // name
         $this->name = new DbField('view_vendors_operators', 'view_vendors_operators', 'x_name', 'name', '"name"', '"name"', 200, 0, -1, false, '"name"', false, false, false, 'FORMATTED TEXT', 'TEXT');
         $this->name->Sortable = true; // Allow sort
+        $this->name->CustomMsg = $Language->FieldPhrase($this->TableVar, $this->name->Param, "CustomMsg");
         $this->Fields['name'] = &$this->name;
     }
 
@@ -262,18 +265,21 @@ class ViewVendorsOperators extends DbTable
         $cnt = -1;
         $rs = null;
         if ($sql instanceof \Doctrine\DBAL\Query\QueryBuilder) { // Query builder
-            $sql = $sql->resetQueryPart("orderBy")->getSQL();
+            $sqlwrk = clone $sql;
+            $sqlwrk = $sqlwrk->resetQueryPart("orderBy")->getSQL();
+        } else {
+            $sqlwrk = $sql;
         }
         $pattern = '/^SELECT\s([\s\S]+)\sFROM\s/i';
         // Skip Custom View / SubQuery / SELECT DISTINCT / ORDER BY
         if (
             ($this->TableType == 'TABLE' || $this->TableType == 'VIEW' || $this->TableType == 'LINKTABLE') &&
-            preg_match($pattern, $sql) && !preg_match('/\(\s*(SELECT[^)]+)\)/i', $sql) &&
-            !preg_match('/^\s*select\s+distinct\s+/i', $sql) && !preg_match('/\s+order\s+by\s+/i', $sql)
+            preg_match($pattern, $sqlwrk) && !preg_match('/\(\s*(SELECT[^)]+)\)/i', $sqlwrk) &&
+            !preg_match('/^\s*select\s+distinct\s+/i', $sqlwrk) && !preg_match('/\s+order\s+by\s+/i', $sqlwrk)
         ) {
-            $sqlwrk = "SELECT COUNT(*) FROM " . preg_replace($pattern, "", $sql);
+            $sqlwrk = "SELECT COUNT(*) FROM " . preg_replace($pattern, "", $sqlwrk);
         } else {
-            $sqlwrk = "SELECT COUNT(*) FROM (" . $sql . ") COUNT_TABLE";
+            $sqlwrk = "SELECT COUNT(*) FROM (" . $sqlwrk . ") COUNT_TABLE";
         }
         $conn = $c ?? $this->getConnection();
         $rs = $conn->executeQuery($sqlwrk);

@@ -6,7 +6,6 @@ namespace PHPMaker2021\test;
 $XUserTypesEdit = &$Page;
 ?>
 <script>
-if (!ew.vars.tables.x_user_types) ew.vars.tables.x_user_types = <?= JsonEncode(GetClientVar("tables", "x_user_types")) ?>;
 var currentForm, currentPageID;
 var fx_user_typesedit;
 loadjs.ready("head", function () {
@@ -16,10 +15,13 @@ loadjs.ready("head", function () {
     fx_user_typesedit = currentForm = new ew.Form("fx_user_typesedit", "edit");
 
     // Add fields
-    var fields = ew.vars.tables.x_user_types.fields;
+    var currentTable = <?= JsonEncode(GetClientVar("tables", "x_user_types")) ?>,
+        fields = currentTable.fields;
+    if (!ew.vars.tables.x_user_types)
+        ew.vars.tables.x_user_types = currentTable;
     fx_user_typesedit.addFields([
-        ["id", [fields.id.required ? ew.Validators.required(fields.id.caption) : null], fields.id.isInvalid],
-        ["name", [fields.name.required ? ew.Validators.required(fields.name.caption) : null], fields.name.isInvalid]
+        ["id", [fields.id.visible && fields.id.required ? ew.Validators.required(fields.id.caption) : null], fields.id.isInvalid],
+        ["name", [fields.name.visible && fields.name.required ? ew.Validators.required(fields.name.caption) : null], fields.name.isInvalid]
     ]);
 
     // Set invalid fields
@@ -98,7 +100,7 @@ loadjs.ready("head", function () {
 <?php
 $Page->showMessage();
 ?>
-<form name="fx_user_typesedit" id="fx_user_typesedit" class="<?= $Page->FormClassName ?>" action="<?= CurrentPageUrl() ?>" method="post">
+<form name="fx_user_typesedit" id="fx_user_typesedit" class="<?= $Page->FormClassName ?>" action="<?= CurrentPageUrl(false) ?>" method="post">
 <?php if (Config("CHECK_TOKEN")) { ?>
 <input type="hidden" name="<?= $TokenNameKey ?>" value="<?= $TokenName ?>"><!-- CSRF token name -->
 <input type="hidden" name="<?= $TokenValueKey ?>" value="<?= $TokenValue ?>"><!-- CSRF token value -->

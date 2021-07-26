@@ -23,6 +23,9 @@ loadjs.ready("head", function () {
 });
 </script>
 <?php } ?>
+<script>
+if (!ew.vars.tables.main_print_orders) ew.vars.tables.main_print_orders = <?= JsonEncode(GetClientVar("tables", "main_print_orders")) ?>;
+</script>
 <?php if (!$Page->isExport()) { ?>
 <div class="btn-toolbar ew-toolbar">
 <?php $Page->ExportOptions->render("body") ?>
@@ -34,7 +37,7 @@ loadjs.ready("head", function () {
 <?php
 $Page->showMessage();
 ?>
-<form name="fmain_print_ordersview" id="fmain_print_ordersview" class="form-inline ew-form ew-view-form" action="<?= CurrentPageUrl() ?>" method="post">
+<form name="fmain_print_ordersview" id="fmain_print_ordersview" class="form-inline ew-form ew-view-form" action="<?= CurrentPageUrl(false) ?>" method="post">
 <?php if (Config("CHECK_TOKEN")) { ?>
 <input type="hidden" name="<?= $TokenNameKey ?>" value="<?= $TokenName ?>"><!-- CSRF token name -->
 <input type="hidden" name="<?= $TokenValueKey ?>" value="<?= $TokenValue ?>"><!-- CSRF token value -->

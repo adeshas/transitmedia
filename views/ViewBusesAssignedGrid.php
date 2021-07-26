@@ -8,7 +8,6 @@ $Grid->run();
 ?>
 <?php if (!$Grid->isExport()) { ?>
 <script>
-if (!ew.vars.tables.view_buses_assigned) ew.vars.tables.view_buses_assigned = <?= JsonEncode(GetClientVar("tables", "view_buses_assigned")) ?>;
 var currentForm, currentPageID;
 var fview_buses_assignedgrid;
 loadjs.ready("head", function () {
@@ -18,10 +17,13 @@ loadjs.ready("head", function () {
     fview_buses_assignedgrid.formKeyCountName = '<?= $Grid->FormKeyCountName ?>';
 
     // Add fields
-    var fields = ew.vars.tables.view_buses_assigned.fields;
+    var currentTable = <?= JsonEncode(GetClientVar("tables", "view_buses_assigned")) ?>,
+        fields = currentTable.fields;
+    if (!ew.vars.tables.view_buses_assigned)
+        ew.vars.tables.view_buses_assigned = currentTable;
     fview_buses_assignedgrid.addFields([
-        ["bus", [fields.bus.required ? ew.Validators.required(fields.bus.caption) : null], fields.bus.isInvalid],
-        ["transaction_id", [fields.transaction_id.required ? ew.Validators.required(fields.transaction_id.caption) : null], fields.transaction_id.isInvalid]
+        ["bus", [fields.bus.visible && fields.bus.required ? ew.Validators.required(fields.bus.caption) : null], fields.bus.isInvalid],
+        ["transaction_id", [fields.transaction_id.visible && fields.transaction_id.required ? ew.Validators.required(fields.transaction_id.caption) : null], fields.transaction_id.isInvalid]
     ]);
 
     // Set invalid fields

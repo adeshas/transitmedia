@@ -158,7 +158,6 @@ class XBusStatusList extends XBusStatus
 
         // Initialize
         $GLOBALS["Page"] = &$this;
-        $this->TokenTimeout = SessionTimeoutTime();
 
         // Language object
         $Language = Container("language");
@@ -244,6 +243,30 @@ class XBusStatusList extends XBusStatus
         return is_object($Response) ? $Response->getBody() : ob_get_clean();
     }
 
+    // Is lookup
+    public function isLookup()
+    {
+        return SameText(Route(0), Config("API_LOOKUP_ACTION"));
+    }
+
+    // Is AutoFill
+    public function isAutoFill()
+    {
+        return $this->isLookup() && SameText(Post("ajax"), "autofill");
+    }
+
+    // Is AutoSuggest
+    public function isAutoSuggest()
+    {
+        return $this->isLookup() && SameText(Post("ajax"), "autosuggest");
+    }
+
+    // Is modal lookup
+    public function isModalLookup()
+    {
+        return $this->isLookup() && SameText(Post("ajax"), "modal");
+    }
+
     // Is terminated
     public function isTerminated()
     {
@@ -261,7 +284,7 @@ class XBusStatusList extends XBusStatus
         if ($this->terminated) {
             return;
         }
-        global $ExportFileName, $TempImages, $DashboardReport;
+        global $ExportFileName, $TempImages, $DashboardReport, $Response;
 
         // Page is terminated
         $this->terminated = true;
@@ -307,6 +330,11 @@ class XBusStatusList extends XBusStatus
                 WriteJson(array_merge(["success" => false], $this->getMessages()));
             }
             return;
+        } else { // Check if response is JSON
+            if (StartsString("application/json", $Response->getHeaderLine("Content-type")) && $Response->getBody()->getSize()) { // With JSON response
+                $this->clearMessages();
+                return;
+            }
         }
 
         // Go to URL if specified
@@ -518,6 +546,7 @@ class XBusStatusList extends XBusStatus
     public $MultiSelectKey;
     public $Command;
     public $RestoreSearch = false;
+    public $HashValue; // Hash value
     public $DetailPages;
     public $OldRecordset;
 
@@ -783,8 +812,8 @@ class XBusStatusList extends XBusStatus
             }
         }
 
-        // Search/sort options
-        $this->setupSearchSortOptions();
+        // Search options
+        $this->setupSearchOptions();
 
         // Set up search panel class
         if ($this->SearchWhere != "") {
@@ -806,7 +835,7 @@ class XBusStatusList extends XBusStatus
         // Set LoginStatus / Page_Rendering / Page_Render
         if (!IsApi() && !$this->isTerminated()) {
             // Pass table and field properties to client side
-            $this->toClientVar(["tableCaption"], ["caption", "Required", "IsInvalid", "Raw"]);
+            $this->toClientVar(["tableCaption"], ["caption", "Visible", "Required", "IsInvalid", "Raw"]);
 
             // Setup login status
             SetupLoginStatus();
@@ -817,7 +846,7 @@ class XBusStatusList extends XBusStatus
             // Global Page Rendering event (in userfn*.php)
             Page_Rendering();
 
-            // Page Rendering event
+            // Page Render event
             if (method_exists($this, "pageRender")) {
                 $this->pageRender();
             }
@@ -1781,8 +1810,8 @@ class XBusStatusList extends XBusStatus
         $item->Visible = false;
     }
 
-    // Set up search/sort options
-    protected function setupSearchSortOptions()
+    // Set up search options
+    protected function setupSearchOptions()
     {
         global $Language, $Security;
         $pageUrl = $this->pageUrl();
@@ -1823,7 +1852,7 @@ class XBusStatusList extends XBusStatus
     /**
     * Export data in HTML/CSV/Word/Excel/XML/Email/PDF format
     *
-    * @param boolean $return Return the data rather than output it
+    * @param bool $return Return the data rather than output it
     * @return mixed
     */
     public function exportData($return = false)
@@ -1837,7 +1866,9 @@ class XBusStatusList extends XBusStatus
 
         // Export all
         if ($this->ExportAll) {
-            set_time_limit(Config("EXPORT_ALL_TIME_LIMIT"));
+            if (Config("EXPORT_ALL_TIME_LIMIT") >= 0) {
+                @set_time_limit(Config("EXPORT_ALL_TIME_LIMIT"));
+            }
             $this->DisplayRecords = $this->TotalRecords;
             $this->StopRecord = $this->TotalRecords;
         } else { // Export one page only

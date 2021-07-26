@@ -158,7 +158,6 @@ class ViewPaymentsPendingList extends ViewPaymentsPending
 
         // Initialize
         $GLOBALS["Page"] = &$this;
-        $this->TokenTimeout = SessionTimeoutTime();
 
         // Language object
         $Language = Container("language");
@@ -244,6 +243,30 @@ class ViewPaymentsPendingList extends ViewPaymentsPending
         return is_object($Response) ? $Response->getBody() : ob_get_clean();
     }
 
+    // Is lookup
+    public function isLookup()
+    {
+        return SameText(Route(0), Config("API_LOOKUP_ACTION"));
+    }
+
+    // Is AutoFill
+    public function isAutoFill()
+    {
+        return $this->isLookup() && SameText(Post("ajax"), "autofill");
+    }
+
+    // Is AutoSuggest
+    public function isAutoSuggest()
+    {
+        return $this->isLookup() && SameText(Post("ajax"), "autosuggest");
+    }
+
+    // Is modal lookup
+    public function isModalLookup()
+    {
+        return $this->isLookup() && SameText(Post("ajax"), "modal");
+    }
+
     // Is terminated
     public function isTerminated()
     {
@@ -261,7 +284,7 @@ class ViewPaymentsPendingList extends ViewPaymentsPending
         if ($this->terminated) {
             return;
         }
-        global $ExportFileName, $TempImages, $DashboardReport;
+        global $ExportFileName, $TempImages, $DashboardReport, $Response;
 
         // Page is terminated
         $this->terminated = true;
@@ -307,6 +330,11 @@ class ViewPaymentsPendingList extends ViewPaymentsPending
                 WriteJson(array_merge(["success" => false], $this->getMessages()));
             }
             return;
+        } else { // Check if response is JSON
+            if (StartsString("application/json", $Response->getHeaderLine("Content-type")) && $Response->getBody()->getSize()) { // With JSON response
+                $this->clearMessages();
+                return;
+            }
         }
 
         // Go to URL if specified
@@ -514,6 +542,7 @@ class ViewPaymentsPendingList extends ViewPaymentsPending
     public $MultiSelectKey;
     public $Command;
     public $RestoreSearch = false;
+    public $HashValue; // Hash value
     public $DetailPages;
     public $OldRecordset;
 
@@ -582,26 +611,32 @@ class ViewPaymentsPendingList extends ViewPaymentsPending
         $this->setupExportOptions();
         $this->transaction_id->setVisibility();
         $this->campaign_id->setVisibility();
-        $this->campaign_name->Visible = false;
-        $this->quantity->setVisibility();
-        $this->transaction_status->setVisibility();
-        $this->print_status->setVisibility();
+        $this->campaign_name->setVisibility();
         $this->payment_status->setVisibility();
         $this->start_date->setVisibility();
         $this->end_date->setVisibility();
         $this->vendor->setVisibility();
         $this->operator->setVisibility();
         $this->platform->setVisibility();
-        $this->inventory->Visible = false;
-        $this->bus_size->Visible = false;
+        $this->inventory->setVisibility();
+        $this->bus_size->setVisibility();
         $this->print_stage->Visible = false;
+        $this->quantity->setVisibility();
         $this->price->setVisibility();
         $this->operator_fee->setVisibility();
         $this->agency_fee->setVisibility();
         $this->lamata_fee->setVisibility();
         $this->lasaa_fee->setVisibility();
         $this->printers_fee->setVisibility();
+        $this->operator_total->setVisibility();
+        $this->agency_total->setVisibility();
+        $this->lamata_total->setVisibility();
+        $this->lasaa_total->setVisibility();
+        $this->printers_total->setVisibility();
+        $this->price_total->setVisibility();
         $this->price_details->Visible = false;
+        $this->transaction_status->setVisibility();
+        $this->print_status->setVisibility();
         $this->hideFieldsForAddEdit();
 
         // Global Page Loading event (in userfn*.php)
@@ -798,8 +833,8 @@ class ViewPaymentsPendingList extends ViewPaymentsPending
             }
         }
 
-        // Search/sort options
-        $this->setupSearchSortOptions();
+        // Search options
+        $this->setupSearchOptions();
 
         // Set up search panel class
         if ($this->SearchWhere != "") {
@@ -821,7 +856,7 @@ class ViewPaymentsPendingList extends ViewPaymentsPending
         // Set LoginStatus / Page_Rendering / Page_Render
         if (!IsApi() && !$this->isTerminated()) {
             // Pass table and field properties to client side
-            $this->toClientVar(["tableCaption"], ["caption", "Required", "IsInvalid", "Raw"]);
+            $this->toClientVar(["tableCaption"], ["caption", "Visible", "Required", "IsInvalid", "Raw"]);
 
             // Setup login status
             SetupLoginStatus();
@@ -832,7 +867,7 @@ class ViewPaymentsPendingList extends ViewPaymentsPending
             // Global Page Rendering event (in userfn*.php)
             Page_Rendering();
 
-            // Page Rendering event
+            // Page Render event
             if (method_exists($this, "pageRender")) {
                 $this->pageRender();
             }
@@ -902,9 +937,6 @@ class ViewPaymentsPendingList extends ViewPaymentsPending
         $filterList = Concat($filterList, $this->transaction_id->AdvancedSearch->toJson(), ","); // Field transaction_id
         $filterList = Concat($filterList, $this->campaign_id->AdvancedSearch->toJson(), ","); // Field campaign_id
         $filterList = Concat($filterList, $this->campaign_name->AdvancedSearch->toJson(), ","); // Field campaign_name
-        $filterList = Concat($filterList, $this->quantity->AdvancedSearch->toJson(), ","); // Field quantity
-        $filterList = Concat($filterList, $this->transaction_status->AdvancedSearch->toJson(), ","); // Field transaction_status
-        $filterList = Concat($filterList, $this->print_status->AdvancedSearch->toJson(), ","); // Field print_status
         $filterList = Concat($filterList, $this->payment_status->AdvancedSearch->toJson(), ","); // Field payment_status
         $filterList = Concat($filterList, $this->start_date->AdvancedSearch->toJson(), ","); // Field start_date
         $filterList = Concat($filterList, $this->end_date->AdvancedSearch->toJson(), ","); // Field end_date
@@ -914,13 +946,22 @@ class ViewPaymentsPendingList extends ViewPaymentsPending
         $filterList = Concat($filterList, $this->inventory->AdvancedSearch->toJson(), ","); // Field inventory
         $filterList = Concat($filterList, $this->bus_size->AdvancedSearch->toJson(), ","); // Field bus_size
         $filterList = Concat($filterList, $this->print_stage->AdvancedSearch->toJson(), ","); // Field print_stage
+        $filterList = Concat($filterList, $this->quantity->AdvancedSearch->toJson(), ","); // Field quantity
         $filterList = Concat($filterList, $this->price->AdvancedSearch->toJson(), ","); // Field price
         $filterList = Concat($filterList, $this->operator_fee->AdvancedSearch->toJson(), ","); // Field operator_fee
         $filterList = Concat($filterList, $this->agency_fee->AdvancedSearch->toJson(), ","); // Field agency_fee
         $filterList = Concat($filterList, $this->lamata_fee->AdvancedSearch->toJson(), ","); // Field lamata_fee
         $filterList = Concat($filterList, $this->lasaa_fee->AdvancedSearch->toJson(), ","); // Field lasaa_fee
         $filterList = Concat($filterList, $this->printers_fee->AdvancedSearch->toJson(), ","); // Field printers_fee
+        $filterList = Concat($filterList, $this->operator_total->AdvancedSearch->toJson(), ","); // Field operator_total
+        $filterList = Concat($filterList, $this->agency_total->AdvancedSearch->toJson(), ","); // Field agency_total
+        $filterList = Concat($filterList, $this->lamata_total->AdvancedSearch->toJson(), ","); // Field lamata_total
+        $filterList = Concat($filterList, $this->lasaa_total->AdvancedSearch->toJson(), ","); // Field lasaa_total
+        $filterList = Concat($filterList, $this->printers_total->AdvancedSearch->toJson(), ","); // Field printers_total
+        $filterList = Concat($filterList, $this->price_total->AdvancedSearch->toJson(), ","); // Field price_total
         $filterList = Concat($filterList, $this->price_details->AdvancedSearch->toJson(), ","); // Field price_details
+        $filterList = Concat($filterList, $this->transaction_status->AdvancedSearch->toJson(), ","); // Field transaction_status
+        $filterList = Concat($filterList, $this->print_status->AdvancedSearch->toJson(), ","); // Field print_status
         if ($this->BasicSearch->Keyword != "") {
             $wrk = "\"" . Config("TABLE_BASIC_SEARCH") . "\":\"" . JsEncode($this->BasicSearch->Keyword) . "\",\"" . Config("TABLE_BASIC_SEARCH_TYPE") . "\":\"" . JsEncode($this->BasicSearch->Type) . "\"";
             $filterList = Concat($filterList, $wrk, ",");
@@ -984,30 +1025,6 @@ class ViewPaymentsPendingList extends ViewPaymentsPending
         $this->campaign_name->AdvancedSearch->SearchValue2 = @$filter["y_campaign_name"];
         $this->campaign_name->AdvancedSearch->SearchOperator2 = @$filter["w_campaign_name"];
         $this->campaign_name->AdvancedSearch->save();
-
-        // Field quantity
-        $this->quantity->AdvancedSearch->SearchValue = @$filter["x_quantity"];
-        $this->quantity->AdvancedSearch->SearchOperator = @$filter["z_quantity"];
-        $this->quantity->AdvancedSearch->SearchCondition = @$filter["v_quantity"];
-        $this->quantity->AdvancedSearch->SearchValue2 = @$filter["y_quantity"];
-        $this->quantity->AdvancedSearch->SearchOperator2 = @$filter["w_quantity"];
-        $this->quantity->AdvancedSearch->save();
-
-        // Field transaction_status
-        $this->transaction_status->AdvancedSearch->SearchValue = @$filter["x_transaction_status"];
-        $this->transaction_status->AdvancedSearch->SearchOperator = @$filter["z_transaction_status"];
-        $this->transaction_status->AdvancedSearch->SearchCondition = @$filter["v_transaction_status"];
-        $this->transaction_status->AdvancedSearch->SearchValue2 = @$filter["y_transaction_status"];
-        $this->transaction_status->AdvancedSearch->SearchOperator2 = @$filter["w_transaction_status"];
-        $this->transaction_status->AdvancedSearch->save();
-
-        // Field print_status
-        $this->print_status->AdvancedSearch->SearchValue = @$filter["x_print_status"];
-        $this->print_status->AdvancedSearch->SearchOperator = @$filter["z_print_status"];
-        $this->print_status->AdvancedSearch->SearchCondition = @$filter["v_print_status"];
-        $this->print_status->AdvancedSearch->SearchValue2 = @$filter["y_print_status"];
-        $this->print_status->AdvancedSearch->SearchOperator2 = @$filter["w_print_status"];
-        $this->print_status->AdvancedSearch->save();
 
         // Field payment_status
         $this->payment_status->AdvancedSearch->SearchValue = @$filter["x_payment_status"];
@@ -1081,6 +1098,14 @@ class ViewPaymentsPendingList extends ViewPaymentsPending
         $this->print_stage->AdvancedSearch->SearchOperator2 = @$filter["w_print_stage"];
         $this->print_stage->AdvancedSearch->save();
 
+        // Field quantity
+        $this->quantity->AdvancedSearch->SearchValue = @$filter["x_quantity"];
+        $this->quantity->AdvancedSearch->SearchOperator = @$filter["z_quantity"];
+        $this->quantity->AdvancedSearch->SearchCondition = @$filter["v_quantity"];
+        $this->quantity->AdvancedSearch->SearchValue2 = @$filter["y_quantity"];
+        $this->quantity->AdvancedSearch->SearchOperator2 = @$filter["w_quantity"];
+        $this->quantity->AdvancedSearch->save();
+
         // Field price
         $this->price->AdvancedSearch->SearchValue = @$filter["x_price"];
         $this->price->AdvancedSearch->SearchOperator = @$filter["z_price"];
@@ -1129,6 +1154,54 @@ class ViewPaymentsPendingList extends ViewPaymentsPending
         $this->printers_fee->AdvancedSearch->SearchOperator2 = @$filter["w_printers_fee"];
         $this->printers_fee->AdvancedSearch->save();
 
+        // Field operator_total
+        $this->operator_total->AdvancedSearch->SearchValue = @$filter["x_operator_total"];
+        $this->operator_total->AdvancedSearch->SearchOperator = @$filter["z_operator_total"];
+        $this->operator_total->AdvancedSearch->SearchCondition = @$filter["v_operator_total"];
+        $this->operator_total->AdvancedSearch->SearchValue2 = @$filter["y_operator_total"];
+        $this->operator_total->AdvancedSearch->SearchOperator2 = @$filter["w_operator_total"];
+        $this->operator_total->AdvancedSearch->save();
+
+        // Field agency_total
+        $this->agency_total->AdvancedSearch->SearchValue = @$filter["x_agency_total"];
+        $this->agency_total->AdvancedSearch->SearchOperator = @$filter["z_agency_total"];
+        $this->agency_total->AdvancedSearch->SearchCondition = @$filter["v_agency_total"];
+        $this->agency_total->AdvancedSearch->SearchValue2 = @$filter["y_agency_total"];
+        $this->agency_total->AdvancedSearch->SearchOperator2 = @$filter["w_agency_total"];
+        $this->agency_total->AdvancedSearch->save();
+
+        // Field lamata_total
+        $this->lamata_total->AdvancedSearch->SearchValue = @$filter["x_lamata_total"];
+        $this->lamata_total->AdvancedSearch->SearchOperator = @$filter["z_lamata_total"];
+        $this->lamata_total->AdvancedSearch->SearchCondition = @$filter["v_lamata_total"];
+        $this->lamata_total->AdvancedSearch->SearchValue2 = @$filter["y_lamata_total"];
+        $this->lamata_total->AdvancedSearch->SearchOperator2 = @$filter["w_lamata_total"];
+        $this->lamata_total->AdvancedSearch->save();
+
+        // Field lasaa_total
+        $this->lasaa_total->AdvancedSearch->SearchValue = @$filter["x_lasaa_total"];
+        $this->lasaa_total->AdvancedSearch->SearchOperator = @$filter["z_lasaa_total"];
+        $this->lasaa_total->AdvancedSearch->SearchCondition = @$filter["v_lasaa_total"];
+        $this->lasaa_total->AdvancedSearch->SearchValue2 = @$filter["y_lasaa_total"];
+        $this->lasaa_total->AdvancedSearch->SearchOperator2 = @$filter["w_lasaa_total"];
+        $this->lasaa_total->AdvancedSearch->save();
+
+        // Field printers_total
+        $this->printers_total->AdvancedSearch->SearchValue = @$filter["x_printers_total"];
+        $this->printers_total->AdvancedSearch->SearchOperator = @$filter["z_printers_total"];
+        $this->printers_total->AdvancedSearch->SearchCondition = @$filter["v_printers_total"];
+        $this->printers_total->AdvancedSearch->SearchValue2 = @$filter["y_printers_total"];
+        $this->printers_total->AdvancedSearch->SearchOperator2 = @$filter["w_printers_total"];
+        $this->printers_total->AdvancedSearch->save();
+
+        // Field price_total
+        $this->price_total->AdvancedSearch->SearchValue = @$filter["x_price_total"];
+        $this->price_total->AdvancedSearch->SearchOperator = @$filter["z_price_total"];
+        $this->price_total->AdvancedSearch->SearchCondition = @$filter["v_price_total"];
+        $this->price_total->AdvancedSearch->SearchValue2 = @$filter["y_price_total"];
+        $this->price_total->AdvancedSearch->SearchOperator2 = @$filter["w_price_total"];
+        $this->price_total->AdvancedSearch->save();
+
         // Field price_details
         $this->price_details->AdvancedSearch->SearchValue = @$filter["x_price_details"];
         $this->price_details->AdvancedSearch->SearchOperator = @$filter["z_price_details"];
@@ -1136,6 +1209,22 @@ class ViewPaymentsPendingList extends ViewPaymentsPending
         $this->price_details->AdvancedSearch->SearchValue2 = @$filter["y_price_details"];
         $this->price_details->AdvancedSearch->SearchOperator2 = @$filter["w_price_details"];
         $this->price_details->AdvancedSearch->save();
+
+        // Field transaction_status
+        $this->transaction_status->AdvancedSearch->SearchValue = @$filter["x_transaction_status"];
+        $this->transaction_status->AdvancedSearch->SearchOperator = @$filter["z_transaction_status"];
+        $this->transaction_status->AdvancedSearch->SearchCondition = @$filter["v_transaction_status"];
+        $this->transaction_status->AdvancedSearch->SearchValue2 = @$filter["y_transaction_status"];
+        $this->transaction_status->AdvancedSearch->SearchOperator2 = @$filter["w_transaction_status"];
+        $this->transaction_status->AdvancedSearch->save();
+
+        // Field print_status
+        $this->print_status->AdvancedSearch->SearchValue = @$filter["x_print_status"];
+        $this->print_status->AdvancedSearch->SearchOperator = @$filter["z_print_status"];
+        $this->print_status->AdvancedSearch->SearchCondition = @$filter["v_print_status"];
+        $this->print_status->AdvancedSearch->SearchValue2 = @$filter["y_print_status"];
+        $this->print_status->AdvancedSearch->SearchOperator2 = @$filter["w_print_status"];
+        $this->print_status->AdvancedSearch->save();
         $this->BasicSearch->setKeyword(@$filter[Config("TABLE_BASIC_SEARCH")]);
         $this->BasicSearch->setType(@$filter[Config("TABLE_BASIC_SEARCH_TYPE")]);
     }
@@ -1145,8 +1234,6 @@ class ViewPaymentsPendingList extends ViewPaymentsPending
     {
         $where = "";
         $this->buildBasicSearchSql($where, $this->campaign_name, $arKeywords, $type);
-        $this->buildBasicSearchSql($where, $this->transaction_status, $arKeywords, $type);
-        $this->buildBasicSearchSql($where, $this->print_status, $arKeywords, $type);
         $this->buildBasicSearchSql($where, $this->payment_status, $arKeywords, $type);
         $this->buildBasicSearchSql($where, $this->vendor, $arKeywords, $type);
         $this->buildBasicSearchSql($where, $this->operator, $arKeywords, $type);
@@ -1154,7 +1241,15 @@ class ViewPaymentsPendingList extends ViewPaymentsPending
         $this->buildBasicSearchSql($where, $this->inventory, $arKeywords, $type);
         $this->buildBasicSearchSql($where, $this->bus_size, $arKeywords, $type);
         $this->buildBasicSearchSql($where, $this->print_stage, $arKeywords, $type);
+        $this->buildBasicSearchSql($where, $this->operator_total, $arKeywords, $type);
+        $this->buildBasicSearchSql($where, $this->agency_total, $arKeywords, $type);
+        $this->buildBasicSearchSql($where, $this->lamata_total, $arKeywords, $type);
+        $this->buildBasicSearchSql($where, $this->lasaa_total, $arKeywords, $type);
+        $this->buildBasicSearchSql($where, $this->printers_total, $arKeywords, $type);
+        $this->buildBasicSearchSql($where, $this->price_total, $arKeywords, $type);
         $this->buildBasicSearchSql($where, $this->price_details, $arKeywords, $type);
+        $this->buildBasicSearchSql($where, $this->transaction_status, $arKeywords, $type);
+        $this->buildBasicSearchSql($where, $this->print_status, $arKeywords, $type);
         return $where;
     }
 
@@ -1319,21 +1414,30 @@ class ViewPaymentsPendingList extends ViewPaymentsPending
             $this->CurrentOrderType = Get("ordertype", "");
             $this->updateSort($this->transaction_id); // transaction_id
             $this->updateSort($this->campaign_id); // campaign_id
-            $this->updateSort($this->quantity); // quantity
-            $this->updateSort($this->transaction_status); // transaction_status
-            $this->updateSort($this->print_status); // print_status
+            $this->updateSort($this->campaign_name); // campaign_name
             $this->updateSort($this->payment_status); // payment_status
             $this->updateSort($this->start_date); // start_date
             $this->updateSort($this->end_date); // end_date
             $this->updateSort($this->vendor); // vendor
             $this->updateSort($this->operator); // operator
             $this->updateSort($this->platform); // platform
+            $this->updateSort($this->inventory); // inventory
+            $this->updateSort($this->bus_size); // bus_size
+            $this->updateSort($this->quantity); // quantity
             $this->updateSort($this->price); // price
             $this->updateSort($this->operator_fee); // operator_fee
             $this->updateSort($this->agency_fee); // agency_fee
             $this->updateSort($this->lamata_fee); // lamata_fee
             $this->updateSort($this->lasaa_fee); // lasaa_fee
             $this->updateSort($this->printers_fee); // printers_fee
+            $this->updateSort($this->operator_total); // operator_total
+            $this->updateSort($this->agency_total); // agency_total
+            $this->updateSort($this->lamata_total); // lamata_total
+            $this->updateSort($this->lasaa_total); // lasaa_total
+            $this->updateSort($this->printers_total); // printers_total
+            $this->updateSort($this->price_total); // price_total
+            $this->updateSort($this->transaction_status); // transaction_status
+            $this->updateSort($this->print_status); // print_status
             $this->setStartRecordNumber(1); // Reset start position
         }
     }
@@ -1380,9 +1484,6 @@ class ViewPaymentsPendingList extends ViewPaymentsPending
                 $this->transaction_id->setSort("");
                 $this->campaign_id->setSort("");
                 $this->campaign_name->setSort("");
-                $this->quantity->setSort("");
-                $this->transaction_status->setSort("");
-                $this->print_status->setSort("");
                 $this->payment_status->setSort("");
                 $this->start_date->setSort("");
                 $this->end_date->setSort("");
@@ -1392,13 +1493,22 @@ class ViewPaymentsPendingList extends ViewPaymentsPending
                 $this->inventory->setSort("");
                 $this->bus_size->setSort("");
                 $this->print_stage->setSort("");
+                $this->quantity->setSort("");
                 $this->price->setSort("");
                 $this->operator_fee->setSort("");
                 $this->agency_fee->setSort("");
                 $this->lamata_fee->setSort("");
                 $this->lasaa_fee->setSort("");
                 $this->printers_fee->setSort("");
+                $this->operator_total->setSort("");
+                $this->agency_total->setSort("");
+                $this->lamata_total->setSort("");
+                $this->lasaa_total->setSort("");
+                $this->printers_total->setSort("");
+                $this->price_total->setSort("");
                 $this->price_details->setSort("");
+                $this->transaction_status->setSort("");
+                $this->print_status->setSort("");
             }
 
             // Reset start position
@@ -1741,9 +1851,6 @@ class ViewPaymentsPendingList extends ViewPaymentsPending
         $this->transaction_id->setDbValue($row['transaction_id']);
         $this->campaign_id->setDbValue($row['campaign_id']);
         $this->campaign_name->setDbValue($row['campaign_name']);
-        $this->quantity->setDbValue($row['quantity']);
-        $this->transaction_status->setDbValue($row['transaction_status']);
-        $this->print_status->setDbValue($row['print_status']);
         $this->payment_status->setDbValue($row['payment_status']);
         $this->start_date->setDbValue($row['start_date']);
         $this->end_date->setDbValue($row['end_date']);
@@ -1753,13 +1860,22 @@ class ViewPaymentsPendingList extends ViewPaymentsPending
         $this->inventory->setDbValue($row['inventory']);
         $this->bus_size->setDbValue($row['bus_size']);
         $this->print_stage->setDbValue($row['print_stage']);
+        $this->quantity->setDbValue($row['quantity']);
         $this->price->setDbValue($row['price']);
         $this->operator_fee->setDbValue($row['operator_fee']);
         $this->agency_fee->setDbValue($row['agency_fee']);
         $this->lamata_fee->setDbValue($row['lamata_fee']);
         $this->lasaa_fee->setDbValue($row['lasaa_fee']);
         $this->printers_fee->setDbValue($row['printers_fee']);
+        $this->operator_total->setDbValue($row['operator_total']);
+        $this->agency_total->setDbValue($row['agency_total']);
+        $this->lamata_total->setDbValue($row['lamata_total']);
+        $this->lasaa_total->setDbValue($row['lasaa_total']);
+        $this->printers_total->setDbValue($row['printers_total']);
+        $this->price_total->setDbValue($row['price_total']);
         $this->price_details->setDbValue($row['price_details']);
+        $this->transaction_status->setDbValue($row['transaction_status']);
+        $this->print_status->setDbValue($row['print_status']);
     }
 
     // Return a row with default values
@@ -1769,9 +1885,6 @@ class ViewPaymentsPendingList extends ViewPaymentsPending
         $row['transaction_id'] = null;
         $row['campaign_id'] = null;
         $row['campaign_name'] = null;
-        $row['quantity'] = null;
-        $row['transaction_status'] = null;
-        $row['print_status'] = null;
         $row['payment_status'] = null;
         $row['start_date'] = null;
         $row['end_date'] = null;
@@ -1781,13 +1894,22 @@ class ViewPaymentsPendingList extends ViewPaymentsPending
         $row['inventory'] = null;
         $row['bus_size'] = null;
         $row['print_stage'] = null;
+        $row['quantity'] = null;
         $row['price'] = null;
         $row['operator_fee'] = null;
         $row['agency_fee'] = null;
         $row['lamata_fee'] = null;
         $row['lasaa_fee'] = null;
         $row['printers_fee'] = null;
+        $row['operator_total'] = null;
+        $row['agency_total'] = null;
+        $row['lamata_total'] = null;
+        $row['lasaa_total'] = null;
+        $row['printers_total'] = null;
+        $row['price_total'] = null;
         $row['price_details'] = null;
+        $row['transaction_status'] = null;
+        $row['print_status'] = null;
         return $row;
     }
 
@@ -1821,12 +1943,6 @@ class ViewPaymentsPendingList extends ViewPaymentsPending
 
         // campaign_name
 
-        // quantity
-
-        // transaction_status
-
-        // print_status
-
         // payment_status
 
         // start_date
@@ -1845,6 +1961,8 @@ class ViewPaymentsPendingList extends ViewPaymentsPending
 
         // print_stage
 
+        // quantity
+
         // price
 
         // operator_fee
@@ -1857,7 +1975,23 @@ class ViewPaymentsPendingList extends ViewPaymentsPending
 
         // printers_fee
 
+        // operator_total
+
+        // agency_total
+
+        // lamata_total
+
+        // lasaa_total
+
+        // printers_total
+
+        // price_total
+
         // price_details
+
+        // transaction_status
+
+        // print_status
         if ($this->RowType == ROWTYPE_VIEW) {
             // transaction_id
             $this->transaction_id->ViewValue = $this->transaction_id->CurrentValue;
@@ -1869,21 +2003,13 @@ class ViewPaymentsPendingList extends ViewPaymentsPending
             $this->campaign_id->ViewValue = FormatNumber($this->campaign_id->ViewValue, 0, -2, -2, -2);
             $this->campaign_id->ViewCustomAttributes = "";
 
-            // quantity
-            $this->quantity->ViewValue = $this->quantity->CurrentValue;
-            $this->quantity->ViewValue = FormatNumber($this->quantity->ViewValue, 0, -2, -2, -2);
-            $this->quantity->ViewCustomAttributes = "";
-
-            // transaction_status
-            $this->transaction_status->ViewValue = $this->transaction_status->CurrentValue;
-            $this->transaction_status->ViewCustomAttributes = "";
-
-            // print_status
-            $this->print_status->ViewValue = $this->print_status->CurrentValue;
-            $this->print_status->ViewCustomAttributes = "";
+            // campaign_name
+            $this->campaign_name->ViewValue = $this->campaign_name->CurrentValue;
+            $this->campaign_name->ViewCustomAttributes = "";
 
             // payment_status
             $this->payment_status->ViewValue = $this->payment_status->CurrentValue;
+            $this->payment_status->CellCssStyle .= "text-align: center;";
             $this->payment_status->ViewCustomAttributes = "";
 
             // start_date
@@ -1908,35 +2034,107 @@ class ViewPaymentsPendingList extends ViewPaymentsPending
             $this->platform->ViewValue = $this->platform->CurrentValue;
             $this->platform->ViewCustomAttributes = "";
 
+            // inventory
+            $this->inventory->ViewValue = $this->inventory->CurrentValue;
+            $this->inventory->ViewCustomAttributes = "";
+
+            // bus_size
+            $this->bus_size->ViewValue = $this->bus_size->CurrentValue;
+            $this->bus_size->ViewCustomAttributes = "";
+
+            // quantity
+            $this->quantity->ViewValue = $this->quantity->CurrentValue;
+            $this->quantity->ViewValue = FormatNumber($this->quantity->ViewValue, 0, -2, -2, -2);
+            $this->quantity->CellCssStyle .= "text-align: right;";
+            $this->quantity->ViewCustomAttributes = "";
+
             // price
             $this->price->ViewValue = $this->price->CurrentValue;
             $this->price->ViewValue = FormatNumber($this->price->ViewValue, 0, -2, -2, -2);
+            $this->price->CellCssStyle .= "text-align: right;";
             $this->price->ViewCustomAttributes = "";
 
             // operator_fee
             $this->operator_fee->ViewValue = $this->operator_fee->CurrentValue;
             $this->operator_fee->ViewValue = FormatNumber($this->operator_fee->ViewValue, 0, -2, -2, -2);
+            $this->operator_fee->CellCssStyle .= "text-align: right;";
             $this->operator_fee->ViewCustomAttributes = "";
 
             // agency_fee
             $this->agency_fee->ViewValue = $this->agency_fee->CurrentValue;
             $this->agency_fee->ViewValue = FormatNumber($this->agency_fee->ViewValue, 0, -2, -2, -2);
+            $this->agency_fee->CellCssStyle .= "text-align: right;";
             $this->agency_fee->ViewCustomAttributes = "";
 
             // lamata_fee
             $this->lamata_fee->ViewValue = $this->lamata_fee->CurrentValue;
             $this->lamata_fee->ViewValue = FormatNumber($this->lamata_fee->ViewValue, 0, -2, -2, -2);
+            $this->lamata_fee->CellCssStyle .= "text-align: right;";
             $this->lamata_fee->ViewCustomAttributes = "";
 
             // lasaa_fee
             $this->lasaa_fee->ViewValue = $this->lasaa_fee->CurrentValue;
             $this->lasaa_fee->ViewValue = FormatNumber($this->lasaa_fee->ViewValue, 0, -2, -2, -2);
+            $this->lasaa_fee->CellCssStyle .= "text-align: right;";
             $this->lasaa_fee->ViewCustomAttributes = "";
 
             // printers_fee
             $this->printers_fee->ViewValue = $this->printers_fee->CurrentValue;
             $this->printers_fee->ViewValue = FormatNumber($this->printers_fee->ViewValue, 0, -2, -2, -2);
+            $this->printers_fee->CellCssStyle .= "text-align: right;";
             $this->printers_fee->ViewCustomAttributes = "";
+
+            // operator_total
+            $this->operator_total->ViewValue = $this->operator_total->CurrentValue;
+            $this->operator_total->ViewValue = FormatNumber($this->operator_total->ViewValue, 0, -2, -2, -2);
+            $this->operator_total->CssClass = "font-weight-bold font-italic";
+            $this->operator_total->CellCssStyle .= "text-align: right;";
+            $this->operator_total->ViewCustomAttributes = "";
+
+            // agency_total
+            $this->agency_total->ViewValue = $this->agency_total->CurrentValue;
+            $this->agency_total->ViewValue = FormatNumber($this->agency_total->ViewValue, 0, -2, -2, -2);
+            $this->agency_total->CssClass = "font-weight-bold font-italic";
+            $this->agency_total->CellCssStyle .= "text-align: right;";
+            $this->agency_total->ViewCustomAttributes = "";
+
+            // lamata_total
+            $this->lamata_total->ViewValue = $this->lamata_total->CurrentValue;
+            $this->lamata_total->ViewValue = FormatNumber($this->lamata_total->ViewValue, 0, -2, -2, -2);
+            $this->lamata_total->CssClass = "font-weight-bold font-italic";
+            $this->lamata_total->CellCssStyle .= "text-align: right;";
+            $this->lamata_total->ViewCustomAttributes = "";
+
+            // lasaa_total
+            $this->lasaa_total->ViewValue = $this->lasaa_total->CurrentValue;
+            $this->lasaa_total->ViewValue = FormatNumber($this->lasaa_total->ViewValue, 0, -2, -2, -2);
+            $this->lasaa_total->CssClass = "font-weight-bold font-italic";
+            $this->lasaa_total->CellCssStyle .= "text-align: right;";
+            $this->lasaa_total->ViewCustomAttributes = "";
+
+            // printers_total
+            $this->printers_total->ViewValue = $this->printers_total->CurrentValue;
+            $this->printers_total->ViewValue = FormatNumber($this->printers_total->ViewValue, 0, -2, -2, -2);
+            $this->printers_total->CssClass = "font-weight-bold font-italic";
+            $this->printers_total->CellCssStyle .= "text-align: right;";
+            $this->printers_total->ViewCustomAttributes = "";
+
+            // price_total
+            $this->price_total->ViewValue = $this->price_total->CurrentValue;
+            $this->price_total->ViewValue = FormatNumber($this->price_total->ViewValue, 0, -2, -2, -2);
+            $this->price_total->CssClass = "font-weight-bold";
+            $this->price_total->CellCssStyle .= "text-align: right;";
+            $this->price_total->ViewCustomAttributes = "";
+
+            // transaction_status
+            $this->transaction_status->ViewValue = $this->transaction_status->CurrentValue;
+            $this->transaction_status->CellCssStyle .= "text-align: center;";
+            $this->transaction_status->ViewCustomAttributes = "";
+
+            // print_status
+            $this->print_status->ViewValue = $this->print_status->CurrentValue;
+            $this->print_status->CellCssStyle .= "text-align: center;";
+            $this->print_status->ViewCustomAttributes = "";
 
             // transaction_id
             $this->transaction_id->LinkCustomAttributes = "";
@@ -1948,24 +2146,22 @@ class ViewPaymentsPendingList extends ViewPaymentsPending
             $this->campaign_id->HrefValue = "";
             $this->campaign_id->TooltipValue = "";
 
-            // quantity
-            $this->quantity->LinkCustomAttributes = "";
-            $this->quantity->HrefValue = "";
-            $this->quantity->TooltipValue = "";
-
-            // transaction_status
-            $this->transaction_status->LinkCustomAttributes = "";
-            $this->transaction_status->HrefValue = "";
-            $this->transaction_status->TooltipValue = "";
-
-            // print_status
-            $this->print_status->LinkCustomAttributes = "";
-            $this->print_status->HrefValue = "";
-            $this->print_status->TooltipValue = "";
+            // campaign_name
+            $this->campaign_name->LinkCustomAttributes = "";
+            $this->campaign_name->HrefValue = "";
+            $this->campaign_name->TooltipValue = "";
 
             // payment_status
             $this->payment_status->LinkCustomAttributes = "";
-            $this->payment_status->HrefValue = "";
+            if (!EmptyValue($this->payment_status->CurrentValue)) {
+                $this->payment_status->HrefValue = "#" . (!empty($this->payment_status->ViewValue) && !is_array($this->payment_status->ViewValue) ? RemoveHtml($this->payment_status->ViewValue) : $this->payment_status->CurrentValue); // Add prefix/suffix
+                $this->payment_status->LinkAttrs["target"] = ""; // Add target
+                if ($this->isExport()) {
+                    $this->payment_status->HrefValue = FullUrl($this->payment_status->HrefValue, "href");
+                }
+            } else {
+                $this->payment_status->HrefValue = "";
+            }
             $this->payment_status->TooltipValue = "";
 
             // start_date
@@ -1992,6 +2188,21 @@ class ViewPaymentsPendingList extends ViewPaymentsPending
             $this->platform->LinkCustomAttributes = "";
             $this->platform->HrefValue = "";
             $this->platform->TooltipValue = "";
+
+            // inventory
+            $this->inventory->LinkCustomAttributes = "";
+            $this->inventory->HrefValue = "";
+            $this->inventory->TooltipValue = "";
+
+            // bus_size
+            $this->bus_size->LinkCustomAttributes = "";
+            $this->bus_size->HrefValue = "";
+            $this->bus_size->TooltipValue = "";
+
+            // quantity
+            $this->quantity->LinkCustomAttributes = "";
+            $this->quantity->HrefValue = "";
+            $this->quantity->TooltipValue = "";
 
             // price
             $this->price->LinkCustomAttributes = "";
@@ -2022,6 +2233,46 @@ class ViewPaymentsPendingList extends ViewPaymentsPending
             $this->printers_fee->LinkCustomAttributes = "";
             $this->printers_fee->HrefValue = "";
             $this->printers_fee->TooltipValue = "";
+
+            // operator_total
+            $this->operator_total->LinkCustomAttributes = "";
+            $this->operator_total->HrefValue = "";
+            $this->operator_total->TooltipValue = "";
+
+            // agency_total
+            $this->agency_total->LinkCustomAttributes = "";
+            $this->agency_total->HrefValue = "";
+            $this->agency_total->TooltipValue = "";
+
+            // lamata_total
+            $this->lamata_total->LinkCustomAttributes = "";
+            $this->lamata_total->HrefValue = "";
+            $this->lamata_total->TooltipValue = "";
+
+            // lasaa_total
+            $this->lasaa_total->LinkCustomAttributes = "";
+            $this->lasaa_total->HrefValue = "";
+            $this->lasaa_total->TooltipValue = "";
+
+            // printers_total
+            $this->printers_total->LinkCustomAttributes = "";
+            $this->printers_total->HrefValue = "";
+            $this->printers_total->TooltipValue = "";
+
+            // price_total
+            $this->price_total->LinkCustomAttributes = "";
+            $this->price_total->HrefValue = "";
+            $this->price_total->TooltipValue = "";
+
+            // transaction_status
+            $this->transaction_status->LinkCustomAttributes = "";
+            $this->transaction_status->HrefValue = "";
+            $this->transaction_status->TooltipValue = "";
+
+            // print_status
+            $this->print_status->LinkCustomAttributes = "";
+            $this->print_status->HrefValue = "";
+            $this->print_status->TooltipValue = "";
         }
 
         // Call Row Rendered event
@@ -2126,8 +2377,8 @@ class ViewPaymentsPendingList extends ViewPaymentsPending
         $item->Visible = false;
     }
 
-    // Set up search/sort options
-    protected function setupSearchSortOptions()
+    // Set up search options
+    protected function setupSearchOptions()
     {
         global $Language, $Security;
         $pageUrl = $this->pageUrl();
@@ -2168,7 +2419,7 @@ class ViewPaymentsPendingList extends ViewPaymentsPending
     /**
     * Export data in HTML/CSV/Word/Excel/XML/Email/PDF format
     *
-    * @param boolean $return Return the data rather than output it
+    * @param bool $return Return the data rather than output it
     * @return mixed
     */
     public function exportData($return = false)
@@ -2182,7 +2433,9 @@ class ViewPaymentsPendingList extends ViewPaymentsPending
 
         // Export all
         if ($this->ExportAll) {
-            set_time_limit(Config("EXPORT_ALL_TIME_LIMIT"));
+            if (Config("EXPORT_ALL_TIME_LIMIT") >= 0) {
+                @set_time_limit(Config("EXPORT_ALL_TIME_LIMIT"));
+            }
             $this->DisplayRecords = $this->TotalRecords;
             $this->StopRecord = $this->TotalRecords;
         } else { // Export one page only

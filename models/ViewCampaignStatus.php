@@ -76,44 +76,52 @@ class ViewCampaignStatus extends DbTable
         $this->id = new DbField('view_campaign_status', 'view_campaign_status', 'x_id', 'id', '"id"', 'CAST("id" AS varchar(255))', 3, 4, -1, false, '"id"', false, false, false, 'FORMATTED TEXT', 'TEXT');
         $this->id->Sortable = true; // Allow sort
         $this->id->DefaultErrorMessage = $Language->phrase("IncorrectInteger");
+        $this->id->CustomMsg = $Language->FieldPhrase($this->TableVar, $this->id->Param, "CustomMsg");
         $this->Fields['id'] = &$this->id;
 
         // name
         $this->name = new DbField('view_campaign_status', 'view_campaign_status', 'x_name', 'name', '"name"', '"name"', 201, 0, -1, false, '"name"', false, false, false, 'FORMATTED TEXT', 'TEXTAREA');
         $this->name->Sortable = true; // Allow sort
+        $this->name->CustomMsg = $Language->FieldPhrase($this->TableVar, $this->name->Param, "CustomMsg");
         $this->Fields['name'] = &$this->name;
 
         // pending
         $this->pending = new DbField('view_campaign_status', 'view_campaign_status', 'x_pending', 'pending', '"pending"', 'CAST("pending" AS varchar(255))', 20, 8, -1, false, '"pending"', false, false, false, 'FORMATTED TEXT', 'TEXT');
         $this->pending->Sortable = true; // Allow sort
         $this->pending->DefaultErrorMessage = $Language->phrase("IncorrectInteger");
+        $this->pending->CustomMsg = $Language->FieldPhrase($this->TableVar, $this->pending->Param, "CustomMsg");
         $this->Fields['pending'] = &$this->pending;
 
         // approved
         $this->approved = new DbField('view_campaign_status', 'view_campaign_status', 'x_approved', 'approved', '"approved"', 'CAST("approved" AS varchar(255))', 20, 8, -1, false, '"approved"', false, false, false, 'FORMATTED TEXT', 'TEXT');
         $this->approved->Sortable = true; // Allow sort
         $this->approved->DefaultErrorMessage = $Language->phrase("IncorrectInteger");
+        $this->approved->CustomMsg = $Language->FieldPhrase($this->TableVar, $this->approved->Param, "CustomMsg");
         $this->Fields['approved'] = &$this->approved;
 
         // denied
         $this->denied = new DbField('view_campaign_status', 'view_campaign_status', 'x_denied', 'denied', '"denied"', 'CAST("denied" AS varchar(255))', 20, 8, -1, false, '"denied"', false, false, false, 'FORMATTED TEXT', 'TEXT');
         $this->denied->Sortable = true; // Allow sort
         $this->denied->DefaultErrorMessage = $Language->phrase("IncorrectInteger");
+        $this->denied->CustomMsg = $Language->FieldPhrase($this->TableVar, $this->denied->Param, "CustomMsg");
         $this->Fields['denied'] = &$this->denied;
 
         // status
         $this->status = new DbField('view_campaign_status', 'view_campaign_status', 'x_status', 'status', '"status"', '"status"', 201, 0, -1, false, '"status"', false, false, false, 'FORMATTED TEXT', 'TEXTAREA');
         $this->status->Sortable = true; // Allow sort
+        $this->status->CustomMsg = $Language->FieldPhrase($this->TableVar, $this->status->Param, "CustomMsg");
         $this->Fields['status'] = &$this->status;
 
         // status_matrix
         $this->status_matrix = new DbField('view_campaign_status', 'view_campaign_status', 'x_status_matrix', 'status_matrix', '"status_matrix"', '"status_matrix"', 201, 0, -1, false, '"status_matrix"', false, false, false, 'FORMATTED TEXT', 'TEXTAREA');
         $this->status_matrix->Sortable = true; // Allow sort
+        $this->status_matrix->CustomMsg = $Language->FieldPhrase($this->TableVar, $this->status_matrix->Param, "CustomMsg");
         $this->Fields['status_matrix'] = &$this->status_matrix;
 
         // status_json
         $this->status_json = new DbField('view_campaign_status', 'view_campaign_status', 'x_status_json', 'status_json', '"status_json"', '"status_json"', 201, 0, -1, false, '"status_json"', false, false, false, 'FORMATTED TEXT', 'TEXTAREA');
         $this->status_json->Sortable = true; // Allow sort
+        $this->status_json->CustomMsg = $Language->FieldPhrase($this->TableVar, $this->status_json->Param, "CustomMsg");
         $this->Fields['status_json'] = &$this->status_json;
     }
 
@@ -294,18 +302,21 @@ class ViewCampaignStatus extends DbTable
         $cnt = -1;
         $rs = null;
         if ($sql instanceof \Doctrine\DBAL\Query\QueryBuilder) { // Query builder
-            $sql = $sql->resetQueryPart("orderBy")->getSQL();
+            $sqlwrk = clone $sql;
+            $sqlwrk = $sqlwrk->resetQueryPart("orderBy")->getSQL();
+        } else {
+            $sqlwrk = $sql;
         }
         $pattern = '/^SELECT\s([\s\S]+)\sFROM\s/i';
         // Skip Custom View / SubQuery / SELECT DISTINCT / ORDER BY
         if (
             ($this->TableType == 'TABLE' || $this->TableType == 'VIEW' || $this->TableType == 'LINKTABLE') &&
-            preg_match($pattern, $sql) && !preg_match('/\(\s*(SELECT[^)]+)\)/i', $sql) &&
-            !preg_match('/^\s*select\s+distinct\s+/i', $sql) && !preg_match('/\s+order\s+by\s+/i', $sql)
+            preg_match($pattern, $sqlwrk) && !preg_match('/\(\s*(SELECT[^)]+)\)/i', $sqlwrk) &&
+            !preg_match('/^\s*select\s+distinct\s+/i', $sqlwrk) && !preg_match('/\s+order\s+by\s+/i', $sqlwrk)
         ) {
-            $sqlwrk = "SELECT COUNT(*) FROM " . preg_replace($pattern, "", $sql);
+            $sqlwrk = "SELECT COUNT(*) FROM " . preg_replace($pattern, "", $sqlwrk);
         } else {
-            $sqlwrk = "SELECT COUNT(*) FROM (" . $sql . ") COUNT_TABLE";
+            $sqlwrk = "SELECT COUNT(*) FROM (" . $sqlwrk . ") COUNT_TABLE";
         }
         $conn = $c ?? $this->getConnection();
         $rs = $conn->executeQuery($sqlwrk);

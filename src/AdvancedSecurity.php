@@ -11,7 +11,7 @@ class AdvancedSecurity
     public $UserLevelPriv = []; // All User Level permissions
     public $UserLevelID = []; // User Level ID array
     public $UserID = []; // User ID array
-    public $CurrentUserLevelID;
+    public $CurrentUserLevelID = -2; // User Level (Anonymous by default)
     public $CurrentUserLevel; // Permissions
     public $CurrentUserID;
     public $CurrentParentUserID;
@@ -22,6 +22,8 @@ class AdvancedSecurity
     // Constructor
     public function __construct()
     {
+        global $Security;
+        $Security = $this;
         // Init User Level
         if ($this->isLoggedIn()) {
             $this->CurrentUserLevelID = $this->sessionUserLevelID();
@@ -118,13 +120,13 @@ class AdvancedSecurity
     }
 
     // Get current user name
-    protected function getCurrentUserName()
+    public function getCurrentUserName()
     {
         return isset($_SESSION[SESSION_USER_NAME]) ? strval($_SESSION[SESSION_USER_NAME]) : $this->userName;
     }
 
     // Set current user name
-    protected function setCurrentUserName($v)
+    public function setCurrentUserName($v)
     {
         $this->userName = $v;
         $_SESSION[SESSION_USER_NAME] = $this->userName;
@@ -163,7 +165,13 @@ class AdvancedSecurity
     // Get JWT Token
     public function createJwt($minExpiry = 0)
     {
-        return CreateJwt($this->currentUserName(), $this->sessionUserID(), $this->sessionParentUserID(), $this->sessionUserLevelID(), $minExpiry);
+        return CreateJwt(
+            $this->currentUserName(),
+            $this->sessionUserID(),
+            $this->sessionParentUserID(),
+            $this->sessionUserLevelID(),
+            $minExpiry
+        );
     }
 
     // Can add
@@ -343,7 +351,9 @@ class AdvancedSecurity
         if ($this->lastUrl() == $s) {
             $s = "";
         }
-        WriteCookie("LastUrl", $s);
+        if (!preg_match('/[?&]modal=1(&|$)/', $s)) { // Query string does not contain "modal=1"
+            WriteCookie("LastUrl", $s);
+        }
     }
 
     // Auto login
@@ -367,16 +377,20 @@ class AdvancedSecurity
             $pwd = Session(PROJECT_NAME . "_Password");
             $autologin = $this->validateUser($usr, $pwd, true);
         }
+        if ($autologin) {
+            WriteAuditLog($usr, $GLOBALS["Language"]->phrase("AuditTrailAutoLogin"), CurrentUserIP(), "", "", "", "");
+        }
         return $autologin;
     }
 
     // Login user
     public function loginUser($userName = null, $userID = null, $parentUserID = null, $userLevel = null)
     {
-        $this->isLoggedIn = true;
-        $_SESSION[SESSION_STATUS] = "login";
         if ($userName != null) {
             $this->setCurrentUserName($userName);
+            $this->isLoggedIn = true;
+            $_SESSION[SESSION_STATUS] = "login";
+            $this->isSysAdmin = $this->validateSysAdmin($userName);
         }
         if ($userID != null) {
             $this->setSessionUserID($userID);
@@ -386,9 +400,6 @@ class AdvancedSecurity
         }
         if ($userLevel != null) {
             $this->setSessionUserLevelID($userLevel);
-            if ((int)$userLevel == -1) {
-                $this->isSysAdmin = true;
-            }
             $this->setupUserLevel();
         }
     }
@@ -462,24 +473,7 @@ class AdvancedSecurity
 
         // Check hard coded admin first
         if (!$valid) {
-            $adminUserName = Config("ADMIN_USER_NAME");
-            $adminPassword = Config("ADMIN_PASSWORD");
-            if (Config("ENCRYPTION_ENABLED")) {
-                try {
-                    $adminUserName = PhpDecrypt(Config("ADMIN_USER_NAME"), Config("ENCRYPTION_KEY"));
-                    $adminPassword = PhpDecrypt(Config("ADMIN_PASSWORD"), Config("ENCRYPTION_KEY"));
-                } catch (\Defuse\Crypto\Exception\WrongKeyOrModifiedCiphertextException $e) {
-                    $adminUserName = Config("ADMIN_USER_NAME");
-                    $adminPassword = Config("ADMIN_PASSWORD");
-                }
-            }
-            if (Config("CASE_SENSITIVE_PASSWORD")) {
-                $valid = (!$customValid && $adminUserName === $usr && $adminPassword === $pwd) ||
-                    ($customValid && $adminUserName === $usr);
-            } else {
-                $valid = (!$customValid && SameText($adminUserName, $usr) && SameText($adminPassword, $pwd)) ||
-                    ($customValid && SameText($adminUserName, $usr));
-            }
+            $valid = $this->validateSysAdmin($usr, $pwd, $customValid);
             if ($valid) {
                 $this->isLoggedIn = true;
                 $_SESSION[SESSION_STATUS] = "login";
@@ -542,7 +536,30 @@ class AdvancedSecurity
             $_SESSION[SESSION_STATUS] = ""; // Clear login status
         }
         return $valid;
-}
+    }
+
+    // Valdiate System Administrator
+    private function validateSysAdmin($userName, $password = "", $checkUserNameOnly = true)
+    {
+        $adminUserName = Config("ADMIN_USER_NAME");
+        $adminPassword = Config("ADMIN_PASSWORD");
+        if (Config("ENCRYPTION_ENABLED")) {
+            try {
+                $adminUserName = PhpDecrypt(Config("ADMIN_USER_NAME"), Config("ENCRYPTION_KEY"));
+                $adminPassword = PhpDecrypt(Config("ADMIN_PASSWORD"), Config("ENCRYPTION_KEY"));
+            } catch (\Defuse\Crypto\Exception\WrongKeyOrModifiedCiphertextException $e) {
+                $adminUserName = Config("ADMIN_USER_NAME");
+                $adminPassword = Config("ADMIN_PASSWORD");
+            }
+        }
+        if (Config("CASE_SENSITIVE_PASSWORD")) {
+            return !$checkUserNameOnly && $adminUserName === $userName && $adminPassword === $password ||
+                $checkUserNameOnly && $adminUserName === $userName;
+        } else {
+            return !$checkUserNameOnly && SameText($adminUserName, $userName) && SameText($adminPassword, $password) ||
+                $checkUserNameOnly && SameText($adminUserName, $userName);
+        }
+    }
 
     // Static User Level security
     public function setupUserLevel()
@@ -964,7 +981,7 @@ class AdvancedSecurity
     // Check if user is system administrator
     public function isSysAdmin()
     {
-        return ($this->isSysAdmin || Session(SESSION_SYS_ADMIN) == 1);
+        return ($this->isSysAdmin || Session(SESSION_SYS_ADMIN) === 1);
     }
 
     // Check if user is administrator
@@ -1048,6 +1065,7 @@ class AdvancedSecurity
             // Get first level
             $this->addUserID($this->CurrentUserID);
             $UserTable = Container("usertable");
+            $filter = "";
             if (method_exists($UserTable, "getUserIDFilter")) {
                 $filter = $UserTable->getUserIDFilter($this->CurrentUserID);
             }
@@ -1130,9 +1148,9 @@ class AdvancedSecurity
     public function parentUserIDList($userId)
     {
         // Own record
-        if (SameString($userId, CurrentUserID())) {
-            if (strval(CurrentParentUserID()) != "") {
-                return QuotedValue(CurrentParentUserID(), DATATYPE_NUMBER, Config("USER_TABLE_DBID"));
+        if (SameString($userId, $this->CurrentUserID)) {
+            if (strval($this->CurrentParentUserID) != "") {
+                return QuotedValue($this->CurrentParentUserID, DATATYPE_NUMBER, Config("USER_TABLE_DBID"));
             }
         }
 

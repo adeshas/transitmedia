@@ -158,7 +158,6 @@ class ViewCampaignsPendingList extends ViewCampaignsPending
 
         // Initialize
         $GLOBALS["Page"] = &$this;
-        $this->TokenTimeout = SessionTimeoutTime();
 
         // Language object
         $Language = Container("language");
@@ -244,6 +243,30 @@ class ViewCampaignsPendingList extends ViewCampaignsPending
         return is_object($Response) ? $Response->getBody() : ob_get_clean();
     }
 
+    // Is lookup
+    public function isLookup()
+    {
+        return SameText(Route(0), Config("API_LOOKUP_ACTION"));
+    }
+
+    // Is AutoFill
+    public function isAutoFill()
+    {
+        return $this->isLookup() && SameText(Post("ajax"), "autofill");
+    }
+
+    // Is AutoSuggest
+    public function isAutoSuggest()
+    {
+        return $this->isLookup() && SameText(Post("ajax"), "autosuggest");
+    }
+
+    // Is modal lookup
+    public function isModalLookup()
+    {
+        return $this->isLookup() && SameText(Post("ajax"), "modal");
+    }
+
     // Is terminated
     public function isTerminated()
     {
@@ -261,7 +284,7 @@ class ViewCampaignsPendingList extends ViewCampaignsPending
         if ($this->terminated) {
             return;
         }
-        global $ExportFileName, $TempImages, $DashboardReport;
+        global $ExportFileName, $TempImages, $DashboardReport, $Response;
 
         // Page is terminated
         $this->terminated = true;
@@ -307,6 +330,11 @@ class ViewCampaignsPendingList extends ViewCampaignsPending
                 WriteJson(array_merge(["success" => false], $this->getMessages()));
             }
             return;
+        } else { // Check if response is JSON
+            if (StartsString("application/json", $Response->getHeaderLine("Content-type")) && $Response->getBody()->getSize()) { // With JSON response
+                $this->clearMessages();
+                return;
+            }
         }
 
         // Go to URL if specified
@@ -515,6 +543,7 @@ class ViewCampaignsPendingList extends ViewCampaignsPending
     public $MultiSelectKey;
     public $Command;
     public $RestoreSearch = false;
+    public $HashValue; // Hash value
     public $DetailPages;
     public $OldRecordset;
 
@@ -806,8 +835,8 @@ class ViewCampaignsPendingList extends ViewCampaignsPending
             }
         }
 
-        // Search/sort options
-        $this->setupSearchSortOptions();
+        // Search options
+        $this->setupSearchOptions();
 
         // Set up search panel class
         if ($this->SearchWhere != "") {
@@ -829,7 +858,7 @@ class ViewCampaignsPendingList extends ViewCampaignsPending
         // Set LoginStatus / Page_Rendering / Page_Render
         if (!IsApi() && !$this->isTerminated()) {
             // Pass table and field properties to client side
-            $this->toClientVar(["tableCaption"], ["caption", "Required", "IsInvalid", "Raw"]);
+            $this->toClientVar(["tableCaption"], ["caption", "Visible", "Required", "IsInvalid", "Raw"]);
 
             // Setup login status
             SetupLoginStatus();
@@ -840,7 +869,7 @@ class ViewCampaignsPendingList extends ViewCampaignsPending
             // Global Page Rendering event (in userfn*.php)
             Page_Rendering();
 
-            // Page Rendering event
+            // Page Render event
             if (method_exists($this, "pageRender")) {
                 $this->pageRender();
             }
@@ -2095,7 +2124,7 @@ class ViewCampaignsPendingList extends ViewCampaignsPending
             $this->transaction_status->ViewCustomAttributes = "";
 
             // status_id
-            $curVal = strval($this->status_id->CurrentValue);
+            $curVal = trim(strval($this->status_id->CurrentValue));
             if ($curVal != "") {
                 $this->status_id->ViewValue = $this->status_id->lookupCacheOption($curVal);
                 if ($this->status_id->ViewValue === null) { // Lookup from database
@@ -2406,8 +2435,8 @@ class ViewCampaignsPendingList extends ViewCampaignsPending
         $item->Visible = false;
     }
 
-    // Set up search/sort options
-    protected function setupSearchSortOptions()
+    // Set up search options
+    protected function setupSearchOptions()
     {
         global $Language, $Security;
         $pageUrl = $this->pageUrl();
@@ -2448,7 +2477,7 @@ class ViewCampaignsPendingList extends ViewCampaignsPending
     /**
     * Export data in HTML/CSV/Word/Excel/XML/Email/PDF format
     *
-    * @param boolean $return Return the data rather than output it
+    * @param bool $return Return the data rather than output it
     * @return mixed
     */
     public function exportData($return = false)
@@ -2462,7 +2491,9 @@ class ViewCampaignsPendingList extends ViewCampaignsPending
 
         // Export all
         if ($this->ExportAll) {
-            set_time_limit(Config("EXPORT_ALL_TIME_LIMIT"));
+            if (Config("EXPORT_ALL_TIME_LIMIT") >= 0) {
+                @set_time_limit(Config("EXPORT_ALL_TIME_LIMIT"));
+            }
             $this->DisplayRecords = $this->TotalRecords;
             $this->StopRecord = $this->TotalRecords;
         } else { // Export one page only
@@ -2750,7 +2781,9 @@ class ViewCampaignsPendingList extends ViewCampaignsPending
                             (select name from y_operators o where o.id = t.operator_id) as operator,
                             (select email from y_operators o where o.id = t.operator_id) as operator_email,
                             (select contact_name from y_operators o where o.id = t.operator_id) as operator_contact_name,
-			    (select p.email from y_platforms p where p.id = (select oo.platform_id from y_operators oo where oo.id = t.operator_id)) as platform_email
+
+			                      (select p.email from y_platforms p where p.id = (select oo.platform_id from y_operators oo where oo.id = t.operator_id)) as platform_email
+
                             from main_campaigns c, main_transactions t 
                             where 
                             t.campaign_id = c.id and
@@ -2780,7 +2813,7 @@ class ViewCampaignsPendingList extends ViewCampaignsPending
                             $search_replace = [
                                 '[x_campaign]' => $camp_details['name'],
                                 '[x_quantity]' => $camp_details['quantity'],
-                                '[x_vendor]' => $vendor,
+                                '[x_vendor]' => " $vendor ",
                                 '[x_supportemail] ' => 'info@transitmedia.com.ng',
                             ];
                             $search = array_keys($search_replace);
@@ -2813,17 +2846,18 @@ class ViewCampaignsPendingList extends ViewCampaignsPending
                             `nohup /opt/lampp/bin/php /opt/tmscripts/TMDOC_generate_invoice_v3.php {$camp_id} 2 &`;
                         //}
 
+
 			// Email to Operator
-                    	$sql_msg = "select value from z_core_settings where name = 'campaign_approved_operator';";
-                        $editmsg = ExecuteScalar($sql_msg);
+      $sql_msg = "select value from z_core_settings where name = 'campaign_approved_operator';";
+        $editmsg = ExecuteScalar($sql_msg);
 
-                        $msg = str_replace($search, $replace, $editmsg);
-                        $msgtxt = strip_tags($msg);
+        $msg = str_replace($search, $replace, $editmsg);
+        $msgtxt = strip_tags($msg);
 
-                        $subject = "APPROVED CAMPAIGN REQUEST ({$vendor}) - TRANSIT MEDIA ADMIN";
-                        $subject = "{$x_camp_name} - ({$vendor}) - TRANSIT MEDIA ADMIN";
+        $subject = "APPROVED CAMPAIGN REQUEST ({$vendor}) - TRANSIT MEDIA ADMIN";
+        $subject = "{$x_camp_name} - ({$vendor}) - TRANSIT MEDIA ADMIN";
 
-                        $source = [
+        $source = [
 					'to_value'=> $operator_email,
 					'cc_value'=>$platform_email,
 					'bcc_value'=>''
@@ -2833,7 +2867,7 @@ class ViewCampaignsPendingList extends ViewCampaignsPending
 			$new_to = $final_to;
 			$new_cc = $final_cc;
 
-                        sendTMmail('admin@transitmedia.com.ng', $new_to, $subject, $msg, $msgtxt, null, $new_cc);
+      sendTMmail('admin@transitmedia.com.ng', $new_to, $subject, $msg, $msgtxt, null, $new_cc);
 
                 }
                 return true; // Success

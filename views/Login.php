@@ -65,7 +65,7 @@ loadjs.ready("head", function() {
 <?php
 $Page->showMessage();
 ?>
-<form name="flogin" id="flogin" class="ew-form ew-login-form" action="<?= CurrentPageUrl() ?>" method="post">
+<form name="flogin" id="flogin" class="ew-form ew-login-form" action="<?= CurrentPageUrl(false) ?>" method="post">
 <?php if (Config("CHECK_TOKEN")) { ?>
 <input type="hidden" name="<?= $TokenNameKey ?>" value="<?= $TokenName ?>"><!-- CSRF token name -->
 <input type="hidden" name="<?= $TokenValueKey ?>" value="<?= $TokenValue ?>"><!-- CSRF token value -->
@@ -110,7 +110,7 @@ if ($cntProviders > 0) {
         foreach ($providers as $id => $provider) {
             if ($provider["enabled"]) {
 ?>
-            <a href="<?= CurrentPageUrl() ?>?provider=<?= $id ?>" class="btn btn-block btn-<?= strtolower($provider["color"]) ?>"><i class="fab fa-<?= strtolower($id) ?> mr-2"></i><?= $Language->phrase("Login" . $id) ?></a>
+            <a href="<?= CurrentPageUrl(false) ?>?provider=<?= $id ?>" class="btn btn-block btn-<?= strtolower($provider["color"]) ?>"><i class="fab fa-<?= strtolower($id) ?> mr-2"></i><?= $Language->phrase("Login" . $id) ?></a>
 <?php
             }
         }

@@ -78,6 +78,7 @@ class SubMediaAllocation extends DbTable
         $this->id->Nullable = false; // NOT NULL field
         $this->id->Sortable = true; // Allow sort
         $this->id->DefaultErrorMessage = $Language->phrase("IncorrectInteger");
+        $this->id->CustomMsg = $Language->FieldPhrase($this->TableVar, $this->id->Param, "CustomMsg");
         $this->Fields['id'] = &$this->id;
 
         // bus_id
@@ -88,6 +89,7 @@ class SubMediaAllocation extends DbTable
         $this->bus_id->PleaseSelectText = $Language->phrase("PleaseSelect"); // "PleaseSelect" text
         $this->bus_id->Lookup = new Lookup('bus_id', 'main_buses', false, 'id', ["number","operator_id","platform_id",""], [], [], [], [], [], [], '', '');
         $this->bus_id->DefaultErrorMessage = $Language->phrase("IncorrectInteger");
+        $this->bus_id->CustomMsg = $Language->FieldPhrase($this->TableVar, $this->bus_id->Param, "CustomMsg");
         $this->Fields['bus_id'] = &$this->bus_id;
 
         // campaign_id
@@ -98,6 +100,7 @@ class SubMediaAllocation extends DbTable
         $this->campaign_id->PleaseSelectText = $Language->phrase("PleaseSelect"); // "PleaseSelect" text
         $this->campaign_id->Lookup = new Lookup('campaign_id', 'main_campaigns', false, 'id', ["name","inventory_id","platform_id",""], [], [], [], [], [], [], '', '');
         $this->campaign_id->DefaultErrorMessage = $Language->phrase("IncorrectInteger");
+        $this->campaign_id->CustomMsg = $Language->FieldPhrase($this->TableVar, $this->campaign_id->Param, "CustomMsg");
         $this->Fields['campaign_id'] = &$this->campaign_id;
 
         // active
@@ -107,6 +110,7 @@ class SubMediaAllocation extends DbTable
         $this->active->DataType = DATATYPE_BOOLEAN;
         $this->active->Lookup = new Lookup('active', 'sub_media_allocation', false, '', ["","","",""], [], [], [], [], [], [], '', '');
         $this->active->OptionCount = 2;
+        $this->active->CustomMsg = $Language->FieldPhrase($this->TableVar, $this->active->Param, "CustomMsg");
         $this->Fields['active'] = &$this->active;
 
         // created_by
@@ -115,18 +119,21 @@ class SubMediaAllocation extends DbTable
         $this->created_by->UsePleaseSelect = true; // Use PleaseSelect by default
         $this->created_by->PleaseSelectText = $Language->phrase("PleaseSelect"); // "PleaseSelect" text
         $this->created_by->DefaultErrorMessage = $Language->phrase("IncorrectInteger");
+        $this->created_by->CustomMsg = $Language->FieldPhrase($this->TableVar, $this->created_by->Param, "CustomMsg");
         $this->Fields['created_by'] = &$this->created_by;
 
         // ts_created
         $this->ts_created = new DbField('sub_media_allocation', 'sub_media_allocation', 'x_ts_created', 'ts_created', '"ts_created"', CastDateFieldForLike("\"ts_created\"", 0, "DB"), 135, 8, 0, false, '"ts_created"', false, false, false, 'FORMATTED TEXT', 'TEXT');
         $this->ts_created->Sortable = true; // Allow sort
         $this->ts_created->DefaultErrorMessage = str_replace("%s", $GLOBALS["DATE_FORMAT"], $Language->phrase("IncorrectDate"));
+        $this->ts_created->CustomMsg = $Language->FieldPhrase($this->TableVar, $this->ts_created->Param, "CustomMsg");
         $this->Fields['ts_created'] = &$this->ts_created;
 
         // ts_last_update
         $this->ts_last_update = new DbField('sub_media_allocation', 'sub_media_allocation', 'x_ts_last_update', 'ts_last_update', '"ts_last_update"', CastDateFieldForLike("\"ts_last_update\"", 0, "DB"), 135, 8, 0, false, '"ts_last_update"', false, false, false, 'FORMATTED TEXT', 'TEXT');
         $this->ts_last_update->Sortable = true; // Allow sort
         $this->ts_last_update->DefaultErrorMessage = str_replace("%s", $GLOBALS["DATE_FORMAT"], $Language->phrase("IncorrectDate"));
+        $this->ts_last_update->CustomMsg = $Language->FieldPhrase($this->TableVar, $this->ts_last_update->Param, "CustomMsg");
         $this->Fields['ts_last_update'] = &$this->ts_last_update;
     }
 
@@ -394,18 +401,21 @@ class SubMediaAllocation extends DbTable
         $cnt = -1;
         $rs = null;
         if ($sql instanceof \Doctrine\DBAL\Query\QueryBuilder) { // Query builder
-            $sql = $sql->resetQueryPart("orderBy")->getSQL();
+            $sqlwrk = clone $sql;
+            $sqlwrk = $sqlwrk->resetQueryPart("orderBy")->getSQL();
+        } else {
+            $sqlwrk = $sql;
         }
         $pattern = '/^SELECT\s([\s\S]+)\sFROM\s/i';
         // Skip Custom View / SubQuery / SELECT DISTINCT / ORDER BY
         if (
             ($this->TableType == 'TABLE' || $this->TableType == 'VIEW' || $this->TableType == 'LINKTABLE') &&
-            preg_match($pattern, $sql) && !preg_match('/\(\s*(SELECT[^)]+)\)/i', $sql) &&
-            !preg_match('/^\s*select\s+distinct\s+/i', $sql) && !preg_match('/\s+order\s+by\s+/i', $sql)
+            preg_match($pattern, $sqlwrk) && !preg_match('/\(\s*(SELECT[^)]+)\)/i', $sqlwrk) &&
+            !preg_match('/^\s*select\s+distinct\s+/i', $sqlwrk) && !preg_match('/\s+order\s+by\s+/i', $sqlwrk)
         ) {
-            $sqlwrk = "SELECT COUNT(*) FROM " . preg_replace($pattern, "", $sql);
+            $sqlwrk = "SELECT COUNT(*) FROM " . preg_replace($pattern, "", $sqlwrk);
         } else {
-            $sqlwrk = "SELECT COUNT(*) FROM (" . $sql . ") COUNT_TABLE";
+            $sqlwrk = "SELECT COUNT(*) FROM (" . $sqlwrk . ") COUNT_TABLE";
         }
         $conn = $c ?? $this->getConnection();
         $rs = $conn->executeQuery($sqlwrk);
@@ -813,11 +823,11 @@ class SubMediaAllocation extends DbTable
     {
         if ($this->getCurrentMasterTable() == "main_campaigns" && !ContainsString($url, Config("TABLE_SHOW_MASTER") . "=")) {
             $url .= (ContainsString($url, "?") ? "&" : "?") . Config("TABLE_SHOW_MASTER") . "=" . $this->getCurrentMasterTable();
-            $url .= "&" . GetForeignKeyUrl("fk_id", $this->campaign_id->CurrentValue);
+            $url .= "&" . GetForeignKeyUrl("fk_id", $this->campaign_id->CurrentValue ?? $this->campaign_id->getSessionValue());
         }
         if ($this->getCurrentMasterTable() == "main_buses" && !ContainsString($url, Config("TABLE_SHOW_MASTER") . "=")) {
             $url .= (ContainsString($url, "?") ? "&" : "?") . Config("TABLE_SHOW_MASTER") . "=" . $this->getCurrentMasterTable();
-            $url .= "&" . GetForeignKeyUrl("fk_id", $this->bus_id->CurrentValue);
+            $url .= "&" . GetForeignKeyUrl("fk_id", $this->bus_id->CurrentValue ?? $this->bus_id->getSessionValue());
         }
         return $url;
     }
@@ -998,7 +1008,7 @@ SORTHTML;
         $this->id->ViewCustomAttributes = "";
 
         // bus_id
-        $curVal = strval($this->bus_id->CurrentValue);
+        $curVal = trim(strval($this->bus_id->CurrentValue));
         if ($curVal != "") {
             $this->bus_id->ViewValue = $this->bus_id->lookupCacheOption($curVal);
             if ($this->bus_id->ViewValue === null) { // Lookup from database
@@ -1019,7 +1029,7 @@ SORTHTML;
         $this->bus_id->ViewCustomAttributes = "";
 
         // campaign_id
-        $curVal = strval($this->campaign_id->CurrentValue);
+        $curVal = trim(strval($this->campaign_id->CurrentValue));
         if ($curVal != "") {
             $this->campaign_id->ViewValue = $this->campaign_id->lookupCacheOption($curVal);
             if ($this->campaign_id->ViewValue === null) { // Lookup from database
@@ -1126,7 +1136,7 @@ SORTHTML;
         $this->bus_id->EditCustomAttributes = "";
         if ($this->bus_id->getSessionValue() != "") {
             $this->bus_id->CurrentValue = GetForeignKeyValue($this->bus_id->getSessionValue());
-            $curVal = strval($this->bus_id->CurrentValue);
+            $curVal = trim(strval($this->bus_id->CurrentValue));
             if ($curVal != "") {
                 $this->bus_id->ViewValue = $this->bus_id->lookupCacheOption($curVal);
                 if ($this->bus_id->ViewValue === null) { // Lookup from database
@@ -1154,7 +1164,7 @@ SORTHTML;
         $this->campaign_id->EditCustomAttributes = "";
         if ($this->campaign_id->getSessionValue() != "") {
             $this->campaign_id->CurrentValue = GetForeignKeyValue($this->campaign_id->getSessionValue());
-            $curVal = strval($this->campaign_id->CurrentValue);
+            $curVal = trim(strval($this->campaign_id->CurrentValue));
             if ($curVal != "") {
                 $this->campaign_id->ViewValue = $this->campaign_id->lookupCacheOption($curVal);
                 if ($this->campaign_id->ViewValue === null) { // Lookup from database

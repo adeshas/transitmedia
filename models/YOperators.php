@@ -78,16 +78,19 @@ class YOperators extends DbTable
         $this->id->Nullable = false; // NOT NULL field
         $this->id->Sortable = true; // Allow sort
         $this->id->DefaultErrorMessage = $Language->phrase("IncorrectInteger");
+        $this->id->CustomMsg = $Language->FieldPhrase($this->TableVar, $this->id->Param, "CustomMsg");
         $this->Fields['id'] = &$this->id;
 
         // name
         $this->name = new DbField('y_operators', 'y_operators', 'x_name', 'name', '"name"', '"name"', 200, 50, -1, false, '"name"', false, false, false, 'FORMATTED TEXT', 'TEXT');
         $this->name->Sortable = true; // Allow sort
+        $this->name->CustomMsg = $Language->FieldPhrase($this->TableVar, $this->name->Param, "CustomMsg");
         $this->Fields['name'] = &$this->name;
 
         // shortname
         $this->shortname = new DbField('y_operators', 'y_operators', 'x_shortname', 'shortname', '"shortname"', '"shortname"', 200, 50, -1, false, '"shortname"', false, false, false, 'FORMATTED TEXT', 'TEXT');
         $this->shortname->Sortable = true; // Allow sort
+        $this->shortname->CustomMsg = $Language->FieldPhrase($this->TableVar, $this->shortname->Param, "CustomMsg");
         $this->Fields['shortname'] = &$this->shortname;
 
         // platform_id
@@ -98,16 +101,19 @@ class YOperators extends DbTable
         $this->platform_id->PleaseSelectText = $Language->phrase("PleaseSelect"); // "PleaseSelect" text
         $this->platform_id->Lookup = new Lookup('platform_id', 'y_platforms', false, 'id', ["name","","",""], [], [], [], [], [], [], '', '');
         $this->platform_id->DefaultErrorMessage = $Language->phrase("IncorrectInteger");
+        $this->platform_id->CustomMsg = $Language->FieldPhrase($this->TableVar, $this->platform_id->Param, "CustomMsg");
         $this->Fields['platform_id'] = &$this->platform_id;
 
         // email
         $this->_email = new DbField('y_operators', 'y_operators', 'x__email', 'email', '"email"', '"email"', 200, 0, -1, false, '"email"', false, false, false, 'FORMATTED TEXT', 'TEXT');
         $this->_email->Sortable = true; // Allow sort
+        $this->_email->CustomMsg = $Language->FieldPhrase($this->TableVar, $this->_email->Param, "CustomMsg");
         $this->Fields['email'] = &$this->_email;
 
         // contact_name
         $this->contact_name = new DbField('y_operators', 'y_operators', 'x_contact_name', 'contact_name', '"contact_name"', '"contact_name"', 200, 0, -1, false, '"contact_name"', false, false, false, 'FORMATTED TEXT', 'TEXT');
         $this->contact_name->Sortable = true; // Allow sort
+        $this->contact_name->CustomMsg = $Language->FieldPhrase($this->TableVar, $this->contact_name->Param, "CustomMsg");
         $this->Fields['contact_name'] = &$this->contact_name;
     }
 
@@ -366,18 +372,21 @@ class YOperators extends DbTable
         $cnt = -1;
         $rs = null;
         if ($sql instanceof \Doctrine\DBAL\Query\QueryBuilder) { // Query builder
-            $sql = $sql->resetQueryPart("orderBy")->getSQL();
+            $sqlwrk = clone $sql;
+            $sqlwrk = $sqlwrk->resetQueryPart("orderBy")->getSQL();
+        } else {
+            $sqlwrk = $sql;
         }
         $pattern = '/^SELECT\s([\s\S]+)\sFROM\s/i';
         // Skip Custom View / SubQuery / SELECT DISTINCT / ORDER BY
         if (
             ($this->TableType == 'TABLE' || $this->TableType == 'VIEW' || $this->TableType == 'LINKTABLE') &&
-            preg_match($pattern, $sql) && !preg_match('/\(\s*(SELECT[^)]+)\)/i', $sql) &&
-            !preg_match('/^\s*select\s+distinct\s+/i', $sql) && !preg_match('/\s+order\s+by\s+/i', $sql)
+            preg_match($pattern, $sqlwrk) && !preg_match('/\(\s*(SELECT[^)]+)\)/i', $sqlwrk) &&
+            !preg_match('/^\s*select\s+distinct\s+/i', $sqlwrk) && !preg_match('/\s+order\s+by\s+/i', $sqlwrk)
         ) {
-            $sqlwrk = "SELECT COUNT(*) FROM " . preg_replace($pattern, "", $sql);
+            $sqlwrk = "SELECT COUNT(*) FROM " . preg_replace($pattern, "", $sqlwrk);
         } else {
-            $sqlwrk = "SELECT COUNT(*) FROM (" . $sql . ") COUNT_TABLE";
+            $sqlwrk = "SELECT COUNT(*) FROM (" . $sqlwrk . ") COUNT_TABLE";
         }
         $conn = $c ?? $this->getConnection();
         $rs = $conn->executeQuery($sqlwrk);
@@ -792,7 +801,7 @@ class YOperators extends DbTable
     {
         if ($this->getCurrentMasterTable() == "y_platforms" && !ContainsString($url, Config("TABLE_SHOW_MASTER") . "=")) {
             $url .= (ContainsString($url, "?") ? "&" : "?") . Config("TABLE_SHOW_MASTER") . "=" . $this->getCurrentMasterTable();
-            $url .= "&" . GetForeignKeyUrl("fk_id", $this->platform_id->CurrentValue);
+            $url .= "&" . GetForeignKeyUrl("fk_id", $this->platform_id->CurrentValue ?? $this->platform_id->getSessionValue());
         }
         return $url;
     }
@@ -978,7 +987,7 @@ SORTHTML;
         $this->shortname->ViewCustomAttributes = "";
 
         // platform_id
-        $curVal = strval($this->platform_id->CurrentValue);
+        $curVal = trim(strval($this->platform_id->CurrentValue));
         if ($curVal != "") {
             $this->platform_id->ViewValue = $this->platform_id->lookupCacheOption($curVal);
             if ($this->platform_id->ViewValue === null) { // Lookup from database
@@ -1080,7 +1089,7 @@ SORTHTML;
         $this->platform_id->EditCustomAttributes = "";
         if ($this->platform_id->getSessionValue() != "") {
             $this->platform_id->CurrentValue = GetForeignKeyValue($this->platform_id->getSessionValue());
-            $curVal = strval($this->platform_id->CurrentValue);
+            $curVal = trim(strval($this->platform_id->CurrentValue));
             if ($curVal != "") {
                 $this->platform_id->ViewValue = $this->platform_id->lookupCacheOption($curVal);
                 if ($this->platform_id->ViewValue === null) { // Lookup from database

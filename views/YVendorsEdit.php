@@ -6,7 +6,6 @@ namespace PHPMaker2021\test;
 $YVendorsEdit = &$Page;
 ?>
 <script>
-if (!ew.vars.tables.y_vendors) ew.vars.tables.y_vendors = <?= JsonEncode(GetClientVar("tables", "y_vendors")) ?>;
 var currentForm, currentPageID;
 var fy_vendorsedit;
 loadjs.ready("head", function () {
@@ -16,10 +15,13 @@ loadjs.ready("head", function () {
     fy_vendorsedit = currentForm = new ew.Form("fy_vendorsedit", "edit");
 
     // Add fields
-    var fields = ew.vars.tables.y_vendors.fields;
+    var currentTable = <?= JsonEncode(GetClientVar("tables", "y_vendors")) ?>,
+        fields = currentTable.fields;
+    if (!ew.vars.tables.y_vendors)
+        ew.vars.tables.y_vendors = currentTable;
     fy_vendorsedit.addFields([
-        ["id", [fields.id.required ? ew.Validators.required(fields.id.caption) : null], fields.id.isInvalid],
-        ["name", [fields.name.required ? ew.Validators.required(fields.name.caption) : null], fields.name.isInvalid]
+        ["id", [fields.id.visible && fields.id.required ? ew.Validators.required(fields.id.caption) : null], fields.id.isInvalid],
+        ["name", [fields.name.visible && fields.name.required ? ew.Validators.required(fields.name.caption) : null], fields.name.isInvalid]
     ]);
 
     // Set invalid fields
@@ -98,7 +100,7 @@ loadjs.ready("head", function () {
 <?php
 $Page->showMessage();
 ?>
-<form name="fy_vendorsedit" id="fy_vendorsedit" class="<?= $Page->FormClassName ?>" action="<?= CurrentPageUrl() ?>" method="post">
+<form name="fy_vendorsedit" id="fy_vendorsedit" class="<?= $Page->FormClassName ?>" action="<?= CurrentPageUrl(false) ?>" method="post">
 <?php if (Config("CHECK_TOKEN")) { ?>
 <input type="hidden" name="<?= $TokenNameKey ?>" value="<?= $TokenName ?>"><!-- CSRF token name -->
 <input type="hidden" name="<?= $TokenValueKey ?>" value="<?= $TokenValue ?>"><!-- CSRF token value -->

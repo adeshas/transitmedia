@@ -11,21 +11,18 @@ $basePath = BasePath(true);
 <title><?= $Language->projectPhrase("BodyTitle") ?></title>
 <meta charset="utf-8">
 <?php if ($ReportExportType != "" && $ReportExportType != "print") { // Stylesheet for exporting reports ?>
-<link rel="stylesheet" type="text/css" href="<?= $basePath ?><?= CssFile(Config("PROJECT_STYLESHEET_FILENAME")) ?>">
-    <?php if ($ReportExportType == "pdf" && Config("PDF_STYLESHEET_FILENAME")) { ?>
-<link rel="stylesheet" type="text/css" href="<?= $basePath ?><?= CssFile(Config("PDF_STYLESHEET_FILENAME")) ?>">
-<?php } ?>
+<link rel="stylesheet" href="<?= $basePath ?><?= CssFile(Config("PROJECT_STYLESHEET_FILENAME")) ?>">
 <?php } ?>
 <?php if (!IsExport() || IsExport("print")) { ?>
 <meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no">
-<link rel="stylesheet" type="text/css" href="<?= $basePath ?>plugins/select2/css/select2.min.css">
-<link rel="stylesheet" type="text/css" href="<?= $basePath ?>plugins/select2-bootstrap4-theme/select2-bootstrap4.min.css">
-<link rel="stylesheet" type="text/css" href="<?= $basePath ?>adminlte3/css/<?= CssFile("adminlte.css") ?>">
-<link rel="stylesheet" type="text/css" href="<?= $basePath ?>plugins/fontawesome-free/css/all.min.css">
-<link rel="stylesheet" type="text/css" href="<?= $basePath ?>css/OverlayScrollbars.min.css">
-<link rel="stylesheet" type="text/css" href="<?= $basePath ?><?= CssFile(Config("PROJECT_STYLESHEET_FILENAME")) ?>">
+<link rel="stylesheet" href="<?= $basePath ?>plugins/select2/css/select2.min.css">
+<link rel="stylesheet" href="<?= $basePath ?>plugins/select2-bootstrap4-theme/select2-bootstrap4.min.css">
+<link rel="stylesheet" href="<?= $basePath ?>adminlte3/css/<?= CssFile("adminlte.css") ?>">
+<link rel="stylesheet" href="<?= $basePath ?>plugins/fontawesome-free/css/all.min.css">
+<link rel="stylesheet" href="<?= $basePath ?>css/OverlayScrollbars.min.css">
+<link rel="stylesheet" href="<?= $basePath ?><?= CssFile(Config("PROJECT_STYLESHEET_FILENAME")) ?>">
 <?php if ($CustomExportType == "pdf" && Config("PDF_STYLESHEET_FILENAME")) { ?>
-<link rel="stylesheet" type="text/css" href="<?= $basePath ?><?= CssFile(Config("PDF_STYLESHEET_FILENAME")) ?>">
+<link rel="stylesheet" href="<?= $basePath ?><?= CssFile(Config("PDF_STYLESHEET_FILENAME")) ?>">
 <?php } ?>
 <script src="<?= $basePath ?>js/ewcore.min.js"></script>
 <script>
@@ -99,7 +96,7 @@ Object.assign(ew, {
     INVALID_PASSWORD_CHARACTERS: "<?= JsEncode(Config("INVALID_PASSWORD_CHARACTERS")) ?>",
     IS_RTL: <?= IsRTL() ? "true" : "false" ?>
 });
-loadjs(ew.PATH_BASE + "jquery/jquery-3.5.1.min.js", "jquery");
+loadjs(ew.PATH_BASE + "jquery/jquery-3.6.0.min.js", "jquery");
 loadjs([
     ew.PATH_BASE + "js/mobile-detect.min.js",
     ew.PATH_BASE + "js/purify.min.js",
@@ -112,7 +109,7 @@ loadjs([
 ], "swal");
 <?= $Language->toJson() ?>
 ew.vars = <?= JsonEncode($ClientVariables) ?>;
-ew.ready("jquery", ew.PATH_BASE + "jquery/jsrender.min.js", "jsrender", ew.renderJsTemplates);
+ew.ready(["wrapper", "jquery"], ew.PATH_BASE + "jquery/jsrender.min.js", "jsrender", ew.renderJsTemplates);
 ew.ready("jsrender", ew.PATH_BASE + "jquery/jquery.overlayScrollbars.min.js", "scrollbars"); // Init sidebar scrollbars after rendering menu
 ew.ready("jquery", ew.PATH_BASE + "jquery/jquery.ui.widget.min.js", "widget");
 ew.loadjs([
@@ -220,7 +217,7 @@ ew.ready("head", [ew.PATH_BASE + "ckeditor/ckeditor.js", ew.PATH_BASE + "js/ewed
             {{else}}
             <a href="{{:href}}" class="nav-link{{if active}} active{{/if}}"{{if target}} target="{{:target}}"{{/if}}{{if attrs}}{{:attrs}}{{/if}}>
                 {{if icon}}<i class="nav-icon {{:icon}}"></i>{{/if}}
-                <p><span class="menu-item-text">{{:text}}</span>
+                <p>{{:text}}
                     {{if items}}
                         <i class="right fas fa-angle-left"></i>
                         {{if label}}
@@ -286,7 +283,7 @@ ew.ready("head", [ew.PATH_BASE + "ckeditor/ckeditor.js", ew.PATH_BASE + "js/ewed
 <?php } ?>
 <link rel="shortcut icon" type="image/x-icon" href="<?= BasePath() ?>/favicon.ico">
 <link rel="icon" type="image/x-icon" href="<?= BasePath() ?>/favicon.ico">
-<meta name="generator" content="PHPMaker 2021.0.6">
+<meta name="generator" content="PHPMaker 2021.0.15">
 </head>
 <body class="<?= Config("BODY_CLASS") ?>" dir="<?= IsRTL() ? "rtl" : "ltr" ?>">
 <?php if (@!$SkipHeaderFooter) { ?>
@@ -377,6 +374,9 @@ if (isset($DebugTimer)) {
 </div>
 <!-- ./wrapper -->
 <?php } ?>
+<script>
+loadjs.done("wrapper");
+</script>
 <!-- template upload (for file upload) -->
 <script id="template-upload" type="text/html">
 {{for files}}
@@ -441,9 +441,9 @@ if (isset($DebugTimer)) {
             <span class="size">{{:~root.formatFileSize(size)}}</span>
         </td>
         <td>
-            {{if !~root.options.readOnly && deleteUrl}}
+            {{if !~root.options.readonly && deleteUrl}}
             <button class="btn btn-default btn-sm delete" data-type="{{>deleteType}}" data-url="{{>deleteUrl}}"><?= $Language->phrase("UploadDelete") ?></button>
-            {{else !~root.options.readOnly}}
+            {{else !~root.options.readonly}}
             <button class="btn btn-default btn-sm cancel"><?= $Language->phrase("UploadCancel") ?></button>
             {{/if}}
         </td>
@@ -467,6 +467,11 @@ if (isset($DebugTimer)) {
 <div id="ew-tooltip"></div>
 <!-- drill down -->
 <div id="ew-drilldown-panel"></div>
+<?php } ?>
+<?php if (IsExport("print")) { ?>
+<script>
+loadjs.done("wrapper");
+</script>
 <?php } ?>
 <script>
 loadjs.ready(ew.bundleIds, function() {

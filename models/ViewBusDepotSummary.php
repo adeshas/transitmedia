@@ -72,27 +72,32 @@ class ViewBusDepotSummary extends DbTable
         // depot
         $this->depot = new DbField('view_bus_depot_summary', 'view_bus_depot_summary', 'x_depot', 'depot', '"depot"', '"depot"', 201, 0, -1, false, '"depot"', false, false, false, 'FORMATTED TEXT', 'TEXTAREA');
         $this->depot->Sortable = true; // Allow sort
+        $this->depot->CustomMsg = $Language->FieldPhrase($this->TableVar, $this->depot->Param, "CustomMsg");
         $this->Fields['depot'] = &$this->depot;
 
         // total_buses
         $this->total_buses = new DbField('view_bus_depot_summary', 'view_bus_depot_summary', 'x_total_buses', 'total_buses', '"total_buses"', 'CAST("total_buses" AS varchar(255))', 20, 8, -1, false, '"total_buses"', false, false, false, 'FORMATTED TEXT', 'TEXT');
         $this->total_buses->Sortable = true; // Allow sort
         $this->total_buses->DefaultErrorMessage = $Language->phrase("IncorrectInteger");
+        $this->total_buses->CustomMsg = $Language->FieldPhrase($this->TableVar, $this->total_buses->Param, "CustomMsg");
         $this->Fields['total_buses'] = &$this->total_buses;
 
         // bus_codes
         $this->bus_codes = new DbField('view_bus_depot_summary', 'view_bus_depot_summary', 'x_bus_codes', 'bus_codes', '"bus_codes"', '"bus_codes"', 201, 0, -1, false, '"bus_codes"', false, false, false, 'FORMATTED TEXT', 'TEXTAREA');
         $this->bus_codes->Sortable = true; // Allow sort
+        $this->bus_codes->CustomMsg = $Language->FieldPhrase($this->TableVar, $this->bus_codes->Param, "CustomMsg");
         $this->Fields['bus_codes'] = &$this->bus_codes;
 
         // good_bus_codes
         $this->good_bus_codes = new DbField('view_bus_depot_summary', 'view_bus_depot_summary', 'x_good_bus_codes', 'good_bus_codes', '"good_bus_codes"', '"good_bus_codes"', 201, 0, -1, false, '"good_bus_codes"', false, false, false, 'FORMATTED TEXT', 'TEXTAREA');
         $this->good_bus_codes->Sortable = true; // Allow sort
+        $this->good_bus_codes->CustomMsg = $Language->FieldPhrase($this->TableVar, $this->good_bus_codes->Param, "CustomMsg");
         $this->Fields['good_bus_codes'] = &$this->good_bus_codes;
 
         // bad_bus_codes
         $this->bad_bus_codes = new DbField('view_bus_depot_summary', 'view_bus_depot_summary', 'x_bad_bus_codes', 'bad_bus_codes', '"bad_bus_codes"', '"bad_bus_codes"', 201, 0, -1, false, '"bad_bus_codes"', false, false, false, 'FORMATTED TEXT', 'TEXTAREA');
         $this->bad_bus_codes->Sortable = true; // Allow sort
+        $this->bad_bus_codes->CustomMsg = $Language->FieldPhrase($this->TableVar, $this->bad_bus_codes->Param, "CustomMsg");
         $this->Fields['bad_bus_codes'] = &$this->bad_bus_codes;
     }
 
@@ -273,18 +278,21 @@ class ViewBusDepotSummary extends DbTable
         $cnt = -1;
         $rs = null;
         if ($sql instanceof \Doctrine\DBAL\Query\QueryBuilder) { // Query builder
-            $sql = $sql->resetQueryPart("orderBy")->getSQL();
+            $sqlwrk = clone $sql;
+            $sqlwrk = $sqlwrk->resetQueryPart("orderBy")->getSQL();
+        } else {
+            $sqlwrk = $sql;
         }
         $pattern = '/^SELECT\s([\s\S]+)\sFROM\s/i';
         // Skip Custom View / SubQuery / SELECT DISTINCT / ORDER BY
         if (
             ($this->TableType == 'TABLE' || $this->TableType == 'VIEW' || $this->TableType == 'LINKTABLE') &&
-            preg_match($pattern, $sql) && !preg_match('/\(\s*(SELECT[^)]+)\)/i', $sql) &&
-            !preg_match('/^\s*select\s+distinct\s+/i', $sql) && !preg_match('/\s+order\s+by\s+/i', $sql)
+            preg_match($pattern, $sqlwrk) && !preg_match('/\(\s*(SELECT[^)]+)\)/i', $sqlwrk) &&
+            !preg_match('/^\s*select\s+distinct\s+/i', $sqlwrk) && !preg_match('/\s+order\s+by\s+/i', $sqlwrk)
         ) {
-            $sqlwrk = "SELECT COUNT(*) FROM " . preg_replace($pattern, "", $sql);
+            $sqlwrk = "SELECT COUNT(*) FROM " . preg_replace($pattern, "", $sqlwrk);
         } else {
-            $sqlwrk = "SELECT COUNT(*) FROM (" . $sql . ") COUNT_TABLE";
+            $sqlwrk = "SELECT COUNT(*) FROM (" . $sqlwrk . ") COUNT_TABLE";
         }
         $conn = $c ?? $this->getConnection();
         $rs = $conn->executeQuery($sqlwrk);

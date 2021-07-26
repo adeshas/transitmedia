@@ -6,7 +6,6 @@ namespace PHPMaker2021\test;
 $XRenewalStageEdit = &$Page;
 ?>
 <script>
-if (!ew.vars.tables.x_renewal_stage) ew.vars.tables.x_renewal_stage = <?= JsonEncode(GetClientVar("tables", "x_renewal_stage")) ?>;
 var currentForm, currentPageID;
 var fx_renewal_stageedit;
 loadjs.ready("head", function () {
@@ -16,10 +15,13 @@ loadjs.ready("head", function () {
     fx_renewal_stageedit = currentForm = new ew.Form("fx_renewal_stageedit", "edit");
 
     // Add fields
-    var fields = ew.vars.tables.x_renewal_stage.fields;
+    var currentTable = <?= JsonEncode(GetClientVar("tables", "x_renewal_stage")) ?>,
+        fields = currentTable.fields;
+    if (!ew.vars.tables.x_renewal_stage)
+        ew.vars.tables.x_renewal_stage = currentTable;
     fx_renewal_stageedit.addFields([
-        ["id", [fields.id.required ? ew.Validators.required(fields.id.caption) : null], fields.id.isInvalid],
-        ["name", [fields.name.required ? ew.Validators.required(fields.name.caption) : null], fields.name.isInvalid]
+        ["id", [fields.id.visible && fields.id.required ? ew.Validators.required(fields.id.caption) : null], fields.id.isInvalid],
+        ["name", [fields.name.visible && fields.name.required ? ew.Validators.required(fields.name.caption) : null], fields.name.isInvalid]
     ]);
 
     // Set invalid fields
@@ -98,7 +100,7 @@ loadjs.ready("head", function () {
 <?php
 $Page->showMessage();
 ?>
-<form name="fx_renewal_stageedit" id="fx_renewal_stageedit" class="<?= $Page->FormClassName ?>" action="<?= CurrentPageUrl() ?>" method="post">
+<form name="fx_renewal_stageedit" id="fx_renewal_stageedit" class="<?= $Page->FormClassName ?>" action="<?= CurrentPageUrl(false) ?>" method="post">
 <?php if (Config("CHECK_TOKEN")) { ?>
 <input type="hidden" name="<?= $TokenNameKey ?>" value="<?= $TokenName ?>"><!-- CSRF token name -->
 <input type="hidden" name="<?= $TokenValueKey ?>" value="<?= $TokenValue ?>"><!-- CSRF token value -->

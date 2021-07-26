@@ -6,7 +6,6 @@ namespace PHPMaker2021\test;
 $XTransactionStatusAdd = &$Page;
 ?>
 <script>
-if (!ew.vars.tables.x_transaction_status) ew.vars.tables.x_transaction_status = <?= JsonEncode(GetClientVar("tables", "x_transaction_status")) ?>;
 var currentForm, currentPageID;
 var fx_transaction_statusadd;
 loadjs.ready("head", function () {
@@ -16,11 +15,14 @@ loadjs.ready("head", function () {
     fx_transaction_statusadd = currentForm = new ew.Form("fx_transaction_statusadd", "add");
 
     // Add fields
-    var fields = ew.vars.tables.x_transaction_status.fields;
+    var currentTable = <?= JsonEncode(GetClientVar("tables", "x_transaction_status")) ?>,
+        fields = currentTable.fields;
+    if (!ew.vars.tables.x_transaction_status)
+        ew.vars.tables.x_transaction_status = currentTable;
     fx_transaction_statusadd.addFields([
-        ["name", [fields.name.required ? ew.Validators.required(fields.name.caption) : null], fields.name.isInvalid],
-        ["admin_name", [fields.admin_name.required ? ew.Validators.required(fields.admin_name.caption) : null], fields.admin_name.isInvalid],
-        ["operator_name", [fields.operator_name.required ? ew.Validators.required(fields.operator_name.caption) : null], fields.operator_name.isInvalid]
+        ["name", [fields.name.visible && fields.name.required ? ew.Validators.required(fields.name.caption) : null], fields.name.isInvalid],
+        ["admin_name", [fields.admin_name.visible && fields.admin_name.required ? ew.Validators.required(fields.admin_name.caption) : null], fields.admin_name.isInvalid],
+        ["operator_name", [fields.operator_name.visible && fields.operator_name.required ? ew.Validators.required(fields.operator_name.caption) : null], fields.operator_name.isInvalid]
     ]);
 
     // Set invalid fields
@@ -99,7 +101,7 @@ loadjs.ready("head", function () {
 <?php
 $Page->showMessage();
 ?>
-<form name="fx_transaction_statusadd" id="fx_transaction_statusadd" class="<?= $Page->FormClassName ?>" action="<?= CurrentPageUrl() ?>" method="post">
+<form name="fx_transaction_statusadd" id="fx_transaction_statusadd" class="<?= $Page->FormClassName ?>" action="<?= CurrentPageUrl(false) ?>" method="post">
 <?php if (Config("CHECK_TOKEN")) { ?>
 <input type="hidden" name="<?= $TokenNameKey ?>" value="<?= $TokenName ?>"><!-- CSRF token name -->
 <input type="hidden" name="<?= $TokenValueKey ?>" value="<?= $TokenValue ?>"><!-- CSRF token value -->

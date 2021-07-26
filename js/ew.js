@@ -1,5 +1,5 @@
 /*!
- * JavaScript for PHPMaker v2021.0.6
+ * JavaScript for PHPMaker v2021.0.15
  * Copyright (c) e.World Technology Limited. All rights reserved.
  */
 (function ($) {
@@ -10,6 +10,10 @@
   var $__default = /*#__PURE__*/_interopDefaultLegacy($);
 
   var commonjsGlobal = typeof globalThis !== 'undefined' ? globalThis : typeof window !== 'undefined' ? window : typeof global !== 'undefined' ? global : typeof self !== 'undefined' ? self : {};
+
+  function unwrapExports (x) {
+  	return x && x.__esModule && Object.prototype.hasOwnProperty.call(x, 'default') ? x['default'] : x;
+  }
 
   function createCommonjsModule(fn, basedir, module) {
   	return module = {
@@ -42,6 +46,24 @@
     var iteratorSymbol = $Symbol.iterator || "@@iterator";
     var asyncIteratorSymbol = $Symbol.asyncIterator || "@@asyncIterator";
     var toStringTagSymbol = $Symbol.toStringTag || "@@toStringTag";
+
+    function define(obj, key, value) {
+      Object.defineProperty(obj, key, {
+        value: value,
+        enumerable: true,
+        configurable: true,
+        writable: true
+      });
+      return obj[key];
+    }
+    try {
+      // IE 8 has a broken Object.defineProperty that only works on DOM objects.
+      define({}, "");
+    } catch (err) {
+      define = function(obj, key, value) {
+        return obj[key] = value;
+      };
+    }
 
     function wrap(innerFn, outerFn, self, tryLocsList) {
       // If outerFn provided and outerFn.prototype is a Generator, then outerFn.prototype instanceof Generator.
@@ -113,16 +135,19 @@
       Generator.prototype = Object.create(IteratorPrototype);
     GeneratorFunction.prototype = Gp.constructor = GeneratorFunctionPrototype;
     GeneratorFunctionPrototype.constructor = GeneratorFunction;
-    GeneratorFunctionPrototype[toStringTagSymbol] =
-      GeneratorFunction.displayName = "GeneratorFunction";
+    GeneratorFunction.displayName = define(
+      GeneratorFunctionPrototype,
+      toStringTagSymbol,
+      "GeneratorFunction"
+    );
 
     // Helper for defining the .next, .throw, and .return methods of the
     // Iterator interface in terms of a single ._invoke method.
     function defineIteratorMethods(prototype) {
       ["next", "throw", "return"].forEach(function(method) {
-        prototype[method] = function(arg) {
+        define(prototype, method, function(arg) {
           return this._invoke(method, arg);
-        };
+        });
       });
     }
 
@@ -141,9 +166,7 @@
         Object.setPrototypeOf(genFun, GeneratorFunctionPrototype);
       } else {
         genFun.__proto__ = GeneratorFunctionPrototype;
-        if (!(toStringTagSymbol in genFun)) {
-          genFun[toStringTagSymbol] = "GeneratorFunction";
-        }
+        define(genFun, toStringTagSymbol, "GeneratorFunction");
       }
       genFun.prototype = Object.create(Gp);
       return genFun;
@@ -413,7 +436,7 @@
     // unified ._invoke helper method.
     defineIteratorMethods(Gp);
 
-    Gp[toStringTagSymbol] = "Generator";
+    define(Gp, toStringTagSymbol, "Generator");
 
     // A Generator should always return itself as the iterator object when the
     // @@iterator function is called on it. Some browsers' implementations of the
@@ -737,7 +760,7 @@
     // as the regeneratorRuntime namespace. Otherwise create a new empty
     // object. Either way, the resulting object will be used to initialize
     // the regeneratorRuntime variable at the top of this file.
-     module.exports 
+    module.exports 
   ));
 
   try {
@@ -758,11 +781,11 @@
 
   var regenerator = runtime_1;
 
-  function _createForOfIteratorHelperLoose(o, allowArrayLike) { var it; if (typeof Symbol === "undefined" || o[Symbol.iterator] == null) { if (Array.isArray(o) || (it = _unsupportedIterableToArray(o)) || allowArrayLike && o && typeof o.length === "number") { if (it) o = it; var i = 0; return function () { if (i >= o.length) return { done: true }; return { done: false, value: o[i++] }; }; } throw new TypeError("Invalid attempt to iterate non-iterable instance.\nIn order to be iterable, non-array objects must have a [Symbol.iterator]() method."); } it = o[Symbol.iterator](); return it.next.bind(it); }
+  function _createForOfIteratorHelperLoose$3(o, allowArrayLike) { var it = typeof Symbol !== "undefined" && o[Symbol.iterator] || o["@@iterator"]; if (it) return (it = it.call(o)).next.bind(it); if (Array.isArray(o) || (it = _unsupportedIterableToArray$3(o)) || allowArrayLike && o && typeof o.length === "number") { if (it) o = it; var i = 0; return function () { if (i >= o.length) return { done: true }; return { done: false, value: o[i++] }; }; } throw new TypeError("Invalid attempt to iterate non-iterable instance.\nIn order to be iterable, non-array objects must have a [Symbol.iterator]() method."); }
 
-  function _unsupportedIterableToArray(o, minLen) { if (!o) return; if (typeof o === "string") return _arrayLikeToArray(o, minLen); var n = Object.prototype.toString.call(o).slice(8, -1); if (n === "Object" && o.constructor) n = o.constructor.name; if (n === "Map" || n === "Set") return Array.from(o); if (n === "Arguments" || /^(?:Ui|I)nt(?:8|16|32)(?:Clamped)?Array$/.test(n)) return _arrayLikeToArray(o, minLen); }
+  function _unsupportedIterableToArray$3(o, minLen) { if (!o) return; if (typeof o === "string") return _arrayLikeToArray$3(o, minLen); var n = Object.prototype.toString.call(o).slice(8, -1); if (n === "Object" && o.constructor) n = o.constructor.name; if (n === "Map" || n === "Set") return Array.from(o); if (n === "Arguments" || /^(?:Ui|I)nt(?:8|16|32)(?:Clamped)?Array$/.test(n)) return _arrayLikeToArray$3(o, minLen); }
 
-  function _arrayLikeToArray(arr, len) { if (len == null || len > arr.length) len = arr.length; for (var i = 0, arr2 = new Array(len); i < len; i++) { arr2[i] = arr[i]; } return arr2; }
+  function _arrayLikeToArray$3(arr, len) { if (len == null || len > arr.length) len = arr.length; for (var i = 0, arr2 = new Array(len); i < len; i++) { arr2[i] = arr[i]; } return arr2; }
   /* global FormData self Blob File */
 
   /* eslint-disable no-inner-declarations */
@@ -966,7 +989,7 @@
                 }
 
                 name = _context.t1.value;
-                _iterator = _createForOfIteratorHelperLoose(map[name]);
+                _iterator = _createForOfIteratorHelperLoose$3(map[name]);
 
               case 5:
                 if ((_step = _iterator()).done) {
@@ -1005,7 +1028,7 @@
       _proto.forEach = function forEach(callback, thisArg) {
         ensureArgs(arguments, 1);
 
-        for (var _iterator2 = _createForOfIteratorHelperLoose(this), _step2; !(_step2 = _iterator2()).done;) {
+        for (var _iterator2 = _createForOfIteratorHelperLoose$3(this), _step2; !(_step2 = _iterator2()).done;) {
           var _step2$value = _step2.value,
               name = _step2$value[0],
               value = _step2$value[1];
@@ -1067,7 +1090,7 @@
           while (1) {
             switch (_context2.prev = _context2.next) {
               case 0:
-                _iterator3 = _createForOfIteratorHelperLoose(this);
+                _iterator3 = _createForOfIteratorHelperLoose$3(this);
 
               case 1:
                 if ((_step3 = _iterator3()).done) {
@@ -1121,7 +1144,7 @@
           while (1) {
             switch (_context3.prev = _context3.next) {
               case 0:
-                _iterator4 = _createForOfIteratorHelperLoose(this);
+                _iterator4 = _createForOfIteratorHelperLoose$3(this);
 
               case 1:
                 if ((_step4 = _iterator4()).done) {
@@ -1155,7 +1178,7 @@
       _proto['_asNative'] = function _asNative() {
         var fd = new _FormData();
 
-        for (var _iterator5 = _createForOfIteratorHelperLoose(this), _step5; !(_step5 = _iterator5()).done;) {
+        for (var _iterator5 = _createForOfIteratorHelperLoose$3(this), _step5; !(_step5 = _iterator5()).done;) {
           var _step5$value = _step5.value,
               name = _step5$value[0],
               value = _step5$value[1];
@@ -1175,7 +1198,7 @@
         var boundary = '----formdata-polyfill-' + Math.random();
         var chunks = [];
 
-        for (var _iterator6 = _createForOfIteratorHelperLoose(this), _step6; !(_step6 = _iterator6()).done;) {
+        for (var _iterator6 = _createForOfIteratorHelperLoose$3(this), _step6; !(_step6 = _iterator6()).done;) {
           var _step6$value = _step6.value,
               name = _step6$value[0],
               value = _step6$value[1];
@@ -1940,7 +1963,7 @@
     return false;
   }
 
-  var Validators = /*#__PURE__*/Object.freeze({
+  var Validators = {
     __proto__: null,
     userLevelId: userLevelId,
     userLevelName: userLevelName,
@@ -1967,8 +1990,9 @@
     custom: custom,
     captcha: captcha,
     recaptcha: recaptcha
-  });
+  };
 
+  var createClass = createCommonjsModule(function (module) {
   function _defineProperties(target, props) {
     for (var i = 0; i < props.length; i++) {
       var descriptor = props[i];
@@ -1985,8 +2009,13 @@
     return Constructor;
   }
 
-  var createClass = _createClass;
+  module.exports = _createClass;
+  module.exports["default"] = module.exports, module.exports.__esModule = true;
+  });
 
+  var _createClass = unwrapExports(createClass);
+
+  var assertThisInitialized = createCommonjsModule(function (module) {
   function _assertThisInitialized(self) {
     if (self === void 0) {
       throw new ReferenceError("this hasn't been initialised - super() hasn't been called");
@@ -1995,16 +2024,43 @@
     return self;
   }
 
-  var assertThisInitialized = _assertThisInitialized;
+  module.exports = _assertThisInitialized;
+  module.exports["default"] = module.exports, module.exports.__esModule = true;
+  });
 
+  var _assertThisInitialized = unwrapExports(assertThisInitialized);
+
+  var setPrototypeOf = createCommonjsModule(function (module) {
+  function _setPrototypeOf(o, p) {
+    module.exports = _setPrototypeOf = Object.setPrototypeOf || function _setPrototypeOf(o, p) {
+      o.__proto__ = p;
+      return o;
+    };
+
+    module.exports["default"] = module.exports, module.exports.__esModule = true;
+    return _setPrototypeOf(o, p);
+  }
+
+  module.exports = _setPrototypeOf;
+  module.exports["default"] = module.exports, module.exports.__esModule = true;
+  });
+
+  unwrapExports(setPrototypeOf);
+
+  var inheritsLoose = createCommonjsModule(function (module) {
   function _inheritsLoose(subClass, superClass) {
     subClass.prototype = Object.create(superClass.prototype);
     subClass.prototype.constructor = subClass;
-    subClass.__proto__ = superClass;
+    setPrototypeOf(subClass, superClass);
   }
 
-  var inheritsLoose = _inheritsLoose;
+  module.exports = _inheritsLoose;
+  module.exports["default"] = module.exports, module.exports.__esModule = true;
+  });
 
+  var _inheritsLoose = unwrapExports(inheritsLoose);
+
+  var defineProperty = createCommonjsModule(function (module) {
   function _defineProperty(obj, key, value) {
     if (key in obj) {
       Object.defineProperty(obj, key, {
@@ -2020,7 +2076,54 @@
     return obj;
   }
 
-  var defineProperty = _defineProperty;
+  module.exports = _defineProperty;
+  module.exports["default"] = module.exports, module.exports.__esModule = true;
+  });
+
+  var _defineProperty = unwrapExports(defineProperty);
+
+  var asyncToGenerator = createCommonjsModule(function (module) {
+  function asyncGeneratorStep(gen, resolve, reject, _next, _throw, key, arg) {
+    try {
+      var info = gen[key](arg);
+      var value = info.value;
+    } catch (error) {
+      reject(error);
+      return;
+    }
+
+    if (info.done) {
+      resolve(value);
+    } else {
+      Promise.resolve(value).then(_next, _throw);
+    }
+  }
+
+  function _asyncToGenerator(fn) {
+    return function () {
+      var self = this,
+          args = arguments;
+      return new Promise(function (resolve, reject) {
+        var gen = fn.apply(self, args);
+
+        function _next(value) {
+          asyncGeneratorStep(gen, resolve, reject, _next, _throw, "next", value);
+        }
+
+        function _throw(err) {
+          asyncGeneratorStep(gen, resolve, reject, _next, _throw, "throw", err);
+        }
+
+        _next(undefined);
+      });
+    };
+  }
+
+  module.exports = _asyncToGenerator;
+  module.exports["default"] = module.exports, module.exports.__esModule = true;
+  });
+
+  var _asyncToGenerator = unwrapExports(asyncToGenerator);
 
   function FormBase(id, pageId) {
     var self = this;
@@ -2120,19 +2223,53 @@
       return false;
     }; // Submit
 
-    this.submit = function (e, action) {
-      var form = this.getForm();
+    this.submit = /*#__PURE__*/function () {
+      var _ref = _asyncToGenerator( /*#__PURE__*/regenerator.mark(function _callee(e, action) {
+        var form, args, result;
+        return regenerator.wrap(function _callee$(_context) {
+          while (1) {
+            switch (_context.prev = _context.next) {
+              case 0:
+                form = this.getForm();
 
-      if (this.canSubmit()) {
-        if (action) form.action = action;
-        form.submit();
-      } else {
-        if ((e === null || e === void 0 ? void 0 : e.type) == "submit") // SubmitEvent
-          e.preventDefault();
-      }
+                if (!this.canSubmit()) {
+                  _context.next = 11;
+                  break;
+                }
 
-      return false;
-    }; // Get dynamic selection list by element name or id
+                if (action) form.action = action;
+                args = {
+                  f: this,
+                  form: form,
+                  result: true
+                };
+                $__default['default'](form).trigger("beforesubmit", [args]);
+                _context.next = 7;
+                return args.result;
+
+              case 7:
+                result = _context.sent;
+                // Support Promise
+                if ($__default['default'].isBoolean(result) && result || $__default['default'].isObject(result) && result.value) // Support Swal.fire()
+                  form.submit();
+                _context.next = 12;
+                break;
+
+              case 11:
+                this.enableForm();
+
+              case 12:
+              case "end":
+                return _context.stop();
+            }
+          }
+        }, _callee, this);
+      }));
+
+      return function (_x, _x2) {
+        return _ref.apply(this, arguments);
+      };
+    }(); // Get dynamic selection list by element name or id
 
     this.getList = function (name) {
       name = name.replace(/^(sv_)?[xy](\d*|\$rowindex\$)_|\[\]$/g, ""); // Remove element name prefix/suffix
@@ -2214,9 +2351,9 @@
         return t ? t + " " + id : id;
       };
 
-      var selector = Object.entries(this.lists).map(function (_ref) {
-        var id = _ref[0],
-            list = _ref[1];
+      var selector = Object.entries(this.lists).map(function (_ref2) {
+        var id = _ref2[0],
+            list = _ref2[1];
         return "[name='" + fixId(id, list.multiple) + "']";
       }).join();
 
@@ -2328,8 +2465,8 @@
           $sf = $__default['default'](".ew-save-filter[data-form=" + id + "]").toggleClass("disabled", !data),
           $df = $__default['default'](".ew-delete-filter[data-form=" + id + "]").toggleClass("disabled", !filters.length).toggleClass("dropdown-toggle", !!filters.length),
           $delete = $df.parent("li").toggleClass("dropdown-submenu dropdown-hover", !!filters.length).toggleClass("disabled", !filters.length),
-          $save = $sf.parent("li").toggleClass("disabled", !data),
-          $btn = $__default['default'](e.target);
+          $save = $sf.parent("li").toggleClass("disabled", !data);
+          $__default['default'](e.target);
 
       var saveFilters = function saveFilters(id, filters) {
         if (ew.SEARCH_FILTER_OPTION == "Client") {
@@ -2480,7 +2617,8 @@
         });
         $form.on("submit", function (e) {
           // Bind submit event
-          return self.submit(e);
+          self.submit(e);
+          return false; // Disable normal submission
         });
         $form.find("[data-field], .ew-priv").on("change", function () {
           if (ew.CONFIRM_CANCEL) self.modified = true;
@@ -2514,15 +2652,15 @@
     ew.forms.add(this);
   }
 
-  function ownKeys(object, enumerableOnly) { var keys = Object.keys(object); if (Object.getOwnPropertySymbols) { var symbols = Object.getOwnPropertySymbols(object); if (enumerableOnly) symbols = symbols.filter(function (sym) { return Object.getOwnPropertyDescriptor(object, sym).enumerable; }); keys.push.apply(keys, symbols); } return keys; }
+  function ownKeys$2(object, enumerableOnly) { var keys = Object.keys(object); if (Object.getOwnPropertySymbols) { var symbols = Object.getOwnPropertySymbols(object); if (enumerableOnly) { symbols = symbols.filter(function (sym) { return Object.getOwnPropertyDescriptor(object, sym).enumerable; }); } keys.push.apply(keys, symbols); } return keys; }
 
-  function _objectSpread(target) { for (var i = 1; i < arguments.length; i++) { var source = arguments[i] != null ? arguments[i] : {}; if (i % 2) { ownKeys(Object(source), true).forEach(function (key) { defineProperty(target, key, source[key]); }); } else if (Object.getOwnPropertyDescriptors) { Object.defineProperties(target, Object.getOwnPropertyDescriptors(source)); } else { ownKeys(Object(source)).forEach(function (key) { Object.defineProperty(target, key, Object.getOwnPropertyDescriptor(source, key)); }); } } return target; }
+  function _objectSpread$2(target) { for (var i = 1; i < arguments.length; i++) { var source = arguments[i] != null ? arguments[i] : {}; if (i % 2) { ownKeys$2(Object(source), true).forEach(function (key) { _defineProperty(target, key, source[key]); }); } else if (Object.getOwnPropertyDescriptors) { Object.defineProperties(target, Object.getOwnPropertyDescriptors(source)); } else { ownKeys$2(Object(source)).forEach(function (key) { Object.defineProperty(target, key, Object.getOwnPropertyDescriptor(source, key)); }); } } return target; }
 
-  function _createForOfIteratorHelperLoose$1(o, allowArrayLike) { var it; if (typeof Symbol === "undefined" || o[Symbol.iterator] == null) { if (Array.isArray(o) || (it = _unsupportedIterableToArray$1(o)) || allowArrayLike && o && typeof o.length === "number") { if (it) o = it; var i = 0; return function () { if (i >= o.length) return { done: true }; return { done: false, value: o[i++] }; }; } throw new TypeError("Invalid attempt to iterate non-iterable instance.\nIn order to be iterable, non-array objects must have a [Symbol.iterator]() method."); } it = o[Symbol.iterator](); return it.next.bind(it); }
+  function _createForOfIteratorHelperLoose$2(o, allowArrayLike) { var it = typeof Symbol !== "undefined" && o[Symbol.iterator] || o["@@iterator"]; if (it) return (it = it.call(o)).next.bind(it); if (Array.isArray(o) || (it = _unsupportedIterableToArray$2(o)) || allowArrayLike && o && typeof o.length === "number") { if (it) o = it; var i = 0; return function () { if (i >= o.length) return { done: true }; return { done: false, value: o[i++] }; }; } throw new TypeError("Invalid attempt to iterate non-iterable instance.\nIn order to be iterable, non-array objects must have a [Symbol.iterator]() method."); }
 
-  function _unsupportedIterableToArray$1(o, minLen) { if (!o) return; if (typeof o === "string") return _arrayLikeToArray$1(o, minLen); var n = Object.prototype.toString.call(o).slice(8, -1); if (n === "Object" && o.constructor) n = o.constructor.name; if (n === "Map" || n === "Set") return Array.from(o); if (n === "Arguments" || /^(?:Ui|I)nt(?:8|16|32)(?:Clamped)?Array$/.test(n)) return _arrayLikeToArray$1(o, minLen); }
+  function _unsupportedIterableToArray$2(o, minLen) { if (!o) return; if (typeof o === "string") return _arrayLikeToArray$2(o, minLen); var n = Object.prototype.toString.call(o).slice(8, -1); if (n === "Object" && o.constructor) n = o.constructor.name; if (n === "Map" || n === "Set") return Array.from(o); if (n === "Arguments" || /^(?:Ui|I)nt(?:8|16|32)(?:Clamped)?Array$/.test(n)) return _arrayLikeToArray$2(o, minLen); }
 
-  function _arrayLikeToArray$1(arr, len) { if (len == null || len > arr.length) len = arr.length; for (var i = 0, arr2 = new Array(len); i < len; i++) { arr2[i] = arr[i]; } return arr2; }
+  function _arrayLikeToArray$2(arr, len) { if (len == null || len > arr.length) len = arr.length; for (var i = 0, arr2 = new Array(len); i < len; i++) { arr2[i] = arr[i]; } return arr2; }
 
   /**
    * Class Field
@@ -2535,16 +2673,16 @@
      * @param {bool} invalid Initial valid status (e.g. server side)
      */
     function Field(fldvar, validators, invalid) {
-      defineProperty(this, "name", "");
+      _defineProperty(this, "name", "");
 
-      defineProperty(this, "validators", []);
+      _defineProperty(this, "validators", []);
 
-      defineProperty(this, "_validate", true);
+      _defineProperty(this, "_validate", true);
 
       this.name = fldvar;
 
       if (Array.isArray(validators)) {
-        for (var _iterator = _createForOfIteratorHelperLoose$1(validators), _step; !(_step = _iterator()).done;) {
+        for (var _iterator = _createForOfIteratorHelperLoose$2(validators), _step; !(_step = _iterator()).done;) {
           var validator = _step.value;
           this.addValidator(validator);
         }
@@ -2579,7 +2717,7 @@
         var _this$_error;
 
         var error = (_this$_error = this._error) !== null && _this$_error !== void 0 ? _this$_error : {};
-        this._error = _objectSpread(_objectSpread({}, error), err);
+        this._error = _objectSpread$2(_objectSpread$2({}, error), err);
         this.invalid = true;
       }
     }
@@ -2616,7 +2754,7 @@
 
       if (this._element && this.shouldValidate) {
         if (Array.isArray(this.validators)) {
-          for (var _iterator2 = _createForOfIteratorHelperLoose$1(this.validators), _step2; !(_step2 = _iterator2()).done;) {
+          for (var _iterator2 = _createForOfIteratorHelperLoose$2(this.validators), _step2; !(_step2 = _iterator2()).done;) {
             var validator = _step2.value;
             var err = validator(this._element);
 
@@ -2654,7 +2792,7 @@
       if (this._element) ew.setFocus(this._element);
     };
 
-    createClass(Field, [{
+    _createClass(Field, [{
       key: "error",
       get: function get() {
         return this._error;
@@ -2683,25 +2821,25 @@
 
     }, {
       key: "element",
-      set: function set(el) {
-        var _this$_element, _this$_element$id;
-
-        this._element = el;
-        this._checkbox = (_this$_element = this._element) !== null && _this$_element !== void 0 && (_this$_element$id = _this$_element.id) !== null && _this$_element$id !== void 0 && _this$_element$id.match(/^[xy]_/) ? document.getElementById(this._element.id.replace(/^[xy]_/, "u_")) : null; // Find the checkbox for the field in Update page
-      }
+      get:
       /**
        * Get form element
        * @returns {HTMLElement|HTMLElement[]}
        */
-      ,
-      get: function get() {
+      function get() {
         return this._element;
       }
       /**
        * Get field value from form element
        * @returns {string|Array}
        */
+      ,
+      set: function set(el) {
+        var _this$_element, _this$_element$id;
 
+        this._element = el;
+        this._checkbox = (_this$_element = this._element) !== null && _this$_element !== void 0 && (_this$_element$id = _this$_element.id) !== null && _this$_element$id !== void 0 && _this$_element$id.match(/^[xy]_/) ? document.getElementById(this._element.id.replace(/^[xy]_/, "u_")) : null; // Find the checkbox for the field in Update page
+      }
     }, {
       key: "value",
       get: function get() {
@@ -2712,21 +2850,21 @@
     return Field;
   }();
 
-  function ownKeys$1(object, enumerableOnly) { var keys = Object.keys(object); if (Object.getOwnPropertySymbols) { var symbols = Object.getOwnPropertySymbols(object); if (enumerableOnly) symbols = symbols.filter(function (sym) { return Object.getOwnPropertyDescriptor(object, sym).enumerable; }); keys.push.apply(keys, symbols); } return keys; }
+  function ownKeys$1(object, enumerableOnly) { var keys = Object.keys(object); if (Object.getOwnPropertySymbols) { var symbols = Object.getOwnPropertySymbols(object); if (enumerableOnly) { symbols = symbols.filter(function (sym) { return Object.getOwnPropertyDescriptor(object, sym).enumerable; }); } keys.push.apply(keys, symbols); } return keys; }
 
-  function _objectSpread$1(target) { for (var i = 1; i < arguments.length; i++) { var source = arguments[i] != null ? arguments[i] : {}; if (i % 2) { ownKeys$1(Object(source), true).forEach(function (key) { defineProperty(target, key, source[key]); }); } else if (Object.getOwnPropertyDescriptors) { Object.defineProperties(target, Object.getOwnPropertyDescriptors(source)); } else { ownKeys$1(Object(source)).forEach(function (key) { Object.defineProperty(target, key, Object.getOwnPropertyDescriptor(source, key)); }); } } return target; }
+  function _objectSpread$1(target) { for (var i = 1; i < arguments.length; i++) { var source = arguments[i] != null ? arguments[i] : {}; if (i % 2) { ownKeys$1(Object(source), true).forEach(function (key) { _defineProperty(target, key, source[key]); }); } else if (Object.getOwnPropertyDescriptors) { Object.defineProperties(target, Object.getOwnPropertyDescriptors(source)); } else { ownKeys$1(Object(source)).forEach(function (key) { Object.defineProperty(target, key, Object.getOwnPropertyDescriptor(source, key)); }); } } return target; }
 
-  function _createForOfIteratorHelperLoose$2(o, allowArrayLike) { var it; if (typeof Symbol === "undefined" || o[Symbol.iterator] == null) { if (Array.isArray(o) || (it = _unsupportedIterableToArray$2(o)) || allowArrayLike && o && typeof o.length === "number") { if (it) o = it; var i = 0; return function () { if (i >= o.length) return { done: true }; return { done: false, value: o[i++] }; }; } throw new TypeError("Invalid attempt to iterate non-iterable instance.\nIn order to be iterable, non-array objects must have a [Symbol.iterator]() method."); } it = o[Symbol.iterator](); return it.next.bind(it); }
+  function _createForOfIteratorHelperLoose$1(o, allowArrayLike) { var it = typeof Symbol !== "undefined" && o[Symbol.iterator] || o["@@iterator"]; if (it) return (it = it.call(o)).next.bind(it); if (Array.isArray(o) || (it = _unsupportedIterableToArray$1(o)) || allowArrayLike && o && typeof o.length === "number") { if (it) o = it; var i = 0; return function () { if (i >= o.length) return { done: true }; return { done: false, value: o[i++] }; }; } throw new TypeError("Invalid attempt to iterate non-iterable instance.\nIn order to be iterable, non-array objects must have a [Symbol.iterator]() method."); }
 
-  function _unsupportedIterableToArray$2(o, minLen) { if (!o) return; if (typeof o === "string") return _arrayLikeToArray$2(o, minLen); var n = Object.prototype.toString.call(o).slice(8, -1); if (n === "Object" && o.constructor) n = o.constructor.name; if (n === "Map" || n === "Set") return Array.from(o); if (n === "Arguments" || /^(?:Ui|I)nt(?:8|16|32)(?:Clamped)?Array$/.test(n)) return _arrayLikeToArray$2(o, minLen); }
+  function _unsupportedIterableToArray$1(o, minLen) { if (!o) return; if (typeof o === "string") return _arrayLikeToArray$1(o, minLen); var n = Object.prototype.toString.call(o).slice(8, -1); if (n === "Object" && o.constructor) n = o.constructor.name; if (n === "Map" || n === "Set") return Array.from(o); if (n === "Arguments" || /^(?:Ui|I)nt(?:8|16|32)(?:Clamped)?Array$/.test(n)) return _arrayLikeToArray$1(o, minLen); }
 
-  function _arrayLikeToArray$2(arr, len) { if (len == null || len > arr.length) len = arr.length; for (var i = 0, arr2 = new Array(len); i < len; i++) { arr2[i] = arr[i]; } return arr2; }
+  function _arrayLikeToArray$1(arr, len) { if (len == null || len > arr.length) len = arr.length; for (var i = 0, arr2 = new Array(len); i < len; i++) { arr2[i] = arr[i]; } return arr2; }
   /**
    * Class Form
    */
 
   var Form = /*#__PURE__*/function (_FormBase) {
-    inheritsLoose(Form, _FormBase);
+    _inheritsLoose(Form, _FormBase);
 
     /**
      * Constructor
@@ -2738,9 +2876,9 @@
 
       _this = _FormBase.call(this, id, pageId) || this;
 
-      defineProperty(assertThisInitialized(_this), "row", {});
+      _defineProperty(_assertThisInitialized(_this), "row", {});
 
-      defineProperty(assertThisInitialized(_this), "fields", {});
+      _defineProperty(_assertThisInitialized(_this), "fields", {});
 
       return _this;
     }
@@ -2774,7 +2912,7 @@
 
     _proto.addFields = function addFields(fields) {
       if (Array.isArray(fields)) {
-        for (var _iterator = _createForOfIteratorHelperLoose$2(fields), _step; !(_step = _iterator()).done;) {
+        for (var _iterator = _createForOfIteratorHelperLoose$1(fields), _step; !(_step = _iterator()).done;) {
           var field = _step.value;
 
           if (Array.isArray(field)) {
@@ -2878,7 +3016,7 @@
 
         this.row[field.name] = field.value; // Get field value
 
-        if (!field.validate()) {
+        if (field.element && !field.validate()) {
           // Invalid field value
           this.addError(field.name, field.error);
           result = false;
@@ -2919,7 +3057,7 @@
       }
     };
 
-    createClass(Form, [{
+    _createClass(Form, [{
       key: "error",
       get: function get() {
         return this._error;
@@ -2939,7 +3077,7 @@
      * @param {Object} settings.data - Data submitted by Ajax
      */
     function AjaxLookup(settings) {
-      defineProperty(this, "_isAutoSuggest", null);
+      _defineProperty(this, "_isAutoSuggest", null);
 
       this.elementId = settings.id; // Id
 
@@ -3052,7 +3190,7 @@
       return results;
     };
 
-    createClass(AjaxLookup, [{
+    _createClass(AjaxLookup, [{
       key: "isAutoSuggest",
       get: function get() {
         if (this._isAutoSuggest === null) this._isAutoSuggest = ew.isAutoSuggest(this.element);
@@ -3071,8 +3209,8 @@
    * Constructor
    */
   function SelectionListOption(value, text, selected) {
-    this.value = String(value || "");
-    this.text = String(text || "");
+    this.value = String(value);
+    this.text = String(text);
     this.selected = !!selected;
   };
 
@@ -3138,7 +3276,7 @@
     this.transform = function (data) {
       var results = AjaxLookup.prototype.transform.call(this, data);
       this.element.options = results.map(function (item) {
-        return new SelectionListOption(item[0], self.formatResult(item));
+        return new SelectionListOption(item.lf || item[0], self.formatResult(item));
       });
       return this.element.options;
     }; // Get suggestions by Ajax
@@ -3180,7 +3318,7 @@
 
     $input.on("typeahead:select", function (e, d) {
       self.setValue(d[self.display]);
-    }).change(function (e) {
+    }).on("change", function (e) {
       var ta = $input.data("tt-typeahead");
 
       if (ta && ta.isOpen() && !ta.menu.empty()) {
@@ -3195,11 +3333,11 @@
       }
 
       self.setValue();
-    }).blur(function (e) {
+    }).on("blur", function (e) {
       // "change" fires before blur
       var ta = $input.data("tt-typeahead");
       if (ta && ta.isOpen()) ta.menu.close();
-    }).focus(function (e) {
+    }).on("focus", function (e) {
       $input.attr("placeholder", $input.data("placeholder")).removeClass("is-invalid");
     }); // Option template ("suggestion" template)
 
@@ -3271,7 +3409,7 @@
 
   var Forms = /*#__PURE__*/function () {
     function Forms() {
-      defineProperty(this, "_forms", {});
+      _defineProperty(this, "_forms", {});
     }
 
     var _proto = Forms.prototype;
@@ -3466,18 +3604,18 @@
     return Select2CustomOption;
   }
 
-  function _createForOfIteratorHelperLoose$3(o, allowArrayLike) { var it; if (typeof Symbol === "undefined" || o[Symbol.iterator] == null) { if (Array.isArray(o) || (it = _unsupportedIterableToArray$3(o)) || allowArrayLike && o && typeof o.length === "number") { if (it) o = it; var i = 0; return function () { if (i >= o.length) return { done: true }; return { done: false, value: o[i++] }; }; } throw new TypeError("Invalid attempt to iterate non-iterable instance.\nIn order to be iterable, non-array objects must have a [Symbol.iterator]() method."); } it = o[Symbol.iterator](); return it.next.bind(it); }
+  function _createForOfIteratorHelperLoose(o, allowArrayLike) { var it = typeof Symbol !== "undefined" && o[Symbol.iterator] || o["@@iterator"]; if (it) return (it = it.call(o)).next.bind(it); if (Array.isArray(o) || (it = _unsupportedIterableToArray(o)) || allowArrayLike && o && typeof o.length === "number") { if (it) o = it; var i = 0; return function () { if (i >= o.length) return { done: true }; return { done: false, value: o[i++] }; }; } throw new TypeError("Invalid attempt to iterate non-iterable instance.\nIn order to be iterable, non-array objects must have a [Symbol.iterator]() method."); }
 
-  function _unsupportedIterableToArray$3(o, minLen) { if (!o) return; if (typeof o === "string") return _arrayLikeToArray$3(o, minLen); var n = Object.prototype.toString.call(o).slice(8, -1); if (n === "Object" && o.constructor) n = o.constructor.name; if (n === "Map" || n === "Set") return Array.from(o); if (n === "Arguments" || /^(?:Ui|I)nt(?:8|16|32)(?:Clamped)?Array$/.test(n)) return _arrayLikeToArray$3(o, minLen); }
+  function _unsupportedIterableToArray(o, minLen) { if (!o) return; if (typeof o === "string") return _arrayLikeToArray(o, minLen); var n = Object.prototype.toString.call(o).slice(8, -1); if (n === "Object" && o.constructor) n = o.constructor.name; if (n === "Map" || n === "Set") return Array.from(o); if (n === "Arguments" || /^(?:Ui|I)nt(?:8|16|32)(?:Clamped)?Array$/.test(n)) return _arrayLikeToArray(o, minLen); }
 
-  function _arrayLikeToArray$3(arr, len) { if (len == null || len > arr.length) len = arr.length; for (var i = 0, arr2 = new Array(len); i < len; i++) { arr2[i] = arr[i]; } return arr2; }
+  function _arrayLikeToArray(arr, len) { if (len == null || len > arr.length) len = arr.length; for (var i = 0, arr2 = new Array(len); i < len; i++) { arr2[i] = arr[i]; } return arr2; }
 
-  function ownKeys$2(object, enumerableOnly) { var keys = Object.keys(object); if (Object.getOwnPropertySymbols) { var symbols = Object.getOwnPropertySymbols(object); if (enumerableOnly) symbols = symbols.filter(function (sym) { return Object.getOwnPropertyDescriptor(object, sym).enumerable; }); keys.push.apply(keys, symbols); } return keys; }
+  function ownKeys(object, enumerableOnly) { var keys = Object.keys(object); if (Object.getOwnPropertySymbols) { var symbols = Object.getOwnPropertySymbols(object); if (enumerableOnly) { symbols = symbols.filter(function (sym) { return Object.getOwnPropertyDescriptor(object, sym).enumerable; }); } keys.push.apply(keys, symbols); } return keys; }
 
-  function _objectSpread$2(target) { for (var i = 1; i < arguments.length; i++) { var source = arguments[i] != null ? arguments[i] : {}; if (i % 2) { ownKeys$2(Object(source), true).forEach(function (key) { defineProperty(target, key, source[key]); }); } else if (Object.getOwnPropertyDescriptors) { Object.defineProperties(target, Object.getOwnPropertyDescriptors(source)); } else { ownKeys$2(Object(source)).forEach(function (key) { Object.defineProperty(target, key, Object.getOwnPropertyDescriptor(source, key)); }); } } return target; }
+  function _objectSpread(target) { for (var i = 1; i < arguments.length; i++) { var source = arguments[i] != null ? arguments[i] : {}; if (i % 2) { ownKeys(Object(source), true).forEach(function (key) { _defineProperty(target, key, source[key]); }); } else if (Object.getOwnPropertyDescriptors) { Object.defineProperties(target, Object.getOwnPropertyDescriptors(source)); } else { ownKeys(Object(source)).forEach(function (key) { Object.defineProperty(target, key, Object.getOwnPropertyDescriptor(source, key)); }); } } return target; }
   var currentUrl = new URL(window.location);
   var forms = new Forms();
-  var $document = $__default['default'](document),
+  var $document$1 = $__default['default'](document),
       $body = $__default['default']("body"); // Remove spinner (immediately)
 
   var _removeSpinner = ew.removeSpinner; // Remove spinner
@@ -3486,7 +3624,7 @@
     var timer = $body.data("_spinner");
     if (timer) timer.cancel();
     timer = $__default['default'].later(500, null, function () {
-      if ($document.data("_ajax") !== true) {
+      if ($document$1.data("_ajax") !== true) {
         // Ajax not running
         _removeSpinner();
 
@@ -3523,6 +3661,13 @@
             }
           }
 
+          if (!options.templateResult) {
+            // Override Select2 default
+            options.templateResult = function (result) {
+              return (result.element instanceof HTMLOptionElement ? result.element.innerHTML : "") || result.text;
+            };
+          }
+
           if (options.ajax != null) {
             options.resultsAdapter = Utils.Decorate(options.resultsAdapter, InfiniteScroll);
           }
@@ -3545,19 +3690,19 @@
             },
             type: "POST",
             dataType: "json",
-            data: lookup.generateRequest(),
+            data: lookup.generateRequest.bind(lookup),
             delay: options.debounce,
             processResults: function processResults(data) {
               return {
                 results: lookup.transform(data).map(function (item) {
                   return {
-                    id: item[0],
+                    id: item.lf,
                     text: lookup.formatResult({
-                      lf: item[0],
-                      df: item[1],
-                      df2: item[2],
-                      df3: item[3],
-                      df4: item[4]
+                      lf: item.lf,
+                      df: item.df,
+                      df2: item.df2,
+                      df3: item.df3,
+                      df4: item.df4
                     })
                   };
                 }),
@@ -3569,11 +3714,16 @@
           };
         }
 
-        $__default['default']("select[data-select2-id='" + options.selectId + "']").select2(options);
+        var $select = $__default['default']("select[data-select2-id='" + options.selectId + "']").select2(options);
+        $select.on("select2:open", function () {
+          var _$$;
+
+          (_$$ = $__default['default'](".select2-container--open .select2-search__field")[0]) === null || _$$ === void 0 ? void 0 : _$$.focus();
+        });
 
         if (options.multiple && options.minimumResultsForSearch === Infinity) {
-          $__default['default']("select[id='<#= ctl #>']").on("select2:opening select2:closing", function (event) {
-            $__default['default'](this).parent().find(".select2-search__field").prop("disabled", true);
+          $select.on("select2:opening select2:closing", function () {
+            $__default['default'](".select2-container--open .select2-search__field").prop("disabled", true);
           });
         }
       };
@@ -3741,7 +3891,7 @@
           message = message.replace("%s", '<span class="ew-session-counter-second">' + counter + '</span>');
         }
 
-        Swal.fire(_objectSpread$2(_objectSpread$2({}, ew.sweetAlertSettings), {}, {
+        Swal.fire(_objectSpread(_objectSpread({}, ew.sweetAlertSettings), {}, {
           html: message,
           showConfirmButton: true,
           confirmButtonText: ew.language.phrase("OKBtn"),
@@ -3749,7 +3899,7 @@
           timerProgressBar: true,
           allowOutsideClick: false,
           allowEscapeKey: false,
-          onBeforeOpen: function onBeforeOpen() {
+          willOpen: function willOpen() {
             timerInterval = setInterval(function () {
               var content = Swal.getContent(),
                   min = content.querySelector(".ew-session-counter-minute"),
@@ -3829,53 +3979,55 @@
   } // Download file
 
   function fileDownload(href, data) {
-    var win = window.parent,
-        jq = win.jQuery,
-        swal = win.Swal,
-        doc = win.document,
-        $doc = jq(doc),
-        method = data ? "POST" : "GET",
-        isHtml = href.includes("export=html");
-    return swal.fire(_objectSpread$2(_objectSpread$2({}, ew.sweetAlertSettings), {}, {
+    var isHtml = href.includes("export=html");
+    return Swal.fire(_objectSpread(_objectSpread({}, ew.sweetAlertSettings), {}, {
+      showConfirmButton: false,
       html: "<p>" + ew.language.phrase("Exporting") + "</p>",
       allowOutsideClick: false,
       allowEscapeKey: false,
-      onBeforeOpen: function onBeforeOpen() {
-        swal.showLoading(), jq.ajax({
+      willOpen: function willOpen() {
+        Swal.showLoading(), $__default['default'].ajax({
           url: href,
-          type: method,
+          type: data ? "POST" : "GET",
           cache: false,
           data: data || null,
           xhrFields: {
             responseType: isHtml ? "text" : "blob"
           }
         }).done(function (data, textStatus, jqXHR) {
-          var url = win.URL.createObjectURL(isHtml ? new Blob([data], {
+          var url = URL.createObjectURL(isHtml ? new Blob([data], {
             type: "text/html"
           }) : data),
-              a = doc.createElement("a"),
+              a = document.createElement("a"),
               cd = jqXHR.getResponseHeader("Content-Disposition"),
               m = cd.match(/\bfilename=((['"])(.+)\2|([^;]+))/i);
           a.style.display = "none";
           a.href = url;
           if (m) a.download = m[3] || m[4];
-          doc.body.appendChild(a);
+          document.body.appendChild(a);
           a.click();
-          $doc.trigger("export", [{
+          $document$1.trigger("export", [{
             "type": "done",
             "url": href,
             "objectUrl": url
           }]);
-          win.URL.revokeObjectURL(url);
-          swal.close();
-        }).fail(function () {
-          swal.showValidationMessage("<div class='text-danger'><h4>" + ew.language.phrase("FailedToExport") + "</h4>" + response + "</div>");
-          $doc.trigger("export", [{
+          URL.revokeObjectURL(url);
+          Swal.close();
+        }).fail(function (jqXHR, textStatus, errorThrown) {
+          var _Swal$getActions;
+
+          Swal.hideLoading();
+          Swal.update({
+            showConfirmButton: true
+          });
+          (_Swal$getActions = Swal.getActions()) === null || _Swal$getActions === void 0 ? void 0 : _Swal$getActions.classList.add("d-flex");
+          Swal.showValidationMessage("<div class='text-danger'>" + (errorThrown || ew.language.phrase("FailedToExport")) + "</div>");
+          $document$1.trigger("export", [{
             "type": "fail",
             "url": href
           }]);
         }).always(function () {
-          $doc.trigger("export", [{
+          $document$1.trigger("export", [{
             "type": "always",
             "url": href
           }]);
@@ -3890,7 +4042,7 @@
     $__default['default'](el).find("img.ew-lazy").each(function () {
       this.src = this.dataset.src;
     });
-    $document.trigger("lazyload"); // All images loaded
+    $document$1.trigger("lazyload"); // All images loaded
   } // Update select2 dropdown position
 
   function updateDropdownPosition() {
@@ -4007,43 +4159,47 @@
         $el = $__default['default'](el),
         ids = ew.forms.ids();
 
-    for (var _iterator = _createForOfIteratorHelperLoose$3(ids), _step; !(_step = _iterator()).done;) {
+    for (var _iterator = _createForOfIteratorHelperLoose(ids), _step; !(_step = _iterator()).done;) {
       var id = _step.value;
       if ($el.find("#" + id)) forms.get(id).init();
     }
+  } // Is function
+
+  function isFunction(x) {
+    return typeof x === "function";
   } // Prompt/Confirm/Alert
 
   function _prompt(text, cb, input, validator) {
     if (input) {
       // Prompt
-      return Swal.fire(_objectSpread$2(_objectSpread$2({}, ew.sweetAlertSettings), {}, {
+      return Swal.fire(_objectSpread(_objectSpread({}, ew.sweetAlertSettings), {}, {
         html: text,
         input: "text",
         confirmButtonText: ew.language.phrase("OKBtn"),
-        showCancelButton: $__default['default'].isFunction(cb),
+        showCancelButton: isFunction(cb),
         cancelButtonText: ew.language.phrase("CancelBtn"),
         inputValidator: validator || function (value) {
           if (!value) return ew.language.phrase("EnterValue");
         }
       })).then(function (result) {
-        if ($__default['default'].isFunction(cb)) cb(result.value);
+        if (isFunction(cb)) cb(result.value);
       });
     } else {
       // Confirm or Alert
-      return Swal.fire(_objectSpread$2(_objectSpread$2({}, ew.sweetAlertSettings), {}, {
+      return Swal.fire(_objectSpread(_objectSpread({}, ew.sweetAlertSettings), {}, {
         html: "<div>" + text + "</div>",
         confirmButtonText: ew.language.phrase("OKBtn"),
-        showCancelButton: $__default['default'].isFunction(cb),
+        showCancelButton: isFunction(cb),
         cancelButtonText: ew.language.phrase("CancelBtn")
       })).then(function (result) {
-        if ($__default['default'].isFunction(cb)) cb(result.value);
+        if (isFunction(cb)) cb(result.value);
       });
     }
   }
 
   function toast(options) {
     options = Object.assign({}, ew.toastOptions, options);
-    $document.Toasts("create", options);
+    $document$1.Toasts("create", options);
     var position = options.position,
         $container = $__default['default']("#toastsContainer" + position[0].toUpperCase() + position.substring(1));
     return $container.children().first();
@@ -4185,7 +4341,7 @@
     }
 
     return promise.then(function () {
-      $document.trigger("updatedone", [{
+      $document$1.trigger("updatedone", [{
         source: self,
         target: obj
       }]); // Document "updatedone" event fired after all the target elements are updated
@@ -4259,7 +4415,7 @@
           "name": name,
           "form": fo
         };
-        $document.trigger("addoption", [args]);
+        $document$1.trigger("addoption", [args]);
         if (args.valid) newOption(obj, result, fo);
       });
       if (obj.list) obj.render();
@@ -4275,7 +4431,7 @@
 
     var _updateSibling = function _updateSibling() {
       // Update the y_* element
-      if (/s(ea)?rch$/.test(fo.id) && prefix == "x") {
+      if (/(s(ea)?rch|summary|crosstab)$/.test(fo.id) && prefix == "x") {
         // Search form
         args[0] = id.replace(/^x_/, "y_");
         updateOptions.apply(self, args); // args[0] is string, use updateOptions()
@@ -4304,7 +4460,7 @@
 
       if (isAutoSuggest(obj) && self.htmlForm) // Auto-Suggest (init form or auto-fill)
         data["v0"] = ar[0] || random(); // Filter by the current value
-      else if (isModalLookup(obj)) // Modal-Lookup
+      else if (obj.options && !["select-one", "select-multiple"].includes(obj.type) || isModalLookup(obj)) // Lookup
           data["v0"] = ar[0] ? obj.multiple ? ar.join(ew.MULTIPLE_OPTION_SEPARATOR) : ar[0] : random(); // Filter by the current value
 
       for (var i = 0, cnt = arp.length; i < cnt; i++) {
@@ -4361,12 +4517,15 @@
       "export": exportType,
       "enabled": true
     };
-    $document.trigger("rendertemplate", [args]);
+    $document$1.trigger("rendertemplate", [args]);
 
     if (args.enabled) {
       if (document.body.replaceWith) {
+        var _document$getElementB;
+
         // Not IE
-        var template = document.getElementById(tmplId).content;
+        var template = (_document$getElementB = document.getElementById(tmplId)) === null || _document$getElementB === void 0 ? void 0 : _document$getElementB.content;
+        if (!template) return;
         template.querySelectorAll(".ew-slot").forEach(function (el) {
           var subtmpl = document.getElementById(el.name || el.id);
 
@@ -4429,7 +4588,7 @@
         if ($meta[0]) html += "<meta http-equiv='Content-Type' content='" + $meta.attr("content") + "'>";
 
         if (exportType == "pdf") {
-          html += "<link rel='stylesheet' type='text/css' href='" + ew.PDF_STYLESHEET_FILENAME + "'>";
+          html += "<link rel='stylesheet' href='" + ew.PDF_STYLESHEET_FILENAME + "'>";
         } else {
           html += "<style>" + $__default['default'].ajax({
             async: false,
@@ -4506,6 +4665,8 @@
 
     var fnelm = getElement("fn_x" + infix + "_" + fld, fobj); // Hidden element
 
+    if ((nelm === null || nelm === void 0 ? void 0 : nelm.type) == "hidden" && !oelm) // For example, detail key
+      return false;
     if (!oelm && (!nelm || Array.isArray(nelm) && nelm.length == 0)) return false;
 
     var getValue = function getValue(obj) {
@@ -4607,9 +4768,8 @@
           }
         }
 
-        $f.prop("action", url).trigger("submit");
-        if (action) // Action
-          $f.find("input[type=hidden][name=useraction]").remove(); // Remove the "useraction" element
+        $f.prop("action", url).trigger("submit"); // if (action) // Action
+        //     $f.find("input[type=hidden][name=useraction]").remove(); // Remove the "useraction" element
       } else {
         // Ajax
         data = $__default['default'].isObject(data) ? $__default['default'].param(data) : $__default['default'].isString(data) ? data : ""; // User data
@@ -4623,7 +4783,7 @@
 
         if (success && $__default['default'].isString(success)) success = window[success];
 
-        if ($__default['default'].isFunction(success)) {
+        if (isFunction(success)) {
           $__default['default'].post(url, data, success);
         } else if ($__default['default'].isObject(success)) {
           // "success" is Ajax settings
@@ -4754,15 +4914,15 @@
    *
    * @param {string} msg - Message
    * @param {callback} cb - Callback function
-   * @param {string} type - CSS class: "muted|primary|success|info|warning|danger"
+   * @param {string} type - CSS class (see https://getbootstrap.com/docs/4.5/utilities/colors/#color)
    */
 
   function _alert(msg, cb, type) {
-    return Swal.fire(_objectSpread$2(_objectSpread$2({}, ew.sweetAlertSettings), {}, {
+    return Swal.fire(_objectSpread(_objectSpread({}, ew.sweetAlertSettings), {}, {
       html: '<p class="text-' + (type || 'danger') + '">' + msg + '</p>',
       confirmButtonText: ew.language.phrase("OKBtn")
     })).then(function (result) {
-      if ($__default['default'].isFunction(cb)) cb(result.value);
+      if (isFunction(cb)) cb(result.value);
     });
   }
   /**
@@ -5180,7 +5340,7 @@
       }
     };
 
-    if ($__default['default'].isFunction(frm.emptyRow) && frm.emptyRow(infix)) {
+    if (isFunction(frm.emptyRow) && frm.emptyRow(infix)) {
       // Empty row
       _delete();
     } else {
@@ -5534,10 +5694,10 @@
         option.innerHTML = args.text;
       }
 
-      args = _objectSpread$2(_objectSpread$2({}, args), {}, {
+      args = _objectSpread(_objectSpread({}, args), {}, {
         option: option
       });
-      $document.trigger("newoption", [args]); // Fire "newoption" event for selection list
+      $document$1.trigger("newoption", [args]); // Fire "newoption" event for selection list
 
       if (obj.list) {
         obj.add(args.option.value, args.option.text);
@@ -5566,7 +5726,7 @@
         if (isAutoSuggest(obj) && values.length == 1) {
           var opts = obj.options || [];
 
-          for (var _iterator2 = _createForOfIteratorHelperLoose$3(opts), _step2; !(_step2 = _iterator2()).done;) {
+          for (var _iterator2 = _createForOfIteratorHelperLoose(opts), _step2; !(_step2 = _iterator2()).done;) {
             var opt = _step2.value;
 
             if (opt.value == values[0]) {
@@ -5580,10 +5740,10 @@
               html = [],
               _opts = obj.options || [];
 
-          for (var _iterator3 = _createForOfIteratorHelperLoose$3(values), _step3; !(_step3 = _iterator3()).done;) {
+          for (var _iterator3 = _createForOfIteratorHelperLoose(values), _step3; !(_step3 = _iterator3()).done;) {
             var value = _step3.value;
 
-            for (var _iterator4 = _createForOfIteratorHelperLoose$3(_opts), _step4; !(_step4 = _iterator4()).done;) {
+            for (var _iterator4 = _createForOfIteratorHelperLoose(_opts), _step4; !(_step4 = _iterator4()).done;) {
               var _opt = _step4.value;
 
               if (value == _opt.value) {
@@ -5642,7 +5802,7 @@
     }
   } // Ajax send
 
-  $document.ajaxSend(function (event, jqxhr, settings) {
+  $document$1.ajaxSend(function (event, jqxhr, settings) {
     var url = settings.url;
     if (url.match(/\/(\w+preview|session)\?/i)) // Preview/Session page
       _removeSpinner(); // Preview has spinner already
@@ -5690,8 +5850,8 @@
     }
   }); // Ajax start
 
-  $document.ajaxStart(function () {
-    $document.data("_ajax", true);
+  $document$1.ajaxStart(function () {
+    $document$1.data("_ajax", true);
     ew.addSpinner();
     $__default['default']("form.ew-form").addClass("ew-wait").each(function () {
       var frm = forms.get(this.id);
@@ -5713,23 +5873,34 @@
       }
     });
     ew.removeSpinner();
-    $document.data("_ajax", false);
+    $document$1.data("_ajax", false);
   } // Ajax stop/error
 
-  $document.ajaxStop(_ajaxStop).ajaxError(_ajaxStop); // Execute JavaScript in HTML loaded by Ajax
+  $document$1.ajaxStop(_ajaxStop).ajaxError(_ajaxStop); // Execute JavaScript in HTML loaded by Ajax
 
   function executeScript(html, id) {
     var matches = html.replace(/<head>[\s\S]*<\/head>/, "").matchAll(/<script([^>]*)>([\s\S]*?)<\/script\s*>/ig);
-    Array.from(matches).forEach(function (ar, i) {
+    Array.from(matches).filter(function (ar, i) {
       var text = ar[2];
-      if (/(\s+type\s*=\s*['"]*text\/javascript['"]*)|^((?!\s+type\s*=).)*$/i.test(ar[1]) && text) addScript(text, "scr_" + id + "_" + i++);
+
+      if (/(\s+type\s*=\s*['"]*text\/javascript['"]*)|^((?!\s+type\s*=).)*$/i.test(ar[1]) && text) {
+        if (ar[1].includes('class="ew-apply-template"')) {
+          // Apply Custom Template first
+          addScript(text, "scr_" + id + "_0");
+          return false;
+        }
+
+        return true;
+      }
+    }).forEach(function (ar, i) {
+      return addScript(ar[2], "scr_" + id + "_" + (i + 1));
     });
   } // Strip JavaScript in HTML loaded by Ajax
 
   function stripScript(html) {
     var matches = html.matchAll(/<script([^>]*)>([\s\S]*?)<\/script\s*>/ig);
 
-    for (var _iterator5 = _createForOfIteratorHelperLoose$3(matches), _step5; !(_step5 = _iterator5()).done;) {
+    for (var _iterator5 = _createForOfIteratorHelperLoose(matches), _step5; !(_step5 = _iterator5()).done;) {
       var _ar2 = _step5.value;
       var text = _ar2[0];
       if (/(\s+type\s*=\s*['"]*text\/javascript['"]*)|^((?!\s+type\s*=).)*$/i.test(_ar2[1])) html = html.replace(text, "");
@@ -5777,7 +5948,7 @@
       var frm = $dlg.removeData("args").find(".modal-body form").data("form");
       if (frm) frm.destroyEditor();
       $dlg.find(".modal-body").html("");
-      $dlg.find(".modal-footer .btn-primary").unbind();
+      $dlg.find(".modal-footer .btn-primary").off();
       $dlg.data("showing", false);
     };
 
@@ -5857,7 +6028,7 @@
               "name": getId(obj),
               "form": form
             };
-            $document.trigger("addoption", [args]);
+            $document$1.trigger("addoption", [args]);
 
             if (args.valid) {
               // Add the new option
@@ -5980,7 +6151,7 @@
       if (frm.canSubmit()) {
         $btn.prop("disabled", false).removeClass("disabled");
         $body.css("cursor", "wait");
-        $__default['default'].post(getApiUrl(ew.API_ADD_ACTION), $__default['default'](form).serialize(), _submitSuccess).fail(_fail).always(function () {
+        $__default['default'].post(getApiUrl([ew.API_ADD_ACTION, form.elements[ew.API_OBJECT_NAME].value]), $__default['default'](form).serialize(), _submitSuccess).fail(_fail).always(function () {
           frm.enableForm();
           $btn.prop("disabled", false).removeClass("disabled");
           $body.css("cursor", "default");
@@ -6030,7 +6201,7 @@
             if (obj) {
               if (obj.options || obj.length) {
                 // Selection list
-                $__default['default'](obj).first().one("updatedone", function () {
+                $__default['default'](obj).first().one("updated", function () {
                   return selectOption(obj, v);
                 });
               } else {
@@ -6082,14 +6253,14 @@
     if (frm) frm.destroyEditor();
     var $bd = $dlg.find(".modal-body").html("");
     if ($bd.ewjtable && $bd.ewjtable("instance")) $bd.ewjtable("destroy");
-    $dlg.find(".modal-footer .btn-primary").unbind();
+    $dlg.find(".modal-footer .btn-primary").off();
     $dlg.find(".modal-dialog").removeClass(function (index, className) {
       var m = className.match(/table\-\w+/);
       return m ? m[0] : "";
     });
     $dlg.data("showing", false);
     $dlg.data("url", null);
-    if (args && args.reload) window.location.reload(true);
+    if (args && args.reload) window.location.reload();
   }
   /**
    * Show modal dialog
@@ -6163,35 +6334,75 @@
         href: url
       })[0];
       return window.location.pathname.endsWith(a.pathname);
+    };
+    /**
+     * handle result
+     *
+     * @param {Object} result - Result object
+     * @param {string|Object} result.error - Error message or object
+     * @param {string} result.error.message - Error message
+     * @param {string} result.error.description - Error message
+     * @param {string} result.failureMessage - Failure message
+     * @param {string} result.successMessage - Success message
+     * @param {string} result.warningMessage - Warning message
+     * @param {string} result.message - Message
+     * @param {string} result.url - Redirection URL
+     * @param {string} result.modal - Redirect to result.url in current modal dialog
+     * @param {boolean} result.view - result.url is View page => No primary button
+     * @param {string} result.caption - Caption of modal dialog for result.url
+     * @param {boolean} result.reload - Reload current page
+     */
+
+    var handleResult = function handleResult(result) {
+      var cb = null,
+          url = result.url,
+          reload = result.reload;
+
+      if (url || reload) {
+        cb = function cb() {
+          if (url) {
+            if (result.modal && !_current(url)) {
+              var args = $dlg.data("args");
+              args.reload = true;
+              if (result.caption) args.caption = result.caption;
+              args.btn = result.view ? null : "";
+              $dlg.data("args", args);
+              url += (url.split("?").length > 1 ? "&" : "?") + "modal=1&rnd=" + random();
+              $body.css("cursor", "wait");
+              $__default['default'].get(url).done(success).fail(_fail).always(_always);
+            } else {
+              $dlg.modal("hide");
+              window.location = sanitizeUrl(url);
+            }
+          } else if (reload) {
+            $dlg.modal("hide");
+            window.location.reload();
+          }
+        };
+      }
+
+      if ($__default['default'].isString(result.failureMessage)) {
+        _alert(result.failureMessage);
+      } else if ($__default['default'].isString(result.warningMessage)) {
+        _alert(result.warningMessage, cb, "warning");
+      } else if ($__default['default'].isString(result.message)) {
+        _alert(result.message, cb, "body");
+      } else if ($__default['default'].isString(result.successMessage)) {
+        _alert(result.successMessage, cb, "success");
+      } else if (result.error) {
+        var _result$error, _result$error2;
+
+        if ($__default['default'].isString(result.error)) _alert(result.error);else if ($__default['default'].isString((_result$error = result.error) === null || _result$error === void 0 ? void 0 : _result$error.message)) _alert(result.error.message);else if ($__default['default'].isString((_result$error2 = result.error) === null || _result$error2 === void 0 ? void 0 : _result$error2.description)) _alert(result.error.description);
+      } else if (cb) {
+        cb();
+      }
     }; // submit success
 
     var _submitSuccess = function _submitSuccess(data) {
       var result = parseJson(data);
 
       if ($__default['default'].isObject(result)) {
-        if ($__default['default'].isString(result.failureMessage)) {
-          _alert(result.failureMessage);
-        } else if (result.error) {
-          var _result$error;
-
-          if ($__default['default'].isString(result.error)) _alert(result.error);else if ($__default['default'].isString((_result$error = result.error) === null || _result$error === void 0 ? void 0 : _result$error.description)) _alert(result.error.description);
-        } else {
-          var url = result.url;
-
-          if (result.modal && !_current(url)) {
-            var args = $dlg.data("args");
-            args.reload = true;
-            if (result.caption) args.caption = result.caption;
-            args.btn = result.view ? null : "";
-            $dlg.data("args", args);
-            url += (url.split("?").length > 1 ? "&" : "?") + "modal=1&rnd=" + random();
-            $body.css("cursor", "wait");
-            $__default['default'].ajax(url).done(success).fail(_fail).always(_always);
-          } else {
-            $dlg.modal("hide");
-            window.location = sanitizeUrl(url);
-          }
-        }
+        handleResult(result);
       } else {
         var body = getContent(data);
 
@@ -6286,7 +6497,7 @@
       var result = parseJson(data);
 
       if ($__default['default'].isObject(result)) {
-        if (result.error) _alert(result.error);
+        handleResult(result);
       } else {
         var args = $dlg.data("args");
         var $lnk = $__default['default'](args.lnk);
@@ -6304,7 +6515,10 @@
         if (table) $dlg.find(".modal-dialog").addClass("table-" + table);
         var $btn = $dlg.find(".modal-footer .btn-primary").addClass("ew-submit").click(_submit);
         $dlg.find(".modal-body form").on("keydown", function (e) {
-          if (e.key == "Enter" && e.target.nodeName != "TEXTAREA") return $btn.click();
+          if (e.key == "Enter" && e.target.nodeName != "TEXTAREA") {
+            $btn.click();
+            return false;
+          }
         });
         ew.modalDialog = $dlg.modal("show");
         executeScript(data, "ModalDialog");
@@ -6440,7 +6654,7 @@
                 txts = [],
                 results = data.records;
 
-            for (var _iterator6 = _createForOfIteratorHelperLoose$3(results), _step6; !(_step6 = _iterator6()).done;) {
+            for (var _iterator6 = _createForOfIteratorHelperLoose(results), _step6; !(_step6 = _iterator6()).done;) {
               var result = _step6.value;
               vals.push(result.lf);
               html.push(result.df);
@@ -6776,6 +6990,10 @@
           maxNumberOfFiles: ew.language.phrase("UploadErrMsgMaxNumberOfFiles"),
           minFileSize: ew.language.phrase("UploadErrMsgMinFileSize")
         },
+        beforeSend: function beforeSend(jqxhr, settings) {
+          if (ew.API_JWT_TOKEN && !ew.IS_WINDOWS_AUTHENTICATION) // Do NOT set JWT authorization header if Windows Authentication
+            jqxhr.setRequestHeader(ew.API_JWT_AUTHORIZATION_HEADER, "Bearer " + ew.API_JWT_TOKEN);
+        },
         done: function done(e, data) {
           if (data.result && data.result.files && Array.isArray(data.result.files.importfiles)) {
             var ok = true;
@@ -6812,7 +7030,7 @@
 
       if ($this.data("imported")) {
         $this.data("imported", false);
-        window.location.reload(true);
+        window.location.reload();
       }
     });
     hideMessage();
@@ -7035,7 +7253,7 @@
       "hdr": hdr,
       "placement": pos
     };
-    $document.trigger("drilldown", [args]);
+    $document$1.trigger("drilldown", [args]);
     var ar = args.url.split("?");
     args.file = ar[0] || "";
     args.data = ar[1] || "";
@@ -7122,10 +7340,16 @@
    */
 
   function ajax(data, callback) {
-    if (!$__default['default'].isObject(data)) return undefined;
-    var action = data.action;
-    if (!action) return undefined;
-    delete data.action;
+    if (!$__default['default'].isObject(data) || !data.url && !data.action) return undefined;
+    var action;
+
+    if (data.url) {
+      if (data.url.startsWith(getApiUrl())) action = data.url.replace(getApiUrl(), "").split("/")[0];else if (data.url.startsWith(ew.API_URL)) action = data.url.replace(ew.API_URL, "").split("/")[0];
+    } else {
+      action = data.action;
+      delete data.action;
+    }
+
     var obj = Object.assign({}, data);
 
     var _convert = function _convert(response) {
@@ -7146,13 +7370,14 @@
       return response;
     };
 
-    var url = getApiUrl(action),
+    var url = obj.url || getApiUrl(action),
         // URL
-    type = obj.type || "POST";
+    type = obj.type || ([ew.API_LIST_ACTION, ew.API_VIEW_ACTION, ew.API_DELETE_ACTION].includes(action) ? "GET" : "POST");
+    delete obj.url;
     delete obj.type;
     obj.dataType = "json";
 
-    if ($__default['default'].isFunction(callback)) {
+    if (isFunction(callback)) {
       // Async
       $__default['default'].ajax({
         url: url,
@@ -7439,10 +7664,20 @@
   function showMessage(arg) {
     var _arg$target;
 
-    var win = window.parent,
-        // Note: If a window does not have a parent, its parent property is a reference to itself.
-    p = (_arg$target = arg === null || arg === void 0 ? void 0 : arg.target) !== null && _arg$target !== void 0 ? _arg$target : win.document,
-        swal = win.Swal,
+    var doc, swal;
+
+    try {
+      var win = window.parent; // Note: If a window does not have a parent, its parent property is a reference to itself.
+
+      doc = win.document;
+      swal = win.Swal;
+    } catch (e) {
+      // In case win.document cannot be accessed
+      doc = window.document;
+      swal = window.Swal;
+    }
+
+    var p = (_arg$target = arg === null || arg === void 0 ? void 0 : arg.target) !== null && _arg$target !== void 0 ? _arg$target : doc,
         $div = $__default['default'](p).find("div.ew-message-dialog:hidden").first(),
         msg = $div.length ? $div.text() : ""; // Text only
 
@@ -7476,7 +7711,7 @@
     }
 
     if ($__default['default'].isString(arg)) {
-      return swal.fire(_objectSpread$2(_objectSpread$2({}, ew.sweetAlertSettings), {}, {
+      return swal.fire(_objectSpread(_objectSpread({}, ew.sweetAlertSettings), {}, {
         html: arg
       }));
     }
@@ -7513,7 +7748,7 @@
       $fn.val(ar.join(ew.MULTIPLE_UPLOAD_SEPARATOR));
       $fa.val("0");
       if (!multiple) // Remove other entries if not multiple upload
-        $ft.children("tr:not(:last-child)").remove();
+        $ft.find("tbody > tr:not(:last-child)").remove();
     };
 
     var _deleted = function _deleted(e, data) {
@@ -7573,17 +7808,15 @@
       $ft.toggleClass("ew-has-rows", ((_data$files2 = data.files) === null || _data$files2 === void 0 ? void 0 : _data$files2.length) > 0 || ((_data$result = data.result) === null || _data$result === void 0 ? void 0 : (_data$result$files = _data$result.files) === null || _data$result$files === void 0 ? void 0 : _data$result$files.length) > 0);
       var ar = $fn.val() ? $fn.val().split(ew.MULTIPLE_UPLOAD_SEPARATOR) : [];
       $label.html(ar.join(", ") || label);
-    };
-
-    var _clicked = function _clicked() {
-      $input.closest("span.fileinput-button").tooltip("hide");
-    }; // var _process = function(e, data) {
+    }; // var _clicked = function() {
+    //     $input.closest("span.fileinput-button").tooltip("hide");
+    // };
+    // var _process = function(e, data) {
     //     $ft.toggleClass("ew-has-rows", data.files?.length > 0);
     // };
 
-    var _downloadTemplate = $__default['default'].templates("#template-download");
-
-    var _uploadTemplate = $__default['default'].templates("#template-upload");
+    var _downloadTemplate = $__default['default'].templates("#template-download"),
+        _uploadTemplate = $__default['default'].templates("#template-upload");
 
     var _completed = function _completed(e, data) {
       // After download template rendered
@@ -7605,9 +7838,10 @@
     }; // Hide input button if readonly
 
     var form = getForm(input),
-        $form = $__default['default'](form);
-    var readonly = $form.find("#confirm").val() == "confirm";
-    if (readonly) $form.find("span.fileinput-button").hide();
+        $form = $__default['default'](form),
+        readonly = $form.find("#confirm").val() == "confirm" || $input.attr("readonly");
+    if (readonly) $input.prop("disabled", true); // $form.find("span.fileinput-button").hide();
+
     var cnt = parseInt($maxfilecount.val(), 10);
     var uploadUrl = getApiUrl(ew.API_JQUERY_UPLOAD_ACTION);
     var formData = {
@@ -7647,10 +7881,10 @@
         maxNumberOfFiles: ew.language.phrase("UploadErrMsgMaxNumberOfFiles"),
         minFileSize: ew.language.phrase("UploadErrMsgMinFileSize")
       },
-      readOnly: readonly // Custom
+      readonly: readonly // Custom
 
     }).on("fileuploaddone", _done).on("fileuploaddestroy", _deleted).on("fileuploadchange", _change).on("fileuploadadded fileuploadfinished fileuploaddestroyed", _changed) //.on("fileuploadprocess", _process)
-    .on('fileuploadadded', _added).on('fileuploadcompleted', _completed).click(_clicked);
+    .on('fileuploadadded', _added).on('fileuploadcompleted', _completed); // .click(_clicked);
 
     if ($fn.val()) {
       $__default['default'].ajax({
@@ -8119,7 +8353,7 @@
     }
   }
 
-  var functions = /*#__PURE__*/Object.freeze({
+  var functions = {
     __proto__: null,
     currentUrl: currentUrl,
     forms: forms,
@@ -8144,6 +8378,7 @@
     initTooltips: initTooltips,
     parseJson: parseJson,
     searchOperatorChanged: searchOperatorChanged,
+    isFunction: isFunction,
     prompt: _prompt,
     toast: toast,
     showToast: showToast,
@@ -8259,7 +8494,7 @@
     exportWithCharts: exportWithCharts,
     fixLayoutHeight: fixLayoutHeight,
     addEventHandlers: addEventHandlers
-  });
+  };
 
   ew.IS_SCREEN_SM_MIN = window.matchMedia("(min-width: 768px)").matches; // Should matches $screen-sm-min
 
@@ -8279,7 +8514,7 @@
     Form: Form,
     Validators: Validators
   }, functions);
-  var $document$1 = $__default['default'](document); // Init document
+  var $document = $__default['default'](document); // Init document
 
   loadjs.ready("load", function () {
     $__default['default'].views.settings.debugMode(ew.DEBUG);
@@ -8292,10 +8527,10 @@
       scrollTop: $__default['default']("#" + hash).offset().top
     }, 800);
     ew.removeSpinner();
-    $document$1.trigger("load");
+    $document.trigger("load");
   }); // Default "addoption" event (fired before adding new option to selection list)
 
-  $document$1.on("addoption", function (e, args) {
+  $document.on("addoption", function (e, args) {
     var row = args.data; // New row to be validated
 
     var arp = args.parents; // Parent field values
@@ -8314,7 +8549,7 @@
     }
   }); // Fix z-index of multiple modals
 
-  $document$1.on("show.bs.modal", ".modal", function () {
+  $document.on("show.bs.modal", ".modal", function () {
     var zIndex = 1050 + $__default['default'](".modal:visible").length;
     $__default['default'](this).css("z-index", zIndex);
     setTimeout(function () {
@@ -8322,7 +8557,7 @@
     }, 0);
   }); // Fix scrolling of multiple modals
 
-  $document$1.on("hidden.bs.modal", ".modal", function () {
+  $document.on("hidden.bs.modal", ".modal", function () {
     $__default['default'](".modal:visible").length && $__default['default']("body").addClass("modal-open");
   });
 
@@ -8532,14 +8767,16 @@
   Treeview.prototype._toggle = Treeview.prototype.toggle;
 
   Treeview.prototype.toggle = function toggle(event) {
-    var $relativeTarget = $__default['default'](event.currentTarget),
-        treeviewMenu = $relativeTarget.next(),
-        href = $relativeTarget.attr("href"),
-        $text = $__default['default'](event.target).closest(".menu-item-text");
-    if (!treeviewMenu.is(".nav-treeview") || $text[0] && href && href != "#" && href != "javascript:void(0);") // Menu text with href
+    var $currentTarget = $__default['default'](event.currentTarget),
+        treeviewMenu = $currentTarget.next(),
+        href = $currentTarget.attr("href"),
+        isText = event.target.tagName == "P";
+    if (!treeviewMenu.is(".nav-treeview") || isText && href && href != "#" && href != "javascript:void(0);") // Menu text with href
       return;
 
     this._toggle(event);
+
+    event.stopImmediatePropagation();
   }; // Dropdown menu parent item with href // Override AdminLTE
 
   $__default['default']("ul.dropdown-menu [data-toggle=dropdown]").on("click", function (e) {
@@ -8548,4 +8785,3 @@
   });
 
 }(jQuery));
-//# sourceMappingURL=ew.js.map

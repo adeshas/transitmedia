@@ -19,7 +19,7 @@ class Email
     public $Charset = ""; // Charset
     public $SendErrDescription; // Send error description
     public $SmtpSecure = ""; // Send secure option
-    protected $Prop = []; // PHPMailer properties
+    protected $Members = []; // PHPMailer members
 
     // Constructor
     public function __construct()
@@ -31,7 +31,13 @@ class Email
     // Set PHPMailer property
     public function __set($name, $value)
     {
-        $this->Prop[$name] = $value;
+        $this->Members[$name] = $value;
+    }
+
+    // Call PHPMailer method
+    public function __call($name, $arguments)
+    {
+        $this->Members[$name] = $arguments;
     }
 
     // Load email from template
@@ -190,6 +196,14 @@ class Email
      */
     public function send()
     {
+        global $CurrentLanguage;
+        $langId = str_replace(["-", "zh_hans_cn"], ["_", "zh_cn"], strtolower($CurrentLanguage));
+        if (!in_array($langId, ["pt_br", "sr_latn", "zh_cn"])) {
+            $langId = explode("_", $langId)[0];
+        }
+        if ($langId != "en" && !array_key_exists("setLanguage", $this->Members)) {
+            $this->Members["setLanguage"] = [$langId];
+        }
         $result = SendEmail(
             $this->Sender,
             $this->Recipient,
@@ -202,10 +216,10 @@ class Email
             $this->SmtpSecure,
             $this->Attachments,
             $this->EmbeddedImages,
-            $this->Prop
+            $this->Members
         );
-        if (is_bool($result)) {
-            return $result;
+        if ($result === true) {
+            return true;
         } else { // Error
             $this->SendErrDescription = $result;
             return false;

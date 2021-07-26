@@ -6,7 +6,6 @@ namespace PHPMaker2021\test;
 $MainReportsEdit = &$Page;
 ?>
 <script>
-if (!ew.vars.tables.main_reports) ew.vars.tables.main_reports = <?= JsonEncode(GetClientVar("tables", "main_reports")) ?>;
 var currentForm, currentPageID;
 var fmain_reportsedit;
 loadjs.ready("head", function () {
@@ -16,18 +15,21 @@ loadjs.ready("head", function () {
     fmain_reportsedit = currentForm = new ew.Form("fmain_reportsedit", "edit");
 
     // Add fields
-    var fields = ew.vars.tables.main_reports.fields;
+    var currentTable = <?= JsonEncode(GetClientVar("tables", "main_reports")) ?>,
+        fields = currentTable.fields;
+    if (!ew.vars.tables.main_reports)
+        ew.vars.tables.main_reports = currentTable;
     fmain_reportsedit.addFields([
-        ["id", [fields.id.required ? ew.Validators.required(fields.id.caption) : null], fields.id.isInvalid],
-        ["date", [fields.date.required ? ew.Validators.required(fields.date.caption) : null, ew.Validators.datetime(0)], fields.date.isInvalid],
-        ["image", [fields.image.required ? ew.Validators.required(fields.image.caption) : null], fields.image.isInvalid],
-        ["video", [fields.video.required ? ew.Validators.required(fields.video.caption) : null], fields.video.isInvalid],
-        ["comments", [fields.comments.required ? ew.Validators.required(fields.comments.caption) : null], fields.comments.isInvalid],
-        ["type_id", [fields.type_id.required ? ew.Validators.required(fields.type_id.caption) : null], fields.type_id.isInvalid],
-        ["campaign_id", [fields.campaign_id.required ? ew.Validators.required(fields.campaign_id.caption) : null], fields.campaign_id.isInvalid],
-        ["ref_bus_id", [fields.ref_bus_id.required ? ew.Validators.required(fields.ref_bus_id.caption) : null], fields.ref_bus_id.isInvalid],
-        ["ts_created", [fields.ts_created.required ? ew.Validators.required(fields.ts_created.caption) : null], fields.ts_created.isInvalid],
-        ["vendor_id", [fields.vendor_id.required ? ew.Validators.required(fields.vendor_id.caption) : null], fields.vendor_id.isInvalid]
+        ["id", [fields.id.visible && fields.id.required ? ew.Validators.required(fields.id.caption) : null], fields.id.isInvalid],
+        ["date", [fields.date.visible && fields.date.required ? ew.Validators.required(fields.date.caption) : null, ew.Validators.datetime(0)], fields.date.isInvalid],
+        ["image", [fields.image.visible && fields.image.required ? ew.Validators.required(fields.image.caption) : null], fields.image.isInvalid],
+        ["video", [fields.video.visible && fields.video.required ? ew.Validators.required(fields.video.caption) : null], fields.video.isInvalid],
+        ["comments", [fields.comments.visible && fields.comments.required ? ew.Validators.required(fields.comments.caption) : null], fields.comments.isInvalid],
+        ["type_id", [fields.type_id.visible && fields.type_id.required ? ew.Validators.required(fields.type_id.caption) : null], fields.type_id.isInvalid],
+        ["campaign_id", [fields.campaign_id.visible && fields.campaign_id.required ? ew.Validators.required(fields.campaign_id.caption) : null], fields.campaign_id.isInvalid],
+        ["ref_bus_id", [fields.ref_bus_id.visible && fields.ref_bus_id.required ? ew.Validators.required(fields.ref_bus_id.caption) : null], fields.ref_bus_id.isInvalid],
+        ["ts_created", [fields.ts_created.visible && fields.ts_created.required ? ew.Validators.required(fields.ts_created.caption) : null], fields.ts_created.isInvalid],
+        ["vendor_id", [fields.vendor_id.visible && fields.vendor_id.required ? ew.Validators.required(fields.vendor_id.caption) : null], fields.vendor_id.isInvalid]
     ]);
 
     // Set invalid fields
@@ -109,7 +111,7 @@ loadjs.ready("head", function () {
 <?php
 $Page->showMessage();
 ?>
-<form name="fmain_reportsedit" id="fmain_reportsedit" class="<?= $Page->FormClassName ?>" action="<?= CurrentPageUrl() ?>" method="post">
+<form name="fmain_reportsedit" id="fmain_reportsedit" class="<?= $Page->FormClassName ?>" action="<?= CurrentPageUrl(false) ?>" method="post">
 <?php if (Config("CHECK_TOKEN")) { ?>
 <input type="hidden" name="<?= $TokenNameKey ?>" value="<?= $TokenName ?>"><!-- CSRF token name -->
 <input type="hidden" name="<?= $TokenValueKey ?>" value="<?= $TokenValue ?>"><!-- CSRF token value -->
