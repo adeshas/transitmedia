@@ -2781,9 +2781,7 @@ class ViewCampaignsPendingList extends ViewCampaignsPending
                             (select name from y_operators o where o.id = t.operator_id) as operator,
                             (select email from y_operators o where o.id = t.operator_id) as operator_email,
                             (select contact_name from y_operators o where o.id = t.operator_id) as operator_contact_name,
-
-			                      (select p.email from y_platforms p where p.id = (select oo.platform_id from y_operators oo where oo.id = t.operator_id)) as platform_email
-
+                            (select p.email from y_platforms p where p.id = (select oo.platform_id from y_operators oo where oo.id = t.operator_id)) as platform_email
                             from main_campaigns c, main_transactions t 
                             where 
                             t.campaign_id = c.id and
@@ -2792,9 +2790,7 @@ class ViewCampaignsPendingList extends ViewCampaignsPending
                             $operator = $camp_details["operator"];
                             $operator_email = $camp_details["operator_email"];
                             $operator_contact_name =  $camp_details["operator_contact_name"];
-
                             $platform_email =  $camp_details["platform_email"];
-
                             $rowssql = "select email from main_users where vendor_id in ";
                             $rowssql .= "(select vendor_id from main_campaigns where id in (select campaign_id from main_transactions where id = " . $camp_id . "));";
                             $rows = ExecuteRows($rowssql);
@@ -2846,29 +2842,23 @@ class ViewCampaignsPendingList extends ViewCampaignsPending
                             `nohup /opt/lampp/bin/php /opt/tmscripts/TMDOC_generate_invoice_v3.php {$camp_id} 2 &`;
                         //}
 
-
-			// Email to Operator
-      $sql_msg = "select value from z_core_settings where name = 'campaign_approved_operator';";
-        $editmsg = ExecuteScalar($sql_msg);
-
-        $msg = str_replace($search, $replace, $editmsg);
-        $msgtxt = strip_tags($msg);
-
-        $subject = "APPROVED CAMPAIGN REQUEST ({$vendor}) - TRANSIT MEDIA ADMIN";
-        $subject = "{$x_camp_name} - ({$vendor}) - TRANSIT MEDIA ADMIN";
-
-        $source = [
-					'to_value'=> $operator_email,
-					'cc_value'=>$platform_email,
-					'bcc_value'=>''
-				];
-			$exposed_emails = get_emails($source);
-			extract($exposed_emails);
-			$new_to = $final_to;
-			$new_cc = $final_cc;
-
-      sendTMmail('admin@transitmedia.com.ng', $new_to, $subject, $msg, $msgtxt, null, $new_cc);
-
+                        	// Email to Operator
+                        	$sql_msg = "select value from z_core_settings where name = 'campaign_approved_operator';";
+                            $editmsg = ExecuteScalar($sql_msg);
+                            $msg = str_replace($search, $replace, $editmsg);
+                            $msgtxt = strip_tags($msg);
+                            $subject = "APPROVED CAMPAIGN REQUEST ({$vendor}) - TRANSIT MEDIA ADMIN";
+                            $subject = "{$x_camp_name} - ({$vendor}) - TRANSIT MEDIA ADMIN";
+                            $source = [
+    							'to_value'=> $operator_email,
+    							'cc_value'=>$platform_email,
+    							'bcc_value'=>''
+    						];
+    						$exposed_emails = get_emails($source);
+    						extract($exposed_emails);
+    						$new_to = $final_to;
+    						$new_cc = $final_cc;
+                            sendTMmail('admin@transitmedia.com.ng', $new_to, $subject, $msg, $msgtxt, null, $new_cc);
                 }
                 return true; // Success
         }
