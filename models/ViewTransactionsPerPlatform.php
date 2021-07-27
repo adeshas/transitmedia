@@ -245,14 +245,14 @@ class ViewTransactionsPerPlatform extends DbTable
 
         // transitmedia_fee
         $this->transitmedia_fee = new DbField('view_transactions_per_platform', 'view_transactions_per_platform', 'x_transitmedia_fee', 'transitmedia_fee', '"transitmedia_fee"', 'CAST("transitmedia_fee" AS varchar(255))', 20, 8, -1, false, '"transitmedia_fee"', false, false, false, 'FORMATTED TEXT', 'TEXT');
-        $this->transitmedia_fee->Sortable = true; // Allow sort
+        $this->transitmedia_fee->Sortable = false; // Allow sort
         $this->transitmedia_fee->DefaultErrorMessage = $Language->phrase("IncorrectInteger");
         $this->transitmedia_fee->CustomMsg = $Language->FieldPhrase($this->TableVar, $this->transitmedia_fee->Param, "CustomMsg");
         $this->Fields['transitmedia_fee'] = &$this->transitmedia_fee;
 
         // lasaa_fee
         $this->lasaa_fee = new DbField('view_transactions_per_platform', 'view_transactions_per_platform', 'x_lasaa_fee', 'lasaa_fee', '"lasaa_fee"', 'CAST("lasaa_fee" AS varchar(255))', 20, 8, -1, false, '"lasaa_fee"', false, false, false, 'FORMATTED TEXT', 'TEXT');
-        $this->lasaa_fee->Sortable = true; // Allow sort
+        $this->lasaa_fee->Sortable = false; // Allow sort
         $this->lasaa_fee->DefaultErrorMessage = $Language->phrase("IncorrectInteger");
         $this->lasaa_fee->CustomMsg = $Language->FieldPhrase($this->TableVar, $this->lasaa_fee->Param, "CustomMsg");
         $this->Fields['lasaa_fee'] = &$this->lasaa_fee;
@@ -1615,8 +1615,6 @@ SORTHTML;
                     $doc->exportCaption($this->price);
                     $doc->exportCaption($this->quantity);
                     $doc->exportCaption($this->amount_paid);
-                    $doc->exportCaption($this->transitmedia_fee);
-                    $doc->exportCaption($this->lasaa_fee);
                     $doc->exportCaption($this->operator_fee);
                     $doc->exportCaption($this->lamata_fee);
                 } else {
@@ -1631,8 +1629,6 @@ SORTHTML;
                     $doc->exportCaption($this->price);
                     $doc->exportCaption($this->quantity);
                     $doc->exportCaption($this->amount_paid);
-                    $doc->exportCaption($this->transitmedia_fee);
-                    $doc->exportCaption($this->lasaa_fee);
                     $doc->exportCaption($this->operator_fee);
                     $doc->exportCaption($this->lamata_fee);
                 }
@@ -1680,8 +1676,6 @@ SORTHTML;
                         $doc->exportField($this->price);
                         $doc->exportField($this->quantity);
                         $doc->exportField($this->amount_paid);
-                        $doc->exportField($this->transitmedia_fee);
-                        $doc->exportField($this->lasaa_fee);
                         $doc->exportField($this->operator_fee);
                         $doc->exportField($this->lamata_fee);
                     } else {
@@ -1696,8 +1690,6 @@ SORTHTML;
                         $doc->exportField($this->price);
                         $doc->exportField($this->quantity);
                         $doc->exportField($this->amount_paid);
-                        $doc->exportField($this->transitmedia_fee);
-                        $doc->exportField($this->lasaa_fee);
                         $doc->exportField($this->operator_fee);
                         $doc->exportField($this->lamata_fee);
                     }
@@ -1730,8 +1722,6 @@ SORTHTML;
                 $doc->exportAggregate($this->price, '');
                 $doc->exportAggregate($this->quantity, 'TOTAL');
                 $doc->exportAggregate($this->amount_paid, '');
-                $doc->exportAggregate($this->transitmedia_fee, '');
-                $doc->exportAggregate($this->lasaa_fee, '');
                 $doc->exportAggregate($this->operator_fee, '');
                 $doc->exportAggregate($this->lamata_fee, 'TOTAL');
                 $doc->endExportRow();

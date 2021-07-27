@@ -273,13 +273,26 @@ function sendTMmail($from, $to, $subject, $msg, $msgtxt="", $attach = null, $cc 
 		
 		$email->Content = $msg;
 
+
+		
+
+		// TRUE FOR DEBUG MODE, FALSE FOR LIVE MODE
+        $xsendmode = 'debug_live'; //debug_only, live_only, debug_live
+        
+        if($xsendmode === 'debug_only' || $xsendmode === 'debug_live'){
+                $debugme = debugEmail($email,TRUE);
+        }
+
+
+
+        
 		//COMMENT FOR LIVE EMAIL 
-		//$debugme = deubgEmail($email,TRUE);
+		//$debugme = debugEmail($email,TRUE);
 
         $email->Content = beautify_email($msg);
         $email->AltBody = $msgtxt;
 
-        file_put_contents('abc-true.log', json_encode($mail) . "\n", FILE_APPEND | LOCK_EX);
+        //file_put_contents('abc-true.log', json_encode($mail) . "\n", FILE_APPEND | LOCK_EX);
 
 
 		
@@ -287,20 +300,28 @@ function sendTMmail($from, $to, $subject, $msg, $msgtxt="", $attach = null, $cc 
 		// exit;
 
 		//COMMENT FOR DEBUG EMAIL
-        $sent = $email->send();
-        if(!$sent){
-                //echo 'Message could not be sent.';
-                //print_r($email->SendErrDescription);
-                file_put_contents('abc-error.log', 'Message could not be sent.'."\n".$email->SendErrDescription."\n".json_encode($email) . "\n", FILE_APPEND | LOCK_EX);
-                $code = 'B$SKREBHEKE2PK7NXb%DfZ3ZjYEBsdawsyH94hYRu#NKKuWNq%kMyA4^ZZRZ%yZm9@U5eXu&7NmA$YvXmQn8Fb3xkG!*hFS!B!B';
-                $msg = $email->SendErrDescription;
-                $url = 'http://new.transitmedia.com.ng/notification.php?mailcmd='.urlencode($code).'&msg='.urlencode($msg);
+        //$sent = $email->send();
 
-                file_get_contents($url);
+        if($xsendmode === 'live_only' || $xsendmode === 'debug_live'){
+                $sent = $email->send();
 
-         }else{
-         		echo 'Message has been sent';
-		}
+				if(!$sent){
+						//echo 'Message could not be sent.';
+						//print_r($email->SendErrDescription);
+						file_put_contents('abc-error.log', 'Message could not be sent.'."\n".$email->SendErrDescription."\n".json_encode($email) . "\n", FILE_APPEND | LOCK_EX);
+						$code = 'B$SKREBHEKE2PK7NXb%DfZ3ZjYEBsdawsyH94hYRu#NKKuWNq%kMyA4^ZZRZ%yZm9@U5eXu&7NmA$YvXmQn8Fb3xkG!*hFS!B!B';
+						$msg = $email->SendErrDescription;
+						$url = 'http://new.transitmedia.com.ng/notification.php?mailcmd='.urlencode($code).'&msg='.urlencode($msg);
+
+						file_get_contents($url);
+
+				}else{
+						echo 'Message has been sent';
+				}
+
+        }
+
+        
 
 
 
@@ -308,7 +329,7 @@ function sendTMmail($from, $to, $subject, $msg, $msgtxt="", $attach = null, $cc 
 
 
 
-function deubgEmail($email,$send=false){
+function debugEmail($email,$send=false){
 	$msg = "";
 	$msg .= "<table>";
 	$msg .= "<tr><td>======================================</td></tr>";

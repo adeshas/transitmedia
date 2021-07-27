@@ -613,7 +613,7 @@ class ViewTransactionsPerPlatformList extends ViewTransactionsPerPlatform
         $this->campaign->setVisibility();
         $this->payment_date->setVisibility();
         $this->inventory->setVisibility();
-        $this->bus_size->Visible = false;
+        $this->bus_size->setVisibility();
         $this->print_stage->Visible = false;
         $this->vendor->setVisibility();
         $this->operator->setVisibility();
@@ -632,8 +632,8 @@ class ViewTransactionsPerPlatformList extends ViewTransactionsPerPlatform
         $this->price->setVisibility();
         $this->quantity->setVisibility();
         $this->amount_paid->setVisibility();
-        $this->transitmedia_fee->setVisibility();
-        $this->lasaa_fee->setVisibility();
+        $this->transitmedia_fee->Visible = false;
+        $this->lasaa_fee->Visible = false;
         $this->operator_fee->setVisibility();
         $this->lamata_fee->setVisibility();
         $this->hideFieldsForAddEdit();
@@ -1698,14 +1698,13 @@ class ViewTransactionsPerPlatformList extends ViewTransactionsPerPlatform
             $this->updateSort($this->campaign); // campaign
             $this->updateSort($this->payment_date); // payment_date
             $this->updateSort($this->inventory); // inventory
+            $this->updateSort($this->bus_size); // bus_size
             $this->updateSort($this->vendor); // vendor
             $this->updateSort($this->operator); // operator
             $this->updateSort($this->transaction_status); // transaction_status
             $this->updateSort($this->price); // price
             $this->updateSort($this->quantity); // quantity
             $this->updateSort($this->amount_paid); // amount_paid
-            $this->updateSort($this->transitmedia_fee); // transitmedia_fee
-            $this->updateSort($this->lasaa_fee); // lasaa_fee
             $this->updateSort($this->operator_fee); // operator_fee
             $this->updateSort($this->lamata_fee); // lamata_fee
             $this->setStartRecordNumber(1); // Reset start position
@@ -2530,6 +2529,10 @@ class ViewTransactionsPerPlatformList extends ViewTransactionsPerPlatform
             $this->inventory->ViewValue = $this->inventory->CurrentValue;
             $this->inventory->ViewCustomAttributes = "";
 
+            // bus_size
+            $this->bus_size->ViewValue = $this->bus_size->CurrentValue;
+            $this->bus_size->ViewCustomAttributes = "";
+
             // vendor
             $this->vendor->ViewValue = $this->vendor->CurrentValue;
             $this->vendor->ViewCustomAttributes = "";
@@ -2574,18 +2577,6 @@ class ViewTransactionsPerPlatformList extends ViewTransactionsPerPlatform
             $this->amount_paid->CellCssStyle .= "text-align: right;";
             $this->amount_paid->ViewCustomAttributes = "";
 
-            // transitmedia_fee
-            $this->transitmedia_fee->ViewValue = $this->transitmedia_fee->CurrentValue;
-            $this->transitmedia_fee->ViewValue = FormatNumber($this->transitmedia_fee->ViewValue, 0, -2, -2, -2);
-            $this->transitmedia_fee->CellCssStyle .= "text-align: right;";
-            $this->transitmedia_fee->ViewCustomAttributes = "";
-
-            // lasaa_fee
-            $this->lasaa_fee->ViewValue = $this->lasaa_fee->CurrentValue;
-            $this->lasaa_fee->ViewValue = FormatNumber($this->lasaa_fee->ViewValue, 0, -2, -2, -2);
-            $this->lasaa_fee->CellCssStyle .= "text-align: right;";
-            $this->lasaa_fee->ViewCustomAttributes = "";
-
             // operator_fee
             $this->operator_fee->ViewValue = $this->operator_fee->CurrentValue;
             $this->operator_fee->ViewValue = FormatNumber($this->operator_fee->ViewValue, 0, -2, -2, -2);
@@ -2619,6 +2610,11 @@ class ViewTransactionsPerPlatformList extends ViewTransactionsPerPlatform
             $this->inventory->HrefValue = "";
             $this->inventory->TooltipValue = "";
 
+            // bus_size
+            $this->bus_size->LinkCustomAttributes = "";
+            $this->bus_size->HrefValue = "";
+            $this->bus_size->TooltipValue = "";
+
             // vendor
             $this->vendor->LinkCustomAttributes = "";
             $this->vendor->HrefValue = "";
@@ -2648,16 +2644,6 @@ class ViewTransactionsPerPlatformList extends ViewTransactionsPerPlatform
             $this->amount_paid->LinkCustomAttributes = "";
             $this->amount_paid->HrefValue = "";
             $this->amount_paid->TooltipValue = "";
-
-            // transitmedia_fee
-            $this->transitmedia_fee->LinkCustomAttributes = "";
-            $this->transitmedia_fee->HrefValue = "";
-            $this->transitmedia_fee->TooltipValue = "";
-
-            // lasaa_fee
-            $this->lasaa_fee->LinkCustomAttributes = "";
-            $this->lasaa_fee->HrefValue = "";
-            $this->lasaa_fee->TooltipValue = "";
 
             // operator_fee
             $this->operator_fee->LinkCustomAttributes = "";
